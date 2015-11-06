@@ -4,11 +4,11 @@ namespace Oro\Bundle\ActivityBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/activities")
@@ -42,37 +42,38 @@ class ActivityController extends Controller
     }
 
     /**
-     * @Route("/context/{entityClass}/{entityId}", name="oro_activity_context")
-     * @Template("OroActivityBundle:Activity:context.html.twig")
+     * @Route("/{activity}/{id}/context", name="oro_activity_context")
      *
-     * @param string $entityClass
-     * @param string $entityId
+     * @Template("OroActivityBundle:Activity/dialog:context.html.twig")
+     *
+     * @param string $activity
+     * @param string $id
      *
      * @return array
      *
      * @throws AccessDeniedException
      */
-    public function contextAction($entityClass, $entityId)
+    public function contextAction($activity, $id)
     {
         $routingHelper = $this->get('oro_entity.routing_helper');
-        $entity = $routingHelper->getEntity($entityClass, $entityId);
-        $entityClass = $routingHelper->resolveEntityClass($entityClass);
+        $entity        = $routingHelper->getEntity($activity, $id);
+        $entityClass   = $routingHelper->resolveEntityClass($activity);
 
-        if (!$this->get('oro_security.security_facade')->isGranted('VIEW', $entity)) {
+        if (!$this->isGranted('VIEW', $entity)) {
             throw new AccessDeniedException();
         }
 
-        $entityTargets = $this->get('oro_entity.entity_context_provider')->getSupportedTargets($entity);
+        $entityTargets    = $this->get('oro_entity.entity_context_provider')->getSupportedTargets($entity);
         $entityClassAlias = $this->get('oro_entity.entity_alias_resolver')->getPluralAlias($entityClass);
 
         return [
-            'sourceEntity' => $entity,
+            'sourceEntity'           => $entity,
             'sourceEntityClassAlias' => $entityClassAlias,
-            'entityTargets' => $entityTargets,
-            'params' => [
+            'entityTargets'          => $entityTargets,
+            'params'                 => [
                 'grid_path' => $this->generateUrl(
                     'oro_activity_context_grid',
-                    ['activityId' => $entity->getId()],
+                    ['activity' => $activity, 'id' => $id],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 )
             ]
@@ -80,21 +81,30 @@ class ActivityController extends Controller
     }
 
     /**
-     * @Route("/context/grid/{activityId}/{entityClass}", name="oro_activity_context_grid")
+     * @Route("/{activity}/{id}/context/grid/{entityClass}", name="oro_activity_context_grid")
+     *
      * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
      *
      * @param string $entityClass
-     * @param string $activityId
+     * @param string $activity
+     * @param string $id
      *
      * @return array
      */
-    public function contextGridAction($activityId, $entityClass = null)
+    public function contextGridAction($activity, $id, $entityClass = null)
     {
         $gridName = $this->get('oro_entity.entity_context_provider')->getContextGridByEntity($entityClass);
+
+        // Need to specify parameters for Oro\Bundle\ActivityBundle\EventListener\Datagrid\ContextGridListener
+        $params = [
+            'activityClass' => $activity,
+            'activityId'    => $id
+        ];
+
         return [
-            'gridName' => $gridName,
-            'multiselect' => false,
-            'params' => ['activityId' => $activityId],
+            'gridName'     => $gridName,
+            'multiselect'  => false,
+            'params'       => $params,
             'renderParams' => []
         ];
     }

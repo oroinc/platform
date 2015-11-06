@@ -79,7 +79,7 @@
 
 {% macro activity_context_link() %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}" data-url="<%= routing.generate('oro_activity_context', {'entityId': relatedActivityId, 'entityClass': relatedActivityClass }) %>"
+    <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}" data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
         {{ UI.renderWidgetDataAttributes({
             'type' : 'dialog',
             'multiple' : true,

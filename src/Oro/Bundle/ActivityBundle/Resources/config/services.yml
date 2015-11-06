@@ -14,7 +14,7 @@ parameters:
     oro_activity.form.handler.activity_entity.api.class:  Oro\Bundle\ActivityBundle\Form\Handler\ActivityEntityApiHandler
     oro_activity.manager.activity_target.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
     oro_activity.manager.activity_context.api.class:    Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager
-
+    oro_activity.listener.datagrid.context.class: Oro\Bundle\ActivityBundle\EventListener\Datagrid\ContextGridListener
 services:
     oro_activity.manager:
         class: %oro_activity.manager.class%

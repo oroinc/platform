@@ -1,23 +1,33 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
+namespace Oro\Bundle\ActivityBundle\EventListener\Datagrid;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+
+/**
+ * This listener add filter for hiding already assigned items for activity entity.
+ */
 class ContextGridListener
 {
-    /** @var ObjectManager */
-    protected $entityManager;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
 
     /**
-     * @param ObjectManager $entityManager
+     * @param DoctrineHelper        $doctrineHelper
+     * @param EntityClassNameHelper $entityClassNameHelper
      */
-    public function __construct(ObjectManager $entityManager)
+    public function __construct(DoctrineHelper $doctrineHelper, EntityClassNameHelper $entityClassNameHelper)
     {
-        $this->entityManager = $entityManager;
+        $this->doctrineHelper        = $doctrineHelper;
+        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
     /**
@@ -26,31 +36,39 @@ class ContextGridListener
     public function onBuildAfter(BuildAfter $event)
     {
         /** @var OrmDatasource $dataSource */
-        $datagrid = $event->getDatagrid();
-        $config = $datagrid->getConfig();
+        $datagrid         = $event->getDatagrid();
+        $config           = $datagrid->getConfig();
         $configParameters = $config->toArray();
 
         if (!array_key_exists('extended_entity_name', $configParameters) ||
-            !$configParameters['extended_entity_name']) {
+            !$configParameters['extended_entity_name']
+        ) {
             return;
         }
 
-        $targetClass = $configParameters['extended_entity_name'];
-        $parameters = $datagrid->getParameters();
-        $dataSource = $datagrid->getDatasource();
+        $targetClass  = $configParameters['extended_entity_name'];
+        $parameters   = $datagrid->getParameters();
+        $dataSource   = $datagrid->getDatasource();
         $queryBuilder = $dataSource->getQueryBuilder();
-        $alias = current($queryBuilder->getDQLPart('from'))->getAlias();
+        $alias        = current($queryBuilder->getDQLPart('from'))->getAlias();
 
-        if ($dataSource instanceof OrmDatasource && $parameters->has('activityId')) {
-            $activityId = $parameters->get('activityId');
-            $email = $this->entityManager->getRepository('OroEmailBundle:Email')->find($activityId);
+        if ($dataSource instanceof OrmDatasource &&
+            $parameters->has('activityId') &&
+            $parameters->has('activityClass')
+        ) {
+            $id          = $parameters->get('activityId');
+            $class       = $parameters->get('activityClass');
+            $entityClass = $this->entityClassNameHelper->resolveEntityClass($class, true);
 
-            if ($email) {
-                $targetsArray = $email->getActivityTargets($targetClass);
+            /** @var ActivityInterface $entity */
+            $entity = $this->doctrineHelper->getEntity($entityClass, $id);
 
-                $targetIds=[];
+            if ($entity) {
+                $targetsArray = $entity->getActivityTargets($targetClass);
+
+                $targetIds = [];
                 foreach ($targetsArray as $target) {
-                    $targetIds[]=$target->getId();
+                    $targetIds[] = $target->getId();
                 }
 
                 if ($targetIds) {
