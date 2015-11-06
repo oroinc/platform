@@ -172,7 +172,7 @@ class SyncCommand extends AbstractSyncCronCommand
     /**
      * @param OutputLogger $logger
      * @param Integration $integration
-     * @param $batchSize
+     * @param int|null $batchSize
      * @param $connector
      * @param $connectorParameters
      *
@@ -204,7 +204,7 @@ class SyncCommand extends AbstractSyncCronCommand
     }
 
     /**
-     * @param $integrations
+     * @param Integration[] $integrations
      *
      * @return int
      */

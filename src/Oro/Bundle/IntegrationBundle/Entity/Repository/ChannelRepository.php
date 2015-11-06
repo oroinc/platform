@@ -53,6 +53,11 @@ class ChannelRepository extends EntityRepository
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param $commandsName
+     *
+     * @return int
+     */
     public function getRunningSyncJobsCountByCommands($commandsName)
     {
         /** @var QueryBuilder $qb */

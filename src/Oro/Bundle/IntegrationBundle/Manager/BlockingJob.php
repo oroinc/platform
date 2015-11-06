@@ -18,7 +18,7 @@ class BlockingJob
     }
 
     /**
-     * @param $channelType
+     * @param string $channelType
      * @param BlockingJobsInterface $blockingJobProvider
      *
      * @return $this
