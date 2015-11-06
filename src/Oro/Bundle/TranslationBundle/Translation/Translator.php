@@ -207,7 +207,7 @@ class Translator extends BaseTranslator
      */
     protected function registerDynamicResources()
     {
-        foreach ($this->dynamicResources as $locale => $items) {
+        foreach ($this->dynamicResources as $items) {
             foreach ($items as $item) {
                 $this->addResource($item['format'], $item['resource'], $item['locale'], $item['domain']);
             }
