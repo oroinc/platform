@@ -23,7 +23,7 @@
     {{ UI.cancelButton(path('oro_user_role_index')) }}
     {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success role-submit', 'label': 'Save and Close'|trans}) %}
     {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
-        {% set html = html ~ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save'|trans}) %}
+        {% set html = html ~ UI.buttonType({'type': 'button', 'class': 'btn-success main-group role-submit', 'label': 'Save'|trans}) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
     {% set options = {
