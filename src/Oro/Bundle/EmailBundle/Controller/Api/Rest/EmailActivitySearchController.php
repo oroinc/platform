@@ -26,7 +26,7 @@ class EmailActivitySearchController extends RestGetController
     /**
      * Searches entities associated with the email activity.
      *
-     * @Get("/activities/emails/relations/search", name="")
+     * @Get("/activities/emails/relations/search")
      *
      * @QueryParam(
      *      name="page",

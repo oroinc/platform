@@ -24,7 +24,7 @@ class DictionaryController extends RestGetController
      *
      * @param string $dictionary The URL safe name or plural alias of a dictionary entity.
      *
-     * @Get("/{dictionary}", name="")
+     * @Get("/{dictionary}")
      *
      * @QueryParam(
      *      name="page",

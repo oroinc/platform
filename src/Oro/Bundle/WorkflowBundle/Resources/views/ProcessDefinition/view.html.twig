@@ -11,7 +11,7 @@
                 'iCss':  'icon-remove',
                 'id':    idButton,
                 'label': 'oro.workflow.action.process.deactivate'|trans,
-                'path':  path('oro_workflow_api_rest_process_deactivate', {'processDefinition': entity.name}),
+                'path':  path('oro_api_process_deactivate', {'processDefinition': entity.name}),
                 'title': 'oro.workflow.action.process.deactivate'|trans,
             }) }}
         {% else %}
@@ -20,7 +20,7 @@
                 'aCss':  'no-hash btn-success',
                 'id':    idButton,
                 'label': 'oro.workflow.action.process.activate'|trans,
-                'path':  path('oro_workflow_api_rest_process_activate', {'processDefinition': entity.name}),
+                'path':  path('oro_api_process_activate', {'processDefinition': entity.name}),
                 'title': 'oro.workflow.action.process.activate'|trans,
             }) }}
         {% endif %}

@@ -125,6 +125,7 @@ oro_entity_config:
                 is_visible:
                     options:
                         require_schema_update: true
+                        value_type:         boolean
                         default_value:      true
                         allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
@@ -142,6 +143,7 @@ oro_entity_config:
 
                 show_filter:
                     options:
+                        value_type:         boolean
                         allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
                             config_id:
@@ -178,6 +180,7 @@ oro_entity_config:
                 # is form enabled for specific field
                 is_enabled:
                     options:
+                        value_type:         boolean
                         default_value:      true
                         required_property:
                             config_id:
@@ -198,6 +201,7 @@ oro_entity_config:
             items:
                 is_displayable:
                     options:
+                        value_type:         boolean
                         default_value:      true
                         required_property:
                             config_id:
@@ -214,6 +218,7 @@ oro_entity_config:
                             label:          oro.entity.entity_config.view.field.items.is_displayable
                 priority:
                     options:
+                        value_type:         integer
                         required_property:
                             config_id:
                                 scope:      extend

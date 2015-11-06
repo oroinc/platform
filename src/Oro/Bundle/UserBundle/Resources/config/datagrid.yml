@@ -707,9 +707,9 @@ datagrid:
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
                 join:
-                    inner:
+                    left:
                         - { join: u.owner, alias: bu }
-                        - { join: bu.organization, alias: organizationOwner }
+                        - { join: u.organization, alias: organizationOwner }
 
                 where:
                     and:
