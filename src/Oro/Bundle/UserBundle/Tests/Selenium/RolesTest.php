@@ -132,7 +132,7 @@ class RolesTest extends Selenium2TestCase
     }
 
     /**
-     * @depends testRolesAdd
+     * @depends testRolesAddSaveAndClose
      * @param $randomPrefix
      */
     public function testRoleDelete($randomPrefix)
