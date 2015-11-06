@@ -54,7 +54,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * @param $commandsName
+     * @param array $commandsName
      *
      * @return int
      */
