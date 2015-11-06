@@ -15,7 +15,7 @@ define(function(require) {
             route_name: '',
             route_parameters: {},
             properties: [],
-            timeout: 500
+            timeout: 100
         },
 
         /**
@@ -34,6 +34,16 @@ define(function(require) {
         resultsMapping: {},
 
         /**
+         * @property {String}
+         */
+        lastSearch: null,
+
+        /**
+         * @property {Object}
+         */
+        waitingSearch: {},
+
+        /**
          * @inheritDoc
          */
         initialize: function(options) {
@@ -44,7 +54,8 @@ define(function(require) {
                 config: {
                     source: _.bind(this.source, this),
                     matcher: _.bind(this.matcher, this),
-                    sorter: _.bind(this.sorter, this)
+                    sorter: _.bind(this.sorter, this),
+                    show: this.show
                 }
             };
             this.options = $.extend(true, thisOptions, this.options, options || {});
@@ -75,16 +86,40 @@ define(function(require) {
                 clearTimeout(this.source.timeoutId);
             }
 
+            if (this.lastSearch === query) {
+                this.$el.typeahead('show');
+                return;
+            }
+
+            if (this.waitingSearch[query]) {
+                return;
+            }
+
+            this.$el.typeahead('hide');
+
             this.source.timeoutId = setTimeout(function() {
                 self.source.timeoutId = null;
+                self.waitingSearch[query] = true;
 
-                $.getJSON(self.url, {
-                    query: query
-                }, function(response) {
-                    var results = self.prepareResults(response);
-                    callback(self.$el.is(':focus') ? results : []);
+                $.ajax({
+                    url: self.url,
+                    data: {query: query},
+                    success: function(response) {
+                        self.sourceCallback(query, callback, response);
+                    },
+                    error: function() {
+                        self.sourceCallback(query, callback, {});
+                    }
                 });
             }, this.options.timeout);
+        },
+
+        sourceCallback: function(query, callback, response) {
+            var results = this.prepareResults(response);
+            callback(this.$el.is(':focus') ? results : []);
+
+            this.lastSearch = query;
+            delete this.waitingSearch[query];
         },
 
         /**
@@ -101,6 +136,22 @@ define(function(require) {
          */
         sorter: function(items) {
             return items;//sorted on server
+        },
+
+        show: function() {
+            this.constructor.prototype.show.apply(this);
+
+            var $window = $(window);
+            var viewportBottom = $window.scrollTop() + $window.height();
+            var elementHeight = this.$element.outerHeight(false);
+            var resultsTop = this.$element.offset().top + elementHeight;
+            var resultsHeight = this.$menu.outerHeight(false);
+            var enoughBelow = resultsTop + resultsHeight <= viewportBottom;
+
+            if (!enoughBelow) {
+                var aboveTop = this.$menu.css('top').replace('px', '') - resultsHeight - elementHeight;
+                this.$menu.css('top', aboveTop + 'px');
+            }
         },
 
         /**
