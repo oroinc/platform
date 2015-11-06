@@ -53,6 +53,21 @@ class ChannelRepository extends EntityRepository
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
+    public function getRunningSyncJobsCountByCommands($commandsName)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getEntityManager()
+            ->getRepository('JMSJobQueueBundle:Job')
+            ->createQueryBuilder('j')
+            ->select('count(j.id)')
+            ->andWhere('j.command in (:commandName)')
+            ->andWhere('j.state=:stateName')
+            ->setParameter('commandName', $commandsName)
+            ->setParameter('stateName', Job::STATE_RUNNING);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
     /**
      * Returns latest status for integration's connector and code if it exists.
      *

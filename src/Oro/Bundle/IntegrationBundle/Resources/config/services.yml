@@ -115,8 +115,6 @@ services:
 
     oro_integration.manager.blocking_job:
         class: %oro_integration.manager.blocking_job.class%
-        arguments:
-            - []
 
     oro_integration.manager.types_registry:
         class: %oro_integration.manager.types_registry.class%
