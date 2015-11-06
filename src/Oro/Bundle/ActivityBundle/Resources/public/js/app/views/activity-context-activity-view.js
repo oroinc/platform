@@ -52,8 +52,10 @@ define([
 
         doRefresh: function() {
             var self = this;
-            //todo: get activity context
-            var url = routing.generate('oro_api_get_email_context', {id: this.options.entityId});
+            var url = routing.generate('oro_api_get_activity_context', {
+                activityClass: this.options.activityClass,
+                activityId: this.options.entityId
+            });
             $.ajax({
                 method: 'GET',
                 url: url,

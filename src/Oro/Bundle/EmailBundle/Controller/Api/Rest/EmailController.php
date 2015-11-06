@@ -123,33 +123,6 @@ class EmailController extends RestController
     }
 
     /**
-     * Get email context data.
-     *
-     * @param int $id The email id
-     *
-     * @ApiDoc(
-     *      description="Get email context data",
-     *      resource=true
-     * )
-     *
-     * @AclAncestor("oro_email_email_view")
-     *
-     * @return Response
-     */
-    public function getContextAction($id)
-    {
-        /** @var Email $email */
-        $email = $this->getManager()->find($id);
-        if (!$email) {
-            return $this->buildNotFoundResponse();
-        }
-
-        $result = $this->getManager()->getEmailContext($email);
-
-        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
-    }
-
-    /**
      * Get email cache manager
      *
      * @return EmailCacheManager

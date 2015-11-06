@@ -48,10 +48,11 @@
     {% endfor %}
 
     {% set options = {
-    contextTargets: contextTargetArray,
-    entityId: entity.id,
-    target: false,
-    checkTarget: checkTarget
+        contextTargets: contextTargetArray,
+        entityId: entity.id,
+        target: false,
+        checkTarget: checkTarget,
+        activityClassAlias: activityClassAlias
     } %}
 
     {% if checkTarget %}

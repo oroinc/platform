@@ -29,7 +29,8 @@ define(function(require) {
                 el: this.options._sourceElement,
                 $container: $container,
                 inputName: this.options.inputName,
-                target: this.options.target
+                target: this.options.target,
+                activityClass: this.options.activityClassAlias
             });
         }
     });
