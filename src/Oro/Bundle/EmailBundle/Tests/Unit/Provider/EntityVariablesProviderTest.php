@@ -126,10 +126,6 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         $this->emailConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with(self::TEST_ENTITY_NAME)
-            ->will($this->returnValue(true));
-        $this->emailConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with(self::TEST_ENTITY_NAME)
             ->will(
@@ -255,16 +251,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->emailConfigProvider->expects($this->exactly(2))
-            ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::TEST_ENTITY_NAME, null, true],
-                        [$entity2Class, null, true],
-                    ]
-                )
-            );
+
         $this->emailConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
             ->will(
@@ -314,10 +301,6 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $field5Config->set('available_in_template', true);
 
         $this->emailConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with(self::TEST_ENTITY_NAME)
-            ->will($this->returnValue(true));
-        $this->emailConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with(self::TEST_ENTITY_NAME)
             ->will(
@@ -366,16 +349,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->emailConfigProvider->expects($this->exactly(2))
-            ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::TEST_ENTITY_NAME, null, true],
-                        [$entity2Class, null, true]
-                    ]
-                )
-            );
+
         $this->emailConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
             ->will(
