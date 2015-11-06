@@ -25,6 +25,9 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
+
     /** @var FormatterManager */
     protected $formatterManager;
 
@@ -69,9 +72,6 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         $entityIds = $this->getEntityConfigProvider()->getIds();
         foreach ($entityIds as $entityId) {
             $className  = $entityId->getClassName();
-            if (!$this->isEntityAvailable($className)) {
-                continue;
-            }
             $entityData = $this->getEntityVariableDefinitions($className);
             if (!empty($entityData)) {
                 $result[$className] = $entityData;
@@ -96,9 +96,6 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         $entityIds = $this->getEntityConfigProvider()->getIds();
         foreach ($entityIds as $entityId) {
             $className  = $entityId->getClassName();
-            if (!$this->isEntityAvailable($className)) {
-                continue;
-            }
             $entityData = $this->getEntityVariableGetters($className);
             if (!empty($entityData)) {
                 $result[$className] = $entityData;
@@ -115,15 +112,15 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
      *
      * @return bool
      */
-    protected function isEntityAvailable($entityClass)
+    protected function isEntityAccessible($entityClass)
     {
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        if ($extendConfigProvider->hasConfig($entityClass)) {
-            $extendConfig = $extendConfigProvider->getConfig($entityClass);
-            if ($extendConfig->is('state', ExtendScope::STATE_NEW)
-                || $extendConfig->is('is_deleted')
-                || ($extendConfig->is('state', ExtendScope::STATE_DELETE) && $extendConfig->is('is_deleted', false))
-            ) {
+        if ($extendConfig = $this->getExtendConfigProvider()->hasConfig($entityClass)) {
+            if (!class_exists($entityClass)) {
+                return false;
+            }
+
+            $extendConfig = $this->getExtendConfigProvider()->getConfig($entityClass);
+            if ($extendConfig->is('state', ExtendScope::STATE_NEW) || $extendConfig->is('is_deleted')) {
                 return false;
             }
         }
@@ -139,7 +136,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     protected function getEntityVariableDefinitions($entityClass)
     {
         $entityClass = ClassUtils::getRealClass($entityClass);
-        if (!$this->getEmailConfigProvider()->hasConfig($entityClass)) {
+        if (!$this->isEntityAccessible($entityClass)) {
             return [];
         }
 
@@ -194,7 +191,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     protected function getEntityVariableGetters($entityClass)
     {
         $entityClass = ClassUtils::getRealClass($entityClass);
-        if (!$this->getEmailConfigProvider()->hasConfig($entityClass)) {
+        if (!$this->isEntityAccessible($entityClass)) {
             return [];
         }
 
@@ -286,5 +283,17 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         }
 
         return $this->entityConfigProvider;
+    }
+
+    /**
+     * @return ConfigProvider
+     */
+    protected function getExtendConfigProvider()
+    {
+        if (!$this->extendConfigProvider) {
+            $this->extendConfigProvider = $this->configManager->getProvider('extend');
+        }
+
+        return $this->extendConfigProvider;
     }
 }
