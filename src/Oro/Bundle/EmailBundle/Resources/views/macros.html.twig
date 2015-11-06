@@ -360,7 +360,7 @@
         {% endset -%}
         {% set actions = actions|trim %}
         <span class="contact-element{% if actions is empty %} contact-element-no-actions{% endif %}">
-            {{ _self.email_address_simple(email) }}
+            <span class="contact-element-wrapper">{{ _self.email_address_simple(email) }}</span>
             {% if actions is not empty -%}
                 <span class="contact-element-actions email-actions">{{ actions|raw }}</span>
             {%- endif %}

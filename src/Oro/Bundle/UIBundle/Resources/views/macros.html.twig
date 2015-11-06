@@ -925,7 +925,7 @@
         {% endset -%}
         {% set actions = actions|trim %}
         <span class="contact-element{% if actions is empty %} contact-element-no-actions{% endif %}">
-            {{ _self.renderPhone(phone) }}
+            <span class="contact-element-wrapper">{{ _self.renderPhone(phone) }}</span>
             {% if actions is not empty -%}
                 <span class="contact-element-actions phone-actions">{{ actions|raw }}</span>
             {%- endif %}
