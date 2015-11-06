@@ -329,11 +329,11 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity2field1Config = new Config(new FieldConfigId('email', $entity2Class, 'email', 'string'));
         $entity2field1Config->set('available_in_template', true);
 
-        $entity3Class        = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity';
+        $entity3Class        = 'Extend\Entity\SomeEntity1';
         $entity3ExtendConfig = new Config(new EntityConfigId('extend', $entity3Class));
         $entity3ExtendConfig->set('state', ExtendScope::STATE_NEW);
 
-        $entity4Class        = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Attachment';
+        $entity4Class        = 'Extend\Entity\SomeEntity2';
         $entity4ExtendConfig = new Config(new EntityConfigId('extend', $entity4Class));
         $entity4ExtendConfig->set('is_deleted', true);
 
@@ -357,19 +357,6 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         [self::TEST_ENTITY_NAME, false, [$entity1field1Config]],
                         [$entity2Class, false, [$entity2field1Config]],
-                    ]
-                )
-            );
-
-        $this->extendConfigProvider->expects($this->exactly(4))
-            ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::TEST_ENTITY_NAME, null, false],
-                        [$entity2Class, null, false],
-                        [$entity3Class, null, true],
-                        [$entity4Class, null, true],
                     ]
                 )
             );
