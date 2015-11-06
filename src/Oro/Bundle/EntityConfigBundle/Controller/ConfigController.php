@@ -153,12 +153,16 @@ class ConfigController extends Controller
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
 
+        /** @var ConfigProvider $entityConfigProvider */
+        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
+
         list(, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
         list ($layoutActions, $requireJsModules) = $this->getLayoutParams($entity);
 
         return [
             'entity'        => $entity,
             'entity_config' => $entityConfigProvider->getConfig($entity->getClassName()),
+            'extend_config' => $extendConfigProvider->getConfig($entity->getClassName()),
             'entity_count'  => $this->getRowCount($entity),
             'link'          => $this->getRowCountLink($entity),
             'entity_name'   => $entityName,
