@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Util\Inflector;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -114,7 +115,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
      */
     protected function isEntityAccessible($entityClass)
     {
-        if ($extendConfig = $this->getExtendConfigProvider()->hasConfig($entityClass)) {
+        if (ExtendHelper::isCustomEntity($entityClass)) {
             if (!class_exists($entityClass)) {
                 return false;
             }
