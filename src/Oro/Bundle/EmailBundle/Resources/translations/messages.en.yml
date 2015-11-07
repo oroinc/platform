@@ -214,8 +214,6 @@ oro:
         seen.label:               Is Seen
         thread_id.label:          Thread ID
         show_details.tooltip:     Show details
-        add_context.label:        Add Context
-        add_context_entity.label: Add Context Entity
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden
         empty_body:               Empty body

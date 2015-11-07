@@ -81,7 +81,7 @@ class ContextsSelectTypeTest extends TypeTestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
@@ -94,7 +94,6 @@ class ContextsSelectTypeTest extends TypeTestCase
                         'route_name'         => 'oro_api_get_search_autocomplete',
                         'separator'          => ';',
                         'forceSelectedData'  => true,
-                        'containerCssClass'  => 'taggable-email',
                         'minimumInputLength' => 0,
                     ]
                 ]
