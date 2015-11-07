@@ -2,22 +2,26 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Util\ClassUtils;
+
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Symfony\Component\Routing\RouterInterface;
 
 class ActivityContextApiEntityManager
 {
     /** @var ActivityManager */
     protected $activityManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenStorageInterface */
+    protected $securityTokenStorage;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -28,18 +32,25 @@ class ActivityContextApiEntityManager
     /** @var EntityClassNameHelper */
     protected $classNameHelper;
 
+    /**
+     * @param ActivityManager       $activityManager
+     * @param TokenStorageInterface $securityTokenStorage
+     * @param ConfigManager         $configManager
+     * @param RouterInterface       $router
+     * @param EntityClassNameHelper $classNameHelper
+     */
     public function __construct(
         ActivityManager $activityManager,
-        SecurityFacade $securityFacade,
+        TokenStorageInterface $securityTokenStorage,
         ConfigManager $configManager,
         RouterInterface $router,
         EntityClassNameHelper $classNameHelper
     ) {
-        $this->activityManager = $activityManager;
-        $this->securityFacade = $securityFacade;
-        $this->configManager = $configManager;
-        $this->router = $router;
-        $this->classNameHelper = $classNameHelper;
+        $this->activityManager      = $activityManager;
+        $this->securityTokenStorage = $securityTokenStorage;
+        $this->configManager        = $configManager;
+        $this->router               = $router;
+        $this->classNameHelper      = $classNameHelper;
     }
 
     /**
@@ -56,7 +67,29 @@ class ActivityContextApiEntityManager
 
         $class = ClassUtils::getClass($activity);
 
-        $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder($class, $criteria);
+        $currentUser = $this->securityTokenStorage->getToken()->getUser();
+        $userClass   = ClassUtils::getClass($currentUser);
+
+        $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
+            $class,
+            $criteria,
+            null,
+            null,
+            null,
+            null,
+            function (QueryBuilder $qb, $targetEntityClass) use ($currentUser, $userClass) {
+                if ($targetEntityClass === $userClass) {
+                    // Exclude current user from result
+                    $qb->andWhere(
+                        $qb->expr()->neq(
+                            QueryUtils::getSelectExprByAlias($qb, 'entityId'),
+                            $currentUser->getId()
+                        )
+                    );
+                }
+            }
+        );
+
         if (null === $queryBuilder) {
             return [];
         }
@@ -66,26 +99,14 @@ class ActivityContextApiEntityManager
             return $result;
         }
 
-        $currentUser      = $this->securityFacade->getLoggedUser();
-        $currentUserClass = ClassUtils::getClass($currentUser);
-        $currentUserId    = $currentUser->getId();
-        $result           = array_values(
-            array_filter(
-                $result,
-                function ($item) use ($currentUserClass, $currentUserId) {
-                    return !($item['entity'] === $currentUserClass && $item['id'] == $currentUserId);
-                }
-            )
-        );
-
         foreach ($result as &$item) {
+            $icon  = $this->configManager->getProvider('entity')->getConfig($item['entity'])->get('icon');
             $route = $this->configManager->getEntityMetadata($item['entity'])->getRoute();
 
             $item['entityId']        = $activity->getId();
             $item['targetId']        = $item['id'];
             $item['targetClassName'] = $this->classNameHelper->getUrlSafeClassName($item['entity']);
-            $item['icon']            = $this->configManager->getProvider('entity')->getConfig($item['entity'])
-                ->get('icon');
+            $item['icon']            = $icon;
             $item['link']            = $route
                 ? $this->router->generate($route, ['id' => $item['id']])
                 : null;

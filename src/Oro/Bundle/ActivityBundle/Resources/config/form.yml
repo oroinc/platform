@@ -1,22 +1,19 @@
-parameters:
-    oro_activity.form.type.contexts_select.class: Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType
-    oro_activity.form.extension.contexts.class:   Oro\Bundle\ActivityBundle\Form\Extension\ContextsExtension
-
 services:
     oro_activity.form.type.contexts_select:
-        class: %oro_activity.form.type.contexts_select.class%
+        class: Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_entity_config.config_manager
             - @translator
             - @oro_search.mapper
-            - @oro_security.security_facade
+            - @security.token_storage
         tags:
             - { name: form.type, alias: oro_activity_contexts_select }
 
     oro_activity.form.extension.contexts:
-        class: %oro_activity.form.extension.contexts.class%
+        class: Oro\Bundle\ActivityBundle\Form\Extension\ContextsExtension
         arguments:
             - @oro_entity.doctrine_helper
+            - @oro_activity.manager
         tags:
             - { name: form.type_extension, alias: form }

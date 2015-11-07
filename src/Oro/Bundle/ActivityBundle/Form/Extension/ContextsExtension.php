@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityBundle\Form\Extension;
 
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -12,21 +11,25 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 
 class ContextsExtension extends AbstractTypeExtension
 {
-    const ACTIVITY_INTERFACE = 'Oro\Bundle\ActivityBundle\Model\ActivityInterface';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ActivityManager */
+    protected $activityManager;
+
     /**
-     * @param DoctrineHelper      $doctrineHelper
+     * @param DoctrineHelper  $doctrineHelper
+     * @param ActivityManager $activityManager
      */
-    public function __construct(
-        DoctrineHelper $doctrineHelper
-    ) {
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(DoctrineHelper $doctrineHelper, ActivityManager $activityManager)
+    {
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->activityManager = $activityManager;
     }
 
     /**
@@ -53,7 +56,7 @@ class ContextsExtension extends AbstractTypeExtension
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
             /** @var ActivityInterface $entity */
             $entity = $event->getData();
-            $form = $event->getForm();
+            $form   = $event->getForm();
 
             if ($entity) {
                 $contexts = $entity->getActivityTargetEntities();
@@ -63,9 +66,7 @@ class ContextsExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
+     * {@inheritdoc}
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -81,11 +82,7 @@ class ContextsExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'contexts_disabled' => false,
-            ]
-        );
+        $resolver->setDefaults(['contexts_disabled' => false]);
     }
 
     /**
@@ -112,11 +109,8 @@ class ContextsExtension extends AbstractTypeExtension
             return false;
         }
 
-        $refClass = new \ReflectionClass($options['data_class']);
-        if (!$refClass->implementsInterface(self::ACTIVITY_INTERFACE)) {
-            return false;
-        }
+        $activities = $this->activityManager->getActivityTypes();
 
-        return true;
+        return in_array($className, $activities, true);
     }
 }

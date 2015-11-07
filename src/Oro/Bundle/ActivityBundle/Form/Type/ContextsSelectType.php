@@ -11,19 +11,17 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ContextsSelectType extends AbstractType
 {
     const NAME = 'oro_activity_contexts_select';
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
     /** @var ConfigManager */
@@ -35,28 +33,28 @@ class ContextsSelectType extends AbstractType
     /** @var ObjectMapper */
     protected $mapper;
 
-    /* @var SecurityFacade */
-    protected $securityFacade;
+    /* @var TokenStorageInterface */
+    protected $securityTokenStorage;
 
     /**
-     * @param EntityManager $entityManager
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     * @param ObjectMapper $mapper
-     * @param SecurityFacade $securityFacade
+     * @param EntityManager         $entityManager
+     * @param ConfigManager         $configManager
+     * @param TranslatorInterface   $translator
+     * @param ObjectMapper          $mapper
+     * @param TokenStorageInterface $securityTokenStorage
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigManager $configManager,
         TranslatorInterface $translator,
         ObjectMapper $mapper,
-        SecurityFacade $securityFacade
+        TokenStorageInterface $securityTokenStorage
     ) {
-        $this->entityManager = $entityManager;
-        $this->configManager = $configManager;
-        $this->translator = $translator;
-        $this->mapper = $mapper;
-        $this->securityFacade = $securityFacade;
+        $this->entityManager        = $entityManager;
+        $this->configManager        = $configManager;
+        $this->translator           = $translator;
+        $this->mapper               = $mapper;
+        $this->securityTokenStorage = $securityTokenStorage;
     }
 
     /**
@@ -71,19 +69,20 @@ class ContextsSelectType extends AbstractType
                 $this->configManager,
                 $this->translator,
                 $this->mapper,
-                $this->securityFacade
+                $this->securityTokenStorage
             )
         );
     }
 
     /**
-     * @param FormView $view
+     * @param FormView      $view
      * @param FormInterface $form
-     * @param array $options
+     * @param array         $options
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $formData = $form->getViewData();
+
         $view->vars['attr']['data-selected-data'] = $formData;
     }
 
@@ -107,9 +106,12 @@ class ContextsSelectType extends AbstractType
             'configs' => $defaultConfigs
         ]);
 
-        $resolver->setNormalizer('configs', function (Options $options, $configs) use ($defaultConfigs) {
-            return array_replace_recursive($defaultConfigs, $configs);
-        });
+        $resolver->setNormalizer(
+            'configs',
+            function (Options $options, $configs) use ($defaultConfigs) {
+                return array_replace_recursive($defaultConfigs, $configs);
+            }
+        );
     }
 
     /**
