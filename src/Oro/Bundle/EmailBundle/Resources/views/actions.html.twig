@@ -145,8 +145,10 @@
     {% endif %}
 {% endmacro -%}
 
+{# @todo: Need to move to the Activity Bundle #}
+{# Button for add context on the activity list item view page #}
 {% macro addContextButton(entity, parameters) -%}
-    {% if resource_granted('oro_email_email_edit', entity) %}
+    {% if resource_granted('EDIT', entity) %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path(

@@ -53,8 +53,8 @@ define([
         doRefresh: function() {
             var self = this;
             var url = routing.generate('oro_api_get_activity_context', {
-                activityClass: this.options.activityClass,
-                activityId: this.options.entityId
+                activity: this.options.activityClass,
+                id: this.options.entityId
             });
             $.ajax({
                 method: 'GET',

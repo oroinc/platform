@@ -57,10 +57,10 @@
 
     {% if checkTarget %}
         {% set targetEntity = {
-        'target': {
-        'id' : target.id,
-        'className': targetClassNameEncoded
-        }
+            'target': {
+                'id' : target.id,
+                'className': targetClassNameEncoded
+            }
         } %}
         {% set options = options|merge(targetEntity) %}
     {% endif %}
@@ -79,7 +79,8 @@
 
 {% macro activity_context_link() %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}" data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
+    <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
+       data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
         {{ UI.renderWidgetDataAttributes({
             'type' : 'dialog',
             'multiple' : true,
@@ -97,5 +98,7 @@
                     'height': 600
                 }
             }
-        }) }}><i class="icon-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i></a>
+        }) }}>
+        <i class="icon-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
+    </a>
 {% endmacro %}

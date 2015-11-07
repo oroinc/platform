@@ -9,8 +9,6 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 
 /**
@@ -22,10 +20,10 @@ class ActivityContextController extends RestGetController
     /**
      * Get activity context data.
      *
-     * @param string $activityClass The type of the activity entity.
-     * @param int    $activityId
+     * @param string $activity The type of the activity entity.
+     * @param int    $id       The id of the activity entity.
      *
-     * @Get("/activity/context/{activityClass}/{activityId}", name="", requirements={"id"="\d+"})
+     * @Get("/activities/{activity}/{id}/context", name="")
      *
      * @ApiDoc(
      *      description="Get activity context data",
@@ -34,24 +32,17 @@ class ActivityContextController extends RestGetController
      *
      * @return Response
      */
-    public function getAction($activityClass, $activityId)
+    public function getAction($activity, $id)
     {
-        $routingHelper = $this->get('oro_entity.routing_helper');
-        $activity = $routingHelper->getEntity($activityClass, $activityId);
+        $className = $this->get('oro_entity.routing_helper')->resolveEntityClass($activity);
 
-        if (!$activity || !$activity instanceof ActivityInterface) {
-            return $this->buildNotFoundResponse();
-        }
-
-        $result = $this->getManager()->getActivityContext($activity);
+        $result = $this->getManager()->getActivityContext($className, $id);
 
         return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
     }
 
     /**
-     * Get entity Manager
-     *
-     * @return ActivityContextApiEntityManager
+     * {@inheritdoc}
      */
     public function getManager()
     {

@@ -4,18 +4,19 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
-class ActivityContextApiEntityManager
+class ActivityContextApiEntityManager extends ApiEntityManager
 {
     /** @var ActivityManager */
     protected $activityManager;
@@ -29,43 +30,46 @@ class ActivityContextApiEntityManager
     /** @var RouterInterface */
     protected $router;
 
-    /** @var EntityClassNameHelper */
-    protected $classNameHelper;
+    /** @var EntityAliasResolver */
+    protected $entityAliasResolver;
 
     /**
+     * @param ObjectManager         $om
      * @param ActivityManager       $activityManager
      * @param TokenStorageInterface $securityTokenStorage
      * @param ConfigManager         $configManager
      * @param RouterInterface       $router
-     * @param EntityClassNameHelper $classNameHelper
+     * @param EntityAliasResolver   $entityAliasResolver
      */
     public function __construct(
+        ObjectManager $om,
         ActivityManager $activityManager,
         TokenStorageInterface $securityTokenStorage,
         ConfigManager $configManager,
         RouterInterface $router,
-        EntityClassNameHelper $classNameHelper
+        EntityAliasResolver $entityAliasResolver
     ) {
+        parent::__construct(null, $om);
+
         $this->activityManager      = $activityManager;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->configManager        = $configManager;
         $this->router               = $router;
-        $this->classNameHelper      = $classNameHelper;
+        $this->entityAliasResolver  = $entityAliasResolver;
     }
 
     /**
-     * Returns the context for the given activity
+     * Returns the context for the given activity class and id
      *
-     * @param ActivityInterface $activity
+     * @param string $class The FQCN of the activity entity
+     * @param        $id
      *
      * @return array
      */
-    public function getActivityContext(ActivityInterface $activity)
+    public function getActivityContext($class, $id)
     {
         $criteria = Criteria::create();
-        $criteria->andWhere(Criteria::expr()->eq('id', $activity->getId()));
-
-        $class = ClassUtils::getClass($activity);
+        $criteria->andWhere(Criteria::expr()->eq('id', $id));
 
         $currentUser = $this->securityTokenStorage->getToken()->getUser();
         $userClass   = ClassUtils::getClass($currentUser);
@@ -103,11 +107,14 @@ class ActivityContextApiEntityManager
             $icon  = $this->configManager->getProvider('entity')->getConfig($item['entity'])->get('icon');
             $route = $this->configManager->getEntityMetadata($item['entity'])->getRoute();
 
-            $item['entityId']        = $activity->getId();
+            $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);
+            $item['entityId']           = $id;
+
             $item['targetId']        = $item['id'];
-            $item['targetClassName'] = $this->classNameHelper->getUrlSafeClassName($item['entity']);
-            $item['icon']            = $icon;
-            $item['link']            = $route
+            $item['targetClassName'] = $this->entityClassNameHelper->getUrlSafeClassName($item['entity']);
+
+            $item['icon'] = $icon;
+            $item['link'] = $route
                 ? $this->router->generate($route, ['id' => $item['id']])
                 : null;
 

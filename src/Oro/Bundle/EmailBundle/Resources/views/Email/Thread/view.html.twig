@@ -20,6 +20,7 @@
 
 {% block navButtons %}
     {% set buttonsHtml %}
+        {# Button for add context on the activity list item view page #}
         {{ Actions.addContextButton(entity) }}
         {{ Actions.addMarkUnreadButton(entity) }}
     {% endset %}
@@ -36,6 +37,7 @@
 {% endblock breadcrumb %}
 
 {% block stats %}
+    {# Display contexts targets in the activity view page #}
     <li class="context-data activity-context-activity-block">
         {{ AC.activity_contexts(entity) }}
     </li>
