@@ -1,12 +1,9 @@
 .contact-element {
-  overflow: visible;
   position: relative;
   top: -4px;
   left: -2px;
-  white-space: nowrap;
   padding: 0 0 0 2px;
   line-height: 19px;
-  height: 23px;
   display: inline-block;
   .contact-element-actions {
     visibility: hidden;
@@ -23,14 +20,13 @@
     outline: none;
   }
   .contact-element-wrapper {
+    word-break: break-all;
     padding: 5px 0 3px;
-    line-height: 13px;
-    height: 21px;
-    display: inline-block;
+    line-height: 23px;
+    margin-right: 5px;
   }
 }
 .contact-element-actions {
-  margin-left: 5px;
   display: inline-block;
   vertical-align: top;
   .btn {
