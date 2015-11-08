@@ -6,18 +6,18 @@ use Symfony\Component\Validator\Constraint;
 
 class UniqueExtendEntityField extends Constraint
 {
-    /** @var string  */
-    public $message = 'This value is already used.';
+    /** @var string */
+    public $sameFieldMessage = 'A field with this name is already exist.';
 
-    /** @var string  */
-    public $path = 'fieldName';
+    /** @var string */
+    public $similarFieldMessage = 'This name conflicts with existing \'{{ field }}\' field.';
 
     /**
      * {@inheritdoc}
      */
     public function validatedBy()
     {
-        return 'oro_entity_extend.validator.unique_extend_entity_field';
+        return UniqueExtendEntityFieldValidator::ALIAS;
     }
 
     /**

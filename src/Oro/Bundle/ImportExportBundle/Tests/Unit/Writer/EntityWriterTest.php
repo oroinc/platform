@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class EntityWriterTest extends \PHPUnit_Framework_TestCase
@@ -9,10 +15,13 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    protected $registry;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityDetachFixer */
     protected $detachFixer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextRegistry */
     protected $contextRegistry;
 
     /** @var EntityWriter */
@@ -24,13 +33,21 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+
         $this->detachFixer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->contextRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
 
-        $this->writer = new EntityWriter($this->entityManager, $this->detachFixer, $this->contextRegistry);
+        $this->writer = new EntityWriter($this->registry, $this->detachFixer, $this->contextRegistry);
     }
 
     /**
@@ -62,6 +79,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->at(2))
             ->method('flush');
 
+        /** @var StepExecution $stepExecution */
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();

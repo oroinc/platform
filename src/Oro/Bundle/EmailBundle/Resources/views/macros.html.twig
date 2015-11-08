@@ -342,8 +342,29 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}">{{ title }}</a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title }}</a>
         {% endif %}
+    {% endif %}
+{%- endmacro -%}
+
+{#
+    Render email address with related actions block
+    Parameters:
+        email - EmailInterface object or string
+        entity - related entity record
+#}
+{%- macro renderEmailWithActions(email, entity) -%}
+    {% if email is not empty %}
+        {%- set actions %}
+            {%- placeholder email_actions with {email: email, entity: entity} -%}
+        {% endset -%}
+        {% set actions = actions|trim %}
+        <span class="contact-element{% if actions is empty %} contact-element-no-actions{% endif %}">
+            <span class="contact-element-wrapper">{{ _self.email_address_simple(email) }}</span>
+            {% if actions is not empty -%}
+                <span class="contact-element-actions email-actions">{{ actions|raw }}</span>
+            {%- endif %}
+        </span>
     {% endif %}
 {%- endmacro -%}
 

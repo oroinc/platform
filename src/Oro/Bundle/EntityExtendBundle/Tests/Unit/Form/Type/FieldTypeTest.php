@@ -13,13 +13,16 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldTypeTest extends TypeTestCase
 {
@@ -29,12 +32,16 @@ class FieldTypeTest extends TypeTestCase
     /** @var FieldType $type */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|Translator */
     protected $translator;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldTypeProvider */
+    protected $fieldTypeProvider;
+
+    /** @var array */
     protected $defaultFieldTypeChoices = [
         self::FIELDS_GROUP    => [
             'bigint'    => 'oro.entity_extend.form.data_type.bigint',
@@ -84,11 +91,27 @@ class FieldTypeTest extends TypeTestCase
                 }
             );
 
+        $this->fieldTypeProvider = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->fieldTypeProvider->expects($this->any())
+            ->method('getSupportedFieldTypes')
+            ->willReturn(array_keys($this->defaultFieldTypeChoices[self::FIELDS_GROUP]));
+        $this->fieldTypeProvider->expects($this->any())
+            ->method('getSupportedRelationTypes')
+            ->willReturn(array_keys($this->defaultFieldTypeChoices[self::RELATIONS_GROUP]));
+
         $this->type = new FieldType(
             $this->configManager,
             $this->translator,
-            new ExtendDbIdentifierNameGenerator()
+            new ExtendDbIdentifierNameGenerator(),
+            $this->fieldTypeProvider
         );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->type, $this->configManager, $this->translator, $this->fieldTypeProvider);
     }
 
     protected function getExtensions()

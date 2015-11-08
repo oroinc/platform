@@ -18,6 +18,8 @@
                     entityClass: oro_class_name(entity, true),
                     entityId: entity.id
             }),
+            'class': parameters.cssClass is defined ? parameters.cssClass : '',
+            'iCss': parameters.iCss is defined ? parameters.iCss : '',
             'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
             'label': email,
             'widget': {

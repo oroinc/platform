@@ -4,6 +4,7 @@
 {% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
 {% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
 {% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
+{% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
 
 {% if exportAllowed or importAllowed %}
     {% if options is not defined %}
@@ -81,11 +82,19 @@
                 });
                 widget.render();
 
-                {% if dataGridName is defined %}
-                var datagridName = {{ dataGridName|json_encode|raw }};
+                {% if dataGridName is defined or refreshPageOnSuccess %}
                 widget.on('importComplete', function (data) {
                     if (data.success) {
-                        mediator.trigger('datagrid:doReset:' + datagridName);
+                        {% if refreshPageOnSuccess %}
+                            {% if afterRefreshPageMessage is defined and afterRefreshPageMessage is not empty %}
+                                mediator.once('page:afterChange', function() {
+                                    mediator.execute('showFlashMessage', 'warning', {{ afterRefreshPageMessage|json_encode|raw }});
+                                });
+                            {% endif %}
+                            mediator.execute('refreshPage');
+                        {% elseif dataGridName is defined %}
+                            mediator.trigger('datagrid:doReset:' + {{ dataGridName|json_encode|raw }});
+                        {% endif %}
                     }
                 });
                 {% endif %}

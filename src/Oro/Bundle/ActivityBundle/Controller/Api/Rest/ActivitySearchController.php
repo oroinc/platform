@@ -27,7 +27,7 @@ class ActivitySearchController extends RestGetController
      *
      * @param string $activity The type of the activity entity.
      *
-     * @Get("/activities/{activity}/relations/search", name="")
+     * @Get("/activities/{activity}/relations/search")
      *
      * @QueryParam(
      *      name="page",

@@ -20,16 +20,12 @@ class NumberTypeFormatter extends NumberFormatter implements TypeFormatterInterf
         switch ($type) {
             case self::TYPE_CURRENCY:
                 return $this->formatCurrency($value);
-                break;
             case self::TYPE_PERCENT:
                 return $this->formatPercent($value);
-                break;
             case self::TYPE_DECIMAL:
                 return $this->formatDecimal($value);
-                break;
             case self::TYPE_INTEGER:
                 return $this->formatDecimal($value);
-                break;
             default:
                 throw new InvalidArgumentException(sprintf('Couldn\'t format "%s" type', $type));
         }

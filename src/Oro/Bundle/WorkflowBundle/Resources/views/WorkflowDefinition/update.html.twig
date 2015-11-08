@@ -36,9 +36,9 @@
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 {# API REST route for POST used both for create and update #}
 {% if entity.name %}
-    {% set formAction = path('oro_workflow_api_rest_workflowdefinition_post', {workflowDefinition: entity.name}) %}
+    {% set formAction = path('oro_api_workflow_definition_post', {workflowDefinition: entity.name}) %}
 {% else %}
-    {% set formAction = path('oro_workflow_api_rest_workflowdefinition_post') %}
+    {% set formAction = path('oro_api_workflow_definition_post') %}
 {% endif %}
 
 {% block head_script %}
