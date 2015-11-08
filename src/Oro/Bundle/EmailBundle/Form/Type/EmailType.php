@@ -133,6 +133,11 @@ class EmailType extends AbstractType
                     ),
                     'configs'   => [
                         'containerCssClass' => 'taggable-email',
+                        'route_name'       => 'oro_activity_form_autocomplete_search',
+                        'route_parameters' => [
+                            'activity' => 'emails',
+                            'name'     => 'emails'
+                        ],
                     ]
                 ]
             );
