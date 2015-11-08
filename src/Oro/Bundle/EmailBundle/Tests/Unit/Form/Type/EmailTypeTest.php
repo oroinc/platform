@@ -152,10 +152,11 @@ class EmailTypeTest extends TypeTestCase
         $mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $securityTokenStorage =
+            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $contextsSelectType = new ContextsSelectType($em, $configManager, $translator, $mapper, $securityFacade);
+        $contextsSelectType = new ContextsSelectType($em, $configManager, $translator, $mapper, $securityTokenStorage);
 
         return [
             new PreloadedExtension(
