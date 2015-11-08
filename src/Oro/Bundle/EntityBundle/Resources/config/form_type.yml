@@ -7,6 +7,7 @@ parameters:
     oro_entity.form.handler.entity_select.class:               Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler
     oro_entity.form.guesser.form_config.class:                 Oro\Bundle\EntityBundle\Form\Guesser\FormConfigGuesser
     oro_entity.form.guesser.doctrine_type.class:               Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser
+    oro_entity.form.type.custom_enum.class:                    Oro\Bundle\EntityBundle\Form\Type\EnumFormType
 
 services:
     oro_entity.form.type.custom_entity:
@@ -90,3 +91,7 @@ services:
         tags:
             - { name: form.type_guesser, priority: 10 }
 
+    oro_entity.form.type.custom_enum:
+        class: %oro_entity.form.type.custom_enum.class%
+        tags:
+            - { name: form.type, alias: custom_enum_type }

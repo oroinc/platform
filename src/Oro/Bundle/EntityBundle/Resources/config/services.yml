@@ -1,5 +1,6 @@
 parameters:
     oro_entity.listener.navigation_listener.class:                                     Oro\Bundle\EntityBundle\EventListener\NavigationListener
+    oro_entity.listener.extend_schema_update_listener:                                 Oro\Bundle\EntityBundle\EventListener\ExtendSchemaUpdateListener
     oro_entity.datagrid_helper.class:                                                  Oro\Bundle\EntityBundle\Grid\GridHelper
     oro_entity.event_listener.custom_entity_grid_listener.class:                       Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
     oro_entity.event_listener.entity_relation_grid_listener.class:                     Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
@@ -52,8 +53,10 @@ parameters:
     oro_entity.form.entity_field.handler.base_handler.class: Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler
     oro_entity.form.entity_field.handler.processor.handler_processor.class:  Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor
 
-    # halpers
+    # helpers
     oro_entity.helper.dictionary.class:                      Oro\Bundle\EntityBundle\Helper\DictionaryHelper
+
+    oro_entity.extension.dictionary_extension.class:         Oro\Bundle\EntityBundle\Form\Extension\DictionaryFormExtension
 
 services:
     oro_entity.listener.navigation_listener:
@@ -62,8 +65,16 @@ services:
             - @oro_security.security_facade
             - @oro_entity_config.config_manager
             - @translator
+            - @oro_menu.cache
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_entity.listener.extend_schema_update_listener:
+        class: %oro_entity.listener.extend_schema_update_listener%
+        arguments:
+            - @oro_menu.cache
+        tags:
+            - { name: kernel.event_listener, event: extend_schema.successful_update, method: onExtendSchemaUpdate }
 
     oro_entity.extension.unique_entity_extension:
         class: %oro_entity.extension.unique_entity_extension.class%
@@ -350,6 +361,13 @@ services:
 
     oro_entity.helper.dictionary:
         class: %oro_entity.helper.dictionary.class%
+
+    oro_entity.extension.dictionary_extension:
+        class: %oro_entity.extension.dictionary_extension.class%
+        arguments:
+            - @oro_entity_config.provider.grouping
+        tags:
+            - { name: form.type_extension, alias: custom_entity_type }
 
     oro_entity.manager.entity_field_manager:
         class: %oro_entity.manager.entity_field_manager.class%

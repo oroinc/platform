@@ -1,0 +1,17 @@
+Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue:
+    # property constraints won't work as AbstractEnumValue has private properties
+    # and Symfony\Component\Validator\Mapping\ClassMetadata::mergeConstraints filters that field constraints
+    # that's why we add custom callback validator here
+    constraints:
+        - Callback:
+            methods:
+                - [Oro\Bundle\EntityBundle\Form\Type\EnumFormType, isFormValid]
+    properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                  max: 255
+        priority:
+            - Range:
+                  min: 0
+                  max: 1000

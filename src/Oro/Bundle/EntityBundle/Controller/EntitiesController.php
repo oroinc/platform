@@ -18,6 +18,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
@@ -219,6 +221,12 @@ class EntitiesController extends Controller
             throw $this->createNotFoundException();
         }
 
+        // in order to not override template, just add 'virtual' id column
+        if (!property_exists($entityClass, 'id')) {
+            $record->{'id'} = $this->get('oro_entity.doctrine_helper')
+                ->getSingleEntityIdentifier($record);
+        }
+
         return [
             'entity_name'   => $entityName,
             'entity'        => $record,
@@ -261,12 +269,10 @@ class EntitiesController extends Controller
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $entityConfig         = $entityConfigProvider->getConfig($entityClass);
 
-        $entityRepository = $em->getRepository($entityClass);
-
-        $record = !$id ? new $entityClass : $entityRepository->find($id);
+        $record = !$id ? $this->createEntity($entityClass) : $em->getRepository($entityClass)->find($id);
 
         $form = $this->createForm(
-            'custom_entity_type',
+            $this->isEnumClass($entityClass) ? 'custom_enum_type' : 'custom_entity_type',
             $record,
             array(
                 'data_class'   => $entityClass,
@@ -282,10 +288,12 @@ class EntitiesController extends Controller
             $form->submit($request);
 
             if ($form->isValid()) {
+                // form processing may change data
+                $record = $form->getData();
                 $em->persist($record);
                 $em->flush();
 
-                $id = $record->getId();
+                $id = $this->get('oro_entity.doctrine_helper')->getSingleEntityIdentifier($record);
 
                 $this->get('session')->getFlashBag()->add(
                     'success',
@@ -299,6 +307,10 @@ class EntitiesController extends Controller
             }
         }
 
+        if (!property_exists($entityClass, 'id')) {
+            $record->{'id'} = $this->get('oro_entity.doctrine_helper')->getSingleEntityIdentifier($record);
+        }
+
         return [
             'entity'        => $record,
             'entity_name'   => $entityName,
@@ -306,6 +318,16 @@ class EntitiesController extends Controller
             'entity_class'  => $entityClass,
             'form'          => $form->createView(),
         ];
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return bool
+     */
+    protected function isEnumClass($entityClass)
+    {
+        return strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_') !== false;
     }
 
     /**
@@ -362,6 +384,23 @@ class EntitiesController extends Controller
         $isGranted      = $securityFacade->isGranted($permission, 'entity:' . $entityName);
         if (!$isGranted) {
             throw new AccessDeniedException('Access denied.');
+        }
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return object|AbstractEnumValue
+     */
+    protected function createEntity($entityClass)
+    {
+        $reflClass = new \ReflectionClass($entityClass);
+        $hasRequiredParams = $reflClass->getConstructor()->getNumberOfRequiredParameters() > 0;
+
+        if ($this->isEnumClass($entityClass) || $hasRequiredParams) {
+            return $reflClass->newInstanceWithoutConstructor();
+        } else {
+            return new $entityClass;
         }
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\FormInterface;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 
 class ConstraintsProvider
@@ -101,10 +103,16 @@ class ConstraintsProvider
     protected function extractMetadataPropertiesConstraints(FormInterface $form)
     {
         $constraints = array();
-        if ($form->getConfig()->getDataClass()) {
+        $dataClass = $form->getConfig()->getDataClass();
+        if ($dataClass) {
             /** @var ClassMetadata $metadata */
             $metadata = $this->metadataFactory->getMetadataFor($form->getConfig()->getDataClass());
-            $constraints = $metadata->properties;
+
+            foreach ($metadata->getConstrainedProperties() as $property) {
+                $propertyMetadata = $metadata->getPropertyMetadata($property);
+                $constraints[$property] = is_array($propertyMetadata) ?
+                    reset($propertyMetadata) : $propertyMetadata;
+            }
         }
         $errorMapping = $form->getConfig()->getOption('error_mapping');
         if (!empty($constraints) && !empty($errorMapping)) {
