@@ -62,8 +62,9 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
         $extendConfig = $this->getEntityConfig(
             $className,
             [
-                'inherit' => ExtendHelper::BASE_ENUM_VALUE_CLASS,
-                'state'   => ExtendScope::STATE_ACTIVE
+                'is_extend' => true,
+                'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS,
+                'state'     => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -258,20 +259,23 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
             $this->getEntityConfig(
                 'Test\Enum',
                 [
-                    'inherit' => ExtendHelper::BASE_ENUM_VALUE_CLASS,
-                    'state'   => ExtendScope::STATE_ACTIVE
+                    'is_extend' => true,
+                    'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS,
+                    'state'     => ExtendScope::STATE_ACTIVE
                 ]
             ),
             $this->getEntityConfig(
                 'Test\NewEnum',
                 [
-                    'inherit' => ExtendHelper::BASE_ENUM_VALUE_CLASS,
-                    'state'   => ExtendScope::STATE_NEW
+                    'is_extend' => true,
+                    'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS,
+                    'state'     => ExtendScope::STATE_NEW
                 ]
             ),
             $this->getEntityConfig(
                 'Test\DeletedEnum',
                 [
+                    'is_extend'  => true,
                     'inherit'    => ExtendHelper::BASE_ENUM_VALUE_CLASS,
                     'state'      => ExtendScope::STATE_ACTIVE,
                     'is_deleted' => true
@@ -280,7 +284,8 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
             $this->getEntityConfig(
                 'Test\NotEnum',
                 [
-                    'state' => ExtendScope::STATE_ACTIVE
+                    'is_extend' => true,
+                    'state'     => ExtendScope::STATE_ACTIVE
                 ]
             ),
         ];
