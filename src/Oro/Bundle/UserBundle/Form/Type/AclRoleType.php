@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -32,7 +33,7 @@ class AclRoleType extends AbstractType
     {
         $builder->add(
             'label',
-            'text',
+            TextType::class,
             array(
                 'required' => true,
                 'label' => 'Role'

@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type\Configuration;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,7 +19,7 @@ class MailerType extends AbstractType
         $builder
             ->add(
                 'oro_installer_mailer_transport',
-                'choice',
+                ChoiceType::class,
                 array(
                     'label'         => 'form.configuration.mailer.transport',
                     'preferred_choices' => array('mail'),
@@ -32,7 +36,7 @@ class MailerType extends AbstractType
             )
             ->add(
                 'oro_installer_mailer_host',
-                'text',
+                TextType::class,
                 array(
                     'label'         => 'form.configuration.mailer.host',
                     'constraints'   => array(
@@ -42,7 +46,7 @@ class MailerType extends AbstractType
             )
             ->add(
                 'oro_installer_mailer_port',
-                'integer',
+                IntegerType::class,
                 array(
                     'label'         => 'form.configuration.mailer.port',
                     'required'      => false,
@@ -53,7 +57,7 @@ class MailerType extends AbstractType
             )
             ->add(
                 'oro_installer_mailer_encryption',
-                'choice',
+                ChoiceType::class,
                 array(
                     'label'         => 'form.configuration.mailer.encryption',
                     'required'      => false,
@@ -68,7 +72,7 @@ class MailerType extends AbstractType
             )
             ->add(
                 'oro_installer_mailer_user',
-                'text',
+                TextType::class,
                 array(
                     'label'         => 'form.configuration.mailer.user',
                     'required'      => false,
@@ -76,7 +80,7 @@ class MailerType extends AbstractType
             )
             ->add(
                 'oro_installer_mailer_password',
-                'password',
+                PasswordType::class,
                 array(
                     'label'         => 'form.configuration.mailer.password',
                     'required'      => false,

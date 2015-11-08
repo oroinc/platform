@@ -46,6 +46,6 @@ class FixArrayToStringListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSubscribedEvents()
     {
-        $this->assertEquals(array(FormEvents::PRE_BIND => 'preBind'), FixArrayToStringListener::getSubscribedEvents());
+        $this->assertEquals(array(FormEvents::PRE_SUBMIT => 'preBind'), FixArrayToStringListener::getSubscribedEvents());
     }
 }

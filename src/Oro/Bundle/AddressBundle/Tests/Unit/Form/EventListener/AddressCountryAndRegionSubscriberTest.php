@@ -37,7 +37,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
-        $this->assertArrayHasKey(FormEvents::PRE_BIND, $result);
+        $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }
 
     public function testPreSetDataEmptyAddress()

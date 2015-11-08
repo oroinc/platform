@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -14,11 +17,11 @@ class EmailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('gridName', 'hidden', array('required' => false))
+            ->add('gridName', HiddenType::class, array('required' => false))
             ->add('from', 'oro_email_email_address', array('required' => true))
             ->add('to', 'oro_email_email_address', array('required' => true, 'multiple' => true))
-            ->add('subject', 'text', array('required' => true))
-            ->add('body', 'textarea', array('required' => false));
+            ->add('subject', TextType::class, array('required' => true))
+            ->add('body', TextareaType::class, array('required' => false));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -32,7 +33,7 @@ class AttributeOptionValueType extends AbstractType
      */
     protected function addFieldId(FormBuilderInterface $builder)
     {
-        $builder->add('id', 'hidden');
+        $builder->add('id', HiddenType::class);
     }
 
     /**
@@ -41,7 +42,7 @@ class AttributeOptionValueType extends AbstractType
      */
     protected function addFieldLocale(FormBuilderInterface $builder)
     {
-        $builder->add('locale', 'hidden');
+        $builder->add('locale', HiddenType::class);
     }
 
     /**

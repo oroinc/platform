@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -45,7 +47,7 @@ class FieldType extends AbstractType
     {
         $builder->add(
             'fieldName',
-            'text',
+            TextType::class,
             array(
                 'label' => 'Field Name',
                 'block' => 'type',
@@ -85,7 +87,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'type',
-            'choice',
+            ChoiceType::class,
             array(
                 'choices'     => $this->types,
                 'empty_value' => 'Please choice type...',

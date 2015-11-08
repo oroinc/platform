@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Oro\Bundle\FlexibleEntityBundle\Form\EventListener\AttributeTypeSubscriber;
@@ -59,7 +63,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldId(FormBuilderInterface $builder)
     {
-        $builder->add('id', 'hidden');
+        $builder->add('id', HiddenType::class);
     }
 
     /**
@@ -68,7 +72,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldCode(FormBuilderInterface $builder)
     {
-        $builder->add('code', 'text', array('required' => true));
+        $builder->add('code', TextType::class, array('required' => true));
     }
 
     /**
@@ -77,7 +81,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldAttributeType(FormBuilderInterface $builder)
     {
-        $builder->add('attributeType', 'choice', array('choices' => $this->getAttributeTypeChoices()));
+        $builder->add('attributeType', ChoiceType::class, array('choices' => $this->getAttributeTypeChoices()));
     }
 
     /**
@@ -86,7 +90,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldRequired(FormBuilderInterface $builder)
     {
-        $builder->add('required', 'choice', array('choices' => array('No', 'Yes')));
+        $builder->add('required', ChoiceType::class, array('choices' => array('No', 'Yes')));
     }
 
     /**
@@ -95,7 +99,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldUnique(FormBuilderInterface $builder)
     {
-        $builder->add('unique', 'choice', array('choices' => array('No', 'Yes')));
+        $builder->add('unique', ChoiceType::class, array('choices' => array('No', 'Yes')));
     }
 
     /**
@@ -104,7 +108,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldDefaultValue(FormBuilderInterface $builder)
     {
-        $builder->add('default_value', 'text', array('required' => false));
+        $builder->add('default_value', TextType::class, array('required' => false));
     }
 
     /**
@@ -113,7 +117,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldSearchable(FormBuilderInterface $builder)
     {
-        $builder->add('searchable', 'choice', array('choices' => array('No', 'Yes')));
+        $builder->add('searchable', ChoiceType::class, array('choices' => array('No', 'Yes')));
     }
 
     /**
@@ -122,7 +126,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldTranslatable(FormBuilderInterface $builder)
     {
-        $builder->add('translatable', 'choice', array('choices' => array('No', 'Yes')));
+        $builder->add('translatable', ChoiceType::class, array('choices' => array('No', 'Yes')));
     }
 
     /**
@@ -131,7 +135,7 @@ class AttributeType extends AbstractType
      */
     protected function addFieldScopable(FormBuilderInterface $builder)
     {
-        $builder->add('scopable', 'choice', array('choices' => array('No', 'Yes')));
+        $builder->add('scopable', ChoiceType::class, array('choices' => array('No', 'Yes')));
     }
 
     /**
@@ -140,7 +144,7 @@ class AttributeType extends AbstractType
      */
     protected function addPositionField(FormBuilderInterface $builder)
     {
-        $builder->add('sortOrder', 'integer', array('label' => 'Position'));
+        $builder->add('sortOrder', IntegerType::class, array('label' => 'Position'));
     }
 
     /**

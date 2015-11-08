@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type\Configuration;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,7 +15,7 @@ class SystemType extends AbstractType
         $builder
             ->add(
                 'oro_installer_locale',
-                'locale',
+                LocaleType::class,
                 array(
                     'label'             => 'form.configuration.system.locale',
                     'preferred_choices' => array('en'),
@@ -26,7 +28,7 @@ class SystemType extends AbstractType
             )
             ->add(
                 'oro_installer_secret',
-                'text',
+                TextType::class,
                 array(
                     'label'             => 'form.configuration.system.secret',
                     'data'              => md5(uniqid()),

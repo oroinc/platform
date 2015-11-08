@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -33,7 +35,7 @@ class ImportType extends AbstractType
     {
         $builder->add(
             'file',
-            'file',
+            FileType::class,
             array(
                 'required' => true
             )
@@ -43,7 +45,7 @@ class ImportType extends AbstractType
 
         $builder->add(
             'processorAlias',
-            'choice',
+            ChoiceType::class,
             array(
                 'choices' => $processorChoices,
                 'required' => true,

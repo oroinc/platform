@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -36,7 +39,7 @@ class EmailTemplateType extends AbstractType
     {
         $builder->add(
             'entityName',
-            'choice',
+            ChoiceType::class,
             array(
                 'choices'            => $this->entityNameChoices,
                 'multiple'           => false,
@@ -49,7 +52,7 @@ class EmailTemplateType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             array(
                 'required' => true
             )
@@ -57,7 +60,7 @@ class EmailTemplateType extends AbstractType
 
         $builder->add(
             'type',
-            'choice',
+            ChoiceType::class,
             array(
                 'multiple'           => false,
                 'expanded'           => true,
@@ -79,7 +82,7 @@ class EmailTemplateType extends AbstractType
 
         $builder->add(
             'parentTemplate',
-            'hidden',
+            HiddenType::class,
             array(
                 'property_path' => 'parent'
             )

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
 
 use Symfony\Component\Form\AbstractType;
@@ -58,7 +60,7 @@ class FlexibleType extends AbstractType
      */
     public function addEntityFields(FormBuilderInterface $builder)
     {
-        $builder->add('id', 'hidden');
+        $builder->add('id', HiddenType::class);
     }
 
     /**
@@ -71,7 +73,7 @@ class FlexibleType extends AbstractType
     {
         $builder->add(
             'values',
-            'collection',
+            CollectionType::class,
             array(
                 'type'               => $this->valueFormAlias,
                 'allow_add'          => true,

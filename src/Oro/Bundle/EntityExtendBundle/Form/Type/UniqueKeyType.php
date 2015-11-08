@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -32,7 +34,7 @@ class UniqueKeyType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             array(
                 'required' => true,
             )
@@ -40,7 +42,7 @@ class UniqueKeyType extends AbstractType
 
         $builder->add(
             'key',
-            'choice',
+            ChoiceType::class,
             array(
                 'multiple' => true,
                 'choices'  => $choices,

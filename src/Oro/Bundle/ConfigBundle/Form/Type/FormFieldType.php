@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -34,7 +35,7 @@ class FormFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $useParentOptions = array('required' => false, 'label' => 'Default');
-        $builder->add('use_parent_scope_value', 'checkbox', $useParentOptions);
+        $builder->add('use_parent_scope_value', CheckboxType::class, $useParentOptions);
 
         if ($options['target_field'] instanceof FieldNodeDefinition) {
             $filedOptions = $options['target_field']->getOptions();

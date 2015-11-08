@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -26,7 +27,7 @@ class UniqueKeyCollectionType extends AbstractType
     {
         $builder->add(
             'keys',
-            'collection',
+            CollectionType::class,
             array(
                 'required'       => true,
                 'type'           => new UniqueKeyType($this->fields),

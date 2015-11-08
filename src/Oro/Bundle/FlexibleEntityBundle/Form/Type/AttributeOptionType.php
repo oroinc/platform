@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -34,7 +37,7 @@ class AttributeOptionType extends AbstractType
      */
     protected function addFieldId(FormBuilderInterface $builder)
     {
-        $builder->add('id', 'hidden');
+        $builder->add('id', HiddenType::class);
     }
 
     /**
@@ -43,7 +46,7 @@ class AttributeOptionType extends AbstractType
      */
     protected function addFieldSortOrder(FormBuilderInterface $builder)
     {
-        $builder->add('sort_order', 'integer', array('required' => false));
+        $builder->add('sort_order', IntegerType::class, array('required' => false));
     }
 
     /**
@@ -63,7 +66,7 @@ class AttributeOptionType extends AbstractType
     {
         $builder->add(
             'optionValues',
-            'collection',
+            CollectionType::class,
             array(
                 'type'         => new AttributeOptionValueType(),
                 'allow_add'    => true,

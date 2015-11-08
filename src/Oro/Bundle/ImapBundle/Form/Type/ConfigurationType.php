@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -73,11 +77,11 @@ class ConfigurationType extends AbstractType
         );
 
         $builder
-            ->add('host', 'text', array('required' => true))
-            ->add('port', 'number', array('required' => true))
+            ->add('host', TextType::class, array('required' => true))
+            ->add('port', NumberType::class, array('required' => true))
             ->add(
                 'ssl',
-                'choice',
+                ChoiceType::class,
                 array(
                     'choices'     => array('ssl' => 'ssl', 'tsl' => 'tsl'),
                     'empty_data'  => null,
@@ -85,8 +89,8 @@ class ConfigurationType extends AbstractType
                     'required'    => false
                 )
             )
-            ->add('user', 'text', array('required' => true))
-            ->add('password', 'password', array('required' => true));
+            ->add('user', TextType::class, array('required' => true))
+            ->add('password', PasswordType::class, array('required' => true));
     }
 
     /**

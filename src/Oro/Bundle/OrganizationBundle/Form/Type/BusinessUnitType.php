@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -19,35 +20,35 @@ class BusinessUnitType extends AbstractType
         $builder
             ->add(
                 'name',
-                'text',
+                TextType::class,
                 array(
                     'required' => true,
                 )
             )
             ->add(
                 'phone',
-                'text',
+                TextType::class,
                 array(
                     'required' => false,
                 )
             )
             ->add(
                 'website',
-                'text',
+                TextType::class,
                 array(
                     'required' => false,
                 )
             )
             ->add(
                 'email',
-                'text',
+                TextType::class,
                 array(
                     'required' => false,
                 )
             )
             ->add(
                 'fax',
-                'text',
+                TextType::class,
                 array(
                     'required' => false,
                 )

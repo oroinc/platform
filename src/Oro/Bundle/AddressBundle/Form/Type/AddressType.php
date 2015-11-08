@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
@@ -31,21 +33,21 @@ class AddressType extends AbstractType
         $builder->addEventSubscriber($this->countryAndRegionSubscriber);
 
         $builder
-            ->add('id', 'hidden')
-            ->add('label', 'text', array('required' => false, 'label' => 'Label'))
-            ->add('namePrefix', 'text', array('required' => false, 'label' => 'Name Prefix'))
-            ->add('firstName', 'text', array('required' => false, 'label' => 'First Name'))
-            ->add('middleName', 'text', array('required' => false, 'label' => 'Middle Name'))
-            ->add('lastName', 'text', array('required' => false, 'label' => 'Last Name'))
-            ->add('nameSuffix', 'text', array('required' => false, 'label' => 'Name Suffix'))
-            ->add('organization', 'text', array('required' => false, 'label' => 'Organization'))
+            ->add('id', HiddenType::class)
+            ->add('label', TextType::class, array('required' => false, 'label' => 'Label'))
+            ->add('namePrefix', TextType::class, array('required' => false, 'label' => 'Name Prefix'))
+            ->add('firstName', TextType::class, array('required' => false, 'label' => 'First Name'))
+            ->add('middleName', TextType::class, array('required' => false, 'label' => 'Middle Name'))
+            ->add('lastName', TextType::class, array('required' => false, 'label' => 'Last Name'))
+            ->add('nameSuffix', TextType::class, array('required' => false, 'label' => 'Name Suffix'))
+            ->add('organization', TextType::class, array('required' => false, 'label' => 'Organization'))
             ->add('country', 'oro_country', array('required' => true, 'label' => 'Country'))
-            ->add('street', 'text', array('required' => true, 'label' => 'Street'))
-            ->add('street2', 'text', array('required' => false, 'label' => 'Street 2'))
-            ->add('city', 'text', array('required' => true, 'label' => 'City'))
+            ->add('street', TextType::class, array('required' => true, 'label' => 'Street'))
+            ->add('street2', TextType::class, array('required' => false, 'label' => 'Street 2'))
+            ->add('city', TextType::class, array('required' => true, 'label' => 'City'))
             ->add('state', 'oro_region', array('required' => false, 'label' => 'State'))
-            ->add('state_text', 'hidden', array('required' => false, 'label' => 'Custom State'))
-            ->add('postalCode', 'text', array('required' => true, 'label' => 'ZIP/Postal code'));
+            ->add('state_text', HiddenType::class, array('required' => false, 'label' => 'Custom State'))
+            ->add('postalCode', TextType::class, array('required' => true, 'label' => 'ZIP/Postal code'));
     }
 
     /**

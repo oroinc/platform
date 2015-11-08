@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type\Configuration;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,7 +16,7 @@ class DatabaseType extends AbstractType
         $builder
             ->add(
                 'oro_installer_database_host',
-                'text',
+                TextType::class,
                 array(
                     'label'         => 'form.configuration.database.host',
                     'constraints'   => array(
@@ -23,7 +26,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_port',
-                'integer',
+                IntegerType::class,
                 array(
                     'label'         => 'form.configuration.database.port',
                     'required'      => false,
@@ -34,7 +37,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_name',
-                'text',
+                TextType::class,
                 array(
                     'label'         => 'form.configuration.database.name',
                     'constraints'   => array(
@@ -44,7 +47,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_user',
-                'text',
+                TextType::class,
                 array(
                     'label'         => 'form.configuration.database.user',
                     'constraints'   => array(
@@ -54,7 +57,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_password',
-                'password',
+                PasswordType::class,
                 array(
                     'label'         => 'form.configuration.database.password',
                     'required'      => false,

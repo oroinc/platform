@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
@@ -22,9 +25,9 @@ class MetricType extends AbstractType
         }
 
         $builder
-            ->add('id', 'hidden')
-            ->add('data', 'number')
-            ->add('unit', 'choice', $unitOptions);
+            ->add('id', HiddenType::class)
+            ->add('data', NumberType::class)
+            ->add('unit', ChoiceType::class, $unitOptions);
     }
 
     /**

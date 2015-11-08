@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -20,14 +24,14 @@ class SetupType extends AbstractType
         $builder
             ->add(
                 'username',
-                'text',
+                TextType::class,
                 array(
                     'label' => 'form.setup.username',
                 )
             )
             ->add(
                 'plainPassword',
-                'repeated',
+                RepeatedType::class,
                 array(
                     'type'           => 'password',
                     'invalid_message' => 'The password fields must match.',
@@ -37,28 +41,28 @@ class SetupType extends AbstractType
             )
             ->add(
                 'email',
-                'email',
+                EmailType::class,
                 array(
                     'label' => 'form.setup.email',
                 )
             )
             ->add(
                 'firstName',
-                'text',
+                TextType::class,
                 array(
                     'label' => 'form.setup.firstname',
                 )
             )
             ->add(
                 'lastName',
-                'text',
+                TextType::class,
                 array(
                     'label' => 'form.setup.lastname',
                 )
             )
             ->add(
                 'loadFixtures',
-                'checkbox',
+                CheckboxType::class,
                 array(
                     'label'    => 'form.setup.load_fixtures',
                     'required' => false,

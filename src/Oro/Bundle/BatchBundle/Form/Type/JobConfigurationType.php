@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\BatchBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,7 +21,7 @@ class JobConfigurationType extends AbstractType
         $builder
             ->add(
                 'steps',
-                'collection',
+                CollectionType::class,
                 array(
                     'type' => new StepConfigurationType()
                 )

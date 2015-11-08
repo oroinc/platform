@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\AbstractType;
@@ -51,7 +53,7 @@ class RecipientListType extends AbstractType
         // custom email
         $builder->add(
             'email',
-            'email',
+            EmailType::class,
             array(
                 'required'      => false
             )
@@ -60,7 +62,7 @@ class RecipientListType extends AbstractType
         // owner
         $builder->add(
             'owner',
-            'checkbox',
+            CheckboxType::class,
             array(
                 'required'      => false
             )

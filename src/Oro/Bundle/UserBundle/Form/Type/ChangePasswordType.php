@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 
 use Symfony\Component\Form\AbstractType;
@@ -33,7 +35,7 @@ class ChangePasswordType extends AbstractType
 
         $builder->add(
             'currentPassword',
-            'password',
+            PasswordType::class,
             array(
                 'required' => false,
                 'label' => 'Current password',
@@ -45,7 +47,7 @@ class ChangePasswordType extends AbstractType
         )
         ->add(
             'plainPassword',
-            'repeated',
+            RepeatedType::class,
             array(
                 'required' => true,
                 'type' => 'password',

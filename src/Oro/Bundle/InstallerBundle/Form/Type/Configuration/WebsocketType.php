@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type\Configuration;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,7 +15,7 @@ class WebsocketType extends AbstractType
         $builder
             ->add(
                 'oro_installer_websocket_host',
-                'text',
+                TextType::class,
                 array(
                     'label'         => 'form.configuration.websocket.host',
                     'required'      => false,
@@ -21,7 +23,7 @@ class WebsocketType extends AbstractType
             )
             ->add(
                 'oro_installer_websocket_port',
-                'integer',
+                IntegerType::class,
                 array(
                     'label'         => 'form.configuration.websocket.port',
                     'required'      => false,

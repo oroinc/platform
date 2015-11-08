@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -16,14 +18,14 @@ class PageStateType extends AbstractType
         $builder
             ->add(
                 'pageId',
-                'text',
+                TextType::class,
                 array(
                     'required' => true,
                 )
             )
             ->add(
                 'data',
-                'textarea',
+                TextareaType::class,
                 array(
                     'required' => true,
                 )

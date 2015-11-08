@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\Form\AbstractType;
@@ -65,7 +66,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'entityName',
-            'choice',
+            ChoiceType::class,
             array(
                 'choices'            => $this->entityNameChoices,
                 'multiple'           => false,

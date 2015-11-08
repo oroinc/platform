@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -96,7 +101,7 @@ class UserType extends AbstractType
             )
             ->add(
                 'plainPassword',
-                'repeated',
+                RepeatedType::class,
                 array(
                     'type'           => 'password',
                     'required'       => true,
@@ -106,7 +111,7 @@ class UserType extends AbstractType
             )
             ->add(
                 'emails',
-                'collection',
+                CollectionType::class,
                 array(
                     'type'           => 'oro_user_email',
                     'allow_add'      => true,
@@ -177,14 +182,14 @@ class UserType extends AbstractType
         $builder
             ->add(
                 'username',
-                'text',
+                TextType::class,
                 array(
                     'required'       => true,
                 )
             )
             ->add(
                 'email',
-                'email',
+                EmailType::class,
                 array(
                     'label'          => 'E-mail',
                     'required'       => true,
@@ -192,7 +197,7 @@ class UserType extends AbstractType
             )
             ->add(
                 'namePrefix',
-                'text',
+                TextType::class,
                 array(
                     'label'          => 'Name prefix',
                     'required'       => false,
@@ -200,7 +205,7 @@ class UserType extends AbstractType
             )
             ->add(
                 'firstName',
-                'text',
+                TextType::class,
                 array(
                     'label'          => 'First name',
                     'required'       => true,
@@ -208,7 +213,7 @@ class UserType extends AbstractType
             )
             ->add(
                 'middleName',
-                'text',
+                TextType::class,
                 array(
                     'label'          => 'Middle name',
                     'required'       => false,
@@ -216,7 +221,7 @@ class UserType extends AbstractType
             )
             ->add(
                 'lastName',
-                'text',
+                TextType::class,
                 array(
                      'label'          => 'Last name',
                      'required'       => true,
@@ -224,7 +229,7 @@ class UserType extends AbstractType
             )
             ->add(
                 'nameSuffix',
-                'text',
+                TextType::class,
                 array(
                     'label'          => 'Name suffix',
                     'required'       => false,
@@ -240,7 +245,7 @@ class UserType extends AbstractType
             )
             ->add(
                 'imageFile',
-                'file',
+                FileType::class,
                 array(
                     'label'          => 'Avatar',
                     'required'       => false,

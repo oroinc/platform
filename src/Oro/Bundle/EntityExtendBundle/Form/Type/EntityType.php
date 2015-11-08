@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -12,7 +13,7 @@ class EntityType extends AbstractType
     {
         $builder->add(
             'className',
-            'text',
+            TextType::class,
             array(
                 'label'    => 'Name',
                 'block'    => 'entity',

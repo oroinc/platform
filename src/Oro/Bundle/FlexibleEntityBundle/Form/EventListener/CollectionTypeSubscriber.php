@@ -22,7 +22,7 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            FormEvents::POST_BIND     => 'postBind',
+            FormEvents::POST_SUBMIT     => 'postBind',
             FormEvents::PRE_SET_DATA  => 'preSet',
         );
     }

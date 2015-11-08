@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,10 +21,10 @@ class MediaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('file', 'file', array('required' => false))
+            ->add('file', FileType::class, array('required' => false))
             ->add(
                 'removed',
-                'checkbox',
+                CheckboxType::class,
                 array(
                     'required' => false,
                     'label'    => 'Remove media',
