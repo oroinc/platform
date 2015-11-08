@@ -110,6 +110,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $field5EntityConfig = new Config(new FieldConfigId('entity', self::TEST_ENTITY_NAME, 'field5', 'string'));
         $field5EntityConfig->set('label', 'field5_label');
 
+        $entityExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
+        $entityExtendConfig->set('is_extend', true);
+
         $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -125,6 +128,14 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_ENTITY_NAME)
             ->will($this->returnValue($em));
 
+        $this->extendConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue(true));
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($entityExtendConfig));
         $this->emailConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with(self::TEST_ENTITY_NAME)
@@ -211,6 +222,12 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity2field1EntityConfig = new Config(new FieldConfigId('entity', $entity2Class, 'email', 'string'));
         $entity2field1EntityConfig->set('label', 'email_label');
 
+        $entity1ExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
+        $entity1ExtendConfig->set('is_extend', true);
+
+        $entity2ExtendConfig = new Config(new EntityConfigId('extend', $entity2Class));
+        $entity2ExtendConfig->set('is_extend', true);
+
         $classMetadata1 = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -251,7 +268,26 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-
+        $this->extendConfigProvider->expects($this->exactly(2))
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, null, true],
+                        [$entity2Class, null, true],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, null, $entity1ExtendConfig],
+                        [$entity2Class, null, $entity2ExtendConfig],
+                    ]
+                )
+            );
         $this->emailConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
             ->will(
@@ -300,6 +336,17 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $field5Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
         $field5Config->set('available_in_template', true);
 
+        $entityExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
+        $entityExtendConfig->set('is_extend', true);
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue(true));
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($entityExtendConfig));
         $this->emailConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with(self::TEST_ENTITY_NAME)
@@ -329,12 +376,20 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity2field1Config = new Config(new FieldConfigId('email', $entity2Class, 'email', 'string'));
         $entity2field1Config->set('available_in_template', true);
 
+        $entity1ExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
+        $entity1ExtendConfig->set('is_extend', true);
+
+        $entity2ExtendConfig = new Config(new EntityConfigId('extend', $entity2Class));
+        $entity2ExtendConfig->set('is_extend', true);
+
         $entity3Class        = 'Extend\Entity\SomeEntity1';
         $entity3ExtendConfig = new Config(new EntityConfigId('extend', $entity3Class));
+        $entity3ExtendConfig->set('is_extend', true);
         $entity3ExtendConfig->set('state', ExtendScope::STATE_NEW);
 
         $entity4Class        = 'Extend\Entity\SomeEntity2';
         $entity4ExtendConfig = new Config(new EntityConfigId('extend', $entity4Class));
+        $entity4ExtendConfig->set('is_extend', true);
         $entity4ExtendConfig->set('is_deleted', true);
 
         $this->entityConfigProvider->expects($this->once())
@@ -361,11 +416,25 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->extendConfigProvider->expects($this->any())
+        $this->extendConfigProvider->expects($this->exactly(4))
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, null, true],
+                        [$entity2Class, null, true],
+                        [$entity3Class, null, true],
+                        [$entity4Class, null, true],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->exactly(4))
             ->method('getConfig')
             ->will(
                 $this->returnValueMap(
                     [
+                        [self::TEST_ENTITY_NAME, null, $entity1ExtendConfig],
+                        [$entity2Class, null, $entity2ExtendConfig],
                         [$entity3Class, null, $entity3ExtendConfig],
                         [$entity4Class, null, $entity4ExtendConfig],
                     ]
