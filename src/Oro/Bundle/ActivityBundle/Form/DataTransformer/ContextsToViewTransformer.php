@@ -1,16 +1,16 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
+namespace Oro\Bundle\ActivityBundle\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ContextsToViewTransformer implements DataTransformerInterface
 {
@@ -26,28 +26,28 @@ class ContextsToViewTransformer implements DataTransformerInterface
     /** @var ObjectMapper */
     protected $mapper;
 
-    /* @var SecurityFacade */
-    protected $securityFacade;
+    /* @var TokenStorageInterface */
+    protected $securityTokenStorage;
 
     /**
-     * @param EntityManager $entityManager
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     * @param ObjectMapper $mapper
-     * @param SecurityFacade $securityFacade
+     * @param EntityManager         $entityManager
+     * @param ConfigManager         $configManager
+     * @param TranslatorInterface   $translator
+     * @param ObjectMapper          $mapper
+     * @param TokenStorageInterface $securityTokenStorage
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigManager $configManager,
         TranslatorInterface $translator,
         ObjectMapper $mapper,
-        SecurityFacade $securityFacade
+        TokenStorageInterface $securityTokenStorage
     ) {
-        $this->entityManager = $entityManager;
-        $this->configManager = $configManager;
-        $this->translator = $translator;
-        $this->mapper = $mapper;
-        $this->securityFacade = $securityFacade;
+        $this->entityManager        = $entityManager;
+        $this->configManager        = $configManager;
+        $this->translator           = $translator;
+        $this->mapper               = $mapper;
+        $this->securityTokenStorage = $securityTokenStorage;
     }
 
     /**
@@ -61,10 +61,12 @@ class ContextsToViewTransformer implements DataTransformerInterface
 
         if (is_array($value)) {
             $result = [];
-            $user = $this->securityFacade->getToken()->getUser();
+            $user   = $this->securityTokenStorage->getToken()->getUser();
             foreach ($value as $target) {
+                // Exclude current user
                 if (ClassUtils::getClass($user) === ClassUtils::getClass($target) &&
-                    $user->getId() === $target->getId()) {
+                    $user->getId() === $target->getId()
+                ) {
                     continue;
                 }
 
@@ -74,7 +76,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
                         $text[] = $this->mapper->getFieldValue($target, $field);
                     }
                 } else {
-                    $text = [(string) $target];
+                    $text = [(string)$target];
                 }
                 $text = implode(' ', $text);
                 if ($label = $this->getClassLabel(ClassUtils::getClass($target))) {
@@ -84,7 +86,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
                 $result[] = json_encode(
                     [
                         'text' => $text,
-                        'id' => json_encode([
+                        'id'   => json_encode([
                             'entityClass' => ClassUtils::getClass($target),
                             'entityId'    => $target->getId(),
                         ])

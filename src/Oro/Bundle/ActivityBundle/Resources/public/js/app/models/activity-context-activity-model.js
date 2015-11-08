@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var EmailContextActivityModel;
+    var ActivityContextActivityModel;
     var routing = require('routing');
     var BaseModel = require('oroui/js/app/models/base/model');
 
     /**
-     * @export  oroemail/js/app/models/email-context-activity-model
+     * @export  oroactivity/js/app/models/activity-context-activity-model
      */
-    EmailContextActivityModel = BaseModel.extend({
+    ActivityContextActivityModel = BaseModel.extend({
         defaults: {
             entity: '',
             className: '',
@@ -17,7 +17,7 @@ define(function(require) {
         },
         url: function() {
             var param = {
-                activity: 'emails',
+                activity: this.get('activityClassAlias'),
                 id: this.get('entityId'),
                 entity:  this.get('targetClassName'),
                 entityId: this.get('targetId')
@@ -27,5 +27,5 @@ define(function(require) {
         }
     });
 
-    return EmailContextActivityModel;
+    return ActivityContextActivityModel;
 });

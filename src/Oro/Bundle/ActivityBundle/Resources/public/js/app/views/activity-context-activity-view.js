@@ -6,26 +6,26 @@ define([
     'oroui/js/messenger',
     'oroui/js/app/views/base/view',
     'oroui/js/mediator',
-    'oroemail/js/app/models/email-context-activity-collection'
-], function($, _, __, routing, messenger, BaseView, mediator, EmailContextActivityCollection) {
+    'oroactivity/js/app/models/activity-context-activity-collection'
+], function($, _, __, routing, messenger, BaseView, mediator, ActivityContextActivityCollection) {
     'use strict';
 
-    var EmailContextActivityView;
+    var ActivityContextActivityView;
 
     /**
-     * @export oroemail/js/app/views/email-context-activity-view
+     * @export oroactivity/js/app/views/activity-context-activity-view
      */
-    EmailContextActivityView = BaseView.extend({
+    ActivityContextActivityView = BaseView.extend({
         options: {},
         events: {},
 
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
-            this.template = _.template($('#email-context-activity-list').html());
+            this.template = _.template($('#activity-context-activity-list').html());
             this.$container = options.$container;
-            this.$containerContextTargets = $(options.$container.context).find('.email-context-activity-items');
-            this.collection = new EmailContextActivityCollection('oro_api_delete_activity_relation');
+            this.$containerContextTargets = $(options.$container.context).find('.activity-context-activity-items');
+            this.collection = new ActivityContextActivityCollection('oro_api_delete_activity_relation');
             this.initEvents();
 
             if (this.options.contextTargets) {
@@ -38,11 +38,11 @@ define([
             }
 
             /**
-            * on adding activity item listen to "widget:doRefresh:email-context-activity-list-widget"
+            * on adding activity item listen to "widget:doRefresh:activity-context-activity-list-widget"
             */
-            this.listenTo(mediator, 'widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this);
-            this.listenTo(mediator, 'widget:doRefresh:email-thread-context', this.doRefresh, this);
-            EmailContextActivityView.__super__.initialize.apply(this, arguments);
+            this.listenTo(mediator, 'widget:doRefresh:activity-context-activity-list-widget', this.doRefresh, this);
+            this.listenTo(mediator, 'widget:doRefresh:activity-thread-context', this.doRefresh, this);
+            ActivityContextActivityView.__super__.initialize.apply(this, arguments);
             this.render();
         },
 
@@ -52,7 +52,10 @@ define([
 
         doRefresh: function() {
             var self = this;
-            var  url = routing.generate('oro_api_get_email_context', {id: this.options.entityId});
+            var url = routing.generate('oro_api_get_activity_context', {
+                activity: this.options.activityClass,
+                id: this.options.entityId
+            });
             $.ajax({
                 method: 'GET',
                 url: url,
@@ -91,14 +94,14 @@ define([
                 $view.find('i.icon-remove').click(function() {
                     model.destroy({
                         success: function(model, response) {
-                            messenger.notificationFlashMessage('success', __('oro.email.contexts.removed'));
+                            messenger.notificationFlashMessage('success', __('oro.activity.contexts.removed'));
 
                             if (self.options.target &&
                                 model.get('targetClassName') === self.options.target.className &&
                                 model.get('targetId') === self.options.target.id) {
                                 mediator.trigger('widget_success:activity_list:item:update');
                             } else {
-                                mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
+                                mediator.trigger('widget:doRefresh:activity-context-activity-list-widget');
                             }
                         },
                         error: function(model, response) {
@@ -110,5 +113,5 @@ define([
         }
     });
 
-    return EmailContextActivityView;
+    return ActivityContextActivityView;
 });
