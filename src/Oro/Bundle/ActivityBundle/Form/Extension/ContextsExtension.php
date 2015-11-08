@@ -13,6 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class ContextsExtension extends AbstractTypeExtension
 {
@@ -22,14 +23,22 @@ class ContextsExtension extends AbstractTypeExtension
     /** @var ActivityManager */
     protected $activityManager;
 
+    /** @var EntityAliasResolver */
+    protected $entityAliasResolver;
+
     /**
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ActivityManager $activityManager
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ActivityManager     $activityManager
+     * @param EntityAliasResolver $entityAliasResolver
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ActivityManager $activityManager)
-    {
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->activityManager = $activityManager;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ActivityManager $activityManager,
+        EntityAliasResolver $entityAliasResolver
+    ) {
+        $this->doctrineHelper      = $doctrineHelper;
+        $this->activityManager     = $activityManager;
+        $this->entityAliasResolver = $entityAliasResolver;
     }
 
     /**
@@ -41,6 +50,9 @@ class ContextsExtension extends AbstractTypeExtension
             return;
         }
 
+        $className = $options['data_class'];
+        $alias     = $this->entityAliasResolver->getPluralAlias($className);
+
         $builder->add(
             'contexts',
             'oro_activity_contexts_select',
@@ -50,6 +62,13 @@ class ContextsExtension extends AbstractTypeExtension
                 'required'  => false,
                 'read_only' => false,
                 'mapped'    => false,
+                'configs'   => [
+                    'route_name'       => 'oro_activity_form_autocomplete_search',
+                    'route_parameters' => [
+                        'activity' => $alias,
+                        'name'     => $alias
+                    ],
+                ]
             ]
         );
 

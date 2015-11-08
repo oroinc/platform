@@ -93,7 +93,6 @@ class ContextsSelectType extends AbstractType
             'placeholder'        => 'oro.activity.contexts.placeholder',
             'allowClear'         => true,
             'multiple'           => true,
-            'route_name'         => 'oro_api_get_search_autocomplete',
             'separator'          => ';',
             'forceSelectedData'  => true,
             'minimumInputLength' => 0,

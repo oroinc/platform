@@ -15,5 +15,6 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_activity.manager
+            - @oro_entity.entity_alias_resolver
         tags:
             - { name: form.type_extension, alias: form }
