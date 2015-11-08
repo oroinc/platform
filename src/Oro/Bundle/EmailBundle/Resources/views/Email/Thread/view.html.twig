@@ -1,6 +1,6 @@
 {% extends "OroUIBundle:actions:view.html.twig" %}
-{% import "OroEmailBundle::actions.html.twig" as Actions %}
 {% import "OroActivityBundle::macros.html.twig" as AC %}
+{% import "OroEmailBundle::actions.html.twig" as Actions %}
 
 {% oro_title_set({params : {"%subject%": entity.subject} }) %}
 
@@ -21,7 +21,7 @@
 {% block navButtons %}
     {% set buttonsHtml %}
         {# Button for add context on the activity list item view page #}
-        {{ Actions.addContextButton(entity) }}
+        {{ AC.addContextButton(entity) }}
         {{ Actions.addMarkUnreadButton(entity) }}
     {% endset %}
     {{ UI.pinnedDropdownButton({

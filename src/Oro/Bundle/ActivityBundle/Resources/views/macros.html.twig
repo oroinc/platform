@@ -102,3 +102,39 @@
         <i class="icon-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
     </a>
 {% endmacro %}
+
+{# Button for add context on the activity list item view page #}
+{% macro addContextButton(entity, parameters) -%}
+    {% if resource_granted('EDIT', entity) %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {{ UI.clientButton({
+            'dataUrl': path(
+            'oro_activity_context', {
+                id:    entity.id,
+                activity: oro_class_name(entity, true)
+            }),
+            'aCss': 'no-hash',
+            'iCss': 'icon-link hide-text',
+            'dataId': entity.id,
+            'label' : 'oro.activity.contexts.add_context.label'|trans,
+            'widget' : {
+                'type' : 'dialog',
+                'multiple' : true,
+                'refresh-widget-alias': 'activity-list-widget',
+                'options' : {
+                    'alias': 'activity-context-dialog',
+                    'dialogOptions' : {
+                        'title' : 'oro.activity.contexts.add_context_entity.label'|trans,
+                        'allowMaximize': true,
+                        'allowMinimize': true,
+                        'modal': true,
+                        'dblclick': 'maximize',
+                        'maximizedHeightDecreaseBy': 'minimize-bar',
+                        'width': 1000,
+                        'height': 600
+                    }
+                }
+            }
+        }) }}
+    {% endif %}
+{% endmacro %}

@@ -75,9 +75,7 @@ class ContextsSelectType extends AbstractType
     }
 
     /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
