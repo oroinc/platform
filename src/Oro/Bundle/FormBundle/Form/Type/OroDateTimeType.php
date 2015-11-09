@@ -56,7 +56,7 @@ class OroDateTimeType extends AbstractType
      */
     public function getParent()
     {
-        return 'datetime';
+        return DateTimeType::class;
     }
 
     /**

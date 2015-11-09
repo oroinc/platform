@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\AbstractType;
 
 class ObjectLabelType extends AbstractType
@@ -19,6 +20,6 @@ class ObjectLabelType extends AbstractType
      */
     public function getParent()
     {
-        return 'hidden';
+        return HiddenType::class;
     }
 }

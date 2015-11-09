@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -21,7 +22,7 @@ class BusinessUnitTreeSelectType extends AbstractType
 
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

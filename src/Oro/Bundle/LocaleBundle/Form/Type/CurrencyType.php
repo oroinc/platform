@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -23,7 +24,7 @@ class CurrencyType extends AbstractType
      */
     public function getParent()
     {
-        return 'currency';
+        return CurrencyType::class;
     }
 
     /**
