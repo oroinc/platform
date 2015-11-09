@@ -727,4 +727,4 @@ services:
             - @doctrine
             - @security.acl.cache.doctrine
         tags:
-            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlush }
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlushConfig }

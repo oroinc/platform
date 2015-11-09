@@ -41,14 +41,18 @@ class EntityConfigListener
      *
      * @param PostFlushConfigEvent $event
      */
-    public function postFlush(PostFlushConfigEvent $event)
+    public function postFlushConfig(PostFlushConfigEvent $event)
     {
         $configManager = $event->getConfigManager();
         foreach ($event->getModels() as $model) {
             /** @var EntityConfigModel $model */
             if ($model instanceof EntityConfigModel) {
-                $aclClass = $this->registry->getManager()->getRepository('OroSecurityBundle:AclClass')
+                $aclClass = $this->registry->getRepository('OroSecurityBundle:AclClass')
                     ->findOneBy(['classType' => $model->getClassName()]);
+
+                if (!$aclClass) {
+                    continue;
+                }
 
                 $changeSet = $configManager->getConfigChangeSet(
                     $configManager->getProvider('security')->getConfig($model->getClassName())
@@ -59,7 +63,7 @@ class EntityConfigListener
                     $removeScopes = array_diff($changeSet['share_scopes'][0], $changeSet['share_scopes'][1]);
                 }
 
-                if (!$aclClass || empty($removeScopes)) {
+                if (empty($removeScopes)) {
                     continue;
                 }
 
