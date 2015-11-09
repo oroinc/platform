@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -69,17 +68,12 @@ class EntityHierarchyProvider
 
             $entityConfigs = $this->extendConfigProvider->getConfigs();
             foreach ($entityConfigs as $entityConfig) {
-                if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
-                    continue;
-                }
-                if ($entityConfig->is('is_deleted')) {
-                    continue;
-                }
-
-                $className = $entityConfig->getId()->getClassName();
-                $parents   = $this->loadParents($className);
-                if (!empty($parents)) {
-                    $this->hierarchy[$className] = $parents;
+                if (ExtendHelper::isEntityAccessible($entityConfig)) {
+                    $className = $entityConfig->getId()->getClassName();
+                    $parents   = $this->loadParents($className);
+                    if (!empty($parents)) {
+                        $this->hierarchy[$className] = $parents;
+                    }
                 }
             }
         }

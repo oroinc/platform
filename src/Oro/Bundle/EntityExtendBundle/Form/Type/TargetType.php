@@ -16,14 +16,10 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 
 class TargetType extends AbstractType
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var FieldConfigId
-     */
+    /** @var FieldConfigId */
     protected $configId;
 
     public function __construct(ConfigManager $configManager, $configId)
@@ -75,15 +71,15 @@ class TargetType extends AbstractType
 
     protected function getEntityChoiceList($entityClassName, $relationType)
     {
-        $choices       = array();
+        $choices       = [];
         $extendEntityConfig = $this->configManager->getProvider('extend');
 
         /** @var EntityConfigId[] $entityIds */
         $entityIds = $this->targetEntity
-            ? array($extendEntityConfig->getId($this->targetEntity))
+            ? [$extendEntityConfig->getId($this->targetEntity)]
             : $extendEntityConfig->getIds();
 
-        if (in_array($relationType, array(RelationTypeBase::ONE_TO_MANY, RelationTypeBase::MANY_TO_MANY))) {
+        if (in_array($relationType, [RelationTypeBase::ONE_TO_MANY, RelationTypeBase::MANY_TO_MANY], true)) {
             $entityIds = array_filter(
                 $entityIds,
                 function (EntityConfigId $configId) {
@@ -99,7 +95,12 @@ class TargetType extends AbstractType
             function (EntityConfigId $configId) {
                 $config = $this->configManager->getConfig($configId);
 
-                return $config->is('is_extend', false) || !$config->is('state', ExtendScope::STATE_NEW);
+                return
+                    !$config->is('state', ExtendScope::STATE_NEW)
+                    && (
+                        $this->targetEntity
+                        || !$config->is('is_deleted')
+                    );
             }
         );
 
@@ -125,9 +126,9 @@ class TargetType extends AbstractType
     {
         $entityConfig = $this->configManager->getProvider('entity')->getConfig($entityClass);
 
-        return array(
+        return [
             'data-icon' => $entityConfig->get('icon')
-        );
+        ];
     }
 
     /**
