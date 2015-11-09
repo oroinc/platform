@@ -588,7 +588,7 @@ define(function(require) {
             this.main.trigger('content:update');
 
             var errors = [];
-            switch (jqXHR.responseJSON.code) {
+            switch (jqXHR.status) {
                 case 400:
                     var jqXHRerrors = jqXHR.responseJSON.errors.children;
                     for (var i in jqXHRerrors) {
