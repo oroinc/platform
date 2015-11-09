@@ -182,11 +182,11 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                         if ($this->isAceApplicable($requiredMask, $ace, $acl)) {
                             $isGranting = $ace->isGranting();
 
-                            $aclExtension = $this->getContext()->getAclExtension();
+                            $aclExt = $this->getContext()->getAclExtension();
                             if ($sid instanceof RoleSecurityIdentity) {
                                 // give an additional chance for the appropriate ACL extension to decide
                                 // whether an access to a domain object is granted or not
-                                $decisionResult = $aclExtension->decideIsGranting(
+                                $decisionResult = $aclExt->decideIsGranting(
                                     $requiredMask,
                                     $this->getContext()->getObject(),
                                     $this->getContext()->getSecurityToken()
@@ -198,20 +198,17 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
                             if ($isGranting) {
                                 // the access is granted if there is at least one granting ACE
-                                if ($aclExtension->getAccessLevel($requiredMask)
-                                    > $aclExtension->getAccessLevel($triggeredMask)
-                                ) {
+                                if ($aclExt->getAccessLevel($requiredMask) > $aclExt->getAccessLevel($triggeredMask)) {
+                                    // the current ACE gives more permissions than previous one
                                     $triggeredAce  = $ace;
                                     $triggeredMask = $requiredMask;
                                 }
 
                                 $result = true;
-                            } else {
+                            } elseif (null === $triggeredAce) {
                                 // remember the first denying ACE
-                                if (null === $triggeredAce) {
-                                    $triggeredAce  = $ace;
-                                    $triggeredMask = $requiredMask;
-                                }
+                                $triggeredAce  = $ace;
+                                $triggeredMask = $requiredMask;
                             }
                         }
                     }
