@@ -87,7 +87,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial eu.{id, email, folder}
+                    - partial eu.{id, email}
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
@@ -104,9 +104,6 @@ datagrid:
                             alias: thread
                         -
                             join: e.recipients
-                            alias: recipients
-                        -
-                            join: e.recipients
                             alias: r_to
                             conditionType: WITH
                             condition: r_to.type = 'to'
@@ -116,7 +113,7 @@ datagrid:
                             conditionType: WITH
                             condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
                         -
-                            join: eu.folder
+                            join: eu.folders
                             alias: f
                         -
                             join: f.origin
@@ -182,18 +179,14 @@ datagrid:
                 ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
                 folder:
-                    label: oro.email.folder_type.label
-                    type: choice
+                    label: oro.email.message_type.label
+                    type: multiselect-messagetype
                     options:
                         field_options:
                             multiple: true
                             choices:
                                 inbox: oro.email.folder_type.inbox
                                 sent: oro.email.folder_type.sent
-                                other: oro.email.folder_type.other
-                                drafts: oro.email.folder_type.drafts
-                                spam: oro.email.folder_type.spam
-                                trash: oro.email.folder_type.trash
                     data_name: f.type
                 folders:
                     type: multiselect-originfolder
@@ -205,12 +198,13 @@ datagrid:
                             choices: @oro_email.datagrid.origin_folder.provider->getListTypeChoices
                 is_new:
                     label: oro.email.status.label
-                    type: choice
+                    type: boolean
                     options:
                         field_options:
                             choices:
-                                false: oro.email.status.unread.label
-                                true: oro.email.status.read.label
+                                # in boolean filter type, 1 = yes, 2 = false
+                                2: oro.email.status.unread.label
+                                1: oro.email.status.read.label
                     data_name: eu.seen
                 mailbox:
                     label: oro.email.mailbox.entity_label
@@ -281,6 +275,9 @@ datagrid:
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 icon: minus
+        options:
+            toolbarOptions:
+                addColumnManager: false
 
     dashboard-recent-emails-grid:
         source:
@@ -299,12 +296,9 @@ datagrid:
                             join: eu.email
                             alias: e
                     inner:
-                        - { join: eu.folder, alias: f }
+                        - { join: eu.folders, alias: f }
                         - { join: f.origin, alias: o }
                         - { join: e.fromEmailAddress, alias: a }
-                where:
-                    and:
-                        - o.id IN (:origin_ids)
         properties:
             id: ~
             row_class_name:
@@ -519,7 +513,6 @@ datagrid:
 
     base-mailboxes-grid:
         source:
-            acl_resource: oro_email_mailbox_view
             type: orm
             query:
                 select:
@@ -565,19 +558,18 @@ datagrid:
                 params:
                     id: id
         options:
+            skip_acl_check: true
             toolbarOptions:
                 hide: true
         actions:
             update:
                 type:         navigate
-                acl_resource: oro_email_mailbox_update
                 label:        oro.grid.action.update
                 link:         update_link
                 icon:         edit
                 rowAction:    true
             delete:
                 type:         delete
-                acl_resource: oro_email_mailbox_delete
                 label:        oro.grid.action.delete
                 icon:         trash
                 link:         delete_link

@@ -18,13 +18,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         _create: function() {
             var data = this.element.data('value');
 
-            // @TODO this 'none' filter probably in not in use any more, to delete
-            this.options.filters.push({
-                type: 'none',
-                applicable: {},
-                popupHint: __('Choose a column first')
-            });
-
             this.$fieldChoice = $('<input>').addClass(this.options.fieldChoiceClass);
             this.$filterContainer = $('<span>').addClass(this.options.filterContainerClass);
             this.element.append(this.$fieldChoice, this.$filterContainer);
@@ -67,32 +60,37 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         },
 
         _renderFilter: function(fieldId) {
+            var filter;
             var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId);
-            var filterId = this._getApplicableFilterId(conditions);
-            var filter = this.options.filters[filterId];
+
+            if (_.isEmpty(conditions)) {
+                filter = {
+                    type: 'none',
+                    applicable: {},
+                    popupHint: '<span class="deleted-field">' + __('oro.querydesigner.field_not_found') + '</span>'
+                };
+            } else {
+                filter = this.options.filters[this._getApplicableFilterId(conditions)];
+            }
 
             if (!filter) {
                 filter = {
                     type: 'none',
                     applicable: {},
-                    popupHint: '<span style="color: red">This filter is not supported.</span>'
+                    popupHint: '<span class="deleted-field">' +
+                        __('oro.querydesigner.field_condition.filter_not_supported') + '</span>'
                 };
-                this._createFilter(filter, 'none');
-                return;
             }
 
             // @TODO temporary workaround. Will by fixed in BAP-8112
             if (conditions.entity === 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account' &&
                 conditions.field === 'lifetimeValue') {
-                filterId = 'not_supported_lifetimeValue';
                 filter = {
                     type: 'none',
                     applicable: {},
-                    popupHint: '<span style="color: red">' +
-                        'The filtering by the LifetimeValue is not supported yet.</span>'
+                    popupHint: '<span class="deleted-field">' +
+                        __('oro.querydesigner.field_condition.lifetimevalue_filter_not_supported') + '</span>'
                 };
-                this._createFilter(filter, filterId);
-                return;
             }
 
             this._createFilter(filter, fieldId);
@@ -124,9 +122,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                         matchedBy = matched;
                         filterId = id;
                     }
-                } else if (_.isNull(filterId)) {
-                    // if a filter was not found so far, use a default filter
-                    filterId = id;
                 }
             });
 

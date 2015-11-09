@@ -26,6 +26,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "note"={
  *              "immutable"=true
  *          },
+ *          "comment"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
  *              "immutable"=true
  *          },

@@ -8,136 +8,118 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ConfigManager
 {
-    const SECTION_VIEW_SEPARATOR  = '___';
+    const SECTION_VIEW_SEPARATOR = '___';
     const SECTION_MODEL_SEPARATOR = '.';
 
     /** @var array Settings array, initiated with global application settings */
     protected $settings;
 
-    /** @var array|AbstractScopeManager[] */
+    /** @var ConfigValueBag */
+    protected $localCache;
+
+    /** @var AbstractScopeManager[] */
     protected $managers;
 
     /** @var string */
-    protected $scopeName;
+    protected $scope;
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /**
+     * @param string                       $scope
      * @param ConfigDefinitionImmutableBag $configDefinition
      * @param EventDispatcherInterface     $eventDispatcher
+     * @param ConfigValueBag               $valueBag
      */
     public function __construct(
+        $scope,
         ConfigDefinitionImmutableBag $configDefinition,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ConfigValueBag $valueBag
     ) {
-        $this->settings = $configDefinition->all();
+        $this->scope           = $scope;
+        $this->settings        = $configDefinition->all();
         $this->eventDispatcher = $eventDispatcher;
+        $this->localCache      = $valueBag;
     }
 
     /**
-     * @param string               $scopeName
+     * @param string               $scope
      * @param AbstractScopeManager $manager
      */
-    public function addManager($scopeName, $manager)
+    public function addManager($scope, $manager)
     {
-        $this->managers[$scopeName] = $manager;
+        $this->managers[$scope] = $manager;
     }
 
     /**
-     * @param string $scopeName
+     * @return int
      */
-    public function setScopeName($scopeName)
+    public function getScopeId()
     {
-        $this->scopeName = $scopeName;
+        return $this->getScopeManager()->getScopeId();
+    }
+
+    /**
+     * @param int $scopeId
+     */
+    public function setScopeId($scopeId)
+    {
+        $this->getScopeManager()->setScopeId($scopeId);
     }
 
     /**
      * Get setting value
      *
      * @param string $name Setting name, for example "oro_user.level"
-     * @param bool    $default
-     * @param bool    $full
+     * @param bool   $default
+     * @param bool   $full
      *
-     * @return array|string
+     * @return mixed
      */
     public function get($name, $default = false, $full = false)
     {
-        $managers = array_reverse($this->managers);
-
-        //in case if we need default value - unset current scope manager
-        if ($default) {
-            unset($managers[$this->scopeName]);
-        }
-        $value = null;
-        foreach ($managers as $scopeName => $manager) {
-            /** @var $manager AbstractScopeManager */
-            $value = $manager->getSettingValue($name, $full);
-
-            if (!is_null($value)) {
-                if ($full
-                    && is_array($value)
-                    && ($scopeName !== $this->scopeName
-                        || (isset($value['scope']) && $value['scope'] !== $manager->getScopedEntityName())
-                    )
-                ) {
-                    $value['use_parent_scope_value'] = true;
-                }
-                break;
-            }
+        // full and default values are not cached locally
+        if ($full || $default) {
+            return $this->getValue($name, $default, $full);
         }
 
-        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
-        if (is_null($value) && !empty($this->settings[$section][$key])) {
-            $setting = $this->settings[$section][$key];
-
-            if (is_array($setting) && array_key_exists('value', $setting) && !$full) {
-                return $setting['value'];
-            } else {
-                return $setting;
-            }
+        // try to get a value from a local cache
+        $scopeId = $this->getScopeId();
+        if ($this->localCache->hasValue($this->scope, $scopeId, $name)) {
+            return $this->localCache->getValue($this->scope, $scopeId, $name);
         }
+
+        $value = $this->getValue($name, $default, $full);
+
+        // put to a local cache
+        $this->localCache->setValue($this->scope, $scopeId, $name, $value);
 
         return $value;
-    }
-
-    /**
-     * @param int|null    $scopeId
-     * @param string|null $scope
-     *
-     * @return $this
-     */
-    public function setScopeId($scopeId = null, $scope = null)
-    {
-        if (is_null($scope)) {
-            $scope = $this->scopeName;
-        }
-
-        $this->managers[$scope]->setScopeId($scopeId);
-
-        return $this;
     }
 
     /**
      * Get Additional Info of Config Value
      *
      * @param $name
+     *
      * @return array
      */
     public function getInfo($name)
     {
-        /** @var AbstractScopeManager[] $managers */
-        $managers = array_reverse($this->managers);
-
         $createdValues = [];
         $updatedValues = [];
 
-        $createdValue = $updatedValue  = null;
+        $createdValue = $updatedValue = null;
         $valueWasFind = false;
 
-        foreach ($managers as $manager) {
+        foreach ($this->managers as $manager) {
             list($created, $updated, $isNullValue) = $manager->getInfo($name);
             if (!$isNullValue) {
                 $createdValue = $created;
@@ -155,10 +137,10 @@ class ConfigManager
 
         if (!$valueWasFind) {
             if (!empty($createdValues)) {
-                $createdValue =  min($createdValues);
+                $createdValue = min($createdValues);
             }
             if (!empty($updatedValues)) {
-                $updatedValue =  max($updatedValues);
+                $updatedValue = max($updatedValues);
             }
         }
 
@@ -174,6 +156,9 @@ class ConfigManager
     public function set($name, $value)
     {
         $this->getScopeManager()->set($name, $value);
+
+        // put to a local cache
+        $this->localCache->setValue($this->scope, $this->getScopeId(), $name, $value);
     }
 
     /**
@@ -184,6 +169,9 @@ class ConfigManager
     public function reset($name)
     {
         $this->getScopeManager()->reset($name);
+
+        // remove from a local cache
+        $this->localCache->removeValue($this->scope, $this->getScopeId(), $name);
     }
 
     /**
@@ -191,49 +179,52 @@ class ConfigManager
      */
     public function flush()
     {
-        $this->getScopeManager()->flush();
+        $this->save($this->getScopeManager()->getChanges());
     }
 
     /**
      * Save settings
      *
-     * @param array $newSettings
+     * @param array $settings
      */
-    public function save($newSettings)
+    public function save($settings)
     {
-        $event = new ConfigSettingsUpdateEvent($this, $newSettings);
+        $settings = $this->normalizeSettings($settings);
+        if (empty($settings)) {
+            return;
+        }
+
+        $oldValues = [];
+        foreach ($settings as $name => $value) {
+            $oldValues[$name] = $this->getValue($name);
+        }
+
+        $event = new ConfigSettingsUpdateEvent($this, $settings);
         $this->eventDispatcher->dispatch(ConfigSettingsUpdateEvent::BEFORE_SAVE, $event);
 
         list($updated, $removed) = $this->getScopeManager()->save($event->getSettings());
 
-        $event = new ConfigUpdateEvent($this, $updated, $removed);
+        $event = new ConfigUpdateEvent($this->buildChangeSet($updated, $removed, $oldValues));
         $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
 
-        $this->getScopeManager()->reload();
+        // clear a local cache
+        $this->localCache->clear();
     }
 
     /**
      * Calculates and returns config change set
      * Does not modify anything, so even if you call flush after calculating you will not persist any changes
      *
-     * @param array $newSettings
+     * @param array $settings
      *
-     * @return array
+     * @return array [updated,              removed]
+     *               [[name => value, ...], [name, ...]]
      */
-    public function calculateChangeSet($newSettings)
+    public function calculateChangeSet(array $settings)
     {
-        return $this->getScopeManager()->calculateChangeSet($newSettings);
-    }
+        $settings = $this->normalizeSettings($settings);
 
-    /**
-     * @param string $entity
-     * @param int    $entityId
-     *
-     * @return bool
-     */
-    public function loadStoredSettings($entity, $entityId)
-    {
-        return $this->getScopeManager()->loadStoredSettings($entity, $entityId);
+        return $this->getScopeManager()->calculateChangeSet($settings);
     }
 
     /**
@@ -242,6 +233,9 @@ class ConfigManager
     public function reload()
     {
         $this->getScopeManager()->reload();
+
+        // clear a local cache
+        $this->localCache->clear();
     }
 
     /**
@@ -255,15 +249,12 @@ class ConfigManager
 
         /** @var FormInterface $child */
         foreach ($form as $child) {
-            $key = str_replace(
-                self::SECTION_VIEW_SEPARATOR,
-                self::SECTION_MODEL_SEPARATOR,
-                $child->getName()
-            );
-            $settings[$child->getName()] = $this->get($key, false, true);
+            $name            = $child->getName();
+            $key             = str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name);
+            $settings[$name] = $this->get($key, false, true);
 
-            if (!isset($settings[$child->getName()]['use_parent_scope_value'])) {
-                $settings[$child->getName()]['use_parent_scope_value'] = true;
+            if (!isset($settings[$name]['use_parent_scope_value'])) {
+                $settings[$name]['use_parent_scope_value'] = true;
             }
         }
 
@@ -278,6 +269,111 @@ class ConfigManager
      */
     protected function getScopeManager()
     {
-        return $this->managers[$this->scopeName];
+        return $this->managers[$this->scope];
+    }
+
+    /**
+     * @param string $name
+     * @param bool   $default
+     * @param bool   $full
+     *
+     * @return mixed
+     */
+    protected function getValue($name, $default = false, $full = false)
+    {
+        $value    = null;
+        $managers = $this->getScopeManagersToGetValue($default);
+        foreach ($managers as $manager) {
+            $value = $manager->getSettingValue($name, $full);
+            if (null !== $value) {
+                break;
+            }
+        }
+
+        if (null === $value) {
+            list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
+            if (!empty($this->settings[$section][$key])) {
+                $setting = $this->settings[$section][$key];
+                if (!$full && is_array($setting) && array_key_exists('value', $setting)) {
+                    $value = $setting['value'];
+                } else {
+                    $value = $setting;
+                }
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param bool $default
+     *
+     * @return AbstractScopeManager[]
+     */
+    protected function getScopeManagersToGetValue($default)
+    {
+        if (!$default) {
+            return $this->managers;
+        }
+
+        // in case if we need default value - skip the current and more priority scope managers than the current one
+        $managers = $this->managers;
+        foreach ($this->managers as $scope => $manager) {
+            unset($managers[$scope]);
+            if ($scope === $this->scope) {
+                break;
+            }
+        }
+
+        return $managers;
+    }
+
+    /**
+     * @param array|null $settings
+     *
+     * @return array
+     */
+    protected function normalizeSettings($settings)
+    {
+        // normalize names and remove unknown settings
+        $normalizedSettings = [];
+        foreach ($settings as $name => $value) {
+            list($section, $key) = explode(
+                ConfigManager::SECTION_MODEL_SEPARATOR,
+                str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name)
+            );
+            if (!empty($this->settings[$section][$key])) {
+                $normalizedSettings[$section . self::SECTION_MODEL_SEPARATOR . $key] = $value;
+            }
+        }
+
+        return $normalizedSettings;
+    }
+
+    /**
+     * @param array $updated
+     * @param array $removed
+     * @param array $oldValues
+     *
+     * @return array
+     */
+    protected function buildChangeSet(array $updated, array $removed, array $oldValues)
+    {
+        $changeSet = [];
+        foreach ($updated as $name => $value) {
+            $oldValue = isset($oldValues[$name]) ? $oldValues[$name] : null;
+            if ($oldValue != $value) {
+                $changeSet[$name] = ['old' => $oldValue, 'new' => $value];
+            }
+        }
+        foreach ($removed as $name) {
+            $oldValue = isset($oldValues[$name]) ? $oldValues[$name] : null;
+            $value    = $this->getValue($name, true);
+            if ($oldValue != $value) {
+                $changeSet[$name] = ['old' => $oldValue, 'new' => $value];
+            }
+        }
+
+        return $changeSet;
     }
 }

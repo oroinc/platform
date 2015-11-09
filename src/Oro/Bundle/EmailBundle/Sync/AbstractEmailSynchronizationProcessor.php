@@ -20,6 +20,9 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
@@ -273,8 +276,9 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         );
 
         $emailUser
-            ->setFolder($folder)
+            ->addFolder($folder)
             ->setSeen($isSeen)
+            ->setOrigin($folder->getOrigin())
             ->getEmail()
                 ->setMessageId($email->getMessageId())
                 ->setMultiMessageId($email->getMultiMessageId())
@@ -284,6 +288,28 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
                 ->setAcceptLanguageHeader($email->getAcceptLanguageHeader());
 
         return $emailUser;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     * @param array       $messageIds
+     * @return EmailUser[]
+     */
+    protected function getExistingEmailUsers(EmailFolder $folder, array $messageIds)
+    {
+        $existEmailUsers = [];
+        if (empty($messageIds)) {
+            return $existEmailUsers;
+        }
+        $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
+        $result              = $emailUserRepository->getEmailUsersByFolderAndMessageIds($folder, $messageIds);
+
+        /** @var EmailUser $emailUser */
+        foreach ($result as $emailUser) {
+            $existEmailUsers[$emailUser->getEmail()->getMessageId()] = $emailUser;
+        }
+
+        return $existEmailUsers;
     }
 
     /**
@@ -335,8 +361,11 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     protected function entitiesToClear()
     {
         return [
+            'Oro\Bundle\EmailBundle\Entity\Email',
             'Oro\Bundle\EmailBundle\Entity\EmailUser',
+            'Oro\Bundle\EmailBundle\Entity\EmailRecipient',
             'Oro\Bundle\ImapBundle\Entity\ImapEmail',
+            'Oro\Bundle\EmailBundle\Entity\EmailBody',
         ];
     }
 

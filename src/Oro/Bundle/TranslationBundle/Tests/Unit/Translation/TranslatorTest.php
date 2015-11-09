@@ -274,7 +274,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($message, $result);
     }
 
-    public function testEnsureDatabaseLoaderAddedWithNoDatabaseTranslationMetadataCache()
+    public function testDynamicResourcesWithoutDatabaseTranslationMetadataCache()
     {
         $locale     = 'en';
         $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
@@ -288,7 +288,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->hasTrans('foo');
     }
 
-    public function testEnsureDatabaseLoaderAddedWithNoLoadedResources()
+    public function testLoadingOfDynamicResources()
     {
         $locale        = 'en';
         $translate     = [

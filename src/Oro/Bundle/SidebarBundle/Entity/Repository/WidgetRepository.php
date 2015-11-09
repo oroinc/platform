@@ -20,7 +20,9 @@ class WidgetRepository extends EntityRepository
      */
     public function getWidgets($user, $placement, Organization $organization)
     {
-        $qb = $this->createQueryBuilder('wi')
+        $qb = $this->_em->createQueryBuilder()
+            ->select(['wi.id', 'wi.placement', 'wi.position', 'wi.widgetName', 'wi.settings', 'wi.state'])
+            ->from($this->_entityName, 'wi')
             ->where('wi.user = :user')
             ->andWhere('wi.placement = :placement')
             ->andWhere('wi.organization = :organization')

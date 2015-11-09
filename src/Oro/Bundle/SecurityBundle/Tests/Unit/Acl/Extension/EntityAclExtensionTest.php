@@ -108,6 +108,13 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configProvider->expects($this->any())
+            ->method('hasConfig')
+            ->willReturn(false);
+
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
@@ -134,14 +141,19 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                             new EntityOwnerAccessor($this->metadataProvider),
                         ],
+                        [
+                            'oro_entity_config.provider.security',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $configProvider
+                        ],
                     ]
                 )
             );
-
+        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider);
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             new ObjectIdAccessor(),
-            new EntityOwnerAccessor($this->metadataProvider),
+            $entityOwnerAccessor, //new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
         $this->decisionMaker->setContainer($container);
@@ -152,6 +164,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             new ObjectIdAccessor(),
             $this->decisionMaker
         );
+
+        $this->extension->setEntityOwnerAccessor($entityOwnerAccessor);
     }
 
     private function buildTestTree()
@@ -230,6 +244,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->tree->addUserBusinessUnit('user31', 'org3', 'bu31');
         $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
         $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
+
+        $this->tree->buildTree();
     }
 
     /**

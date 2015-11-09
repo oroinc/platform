@@ -57,7 +57,10 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('label')->end()
                     ->booleanNode(PropertyInterface::TRANSLATABLE_KEY)->defaultTrue()->end()
                     ->booleanNode('editable')->defaultFalse()->end()
-                    ->booleanNode('renderable')->defaultTrue()->end()
+                    ->booleanNode('renderable')->end()
+                    ->booleanNode('manageable')->end()
+                    ->scalarNode('order')->end()
+                    ->booleanNode('required')->end()
                 ->end()
             ->end();
 

@@ -115,6 +115,7 @@ class UserAclHandler implements SearchHandlerInterface
                 if ((boolean)$excludeCurrentUser) {
                     $this->excludeUser($queryBuilder, $user);
                 }
+                $this->addAdditionalFilterCriteria($queryBuilder);
                 $queryBuilder
                     ->setFirstResult($firstResult)
                     ->setMaxResults($perPage);
@@ -290,6 +291,18 @@ class UserAclHandler implements SearchHandlerInterface
                 )
             )
             ->setParameter(1, '%' . str_replace(' ', '%', $search) . '%');
+    }
+
+    /**
+     * Add additional filter
+     *
+     * @param QueryBuilder $queryBuilder
+     */
+    protected function addAdditionalFilterCriteria(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder
+            ->andWhere('user.enabled = :enabled')
+            ->setParameter('enabled', true);
     }
 
     /**

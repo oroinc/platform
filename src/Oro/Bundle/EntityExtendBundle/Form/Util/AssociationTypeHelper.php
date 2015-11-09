@@ -25,6 +25,7 @@ class AssociationTypeHelper extends ConfigTypeHelper
 
         $this->entityClassResolver = $entityClassResolver;
     }
+
     /**
      * Checks if the given entity is included in 'dictionary' group
      *
@@ -38,6 +39,28 @@ class AssociationTypeHelper extends ConfigTypeHelper
         if ($groupingConfigProvider->hasConfig($className)) {
             $groups = $groupingConfigProvider->getConfig($className)->get('groups');
             if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the given entity is support activity
+     *
+     * @param string $className
+     *
+     * @return bool
+     */
+    public function isSupportActivityEnabled($className)
+    {
+        $dictionaryConfigProvider = $this->configManager->getProvider('dictionary');
+        if ($dictionaryConfigProvider->hasConfig($className)) {
+            $activitySupport = $dictionaryConfigProvider
+                ->getConfig($className)
+                ->get(GroupingScope::GROUP_DICTIONARY_ACTIVITY_SUPPORT);
+            if ($activitySupport === 'true') {
                 return true;
             }
         }

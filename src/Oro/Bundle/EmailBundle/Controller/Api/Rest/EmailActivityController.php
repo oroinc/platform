@@ -26,7 +26,7 @@ class EmailActivityController extends RestGetController
     /**
      * Get entities where an email found by specified filters is an activity.
      *
-     * @Get("/activities/emails/relations", name="")
+     * @Get("/activities/emails/relations")
      *
      * @QueryParam(
      *      name="page",

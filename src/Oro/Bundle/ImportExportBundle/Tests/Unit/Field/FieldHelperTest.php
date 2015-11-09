@@ -57,7 +57,9 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected function prepareConfigProvider()
     {
-        $configProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $configProvider->expects($this->any())->method('hasConfig')
             ->with($this->isType('string'), $this->isType('string'))
             ->will(

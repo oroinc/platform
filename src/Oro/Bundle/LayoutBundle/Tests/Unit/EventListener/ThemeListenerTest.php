@@ -38,11 +38,24 @@ class ThemeListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('defaultTheme', $subRequestEvent->getRequest()->attributes->get('_theme'));
     }
 
-    public function testShouldSetSubRequestThemeFromMasterRequestQueryString()
+    public function testShouldNotSetSubRequestThemeFromMasterRequestQueryStringWithDebugFalse()
     {
         $masterRequestEvent = $this->createMasterRequestEvent(['_theme' => 'testTheme'], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
-        $this->assertNull($masterRequestEvent->getRequest()->attributes->get('_theme'));
+        $this->assertEquals('defaultTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
+
+        $subRequestEvent = $this->createSubRequestEvent();
+        $this->listener->onKernelRequest($subRequestEvent);
+        $this->assertEquals('defaultTheme', $subRequestEvent->getRequest()->attributes->get('_theme'));
+    }
+
+    public function testShouldSetSubRequestThemeFromMasterRequestQueryStringWithDebugTrue()
+    {
+        $this->listener->setDebug(true);
+
+        $masterRequestEvent = $this->createMasterRequestEvent(['_theme' => 'testTheme'], ['_route' => 'testRoute']);
+        $this->listener->onKernelRequest($masterRequestEvent);
+        $this->assertEquals('testTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
 
         $subRequestEvent = $this->createSubRequestEvent();
         $this->listener->onKernelRequest($subRequestEvent);

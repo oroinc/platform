@@ -98,10 +98,11 @@ class ImapClearManager implements LoggerAwareInterface
 
         foreach ($folders as $folder) {
             $imapFolder = $folderRepository->findOneBy(['folder' => $folder]);
-            if (!$origin->isActive()) {
+            if ($imapFolder && !$origin->isActive()) {
                 $this->clearFolder($imapFolder);
                 $this->em->remove($imapFolder);
-            } elseif (!$folder->isSyncEnabled()) {
+                $this->logger->notice(sprintf('ImapFolder with ID %s removed', $imapFolder->getId()));
+            } elseif ($imapFolder && !$folder->isSyncEnabled()) {
                 $this->clearFolder($imapFolder);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
             }
@@ -109,11 +110,13 @@ class ImapClearManager implements LoggerAwareInterface
         foreach ($folders as $folder) {
             if (!$origin->isActive()) {
                 $this->em->remove($folder);
+                $this->logger->notice(sprintf('Folder with ID %s removed', $folder->getId()));
             }
         }
 
         if (!$origin->isActive()) {
             $this->em->remove($origin);
+            $this->logger->notice(sprintf('Origin with ID %s removed', $origin->getId()));
         }
 
         $this->em->flush();
@@ -125,34 +128,69 @@ class ImapClearManager implements LoggerAwareInterface
     protected function clearFolder($imapFolder)
     {
         $folder = $imapFolder->getFolder();
-        $query = $this->em->getRepository('OroEmailBundle:EmailUser')
-            ->getEmailUserByFolder($folder)
-            ->getQuery();
-        $iterableResult = $query->iterate();
-
+        $limit = self::BATCH_SIZE;
+        $offset = 0;
         $i = 0;
-        while (($row = $iterableResult->next()) !== false) {
-            /** @var EmailUser $emailUser */
-            $emailUser = $row[0];
-            $email = $emailUser->getEmail();
-            $this->em->remove($emailUser);
+        while ($result =
+            $this->em->getRepository('OroEmailBundle:EmailUser')
+                ->getEmailUserByFolder($folder, $limit, $offset)->getQuery()->getResult()
+        ) {
+            foreach ($result as $emailUser) {
+                /** @var EmailUser $emailUser */
+                $emailUser->removeFolder($folder);
+                $email = $emailUser->getEmail();
+                if ($emailUser->getFolders()->isEmpty()) {
+                    $this->em->remove($emailUser);
+                }
 
-            $imapEmail = $this->em->getRepository('OroImapBundle:ImapEmail')->findOneBy([
-                'email' => $email,
-                'imapFolder' => $imapFolder,
-            ]);
-            if ($imapEmail !== null) {
-                $this->em->remove($imapEmail);
+                $imapEmails = $this->em->getRepository('OroImapBundle:ImapEmail')->findBy([
+                    'email' => $email,
+                    'imapFolder' => $imapFolder
+                ]);
+                foreach ($imapEmails as $imapEmail) {
+                    $this->em->remove($imapEmail);
+                }
+                ++$i;
             }
+            $this->em->flush();
+            $this->cleanUp();
 
-            if (($i % self::BATCH_SIZE) === 0) {
-                $this->em->flush();
-                $this->em->clear('OroEmailBundle:EmailUser');
-                $this->em->clear('OroImapBundle:ImapEmail');
-            }
-            ++$i;
+        }
+        if ($i > 0) {
+            $this->logger->notice(
+                sprintf(
+                    'ImapFolder with ID %s cleared. Removed %d emails.',
+                    $imapFolder->getId(),
+                    $i
+                )
+            );
         }
 
         $this->em->flush();
+        $this->cleanUp();
+    }
+
+    /**
+     * @return array
+     */
+    protected function entitiesToClear()
+    {
+        return [
+            'Oro\Bundle\EmailBundle\Entity\EmailUser',
+            'Oro\Bundle\EmailBundle\Entity\Email',
+            'Oro\Bundle\EmailBundle\Entity\EmailRecipient',
+            'Oro\Bundle\ImapBundle\Entity\ImapEmail',
+            'Oro\Bundle\EmailBundle\Entity\EmailBody',
+        ];
+    }
+
+    /**
+     * clean up
+     */
+    protected function cleanUp()
+    {
+        foreach ($this->entitiesToClear() as $entityClass) {
+            $this->em->clear($entityClass);
+        }
     }
 }

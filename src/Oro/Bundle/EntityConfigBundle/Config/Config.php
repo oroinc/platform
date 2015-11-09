@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 /**
  * The aim of this class is to store configuration data for each configurable object (entity or field).
+ * IMPORTANT: A performance of this class is very crucial, be careful during a refactoring.
  */
 class Config implements ConfigInterface
 {
@@ -39,7 +40,7 @@ class Config implements ConfigInterface
      */
     public function get($code, $strict = false, $default = null)
     {
-        if ($this->has($code)) {
+        if (array_key_exists($code, $this->values)) {
             return $this->values[$code];
         }
 
@@ -75,7 +76,7 @@ class Config implements ConfigInterface
      */
     public function has($code)
     {
-        return isset($this->values[$code]) || array_key_exists($code, $this->values);
+        return array_key_exists($code, $this->values);
     }
 
     /**
@@ -106,6 +107,14 @@ class Config implements ConfigInterface
         return $filter
             ? array_filter($this->values, $filter)
             : $this->values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValues()
+    {
+        return $this->values;
     }
 
     /**

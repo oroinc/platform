@@ -5,6 +5,7 @@ define(function(require) {
     var document = window.document;
     var $ = require('jquery');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
@@ -260,13 +261,16 @@ define(function(require) {
             var variable = $(e.currentTarget).html();
 
             e.preventDefault();
-            if (!field.length && this.lastElement && this.lastElement.is(':visible')) {
+            if (!field.length && this.lastElement && this.lastElement.is(':visible, [data-focusable]')) {
                 field = this.lastElement;
             }
 
-            if (field) {
+            if (field.length) {
                 field.insertAtCursor(variable).focus();
                 mediator.trigger('email-variable-view:click-variable', field, variable);
+            } else {
+                mediator.execute('showFlashMessage', 'error',
+                    __('oro.email.emailtemplate.cannot_insert_variable'));
             }
         },
 

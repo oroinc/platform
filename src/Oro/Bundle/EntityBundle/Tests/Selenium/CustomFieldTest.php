@@ -17,13 +17,13 @@ class CustomFieldTest extends Selenium2TestCase
     protected $fields = array(
         array('type' => 'BigInt', 'value' => '123456789'),
         array('type' => 'Boolean', 'value' => 'Yes'),
-        array('type' => 'Currency', 'value' => '100.00'),
+        array('type' => 'Currency', 'value' => '$100.00'),
         array('type' => 'Date', 'value' => 'Apr 9, 2014'),
         array('type' => 'DateTime', 'value' => 'Dec 25, 2014, 12:15 AM'),
         array('type' => 'Decimal', 'value' => '0.55'),
         array('type' => 'Float', 'value' => '500.1'),
         array('type' => 'Integer', 'value' => '100500'),
-        array('type' => 'Percent', 'value' => '50'),
+        array('type' => 'Percent', 'value' => '50%'),
         array('type' => 'SmallInt', 'value' => '1'),
         array('type' => 'String', 'value' => 'Some string value'),
         array('type' => 'Text', 'value' => 'Some text value')
@@ -35,6 +35,7 @@ class CustomFieldTest extends Selenium2TestCase
         /** @var ConfigEntities $login */
         $login = $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->filterBy('Name', 'User', 'is equal to')
+            ->filterByMultiselect('Module', ['OroUserBundle'])
             ->open(array('User'));
         foreach ($this->fields as $field) {
             /** @var ConfigEntity $login */
@@ -81,7 +82,7 @@ class CustomFieldTest extends Selenium2TestCase
         /** @var ConfigEntity $login */
         $login = $login->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
-            $login->setCustomField(strtolower($field['type']).'_field', $field['value']);
+            $login->setCustomField(strtolower($field['type']).'_field', trim($field['value'], '$%'));
         }
         $login->save()
             ->assertMessage('User saved');

@@ -2,31 +2,20 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class FieldConfigEvent extends Event
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $className;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $fieldName;
 
     /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @param string        $className Entity class name
-     * @param string        $fieldName
-     * @param ConfigManager $configManager
+     * @param string        $className     The FQCN of an entity
+     * @param string        $fieldName     The name of a field
+     * @param ConfigManager $configManager The entity config manager
      */
     public function __construct($className, $fieldName, ConfigManager $configManager)
     {
@@ -49,13 +38,5 @@ class FieldConfigEvent extends Event
     public function getFieldName()
     {
         return $this->fieldName;
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    public function getConfigManager()
-    {
-        return $this->configManager;
     }
 }

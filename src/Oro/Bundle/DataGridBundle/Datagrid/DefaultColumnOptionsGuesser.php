@@ -9,20 +9,21 @@ class DefaultColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {
     /** @var array */
     protected $typeToFrontendTypeMap = [
-        'integer'  => Property::TYPE_INTEGER,
-        'smallint' => Property::TYPE_INTEGER,
-        'bigint'   => Property::TYPE_INTEGER,
-        'decimal'  => Property::TYPE_DECIMAL,
-        'float'    => Property::TYPE_DECIMAL,
-        'boolean'  => Property::TYPE_BOOLEAN,
-        'date'     => Property::TYPE_DATE,
-        'datetime' => Property::TYPE_DATETIME,
-        'time'     => Property::TYPE_TIME,
-        'money'    =>  Property::TYPE_CURRENCY,
-        'percent'  => Property::TYPE_PERCENT,
+        'integer'      => Property::TYPE_INTEGER,
+        'smallint'     => Property::TYPE_INTEGER,
+        'bigint'       => Property::TYPE_INTEGER,
+        'decimal'      => Property::TYPE_DECIMAL,
+        'float'        => Property::TYPE_DECIMAL,
+        'boolean'      => Property::TYPE_BOOLEAN,
+        'date'         => Property::TYPE_DATE,
+        'datetime'     => Property::TYPE_DATETIME,
+        'time'         => Property::TYPE_TIME,
+        'money'        => Property::TYPE_CURRENCY,
+        'percent'      => Property::TYPE_PERCENT,
         'simple_array' => Property::TYPE_SIMPLE_ARRAY,
         'array'        => Property::TYPE_ARRAY,
         'json_array'   => Property::TYPE_ARRAY,
+        'row_array'    => Property::TYPE_ROW_ARRAY,
     ];
 
     /**

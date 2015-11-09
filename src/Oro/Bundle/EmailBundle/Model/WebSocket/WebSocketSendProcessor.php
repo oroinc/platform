@@ -27,13 +27,15 @@ class WebSocketSendProcessor
     /**
      * Get user topic
      *
-     * @param User $user
+     * @param User|int $user
      * @param Organization $organization
      * @return string
      */
-    public static function getUserTopic(User $user, Organization $organization)
+    public static function getUserTopic($user, Organization $organization)
     {
-        return sprintf(self::TOPIC, $user->getId(), $organization->getId());
+        $userId = $user instanceof User ? $user->getId() : $user;
+
+        return sprintf(self::TOPIC, $userId, $organization->getId());
     }
 
     /**
@@ -44,20 +46,16 @@ class WebSocketSendProcessor
     public function send($usersWithNewEmails)
     {
         if ($usersWithNewEmails) {
-            foreach ($usersWithNewEmails as $item) {
+            foreach ($usersWithNewEmails as $ownerId => $item) {
                 /** @var EmailUser $emailUser */
                 $emailUser = $item['entity'];
+
+                $topic = self::getUserTopic($ownerId, $emailUser->getOrganization());
                 $messageData = [
                     'hasNewEmail' => array_key_exists('new', $item) === true && $item['new'] > 0 ? : false
                 ];
 
-                $this->publisher->send(
-                    self::getUserTopic(
-                        $emailUser->getOwner(),
-                        $emailUser->getOrganization()
-                    ),
-                    json_encode($messageData)
-                );
+                $this->publisher->send($topic, json_encode($messageData));
             }
         }
     }

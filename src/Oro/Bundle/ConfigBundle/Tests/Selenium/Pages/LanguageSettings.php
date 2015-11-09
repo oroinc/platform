@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Selenium\Pages;
 
-use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
-
 /**
  * Class Configuration
  *
@@ -11,7 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
  * @method LanguageSettings openLanguageSettings(string $bundlePath,  boolean $directLoad)
  * {@inheritdoc}
  */
-class LanguageSettings extends AbstractPage
+class LanguageSettings extends Configuration
 {
     const URL = '/config/system/platform/language_settings';
 

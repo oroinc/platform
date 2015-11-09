@@ -136,4 +136,27 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('First Name', $firstOwner->getUser()->getFirstName());
         $this->assertEquals('Organization One', $firstOwner->getOrganization()->getName());
     }
+
+    public function testIsUpdatedFlags()
+    {
+        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+            ->disableOriginalConstructor()->getMock();
+        $date = new \DateTime('2012-12-12 12:12:12');
+        $activityList = new ActivityList();
+        $activityList->setUpdatedBy($user);
+        $activityList->setUpdatedAt($date);
+
+        $this->assertTrue($activityList->isUpdatedBySet());
+        $this->assertTrue($activityList->isUpdatedAtSet());
+    }
+
+    public function testIsNotUpdatedFlags()
+    {
+        $activityList = new ActivityList();
+        $activityList->setUpdatedBy(null);
+        $activityList->setUpdatedAt(null);
+
+        $this->assertFalse($activityList->isUpdatedBySet());
+        $this->assertFalse($activityList->isUpdatedAtSet());
+    }
 }

@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\NotificationBundle\DependencyInjection\Compiler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Connection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class EventsCompilerPass implements CompilerPassInterface
 {
+    /** a table name of {@see Oro\Bundle\NotificationBundle\Entity\Event} */
+    const EVENT_TABLE_NAME = 'oro_notification_event';
+
     const SERVICE_KEY    = 'oro_notification.manager';
     const DISPATCHER_KEY = 'event_dispatcher';
 
@@ -25,45 +28,37 @@ class EventsCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $eventClassName = $container->getParameter('oro_notification.event_entity.class');
+        // register event listeners
+        // by performance reasons native SQL is used here rather than ORM
+        // ORM usage leads unnecessary loading of Doctrine metadata and ORO entity configs which is not needed here
+        /** @var Connection $connection */
+        $connection = $container->get('doctrine.dbal.default_connection');
+        if ($this->checkDatabase($connection)) {
+            $dispatcher = $container->findDefinition(self::DISPATCHER_KEY);
 
-        $dispatcher = $container->findDefinition(self::DISPATCHER_KEY);
-        $em         = $container->get('doctrine.orm.entity_manager');
-
-        $eventNames = array();
-        if ($this->checkDatabase($em, $eventClassName) !== false) {
-            $eventNames = $em->getRepository($eventClassName)
-                ->getEventNames();
-        }
-        foreach ($eventNames as $eventName) {
-            $dispatcher->addMethodCall(
-                'addListenerService',
-                array($eventName['name'], array(self::SERVICE_KEY, 'process'))
-            );
+            $rows = $connection->fetchAll('SELECT name FROM ' . self::EVENT_TABLE_NAME);
+            foreach ($rows as $row) {
+                $dispatcher->addMethodCall(
+                    'addListenerService',
+                    [$row['name'], [self::SERVICE_KEY, 'process']]
+                );
+            }
         }
     }
 
     /**
-     * @param EntityManager $em
-     * @param  string       $className
+     * @param Connection $connection
      *
      * @return bool
      */
-    public function checkDatabase(EntityManager $em, $className)
+    protected function checkDatabase(Connection $connection)
     {
-        $table  = $em->getClassMetadata($className)->getTableName();
         $result = false;
         try {
-            $conn = $em->getConnection();
-
-            if (!$conn->isConnected()) {
-                $em->getConnection()->connect();
-            }
-
-            $result = $conn->isConnected() && (bool)array_intersect(
-                array($table),
-                $em->getConnection()->getSchemaManager()->listTableNames()
-            );
+            $connection->connect();
+            $result =
+                $connection->isConnected()
+                && $connection->getSchemaManager()->tablesExist([self::EVENT_TABLE_NAME]);
         } catch (\PDOException $e) {
         }
 

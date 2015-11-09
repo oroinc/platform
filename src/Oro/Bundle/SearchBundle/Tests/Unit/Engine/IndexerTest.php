@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
-use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -76,6 +75,8 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $searchAclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()->getMock();
 
         $searchAclHelper->expects($this->any())
             ->method('apply')
@@ -93,7 +94,8 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             $this->configManager,
             $this->entityProvider,
             $this->translator,
-            $searchAclHelper
+            $searchAclHelper,
+            $eventDispatcher
         );
     }
 

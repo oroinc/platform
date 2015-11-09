@@ -23,16 +23,20 @@ define([
                 this.editor = SelectCellRadioEditor;
             }
 
-            if (this.choices) {
+            if (options.column.get('metadata').choices) {
                 this.optionValues = [];
-                _.each(this.choices, function(value, key) {
+                _.each(options.column.get('metadata').choices, function(value, key) {
                     this.optionValues.push([value, key]);
                 }, this);
+            } else {
+                throw new Error('Column metadata must have choices specified');
             }
             SelectCell.__super__.initialize.apply(this, arguments);
 
             this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
                 this.enterEditMode();
+
+                this.$el.find('select').uniform();
             });
         },
 
@@ -53,8 +57,6 @@ define([
         enterEditMode: function() {
             if (this.column.get('editable')) {
                 SelectCell.__super__.enterEditMode.apply(this, arguments);
-
-                this.$el.find('select').uniform();
             }
         },
 
