@@ -226,7 +226,7 @@ define(function(require) {
         },
 
         getChoiceLabel: function() {
-            return this.$('.select2-choice').data('select2-data').label;
+            return _.result(this.$('.select2-choice').data('select2-data'), 'label') || '';
         },
 
         getServerUpdateData: function() {
