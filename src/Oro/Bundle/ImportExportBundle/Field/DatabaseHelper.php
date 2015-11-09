@@ -87,7 +87,9 @@ class DatabaseHelper
 
         if (empty($this->entities[$entityName]) || empty($this->entities[$entityName][$storageKey])) {
             /** @var EntityRepository $entityRepository */
-            $entityRepository = $this->registry->getRepository($entityName);
+            $entityRepository = $this->registry
+                ->getManagerForClass($entityName)
+                ->getRepository($entityName);
             $queryBuilder = $entityRepository->createQueryBuilder('e')
                 ->andWhere(implode(' AND ', $where))
                 ->setParameters($criteria)

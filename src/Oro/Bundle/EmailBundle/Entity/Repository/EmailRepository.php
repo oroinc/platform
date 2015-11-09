@@ -140,16 +140,26 @@ class EmailRepository extends EntityRepository
      */
     public function getEmailsByOwnerEntity($entity, $ownerColumnName)
     {
-        $queryBuilder = $this
+        $emailFoundInRecipients = $this
             ->createQueryBuilder('e')
             ->join('e.recipients', 'r')
             ->join('r.emailAddress', 'ea')
             ->andWhere("ea.$ownerColumnName = :contactId")
             ->andWhere('ea.hasOwner = :hasOwner')
             ->setParameter('contactId', $entity->getId())
-            ->setParameter('hasOwner', true);
+            ->setParameter('hasOwner', true)
+            ->getQuery()->getResult();
 
-        return $queryBuilder->getQuery()->getResult();
+        $emailFoundInFrom = $this
+            ->createQueryBuilder('e')
+            ->join('e.fromEmailAddress', 'ea')
+            ->andWhere("ea.$ownerColumnName = :contactId")
+            ->andWhere('ea.hasOwner = :hasOwner')
+            ->setParameter('contactId', $entity->getId())
+            ->setParameter('hasOwner', true)
+            ->getQuery()->getResult();
+
+        return array_merge($emailFoundInRecipients, $emailFoundInFrom);
     }
 
     /**

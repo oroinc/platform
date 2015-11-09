@@ -4,8 +4,14 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\Common\Inflector\Inflector;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExtendHelper
 {
     const ENTITY_NAMESPACE = 'Extend\\Entity\\';
@@ -13,6 +19,7 @@ class ExtendHelper
     const MAX_ENUM_VALUE_ID_LENGTH = 32;
     const MAX_ENUM_SNAPSHOT_LENGTH = 500;
     const BASE_ENUM_VALUE_CLASS    = 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue';
+    const ENUM_SNAPSHOT_SUFFIX     = 'Snapshot';
 
     /**
      * @param string $type
@@ -232,7 +239,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumCode must not be empty.');
         }
 
-        return ExtendHelper::ENTITY_NAMESPACE . 'EV_' . str_replace(" ", "_", ucwords(strtr($enumCode, "_-", "  ")));
+        return ExtendHelper::ENTITY_NAMESPACE . 'EV_' . str_replace(' ', '_', ucwords(strtr($enumCode, '_-', '  ')));
     }
 
     /**
@@ -245,7 +252,7 @@ class ExtendHelper
      */
     public static function getMultiEnumSnapshotFieldName($fieldName)
     {
-        return $fieldName . 'Snapshot';
+        return $fieldName . self::ENUM_SNAPSHOT_SUFFIX;
     }
 
     /**
@@ -344,5 +351,80 @@ class ExtendHelper
         $proxyShortClassName .= $shortClassName;
 
         return ExtendHelper::ENTITY_NAMESPACE . $proxyShortClassName;
+    }
+
+    /**
+     * Check if the given configurable entity is ready to be used in a business logic.
+     * It means that a entity class should exist and should not be marked as deleted.
+     *
+     * @param ConfigInterface $extendConfig The entity's configuration in the 'extend' scope
+     *
+     * @return bool
+     */
+    public static function isEntityAccessible(ConfigInterface $extendConfig)
+    {
+        if ($extendConfig->is('is_extend')) {
+            if ($extendConfig->is('is_deleted')) {
+                return false;
+            }
+            if ($extendConfig->is('state', ExtendScope::STATE_NEW)) {
+                return false;
+            }
+            // check if a new entity has been requested to be deleted before schema is updated
+            if ($extendConfig->is('state', ExtendScope::STATE_DELETE)
+                && !class_exists($extendConfig->getId()->getClassName())
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the given configurable entity is used to store enum values and ready to be used in a business logic.
+     * It means that a entity class should be extended from AbstractEnumValue,
+     * should exist and should not be marked as deleted.
+     *
+     * @param ConfigInterface $extendConfig The entity's configuration in the 'extend' scope
+     *
+     * @return bool
+     */
+    public static function isEnumValueEntityAccessible(ConfigInterface $extendConfig)
+    {
+        return
+            $extendConfig->is('is_extend')
+            && $extendConfig->is('inherit', self::BASE_ENUM_VALUE_CLASS)
+            && self::isEntityAccessible($extendConfig);
+    }
+
+    /**
+     * Check if the given configurable field is ready to be used in a business logic.
+     * It means that a field should exist in a class and should not be marked as deleted.
+     *
+     * @param ConfigInterface $extendFieldConfig The field's configuration in the 'extend' scope
+     *
+     * @return bool
+     */
+    public static function isFieldAccessible(ConfigInterface $extendFieldConfig)
+    {
+        if ($extendFieldConfig->is('is_extend')) {
+            if ($extendFieldConfig->is('is_deleted')) {
+                return false;
+            }
+            if ($extendFieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                return false;
+            }
+            // check if a new field has been requested to be deleted before schema is updated
+            if ($extendFieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+                /** @var FieldConfigId $fieldId */
+                $fieldId = $extendFieldConfig->getId();
+                if (!property_exists($fieldId->getClassName(), $fieldId->getFieldName())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -76,6 +76,13 @@ class AclRoleType extends AbstractType
                 'multiple' => true,
             )
         );
+        $builder->add(
+            'privileges',
+            'hidden',
+            [
+                'mapped' => false,
+            ]
+        );
     }
 
     /**

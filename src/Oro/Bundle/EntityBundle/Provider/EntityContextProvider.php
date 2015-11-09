@@ -60,7 +60,7 @@ class EntityContextProvider
                 $entityTargets[] = [
                     'label' => $targetEntity['label'],
                     'className' => $this->routingHelper->getUrlSafeClassName($targetEntity['name']),
-                    'first' => !(bool) $i,
+                    'first' => count($entityTargets) === 0,
                     'gridName' => $gridName
                 ];
 

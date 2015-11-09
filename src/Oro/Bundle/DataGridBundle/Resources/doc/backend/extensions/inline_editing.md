@@ -9,7 +9,7 @@ datagrid:
     {grid-uid}:
         # <grid configuration> goes here
         inline_editing:
-        enable: true
+            enable: true
         save_api_accessor:
             http_method: PATCH
             route: orocrm_account_update
@@ -30,7 +30,7 @@ datagrid:
                 component_options:
                     {key}: {value}
             save_api_accessor:
-                # api aceesor options
+                # api accessor options
                 {key}: {value}
 ```
 Option name              | Default value | Description

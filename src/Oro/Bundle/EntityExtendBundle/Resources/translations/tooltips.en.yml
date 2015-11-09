@@ -4,3 +4,5 @@ oro.entity_extend.enum_options.tooltip: Deleting an option will remove it from a
 oro.entity_extend.enum_options.priority.tooltip: Click and drag to reorder.
 oro.entity_extend.enum_options.default.tooltip: If marked, this option will be selected by default for new records.
 oro.entity_extend.entity_config.search.field.items.title_field.tooltip: Field value will be included into the search result title
+oro.entity_extend.entity_config.search.field.items.searchable.tooltip: The field will appear in search results after the completion of reindex job that might take some time.
+oro.entity_extend.entity_config.search.entity.items.searchable.tooltip: The entity will appear in search results after the completion of reindex job that might take some time.

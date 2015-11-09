@@ -141,7 +141,7 @@ define(function(require) {
                     dropdownContainerWidth -= dropdownWidth;
                 }
 
-                this.getElement('hiddenTabs').each( function(i) {
+                this.getElement('hiddenTabs').each(function(i) {
                     var $tab = $(this);
                     if (!showAll) {
                         visibleWidth += $tab.data('dropdownOuterWidth');

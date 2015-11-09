@@ -3,3 +3,4 @@ config:
         'orouser/js/init-user': 'bundles/orouser/js/init-user.js'
         'oro/select2-acl-user-multiselect-component': 'bundles/orouser/js/components/select2-acl-user-multiselect-component.js'
         'oro/select2-acl-user-autocomplete-component': 'bundles/orouser/js/components/select2-acl-user-autocomplete-component.js'
+        'orouser/js/views/role-view': 'bundles/orouser/js/views/role-view.js'

@@ -72,7 +72,7 @@ class EnumSynchronizer
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
                 if ($fieldConfig->is('is_deleted')
-                    || !in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])
+                    || !in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'], true)
                 ) {
                     continue;
                 }

@@ -11,6 +11,11 @@ placeholders:
         items:
             email_requirejs_config:
                 order: 100
+    email_actions:
+        items:
+            oro_email_action_send_email_button:
+                order: 20
+
 
 items:
     oro_send_email_button:
@@ -27,3 +32,7 @@ items:
     email_requirejs_config:
         template: OroEmailBundle::requirejs.config.js.twig
         applicable: @oro_user.placeholder.filter->isUserApplicable()
+    oro_email_action_send_email_button:
+        applicable: @oro_email.placeholder.send_email.filter->isApplicable($entity$)
+        template: OroEmailBundle:Email/action:sendEmailButton.html.twig
+        acl: oro_email_email_create

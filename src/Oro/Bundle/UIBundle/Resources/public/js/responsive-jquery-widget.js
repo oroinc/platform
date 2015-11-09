@@ -106,7 +106,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             var sectionWidth = $section.outerWidth();
             var size = this._getSize(sectionWidth);
             var classNames = [size.modifierClassName];
-            var hasBlocks = true;
+            var hasBlocks = false;
             var isChanged = false;
 
             $cells.each(function() {
@@ -114,7 +114,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 if (context._updateCell($cell)) {
                     isChanged = true;
                 }
-                hasBlocks = !$cell.hasClass(options.cellNoBlocksModifier);
+                hasBlocks = hasBlocks || !$cell.hasClass(options.cellNoBlocksModifier);
             });
 
             if (!hasBlocks) {

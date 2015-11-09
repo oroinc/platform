@@ -4,8 +4,16 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
+use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
+use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeConverterInterface;
+
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    /**
+     * @var TypeFormatterInterface
+     */
+    protected $formatter;
+
     /**
      * @var string
      */
@@ -39,6 +47,14 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
+     * @param TypeFormatterInterface $formatter
+     */
+    public function setFormatter(TypeFormatterInterface $formatter)
+    {
+        $this->formatter = $formatter;
+    }
+
+    /**
      * @param \DateTime $object
      * @param mixed $format
      * @param array $context
@@ -46,14 +62,25 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        if (!empty($context['format'])) {
+            return $object->format($context['format']);
+        }
+
+        if (!empty($context['type']) && in_array($context['type'], ['datetime', 'date', 'time'], true)) {
+            if ($this->formatter !== null && $this->formatter instanceof TypeFormatterInterface) {
+                return $this->formatter->formatType($object, $context['type']);
+            }
+        }
+
         return $object->format($this->getFormat($context));
     }
 
     /**
-     * @param mixed $data
+     * @param mixed  $data
      * @param string $class
-     * @param mixed $format
-     * @param array $context
+     * @param mixed  $format
+     * @param array  $context
+     *
      * @return \DateTime|null
      * @throws RuntimeException
      */
@@ -63,9 +90,24 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
             return null;
         }
 
+        $format   = $this->getFormat($context);
         $timezone = $this->getTimezone($context);
-        $format = $this->getFormat($context);
-        $datetime = \DateTime::createFromFormat($format . '|', (string) $data, $timezone);
+        $datetime = false;
+
+        if (!empty($context['format'])) {
+            $datetime = \DateTime::createFromFormat($context['format'] . '|', (string)$data, $timezone);
+        } elseif (!empty($context['type']) && in_array($context['type'], ['datetime', 'date', 'time'], true)) {
+            $formatter = $this->formatter;
+            if (null !== $formatter && $formatter instanceof DateTimeTypeConverterInterface) {
+                /** @var DateTimeTypeConverterInterface $formatter */
+                $datetime = $formatter->convertToDateTime($data, $context['type']);
+            }
+        }
+
+        // Default denormalization
+        if (false === $datetime) {
+            $datetime = \DateTime::createFromFormat($format . '|', (string)$data, $timezone);
+        }
 
         // If we are denormalizing date or time for backward compatibility try to denormalize as dateTime
         if (false === $datetime
@@ -99,8 +141,12 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @return string
+     * Gets format from $context.
+     * In cases when format or type is not specified, default format used.
+     *
      * @param array $context
+     *
+     * @return string
      */
     protected function getFormat(array $context)
     {
