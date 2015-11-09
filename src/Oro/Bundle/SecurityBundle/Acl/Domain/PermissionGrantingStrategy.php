@@ -18,8 +18,8 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
  */
 class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 {
-    const ALL = 'all';
-    const ANY = 'any';
+    const ALL   = 'all';
+    const ANY   = 'any';
     const EQUAL = 'equal';
 
     /**
@@ -155,11 +155,11 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * This process is repeated until either a granting ACE is found, or no
      * permission/identity combinations are left.
      *
-     * @param AclInterface $acl
-     * @param EntryInterface[] $aces An array of ACE to check against
-     * @param array $masks An array of permission masks
-     * @param SecurityIdentityInterface[] $sids An array of SecurityIdentityInterface implementations
-     * @param boolean $administrativeMode True turns off audit logging
+     * @param AclInterface                $acl
+     * @param EntryInterface[]            $aces               An array of ACE to check against
+     * @param array                       $masks              An array of permission masks
+     * @param SecurityIdentityInterface[] $sids               An array of SecurityIdentityInterface implementations
+     * @param boolean                     $administrativeMode True turns off audit logging
      *
      * @return boolean|null true if granting access; false if denying access; null if ACE was not found.
      * @throws NoAceFoundException
@@ -171,9 +171,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         array $sids,
         $administrativeMode
     ) {
-        $triggeredAce = null;
+        $triggeredAce  = null;
         $triggeredMask = 0;
-        $result = false;
+        $result        = false;
 
         foreach ($sids as $sid) {
             foreach ($aces as $ace) {
@@ -182,11 +182,11 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                         if ($this->isAceApplicable($requiredMask, $ace, $acl)) {
                             $isGranting = $ace->isGranting();
 
+                            $aclExt = $this->getContext()->getAclExtension();
                             if ($sid instanceof RoleSecurityIdentity) {
                                 // give an additional chance for the appropriate ACL extension to decide
                                 // whether an access to a domain object is granted or not
-                                $aclExtension = $this->getContext()->getAclExtension();
-                                $decisionResult = $aclExtension->decideIsGranting(
+                                $decisionResult = $aclExt->decideIsGranting(
                                     $requiredMask,
                                     $this->getContext()->getObject(),
                                     $this->getContext()->getSecurityToken()
@@ -198,19 +198,17 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
                             if ($isGranting) {
                                 // the access is granted if there is at least one granting ACE
-                                $triggeredAce = $ace;
-                                $triggeredMask = $requiredMask;
-                                $result = true;
-                                // break all loops when granting ACE was found
-                                break 3;
-                            } else {
-                                // remember the first denying ACE
-                                if (null === $triggeredAce) {
-                                    $triggeredAce = $ace;
+                                if ($aclExt->getAccessLevel($requiredMask) > $aclExt->getAccessLevel($triggeredMask)) {
+                                    // the current ACE gives more permissions than previous one
+                                    $triggeredAce  = $ace;
                                     $triggeredMask = $requiredMask;
                                 }
-                                // break for all masks
-                                break 3;
+
+                                $result = true;
+                            } elseif (null === $triggeredAce) {
+                                // remember the first denying ACE
+                                $triggeredAce  = $ace;
+                                $triggeredMask = $requiredMask;
                             }
                         }
                     }
@@ -246,16 +244,17 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * Strategy EQUAL:
      *     The ACE will be considered applicable when the bitmasks are equal.
      *
-     * @param integer $requiredMask
+     * @param integer        $requiredMask
      * @param EntryInterface $ace
-     * @param AclInterface $acl
+     * @param AclInterface   $acl
+     *
      * @return bool
      * @throws \RuntimeException if the ACE strategy is not supported
      */
     protected function isAceApplicable($requiredMask, EntryInterface $ace, AclInterface $acl)
     {
         $extension = $this->getContext()->getAclExtension();
-        $aceMask = $ace->getMask();
+        $aceMask   = $ace->getMask();
         if ($acl->getObjectIdentity()->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             if ($acl->getObjectIdentity()->getIdentifier() !== $extension->getExtensionKey()) {
                 return false;
@@ -267,8 +266,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         }
 
         $requiredMask = $extension->removeServiceBits($requiredMask);
-        $aceMask = $extension->removeServiceBits($aceMask);
-        $strategy = $ace->getStrategy();
+        $aceMask      = $extension->removeServiceBits($aceMask);
+        $strategy     = $ace->getStrategy();
         switch ($strategy) {
             case self::ALL:
                 return $requiredMask === ($aceMask & $requiredMask);
