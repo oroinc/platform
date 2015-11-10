@@ -23,13 +23,12 @@ define(function(require) {
             'change input[name=value]': 'autoSize'
         },
 
-        getAvailableOptions: function(options) {
-            return [];
+        listen: {
+            'change:visibility': 'autoSize'
         },
 
-        render: function() {
-            MultiselectEditorView.__super__.render.call(this);
-            this.autoSize();
+        getAvailableOptions: function(options) {
+            return [];
         },
 
         autoSize: function() {
@@ -37,7 +36,10 @@ define(function(require) {
             var widthes = this.$('.select2-search-choice').map(function(i, item) {return item.clientWidth;});
             widthes.sort();
             var percentile90 = widthes[Math.floor(widthes.length * 0.9)];
-            this.$('.select2-choices').width((percentile90 + this.SELECTED_ITEMS_H_MARGIN) * widthPieces);
+            this.$('.select2-choices').width(
+                (percentile90 + this.SELECTED_ITEMS_H_MARGIN_BETWEEN) * widthPieces +
+                this.SELECTED_ITEMS_H_INCREMENT
+            );
         },
 
         getInitialResultItem: function() {

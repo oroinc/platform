@@ -47,6 +47,7 @@ define(function(require) {
             });
             this.resizeToCell(viewInstance);
             this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+            viewInstance.trigger('change:visibility');
             return viewInstance;
         },
 
@@ -55,9 +56,6 @@ define(function(require) {
          */
         resizeToCell: function(view) {
             view.$el.width(view.cell.$el.outerWidth() + this.getWidthIncrement());
-            if (_.isFunction(view.autoSize)) {
-                view.autoSize();
-            }
         },
 
         /**
