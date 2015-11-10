@@ -50,7 +50,7 @@ parameters:
     oro_security.provider.share_provider.class:                Oro\Bundle\SecurityBundle\Provider\ShareProvider
     oro_security.provider.share_scope_provider.class:          Oro\Bundle\SecurityBundle\Provider\ShareScopeProvider
 
-    oro_security.twig.security_extension:                      Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
+    oro_security.twig.security_extension.class:                Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
     oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
 
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
@@ -380,13 +380,9 @@ services:
             - { name: monolog.logger, channel: security }
 
     oro_security.twig.security_extension:
-        class: %oro_security.twig.security_extension%
+        class: %oro_security.twig.security_extension.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @security.acl.cache.doctrine
             - @oro_security.security_facade
-            - @oro_locale.formatter.name
-            - @translator
         tags:
             - { name: twig.extension }
 
