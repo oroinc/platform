@@ -41,6 +41,7 @@ parameters:
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
     oro_email.email_websocket.processor.class:    Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor
+    oro_email.placeholder.send_email.filter.class: Oro\Bundle\EmailBundle\Placeholder\SendEmailPlaceholderFilter
 
     oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -385,8 +386,7 @@ services:
         class: %oro_email.emailtemplate.variable_provider.entity.class%
         arguments:
             - @translator
-            - @oro_entity_config.provider.email
-            - @oro_entity_config.provider.entity
+            - @oro_entity_config.config_manager
             - @doctrine
             - @oro_ui.formatter
         lazy: true
@@ -934,3 +934,6 @@ services:
             - @doctrine.orm.entity_manager
         tags:
             - { name: oro_workflow.action, alias: add_email_activity_target }
+
+    oro_email.placeholder.send_email.filter:
+        class: %oro_email.placeholder.send_email.filter.class%

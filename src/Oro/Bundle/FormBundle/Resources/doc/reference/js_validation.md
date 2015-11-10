@@ -85,6 +85,23 @@ In case you have one form which saves several different entities at once (e.g. c
 ```
 After that, validation for sub-entinty works only if some of fields is not blank. Otherwise it ignores all validation rules for fields elements of sub-entity.
 
+## Ignore validation section
+There are cases when developer need to suppress validation for some field or group of fields. It can be done over `data-validation-ignore` attribute of container element. It works the same way as with `data-validation-optional-group` attribute, except validator omit these fields even if they have some value.
+```
++<form>
+|
++--<fieldset>
+|  +--<input>
+|  +--<input>
+|  +--<input>
+|
++--<fieldset data-validation-ignore>
+   +--<input>
+   +--<input>
+   +--<input>
+```
+This attribute is checked in each validation cycle, so developer can add/remove it in runtime to get required behavior.
+
 ## Conformity server side validations to client once
 ```
 +--------------+---------+-----+-------------------------------+---------+

@@ -629,6 +629,8 @@ datagrid:
                     and:
                         - u.id != @oro_security.security_facade->getLoggedUserId
         columns:
+            id:
+                label:         oro.user.id.label
             firstName:
                 label:         oro.user.first_name.label
             lastName:
@@ -707,9 +709,9 @@ datagrid:
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
                 join:
-                    inner:
+                    left:
                         - { join: u.owner, alias: bu }
-                        - { join: bu.organization, alias: organizationOwner }
+                        - { join: u.organization, alias: organizationOwner }
 
                 where:
                     and:

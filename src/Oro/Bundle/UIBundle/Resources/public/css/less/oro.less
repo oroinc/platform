@@ -143,6 +143,8 @@ label, input, button, select, textarea { font-size:13px;}
         padding-top:7px;
         width: 100%;
         word-wrap: break-word;
+        padding-left: 5px; // to get nice hover background
+        box-sizing: border-box;
         &.html-content {
           overflow: auto;
         }
@@ -868,9 +870,10 @@ footer {
   border-radius: 0 0 3px 3px;
   border-bottom: 1px solid #e5e5e5;
 }
-.ui-dialog .widget-actions-section .btn,
-.ui-dialog .widget-actions-section a.action {
-  margin-left: 5px;
+.ui-dialog .widget-actions-section {
+  .btn, .action {
+    margin-left: 5px;
+  }
 }
 .ui-dialog .ui-resizable-se {
   height: 14px;
@@ -2115,7 +2118,7 @@ textarea {
     padding-top: 5px;
   }
   > input[type=checkbox]:only-child {
-    margin-top: 6px;
+    margin-top: 10px;
   }
 }
 .btn-group > .btn-small {

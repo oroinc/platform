@@ -5,9 +5,8 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class TargetFieldType extends AbstractType
 {
@@ -15,19 +14,14 @@ class TargetFieldType extends AbstractType
     protected $configManager;
 
     /** @var string|null */
-    protected $entityClass = null;
-
-    /** @var EntityFieldProvider */
-    protected $entityFieldProvider;
+    protected $entityClass;
 
     /**
-     * @param ConfigManager       $configManager
-     * @param EntityFieldProvider $entityFieldProvider
+     * @param ConfigManager $configManager
      */
-    public function __construct(ConfigManager $configManager, EntityFieldProvider $entityFieldProvider)
+    public function __construct(ConfigManager $configManager)
     {
-        $this->configManager       = $configManager;
-        $this->entityFieldProvider = $entityFieldProvider;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -48,7 +42,7 @@ class TargetFieldType extends AbstractType
                 'attr'            => ['class' => 'extend-rel-target-field'],
                 'label'           => 'oro.entity_extend.form.target_field',
                 'empty_value'     => 'oro.entity.form.choose_entity_field',
-                'choices'         => $this->getPropertyChoiceList(),
+                'choices'         => $this->getFieldChoiceList(),
                 'auto_initialize' => false
             ]
         );
@@ -57,7 +51,7 @@ class TargetFieldType extends AbstractType
     /**
      * @return array
      */
-    protected function getPropertyChoiceList()
+    protected function getFieldChoiceList()
     {
         $choices = [];
 
@@ -65,16 +59,27 @@ class TargetFieldType extends AbstractType
             return $choices;
         }
 
-        $fields = $this->entityFieldProvider->getFields($this->entityClass);
-        foreach ($fields as $field) {
+        $entityConfigProvider = $this->configManager->getProvider('entity');
+        $fieldConfigs         = $this->configManager->getProvider('extend')->getConfigs($this->entityClass);
+        foreach ($fieldConfigs as $fieldConfig) {
+            /** @var FieldConfigId $fieldId */
+            $fieldId = $fieldConfig->getId();
             if (!in_array(
-                $field['type'],
-                ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
+                $fieldId->getFieldType(),
+                ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money'],
+                true
             )) {
                 continue;
             }
+            if ($fieldConfig->is('is_deleted')) {
+                continue;
+            }
 
-            $choices[$field['name']] = $field['label'] ? : $field['name'];
+            $fieldLabel = $entityConfigProvider
+                ->getConfig($fieldId->getClassName(), $fieldId->getFieldName())
+                ->get('label');
+
+            $choices[$fieldId->getFieldName()] = $fieldLabel ?: $fieldId->getFieldName();
         }
 
         return $choices;

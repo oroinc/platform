@@ -19,13 +19,12 @@ class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterIn
         switch ($type) {
             case self::TYPE_DATETIME:
                 return $this->format($value);
-                break;
             case self::TYPE_DATE:
-                return $this->formatDate($value);
-                break;
+                // Date data does not contain time and timezone information.
+                return $this->formatDate($value, null, null, 'UTC');
             case self::TYPE_TIME:
-                return $this->formatTime($value);
-                break;
+                // Time data does not contain date and timezone information.
+                return $this->formatTime($value, null, null, 'UTC');
             default:
                 throw new InvalidArgumentException(sprintf('Couldn\'t format "%s" type', $type));
         }
