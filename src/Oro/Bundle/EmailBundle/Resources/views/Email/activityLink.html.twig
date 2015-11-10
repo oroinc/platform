@@ -1,12 +1,15 @@
-{{ UI.clientLink({
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set options = {
     'dataUrl': path(
         'oro_email_email_create', {
-            to: oro_get_email(entity),
+            to: email is defined ? email|escape('html') : oro_get_email(entity),
             entityClass: oro_class_name(entity, true),
             entityId: entity.id
     }),
     'aCss': 'no-hash',
     'iCss': 'icon-envelope',
+    'class': cssClass is defined ? cssClass : '',
     'dataId': entity.id,
     'label' : 'oro.email.send_email'|trans,
     'widget' : {
@@ -25,4 +28,8 @@
             }
         }
     }
-}) }}
+} %}
+
+{% block action_controll %}
+    {{ UI.clientLink(options) }}
+{% endblock %}

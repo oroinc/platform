@@ -333,13 +333,15 @@
         {% set id = id ~ '_collection' %}
         <div class="row-oro">
             {% set prototype_name = form.vars.prototype_name %}
-            <div {{ block('widget_container_attributes') }} data-last-index="{{ form.children|length}}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
+            <div {{ block('widget_container_attributes') }} data-last-index="{{ form.children|length}}" data-row-count-add="{{ form.vars.row_count_add }}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
                 {% if form.children|length %}
                     {% for child in form.children %}
                         {{ _self.oro_collection_item_prototype(child) }}
                     {% endfor %}
                 {% elseif show_form_when_empty and prototype_html is defined %}
-                    {{ prototype_html|replace({(prototype_name): '0'})|raw }}
+                    {% for i in 0..(form.vars.row_count_initial - 1) %}
+                        {{ prototype_html|replace({(prototype_name): i})|raw }}
+                    {% endfor %}
                 {% endif %}
             </div>
             {% if allow_add %}
@@ -404,6 +406,19 @@
         </div>
     {% endspaceless %}
 {% endblock %}
+
+{% block oro_autocomplete_widget %}
+    {% if autocomplete.selection_template_twig is defined and autocomplete.selection_template_twig %}
+        {% set componentOptions = componentOptions|merge({
+            selection_template: include(autocomplete.selection_template_twig)
+        }) %}
+    {% endif %}
+    {% set attr = attr|merge({
+        'data-page-component-module': componentModule,
+        'data-page-component-options': componentOptions|json_encode
+    }) %}
+    {{ form_widget(form, {attr: attr}) }}
+{% endblock oro_autocomplete_widget %}
 
 {% block oro_entity_create_or_select_widget %}
     {% set currentMode = form.mode.vars.value|default('create') %}

@@ -280,8 +280,11 @@ define([
         },
 
         getEventView: function() {
+            // fetch calendar related connection
+            var connection = this.options.connections.findWhere({calendarUid: this.model.get('calendarUid')});
             return this.viewTemplate(_.extend(this.model.toJSON(), {
-                formatter: fieldFormatter
+                formatter: fieldFormatter,
+                connection: connection ? connection.toJSON() : null
             }));
         },
 

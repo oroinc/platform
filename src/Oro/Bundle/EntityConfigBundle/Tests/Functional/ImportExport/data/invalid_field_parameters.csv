@@ -1,0 +1,6 @@
+fieldName,is_serialized,type,email.available_in_template,entity.label,entity.description,datagrid.is_visible,datagrid.show_filter,form.is_enabled,view.is_displayable,view.priority,extend.length,search.searchable,search.title_field,dataaudit.auditable,importexport.header,importexport.order,importexport.identity,importexport.excluded,extend.precision,extend.scale,attachment.attachment,attachment.maxsize,attachment.width,attachment.height,enum.enum_options,enum.enum_options.0.label,enum.enum_options.0.is_default,enum.enum_options.1.label,enum.enum_options.1.is_default,enum.enum_options.2.label,enum.enum_options.2.is_default
+testimage,,image,yes,label_value,description_value,,,yes,yes,7,,,,,header_value,16,,no,,,attachment_value,-1,1,1,,,,,,,
+test,,ffff,yes,label_value,description_value,,,yes,yes,7,,,,,header_value,16,,no,,,attachment_value,-1,1,1,,,,,,,
+test,,string,yes,,description_value,,,yes,yes,7,,,,,header_value,16,,no,,,attachment_value,-1,1,1,,,,,,,
+field_multiEnum,,multiEnum,yes,label_value,description_value,yes,no,yes,yes,1,,no,,no,header_value,1,,no,,,,,,,,!@#$!@#$,yes,enum_label_1,no,enum_label_2,no
+field_integer,,integer,yes,label_valuelabel_valuelabel_valuelabel_valuelabel_value,description_value,yes,no,yes,yes,11,,no,,no,header_value,5,no,no,,,,,,,,,,,,,

@@ -193,6 +193,7 @@ oro_entity_config:
                 length:
                     options:
                         require_schema_update: true
+                        value_type:         integer
                         default_value:      255
                         allowed_type:       [string]
                         required_property:
@@ -216,6 +217,7 @@ oro_entity_config:
                 precision:
                     options:
                         require_schema_update: true
+                        value_type:         integer
                         default_value:      2
                         allowed_type:       [decimal]
                         required_property:
@@ -238,6 +240,7 @@ oro_entity_config:
                 scale:
                     options:
                         require_schema_update: true
+                        value_type:         integer
                         default_value:      2
                         allowed_type:       [decimal]
                         required_property:
@@ -440,6 +443,7 @@ oro_entity_config:
                 # is used to store enum values
                 enum_options: # array
                     options:
+                        value_type:         enum
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
                     form:
@@ -475,6 +479,7 @@ oro_entity_config:
                 # Indicates what custom field could be searchable
                 searchable:
                     options:
+                        value_type:         boolean
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, oneToMany]
                         required_property:
                             config_id:
@@ -492,6 +497,7 @@ oro_entity_config:
                 # Indicates what custom text field is a part of search result title
                 title_field:
                     options:
+                        value_type:         boolean
                         allowed_type:       [string]
                         required_property:
                             config_id:
