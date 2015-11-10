@@ -63,54 +63,58 @@ class TooltipFormExtension extends AbstractTypeExtension
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        if (!$form->getParent()) {
+            return;
+        }
+
         foreach ($this->optionalParameters as $parameter) {
             if (isset($options[$parameter])) {
                 $view->vars[$parameter] = $options[$parameter];
             }
         }
 
-        $this->prepareModifyFieldTooltip($form, $options);
+        $this->prepareModifyFieldTooltip($form, $view);
     }
 
     /**
-     * @param FormInterface $form
-     * @param array $options
-     */
-    public function prepareModifyFieldTooltip($form, $options)
-    {
-        if (empty($options['data_class'])) {
-            return;
-        }
-
-        $className = $options['data_class'];
-        $fields = $this->entityFieldProvider->getFields($className);
-
-        foreach ($fields as $value) {
-            $fieldName = $value['name'];
-            $skipField = !$form->has($fieldName) || !$this->entityConfigProvider->hasConfig($className, $fieldName);
-            //skip field if it doesn't contain in form, config or contains own custom tooltip in form
-            if ($skipField || $form->get($fieldName)->getConfig()->getOption('tooltip') !== null) {
-                continue;
-            }
-            $this->modifyFieldTooltip($className, $form, $form->get($fieldName));
-        }
-    }
-
-    /**
-     * @param string $className
-     * @param FormInterface $form
      * @param FormInterface $field
+     * @param FormView $view
      */
-    public function modifyFieldTooltip($className, $form, $field)
+    public function prepareModifyFieldTooltip(FormInterface $field, FormView $view)
     {
-        if (!$field->getConfig()->getOption('description')) {
-            $tooltipRaw = $this->entityConfigProvider->getConfig($className, $field->getName())->get('description');
-            $tooltip = $this->translator->trans($tooltipRaw);
+        $parentOptions = $field->getParent()->getConfig()->getOptions();
+        $parentClassName = isset($parentOptions['data_class']) ? $parentOptions['data_class'] : null;
+        $validDescription =
+            $parentClassName &&
+            $this->entityConfigProvider->hasConfig($parentClassName, $field->getName()) &&
+            !$field->getConfig()->getOption('description');
+
+        if (isset($view->vars['tooltip'])) {
+            if ($foundedDomain = $this->getFoundedDomain($view->vars['tooltip'])) {
+                $view->vars['tooltip'] = $this->translator->trans($view->vars['tooltip'], [], $foundedDomain);
+            }
+        } elseif ($validDescription) {
+            $tipRaw = $this->entityConfigProvider->getConfig($parentClassName, $field->getName())->get('description');
+            $tip = $this->translator->trans($tipRaw);
             //if text has been added by user in gui
-            if ($tooltipRaw !== $tooltip) {
-                FormUtils::replaceField($form, $field->getName(), ['tooltip' => $tooltip]);
+            if ($tipRaw !== $tip) {
+                $view->vars['tooltip'] = $tip;
             }
         }
+    }
+
+    /**
+     * @param string $idTranslation
+     * @return bool|string
+     */
+    protected function getFoundedDomain($idTranslation)
+    {
+        if ($this->translator->hasTrans($idTranslation, 'messages')) {
+            return 'messages';
+        } elseif ($this->translator->hasTrans($idTranslation, 'tooltips')) {
+            return 'tooltips';
+        }
+        return false;
     }
 
     /**

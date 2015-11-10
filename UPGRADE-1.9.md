@@ -70,3 +70,6 @@ UPGRADE FROM 1.8 to 1.9
 
 ####EmailBundle
  - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
+
+####TranslationBundle
+ - /Resources/translations/tooltips.*.yml deprecated since 1.9.0. Will be removed in 1.11.0. Use /Resources/translations/messages.*.yml instead
