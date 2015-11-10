@@ -19,12 +19,34 @@ define(function(require) {
             MultiselectEditorView.__super__.initialize.apply(this, arguments);
         },
 
+        events: {
+            'change input[name=value]': 'autoSize'
+        },
+
         getAvailableOptions: function(options) {
             return [];
         },
 
+        render: function() {
+            MultiselectEditorView.__super__.render.call(this);
+            this.autoSize();
+        },
+
+        autoSize: function() {
+            var widthPieces = Math.ceil(Math.pow(this.getValue().data.length, 0.6));
+            var widthes = this.$('.select2-search-choice').map(function(i, item) {return item.clientWidth;});
+            widthes.sort();
+            var percentile90 = widthes[Math.floor(widthes.length * 0.9)];
+            this.$('.select2-choices').width((percentile90 + this.SELECTED_ITEMS_H_MARGIN) * widthPieces);
+        },
+
         getInitialResultItem: function() {
-            return this.getModelValue().data;
+            var modelValue = this.getModelValue();
+            if (modelValue !== null && modelValue && modelValue.data) {
+                return modelValue.data;
+            } else {
+                return [];
+            }
         },
 
         getFormattedValue: function() {

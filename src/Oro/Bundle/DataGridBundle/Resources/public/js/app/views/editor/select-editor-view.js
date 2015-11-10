@@ -67,6 +67,9 @@ define(function(require) {
     SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
         className: 'select-editor',
 
+        SELECTED_ITEMS_H_MARGIN: 5,
+        SELECTED_ITEMS_V_MARGIN: 6,
+
         initialize: function(options) {
             this.availableChoices = this.getAvailableOptions(options);
             SelectEditorView.__super__.initialize.apply(this, arguments);
