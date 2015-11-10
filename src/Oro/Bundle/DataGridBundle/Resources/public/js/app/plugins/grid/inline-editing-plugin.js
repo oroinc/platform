@@ -577,6 +577,7 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
+            var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.cell.disposed && this.cell.$el) {
                 var _this = this;
                 this.cell.$el.addClass('save-fail');
@@ -588,7 +589,7 @@ define(function(require) {
             this.main.trigger('content:update');
 
             var errors = [];
-            switch (jqXHR.status) {
+            switch (errorCode) {
                 case 400:
                     var jqXHRerrors = jqXHR.responseJSON.errors.children;
                     for (var i in jqXHRerrors) {
