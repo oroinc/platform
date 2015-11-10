@@ -55,6 +55,9 @@ define(function(require) {
          */
         resizeToCell: function(view) {
             view.$el.width(view.cell.$el.outerWidth() + this.getWidthIncrement());
+            if (_.isFunction(view.autoSize)) {
+                view.autoSize();
+            }
         },
 
         /**
