@@ -169,6 +169,14 @@ table.grid {
   .boolean-cell {
       text-align: left;
   }
+  .multiselect-cell {
+    .multiselect-value:after{
+      content: ', '
+    }
+    .multiselect-value:last-child:after{
+      content: ''
+    }
+  }
   .number-cell,
   .integer-cell {
       text-align: right;

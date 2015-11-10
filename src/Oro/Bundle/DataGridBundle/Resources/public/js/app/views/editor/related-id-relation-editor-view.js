@@ -89,7 +89,7 @@ define(function(require) {
         DEFAULT_PER_PAGE: 20,
         input_delay: 250,
         initialize: function(options) {
-            if (options.value_field_name) {
+            if (options.value_field_name || options.ignore_value_field_name) {
                 this.valueFieldName = options.value_field_name;
             } else {
                 throw new Error('`value_field_name` option is required');
@@ -226,7 +226,7 @@ define(function(require) {
         },
 
         getChoiceLabel: function() {
-            return this.$('.select2-choice').data('select2-data').label;
+            return this.getSelect2Value().label;
         },
 
         getServerUpdateData: function() {

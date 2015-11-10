@@ -132,6 +132,10 @@ define(function(require) {
             };
         },
 
+        getSelect2Value: function() {
+            return this.$('.select2-choice').data('select2-data');
+        },
+
         dispose: function() {
             if (this.disposed) {
                 return;
