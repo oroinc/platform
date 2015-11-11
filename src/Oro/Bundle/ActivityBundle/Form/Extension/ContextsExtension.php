@@ -8,15 +8,20 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class ContextsExtension extends AbstractTypeExtension
 {
+    /** @var Request */
+    protected $request;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -26,19 +31,33 @@ class ContextsExtension extends AbstractTypeExtension
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
+    /** @var EntityRoutingHelper */
+    protected $entityRoutingHelper;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ActivityManager     $activityManager
      * @param EntityAliasResolver $entityAliasResolver
+     * @param EntityRoutingHelper $entityRoutingHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ActivityManager $activityManager,
-        EntityAliasResolver $entityAliasResolver
+        EntityAliasResolver $entityAliasResolver,
+        EntityRoutingHelper $entityRoutingHelper
     ) {
         $this->doctrineHelper      = $doctrineHelper;
         $this->activityManager     = $activityManager;
         $this->entityAliasResolver = $entityAliasResolver;
+        $this->entityRoutingHelper = $entityRoutingHelper;
+    }
+
+    /**
+     * @param Request|null $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 
     /**
@@ -72,16 +91,36 @@ class ContextsExtension extends AbstractTypeExtension
             ]
         );
 
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
-            /** @var ActivityInterface $entity */
-            $entity = $event->getData();
-            $form   = $event->getForm();
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            [$this, 'addDefaultContextListener']
+        );
+    }
 
-            if ($entity) {
+    /**
+     * Adds default or existent activity contexts data to the form
+     *
+     * @param FormEvent $event
+     */
+    public function addDefaultContextListener(FormEvent $event)
+    {
+        /** @var ActivityInterface $entity */
+        $entity = $event->getData();
+        $form   = $event->getForm();
+
+        if ($entity) {
+            $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($this->request);
+            $targetEntityId    = $this->entityRoutingHelper->getEntityId($this->request);
+            $contexts          = [];
+
+            if ($entity->getId()) {
                 $contexts = $entity->getActivityTargetEntities();
-                $form->get('contexts')->setData($contexts);
+            } elseif ($targetEntityClass && $this->request->getMethod() === 'GET') {
+                $contexts[] = $this->entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
             }
-        });
+
+            $form->get('contexts')->setData($contexts);
+        }
     }
 
     /**

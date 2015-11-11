@@ -16,5 +16,8 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_activity.manager
             - @oro_entity.entity_alias_resolver
+            - @oro_entity.routing_helper
+        calls:
+            - [setRequest, [@?request=]]
         tags:
             - { name: form.type_extension, alias: form }
