@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\AST\SelectStatement;
