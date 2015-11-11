@@ -51,18 +51,17 @@ define([
         },
 
         doRefresh: function() {
-            var self = this;
             var url = routing.generate('oro_api_get_activity_context', {
                 activity: this.options.activityClass,
                 id: this.options.entityId
             });
+            var collection = this.collection;
             $.ajax({
                 method: 'GET',
                 url: url,
                 success: function(r) {
-                    self.collection.reset();
-                    self.collection.add(r);
-                    self.render();
+                    collection.reset();
+                    collection.add(r);
                 }
             });
         },
