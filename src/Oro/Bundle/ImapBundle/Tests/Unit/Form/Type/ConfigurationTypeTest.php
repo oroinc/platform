@@ -27,6 +27,12 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $fieldProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
+
     protected function setUp()
     {
         $this->encryptor = new Mcrypt('someKey');
@@ -57,12 +63,22 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->fieldProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->setMethods(['hasConfig', 'getConfig', 'get'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
         parent::setUp();
     }
 
     protected function getExtensions()
     {
-        $tooltipExtension = new TooltipFormExtension();
+        $tooltipExtension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $this->translator);
 
         return array_merge(
             parent::getExtensions(),

@@ -10,7 +10,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class TooltipFormExtension extends AbstractTypeExtension
 {

@@ -120,7 +120,7 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
                 [
                     'required' => true,
                     'label'    => 'oro.integration.integration.default_user_owner.label',
-                    'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip',
+                    'tooltip'  => 'oro.integration.integration.default_user_owner.description',
                 ]
             );
         }
