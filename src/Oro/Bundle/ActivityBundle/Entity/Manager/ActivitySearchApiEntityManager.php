@@ -57,9 +57,14 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
         if (empty($entities)) {
             $entities = array_flip($this->activityManager->getActivityTargets($this->class));
         }
+        $aliases = [];
+        foreach ($entities as $targetEntityClass) {
+            $alias = $this->searchIndexer->getEntityAlias($targetEntityClass);
+            if (null !== $alias) {
+                $aliases[] = $alias;
+            }
+        }
 
-        return array_values(
-            $this->searchIndexer->getEntityAliases($entities)
-        );
+        return $aliases;
     }
 }
