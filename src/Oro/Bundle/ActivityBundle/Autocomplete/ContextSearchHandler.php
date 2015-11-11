@@ -185,10 +185,14 @@ class ContextSearchHandler implements ConverterInterface
     protected function getSearchAliases()
     {
         $class    = $this->entityClassNameHelper->resolveEntityClass($this->class, true);
-        $entities = array_flip($this->activityManager->getActivityTargets($class));
+        $aliases = [];
+        foreach ($this->activityManager->getActivityTargets($class) as $targetEntityClass => $fieldName) {
+            $alias = $this->indexer->getEntityAlias($targetEntityClass);
+            if (null !== $alias) {
+                $aliases[] = $alias;
+            }
+        }
 
-        return array_values(
-            $this->indexer->getEntityAliases($entities)
-        );
+        return $aliases;
     }
 }
