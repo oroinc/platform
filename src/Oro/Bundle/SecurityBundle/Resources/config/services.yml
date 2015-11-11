@@ -71,12 +71,13 @@ parameters:
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
 
-    oro_security.workflow.action.remove_ace_share_scope.class: Oro\Bundle\SecurityBundle\Model\Action\RemoveAceByShareScopeAction
     oro_security.ace.query.manager.class:                      Oro\Bundle\SecurityBundle\Model\Action\AceQueryManager
 
     oro_security_search.index.class:                           Oro\Bundle\SecurityBundle\Search\SecurityIndexer
 
     oro_security.orm.acl_conditional_factor_builder.class:     Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder
+
+    oro_security.listener.entity_config.class:                 Oro\Bundle\SecurityBundle\EventListener\EntityConfigListener
 
 services:
     oro_security.security_facade:
@@ -610,16 +611,6 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
 
-    oro_security.workflow.action.remove_ace_share_scope:
-        class: %oro_security.workflow.action.remove_ace_share_scope.class%
-        arguments:
-            - @oro_workflow.context_accessor
-            - @oro_security.ace.query.manager
-            - @doctrine.orm.entity_manager
-            - @security.acl.cache.doctrine
-        tags:
-            - { name: oro_workflow.action, alias: remove_ace_share_scope }
-
     oro_security_search.index:
         class: %oro_security_search.index.class%
         arguments:
@@ -632,3 +623,12 @@ services:
 
     oro_security.orm.acl_conditional_factor_builder:
         class: %oro_security.orm.acl_conditional_factor_builder.class%
+
+    oro_security.listener.entity_config:
+        class: %oro_security.listener.entity_config.class%
+        arguments:
+            - @oro_security.ace.query.manager
+            - @doctrine
+            - @security.acl.cache.doctrine
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlushConfig }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Columns;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -14,7 +16,6 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class ColumnsExtension extends AbstractExtension
 {
@@ -367,12 +368,12 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
-     * @return User
+     * @return UserInterface
      */
     protected function getCurrentUser()
     {
         $user = $this->securityFacade->getLoggedUser();
-        if ($user instanceof User) {
+        if ($user instanceof UserInterface) {
             return $user;
         }
 
