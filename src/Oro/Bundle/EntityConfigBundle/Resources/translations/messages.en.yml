@@ -58,6 +58,7 @@ oro:
 
         import:
             title: Import Entity Fields
+            label: Import Fields
             message:
                 invalid_field_name: Invalid field name.
                 invalid_field_type: Invalid field type.
