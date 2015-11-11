@@ -109,19 +109,19 @@ define(function(require) {
             var originalRender = cell.render;
             cell.render = function() {
                 originalRender.apply(this, arguments);
-                var originalEvents = cell.events;
-                if (_this.isEditable(cell)) {
+                var originalEvents = this.events;
+                if (_this.isEditable(this)) {
                     this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
-                    cell.events = _.extend(Object.create(cell.events), {
+                    this.events = _.extend(Object.create(this.events), {
                         'dblclick': enterEditModeIfNeeded,
-                        'mouseleave': this.hidePopover,
+                        'mouseleave': _this.hidePopover,
                         'mousedown .icon-edit': enterEditModeIfNeeded,
                         'click': _.noop
                     });
                 }
-                cell.delegateEvents();
-                cell.events = originalEvents;
+                this.delegateEvents();
+                this.events = originalEvents;
                 return this;
             };
         },
@@ -130,7 +130,8 @@ define(function(require) {
             this.initPopover();
         },
 
-        onGridRowClicked: function() {
+        onGridRowClicked: function(grid, row) {
+            row.$('.editable').removeClass('editable');
             this.hidePopover();
         },
 
