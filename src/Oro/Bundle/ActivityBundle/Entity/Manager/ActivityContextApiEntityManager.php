@@ -13,6 +13,7 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
@@ -103,20 +104,35 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             return $result;
         }
 
+        $entityProvider = $this->configManager->getProvider('entity');
         foreach ($result as &$item) {
-            $icon  = $this->configManager->getProvider('entity')->getConfig($item['entity'])->get('icon');
-            $route = $this->configManager->getEntityMetadata($item['entity'])->getRoute();
+            $config        = $entityProvider->getConfig($item['entity']);
+            $metadata      = $this->configManager->getEntityMetadata($item['entity']);
+            $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($item['entity']);
+
+            $link = null;
+            if ($metadata) {
+                $link = $this->router->generate($metadata->getRoute(), ['id' => $item['id']]);
+            } elseif ($link === null && ExtendHelper::isCustomEntity($item['entity'])) {
+                // Generate view link for the custom entity
+                $link = $this->router->generate(
+                    'oro_entity_view',
+                    [
+                        'id'         => $item['id'],
+                        'entityName' => $safeClassName
+
+                    ]
+                );
+            }
 
             $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);
             $item['entityId']           = $id;
 
             $item['targetId']        = $item['id'];
-            $item['targetClassName'] = $this->entityClassNameHelper->getUrlSafeClassName($item['entity']);
+            $item['targetClassName'] = $safeClassName;
 
-            $item['icon'] = $icon;
-            $item['link'] = $route
-                ? $this->router->generate($route, ['id' => $item['id']])
-                : null;
+            $item['icon'] = $config->get('icon');
+            $item['link'] = $link;
 
             unset($item['id'], $item['entity']);
         }
