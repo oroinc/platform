@@ -16,3 +16,27 @@ oro:
             NONE: None
         organization:
             access_denied: You don't have access to organization "%organization_name%"
+        share_scopes:
+            not_available: N/A
+            label: Share Scopes
+            business_unit:
+                label: Business Unit
+                short_label: BU
+            user:
+                label: User
+                short_label: User
+            widget.title: Sharing Settings
+        action:
+            share: Share
+            shared: Sharing settings were successfully applied
+            share_with: Share with
+            share_with_placeholder: Enter Name
+            shared_with: Shared with {{ name }}
+            shared_with_plural: Shared with {{ name }} and +{{ count }} more
+        datagrid:
+            shared_datagrid.title: Already shared with
+            share_grid_row_details_from: from
+            actions:
+                remove.label: Remove
+            mass_actions:
+                remove.label: Remove

@@ -7,6 +7,9 @@ placeholders:
         items:
             organization_name:
                 order: 200
+    view_navButtons_before:
+        items:
+            oro_share: ~
 
 items:
     organization_selector:
@@ -14,3 +17,6 @@ items:
         applicable: @oro_user.placeholder.filter->isUserApplicable()
     organization_name:
         template: OroSecurityBundle:Organization:current_name.html.twig
+    oro_share:
+        template: OroSecurityBundle:Share:shareButton.html.twig
+        applicable: @oro_security.placeholder.filter->isShareEnabled($entity$)

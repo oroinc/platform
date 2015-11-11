@@ -2,87 +2,29 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * User config scope
  */
-class UserScopeManager extends AbstractScopeManager implements ContainerAwareInterface
+class UserScopeManager extends AbstractScopeManager
 {
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $security;
+    /** @var TokenStorageInterface */
+    protected $securityContext;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $scopeId;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSettingValue($name, $full = false)
-    {
-        if (is_null($this->scopeId) || $this->scopeId == 0) {
-            $this->setScopeId();
-        }
-
-        return parent::getSettingValue($name, $full);
-    }
-
-    /**
-     * @param int|null $scopeId
-     * @return $this
-     */
-    public function setScopeId($scopeId = null)
-    {
-        if (is_null($scopeId)) {
-            $token = $this->getSecurity()->getToken();
-            if ($token) {
-                $user = $token->getUser();
-                if ($user instanceof User) {
-                    $scopeId = $user->getId() ?: 0;
-                }
-            }
-        }
-
-        $this->scopeId = $scopeId;
-        $this->loadStoredSettings($this->getScopedEntityName(), $this->scopeId);
-
-        return $this;
-    }
-
-    /**
-     * DI setter for security context
+     * Sets the security context
      *
-     * @param SecurityContextInterface $security
-     *
-     * @deprecated since 1.8
+     * @param TokenStorageInterface $securityContext
      */
-    public function setSecurity(SecurityContextInterface $security)
+    public function setSecurityContext(TokenStorageInterface $securityContext)
     {
-        $this->security = $security;
-
-        $this->loadUserStoredSettings($this->security->getToken());
+        $this->securityContext = $securityContext;
     }
 
     /**
@@ -98,50 +40,36 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
      */
     public function getScopeId()
     {
-        if (is_null($this->scopeId)) {
-            $this->setScopeId();
-        }
+        $this->ensureScopeIdInitialized();
 
         return $this->scopeId;
     }
 
     /**
-     * @return SecurityContextInterface
+     * {@inheritdoc}
      */
-    protected function getSecurity()
+    public function setScopeId($scopeId)
     {
-        if (!$this->container) {
-            throw new \InvalidArgumentException('ContainerInterface is not injected');
-        }
-
-        if (!$this->security) {
-            $this->security = $this->container->get('security.context');
-
-            $this->loadUserStoredSettings($this->security->getToken());
-        }
-
-        return $this->security;
+        $this->scopeId = $scopeId;
     }
 
     /**
-     * If we have a user - try to merge his scoped settings into global settings array
-     *
-     * @param TokenInterface|null $token
+     * Makes sure that the scope id is set
      */
-    protected function loadUserStoredSettings(TokenInterface $token = null)
+    protected function ensureScopeIdInitialized()
     {
-        if (!$token) {
-            return;
-        }
+        if (null === $this->scopeId) {
+            $scopeId = 0;
 
-        /** @var User $user */
-        $user = $token->getUser();
-        if ($user instanceof User) {
-            foreach ($user->getGroups() as $group) {
-                $this->loadStoredSettings('group', $group->getId());
+            $token = $this->securityContext->getToken();
+            if ($token) {
+                $user = $token->getUser();
+                if ($user instanceof User && $user->getId()) {
+                    $scopeId = $user->getId();
+                }
             }
 
-            $this->loadStoredSettings('user', $user->getId());
+            $this->scopeId = $scopeId;
         }
     }
 }

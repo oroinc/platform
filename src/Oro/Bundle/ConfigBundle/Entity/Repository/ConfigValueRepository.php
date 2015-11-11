@@ -27,7 +27,7 @@ class ConfigValueRepository extends EntityRepository
 
         $this->getEntityManager()->beginTransaction();
         foreach ($removed as $item) {
-            $builder->delete('OroConfigBundle:ConfigValue', 'cv')
+            $builder->delete('Oro\Bundle\ConfigBundle\Entity\ConfigValue', 'cv')
                 ->where('cv.config = :config')
                 ->andWhere('cv.name = :name')
                 ->andWhere('cv.section = :section')

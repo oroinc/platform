@@ -14,6 +14,8 @@ use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
 
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
@@ -52,7 +54,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class ActivityList extends ExtendActivityList
+class ActivityList extends ExtendActivityList implements DatesAwareInterface, UpdatedByAwareInterface
 {
     const ENTITY_NAME  = 'OroActivityListBundle:ActivityList';
     const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
@@ -81,6 +83,7 @@ class ActivityList extends ExtendActivityList
 
     /**
      * @var User
+     * @deprecated 1.8.0:1.10.0 Will be renamed to updatedBy
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
@@ -180,6 +183,16 @@ class ActivityList extends ExtendActivityList
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $activityOwners;
+
+    /**
+     * @var bool
+     */
+    protected $updatedAtSet;
+
+    /**
+     * @var bool
+     */
+    protected $updatedBySet = null;
 
     public function __construct()
     {
@@ -396,13 +409,13 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
-     * @param User $owningUser
+     * @param User $owner
      *
      * @return self
      */
-    public function setOwner(User $owningUser = null)
+    public function setOwner(User $owner = null)
     {
-        $this->owner = $owningUser;
+        $this->owner = $owner;
 
         return $this;
     }
@@ -425,12 +438,46 @@ class ActivityList extends ExtendActivityList
 
     /**
      * @param User $editor
+     * @deprecated 1.8.0:1.10.0 Use $this->setUpdatedBy() instead
      *
      * @return self
      */
     public function setEditor(User $editor = null)
     {
+        if ($editor !== null) {
+            $this->updatedBySet = true;
+        }
+
         $this->editor = $editor;
+
+        return $this;
+    }
+
+    /**
+     * @deprecated since 1.8. Use $this->getUpdatedBy() instead
+     * @return User
+     */
+    public function getEditor()
+    {
+        return $this->editor;
+    }
+
+    /**
+     * @param User|null $updatedBy
+     *
+     * @return self
+     */
+    public function setUpdatedBy(User $updatedBy = null)
+    {
+        $this->updatedBySet = false;
+        if ($updatedBy !== null) {
+            $this->updatedBySet = true;
+        }
+
+        /**
+         * @TODO will be renamed after BAP-9004
+         */
+        $this->editor = $updatedBy;
 
         return $this;
     }
@@ -438,9 +485,17 @@ class ActivityList extends ExtendActivityList
     /**
      * @return User
      */
-    public function getEditor()
+    public function getUpdatedBy()
     {
         return $this->editor;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUpdatedBySet()
+    {
+        return $this->updatedBySet;
     }
 
     /**
@@ -476,22 +531,6 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
-     * Set creation date
-     *
-     * @param \DateTime %createdAt
-     *
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get creation date
-     *
      * @return \DateTime
      */
     public function getCreatedAt()
@@ -500,8 +539,17 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
-     * Get modification date
-     *
+     * @param \DateTime $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(\DateTime $createdAt = null)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
      * @return \DateTime
      */
     public function getUpdatedAt()
@@ -510,17 +558,28 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
-     * Set modification date
-     *
      * @param \DateTime $updatedAt
      *
-     * @return self
+     * @return $this
      */
-    public function setUpdatedAt($updatedAt)
+    public function setUpdatedAt(\DateTime $updatedAt = null)
     {
+        $this->updatedAtSet = false;
+        if ($updatedAt !== null) {
+            $this->updatedAtSet = true;
+        }
+
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUpdatedAtSet()
+    {
+        return $this->updatedAtSet;
     }
 
     /**

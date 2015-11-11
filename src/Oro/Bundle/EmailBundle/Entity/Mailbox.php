@@ -134,7 +134,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $autoResponseRules;
 
     /**
-     * @var \Datetime $created
+     * @var \Datetime
      *
      * @ORM\Column(name="created_at", type="datetime")
      * @ConfigField(
@@ -148,7 +148,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $createdAt;
 
     /**
-     * @var \Datetime $updated
+     * @var \Datetime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      * @ConfigField(

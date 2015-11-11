@@ -55,6 +55,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getDefaultValues($type, $fieldType);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getDefaultValues($type, $fieldType));
     }
 
     /**
@@ -66,6 +68,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getRequiredPropertyValues($type);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getRequiredPropertyValues($type));
     }
 
     /**
@@ -77,6 +81,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getNotAuditableValues($type);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getNotAuditableValues($type));
     }
 
     /**
@@ -88,6 +94,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getTranslatableValues($type);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getTranslatableValues($type));
     }
 
     /**
@@ -99,6 +107,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getIndexedValues($type);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getIndexedValues($type));
     }
 
     /**
@@ -110,6 +120,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getFormItems($type, $fieldType);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getFormItems($type, $fieldType));
     }
 
     /**
@@ -121,6 +133,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->hasForm($type, $fieldType);
 
         $this->assertEquals($expectedValue, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValue, $this->configContainer->hasForm($type, $fieldType));
     }
 
     /**

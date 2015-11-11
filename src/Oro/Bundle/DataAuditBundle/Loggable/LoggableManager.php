@@ -68,9 +68,6 @@ class LoggableManager
     protected $pendingRelatedEntities = [];
 
     /** @var array */
-    protected $updatedEntities = [];
-
-    /** @var array */
     protected $collectionLogData = [];
 
     /** @var ConfigProvider */
@@ -178,9 +175,14 @@ class LoggableManager
             $uow->getScheduledEntityInsertions(),
             $uow->getScheduledEntityUpdates()
         );
+
+        $updatedEntities = [];
         foreach ($entities as $entity) {
-            $entityMeta = $this->em->getClassMetadata(ClassUtils::getClass($entity));
-            $this->calculateManyToOneData($entityMeta, $entity);
+            $entityMeta      = $this->em->getClassMetadata(ClassUtils::getClass($entity));
+            $updatedEntities = array_merge(
+                $updatedEntities,
+                $this->calculateManyToOneData($entityMeta, $entity)
+            );
         }
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
@@ -193,14 +195,13 @@ class LoggableManager
             $this->createLogEntity(self::ACTION_REMOVE, $entity);
         }
 
-        foreach ($this->collectionLogData as $className => $entityData) {
+        foreach ($this->collectionLogData as $entityData) {
             foreach ($entityData as $identifier => $values) {
-                if (!isset($this->updatedEntities[$identifier])) {
+                if (!isset($updatedEntities[$identifier])) {
                     continue;
                 }
 
-                $entity = $this->updatedEntities[$identifier];
-                $this->createLogEntity(static::ACTION_UPDATE, $entity);
+                $this->createLogEntity(static::ACTION_UPDATE, $updatedEntities[$identifier]);
             }
         }
     }
@@ -259,23 +260,17 @@ class LoggableManager
 
     /**
      * @param DoctrineClassMetadata $entityMeta
-     * @param object $entity
+     * @param object                $entity
+     *
+     * @return array [entityIdentifier => entity, ...]
      */
     protected function calculateManyToOneData(DoctrineClassMetadata $entityMeta, $entity)
     {
-        $requiredProperties = array_flip([
-            'type',
-            'fieldName',
-            'targetEntity',
-            'inversedBy',
-        ]);
-
+        $entities = [];
         foreach ($entityMeta->associationMappings as $assoc) {
-            if (count($requiredProperties) !== count(array_filter(array_intersect_key($assoc, $requiredProperties)))) {
-                continue;
-            }
-
-            if ($assoc['type'] !== DoctrineClassMetadata::MANY_TO_ONE) {
+            if ($assoc['type'] !== DoctrineClassMetadata::MANY_TO_ONE
+                || empty($assoc['inversedBy'])
+            ) {
                 continue;
             }
 
@@ -292,8 +287,11 @@ class LoggableManager
 
             $entityIdentifier = $this->getEntityIdentifierString($owner);
             $this->calculateCollectionData($collection, $entityIdentifier);
-            $this->updatedEntities[$entityIdentifier] = $owner;
+
+            $entities[$entityIdentifier] = $owner;
         }
+
+        return $entities;
     }
 
     /**

@@ -13,6 +13,8 @@ use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
+use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailExtension extends \Twig_Extension
 {
@@ -29,8 +31,12 @@ class EmailExtension extends \Twig_Extension
 
     /** @var EntityManager */
     protected $em;
+
     /**  @var MailboxProcessStorage */
     private $mailboxProcessStorage;
+
+    /** @var SecurityFacade */
+    private $securityFacade;
 
     /**
      * @param EmailHolderHelper      $emailHolderHelper
@@ -38,19 +44,22 @@ class EmailExtension extends \Twig_Extension
      * @param EmailAttachmentManager $emailAttachmentManager
      * @param EntityManager          $em
      * @param MailboxProcessStorage  $mailboxProcessStorage
+     * @param SecurityFacade         $securityFacade
      */
     public function __construct(
         EmailHolderHelper $emailHolderHelper,
         EmailAddressHelper $emailAddressHelper,
         EmailAttachmentManager $emailAttachmentManager,
         EntityManager $em,
-        MailboxProcessStorage $mailboxProcessStorage
+        MailboxProcessStorage $mailboxProcessStorage,
+        SecurityFacade $securityFacade
     ) {
         $this->emailHolderHelper = $emailHolderHelper;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->emailAttachmentManager = $emailAttachmentManager;
         $this->em = $em;
         $this->mailboxProcessStorage = $mailboxProcessStorage;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -65,7 +74,9 @@ class EmailExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_get_email_thread_recipients', [$this, 'getEmailThreadRecipients']),
             new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
             new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach']),
-            new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel'])
+            new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
+            new \Twig_SimpleFunction('oro_get_email_clank_event', [$this, 'getEmailClankEvent']),
+            new \Twig_SimpleFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount'])
         ];
     }
 
@@ -145,7 +156,6 @@ class EmailExtension extends \Twig_Extension
      *
      * @param EmailAttachment $emailAttachment
      * @param object $targetEntity
-     * @param string $targetClass
      *
      * @return bool
      */
@@ -161,6 +171,46 @@ class EmailExtension extends \Twig_Extension
         } else {
             return true;
         }
+    }
+
+    /**
+     * Return unique identificator for clank event. This identification
+     * is used in notification widget to show message about new emails
+     *
+     * @return string
+     */
+    public function getEmailClankEvent()
+    {
+        if (!$this->securityFacade->hasLoggedUser()) {
+            return '';
+        }
+
+        $currentOrganization = $this->securityFacade->getOrganization();
+        $currentUser         = $this->securityFacade->getLoggedUser();
+
+        return WebSocketSendProcessor::getUserTopic($currentUser, $currentOrganization);
+    }
+
+    /**
+     * Return array of numbers unread emails per folder
+     *
+     * @return array
+     */
+    public function getUnreadEmailsCount()
+    {
+        if (!$this->securityFacade->hasLoggedUser()) {
+            return [];
+        }
+
+        $currentOrganization = $this->securityFacade->getOrganization();
+        $currentUser = $this->securityFacade->getLoggedUser();
+        $result = $this->em->getRepository("OroEmailBundle:Email")
+            ->getCountNewEmailsPerFolders($currentUser, $currentOrganization);
+        $total = $this->em->getRepository("OroEmailBundle:Email")
+            ->getCountNewEmails($currentUser, $currentOrganization);
+        $result[] = array('num' => $total, 'id' => 0);
+
+        return $result;
     }
 
     /**

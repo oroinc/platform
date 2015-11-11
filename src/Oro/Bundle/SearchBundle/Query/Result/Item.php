@@ -38,13 +38,6 @@ class Item
     protected $recordUrl;
 
     /**
-     * @deprecated deprecated since 1.5.1 will be removed in 1.7
-     *
-     * @var string
-     */
-    protected $recordText;
-
-    /**
      * @var array
      */
     protected $entityConfig;
@@ -61,7 +54,6 @@ class Item
      * @param string|null   $recordId
      * @param string|null   $recordTitle
      * @param string|null   $recordUrl
-     * @param string        $recordText
      * @param array         $entityConfig
      */
     public function __construct(
@@ -70,7 +62,6 @@ class Item
         $recordId = null,
         $recordTitle = null,
         $recordUrl = null,
-        $recordText = '',
         $entityConfig = array()
     ) {
         $this->em           = $em;
@@ -78,7 +69,6 @@ class Item
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
-        $this->recordText   = empty($recordText) ? '' : $recordText;
         $this->entityConfig = empty($entityConfig) ? array() : $entityConfig;
     }
 
@@ -183,33 +173,6 @@ class Item
     public function getRecordUrl()
     {
         return $this->recordUrl;
-    }
-
-    /**
-     * Set record string data
-     *
-     * @deprecated deprecated since 1.5.1 will be removed in 1.7
-     * @param string $recordText
-     *
-     * @return Item
-     */
-    public function setRecordText($recordText)
-    {
-        $this->recordText = $recordText;
-
-        return $this;
-    }
-
-    /**
-     * Get record string data
-     *
-     * @deprecated deprecated since 1.5.1 will be removed in 1.7
-     *
-     * @return string
-     */
-    public function getRecordText()
-    {
-        return $this->recordText;
     }
 
     /**

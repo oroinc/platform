@@ -210,7 +210,6 @@ class RenameExtendTablesAndColumns implements
                 );
                 break;
             case RelationType::MANY_TO_MANY:
-            case 'optionSet':
                 break;
             default:
                 $oldColumnName = 'field_' . $fieldConfigId->getFieldName();

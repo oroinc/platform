@@ -8,7 +8,9 @@ define(function(require) {
      * @export  oroemail/js/app/models/email-notification-model
      */
     EmailNotificationModel = BaseModel.extend({
-        'route': '',
+        'replyRoute': '',
+        'replyAllRoute': '',
+        'forwardRoute': '',
         'id': '',
         'seen': '',
         'subject': '',

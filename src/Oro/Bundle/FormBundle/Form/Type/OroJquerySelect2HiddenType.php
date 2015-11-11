@@ -14,7 +14,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
@@ -32,19 +32,19 @@ class OroJquerySelect2HiddenType extends AbstractType
     protected $searchRegistry;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $configProvider;
 
     /**
-     * @param EntityManager           $entityManager
-     * @param SearchRegistry          $registry
-     * @param ConfigProviderInterface $configProvider
+     * @param EntityManager  $entityManager
+     * @param SearchRegistry $registry
+     * @param ConfigProvider $configProvider
      */
     public function __construct(
         EntityManager $entityManager,
         SearchRegistry $registry,
-        ConfigProviderInterface $configProvider
+        ConfigProvider $configProvider
     ) {
         $this->entityManager  = $entityManager;
         $this->searchRegistry = $registry;

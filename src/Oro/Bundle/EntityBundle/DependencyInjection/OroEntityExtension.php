@@ -4,16 +4,14 @@ namespace Oro\Bundle\EntityBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
-class OroEntityExtension extends Extension implements PrependExtensionInterface
+class OroEntityExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -53,36 +51,6 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
             $hydrators[$key] = $value;
         }
         $container->setParameter('oro_entity.orm.hydrators', $hydrators);
-    }
-
-    /**
-     * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
-     *
-     * @param ContainerBuilder $container
-     */
-    public function prepend(ContainerBuilder $container)
-    {
-        $dbDriver = $container->getParameter('database_driver');
-        if ($dbDriver == DatabaseDriverInterface::DRIVER_POSTGRESQL) {
-            $doctrineConfig = $container->getExtensionConfig('doctrine');
-            $doctrineConnectionOptions = [];
-            foreach ($doctrineConfig as $config) {
-                if (isset($config['dbal']['connections'])) {
-                    foreach (array_keys($config['dbal']['connections']) as $connectionName) {
-                        // Enable ATTR_EMULATE_PREPARES for PostgreSQL
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
-                            \PDO::ATTR_EMULATE_PREPARES => true
-                        ];
-                        // Add support of "oid" and "name" Db types for EnterpriseDB
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [
-                            'oid' => 'integer',
-                            'name' => 'string'
-                        ];
-                    }
-                }
-            }
-            $container->prependExtensionConfig('doctrine', $doctrineConnectionOptions);
-        }
     }
 
     /**

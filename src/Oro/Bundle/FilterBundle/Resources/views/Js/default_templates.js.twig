@@ -48,6 +48,36 @@
     </div>
 </script>
 
+<script type="text/template" id="number-range-filter-template">
+    <div class="choice-filter number-range-filter">
+        <div class="btn-group btn-block">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+                <%- selectedChoiceLabel %><span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <% _.each(choices, function (option) { %>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                        <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+        <div class="value-field-frame">
+            <div class="filter-value">
+                <div class="filter-start">
+                    <input type="text" class="" value="<%= value.value %>" name="value">
+                </div>
+                <span class="filter-separator">-</span>
+                <div class="filter-end">
+                    <input type="text" value="<%= value.value_end %>" name="value_end">
+                </div>
+            </div>
+            <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+            <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+        </div>
+    </div>
+</script>
+
 <script type="text/template" id="many-to-many-filter-template">
     <div class="choice-filter">
         <div class="btn-group btn-block">
@@ -157,4 +187,25 @@
 <script type="text/template" id="dictionary-filter-template">
     <span> <%= _.__('oro.filter.embedded.choice.field_to_value') %></span><%= parts.join('') %>:
     <input type="hidden" name="select-values-autocomplete" class="select-values-autocomplete hide" value="" />
+</script>
+<script type="text/template" id="choice-tree-template">
+    <div class="filter-item oro-drop filter-business-unit">
+        <div class="">
+            <div>
+                <input type="text" name="search" value=""/>
+            </div>
+            <div class="buttons">
+                <span class="button-all active" data-mode="all'"><%- _.__("oro.filter.choice-tree.all") %></span> |
+                <span class="button-selected" data-mode="selected"><%- _.__("oro.filter.choice-tree.selected") %></span>
+            </div>
+            <div class="list"></div>
+            <input type="hidden" name="value">
+            <input type="hidden" name="type">
+            <div class="oro-action">
+                <div class="btn-group">
+                    <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </script>

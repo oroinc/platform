@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -69,32 +68,13 @@ class EntityHierarchyProvider
 
             $entityConfigs = $this->extendConfigProvider->getConfigs();
             foreach ($entityConfigs as $entityConfig) {
-                if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
-                    continue;
-                }
-                if ($entityConfig->is('is_deleted')) {
-                    continue;
-                }
-
-                $className = $entityConfig->getId()->getClassName();
-                $parents   = [];
-                $this->loadParents($parents, $className);
-                if (empty($parents)) {
-                    continue;
-                }
-
-                // remove proxies if they are in list of parents
-                $parents = array_filter(
-                    $parents,
-                    function ($parentClassName) {
-                        return strpos($parentClassName, ExtendHelper::ENTITY_NAMESPACE) !== 0;
+                if (ExtendHelper::isEntityAccessible($entityConfig)) {
+                    $className = $entityConfig->getId()->getClassName();
+                    $parents   = $this->loadParents($className);
+                    if (!empty($parents)) {
+                        $this->hierarchy[$className] = $parents;
                     }
-                );
-                if (empty($parents)) {
-                    continue;
                 }
-
-                $this->hierarchy[$className] = $parents;
             }
         }
     }
@@ -102,20 +82,32 @@ class EntityHierarchyProvider
     /**
      * Finds parent doctrine entities for given entity class name
      *
-     * @param array  $result
      * @param string $className
+     *
+     * @return string[]
      */
-    protected function loadParents(array &$result, $className)
+    protected function loadParents($className)
     {
+        $result = [];
+
         $reflection  = new \ReflectionClass($className);
         $parentClass = $reflection->getParentClass();
-        if ($parentClass) {
+        while ($parentClass) {
             $parentClassName = $parentClass->getName();
-            $em              = $this->doctrine->getManagerForClass($className);
-            if ($em && !$em->getMetadataFactory()->isTransient($parentClassName)) {
-                $result[] = $parentClassName;
+            // a parent class should be:
+            // - not extended entity proxy
+            // - registered in Doctrine, for example Entity or MappedSuperclass
+            if (strpos($parentClassName, ExtendHelper::ENTITY_NAMESPACE) !== 0) {
+                $em = $this->doctrine->getManagerForClass($className);
+                if ($em && !$em->getMetadataFactory()->isTransient($parentClassName)) {
+                    $result[] = $parentClassName;
+                }
             }
-            $this->loadParents($result, $parentClassName);
+
+            $reflection  = new \ReflectionClass($parentClassName);
+            $parentClass = $reflection->getParentClass();
         }
+
+        return $result;
     }
 }

@@ -44,8 +44,6 @@ Also the following permissions are supported:
  - **ASSIGN**: Controls whether a user is allowed to change an owner of a record. For example assign a record to another user.
  - **SHARE**: Controls whether the user can share a record with another user.
 
- `*` **NOTE: SHARE functionality isn't implemented yet, so SHARE permissions are not used**
-
 - [Implementation](./Resources/doc/implementation.md)
 - [UI](./Resources/doc/ui.md)
 - [ACL manager](./Resources/doc/acl-manager.md)

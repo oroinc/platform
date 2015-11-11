@@ -187,7 +187,24 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getDate($entity)
+    public function getOwner($entity)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedAt($entity)
+    {
+        /** @var $entity Email */
+        return $entity->getSentAt();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedAt($entity)
     {
         /** @var $entity Email */
         return $entity->getSentAt();
@@ -200,14 +217,6 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         return $entity->isHead();
-    }
-
-    /**
-     *  {@inheritdoc}
-     */
-    public function isDateUpdatable()
-    {
-        return false;
     }
 
     /**
@@ -315,9 +324,7 @@ class EmailActivityListProvider implements
      */
     public function isApplicable($entity)
     {
-        return
-            $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
-            && $this->getOrganization($entity);
+        return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS;
     }
 
     /**

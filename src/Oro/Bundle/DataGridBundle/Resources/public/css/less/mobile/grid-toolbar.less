@@ -1,0 +1,35 @@
+.grid-toolbar {
+  .pagination-container {
+    margin: 0 auto;
+    width: 270px;
+    .forScreen(590px, width, 200px);
+    .forScreen(520px, float, right);
+    .page-size {
+      margin-left: 16px;
+      label {
+        display: inline-block;
+        .forScreen(590px, display, none);
+      }
+    }
+  }
+  .actions-panel {
+    margin-left: 16px;
+    .action.btn {
+      height: 32px;
+      margin-right: 8px;
+      padding: 0 7px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+    a.action.btn {
+      .forScreen(400px, display, none);
+      i {
+        font-size: 14px;
+        &:before {
+          line-height: 30px;
+        }
+      }
+    }
+  }
+}
