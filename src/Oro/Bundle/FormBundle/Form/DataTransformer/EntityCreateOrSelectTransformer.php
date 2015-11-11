@@ -78,6 +78,7 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function reverseTransform($value)
     {
