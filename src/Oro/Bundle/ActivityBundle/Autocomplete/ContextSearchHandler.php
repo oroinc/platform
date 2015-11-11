@@ -20,7 +20,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
  * Can not use default Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface cause in this handler we manipulate
  * with different types of entities.
  *
- * Also @see Oro\Bundle\EmailBundle\Form\DataTransformer\ContextsToViewTransformer
+ * Also @see Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer
  */
 class ContextSearchHandler implements ConverterInterface
 {
