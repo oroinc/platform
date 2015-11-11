@@ -28,13 +28,13 @@ class DictionaryHelper
     public function getNamePrimaryKeyField(ClassMetadata $metadata)
     {
         $idNames = $metadata->getIdentifierFieldNames();
-        if (count($idNames) !== 1) {
-            throw new RuntimeException(
-                sprintf('Primary key for entity %s is absent or contains more than one field', $metadata->getName())
-            );
+        if (count($idNames) === 1) {
+            return $idNames[0];
         }
 
-        return $idNames[0];
+        throw new RuntimeException(
+            sprintf('Primary key for entity %s is absent or contains more than one field', $metadata->getName())
+        );
     }
 
     /**
@@ -59,7 +59,9 @@ class DictionaryHelper
 
         if (!empty($searchFields)) {
             return $searchFields;
-        } elseif (in_array(self::DEFAULT_SEARCH_FIELD, $fieldNames)) {
+        }
+
+        if (in_array(self::DEFAULT_SEARCH_FIELD, $fieldNames)) {
             return [self::DEFAULT_SEARCH_FIELD];
         }
 
@@ -76,9 +78,8 @@ class DictionaryHelper
      */
     public function getRepresentationField(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
     {
-        $fieldNames = $doctrineMetadata->getFieldNames();
-
         if (isset($entityMetadata->defaultValues['dictionary']['representation_field'])) {
+            $fieldNames = $doctrineMetadata->getFieldNames();
             $representationField = $entityMetadata->defaultValues['dictionary']['representation_field'];
             if (in_array($representationField, $fieldNames)) {
                 return $representationField;
