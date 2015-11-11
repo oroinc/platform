@@ -46,21 +46,14 @@ class DictionaryHelper
      */
     public function getSearchFields(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
     {
-        $fieldNames = $doctrineMetadata->getFieldNames();
-
         if (isset($entityMetadata->defaultValues['dictionary']['search_fields'])) {
             $searchFields = $entityMetadata->defaultValues['dictionary']['search_fields'];
-            foreach ($searchFields as $key => $searchField) {
-                if (!in_array($searchField, $fieldNames)) {
-                    unset($fieldNames[$key]);
-                }
+            if ($searchFields) {
+                return $searchFields;
             }
         }
 
-        if (!empty($searchFields)) {
-            return $searchFields;
-        }
-
+        $fieldNames = $doctrineMetadata->getFieldNames();
         if (in_array(self::DEFAULT_SEARCH_FIELD, $fieldNames)) {
             return [self::DEFAULT_SEARCH_FIELD];
         }
