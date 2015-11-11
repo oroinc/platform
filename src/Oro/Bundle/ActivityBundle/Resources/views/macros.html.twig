@@ -32,17 +32,18 @@
     {% set activityClassAlias = oro_class_alias(entity, true) %}
     {% for item in entity.getActivityTargetEntities() %}
         {% set itemClassName = oro_class_name(item) %}
-        {% set itemClassNameEncoded = oro_class_name(item, true) %}
-        {% set contextTarget = {
-            'activityClassAlias': activityClassAlias,
-            'entityId': entity.id,
-            'targetId': item.id,
-            "targetClassName": itemClassNameEncoded,
-            'title': item|oro_format_name,
-            'icon': oro_entity_config_value(itemClassName, 'icon' ),
-            'link': oro_entity_metadata_value(itemClassName, 'routeView') ? path(oro_entity_route(itemClassName), {id:item.id} ) : false
-        } %}
+        {# Check access for activity item and skip current user from result #}
         {% if resource_granted('VIEW', item) and not ((app.user.id == item.id) and (oro_class_name(app.user) == itemClassName)) %}
+            {% set itemClassNameEncoded = oro_class_name(item, true) %}
+            {% set contextTarget = {
+                'activityClassAlias': activityClassAlias,
+                'entityId': entity.id,
+                'targetId': item.id,
+                "targetClassName": itemClassNameEncoded,
+                'title': item|oro_format_name,
+                'icon': oro_entity_config_value(itemClassName, 'icon' ),
+                'link': oro_entity_view_link(itemClassName, item.id)
+            } %}
             {% set contextTargetArray = contextTargetArray|merge([contextTarget]) %}
         {% endif %}
     {% endfor %}
