@@ -15,6 +15,10 @@ oro_entity_config:
                             label:          oro.activity.activities
                             association_class: activity
 
+                # target entities where will be shown activities from the configured entity
+                inheritence_targets: # array of strings
+                    options: []
+
                 # this attribute can be used to prohibit changing activity state (no matter whether
                 # it is enabled or not) for the entity
                 # if TRUE than no one activity state can be changed
