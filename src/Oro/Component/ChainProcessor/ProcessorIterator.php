@@ -56,6 +56,48 @@ class ProcessorIterator implements \Iterator
     }
 
     /**
+     * Gets a action the iterator works with.
+     *
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * Gets the name of a group the iterator points to.
+     *
+     * @return string|null
+     */
+    public function getGroup()
+    {
+        if (!$this->valid()) {
+            return null;
+        }
+
+        $attributes = $this->processors[$this->action][$this->index]['attributes'];
+
+        return isset($attributes['group'])
+            ? $attributes['group']
+            : null;
+    }
+
+    /**
+     * Gets the id of a processor the iterator points to.
+     *
+     * @return string|null
+     */
+    public function getProcessorId()
+    {
+        if (!$this->valid()) {
+            return null;
+        }
+
+        return $this->processors[$this->action][$this->index]['processor'];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function current()

@@ -4,8 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class BuildQuery implements ProcessorInterface
 {
@@ -41,7 +40,7 @@ class BuildQuery implements ProcessorInterface
         $query = $this->doctrineHelper->getEntityRepository($entityClass)->createQueryBuilder('e');
         $joins = $context->getJoins();
         if ($joins) {
-            QueryUtils::applyJoins($query, $joins);
+            $this->doctrineHelper->applyJoins($query, $joins);
         }
         $criteria = $context->getCriteria();
         if ($criteria) {

@@ -2,7 +2,6 @@ oro_api:
     actions:
         get_list:
             processor: oro_api.get_list.processor
-            context_class: Oro\Bundle\ApiBundle\Processor\GetList\GetListContext
             processing_groups:
                 initialize:
                     priority: -10
@@ -18,7 +17,6 @@ oro_api:
                     priority: -80
         get:
             processor: oro_api.get.processor
-            context_class: Oro\Bundle\ApiBundle\Processor\Get\GetContext
             processing_groups:
                 initialize:
                     priority: -10

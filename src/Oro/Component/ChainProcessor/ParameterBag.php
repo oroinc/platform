@@ -2,15 +2,13 @@
 
 namespace Oro\Component\ChainProcessor;
 
-class ParameterBag implements \Countable, \ArrayAccess
+class ParameterBag extends AbstractParameterBag
 {
     /** @var array */
     protected $items = [];
 
     /**
-     * @param string $key The name of a parameter
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function has($key)
     {
@@ -18,9 +16,7 @@ class ParameterBag implements \Countable, \ArrayAccess
     }
 
     /**
-     * @param string $key The name of a parameter
-     *
-     * @return mixed|null
+     * {@inheritdoc}
      */
     public function get($key)
     {
@@ -30,10 +26,7 @@ class ParameterBag implements \Countable, \ArrayAccess
     }
 
     /**
-     * @param string $key   The name of a parameter
-     * @param mixed  $value The value of a parameter
-     *
-     * @return mixed|null
+     * {@inheritdoc}
      */
     public function set($key, $value)
     {
@@ -41,7 +34,7 @@ class ParameterBag implements \Countable, \ArrayAccess
     }
 
     /**
-     * @param string $key The name of a parameter
+     * {@inheritdoc}
      */
     public function remove($key)
     {
@@ -49,9 +42,7 @@ class ParameterBag implements \Countable, \ArrayAccess
     }
 
     /**
-     * Gets a native PHP array representation of the bag.
-     *
-     * @return array [key => value, ...]
+     * {@inheritdoc}
      */
     public function toArray()
     {
@@ -59,52 +50,10 @@ class ParameterBag implements \Countable, \ArrayAccess
     }
 
     /**
-     * Removes all parameters from the bag.
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function clear()
     {
         $this->items = [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function count()
-    {
-        return count($this->items);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($offset)
-    {
-        return $this->has($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->set($offset, $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset)
-    {
-        $this->remove($offset);
     }
 }

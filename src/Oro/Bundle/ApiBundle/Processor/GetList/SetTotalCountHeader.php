@@ -55,7 +55,7 @@ class SetTotalCountHeader implements ProcessorInterface
         }
 
         $query = $context->getQuery();
-        if (null !== $query) {
+        if (null !== $query && null === $totalCount) {
             $totalCount = $this->calculateTotalCount($query);
         }
 

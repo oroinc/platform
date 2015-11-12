@@ -9,7 +9,7 @@ interface ProcessorBagInterface
      *
      * @param ContextInterface $context
      *
-     * @return \Iterator of ProcessorInterface
+     * @return ProcessorIterator
      */
     public function getProcessors(ContextInterface $context);
 

@@ -2,38 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
-use Oro\Component\ChainProcessor\Context;
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
-class GetConfigContext extends Context
+class GetConfigContext extends ApiContext
 {
-    /** API version */
-    const VERSION = 'version';
-
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
     /**
-     * Gets API version
-     *
-     * @return string|null
-     */
-    public function getVersion()
-    {
-        return $this->get(self::VERSION);
-    }
-
-    /**
-     * Sets API version
-     *
-     * @param string $version
-     */
-    public function setVersion($version)
-    {
-        $this->set(self::VERSION, $version);
-    }
-
-    /**
-     * Gets FQCN of an entity
+     * Gets FQCN of an entity.
      *
      * @return string|null
      */
@@ -43,7 +20,7 @@ class GetConfigContext extends Context
     }
 
     /**
-     * Sets FQCN of an entity
+     * Sets FQCN of an entity.
      *
      * @param string $className
      */

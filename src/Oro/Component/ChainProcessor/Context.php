@@ -140,4 +140,12 @@ class Context extends ParameterBag implements ContextInterface
     {
         $this->set(self::RESULT, $data);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeResult()
+    {
+        $this->remove(self::RESULT);
+    }
 }

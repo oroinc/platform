@@ -1,8 +1,17 @@
-oro_rest_api:
-    resource: Oro\Bundle\ApiBundle\Controller\RestApiController
-    type: rest
-    prefix: api/
-    requirements:
-        version:  latest|v(\d+(\.\d+)*)
+oro_rest_api_cget:
+    path: /api/{version}/{entity}.{_format}
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: OroApiBundle:RestApi:cget
+        _action: get_list
+    options:
+        group: rest_api
+
+oro_rest_api_get:
+    path: /api/{version}/{entity}/{id}.{_format}
+    methods: [GET]
+    defaults:
+        _controller: OroApiBundle:RestApi:get
+        _action: get
+    options:
+        group: rest_api

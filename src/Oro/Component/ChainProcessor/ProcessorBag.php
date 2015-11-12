@@ -10,7 +10,11 @@ class ProcessorBag implements ProcessorBagInterface
     /** @var ProcessorFactoryInterface */
     protected $processorFactory;
 
-    /** @var array|null */
+    /**
+     * @var array|null
+     * after the bag is initialized this property is set to NULL,
+     * this switches the bag in "frozen" state and further modification of it is prohibited
+     */
     private $initialData = [];
 
     /**
