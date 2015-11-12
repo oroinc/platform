@@ -23,8 +23,10 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
  *
  *  [
  *      // exclude the 'email' field
- *      'excluded_fields' => ['email'],
+ *      'excluded_fields' => ['email'], // @deprecated since 1.9. Use 'exclude' attribute for a field
  *      'fields' => [
+ *          // exclude the 'email' field
+ *          'email'        => ['exclude' => true]
  *          // serialize the 'status' many-to-one relation using the value of the 'name' field
  *          'status'       => ['fields' => 'name'],
  *          // order the 'phones' many-to-many relation by the 'primary' field and
@@ -50,8 +52,8 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
  *              ]
  *          ],
  *          'addresses'    => [
- *              'excluded_fields' => ['owner'],
  *              'fields'          => [
+ *                  'owner'   => ['exclude' => true],
  *                  'country' => ['fields' => 'name'],
  *                  'types'   => [
  *                      'fields' => 'name',
@@ -583,9 +585,19 @@ class EntitySerializer
      */
     protected function getExcludedFields($config)
     {
-        return !empty($config['excluded_fields'])
+        // @deprecated since 1.9. Use 'exclude' attribute for a field
+        $result = !empty($config['excluded_fields'])
             ? $config['excluded_fields']
             : [];
+        if (!empty($config['fields']) && !is_string($config['fields'])) {
+            foreach ($config['fields'] as $field => $fieldConfig) {
+                if (isset($fieldConfig['exclude']) && $fieldConfig['exclude']) {
+                    $result[] = $field;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

@@ -45,7 +45,10 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithExclusion()
+    /**
+     * @deprecated since 1.9. Use 'exclude' attribute for a field
+     */
+    public function testSimpleEntityWithExclusionDeprecated()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -71,6 +74,50 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             $qb,
             [
                 'excluded_fields' => ['name', 'isException'],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'     => 1,
+                    'label'  => 'test_label',
+                    'public' => true
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testSimpleEntityWithExclusion()
+    {
+        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT o0_.id AS id_0, o0_.label AS label_1, o0_.public AS public_2'
+            . ' FROM oro_test_serializer_group o0_'
+            . ' WHERE o0_.id = ?',
+            [
+                [
+                    'id_0'     => 1,
+                    'label_1'  => 'test_label',
+                    'public_2' => 1,
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'fields' => [
+                    'name'        => ['exclude' => true],
+                    'isException' => ['exclude' => true],
+                ]
             ]
         );
 
