@@ -203,7 +203,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         $updatedValue = [];
         foreach ($value as $subvalue) {
             // don't allow empty data
-            if (!count(array_filter($subvalue))) {
+            if (0 === count(array_filter($subvalue))) {
                 continue;
             }
             $enum = ['id' => null, 'priority' => null];
