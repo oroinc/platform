@@ -30,9 +30,10 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['orderShift']));
+            _.extend(this, _.pick(options, ['orderShift', 'filterModel']));
 
             ColumnManagerView.__super__.initialize.apply(this, arguments);
+            this.listenTo(options.filterModel, 'change', this.onFilterChange);
         },
 
         /**
@@ -116,6 +117,14 @@ define(function(require) {
                 this.collection.sort();
                 this.trigger('reordered');
             }
+        },
+
+        onFilterChange: function() {
+            this.filter(this.filterer);
+        },
+
+        filterer: function(item) {
+            return !this.filterModel.get('renderable') || item.get('renderable');
         }
     });
 

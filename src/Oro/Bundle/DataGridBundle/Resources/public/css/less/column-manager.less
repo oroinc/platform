@@ -89,6 +89,15 @@
     .opacity(65);
     .box-shadow(none);
   }
+  .column-manager-filter {
+    margin-top: 4px;
+    .column-filter-renderable-tab {
+      &.active {
+        pointer-events : none;
+        color: #444;
+      }
+    }
+  }
 }
 
 .dropup .column-manager .dropdown-menu {
