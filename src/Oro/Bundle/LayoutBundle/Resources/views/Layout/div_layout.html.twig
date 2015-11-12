@@ -57,6 +57,12 @@
     {% endif %}
 {% endblock %}
 
+{% block stylesheets_widget %}
+    {% for style in styles %}
+        <link rel="stylesheet" href="{{ style }}" />
+    {% endfor %}
+{% endblock %}
+
 {% block style_widget %}
     {% if attr.href is defined and attr.href is not empty %}
         <link rel="stylesheet"{{ block('block_attributes') }}/>

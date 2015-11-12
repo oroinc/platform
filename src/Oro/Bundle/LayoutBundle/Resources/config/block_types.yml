@@ -29,6 +29,11 @@ services:
         tags:
              - { name: layout.block_type, alias: script }
 
+    oro_layout.block_type.stylesheets:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StylesheetsType
+        tags:
+             - { name: layout.block_type, alias: stylesheets }
+
     oro_layout.block_type.style:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
         tags:
