@@ -10,7 +10,7 @@ class GetConfigContext extends ApiContext
     const CLASS_NAME = 'class';
 
     /**
-     * Gets FQCN of an entity
+     * Gets FQCN of an entity.
      *
      * @return string|null
      */
@@ -20,7 +20,7 @@ class GetConfigContext extends ApiContext
     }
 
     /**
-     * Sets FQCN of an entity
+     * Sets FQCN of an entity.
      *
      * @param string $className
      */

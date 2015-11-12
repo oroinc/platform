@@ -58,13 +58,13 @@ class LoadDataByEntitySerializer implements ProcessorInterface
             $context->getVersion(),
             $context->getRequestType()
         );
-        if (!$config) {
+        if (empty($config['definition'])) {
             // an entity does not have a configuration for the EntitySerializer
             return;
         }
 
         $context->setResult(
-            $this->entitySerializer->serialize($query, $config)
+            $this->entitySerializer->serialize($query, $config['definition'])
         );
 
         // data returned by the EntitySerializer are already normalized

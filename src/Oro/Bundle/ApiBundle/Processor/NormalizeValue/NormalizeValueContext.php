@@ -6,14 +6,16 @@ use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 class NormalizeValueContext extends ApiContext
 {
-    /** API version */
+    /** a data-type of a value */
     const DATA_TYPE = 'dataType';
 
-    /** API version */
+    /** a regular expression that can be used to validate a value */
     const REQUIREMENT = 'requirement';
 
     /**
-     * {@inheritdoc}
+     * Gets data-type of a value.
+     *
+     * @return string
      */
     public function getDataType()
     {
@@ -21,7 +23,9 @@ class NormalizeValueContext extends ApiContext
     }
 
     /**
-     * {@inheritdoc}
+     * Sets data-type of a value.
+     *
+     * @param string $dataType
      */
     public function setDataType($dataType)
     {
@@ -29,7 +33,9 @@ class NormalizeValueContext extends ApiContext
     }
 
     /**
-     * {@inheritdoc}
+     * Checks whether a regular expression that can be used to validate a value exists.
+     *
+     * @return bool
      */
     public function hasRequirement()
     {
@@ -37,7 +43,9 @@ class NormalizeValueContext extends ApiContext
     }
 
     /**
-     * {@inheritdoc}
+     * Gets a regular expression that can be used to validate a value.
+     *
+     * @return string|null
      */
     public function getRequirement()
     {
@@ -45,15 +53,17 @@ class NormalizeValueContext extends ApiContext
     }
 
     /**
-     * {@inheritdoc}
+     * Sets a regular expression that can be used to validate a value.
+     *
+     * @param string|null $requirement
      */
-    public function setRequirement($data)
+    public function setRequirement($requirement)
     {
-        $this->set(self::REQUIREMENT, $data);
+        $this->set(self::REQUIREMENT, $requirement);
     }
 
     /**
-     * {@inheritdoc}
+     * Removes a regular expression that can be used to validate a value.
      */
     public function removeRequirement()
     {

@@ -21,6 +21,7 @@ class OroApiExtension extends Extension
         $loader->load('services.yml');
         $loader->load('processors.normalize_value.yml');
         $loader->load('processors.get_config.yml');
+        $loader->load('processors.build_config.yml');
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
 
