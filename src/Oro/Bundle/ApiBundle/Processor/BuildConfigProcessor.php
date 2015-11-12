@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Component\ChainProcessor\ActionProcessor;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Processor\BuildConfig\BuildConfigContext;
 
-class GetListProcessor extends ActionProcessor
+class BuildConfigProcessor extends ActionProcessor
 {
     /**
      * {@inheritdoc}
      */
     protected function createContextObject()
     {
-        return new GetListContext();
+        return new BuildConfigContext();
     }
 }

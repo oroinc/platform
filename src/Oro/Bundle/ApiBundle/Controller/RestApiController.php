@@ -11,9 +11,10 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\ApiBundle\Handler\ActionHandler;
+use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
+use Oro\Bundle\ApiBundle\Request\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
@@ -31,10 +32,10 @@ class RestApiController extends FOSRestController
      */
     public function cgetAction(Request $request)
     {
-        $handler = $this->getActionHandler();
-        $context = $this->getContext($handler, $request);
+        $processor = $this->getProcessor($request);
+        $context = $this->getContext($processor, $request);
 
-        $handler->handle($context);
+        $processor->process($context);
 
         return $this->buildGetResponse(
             $context,
@@ -55,12 +56,12 @@ class RestApiController extends FOSRestController
      */
     public function getAction(Request $request)
     {
-        $handler = $this->getActionHandler();
+        $processor = $this->getProcessor($request);
         /** @var GetContext $context */
-        $context = $this->getContext($handler, $request);
+        $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
 
-        $handler->handle($context);
+        $processor->process($context);
 
         return $this->buildGetResponse(
             $context,
@@ -71,22 +72,28 @@ class RestApiController extends FOSRestController
     }
 
     /**
-     * @return ActionHandler
+     * @param Request $request
+     *
+     * @return ActionProcessor
      */
-    protected function getActionHandler()
+    protected function getProcessor(Request $request)
     {
-        return $this->get('oro_api.action_handler');
+        /** @var ActionProcessorBag $processorBag */
+        $processorBag = $this->get('oro_api.action_processor_bag');
+
+        return $processorBag->getProcessor($request->attributes->get('_action'));
     }
 
     /**
-     * @param ActionHandler $handler
-     * @param Request       $request
+     * @param ActionProcessor $processor
+     * @param Request         $request
      *
      * @return Context
      */
-    protected function getContext(ActionHandler $handler, Request $request)
+    protected function getContext(ActionProcessor $processor, Request $request)
     {
-        $context = $handler->createContext($request->attributes->get('_action'));
+        /** @var Context $context */
+        $context = $processor->createContext();
         $context->setRequestType(RequestType::REST);
         $context->setVersion($request->attributes->get('version'));
         $context->setClassName($request->attributes->get('entity'));

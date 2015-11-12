@@ -41,7 +41,7 @@ class ProtectQueryByAcl implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         if (!$entityClass) {
-            // entity type is not specified
+            // an entity type is not specified
             return;
         }
 

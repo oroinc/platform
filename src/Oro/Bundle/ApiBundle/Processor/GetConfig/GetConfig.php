@@ -33,7 +33,7 @@ class GetConfig implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         if (!$entityClass) {
-            // no entity type is specified
+            // an entity type is not specified
             return;
         }
 

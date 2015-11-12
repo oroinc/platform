@@ -25,7 +25,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
         $processorBag     = new ProcessorBag($processorFactory);
 
         $this->valueNormalizer = new ValueNormalizer(
-            new NormalizeValueProcessor($processorBag)
+            new NormalizeValueProcessor($processorBag, 'normalize_value')
         );
 
         $processorMap = [

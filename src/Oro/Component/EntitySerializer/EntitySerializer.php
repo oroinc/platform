@@ -23,7 +23,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
  *
  *  [
  *      // exclude the 'email' field
- *      'excluded_fields' => ['email'], // @deprecated since 1.9. Use 'exclude' attribute for a field
+ *      'excluded_fields' => ['email'], // deprecated since 1.9. Use 'exclude' attribute for a field
  *      'fields' => [
  *          // exclude the 'email' field
  *          'email'        => ['exclude' => true]

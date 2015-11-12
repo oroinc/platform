@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class SetDefaultSorting implements ProcessorInterface
 {
@@ -52,7 +52,7 @@ class SetDefaultSorting implements ProcessorInterface
                     DataType::ORDER_BY,
                     'Result sorting. One or several fields separated by comma, for example \'field1,-field2\'.',
                     function () use ($entityClass) {
-                        return $this->getDefaultOrderBy($entityClass);
+                        return $this->doctrineHelper->getOrderByIdentifier($entityClass);
                     },
                     function ($value) {
                         $result = [];
@@ -67,27 +67,5 @@ class SetDefaultSorting implements ProcessorInterface
                 )
             );
         }
-    }
-
-    /**
-     * Gets default ORDER BY
-     *
-     * @param string $entityClass
-     *
-     * @return array|null
-     */
-    protected function getDefaultOrderBy($entityClass)
-    {
-        $ids = $this->doctrineHelper->getEntityMetadata($entityClass)->getIdentifierFieldNames();
-        if (empty($ids)) {
-            return null;
-        }
-
-        $orderBy = [];
-        foreach ($ids as $pk) {
-            $orderBy[$pk] = Criteria::ASC;
-        }
-
-        return $orderBy;
     }
 }

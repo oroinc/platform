@@ -10,7 +10,7 @@ class NormalizeValueProcessor extends ActionProcessor
     /**
      * {@inheritdoc}
      */
-    public function createContext()
+    protected function createContextObject()
     {
         return new NormalizeValueContext();
     }

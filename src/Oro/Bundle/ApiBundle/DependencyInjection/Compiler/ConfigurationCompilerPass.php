@@ -12,20 +12,20 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Configuration;
 
 class ConfigurationCompilerPass implements CompilerPassInterface
 {
-    const ACTION_HANDLER_SERVICE_ID = 'oro_api.action_handler';
-    const PROCESSOR_BAG_SERVICE_ID = 'oro_api.processor_bag';
+    const ACTION_PROCESSOR_BAG_SERVICE_ID = 'oro_api.action_processor_bag';
+    const PROCESSOR_BAG_SERVICE_ID        = 'oro_api.processor_bag';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $config                  = $this->getConfig($container);
-        $actionHandlerServiceDef = $this->findDefinition($container, self::ACTION_HANDLER_SERVICE_ID);
-        $processorBagServiceDef  = $this->findDefinition($container, self::PROCESSOR_BAG_SERVICE_ID);
+        $config                       = $this->getConfig($container);
+        $actionProcessorBagServiceDef = $this->findDefinition($container, self::ACTION_PROCESSOR_BAG_SERVICE_ID);
+        $processorBagServiceDef       = $this->findDefinition($container, self::PROCESSOR_BAG_SERVICE_ID);
         foreach ($config['actions'] as $action => $actionConfig) {
-            if (null !== $actionHandlerServiceDef) {
-                $actionHandlerServiceDef->addMethodCall(
+            if (null !== $actionProcessorBagServiceDef) {
+                $actionProcessorBagServiceDef->addMethodCall(
                     'addProcessor',
                     [$action, new Reference($actionConfig['processor'])]
                 );

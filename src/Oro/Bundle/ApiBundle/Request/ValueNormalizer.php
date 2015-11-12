@@ -73,7 +73,6 @@ class ValueNormalizer
     {
         if (null === $this->context) {
             $this->context = $this->processor->createContext();
-            $this->context->setAction('normalize_value');
         }
         $this->context->setRequestType($requestType);
         $this->context->setDataType($dataType);

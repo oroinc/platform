@@ -21,20 +21,17 @@ class ConfigProvider
     /**
      * Gets a config for the given version of an entity.
      *
-     * @param string      $className   The FQCN of an entity
-     * @param string      $version     The version of a config
-     * @param string|null $requestType The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string $className   The FQCN of an entity
+     * @param string $version     The version of a config
+     * @param string $requestType The type of API request, for example "rest", "soap", "odata", etc.
      *
      * @return array|null
      */
-    public function getConfig($className, $version, $requestType = null)
+    public function getConfig($className, $version, $requestType)
     {
         /** @var GetConfigContext $context */
         $context = $this->processor->createContext();
-        $context->setAction('get_config');
-        if (null !== $requestType) {
-            $context->setRequestType($requestType);
-        }
+        $context->setRequestType($requestType);
         $context->setClassName($className);
         if ($version !== $context::LATEST_VERSION) {
             $context->setVersion($version);

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Normalizer;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Component\EntitySerializer\DataAccessorInterface;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ItemNormalizer
 {
