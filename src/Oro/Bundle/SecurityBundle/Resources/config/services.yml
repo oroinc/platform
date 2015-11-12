@@ -71,13 +71,7 @@ parameters:
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
 
-    oro_security.ace.query.manager.class:                      Oro\Bundle\SecurityBundle\Model\Action\AceQueryManager
-
-    oro_security_search.index.class:                           Oro\Bundle\SecurityBundle\Search\SecurityIndexer
-
     oro_security.orm.acl_conditional_factor_builder.class:     Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder
-
-    oro_security.listener.entity_config.class:                 Oro\Bundle\SecurityBundle\EventListener\EntityConfigListener
 
 services:
     oro_security.security_facade:
@@ -390,6 +384,7 @@ services:
         arguments:
              - @oro_security.orm.ownership_sql_walker_builder
              - @event_dispatcher
+             - @oro_security.orm.acl_conditional_factor_builder
 
     oro_security.search.acl_helper:
         class: %oro_security.search.acl_helper.class%
@@ -407,9 +402,6 @@ services:
             - @oro_security.entity_security_metadata_provider
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.ownership_tree_provider.chain
-            - @doctrine
-            - @oro_entity_config.provider.security
-            - @security.acl.security_identity_retrieval_strategy
             - @?security.acl.voter.basic_permissions
         calls:
             - [setAclGroupProvider, [@oro_security.acl.group_provider.chain]]
@@ -585,50 +577,5 @@ services:
                 tree_walker: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker
                 walker_hint_provider: oro_security.walker_hint_provider.current_user
 
-    # Disables postGenerateSchema event listener, which used to take care of acl tables. For now these tables are
-    # managed by platform entities.
-    security.acl.dbal.schema_listener:
-        synthetic: true
-
-    oro_security.widget_provider.actions:
-        parent: oro_ui.widget_provider.action_button.abstract
-        arguments:
-            - oro_share_button
-            - oro_share_link
-        tags:
-            - { name: oro_ui.view_action_provider, group: activity}
-
-    oro_security.form.share:
-        class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
-        arguments:
-            - 'oro_share_form'
-            - 'oro_share'
-
-    oro_security.ace.query.manager:
-        class: %oro_security.ace.query.manager.class%
-        arguments:
-            - @oro_entity.doctrine_helper
-
-    oro_security_search.index:
-        class: %oro_security_search.index.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-            - @twig
-            - @oro_entity_config.config_manager
-            - @oro_search.index
-            - @oro_security.formatter.share_formatter
-            - @oro_security.provider.share_scope_provider
-
     oro_security.orm.acl_conditional_factor_builder:
         class: %oro_security.orm.acl_conditional_factor_builder.class%
-
-    oro_security.listener.entity_config:
-        class: %oro_security.listener.entity_config.class%
-        arguments:
-            - @oro_security.ace.query.manager
-            - @doctrine
-            - @security.acl.cache.doctrine
-        tags:
-            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlushConfig }

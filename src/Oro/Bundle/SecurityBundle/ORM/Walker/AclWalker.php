@@ -11,6 +11,7 @@ use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\WhereClause;
 
+use Oro\Bundle\SecurityBundle\Exception\NotFoundAclConditionFactorBuilderException;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
@@ -22,6 +23,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 class AclWalker extends TreeWalkerAdapter
 {
     const ORO_ACL_CONDITION = 'oro_acl.condition';
+    const ORO_ACL_FACTOR_BUILDER = 'oro_acl.factor.builder';
 
     /** @var AclConditionalFactorBuilder */
     protected $aclConditionFactorBuilder;
@@ -33,6 +35,13 @@ class AclWalker extends TreeWalkerAdapter
     {
         /** @var Query $query */
         $query = $this->_getQuery();
+
+        if (!$query->hasHint(self::ORO_ACL_FACTOR_BUILDER)
+            || !$query->getHint(self::ORO_ACL_FACTOR_BUILDER) instanceof AclConditionalFactorBuilder) {
+            throw new NotFoundAclConditionFactorBuilderException();
+        }
+
+        $this->aclConditionFactorBuilder = $query->getHint(self::ORO_ACL_FACTOR_BUILDER);
 
         if ($query->hasHint(self::ORO_ACL_CONDITION)) {
             /** @var AclConditionStorage $aclCondition */

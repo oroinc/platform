@@ -9,15 +9,14 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Provider\ShareProvider;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use OroPro\Bundle\SecurityBundle\Provider\ShareProvider;
 
 class SecurityFacade
 {

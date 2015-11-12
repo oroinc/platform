@@ -50,14 +50,22 @@ class AclHelper
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var AclConditionalFactorBuilder */
+    protected $aclConditionFactorBuilder;
+
     /**
      * @param OwnershipConditionDataBuilder $builder
      * @param EventDispatcherInterface      $eventDispatcher
+     * @param AclConditionalFactorBuilder   $aclConditionFactorBuilder
      */
-    public function __construct(OwnershipConditionDataBuilder $builder, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->builder         = $builder;
+    public function __construct(
+        OwnershipConditionDataBuilder $builder,
+        EventDispatcherInterface $eventDispatcher,
+        AclConditionalFactorBuilder $aclConditionFactorBuilder
+    ) {
+        $this->builder = $builder;
         $this->eventDispatcher = $eventDispatcher;
+        $this->aclConditionFactorBuilder = $aclConditionFactorBuilder;
     }
 
     /**
@@ -137,6 +145,7 @@ class AclHelper
                     $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
                 }
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
+                $query->setHint(AclWalker::ORO_ACL_FACTOR_BUILDER, $this->aclConditionFactorBuilder);
             }
         }
 
