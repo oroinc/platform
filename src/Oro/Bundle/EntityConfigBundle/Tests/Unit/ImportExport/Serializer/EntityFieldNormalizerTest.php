@@ -293,6 +293,8 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'enum.code1.0.label' => 'label1',
                         'enum.code1.0.is_default' => 'yes',
                         'enum.code1.1.label' => 'label2',
+                        'enum.code1.2.is_default' => null,
+                        'enum.code1.2.label' => null,
                         'enum.code1.1.is_default' => '',
 
                         'notsupportedsope.code1' => 'value7',
