@@ -132,4 +132,9 @@ interface ContextInterface extends \ArrayAccess
      * @param mixed $data
      */
     public function setResult($data);
+
+    /**
+     * Removes result data
+     */
+    public function removeResult();
 }

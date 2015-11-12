@@ -2,10 +2,12 @@
 
 namespace Oro\Component\ChainProcessor;
 
+use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+
 /**
- * The base class for action processors.
+ * A processors that executes other processors registered in the ProcessorBag.
  */
-abstract class ChainProcessor implements ProcessorInterface
+class ChainProcessor implements ProcessorInterface
 {
     /** @var ProcessorBag */
     protected $processorBag;
@@ -19,14 +21,33 @@ abstract class ChainProcessor implements ProcessorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function process(ContextInterface $context)
+    {
+        $this->executeProcessors($context);
+    }
+
+    /**
      * @param ContextInterface $context
+     *
+     * @throws ExecutionFailedException if some processor fired an exception
      */
     protected function executeProcessors(ContextInterface $context)
     {
         $processors = $this->processorBag->getProcessors($context);
         /** @var ProcessorInterface $processor */
         foreach ($processors as $processor) {
-            $processor->process($context);
+            try {
+                $processor->process($context);
+            } catch (\Exception $e) {
+                throw new ExecutionFailedException(
+                    $processors->getProcessorId(),
+                    $processors->getAction(),
+                    $processors->getGroup(),
+                    $e
+                );
+            }
         }
     }
 }

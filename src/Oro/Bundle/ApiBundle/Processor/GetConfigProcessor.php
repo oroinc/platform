@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ChainProcessor;
-use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ActionProcessor;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\GetConfigContext;
 
-class GetConfigProcessor extends ChainProcessor
+class GetConfigProcessor extends ActionProcessor
 {
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function createContext()
     {
-        $this->executeProcessors($context);
+        return new GetConfigContext();
     }
 }

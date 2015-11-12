@@ -5,9 +5,6 @@ namespace Oro\Bundle\ApiBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use FOS\RestBundle\Util\Codes;
@@ -17,112 +14,102 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\Handler\ActionHandler;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
+use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 
-/**
- * @RouteResource("item")
- * @NamePrefix("oro_api_rest_")
- */
 class RestApiController extends FOSRestController
 {
     /**
-     * Gets items
+     * Get a list of entities
      *
-     * @param Request $request The request
-     * @param string  $version API version
-     * @param string  $entity  The plural alias of an entity
+     * @param Request $request
      *
-     * @Get("/{version}/{entity}", name="")
-     *
-     * @ApiDoc(description="Gets items", resource=true)
+     * @ApiDoc(description="Get entities", resource=true)
      *
      * @return Response
      */
-    public function cgetAction(Request $request, $version, $entity)
+    public function cgetAction(Request $request)
     {
-        $handler = $this->getHandler();
-
-        /** @var GetListContext $context */
-        $context = $handler->createContext('get_list');
-        $context->setVersion($version);
-        $context->setClassName($this->getEntityClassName($entity));
-        $this->initRequestHeaders($request, $context);
+        $handler = $this->getActionHandler();
+        $context = $this->getContext($handler, $request);
 
         $handler->handle($context);
 
-        $result = $context->getResult();
-
-        $view = $this->view($result, is_array($result) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND);
-        $this->setResponseHeaders($view, $context);
-
-        return $this->handleView($view);
+        return $this->buildGetResponse(
+            $context,
+            function ($result) {
+                return is_array($result) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND;
+            }
+        );
     }
 
     /**
-     * Gets item
+     * Get an entity
      *
-     * @param Request $request The request
-     * @param string  $version API version
-     * @param string  $entity  The plural alias of an entity
-     * @param string  $id      The identifier of an entity
+     * @param Request $request
      *
-     * @Get("/{version}/{entity}/{id}", name="")
-     *
-     * @ApiDoc(description="Gets item", resource=true)
+     * @ApiDoc(description="Get entity", resource=true)
      *
      * @return Response
      */
-    public function getAction(Request $request, $version, $entity, $id)
+    public function getAction(Request $request)
     {
-        $handler = $this->getHandler();
-
+        $handler = $this->getActionHandler();
         /** @var GetContext $context */
-        $context = $handler->createContext('get');
-        $context->setVersion($version);
-        $context->setClassName($this->getEntityClassName($entity));
-        $context->setId($id);
-        $this->initRequestHeaders($request, $context);
+        $context = $this->getContext($handler, $request);
+        $context->setId($request->attributes->get('id'));
 
         $handler->handle($context);
 
-        $result = $context->getResult();
-
-        $view = $this->view($result, null !== $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND);
-        $this->setResponseHeaders($view, $context);
-
-        return $this->handleView($view);
+        return $this->buildGetResponse(
+            $context,
+            function ($result) {
+                return null !== $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND;
+            }
+        );
     }
 
     /**
      * @return ActionHandler
      */
-    protected function getHandler()
+    protected function getActionHandler()
     {
         return $this->get('oro_api.action_handler');
     }
 
     /**
-     * @param string $pluralAlias
+     * @param ActionHandler $handler
+     * @param Request       $request
      *
-     * @return string
+     * @return Context
      */
-    protected function getEntityClassName($pluralAlias)
+    protected function getContext(ActionHandler $handler, Request $request)
     {
-        return $this->get('oro_entity.entity_alias_resolver')
-            ->getClassByPluralAlias($pluralAlias);
+        $context = $handler->createContext($request->attributes->get('_action'));
+        $context->setRequestType(RequestType::REST);
+        $context->setVersion($request->attributes->get('version'));
+        $context->setClassName($request->attributes->get('entity'));
+        $context->setRequestHeaders(new RestRequestHeaders($request));
+        $context->setFilterValues(new RestFilterValueAccessor($request));
+
+        return $context;
     }
 
     /**
-     * @param Request $request
-     * @param Context $context
+     * @param Context  $context
+     * @param callable $getStatusCode
+     *
+     * @return Response
      */
-    protected function initRequestHeaders(Request $request, Context $context)
+    protected function buildGetResponse(Context $context, $getStatusCode)
     {
-        $headers = $context->getRequestHeaders();
-        $keys    = $request->headers->keys();
-        foreach ($keys as $key) {
-            $headers->set(str_replace('_', '-', $key), $request->headers->get($key));
-        }
+        $result = $context->getResult();
+
+        $view = $this->view($result, $getStatusCode($result));
+        $this->setResponseHeaders($view, $context);
+
+        return $this->handleView($view);
     }
 
     /**

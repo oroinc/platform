@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class NormalizeEntityId implements ProcessorInterface
@@ -14,12 +16,17 @@ class NormalizeEntityId implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper  $doctrineHelper
+     * @param ValueNormalizer $valueNormalizer
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, ValueNormalizer $valueNormalizer)
     {
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -45,35 +52,51 @@ class NormalizeEntityId implements ProcessorInterface
         $idFields = $metadata->getIdentifierFieldNames();
         if (count($idFields) === 1) {
             // single identifier
-            if ($metadata->getTypeOfField(reset($idFields)) === 'integer') {
-                $normalizedId = (int)$entityId;
-                if (((string)$normalizedId) !== $entityId) {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'Expected integer identifier value for the entity "%s". Given "%s".',
-                            $entityClass,
-                            $entityId
-                        )
-                    );
-                }
-                $context->setId($normalizedId);
-            }
+            $context->setId(
+                $this->normalizeValue(
+                    $entityId,
+                    $metadata->getTypeOfField(reset($idFields)),
+                    $context->getRequestType()
+                )
+            );
         } else {
             // combined identifier
-            $context->setId($this->normalizeCombinedEntityId($entityId, $idFields, $metadata));
+            $context->setId(
+                $this->normalizeCombinedEntityId(
+                    $entityId,
+                    $idFields,
+                    $metadata,
+                    $context->getRequestType()
+                )
+            );
         }
+    }
+
+    /**
+     * @param mixed  $value
+     * @param string $dataType
+     * @param string $requestType
+     *
+     * @return mixed
+     */
+    protected function normalizeValue($value, $dataType, $requestType)
+    {
+        return $dataType !== DataType::STRING
+            ? $this->valueNormalizer->normalizeValue($value, $dataType, $requestType)
+            : $value;
     }
 
     /**
      * @param string        $entityId
      * @param string[]      $idFields
      * @param ClassMetadata $metadata
+     * @param string        $requestType
      *
      * @return array
      *
      * @throws \RuntimeException if the given entity id cannot be normalized
      */
-    protected function normalizeCombinedEntityId($entityId, $idFields, ClassMetadata $metadata)
+    protected function normalizeCombinedEntityId($entityId, $idFields, ClassMetadata $metadata, $requestType)
     {
         $fieldMap   = array_flip($idFields);
         $normalized = [];
@@ -103,21 +126,7 @@ class NormalizeEntityId implements ProcessorInterface
                 );
             }
 
-            if ($metadata->getTypeOfField($key) === 'integer') {
-                $normalizedVal = (int)$val;
-                if (((string)$normalizedVal) !== $val) {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'Expected integer identifier value for the key "%s" of the entity "%s". Given "%s".',
-                            $key,
-                            $metadata->getName(),
-                            $entityId
-                        )
-                    );
-                }
-                $val = (int)$normalizedVal;
-            }
-            $normalized[$key] = $val;
+            $normalized[$key] = $this->normalizeValue($val, $metadata->getTypeOfField($key), $requestType);
 
             unset($fieldMap[$key]);
         }

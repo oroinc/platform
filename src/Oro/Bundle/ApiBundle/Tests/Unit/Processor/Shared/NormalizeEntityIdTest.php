@@ -10,16 +10,22 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $valueNormalizer;
+
     /** @var NormalizeEntityId */
     protected $processor;
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new NormalizeEntityId($this->doctrineHelper);
+        $this->processor = new NormalizeEntityId($this->doctrineHelper, $this->valueNormalizer);
     }
 
     public function testProcessWhenNoId()
@@ -101,9 +107,14 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
             ->with('id')
             ->willReturn('integer');
 
+        $this->valueNormalizer->expects($this->at(0))
+            ->method('normalizeValue')
+            ->with('123', 'integer')
+            ->willReturn(123);
+
         $this->processor->process($context);
 
-        $this->assertSame(123, $context->getId('123'));
+        $this->assertSame(123, $context->getId());
     }
 
     public function testProcessForCompositeIdentifier()
@@ -140,11 +151,20 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
+        $this->valueNormalizer->expects($this->at(0))
+            ->method('normalizeValue')
+            ->with('123', 'integer')
+            ->willReturn(123);
+        $this->valueNormalizer->expects($this->at(1))
+            ->method('normalizeValue')
+            ->with('456', 'integer')
+            ->willReturn(456);
+
         $this->processor->process($context);
 
         $this->assertSame(
             ['id1' => 123, 'id2' => 456],
-            $context->getId('123')
+            $context->getId()
         );
     }
 }

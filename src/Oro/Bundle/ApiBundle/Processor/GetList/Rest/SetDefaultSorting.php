@@ -1,15 +1,20 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\GetList\Rest;
 
 use Doctrine\Common\Collections\Criteria;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Filter\SortFilter;
+use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class SetDefaultSorting implements ProcessorInterface
 {
+    const SORT_FILTER_KEY = 'sort';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -39,18 +44,28 @@ class SetDefaultSorting implements ProcessorInterface
             return;
         }
 
-        $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            $criteria = new Criteria();
-            $context->setCriteria($criteria);
-        }
+        $filters = $context->getFilters();
+        if (!$filters->has(self::SORT_FILTER_KEY)) {
+            $filters->add(
+                self::SORT_FILTER_KEY,
+                new SortFilter(
+                    DataType::ORDER_BY,
+                    'Result sorting. One or several fields separated by comma, for example \'field1,-field2\'.',
+                    function () use ($entityClass) {
+                        return $this->getDefaultOrderBy($entityClass);
+                    },
+                    function ($value) {
+                        $result = [];
+                        if (null !== $value) {
+                            foreach ($value as $field => $order) {
+                                $result[] = (Criteria::DESC === $order ? '-' : '') . $field;
+                            }
+                        }
 
-        $orderings = $criteria->getOrderings();
-        if (empty($orderings)) {
-            $defaultOrderBy = $this->getDefaultOrderBy($entityClass);
-            if ($defaultOrderBy) {
-                $criteria->orderBy($defaultOrderBy);
-            }
+                        return implode(',', $result);
+                    }
+                )
+            );
         }
     }
 

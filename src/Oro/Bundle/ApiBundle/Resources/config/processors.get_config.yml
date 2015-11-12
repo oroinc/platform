@@ -10,11 +10,11 @@ services:
         arguments:
             - @oro_api.config_bag
         tags:
-             - { name: oro.api.processor, action: get_config, priority: -10 }
+            - { name: oro.api.processor, action: get_config, priority: -10 }
 
     oro_api.get_config.metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\GetConfigFromMetadata
         arguments:
             - @oro_entity.doctrine_helper
         tags:
-             - { name: oro.api.processor, action: get_config, priority: -20 }
+            - { name: oro.api.processor, action: get_config, priority: -20 }

@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
-use Oro\Bundle\ApiBundle\Provider\VersionUtil;
 
 class GetConfig implements ProcessorInterface
 {

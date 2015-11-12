@@ -7,8 +7,6 @@ use Oro\Bundle\ApiBundle\Processor\GetConfigProcessor;
 
 class ConfigProvider
 {
-    const LATEST_VERSION = 'latest';
-
     /** @var GetConfigProcessor */
     protected $processor;
 
@@ -21,19 +19,24 @@ class ConfigProvider
     }
 
     /**
-     * Gets a config for the given class version
+     * Gets a config for the given version of an entity.
      *
-     * @param string $className The FQCN of an entity
-     * @param string $version   The version of a config
+     * @param string      $className   The FQCN of an entity
+     * @param string      $version     The version of a config
+     * @param string|null $requestType The type of API request, for example "rest", "soap", "odata", etc.
      *
      * @return array|null
      */
-    public function getConfig($className, $version)
+    public function getConfig($className, $version, $requestType = null)
     {
-        $context = new GetConfigContext();
+        /** @var GetConfigContext $context */
+        $context = $this->processor->createContext();
         $context->setAction('get_config');
+        if (null !== $requestType) {
+            $context->setRequestType($requestType);
+        }
         $context->setClassName($className);
-        if ($version !== self::LATEST_VERSION) {
+        if ($version !== $context::LATEST_VERSION) {
             $context->setVersion($version);
         }
 

@@ -27,7 +27,7 @@ class ConfigurationCompilerPass implements CompilerPassInterface
             if (null !== $actionHandlerServiceDef) {
                 $actionHandlerServiceDef->addMethodCall(
                     'addProcessor',
-                    [$action, new Reference($actionConfig['processor']), $actionConfig['context_class']]
+                    [$action, new Reference($actionConfig['processor'])]
                 );
             }
             if (null !== $processorBagServiceDef && isset($actionConfig['processing_groups'])) {

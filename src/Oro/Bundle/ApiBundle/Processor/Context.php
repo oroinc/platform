@@ -4,16 +4,19 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Doctrine\Common\Collections\Criteria;
 
-use Oro\Component\ChainProcessor\Context as BaseContext;
 use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
+use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 
-class Context extends BaseContext
+class Context extends ApiContext
 {
-    /** API version */
-    const VERSION = 'version';
-
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
+
+    /** a list of filters is used to add additional restrictions to a query is used to get result data */
+    const FILTERS = 'filters';
 
     /** a query is used to get result data */
     const QUERY = 'query';
@@ -27,52 +30,85 @@ class Context extends BaseContext
      */
     const INCLUDE_HEADER = 'X-Include';
 
-    /** @var ParameterBag|null */
+    /** @var FilterValueAccessorInterface */
+    private $filterValues;
+
+    /** @var ParameterBagInterface */
     private $requestHeaders;
 
-    /** @var ParameterBag|null */
+    /** @var ParameterBagInterface */
     private $responseHeaders;
 
-    public function __construct()
+    /**
+     * Gets a collection of the FilterValue objects that contains all incoming filters
+     *
+     * @return FilterValueAccessorInterface
+     */
+    public function getFilterValues()
     {
-        $this->requestHeaders  = new CaseInsensitiveParameterBag();
-        $this->responseHeaders = new ParameterBag();
+        if (null === $this->filterValues) {
+            $this->filterValues = new NullFilterValueAccessor();
+        }
+
+        return $this->filterValues;
     }
 
     /**
-     * @return ParameterBag
+     * Sets an object that will be used to accessing incoming filters
+     *
+     * @param FilterValueAccessorInterface $accessor
+     */
+    public function setFilterValues(FilterValueAccessorInterface $accessor)
+    {
+        $this->filterValues = $accessor;
+    }
+
+    /**
+     * Gets headers an API request
+     *
+     * @return ParameterBagInterface
      */
     public function getRequestHeaders()
     {
+        if (null === $this->requestHeaders) {
+            $this->requestHeaders = new CaseInsensitiveParameterBag();
+        }
+
         return $this->requestHeaders;
     }
 
     /**
-     * @return ParameterBag
+     * Sets an object that will be used to accessing headers an API request
+     *
+     * @param ParameterBagInterface $parameterBag
+     */
+    public function setRequestHeaders(ParameterBagInterface $parameterBag)
+    {
+        $this->requestHeaders = $parameterBag;
+    }
+
+    /**
+     * Gets headers an API response
+     *
+     * @return ParameterBagInterface
      */
     public function getResponseHeaders()
     {
+        if (null === $this->responseHeaders) {
+            $this->responseHeaders = new ParameterBag();
+        }
+
         return $this->responseHeaders;
     }
 
     /**
-     * Gets API version
+     * Sets an object that will be used to accessing headers an API response
      *
-     * @return string|null
+     * @param ParameterBagInterface $parameterBag
      */
-    public function getVersion()
+    public function setResponseHeaders(ParameterBagInterface $parameterBag)
     {
-        return $this->get(self::VERSION);
-    }
-
-    /**
-     * Sets API version
-     *
-     * @param string $version
-     */
-    public function setVersion($version)
-    {
-        $this->set(self::VERSION, $version);
+        $this->responseHeaders = $parameterBag;
     }
 
     /**
@@ -93,6 +129,20 @@ class Context extends BaseContext
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * Gets a list of filters is used to add additional restrictions to a query is used to get result data
+     *
+     * @return FilterCollection
+     */
+    public function getFilters()
+    {
+        if (!$this->has(self::FILTERS)) {
+            $this->set(self::FILTERS, new FilterCollection());
+        }
+
+        return $this->get(self::FILTERS);
     }
 
     /**

@@ -67,10 +67,10 @@ class AcmeTextRepresentationBundle extends Bundle
 
 namespace Acme\Bundle\TextRepresentationBundle;
 
-use Oro\Component\ChainProcessor\ChainProcessor;
+use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ContextInterface;
 
-class TextRepresentationProcessor extends ChainProcessor
+class TextRepresentationProcessor extends ActionProcessor
 {
     /**
      * {@inheritdoc}
@@ -120,7 +120,7 @@ class ObjectToStringConverter
      */
     public function convertObjectToString($object, $representationType = null)
     {
-        $context = new Context();
+        $context = $this->processor->createContext();
         $context->set('object', $object);
         $context->set('class', get_class($object));
         if (null !== $representationType) {
@@ -190,6 +190,7 @@ class GetObjectId implements ProcessorInterface
     public function process(ContextInterface $context)
     {
         if ($context->has('objectId')) {
+            // object id is already retrieved
             return;
         }
         $object = $context->get('object');
@@ -226,6 +227,7 @@ class FormatClassNameIdPair implements ProcessorInterface
     public function process(ContextInterface $context)
     {
         if ($context->hasResult()) {
+            // already formatted
             return;
         }
         $context->setResult(sprintf('%s - %s', $context->get('class'), $context->get('objectId')));

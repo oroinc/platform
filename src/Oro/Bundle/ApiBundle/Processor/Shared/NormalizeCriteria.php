@@ -1,18 +1,21 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\Context;
 
 class NormalizeCriteria implements ProcessorInterface
 {
+    const UNLIMITED_RESULT = -1;
+
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var Context $context */
 
         if ($context->hasQuery()) {
             // a query is already built
@@ -21,12 +24,12 @@ class NormalizeCriteria implements ProcessorInterface
 
         $criteria = $context->getCriteria();
         if (null === $criteria) {
-            // no the Criteria object
+            // no Criteria object
             return;
         }
 
         // check if a paging disabled
-        if (-1 === $criteria->getMaxResults()) {
+        if (self::UNLIMITED_RESULT === $criteria->getMaxResults()) {
             $criteria->setFirstResult(null);
             $criteria->setMaxResults(null);
         }

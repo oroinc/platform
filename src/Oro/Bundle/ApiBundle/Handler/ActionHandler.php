@@ -2,73 +2,63 @@
 
 namespace Oro\Bundle\ApiBundle\Handler;
 
-use Oro\Component\ChainProcessor\ChainProcessor;
+use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 class ActionHandler
 {
-    /** @var array */
+    /** @var ActionProcessor[] */
     protected $processors = [];
 
     /**
-     * @param string         $action
-     * @param ChainProcessor $processor
-     * @param string         $contextClass
+     * Registers a processor for the given action type.
+     *
+     * @param string          $action
+     * @param ActionProcessor $processor
      */
-    public function addProcessor($action, ChainProcessor $processor, $contextClass)
+    public function addProcessor($action, ActionProcessor $processor)
     {
-        $this->processors[$action] = [
-            'processor'    => $processor,
-            'contextClass' => $contextClass
-        ];
+        $this->processors[$action] = $processor;
     }
 
     /**
+     * Creates the Context object that should be used to handling the given action type.
+     *
      * @param string $action
      *
      * @return Context
      */
     public function createContext($action)
     {
-        $this->assertActionDefined($action);
-
-        $className = $this->processors[$action]['contextClass'];
-
         /** @var Context $context */
-        $context = new $className();
+        $context = $this->getProcessor($action)->createContext();
         $context->setAction($action);
 
         return $context;
     }
 
     /**
+     * Handles an action.
+     * To create the Context object use {@see createContext} method.
+     *
      * @param Context $context
      */
     public function handle(Context $context)
     {
-        $processor = $this->getProcessor($context->getAction());
-        $processor->process($context);
+        $this->getProcessor($context->getAction())->process($context);
     }
 
     /**
      * @param string $action
      *
-     * @return ChainProcessor
+     * @return ActionProcessor
      */
     protected function getProcessor($action)
-    {
-        $this->assertActionDefined($action);
-
-        return $this->processors[$action]['processor'];
-    }
-
-    /**
-     * @param string $action
-     */
-    protected function assertActionDefined($action)
     {
         if (!isset($this->processors[$action])) {
             throw new \RuntimeException(sprintf('The action "%s" is not defined.', $action));
         }
+
+        return $this->processors[$action];
     }
 }

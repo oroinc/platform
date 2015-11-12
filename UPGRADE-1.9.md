@@ -16,6 +16,9 @@ UPGRADE FROM 1.8 to 1.9
 - Removed method `loadStoredSettings` of `Oro\Bundle\ConfigBundle\Config\ConfigManager`.
 - Removed class `Oro\Bundle\ConfigBundle\Manager\UserConfigManager` and service `oro_config.user_config_manager`. Use `oro_config.user` service instead.
 
+####DistributionBundle:
+- Fix `priority` attribute handling for `routing.options_resolver` tag to be conform Symfony standards. New behaviour: the higher the priority, the sooner the resolver gets executed.
+
 ####EntityBundle
 - Methods `getSingleRootAlias`, `getPageOffset`, `applyJoins` and `normalizeCriteria` of `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` marked as deprecated. Use corresponding methods of `Oro\Bundle\EntityBundle\ORM\QueryUtils` instead.
 

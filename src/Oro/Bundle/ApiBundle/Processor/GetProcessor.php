@@ -2,20 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ChainProcessor;
-use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ActionProcessor;
+use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 
-class GetProcessor extends ChainProcessor
+class GetProcessor extends ActionProcessor
 {
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function createContext()
     {
-        $this->executeProcessors($context);
-
-        if (!$context->hasResult()) {
-            throw new \RuntimeException('Unsupported request.');
-        }
+        return new GetContext();
     }
 }

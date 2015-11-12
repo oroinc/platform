@@ -12,14 +12,22 @@ services:
     oro_api.get.normalize_include_header:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
         tags:
-             - { name: oro.api.processor, action: get, group: initialize, priority: 50 }
+            - { name: oro.api.processor, action: get, group: initialize, priority: 50 }
+
+    oro_api.get.normalize_entity_class:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 20 }
 
     oro_api.get.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
             - @oro_entity.doctrine_helper
+            - @oro_api.value_normalizer
         tags:
-             - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
 
     #
     # security_check
@@ -32,11 +40,23 @@ services:
             - @oro_entity.doctrine_helper
             - VIEW
         tags:
-             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
+            - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
 
     #
     # build_query
     #
+
+    oro_api.get.build_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, priority: 70 }
+
+    oro_api.get.normalize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeCriteria
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, priority: 60 }
 
     oro_api.get.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
@@ -44,14 +64,14 @@ services:
             - @oro_security.acl_helper
             - VIEW
         tags:
-             - { name: oro.api.processor, action: get, group: build_query, priority: 50 }
+            - { name: oro.api.processor, action: get, group: build_query, priority: 50 }
 
     oro_api.get.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Get\BuildQuery
         arguments:
             - @oro_entity.doctrine_helper
         tags:
-             - { name: oro.api.processor, action: get, group: build_query, priority: -10 }
+            - { name: oro.api.processor, action: get, group: build_query, priority: -10 }
 
     #
     # load_data
@@ -63,12 +83,12 @@ services:
             - @oro_api.config_provider
             - @oro_api.entity_serializer
         tags:
-             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
+            - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
 
     oro_api.get.load_data_by_orm_query:
         class: Oro\Bundle\ApiBundle\Processor\Get\LoadDataByOrmQuery
         tags:
-             - { name: oro.api.processor, action: get, group: load_data, priority: -20 }
+            - { name: oro.api.processor, action: get, group: load_data, priority: -20 }
 
     #
     # normalize_data
@@ -77,11 +97,20 @@ services:
     oro_api.get.initialize_entity_proxy:
         class: Oro\Bundle\ApiBundle\Processor\Get\InitializeEntityProxy
         tags:
-             - { name: oro.api.processor, action: get, group: normalize_data, priority: 10 }
+            - { name: oro.api.processor, action: get, group: normalize_data, priority: 10 }
 
     oro_api.get.normalize_data:
         class: Oro\Bundle\ApiBundle\Processor\Get\NormalizeData
         arguments:
             - @oro_api.item_normalizer
         tags:
-             - { name: oro.api.processor, action: get, group: normalize_data, priority: -10 }
+            - { name: oro.api.processor, action: get, group: normalize_data, priority: -10 }
+
+    #
+    # finalize
+    #
+
+    oro_api.get.validate_result:
+        class: Oro\Bundle\ApiBundle\Processor\Get\ValidateResult
+        tags:
+            - { name: oro.api.processor, action: get, group: finalize, priority: 250 }

@@ -1,0 +1,7 @@
+oro_entity:
+    entity_alias_exclusions:
+        - Oro\Bundle\SecurityBundle\Entity\AclClass
+        - Oro\Bundle\SecurityBundle\Entity\AclEntry
+        - Oro\Bundle\SecurityBundle\Entity\AclObjectIdentity
+        - Oro\Bundle\SecurityBundle\Entity\AclObjectIdentityAncestor
+        - Oro\Bundle\SecurityBundle\Entity\AclSecurityIdentity
