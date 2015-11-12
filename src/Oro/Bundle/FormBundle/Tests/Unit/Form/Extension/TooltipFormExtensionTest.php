@@ -36,7 +36,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->setMethods(['trans', 'hasTrans', 'transChoice', 'setLocale', 'getLocale'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -79,9 +79,6 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->mockMethods($form, ['getParent', 'getConfig', 'getOptions', 'getOption'], ['data_class' => 'abc']);
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->will($this->returnValue('test'));
         $this->translator->expects($this->any())
             ->method('hasTrans')
             ->will($this->returnValue(true));
@@ -95,85 +92,70 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param int $iteration
      * @param array $options
-     * @param string $domain
-     * @param string $translatedTooltip
+     * @param string $expectedTooltip
      * @dataProvider modifyFormTooltipFieldProvider
      */
-    public function testModifyFormTooltipField($iteration, $options, $domain, $translatedTooltip)
+    public function testModifyFormTooltipField($options, $expectedTooltip)
     {
         $translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->setMethods(['trans', 'hasTrans', 'transChoice', 'setLocale', 'getLocale'])
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->mockMethods($this->form, ['getParent', 'getConfig', 'getOptions'], ['data_class' => 'TestClass']);
         $view = new FormView();
-        if ($iteration !== null) {
-            $translator
-                ->expects($this->at($iteration))
-                ->method('hasTrans')
-                ->with($this->stringContains($options['tooltip']), $this->stringContains($domain))
-                ->will($this->returnValue(true));
-        }
-        $translator
-            ->expects($this->any())
-            ->method('trans')
-            ->with($options['tooltip'], [], $domain)
-            ->will($this->returnValue($translatedTooltip));
         $this->configProvider->expects($this->any())
             ->method('hasConfig')
             ->will($this->returnValue(true));
-        $this->form->expects($this->any())
-            ->method('getOption')
-            ->will($this->returnValue(false));
-
         $extension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $translator);
         $extension->buildView($view, $this->form, $options);
 
-        $this->assertEquals($view->vars['tooltip'], $translatedTooltip);
+        $this->assertEquals($view->vars['tooltip'], $expectedTooltip);
     }
 
     /**
-     * @param array $options
+     * @param int $iteration
+     * @param string $domain
      * @param string $tooltip
-     * @param string $translatedTooltip
+     * @param string $expectedTooltip
      * @param bool $isEmptyViewTooltip
      * @dataProvider testModifyEntityConfigTooltipFieldProvider
      */
-    public function testModifyEntityConfigTooltipField($options, $tooltip, $translatedTooltip, $isEmptyViewTooltip)
-    {
+    public function testModifyEntityConfigTooltipField(
+        $iteration,
+        $domain,
+        $tooltip,
+        $expectedTooltip,
+        $isEmptyViewTooltip
+    ) {
         $translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->setMethods(['trans', 'transChoice', 'setLocale', 'getLocale'])
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+            ->setMethods(['hasTrans'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->mockMethods($this->form, ['getParent', 'getConfig', 'getOptions'], ['data_class' => 'TestClass']);
         $this->mockMethods($this->configProvider, ['getConfig', 'get'], $tooltip);
         $view = new FormView();
-        $translator
-            ->expects($this->any())
-            ->method('trans')
-            ->with($tooltip)
-            ->will($this->returnValue($translatedTooltip));
         $this->configProvider->expects($this->any())
             ->method('hasConfig')
             ->will($this->returnValue(true));
-        $this->form->expects($this->any())
-            ->method('getOption')
-            ->will($this->returnValue(false));
-
+        if ($iteration !== null) {
+            $translator
+                ->expects($this->at($iteration))
+                ->method('hasTrans')
+                ->with($this->stringContains($tooltip), $this->stringContains($domain))
+                ->will($this->returnValue(true));
+        }
         $extension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $translator);
-        $extension->buildView($view, $this->form, $options);
+        $extension->buildView($view, $this->form, []);
 
         if ($isEmptyViewTooltip) {
             $this->assertArrayNotHasKey('tooltip', $view->vars);
         } else {
             $this->assertArrayHasKey('tooltip', $view->vars);
-            $this->assertEquals($view->vars['tooltip'], $translatedTooltip);
+            $this->assertEquals($view->vars['tooltip'], $expectedTooltip);
         }
     }
 
@@ -184,7 +166,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getParent')
             ->will($this->returnValue(false));
         $translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -199,23 +181,9 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
     public function modifyFormTooltipFieldProvider()
     {
         return [
-            'Test with form tooltip via messages domain' => [
-                'iteration' => 0,
+            'Test with form tooltip' => [
                 'options' => ['tooltip' => 'Custom Messages Domain Tooltip'],
-                'domain' => 'messages',
-                'translatedTooltip' => 'Translated Custom Messages Domain Tooltip'
-            ],
-            'Test with form tooltip via tooltips domain' => [
-                'iteration' => 1,
-                'options' => ['tooltip' => 'Custom Tooltips Domain Tooltip'],
-                'domain' => 'tooltips',
-                'translatedTooltip' => 'Translated Custom Tooltips Domain Tooltip'
-            ],
-            'Test with form tooltip via unknown domain' => [
-                'iteration' => null,
-                'options' => ['tooltip' => 'The Same'],
-                'domain' => 'unknown',
-                'translatedTooltip' => 'The Same'
+                'expectedTooltip' => 'Custom Messages Domain Tooltip'
             ]
         ];
     }
@@ -226,16 +194,25 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
     public function testModifyEntityConfigTooltipFieldProvider()
     {
         return [
-            'Test translated entity config field with difference value' => [
-                'options' => [],
+            'Test entity config field with messages domain' => [
+                'iteration' => 0,
+                'domain' => 'messages',
                 'tooltip' => 'Custom Tooltip',
-                'translatedTooltip' => 'Translated Custom Tooltip',
+                'expectedTooltip' => 'Custom Tooltip',
                 'isEmptyViewTooltip' => false
             ],
-            'Test translated entity config field with equal value' => [
-                'options' => [],
+            'Test entity config field with tooltips domain' => [
+                'iteration' => 1,
+                'domain' => 'tooltips',
                 'tooltip' => 'Custom Tooltip',
-                'translatedTooltip' => 'Custom Tooltip',
+                'expectedTooltip' => 'Custom Tooltip',
+                'isEmptyViewTooltip' => false
+            ],
+            'Test entity config field with unknown domain' => [
+                'iteration' => null,
+                'domain' => 'unknown',
+                'tooltip' => null,
+                'expectedTooltip' => null,
                 'isEmptyViewTooltip' => true
             ]
         ];

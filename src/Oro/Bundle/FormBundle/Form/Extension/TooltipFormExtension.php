@@ -6,13 +6,16 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class TooltipFormExtension extends AbstractTypeExtension
 {
+    const DEFAULT_TRANSLATE_DOMAIN = 'messages';
+    const TOOLTIPS_TRANSLATE_DOMAIN = 'tooltips';
+
     /**
      * @var array
      */
@@ -37,12 +40,12 @@ class TooltipFormExtension extends AbstractTypeExtension
     /**
      * @param EntityFieldProvider $entityFieldProvider
      * @param ConfigProvider $entityConfigProvider
-     * @param TranslatorInterface $translator
+     * @param Translator $translator
      */
     public function __construct(
         EntityFieldProvider $entityFieldProvider,
         ConfigProvider $entityConfigProvider,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->entityFieldProvider = $entityFieldProvider;
         $this->entityConfigProvider = $entityConfigProvider;
@@ -72,48 +75,29 @@ class TooltipFormExtension extends AbstractTypeExtension
             }
         }
 
-        $this->prepareModifyFieldTooltip($form, $view);
+        $this->updateTooltip($form, $view);
     }
 
     /**
      * @param FormInterface $field
      * @param FormView $view
      */
-    public function prepareModifyFieldTooltip(FormInterface $field, FormView $view)
+    public function updateTooltip(FormInterface $field, FormView $view)
     {
         $parentOptions = $field->getParent()->getConfig()->getOptions();
         $parentClassName = isset($parentOptions['data_class']) ? $parentOptions['data_class'] : null;
-        $validDescription =
+        if (!isset($view->vars['tooltip']) &&
             $parentClassName &&
-            $this->entityConfigProvider->hasConfig($parentClassName, $field->getName()) &&
-            !$field->getConfig()->getOption('description');
-
-        if (isset($view->vars['tooltip'])) {
-            if ($foundedDomain = $this->getFoundedDomain($view->vars['tooltip'])) {
-                $view->vars['tooltip'] = $this->translator->trans($view->vars['tooltip'], [], $foundedDomain);
-            }
-        } elseif ($validDescription) {
-            $tipRaw = $this->entityConfigProvider->getConfig($parentClassName, $field->getName())->get('description');
-            $tip = $this->translator->trans($tipRaw);
-            //if text has been added by user in gui
-            if ($tipRaw !== $tip) {
-                $view->vars['tooltip'] = $tip;
+            $this->entityConfigProvider->hasConfig($parentClassName, $field->getName())
+        ) {
+            $tooltip = $this->entityConfigProvider->getConfig($parentClassName, $field->getName())->get('description');
+            //@deprecated 1.9.0:1.11.0 tooltips.*.yml will be removed. Use Resources/translations/messages.*.yml instead
+            if ($this->translator->hasTrans($tooltip, self::DEFAULT_TRANSLATE_DOMAIN) ||
+                $this->translator->hasTrans($tooltip, self::TOOLTIPS_TRANSLATE_DOMAIN)
+            ) {
+                $view->vars['tooltip'] = $tooltip;
             }
         }
-    }
-
-    /**
-     * @param string $idTranslation
-     * @return bool|string
-     */
-    protected function getFoundedDomain($idTranslation)
-    {
-        if ($this->translator->hasTrans($idTranslation, 'messages')) {
-            return 'messages';
-        } elseif ($this->translator->hasTrans($idTranslation, 'tooltips')) {
-            return 'tooltips';
-        }
-        return false;
     }
 
     /**
