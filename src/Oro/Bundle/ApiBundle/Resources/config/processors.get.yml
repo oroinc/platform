@@ -25,7 +25,7 @@ services:
     oro_api.get.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
-            - @oro_entity.doctrine_helper
+            - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
@@ -38,7 +38,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
             - @security.authorization_checker
-            - @oro_entity.doctrine_helper
+            - @oro_api.doctrine_helper
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
@@ -70,7 +70,7 @@ services:
     oro_api.get.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Get\BuildQuery
         arguments:
-            - @oro_entity.doctrine_helper
+            - @oro_api.doctrine_helper
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -10 }
 

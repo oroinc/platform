@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\BuildConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class BuildDefinition implements ProcessorInterface
 {

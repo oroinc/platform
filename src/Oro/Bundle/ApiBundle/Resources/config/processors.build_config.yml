@@ -9,6 +9,6 @@ services:
     oro_api.get_config.metadata:
         class: Oro\Bundle\ApiBundle\Processor\BuildConfig\BuildDefinition
         arguments:
-            - @oro_entity.doctrine_helper
+            - @oro_api.doctrine_helper
         tags:
             - { name: oro.api.processor, action: build_config, priority: -10 }
