@@ -10,7 +10,7 @@ class GetProcessor extends ActionProcessor
     /**
      * {@inheritdoc}
      */
-    public function createContext()
+    protected function createContextObject()
     {
         return new GetContext();
     }

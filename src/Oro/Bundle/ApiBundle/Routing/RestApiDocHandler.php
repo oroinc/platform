@@ -8,8 +8,8 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Handler\ActionHandler;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -40,8 +40,8 @@ class RestApiDocHandler implements HandlerInterface
         ],
     ];
 
-    /** @var ActionHandler */
-    protected $actionHandler;
+    /** @var ActionProcessorBag */
+    protected $processorBag;
 
     /** @var EntityClassNameProviderInterface */
     protected $entityClassNameProvider;
@@ -56,20 +56,20 @@ class RestApiDocHandler implements HandlerInterface
     protected $valueNormalizer;
 
     /**
-     * @param ActionHandler                    $actionHandler
+     * @param ActionProcessorBag               $processorBag
      * @param EntityClassNameProviderInterface $entityClassNameProvider
      * @param EntityAliasResolver              $entityAliasResolver
      * @param DoctrineHelper                   $doctrineHelper
      * @param ValueNormalizer                  $valueNormalizer
      */
     public function __construct(
-        ActionHandler $actionHandler,
+        ActionProcessorBag $processorBag,
         EntityClassNameProviderInterface $entityClassNameProvider,
         EntityAliasResolver $entityAliasResolver,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
-        $this->actionHandler           = $actionHandler;
+        $this->processorBag            = $processorBag;
         $this->entityClassNameProvider = $entityClassNameProvider;
         $this->entityAliasResolver     = $entityAliasResolver;
         $this->doctrineHelper          = $doctrineHelper;
@@ -203,13 +203,14 @@ class RestApiDocHandler implements HandlerInterface
      */
     protected function addFilters(ApiDoc $annotation, $action, $entityClass)
     {
+        $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
-        $context = $this->actionHandler->createContext($action);
+        $context = $processor->createContext($action);
         $context->setLastGroup('initialize');
         if ($entityClass) {
             $context->setClassName($entityClass);
         }
-        $this->actionHandler->handle($context);
+        $processor->process($context);
 
         $filters = $context->getFilters();
         foreach ($filters as $key => $filter) {

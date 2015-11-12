@@ -10,7 +10,7 @@ class BuildConfigProcessor extends ActionProcessor
     /**
      * {@inheritdoc}
      */
-    public function createContext()
+    protected function createContextObject()
     {
         return new BuildConfigContext();
     }

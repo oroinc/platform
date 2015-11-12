@@ -4,6 +4,7 @@ services:
         public: false
         arguments:
             - @oro_api.processor_bag
+            - build_config
 
     oro_api.get_config.metadata:
         class: Oro\Bundle\ApiBundle\Processor\BuildConfig\BuildDefinition

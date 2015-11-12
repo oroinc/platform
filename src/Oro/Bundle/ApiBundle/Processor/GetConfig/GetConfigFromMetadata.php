@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\BuildConfig\BuildConfigContext;
 use Oro\Bundle\ApiBundle\Processor\BuildConfigProcessor;
 
 class GetConfigFromMetadata implements ProcessorInterface
@@ -37,8 +38,8 @@ class GetConfigFromMetadata implements ProcessorInterface
             return;
         }
 
+        /** @var BuildConfigContext $buildConfigContext */
         $buildConfigContext = $this->buildConfigProcessor->createContext();
-        $buildConfigContext->setAction('build_config');
         $buildConfigContext->setRequestType($context->getRequestType());
         $buildConfigContext->setClassName($entityClass);
 

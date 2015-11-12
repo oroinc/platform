@@ -4,6 +4,7 @@ services:
         public: false
         arguments:
             - @oro_api.processor_bag
+            - normalize_value
 
     #
     # common processors

@@ -5,8 +5,8 @@ parameters:
     oro_api.rest.default_format: json
 
 services:
-    oro_api.action_handler:
-        class: Oro\Bundle\ApiBundle\Handler\ActionHandler
+    oro_api.action_processor_bag:
+        class: Oro\Bundle\ApiBundle\Request\ActionProcessorBag
 
     oro_api.processor_bag:
         class: Oro\Component\ChainProcessor\ProcessorBag
@@ -117,7 +117,7 @@ services:
         class: Oro\Bundle\ApiBundle\Routing\RestApiDocHandler
         public: false
         arguments:
-            - @oro_api.action_handler
+            - @oro_api.action_processor_bag
             - @oro_entity.entity_class_name_provider
             - @oro_entity.entity_alias_resolver
             - @oro_entity.doctrine_helper
