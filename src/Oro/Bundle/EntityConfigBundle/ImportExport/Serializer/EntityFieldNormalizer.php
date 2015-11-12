@@ -201,21 +201,23 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         $default = false;
 
         $updatedValue = [];
-        foreach ($value as $key => $subvalue) {
+        foreach ($value as $subvalue) {
             // don't allow empty data
-            if (0 === count(array_filter($subvalue))) {
+            if (!count(array_filter($subvalue))) {
                 continue;
             }
-            $updatedValue[$key] = ['id' => null, 'priority' => null];
+            $enum = ['id' => null, 'priority' => null];
             foreach ($this->getEnumConfig() as $subfield => $subconfig) {
-                $updatedValue[$key][$subfield] = $this->denormalizeFieldValue($subconfig, $subvalue[$subfield], $type);
+                $enum[$subfield] = $this->denormalizeFieldValue($subconfig, $subvalue[$subfield], $type);
             }
 
-            $updatedValue[$key]['is_default'] = !$default && !empty($updatedValue[$key]['is_default']);
+            $enum['is_default'] = !$default && !empty($enum['is_default']);
 
-            if ($type !== 'multiEnum' && $updatedValue[$key]['is_default']) {
+            if ($type !== 'multiEnum' && $enum['is_default']) {
                 $default = true;
             }
+
+            $updatedValue[] = $enum;
         }
 
         return $updatedValue;
