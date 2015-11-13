@@ -15,7 +15,9 @@ oro_entity_config:
                             label:          oro.activity.activities
                             association_class: activity
 
-                # target entities where will be shown activities from the configured entity
+                # target entity classes whose activities will be shown in current entity
+                # if entity one has relation with entity two and for both enabled activity
+                # we can configure entity one using this option for show activities from related entity two
                 inheritence_targets: # array of strings
                     options: []
 
