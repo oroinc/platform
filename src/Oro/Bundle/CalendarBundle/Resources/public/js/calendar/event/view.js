@@ -331,7 +331,7 @@ define([
                     type: 'GET',
                     success: function(targets) {
                         var targetsStrArray = [];
-                        targets.forEach(function (target) {
+                        targets.forEach(function(target) {
                             var targetData = {
                                 entityClass: target.targetClassName.split('_').join('\\'),
                                 entityId: target.targetId
