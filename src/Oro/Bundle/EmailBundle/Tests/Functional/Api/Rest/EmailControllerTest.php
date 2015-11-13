@@ -83,17 +83,6 @@ class EmailControllerTest extends WebTestCase
         return $result['id'];
     }
 
-    public function testGetEmailContext()
-    {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_api_get_email_context', ['id' => $this->getReference('email_1')->getId()])
-        );
-
-        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(2, $entities);
-    }
-
     public function testCreateEmail()
     {
         $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->email);
