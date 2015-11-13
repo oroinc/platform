@@ -48,7 +48,7 @@ define(function(require) {
                     '<span class="column-filter-match">' +
                     label.substr(start, length) +
                     '</span>' +
-                    label.substr(start+length);
+                    label.substr(start + length);
             }
             return result;
         },

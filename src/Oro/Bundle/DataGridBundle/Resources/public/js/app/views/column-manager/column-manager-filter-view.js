@@ -9,6 +9,7 @@ define(function(require) {
         autoRender: true,
         events: {
             'keyup [data-role="column-manager-search"]': 'onSearch',
+            'change [data-role="column-manager-search"]': 'onSearch',
             'paste [data-role="column-manager-search"]': 'onSearch',
             'click [data-role="column-manager-clear-search"]': 'onClearSearch',
             'click [data-role="column-manager-show-all"]': 'onShowAll',
@@ -16,7 +17,16 @@ define(function(require) {
         },
 
         listen: {
-            'change model': 'render'
+            'change model': 'updateView'
+        },
+
+        updateView: function() {
+            var search = this.model.get('search');
+            var renderable = Boolean(this.model.get('renderable'));
+            this.$('[data-role="column-manager-search"]').val(search);
+            this.$('.column-manager-search').toggleClass('empty', search.length === 0);
+            this.$('[data-role="column-manager-show-all"]').toggleClass('active', !renderable);
+            this.$('[data-role="column-manager-show-selected"]').toggleClass('active', renderable);
         },
 
         onSearch: function(e) {
@@ -26,6 +36,7 @@ define(function(require) {
         onClearSearch: function(e) {
             e.preventDefault();
             e.stopPropagation();
+            this.$('[data-role="column-manager-search"]').focus();
             this.model.set('search', '');
         },
 
