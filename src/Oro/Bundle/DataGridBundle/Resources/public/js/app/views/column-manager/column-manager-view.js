@@ -30,7 +30,7 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['orderShift']));
+            _.extend(this, _.pick(options, ['orderShift', 'filterModel']));
 
             ColumnManagerView.__super__.initialize.apply(this, arguments);
         },
@@ -43,6 +43,12 @@ define(function(require) {
             ColumnManagerView.__super__.render.apply(this, arguments);
             this.initSorting();
             return this;
+        },
+
+        initItemView: function() {
+            var itemView = ColumnManagerView.__super__.initItemView.apply(this, arguments);
+            itemView.setFilterModel(this.filterModel);
+            return itemView;
         },
 
         /**
