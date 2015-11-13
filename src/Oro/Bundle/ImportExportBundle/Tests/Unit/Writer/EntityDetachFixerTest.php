@@ -3,25 +3,25 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
+
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 
 class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    protected $registry;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityFieldProvider */
     protected $entityFieldProvider;
 
-    /**
-     * @var EntityDetachFixer
-     */
+    /** @var EntityDetachFixer */
     protected $fixer;
 
     protected function setUp()
@@ -29,10 +29,20 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+
         $this->entityFieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->fixer = new EntityDetachFixer($this->entityManager, $this->entityFieldProvider);
+        
+        $this->fixer = new EntityDetachFixer($this->registry, $this->entityFieldProvider);
     }
 
     public function testFixEntityAssociationFieldsLevel()
@@ -53,11 +63,6 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
         $entity->field = $fieldValue;
 
-        $mapping = array(
-            array(
-                'fieldName' => 'field'
-            )
-        );
         if ($fieldValue instanceof ArrayCollection) {
             $linkedEntity = $fieldValue->getIterator()->offsetGet(0);
         } else {
@@ -113,14 +118,14 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @return array
+     */
     public function valueDataProvider()
     {
         $entity = new \stdClass();
-        $collection = new ArrayCollection(array($entity));
+        $collection = new ArrayCollection([$entity]);
 
-        return array(
-            array(new \stdClass()),
-            array($collection)
-        );
+        return [[new \stdClass()], [$collection]];
     }
 }

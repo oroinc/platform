@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 
@@ -14,8 +16,8 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
     const SKIP_CLEAR = 'writer_skip_clear';
 
-    /** @var EntityManager */
-    protected $entityManager;
+    /** @var ManagerRegistry */
+    protected $registry;
 
     /** @var EntityDetachFixer */
     protected $detachFixer;
@@ -27,11 +29,11 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
     protected $contextRegistry;
 
     public function __construct(
-        EntityManager $entityManager,
+        ManagerRegistry $registry,
         EntityDetachFixer $detachFixer,
         ContextRegistry $contextRegistry
     ) {
-        $this->entityManager   = $entityManager;
+        $this->registry   = $registry;
         $this->detachFixer     = $detachFixer;
         $this->contextRegistry = $contextRegistry;
     }
@@ -41,18 +43,21 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
      */
     public function write(array $items)
     {
+        $entityManager = array_key_exists(0, $items)
+            ? $this->registry->getManagerForClass(ClassUtils::getRealClass($items[0]))
+            : $this->registry->getManager();
         foreach ($items as $item) {
-            $this->entityManager->persist($item);
+            $entityManager->persist($item);
             $this->detachFixer->fixEntityAssociationFields($item, 1);
         }
-        $this->entityManager->flush();
+        $entityManager->flush();
 
         $configuration = $this->contextRegistry
             ->getByStepExecution($this->stepExecution)
             ->getConfiguration();
 
         if (empty($configuration[self::SKIP_CLEAR])) {
-            $this->entityManager->clear();
+            $entityManager->clear();
         }
     }
 

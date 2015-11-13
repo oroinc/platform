@@ -15,7 +15,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
- * @Rest\NamePrefix("oro_api_workflow_")
+ * @Rest\NamePrefix("oro_api_workflow_entity_")
  */
 class EntityController extends FOSRestController
 {

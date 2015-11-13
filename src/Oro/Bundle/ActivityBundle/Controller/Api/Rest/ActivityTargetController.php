@@ -23,7 +23,7 @@ class ActivityTargetController extends RestGetController
     /**
      * Get types of entities which can be associated with at least one activity type.
      *
-     * @Get("/activities/targets", name="")
+     * @Get("/activities/targets")
      *
      * @ApiDoc(
      *      description="Get types of entities which can be associated with at least one activity type",
@@ -44,7 +44,7 @@ class ActivityTargetController extends RestGetController
      *
      * @param string $entity The type of the target entity.
      *
-     * @Get("/activities/targets/{entity}", name="")
+     * @Get("/activities/targets/{entity}")
      *
      * @ApiDoc(
      *      description="Get types of activities which can be added to the specified entity type",
@@ -69,7 +69,7 @@ class ActivityTargetController extends RestGetController
      * @param string $entity The type of the target entity.
      * @param mixed  $id     The id of the target entity.
      *
-     * @Get("/activities/targets/{entity}/{id}", name="")
+     * @Get("/activities/targets/{entity}/{id}")
      *
      * @QueryParam(
      *      name="page",
