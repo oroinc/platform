@@ -8,14 +8,14 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
-use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 
 class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,9 +32,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $securityContext;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $aclVoter;
@@ -86,11 +83,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $strategy = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface');
 
         $this->builder = new OwnershipConditionDataBuilder(
             $securityContextLink,
@@ -98,9 +90,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             $entityMetadataProvider,
             $this->metadataProvider,
             $treeProvider,
-            $this->registry,
-            $configProvider,
-            $strategy,
             $this->aclVoter
         );
     }

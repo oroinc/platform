@@ -491,6 +491,8 @@ class MigrationsLoader
 
         ksort($priorityMigrations);
 
-        return call_user_func_array('array_merge', $priorityMigrations);
+        return empty($priorityMigrations)
+            ? $priorityMigrations
+            : call_user_func_array('array_merge', $priorityMigrations);
     }
 }

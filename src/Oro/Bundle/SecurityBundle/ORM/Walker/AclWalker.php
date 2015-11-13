@@ -158,7 +158,7 @@ class AclWalker extends TreeWalkerAdapter
                     ->joins[$condition->getJoinKey()];
                 if (!($condition instanceof JoinAssociationCondition)) {
                     $aclConditionalFactors = $this->aclConditionFactorBuilder->addJoinAclConditionalFactor(
-                        [],
+                        [], //default empty conditional factors
                         $condition,
                         $this->_getQuery()
                     );
@@ -177,7 +177,7 @@ class AclWalker extends TreeWalkerAdapter
                     }
                 } else {
                     $conditionalFactors = $this->aclConditionFactorBuilder->addJoinAclConditionalFactor(
-                        [],
+                        [], //default empty conditional factors
                         $condition,
                         $this->_getQuery()
                     );
@@ -200,10 +200,8 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function addAclToWhereClause($AST, array $whereConditions)
     {
-        $aclConditionalFactors = [];
-
-        $this->aclConditionFactorBuilder->addWhereAclConditionalFactors(
-            $aclConditionalFactors,
+        $aclConditionalFactors = $this->aclConditionFactorBuilder->addWhereAclConditionalFactors(
+            [], //default empty conditional factors
             $whereConditions,
             $this->_getQuery()
         );
