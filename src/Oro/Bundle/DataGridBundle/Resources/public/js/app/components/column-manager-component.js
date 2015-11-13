@@ -49,7 +49,13 @@ define(function(require) {
 
             this.managedColumns = options.managedColumns;
 
+            this.columnFilterModel = new ColumnFilterModel();
+
             this._createViews(options);
+
+            this.columnFilterModel.on('change', _.bind(function(model) {
+                this.columnManagerView.filter(_.bind(model.filterer, model));
+            }, this));
 
             this._applyState(this.grid.collection, this.grid.collection.state);
 
@@ -94,17 +100,15 @@ define(function(require) {
         _createViews: function(options) {
             // index of first manageable column
             var orderShift = this.managedColumns[0] ? this.managedColumns[0].get('order') : 0;
-            var columnFilterModel = new ColumnFilterModel();
-
             this.columnManagerView = new ColumnManagerView({
                 el: options._sourceElement,
                 collection: this.managedColumns,
-                filterModel: columnFilterModel,
+                filterModel: this.columnFilterModel,
                 orderShift: orderShift
             });
             this.columnFilterView = new ColumnFilterView({
                 el: this.columnManagerView.$el.find('.column-manager-filter').get(0),
-                model: columnFilterModel
+                model: this.columnFilterModel
             });
         },
 

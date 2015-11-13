@@ -7,6 +7,10 @@ define(function(require) {
     ColumnFilterModel = BaseModel.extend({
         defaults: {
             renderable: false
+        },
+
+        filterer: function(item) {
+            return !this.get('renderable') || item.get('renderable');
         }
     });
 
