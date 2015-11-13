@@ -2,10 +2,10 @@ define(function(require) {
     'use strict';
 
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var EmailContextActivityView = require('oroemail/js/app/views/email-context-activity-view');
+    var ActivityContextActivityView = require('oroactivity/js/app/views/activity-context-activity-view');
 
     /**
-     * @exports EmailContextActivityComponent
+     * @exports ActivityContextActivityComponent
      */
     return BaseComponent.extend({
         contextsView: null,
@@ -23,13 +23,14 @@ define(function(require) {
         initView: function() {
             var $container = this.options._sourceElement.find('#' + this.options.container);
             var items = typeof this.options.contextTargets === 'undefined' ? [] : this.options.contextTargets;
-            this.contextsView = new EmailContextActivityView({
+            this.contextsView = new ActivityContextActivityView({
                 contextTargets: items,
                 entityId: this.options.entityId,
                 el: this.options._sourceElement,
                 $container: $container,
                 inputName: this.options.inputName,
-                target: this.options.target
+                target: this.options.target,
+                activityClass: this.options.activityClassAlias
             });
         }
     });

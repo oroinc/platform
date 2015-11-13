@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var EmailContextComponent;
+    var ActivityContextComponent;
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -10,12 +10,12 @@ define(function(require) {
     var messenger = require('oroui/js/messenger');
     var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var EmailContextView = require('oroemail/js/app/views/email-context-view');
+    var ActivityContextView = require('oroactivity/js/app/views/activity-context-view');
 
     /**
-     * @exports EmailContextComponent
+     * @exports ActivityContextComponent
      */
-    EmailContextComponent = BaseComponent.extend({
+    ActivityContextComponent = BaseComponent.extend({
         contextView: null,
 
         initialize: function(options) {
@@ -30,7 +30,7 @@ define(function(require) {
         },
 
         initView: function() {
-            this.contextView = new EmailContextView({
+            this.contextView = new ActivityContextView({
                 items: this.options.items || [],
                 el: this.options._sourceElement,
                 params: this.options.params || [],
@@ -68,7 +68,7 @@ define(function(require) {
             gridWidget._showLoading();
             $.ajax({
                 url: routing.generate('oro_api_post_activity_relation', {
-                    activity: 'emails', id: this.options.sourceEntityId
+                    activity: this.options.sourceEntityClassAlias, id: this.options.sourceEntityId
                 }),
                 type: 'POST',
                 dataType: 'json',
@@ -76,9 +76,9 @@ define(function(require) {
                     targets: [{entity: contextTargetClass, id: id}]
                 }
             }).done(function() {
-                messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
+                messenger.notificationFlashMessage('success', __('oro.activity.contexts.added'));
                 mediator.trigger('widget_success:activity_list:item:update');
-                mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
+                mediator.trigger('widget:doRefresh:activity-context-activity-list-widget');
             }).fail(function(response) {
                 messenger.showErrorMessage(__('oro.ui.item_add_error'), response.responseJSON || {});
             }).always(function() {
@@ -93,5 +93,5 @@ define(function(require) {
         }
     });
 
-    return EmailContextComponent;
+    return ActivityContextComponent;
 });

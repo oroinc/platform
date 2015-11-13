@@ -1,19 +1,17 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
-use Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType;
+use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 
 class ContextsSelectTypeTest extends TypeTestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -26,7 +24,7 @@ class ContextsSelectTypeTest extends TypeTestCase
     protected $mapper;
 
     /* @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $securityTokenStorage;
 
     protected function setUp()
     {
@@ -47,9 +45,10 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->securityTokenStorage =
+            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')
+                ->disableOriginalConstructor()
+                ->getMock();
     }
 
     protected function getExtensions()
@@ -74,27 +73,25 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->configManager,
             $this->translator,
             $this->mapper,
-            $this->securityFacade
+            $this->securityTokenStorage
         );
         $type->buildForm($builder, []);
     }
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
                 [
                     'tooltip' => false,
                     'configs' => [
-                        'placeholder'        => 'oro.email.contexts.placeholder',
+                        'placeholder'        => 'oro.activity.contexts.placeholder',
                         'allowClear'         => true,
                         'multiple'           => true,
-                        'route_name'         => 'oro_api_get_search_autocomplete',
                         'separator'          => ';',
                         'forceSelectedData'  => true,
-                        'containerCssClass'  => 'taggable-email',
                         'minimumInputLength' => 0,
                     ]
                 ]
@@ -105,7 +102,7 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->configManager,
             $this->translator,
             $this->mapper,
-            $this->securityFacade
+            $this->securityTokenStorage
         );
         $type->setDefaultOptions($resolver);
     }
@@ -117,7 +114,7 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->configManager,
             $this->translator,
             $this->mapper,
-            $this->securityFacade
+            $this->securityTokenStorage
         );
         $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
 
@@ -130,8 +127,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->configManager,
             $this->translator,
             $this->mapper,
-            $this->securityFacade
+            $this->securityTokenStorage
         );
-        $this->assertEquals('oro_email_contexts_select', $type->getName());
+        $this->assertEquals('oro_activity_contexts_select', $type->getName());
     }
 }
