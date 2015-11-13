@@ -33,7 +33,8 @@ define([
             loadingMaskContent: '.loading-content',
             backgroundColor: 'input[name$="[backgroundColor]"]',
             calendarUid: '[name*="calendarUid"]',
-            invitedUsers: 'input[name$="[invitedUsers]"]'
+            invitedUsers: 'input[name$="[invitedUsers]"]',
+            contexts: 'input[name$="[contexts]"]'
         },
 
         /** @property {Array} */
@@ -319,6 +320,29 @@ define([
             form.find(this.selectors.invitedUsers).on('change', _.bind(function(e) {
                 this._toggleCalendarUidByInvitedUsers(form);
             }, this));
+
+            // Adds calendar event activity contexts items to the form
+            if (this.model.originalId) {
+                var contexts = form.find(this.selectors.contexts);
+                $.ajax({
+                    url: routing.generate('oro_api_get_activity_context', {
+                        activity: 'calendarevents', id: this.model.originalId
+                    }),
+                    type: 'GET',
+                    success: function(targets) {
+                        var targetsStrArray = [];
+                        targets.forEach(function (target) {
+                            var targetData = {
+                                entityClass: target.targetClassName.split('_').join('\\'),
+                                entityId: target.targetId
+                            };
+                            targetsStrArray.push(JSON.stringify(targetData));
+                        });
+                        contexts.val(targetsStrArray.join(';'));
+                        contexts.trigger('change');
+                    }
+                });
+            }
 
             return form;
         },

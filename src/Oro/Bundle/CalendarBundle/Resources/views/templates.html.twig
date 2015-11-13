@@ -50,6 +50,9 @@
             form_row(form.notifyInvitedUsers)
         ]
     %}
+    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+        {% set data = data|merge([form_row(child)]) %}
+    {% endfor %}
     <div class="widget-content">
         <div class="alert alert-error" style="display: none;"></div>
         <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="#">

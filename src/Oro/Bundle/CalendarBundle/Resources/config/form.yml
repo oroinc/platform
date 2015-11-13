@@ -81,6 +81,7 @@ services:
             - @request
             - @doctrine.orm.entity_manager
             - @oro_calendar.send_processor.email
+            - @oro_activity.manager
 
     oro_calendar.calendar_event_invitees.form.type:
         class: %oro_calendar.calendar_event_invitees.form.type.class%
