@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Symfony\Component\Form\FormView;
+
+use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 
 class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $fieldProvider;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
@@ -21,10 +19,6 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->fieldProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->configProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->setMethods(['hasConfig', 'getConfig', 'get'])
@@ -59,7 +53,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $extension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $this->translator);
+        $extension = new TooltipFormExtension($this->configProvider, $this->translator);
         $extension->setDefaultOptions($resolver);
         $this->assertEquals('form', $extension->getExtendedType());
     }
@@ -82,7 +76,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->translator->expects($this->any())
             ->method('hasTrans')
             ->will($this->returnValue(true));
-        $extension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $this->translator);
+        $extension = new TooltipFormExtension($this->configProvider, $this->translator);
         $extension->buildView($view, $form, $options);
 
         foreach ($options as $option => $value) {
@@ -108,7 +102,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->any())
             ->method('hasConfig')
             ->will($this->returnValue(true));
-        $extension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $translator);
+        $extension = new TooltipFormExtension($this->configProvider, $translator);
         $extension->buildView($view, $this->form, $options);
 
         $this->assertEquals($view->vars['tooltip'], $expectedTooltip);
@@ -148,7 +142,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
                 ->with($this->stringContains($tooltip), $this->stringContains($domain))
                 ->will($this->returnValue(true));
         }
-        $extension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $translator);
+        $extension = new TooltipFormExtension($this->configProvider, $translator);
         $extension->buildView($view, $this->form, []);
 
         if ($isEmptyViewTooltip) {
@@ -170,7 +164,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $extension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $translator);
+        $extension = new TooltipFormExtension($this->configProvider, $translator);
         $extension->buildView($view, $this->form, ['toolbar' => 'test']);
         $this->assertArrayNotHasKey('toolbar', $view->vars);
     }
