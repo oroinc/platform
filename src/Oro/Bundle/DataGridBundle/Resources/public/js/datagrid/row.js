@@ -37,6 +37,7 @@ define([
             Row.__super__.initialize.apply(this, arguments);
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
+            this.listenTo(this.model, "backgrid:selected", this.selectRow);
         },
 
         /**
@@ -55,6 +56,17 @@ define([
 
             this.$el.html(fragment);
             this.trigger('columns:reorder');
+        },
+
+        /**
+         * Handle for select/deselect row
+         *
+         * @param {Backbone.Model} model
+         * @param {Boolean} isChecked if true the row must be selected
+         */
+        selectRow: function (model, isChecked) {
+            isChecked ? this.$el.addClass("row-selected")
+                      : this.$el.removeClass("row-selected");
         },
 
         className: function() {
