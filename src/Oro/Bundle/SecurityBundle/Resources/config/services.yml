@@ -27,6 +27,7 @@ parameters:
     oro_security.type.oro_acl_access_level_selector.class:     Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType
     oro_security.type.oro_acl_label.class:                     Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType
     oro_security.type.oro_acl_collection.class:                Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType
+    oro_security.type.oro_acl_permission_collection.class:     Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType
     oro_security.type.oro_acl_privilege.class:                 Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType
 
     oro_security.entity_security_metadata_provider.class:      Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider
@@ -243,6 +244,11 @@ services:
         class: %oro_security.type.oro_acl_privilege.class%
         tags:
             - { name: form.type, alias: oro_acl_privilege }
+
+    oro_security.form.type.oro_acl_permission_collection:
+        class: %oro_security.type.oro_acl_permission_collection.class%
+        tags:
+            - { name: form.type, alias: oro_acl_permission_collection }
 
     oro_security.entity_security_metadata_provider:
         public: false

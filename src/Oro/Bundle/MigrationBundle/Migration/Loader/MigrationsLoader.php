@@ -15,6 +15,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
+use Oro\Bundle\MigrationBundle\Migration\PrioritizedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
@@ -26,6 +27,7 @@ use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 class MigrationsLoader
 {
     const MIGRATIONS_PATH = 'Migrations/Schema';
+    const DEFAULT_MIGRATION_PRIORITY = 0;
 
     /**
      * @var KernelInterface
@@ -275,6 +277,7 @@ class MigrationsLoader
         // group migration by bundle & version then sort them within same version
         $groupedMigrations = $this->groupAndSortMigrations($files, $migrations);
 
+        $nonPriorityMigrations = [];
         // add migration objects to result tacking into account bundles order
         foreach ($files['bundles'] as $bundleName) {
             // add installers to the result
@@ -282,7 +285,7 @@ class MigrationsLoader
                 if ($installerBundleName === $bundleName && isset($migrations[$sourceFile])) {
                     /** @var Installation $installer */
                     $installer = $migrations[$sourceFile];
-                    $result[]  = new MigrationState(
+                    $nonPriorityMigrations[]  = new MigrationState(
                         $installer,
                         $installerBundleName,
                         $installer->getMigrationVersion()
@@ -293,7 +296,7 @@ class MigrationsLoader
             if (isset($groupedMigrations[$bundleName])) {
                 foreach ($groupedMigrations[$bundleName] as $version => $versionedMigrations) {
                     foreach ($versionedMigrations as $migration) {
-                        $result[] = new MigrationState(
+                        $nonPriorityMigrations[] = new MigrationState(
                             $migration,
                             $bundleName,
                             $version
@@ -302,6 +305,8 @@ class MigrationsLoader
                 }
             }
         }
+
+        $result = array_merge($result, $this->sortMigrationsByPriority($nonPriorityMigrations));
     }
 
     /**
@@ -465,5 +470,27 @@ class MigrationsLoader
         }
 
         return $bundles;
+    }
+
+    /**
+     * @param array $nonPriorityMigrations
+     *
+     * @return array
+     */
+    protected function sortMigrationsByPriority(array $nonPriorityMigrations)
+    {
+        $priorityMigrations = [];
+        /** @var MigrationState $migrationState */
+        foreach ($nonPriorityMigrations as $migrationState) {
+            if ($migrationState->getMigration() instanceof PrioritizedMigrationInterface) {
+                $priorityMigrations[$migrationState->getMigration()->getPriority()][] = $migrationState;
+            } else {
+                $priorityMigrations[self::DEFAULT_MIGRATION_PRIORITY][] = $migrationState;
+            }
+        }
+
+        ksort($priorityMigrations);
+
+        return call_user_func_array('array_merge', $priorityMigrations);
     }
 }
