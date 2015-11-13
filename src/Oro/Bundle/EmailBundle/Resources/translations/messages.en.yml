@@ -81,6 +81,7 @@ oro:
             subject.label:       Subject
             content.label:       Content
             entity_name.label:   Entity name
+            entity_name.tooltip: Choose an entity this template is related to or keep it empty if this template is not related to any entity.
             type.label:          Type
             translations.label:  Translations
             organization.label:  Organization

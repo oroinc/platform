@@ -19,8 +19,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
@@ -242,13 +243,14 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
         return
-            !$extendConfig->is('is_deleted')
-            && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-            && !$extendConfig->is('state', ExtendScope::STATE_NEW)
+            $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+            && ExtendHelper::isFieldAccessible($extendConfig)
             && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations, true)
             && (
                 !$extendConfig->has('target_entity')
-                || !$extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')
+                || ExtendHelper::isEntityAccessible(
+                    $extendConfigProvider->getConfig($extendConfig->get('target_entity'))
+                )
             );
     }
 

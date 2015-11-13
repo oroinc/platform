@@ -68,6 +68,7 @@ services:
         class: %oro_email.form.type.autoresponse_template_choice.class%
         arguments:
             - @oro_security.security_facade
+            - @translator
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template_choice }
 
