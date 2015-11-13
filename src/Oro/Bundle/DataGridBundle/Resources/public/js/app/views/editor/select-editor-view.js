@@ -69,6 +69,7 @@ define(function(require) {
 
         initialize: function(options) {
             this.availableChoices = this.getAvailableOptions(options);
+            this.prestine = true;
             SelectEditorView.__super__.initialize.apply(this, arguments);
         },
 
@@ -100,11 +101,23 @@ define(function(require) {
 
             // must prevent selection on TAB
             this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
-                if (e.keyCode === _this.TAB_KEY_CODE) {
-                    e.stopImmediatePropagation();
-                    e.preventDefault();
-                    _this.$('input[name=value]').select2('close');
-                    _this.onGenericTabKeydown(e);
+                var prestine = _this.prestine;
+                _this.prestine = false;
+                switch (e.keyCode) {
+                    case _this.ENTER_KEY_CODE:
+                        if (prestine  && !_this.getModelValue()) {
+                            e.stopImmediatePropagation();
+                            e.preventDefault();
+                            _this.$('input[name=value]').select2('close');
+                            _this.onGenericEnterKeydown(e);
+                        }
+                        break;
+                    case _this.TAB_KEY_CODE:
+                        e.stopImmediatePropagation();
+                        e.preventDefault();
+                        _this.$('input[name=value]').select2('close');
+                        _this.onGenericTabKeydown(e);
+                        break;
                 }
                 _this.onGenericArrowKeydown(e);
             });

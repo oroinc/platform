@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Psr\Log\LoggerInterface;
+
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,6 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\IntegrationBundle\Manager\BlockingJob;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
@@ -97,6 +102,7 @@ class SyncCommand extends AbstractSyncCronCommand
 
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
+        /** @var BlockingJob $blockedJobsManager */
         $connector = $input->getOption('connector');
         $integrationId = $input->getOption('integration-id');
         $batchSize = $input->getOption('transport-batch-size');
@@ -104,52 +110,117 @@ class SyncCommand extends AbstractSyncCronCommand
         $entityManager = $this->getService('doctrine.orm.entity_manager');
         $repository = $entityManager->getRepository('OroIntegrationBundle:Channel');
         $logger = new OutputLogger($output);
-        $exitCode = self::STATUS_SUCCESS;
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
+        $blockedJobsManager = $this->getService('oro_integration.manager.blocking_job');
 
         if ($this->isJobRunning($integrationId)) {
             $logger->warning('Job already running. Terminating....');
-
             return self::STATUS_SUCCESS;
         }
 
         if ($integrationId) {
             $integration = $repository->getOrLoadById($integrationId);
+
             if (!$integration) {
                 $logger->critical(sprintf('Integration with given ID "%d" not found', $integrationId));
 
                 return self::STATUS_FAILED;
             }
-            $integrations = [$integration];
+
+            if ($this->isBlockingJobRunning($integration, $blockedJobsManager)) {
+                $logger->warning('Blocking jobs already running. Terminating....');
+
+                return self::STATUS_SUCCESS;
+            }
+
+            $exitCode = $this->processIntegration($logger, $integration, $batchSize, $connector, $connectorParameters);
         } else {
             $integrations = $repository->getConfiguredChannelsForSync(null, true);
-        }
-
-        /* @var Integration $integration */
-        foreach ($integrations as $integration) {
-            try {
-                $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
-
-                $this->updateToken($integration);
-                if ($batchSize) {
-                    $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
-                }
-
-                $processor = $this->getSyncProcessor($integration, $logger);
-                $result = $processor->process($integration, $connector, $connectorParameters);
-                $exitCode = $result ?: self::STATUS_FAILED;
-            } catch (\Exception $e) {
-                $logger->critical($e->getMessage(), ['exception' => $e]);
-
-                $exitCode = self::STATUS_FAILED;
-
-                continue;
-            }
+            $exitCode = $this->processIntegrations($integrations);
         }
 
         $logger->notice('Completed');
 
         return $exitCode;
+    }
+
+    /**
+     * @param Integration $integration
+     * @param BlockingJob $blockingJobManager
+     *
+     * @return bool
+     */
+    protected function isBlockingJobRunning(Integration $integration, BlockingJob $blockingJobManager)
+    {
+        if ($blockingJobManager->hasBlockingJobs($integration->getType())) {
+            $commandNames = $blockingJobManager->getBlockingJobs($integration->getType());
+            $commandNames = $commandNames->getCommandName();
+            $managerRegistry = $this->getService('doctrine');
+
+            /** @var ManagerRegistry $managerRegistry */
+            $running = $managerRegistry->getRepository('OroIntegrationBundle:Channel')
+                ->getRunningSyncJobsCountByCommands($commandNames);
+
+            if ($running > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param OutputLogger $logger
+     * @param Integration $integration
+     * @param int|null $batchSize
+     * @param $connector
+     * @param $connectorParameters
+     *
+     * @return int
+     */
+    protected function processIntegration(
+        OutputLogger $logger,
+        Integration $integration,
+        $batchSize,
+        $connector,
+        $connectorParameters
+    ) {
+        try {
+            $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
+            $this->updateToken($integration);
+            if ($batchSize) {
+                $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
+            }
+            $processor = $this->getSyncProcessor($integration, $logger);
+            $result = $processor->process($integration, $connector, $connectorParameters);
+            $exitCode = $result ?: self::STATUS_FAILED;
+        } catch (\Exception $e) {
+            $logger->critical($e->getMessage(), ['exception' => $e]);
+            $exitCode = self::STATUS_FAILED;
+
+        }
+
+        return $exitCode;
+    }
+
+    /**
+     * @param Integration[] $integrations
+     *
+     * @return int
+     */
+    protected function processIntegrations($integrations)
+    {
+        /** @var ManagerRegistry $managerRegistry */
+        $managerRegistry = $this->getService('doctrine');
+        foreach ($integrations as $integration) {
+            $integrationId = sprintf('--%s=%s', 'integration-id', $integration->getId());
+            $jobArgs = [$integrationId];
+            $job = new Job(self::COMMAND_NAME, $jobArgs, true);
+            $managerRegistry->getManager()->persist($job);
+        }
+        $managerRegistry->getManager()->flush();
+
+        return self::STATUS_SUCCESS;
     }
 
     /**

@@ -58,6 +58,8 @@ class AutoResponseRuleType extends AbstractType
                 'class' => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
                 'create_entity_form_type' => 'oro_email_autoresponse_template',
                 'select_entity_form_type' => 'oro_email_autoresponse_template_choice',
+                'editable' => true,
+                'edit_route' => 'oro_email_autoresponserule_edittemplate',
             ]);
 
         $builder->addEventSubscriber($this->autoResponseRuleSubscriber);
