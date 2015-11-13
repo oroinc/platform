@@ -215,6 +215,8 @@ oro:
         seen.label:               Is Seen
         thread_id.label:          Thread ID
         show_details.tooltip:     Show details
+        contexts:
+            tooltip:              Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden
         empty_body:               Empty body
