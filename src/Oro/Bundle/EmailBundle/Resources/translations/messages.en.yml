@@ -81,6 +81,7 @@ oro:
             subject.label:       Subject
             content.label:       Content
             entity_name.label:   Entity name
+            entity_name.tooltip: Choose an entity this template is related to or keep it empty if this template is not related to any entity.
             type.label:          Type
             translations.label:  Translations
             organization.label:  Organization
@@ -223,6 +224,7 @@ oro:
             added.already:        The context has already been added
             type.not_supported:   The context type is not supported
             removed:              The context has been removed
+            tooltip:              Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden
         empty_body:               Empty body

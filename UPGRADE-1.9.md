@@ -97,3 +97,6 @@ UPGRADE FROM 1.8 to 1.9
 
 ####ImportExportBundle:
 - Added `Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter` as default formatter for the date, time and datetime types in `Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer`. This types exported/imported depends on the application locale and timezone and recognized as dates in Microsoft Excel.
+
+####TranslationBundle
+ - /Resources/translations/tooltips.*.yml deprecated since 1.9.0. Will be removed in 1.11.0. Use /Resources/translations/messages.*.yml instead
