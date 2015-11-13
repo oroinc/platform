@@ -6,6 +6,8 @@ define(function(require) {
     var Backgrid = require('backgrid');
     var tools = require('oroui/js/tools');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var ColumnFilterModel = require('orodatagrid/js/app/models/column-manager/column-filter-model');
+    var ColumnFilterView = require('orodatagrid/js/app/views/column-manager/column-manager-filter-view');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
 
     /**
@@ -47,7 +49,13 @@ define(function(require) {
 
             this.managedColumns = options.managedColumns;
 
-            this._createColumnManagerView(options);
+            this.columnFilterModel = new ColumnFilterModel();
+
+            this._createViews(options);
+
+            this.columnFilterModel.on('change', _.bind(function(model) {
+                this.columnManagerView.filter(_.bind(model.filterer, model));
+            }, this));
 
             this._applyState(this.grid.collection, this.grid.collection.state);
 
@@ -84,19 +92,23 @@ define(function(require) {
         },
 
         /**
-         * Creates view for column manager
+         * Creates views for column manager
          *
          * @param {Object} options
          * @protected
          */
-        _createColumnManagerView: function(options) {
+        _createViews: function(options) {
             // index of first manageable column
             var orderShift = this.managedColumns[0] ? this.managedColumns[0].get('order') : 0;
-
             this.columnManagerView = new ColumnManagerView({
                 el: options._sourceElement,
                 collection: this.managedColumns,
+                filterModel: this.columnFilterModel,
                 orderShift: orderShift
+            });
+            this.columnFilterView = new ColumnFilterView({
+                el: this.columnManagerView.$el.find('.column-manager-filter').get(0),
+                model: this.columnFilterModel
             });
         },
 
