@@ -15,7 +15,10 @@ use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 class Orm extends AbstractEngine
 {
     /** @var SearchIndexRepository */
-    protected $indexRepository;
+    private $indexRepository;
+
+    /** @var OroEntityManager */
+    private $indexManager;
 
     /** @var ObjectMapper */
     protected $mapper;
@@ -85,13 +88,12 @@ class Orm extends AbstractEngine
             return true;
         }
 
-        $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
-        $existingItems     = $this->getIndexRepository()->getItemsForEntities($entities);
+        $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
 
         $hasDeletedEntities = !empty($existingItems);
         foreach ($existingItems as $items) {
             foreach ($items as $item) {
-                $itemEntityManager->remove($item);
+                $this->getIndexManager()->remove($item);
             }
         }
 
@@ -133,8 +135,7 @@ class Orm extends AbstractEngine
      */
     protected function saveItemData(array $entities)
     {
-        $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
-        $existingItems     = $this->getIndexRepository()->getItemsForEntities($entities);
+        $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
 
         $hasSavedEntities = false;
         foreach ($entities as $entity) {
@@ -165,7 +166,7 @@ class Orm extends AbstractEngine
                 ->setChanged(false)
                 ->saveItemData($data);
 
-            $itemEntityManager->persist($item);
+            $this->getIndexManager()->persist($item);
 
             $hasSavedEntities = true;
         }
@@ -186,7 +187,8 @@ class Orm extends AbstractEngine
      */
     public function flush()
     {
-        $this->registry->getManager()->flush();
+        $this->getIndexManager()->flush();
+        $this->getIndexManager()->clear();
     }
 
     /**
@@ -259,10 +261,31 @@ class Orm extends AbstractEngine
      */
     protected function getIndexRepository()
     {
-        $this->indexRepository = $this->registry->getRepository('OroSearchBundle:Item');
+        if ($this->indexRepository) {
+            return $this->indexRepository;
+        }
+
+        $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
         $this->indexRepository->setDriversClasses($this->drivers);
+        $this->indexRepository->setRegistry($this->registry);
 
         return $this->indexRepository;
+    }
+
+    /**
+     * Get search index repository
+     *
+     * @return OroEntitymanager
+     */
+    protected function getIndexManager()
+    {
+        if ($this->indexManager) {
+            return $this->indexManager;
+        }
+
+        $this->indexManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+
+        return $this->indexManager;
     }
 
     /**
