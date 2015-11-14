@@ -5,10 +5,17 @@ services:
         arguments:
             - @oro_api.processor_bag
             - get_list
+        tags:
+            - { name: oro.api.action_processor }
 
     #
     # initialize
     #
+
+    oro_api.get_list.normalize_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: 250 }
 
     oro_api.get_list.normalize_include_header:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
@@ -33,6 +40,19 @@ services:
             - @oro_api.doctrine_helper
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest, priority: -10 }
+
+    oro_api.get_list.register_filters:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\RegisterFilters
+        arguments:
+            - @oro.api.filter_factory
+            - @oro_api.config_provider
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: -50 }
+
+    oro_api.get_list.rest.normalize_filter_keys:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\Rest\NormalizeFilterKeys
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest, priority: -60 }
 
     #
     # security_check

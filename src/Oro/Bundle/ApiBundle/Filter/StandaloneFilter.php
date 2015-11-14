@@ -21,13 +21,13 @@ abstract class StandaloneFilter implements FilterInterface
 
     /**
      * @param string              $dataType
-     * @param string              $description
+     * @param string|null         $description
      * @param mixed|callable|null $defaultValue
      * @param callable|null       $defaultValueToStringConverter
      */
     public function __construct(
         $dataType,
-        $description,
+        $description = null,
         $defaultValue = null,
         $defaultValueToStringConverter = null
     ) {

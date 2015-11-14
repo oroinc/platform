@@ -5,10 +5,17 @@ services:
         arguments:
             - @oro_api.processor_bag
             - get
+        tags:
+            - { name: oro.api.action_processor }
+
 
     #
     # initialize
     #
+    oro_api.get.normalize_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
 
     oro_api.get.normalize_include_header:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader

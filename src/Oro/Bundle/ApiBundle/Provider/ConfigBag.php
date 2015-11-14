@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Bundle\ApiBundle\Request\Version;
+
 class ConfigBag
 {
     /** @var array */
@@ -18,13 +20,16 @@ class ConfigBag
     /**
      * Gets a config for the given class version
      *
-     * @param string      $className The FQCN of an entity
-     * @param string|null $version   The version of a config. NULL to get the latest version of config
+     * @param string $className The FQCN of an entity
+     * @param string $version   The version of a config
      *
      * @return array|null
      */
-    public function getConfig($className, $version = null)
+    public function getConfig($className, $version)
     {
+        if ($version === Version::LATEST) {
+            $version = null;
+        }
         if ($version && isset($this->entityConfig[$className][$version])) {
             return $this->entityConfig[$className][$version];
         }

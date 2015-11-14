@@ -130,3 +130,20 @@ services:
             - @oro_api.value_normalizer
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    oro.api.filter_factory:
+        class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory
+        public: false
+
+    oro.api.filter_factory.default:
+        class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
+        public: false
+        calls:
+            - [addFilter, [ 'integer', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'unsignedInteger', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'string', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'boolean', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'entityAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'entityPluralAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+        tags:
+            - { name: oro.api.filter_factory, priority: -10 }

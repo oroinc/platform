@@ -1,14 +1,19 @@
 services:
     oro_api.build_config.processor:
-        class: Oro\Bundle\ApiBundle\Processor\BuildConfigProcessor
+        class: Oro\Bundle\ApiBundle\Processor\ConfigProcessor
         public: false
         arguments:
             - @oro_api.processor_bag
             - build_config
 
-    oro_api.get_config.metadata:
+    oro_api.build_config.definition:
         class: Oro\Bundle\ApiBundle\Processor\BuildConfig\BuildDefinition
         arguments:
             - @oro_api.doctrine_helper
         tags:
             - { name: oro.api.processor, action: build_config, priority: -10 }
+
+    oro_api.build_config.filters:
+        class: Oro\Bundle\ApiBundle\Processor\BuildConfig\BuildFilters
+        tags:
+            - { name: oro.api.processor, action: build_config, requestAction: get_list, priority: -10 }

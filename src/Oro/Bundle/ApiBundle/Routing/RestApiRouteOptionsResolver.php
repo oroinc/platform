@@ -8,9 +8,9 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
@@ -27,7 +27,7 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
     const FORMAT_ATTRIBUTE    = '_format';
     const VERSION_ATTRIBUTE   = 'version';
     const VERSION_REQUIREMENT = 'latest|v\d+(\.\d+)*';
-    const DEFAULT_VERSION     = ApiContext::LATEST_VERSION;
+    const DEFAULT_VERSION     = Version::LATEST;
 
     /** @var EntityManagerBag */
     protected $entityManagerBag;

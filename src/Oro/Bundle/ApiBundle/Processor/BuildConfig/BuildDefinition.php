@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\BuildConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class BuildDefinition implements ProcessorInterface
@@ -24,7 +25,7 @@ class BuildDefinition implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var BuildConfigContext $context */
+        /** @var ConfigContext $context */
 
         if ($context->hasResult()) {
             // a definition is already built

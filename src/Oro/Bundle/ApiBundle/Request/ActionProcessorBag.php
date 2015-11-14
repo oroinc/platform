@@ -10,14 +10,13 @@ class ActionProcessorBag
     protected $processors = [];
 
     /**
-     * Registers a processor for the given action type.
+     * Registers a processor in the bag.
      *
-     * @param string          $action
      * @param ActionProcessor $processor
      */
-    public function addProcessor($action, ActionProcessor $processor)
+    public function addProcessor(ActionProcessor $processor)
     {
-        $this->processors[$action] = $processor;
+        $this->processors[] = $processor;
     }
 
     /**
@@ -29,10 +28,12 @@ class ActionProcessorBag
      */
     public function getProcessor($action)
     {
-        if (!isset($this->processors[$action])) {
-            throw new \RuntimeException(sprintf('The action "%s" is not defined.', $action));
+        foreach ($this->processors as $processor) {
+            if ($processor->getAction() === $action) {
+                return $processor;
+            }
         }
 
-        return $this->processors[$action];
+        throw new \RuntimeException(sprintf('A processor for "%s" action was not found.', $action));
     }
 }

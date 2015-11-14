@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
-use Oro\Component\Config\CumulativeResourceInfo;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
+use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroApiExtension extends Extension
 {
@@ -19,6 +20,7 @@ class OroApiExtension extends Extension
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('filters.yml');
         $loader->load('processors.normalize_value.yml');
         $loader->load('processors.get_config.yml');
         $loader->load('processors.build_config.yml');
@@ -26,7 +28,7 @@ class OroApiExtension extends Extension
         $loader->load('processors.get.yml');
 
         $configLoader = new CumulativeConfigLoader(
-            'oro_entity',
+            'oro_api',
             new YamlCumulativeFileLoader('Resources/config/oro/api.yml')
         );
         $resources    = $configLoader->load($container);

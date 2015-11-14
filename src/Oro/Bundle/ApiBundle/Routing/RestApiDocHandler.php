@@ -205,7 +205,8 @@ class RestApiDocHandler implements HandlerInterface
     {
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
-        $context = $processor->createContext($action);
+        $context = $processor->createContext();
+        $context->setRequestType(RequestType::REST);
         $context->setLastGroup('initialize');
         if ($entityClass) {
             $context->setClassName($entityClass);

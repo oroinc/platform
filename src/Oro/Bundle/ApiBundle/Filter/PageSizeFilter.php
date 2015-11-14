@@ -21,4 +21,12 @@ class PageSizeFilter extends StandaloneFilter
             $criteria->setMaxResults($val);
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createExpression(FilterValue $value = null)
+    {
+        return null;
+    }
 }
