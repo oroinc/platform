@@ -15,7 +15,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
-use Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType;
+use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
@@ -152,10 +152,11 @@ class EmailTypeTest extends TypeTestCase
         $mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $securityTokenStorage =
+            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $contextsSelectType = new ContextsSelectType($em, $configManager, $translator, $mapper, $securityFacade);
+        $contextsSelectType = new ContextsSelectType($em, $configManager, $translator, $mapper, $securityTokenStorage);
 
         return [
             new PreloadedExtension(

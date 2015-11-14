@@ -14,6 +14,7 @@ oro_entity_config:
                             required:       false
                             label:          oro.activity.activities
                             association_class: activity
+                            tooltip:        oro.activity.entity_config.activity.entity.items.activities.tooltip
 
                 # this attribute can be used to prohibit changing activity state (no matter whether
                 # it is enabled or not) for the entity

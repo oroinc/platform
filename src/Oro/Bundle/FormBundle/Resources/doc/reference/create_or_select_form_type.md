@@ -3,13 +3,16 @@ Entity Create or Select Form Type
 
 ### Overview
 
-Entity create or select form type provides functionality to create new entity or select existing one.
+Entity create or select form type provides functionality to create new entity or select existing one or edit existing one.
 
-Form type has 3 modes - create (default), grid and select.
+Form type has 4 modes - create (default), edit, grid and select.
 
 **Create mode** shows entity form and allows user to enter all required data to create new entity. This form
 includes frontend and backend validation. In this mode user can click button "Select Existing"
 that will redirect user to grid mode.
+
+**Edit mode** shows forms for both create and view mode, allowing user to edit the entity using form for create mode.
+This mode is currently supported by 'oro_entity_create_or_select_choice' type only
 
 **Grid mode** shows grid with existing entities and allows user select any of it by clicking on appropriate row.
 This mode has two button - "Cancel" that returns user back to previous mode (create or view), and "Create new"
@@ -28,8 +31,10 @@ null (grid mode).
 Entity create or select form type allows user to configure rendering information in each mode. Existing options are:
 
 * **class** (required) - fully-qualified class name used both in create and view mode to return instance of this class;
-* **create_entity_form_type** (required) - form type used to create new form in create mode,
+* **create_entity_form_type** (required) - form type used to create new form in create mode or edit existing record in edit mode,
 it's usually name of existing already configured form type for specific entity;
+In case you pass data-default-value attribute in fields of this type, these will be default values after transition
+from edit to create mode
 * **create_entity_form_options** - additional options for create entity form type;
 * **grid_name** (required) - name of grid used to render list of existing entities in grid mode, grid must contain
 entity identifier and data required to render widgets in view mode;
