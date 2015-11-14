@@ -535,6 +535,22 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
         return $fieldHelper;
     }
 
+    public function testHeadersCache()
+    {
+        $fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fieldHelper->expects($this->once())->method('getFields')->willReturn([]);
+
+        $relationCalculator = $this->prepareRelationCalculator();
+        $converter = new ConfigurableTableDataConverter($fieldHelper, $relationCalculator);
+
+        $converter->setEntityName('ScalarEntity');
+        $converter->convertToImportFormat(['ID' => '42']);
+        $converter->convertToImportFormat(['ID' => '42']);
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */

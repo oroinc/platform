@@ -37,6 +37,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      */
     protected $collectionDelimiter = '(\d+)';
 
+    /** @var string[]|array[] */
+    protected $headers = [];
+
     /**
      * @param FieldHelper $fieldHelper
      * @param RelationCalculatorInterface $relationCalculator
@@ -73,6 +76,18 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     public function setEntityName($entityName)
     {
         $this->entityName = $entityName;
+    }
+
+    /** {@inheritdoc} */
+    protected function convertHeader(array $header, $direction)
+    {
+        if (!array_key_exists($this->entityName, $this->headers)
+            || !array_key_exists($direction, $this->headers[$this->entityName])
+        ) {
+            $this->headers[$this->entityName][$direction] = parent::convertHeader($header, $direction);
+        }
+
+        return $this->headers[$this->entityName][$direction];
     }
 
     /**
