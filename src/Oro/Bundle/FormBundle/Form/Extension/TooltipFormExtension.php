@@ -8,7 +8,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class TooltipFormExtension extends AbstractTypeExtension
@@ -28,26 +27,20 @@ class TooltipFormExtension extends AbstractTypeExtension
         'tooltip_parameters'
     );
 
-    /** @var EntityFieldProvider */
-    protected $entityFieldProvider;
-
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /** @var TranslatorInterface */
+    /** @var Translator */
     protected $translator;
 
     /**
-     * @param EntityFieldProvider $entityFieldProvider
      * @param ConfigProvider $entityConfigProvider
      * @param Translator $translator
      */
     public function __construct(
-        EntityFieldProvider $entityFieldProvider,
         ConfigProvider $entityConfigProvider,
         Translator $translator
     ) {
-        $this->entityFieldProvider = $entityFieldProvider;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->translator = $translator;
     }
@@ -82,7 +75,7 @@ class TooltipFormExtension extends AbstractTypeExtension
      * @param FormInterface $field
      * @param FormView $view
      */
-    public function updateTooltip(FormInterface $field, FormView $view)
+    protected function updateTooltip(FormInterface $field, FormView $view)
     {
         $parentOptions = $field->getParent()->getConfig()->getOptions();
         $parentClassName = isset($parentOptions['data_class']) ? $parentOptions['data_class'] : null;

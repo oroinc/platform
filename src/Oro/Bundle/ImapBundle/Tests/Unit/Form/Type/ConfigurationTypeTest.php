@@ -28,9 +28,6 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     protected $translator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $fieldProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
     protected function setUp()
@@ -63,10 +60,6 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->fieldProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->configProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->setMethods(['hasConfig', 'getConfig', 'get'])
@@ -78,7 +71,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     protected function getExtensions()
     {
-        $tooltipExtension = new TooltipFormExtension($this->fieldProvider, $this->configProvider, $this->translator);
+        $tooltipExtension = new TooltipFormExtension($this->configProvider, $this->translator);
 
         return array_merge(
             parent::getExtensions(),
