@@ -12,6 +12,12 @@ class NormalizeValueContext extends ApiContext
     /** a regular expression that can be used to validate a value */
     const REQUIREMENT = 'requirement';
 
+    /** determines if a value can be an array */
+    const ARRAY_ALLOWED = 'arrayAllowed';
+
+    /** a delimiter that should be used to split a string to separate items */
+    const ARRAY_DELIMITER = 'arrayDelimiter';
+
     /**
      * Gets data-type of a value.
      *
@@ -68,5 +74,45 @@ class NormalizeValueContext extends ApiContext
     public function removeRequirement()
     {
         $this->remove(self::REQUIREMENT);
+    }
+
+    /**
+     * Gets a flag determines if a value can be an array.
+     *
+     * @return bool|null
+     */
+    public function isArrayAllowed()
+    {
+        return $this->get(self::ARRAY_ALLOWED);
+    }
+
+    /**
+     * Sets a flag determines if a value can be an array.
+     *
+     * @param bool|null $flag
+     */
+    public function setArrayAllowed($flag)
+    {
+        $this->set(self::ARRAY_ALLOWED, $flag);
+    }
+
+    /**
+     * Gets a delimiter that should be used to split a string to separate items.
+     *
+     * @return string|null
+     */
+    public function getArrayDelimiter()
+    {
+        return $this->get(self::ARRAY_DELIMITER);
+    }
+
+    /**
+     * Sets a delimiter that should be used to split a string to separate items.
+     *
+     * @param string|null $delimiter
+     */
+    public function setArrayDelimiter($delimiter)
+    {
+        $this->set(self::ARRAY_DELIMITER, $delimiter);
     }
 }

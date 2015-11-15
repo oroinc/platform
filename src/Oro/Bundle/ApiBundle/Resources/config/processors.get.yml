@@ -30,12 +30,12 @@ services:
             - { name: oro.api.processor, action: get, group: initialize, priority: 20 }
 
     oro_api.get.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeEntityId
         arguments:
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: get, group: initialize, requestType: rest, priority: 10 }
 
     #
     # security_check
@@ -53,18 +53,6 @@ services:
     #
     # build_query
     #
-
-    oro_api.get.build_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria
-        arguments:
-            - @oro_api.value_normalizer
-        tags:
-            - { name: oro.api.processor, action: get, group: build_query, priority: 70 }
-
-    oro_api.get.normalize_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeCriteria
-        tags:
-            - { name: oro.api.processor, action: get, group: build_query, priority: 60 }
 
     oro_api.get.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl

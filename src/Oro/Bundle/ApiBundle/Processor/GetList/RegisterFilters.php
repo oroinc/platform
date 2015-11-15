@@ -88,6 +88,9 @@ class RegisterFilters implements ProcessorInterface
                 $filter->setField($field);
             }
             if ($filter instanceof StandaloneFilter) {
+                if (isset($fieldConfig['allow_array'])) {
+                    $filter->setArrayAllowed($fieldConfig['allow_array']);
+                }
                 if (isset($fieldConfig['description'])) {
                     $filter->setDescription($fieldConfig['description']);
                 }

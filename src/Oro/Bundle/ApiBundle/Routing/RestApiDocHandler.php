@@ -8,10 +8,11 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
@@ -111,7 +112,9 @@ class RestApiDocHandler implements HandlerInterface
             }
         }
 
-        $this->addFilters($annotation, $action, $entityClass);
+        if ($action === 'get_list') {
+            $this->addFilters($annotation, $action, $entityClass);
+        }
     }
 
     /**
@@ -204,7 +207,7 @@ class RestApiDocHandler implements HandlerInterface
     protected function addFilters(ApiDoc $annotation, $action, $entityClass)
     {
         $processor = $this->processorBag->getProcessor($action);
-        /** @var Context $context */
+        /** @var GetListContext $context */
         $context = $processor->createContext();
         $context->setRequestType(RequestType::REST);
         $context->setLastGroup('initialize');
@@ -220,7 +223,8 @@ class RestApiDocHandler implements HandlerInterface
                     'description' => $filter->getDescription(),
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
-                        RequestType::REST
+                        RequestType::REST,
+                        $filter->isArrayAllowed() ? RestRequest::ARRAY_DELIMITER : null
                     )
                 ];
                 $default = $filter->getDefaultValueString();

@@ -2,45 +2,54 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
+use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
 
-class NormalizeBoolean implements ProcessorInterface
+class NormalizeBoolean extends AbstractProcessor
 {
     const REQUIREMENT = '0|1|true|false|yes|no';
 
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    protected function getDataTypeString()
     {
-        /** @var NormalizeValueContext $context */
+        return 'boolean';
+    }
 
-        if (!$context->hasRequirement()) {
-            $context->setRequirement(self::REQUIREMENT);
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDataTypePluralString()
+    {
+        return 'booleans';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequirement()
+    {
+        return self::REQUIREMENT;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function normalizeValue($value)
+    {
+        switch ($value) {
+            case '1':
+            case 'true':
+            case 'yes':
+                return true;
+            case '0':
+            case 'false':
+            case 'no':
+                return false;
         }
-        if ($context->hasResult()) {
-            $value = $context->getResult();
-            if (null !== $value && is_string($value)) {
-                switch ($value) {
-                    case '1':
-                    case 'true':
-                    case 'yes':
-                        $normalizedValue = true;
-                        break;
-                    case '0':
-                    case 'false':
-                    case 'no':
-                        $normalizedValue = false;
-                        break;
-                    default:
-                        throw new \RuntimeException(
-                            sprintf('Expected boolean value. Given "%s".', $value)
-                        );
-                }
-                $context->setResult($normalizedValue);
-            }
-        }
+
+        throw new \UnexpectedValueException(
+            sprintf('Expected %s value. Given "%s".', $this->getDataTypeString(), $value)
+        );
     }
 }

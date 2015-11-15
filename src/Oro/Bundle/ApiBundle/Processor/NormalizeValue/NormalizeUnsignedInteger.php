@@ -2,34 +2,46 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-
-class NormalizeUnsignedInteger implements ProcessorInterface
+class NormalizeUnsignedInteger extends AbstractProcessor
 {
     const REQUIREMENT = '\d+';
 
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    protected function getDataTypeString()
     {
-        /** @var NormalizeValueContext $context */
+        return 'unsigned integer';
+    }
 
-        if (!$context->hasRequirement()) {
-            $context->setRequirement(self::REQUIREMENT);
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDataTypePluralString()
+    {
+        return 'unsigned integers';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequirement()
+    {
+        return self::REQUIREMENT;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function normalizeValue($value)
+    {
+        $normalizedValue = (int)$value;
+        if (((string)$normalizedValue) !== $value || $normalizedValue < 0) {
+            throw new \UnexpectedValueException(
+                sprintf('Expected %s value. Given "%s".', $this->getDataTypeString(), $value)
+            );
         }
-        if ($context->hasResult()) {
-            $value = $context->getResult();
-            if (null !== $value && is_string($value)) {
-                $normalizedValue = (int)$value;
-                if (((string)$normalizedValue) !== $value || $normalizedValue < 0) {
-                    throw new \RuntimeException(
-                        sprintf('Expected unsigned integer value. Given "%s".', $value)
-                    );
-                }
-                $context->setResult($normalizedValue);
-            }
-        }
+
+        return $normalizedValue;
     }
 }

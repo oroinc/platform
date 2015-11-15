@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Route;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -211,7 +212,7 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
             }
             $route->setRequirement(
                 self::ID_ATTRIBUTE,
-                implode(',', $requirements)
+                implode(RestRequest::ARRAY_DELIMITER, $requirements)
             );
         }
     }

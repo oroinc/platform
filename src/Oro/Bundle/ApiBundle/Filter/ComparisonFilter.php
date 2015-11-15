@@ -40,6 +40,16 @@ class ComparisonFilter extends StandaloneFilter
     /**
      * {@inheritdoc}
      */
+    public function isArrayAllowed($operator = null)
+    {
+        return
+            parent::isArrayAllowed($operator)
+            && in_array(null !== $operator ? $operator : self::EQ, [self::EQ, self::NEQ], true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function apply(Criteria $criteria, FilterValue $value = null)
     {
         $expr = $this->createExpression($value);

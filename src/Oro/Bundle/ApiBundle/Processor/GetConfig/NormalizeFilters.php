@@ -136,7 +136,8 @@ class NormalizeFilters implements ProcessorInterface
                 $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
                 if (count($targetIdFieldNames) === 1) {
                     $filters[$fieldName] = [
-                        'data_type' => $targetMetadata->getTypeOfField(reset($targetIdFieldNames))
+                        'data_type'   => $targetMetadata->getTypeOfField(reset($targetIdFieldNames)),
+                        'allow_array' => true
                     ];
                 }
             }

@@ -34,6 +34,6 @@ class ActionProcessorBag
             }
         }
 
-        throw new \RuntimeException(sprintf('A processor for "%s" action was not found.', $action));
+        throw new \InvalidArgumentException(sprintf('A processor for "%s" action was not found.', $action));
     }
 }

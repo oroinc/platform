@@ -1,10 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared;
+namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\Context;
 
 class NormalizeCriteria implements ProcessorInterface
 {
@@ -15,7 +14,7 @@ class NormalizeCriteria implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var Context $context */
+        /** @var GetListContext $context */
 
         if ($context->hasQuery()) {
             // a query is already built

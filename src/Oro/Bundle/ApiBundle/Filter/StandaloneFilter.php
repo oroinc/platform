@@ -10,6 +10,9 @@ abstract class StandaloneFilter implements FilterInterface
     /** @var string */
     protected $dataType;
 
+    /** @var bool */
+    protected $arrayAllowed = false;
+
     /** @var string */
     protected $description;
 
@@ -55,6 +58,28 @@ abstract class StandaloneFilter implements FilterInterface
     public function setDataType($dataType)
     {
         $this->dataType = $dataType;
+    }
+
+    /**
+     * Gets a flag determines if a value can be an array.
+     *
+     * @param string|null $operator
+     *
+     * @return bool
+     */
+    public function isArrayAllowed($operator = null)
+    {
+        return $this->arrayAllowed;
+    }
+
+    /**
+     * Sets a flag determines if a value can be an array.
+     *
+     * @param bool $arrayAllowed
+     */
+    public function setArrayAllowed($arrayAllowed)
+    {
+        $this->arrayAllowed = $arrayAllowed;
     }
 
     /**

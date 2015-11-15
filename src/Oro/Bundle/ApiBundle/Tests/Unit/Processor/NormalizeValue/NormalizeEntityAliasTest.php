@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\NormalizeValue;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityAlias;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
 
 class NormalizeEntityAliasTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,8 +35,33 @@ class NormalizeEntityAliasTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals('[a-zA-Z]\w+', $context->getRequirement());
+        $this->assertEquals(NormalizeEntityAlias::REQUIREMENT, $context->getRequirement());
         $this->assertEquals('Test\Class', $context->getResult());
+    }
+
+    public function testProcessForArray()
+    {
+        $context = new NormalizeValueContext();
+        $context->setArrayAllowed(true);
+        $context->setArrayDelimiter(RestRequest::ARRAY_DELIMITER);
+        $context->setResult('alias1,alias2');
+
+        $this->entityAliasResolver->expects($this->exactly(2))
+            ->method('getClassByAlias')
+            ->willReturnMap(
+                [
+                    ['alias1', 'Test\Class1'],
+                    ['alias2', 'Test\Class2'],
+                ]
+            );
+
+        $this->processor->process($context);
+
+        $this->assertEquals(
+            $this->getArrayRequirement(NormalizeEntityAlias::REQUIREMENT),
+            $context->getRequirement()
+        );
+        $this->assertEquals(['Test\Class1', 'Test\Class2'], $context->getResult());
     }
 
     public function testProcessForAlreadyNormalizedAlias()
@@ -68,5 +94,10 @@ class NormalizeEntityAliasTest extends \PHPUnit_Framework_TestCase
         $this->processor->process($context);
 
         $this->assertEquals('test', $context->getRequirement());
+    }
+
+    protected function getArrayRequirement($requirement)
+    {
+        return sprintf('%1$s(%2$s%1$s)*', $requirement, RestRequest::ARRAY_DELIMITER);
     }
 }
