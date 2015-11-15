@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\WorkflowBundle\Model\Attribute;
@@ -134,7 +134,7 @@ class WorkflowAttributesType extends AbstractType
      *
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(array('attribute_fields'));
 

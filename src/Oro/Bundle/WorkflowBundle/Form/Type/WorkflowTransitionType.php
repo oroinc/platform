@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
@@ -35,7 +35,7 @@ class WorkflowTransitionType extends AbstractType
      *
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(array('workflow_item', 'transition_name'));
 

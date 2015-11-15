@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -40,7 +41,7 @@ class OroJquerySelect2HiddenType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $defaultConfig = array(
             'placeholder'        => 'oro.form.choose_value',
