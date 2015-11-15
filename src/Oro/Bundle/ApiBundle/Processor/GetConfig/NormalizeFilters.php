@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ConfigContext;
@@ -43,7 +45,7 @@ class NormalizeFilters implements ProcessorInterface
             $entityClass = $context->getClassName();
             if ($entityClass && $this->doctrineHelper->isManageableEntity($entityClass)) {
                 $fields = $this->removeExclusions(
-                    $this->completeFields($fields, $entityClass)
+                    $this->completeFilters($fields, $entityClass)
                 );
             }
         }
@@ -57,38 +59,103 @@ class NormalizeFilters implements ProcessorInterface
     }
 
     /**
-     * @param array  $fields
+     * @param array  $filters
      * @param string $entityClass
      *
      * @return array
      */
-    protected function completeFields(array $fields, $entityClass)
+    protected function completeFilters(array $filters, $entityClass)
     {
         $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
 
-        $fieldNames = $metadata->getFieldNames();
+        $filters = $this->getFieldFilters($filters, $metadata);
+        $filters = $this->getAssociationFilters($filters, $metadata);
+
+        return $filters;
+    }
+
+    /**
+     * @param array         $filters
+     * @param ClassMetadata $metadata
+     *
+     * @return array
+     */
+    protected function getFieldFilters(array $filters, ClassMetadata $metadata)
+    {
+        $indexedColumns = [];
+        if (isset($metadata->table['indexes'])) {
+            foreach ($metadata->table['indexes'] as $index) {
+                $indexedColumns[reset($index['columns'])] = true;
+            }
+        }
+        $fieldNames = array_diff($metadata->getFieldNames(), $metadata->getIdentifierFieldNames());
         foreach ($fieldNames as $fieldName) {
-            if (!isset($fields[$fieldName])) {
-                $fields[$fieldName] = [
-                    'data_type' => $metadata->getTypeOfField($fieldName)
+            if (isset($filters[$fieldName])) {
+                // already defined
+                continue;
+            }
+
+            $mapping  = $metadata->getFieldMapping($fieldName);
+            $hasIndex = false;
+            if (isset($mapping['unique']) && true === $mapping['unique']) {
+                $hasIndex = true;
+            } elseif (isset($indexedColumns[$mapping['columnName']])) {
+                $hasIndex = true;
+            }
+            if ($hasIndex) {
+                $filters[$fieldName] = [
+                    'data_type' => $mapping['type']
                 ];
             }
         }
 
-        return $fields;
+        return $filters;
     }
 
     /**
-     * @param array $fields
+     * @param array         $filters
+     * @param ClassMetadata $metadata
      *
      * @return array
      */
-    protected function removeExclusions(array $fields)
+    protected function getAssociationFilters(array $filters, ClassMetadata $metadata)
+    {
+        $fieldNames = $metadata->getAssociationNames();
+        foreach ($fieldNames as $fieldName) {
+            if (isset($filters[$fieldName])) {
+                // already defined
+                continue;
+            }
+            $mapping  = $metadata->getAssociationMapping($fieldName);
+            $hasIndex = false;
+            if ($mapping['type'] & ClassMetadata::TO_ONE) {
+                $hasIndex = true;
+            }
+            if ($hasIndex) {
+                $targetMetadata     = $this->doctrineHelper->getEntityMetadata($mapping['targetEntity']);
+                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+                if (count($targetIdFieldNames) === 1) {
+                    $filters[$fieldName] = [
+                        'data_type' => $targetMetadata->getTypeOfField(reset($targetIdFieldNames))
+                    ];
+                }
+            }
+        }
+
+        return $filters;
+    }
+
+    /**
+     * @param array $filters
+     *
+     * @return array
+     */
+    protected function removeExclusions(array $filters)
     {
         return array_filter(
-            $fields,
-            function (array $fieldConfig) {
-                return !isset($fieldConfig['exclude']) || !$fieldConfig['exclude'];
+            $filters,
+            function (array $config) {
+                return !isset($config['exclude']) || !$config['exclude'];
             }
         );
     }

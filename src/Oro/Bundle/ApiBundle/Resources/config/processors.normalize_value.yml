@@ -43,6 +43,11 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, requestType: rest, dataType: boolean, priority: -10 }
 
+    oro_api.normalize_value.rest.datetime:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDateTime
+        tags:
+            - { name: oro.api.processor, action: normalize_value, requestType: rest, dataType: datetime, priority: -10 }
+
     oro_api.normalize_value.rest.order_by:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeOrderBy
         tags:

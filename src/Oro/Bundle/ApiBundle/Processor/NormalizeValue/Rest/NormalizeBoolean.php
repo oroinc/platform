@@ -8,6 +8,8 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 
 class NormalizeBoolean implements ProcessorInterface
 {
+    const REQUIREMENT = '0|1|true|false|yes|no';
+
     /**
      * {@inheritdoc}
      */
@@ -16,7 +18,7 @@ class NormalizeBoolean implements ProcessorInterface
         /** @var NormalizeValueContext $context */
 
         if (!$context->hasRequirement()) {
-            $context->setRequirement('0|1|true|false|yes|no');
+            $context->setRequirement(self::REQUIREMENT);
         }
         if ($context->hasResult()) {
             $value = $context->getResult();

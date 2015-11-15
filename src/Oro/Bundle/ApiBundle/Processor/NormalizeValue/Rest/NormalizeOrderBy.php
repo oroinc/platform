@@ -15,6 +15,8 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
  */
 class NormalizeOrderBy implements ProcessorInterface
 {
+    const REQUIREMENT = '-?[\w\.]+(,-?[\w\.]+)*';
+
     /**
      * {@inheritdoc}
      */
@@ -23,7 +25,7 @@ class NormalizeOrderBy implements ProcessorInterface
         /** @var NormalizeValueContext $context */
 
         if (!$context->hasRequirement()) {
-            $context->setRequirement('-?[\w\.]+(,-?[\w\.]+)*');
+            $context->setRequirement(self::REQUIREMENT);
         }
         if ($context->hasResult()) {
             $value = $context->getResult();

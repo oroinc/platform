@@ -21,13 +21,14 @@ class NormalizeFilterKeys implements ProcessorInterface
 
         $filters = $filterCollection->all();
         foreach ($filters as $filterKey => $filter) {
-            if (false === strpos($filterKey, '[')) {
-                $filterCollection->remove($filterKey);
-                $filterCollection->add(
-                    sprintf(self::FILTER_KEY_TEMPLATE, $filterKey),
-                    $filter
-                );
+            if ('sort' === $filterKey || 0 === strpos($filterKey, 'page[')) {
+                continue;
             }
+            $filterCollection->remove($filterKey);
+            $filterCollection->add(
+                sprintf(self::FILTER_KEY_TEMPLATE, $filterKey),
+                $filter
+            );
         }
     }
 }

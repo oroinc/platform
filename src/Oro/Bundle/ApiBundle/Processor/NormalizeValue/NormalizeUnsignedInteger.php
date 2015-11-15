@@ -7,6 +7,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class NormalizeUnsignedInteger implements ProcessorInterface
 {
+    const REQUIREMENT = '\d+';
+
     /**
      * {@inheritdoc}
      */
@@ -15,7 +17,7 @@ class NormalizeUnsignedInteger implements ProcessorInterface
         /** @var NormalizeValueContext $context */
 
         if (!$context->hasRequirement()) {
-            $context->setRequirement('\d+');
+            $context->setRequirement(self::REQUIREMENT);
         }
         if ($context->hasResult()) {
             $value = $context->getResult();

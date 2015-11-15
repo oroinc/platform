@@ -143,6 +143,7 @@ services:
             - [addFilter, [ 'unsignedInteger', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
             - [addFilter, [ 'string', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
             - [addFilter, [ 'boolean', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'datetime', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
             - [addFilter, [ 'entityAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
             - [addFilter, [ 'entityPluralAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
         tags:

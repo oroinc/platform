@@ -26,6 +26,8 @@ class ApiDocDataTypeConverter
                 return ApiDocDataType::INTEGER;
             case DataType::BOOLEAN:
                 return ApiDocDataType::BOOLEAN;
+            case DataType::DATETIME:
+                return ApiDocDataType::DATETIME;
         }
 
         return ApiDocDataType::STRING;

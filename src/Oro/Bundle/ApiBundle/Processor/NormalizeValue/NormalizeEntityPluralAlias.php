@@ -8,6 +8,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class NormalizeEntityPluralAlias implements ProcessorInterface
 {
+    const REQUIREMENT = '[a-zA-Z]\w+';
+
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
@@ -27,7 +29,7 @@ class NormalizeEntityPluralAlias implements ProcessorInterface
         /** @var NormalizeValueContext $context */
 
         if (!$context->hasRequirement()) {
-            $context->setRequirement('[a-zA-Z]\w+');
+            $context->setRequirement(self::REQUIREMENT);
         }
         if ($context->hasResult()) {
             $value = $context->getResult();
