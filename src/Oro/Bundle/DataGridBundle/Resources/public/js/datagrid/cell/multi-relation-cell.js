@@ -47,8 +47,8 @@ define([
                 try {
                     value = JSON.parse(value);
                 } catch (e) {
-                    this.$el.html('');
-                    return;
+                    this.$el.html('Unexpected format');
+                    return this;
                 }
             }
             if (value === null || value === void 0) {
@@ -58,13 +58,19 @@ define([
                     data: []
                 };
             }
-            this.$el.html(value.count > 0 ? (
-                '<span class="multiselect-value-wrapper"><span class="value-item">' +
-                value.data
-                    .map(function(item) {return item.label;})
-                    .join('</span><span class="value-item">') +
-                '</span></span>'
-            ) : '');
+
+            try {
+                this.$el.html(value.count > 0 ? (
+                    '<span class="multiselect-value-wrapper"><span class="value-item">' +
+                    value.data
+                        .map(function(item) {return item.label;})
+                        .join('</span><span class="value-item">') +
+                    '</span></span>'
+                ) : '');
+            } catch (e) {
+                this.$el.html('Unexpected format');
+            }
+
             return this;
         }
     });

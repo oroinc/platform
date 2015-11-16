@@ -63,6 +63,7 @@ define([
             } catch (e) {
                 this.$el.html('Unexpected format');
             }
+
             return this;
         }
     });
