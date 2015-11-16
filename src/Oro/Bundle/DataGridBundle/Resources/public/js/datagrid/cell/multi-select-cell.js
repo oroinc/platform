@@ -47,11 +47,16 @@ define([
                 }
             }
 
+            if (value === null || value === void 0) {
+                // assume empty
+                value = [];
+            }
+
             this.$el.html(value.length > 0 ? (
-                '<span class="multiselect-value-wrapper"><span class="multiselect-value">' +
+                '<span class="multiselect-value-wrapper"><span class="value-item">' +
                 value
                     .map(function(item) {return choices[item];})
-                    .join('</span><span class="multiselect-value">') +
+                    .join('</span><span class="value-item">') +
                 '</span></span>'
             ) : '');
             return this;

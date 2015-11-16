@@ -51,11 +51,18 @@ define([
                     return;
                 }
             }
+            if (value === null || value === void 0) {
+                // assume empty
+                value = {
+                    count: 0,
+                    data: []
+                };
+            }
             this.$el.html(value.count > 0 ? (
-                '<span class="multiselect-value-wrapper"><span class="multiselect-value">' +
+                '<span class="multiselect-value-wrapper"><span class="value-item">' +
                 value.data
                     .map(function(item) {return item.label;})
-                    .join('</span><span class="multiselect-value">') +
+                    .join('</span><span class="value-item">') +
                 '</span></span>'
             ) : '');
             return this;

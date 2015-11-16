@@ -15,6 +15,7 @@ define(function(require) {
     var select2autosizer = require('../../../utils/select2-autosizer');
 
     MultiselectEditorView = RelatedIdRelationEditorView.extend(/** @exports MultiselectEditorView.prototype */{
+        className: 'multi-relation-editor',
         initialize: function(options) {
             options.ignore_value_field_name = true;
             MultiselectEditorView.__super__.initialize.apply(this, arguments);
@@ -33,7 +34,7 @@ define(function(require) {
         },
 
         autoSize: function() {
-            select2autosizer.applyTo(this.$el);
+            select2autosizer.applyTo(this.$el, this);
         },
 
         getInitialResultItem: function() {
@@ -70,6 +71,13 @@ define(function(require) {
             var value = this.model.get(this.column.get('name'));
             if (_.isString(value)) {
                 value = JSON.parse(value);
+            }
+            if (value === null || value === void 0) {
+                // assume empty
+                value = {
+                    count: 0,
+                    data: []
+                };
             }
             return value;
         },

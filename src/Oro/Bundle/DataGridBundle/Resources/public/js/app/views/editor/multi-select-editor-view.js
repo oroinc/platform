@@ -14,6 +14,7 @@ define(function(require) {
     var select2autosizer = require('../../../utils/select2-autosizer');
 
     MultiSelectEditorView = SelectEditorView.extend(/** @exports MultiSelectEditorView.prototype */{
+        className: 'multi-select-editor',
         initialize: function(options) {
             options.ignore_value_field_name = true;
             MultiSelectEditorView.__super__.initialize.apply(this, arguments);
@@ -28,7 +29,7 @@ define(function(require) {
         },
 
         autoSize: function() {
-            select2autosizer.applyTo(this.$el);
+            select2autosizer.applyTo(this.$el, this);
         },
 
         getSelect2Options: function() {
@@ -47,6 +48,7 @@ define(function(require) {
                 value = JSON.parse(value);
             }
             if (_.isNull(value) || value === void 0) {
+                // assume empty
                 return [];
             }
             return value;

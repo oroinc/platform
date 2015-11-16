@@ -140,11 +140,12 @@
       width: calc(~"100% - 61px")
     }
   }
-  &.multiselect-frontend-type-editor{
+  &.multi-select-editor, &.multi-relation-editor{
     width: auto !important; // ignore cell width
     min-width: 0; // ignore min-width
     .select2-container {
       height: auto;
+      width: auto !important;
     }
     .select2-choices {
       max-height: 40vh;
