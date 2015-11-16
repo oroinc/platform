@@ -26,15 +26,6 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
-
     /** @var array */
     protected $config;
 
@@ -62,15 +53,6 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $this->securityProvider->expects($this->any())
             ->method('isProtectedEntity')
             ->will($this->returnValue(true));
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $searchAclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
             ->disableOriginalConstructor()
@@ -91,9 +73,6 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             $this->engine,
             $this->mapper,
             $this->securityProvider,
-            $this->configManager,
-            $this->entityProvider,
-            $this->translator,
             $searchAclHelper,
             $eventDispatcher
         );

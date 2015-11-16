@@ -24,7 +24,7 @@ class EmailActivityEntityController extends RestGetController
      *
      * @param int $id The id of the email entity.
      *
-     * @Get("/activities/emails/{id}/relations", name="")
+     * @Get("/activities/emails/{id}/relations")
      *
      * @QueryParam(
      *      name="page",

@@ -19,6 +19,7 @@ parameters:
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
     oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
+    oro_ui.user_agent_provider.class:                      Oro\Bundle\UIBundle\Provider\UserAgentProvider
 
     ## Formatters
     oro_ui.formatter.class:                                Oro\Bundle\UIBundle\Formatter\FormatterManager
@@ -113,6 +114,11 @@ services:
         arguments:
             - @oro_form.provider.html_tag_provider
             - %kernel.cache_dir%
+
+    oro_ui.user_agent_provider:
+        class: %oro_ui.user_agent_provider.class%
+        arguments:
+            - @service_container
 
     ## Formatters
     oro_ui.formatter:

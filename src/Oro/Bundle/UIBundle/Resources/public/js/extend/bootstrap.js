@@ -64,7 +64,7 @@ define([
     };
 
     /**
-     * This customization allows to define own render function for Typeahead
+     * This customization allows to define own click, render, show functions for Typeahead
      */
     var Typeahead;
     var origTypeahead = $.fn.typeahead.Constructor;
@@ -74,6 +74,7 @@ define([
         var opts = $.extend({}, $.fn.typeahead.defaults, options);
         this.click = opts.click || this.click;
         this.render = opts.render || this.render;
+        this.show = opts.show || this.show;
         origTypeahead.apply(this, arguments);
     };
 
@@ -116,6 +117,11 @@ define([
                         $(this).popover(action);
                     }
                 });
+            }
+            // clear timeout if it exists
+            if (this.timeout) {
+                clearTimeout(this.timeout);
+                delete this.timeout;
             }
             return method.apply(this, arguments);
         };

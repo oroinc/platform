@@ -25,9 +25,6 @@ oro:
         to: To
         attachment:
             added: Attachment added
-        contexts:
-            added:   The context has been added
-            removed: The context has been removed
         send_email: Send email
         menu.shortcut_compose_email.label: Compose email
         action:

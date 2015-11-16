@@ -20,7 +20,6 @@ parameters:
     oro_email.form.type.email_address.api.class:          Oro\Bundle\EmailBundle\Form\Type\EmailAddressApiType
     oro_email.form.type.attachment.class:                 Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType
     oro_email.form.type.attachments.class:                Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType
-    oro_email.form.type.contexts_select.class:            Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType
     oro_email.form.type.email_link_to_scope.class:        Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
     oro_email.form.type.mailbox_grid.class:               Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
     oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
@@ -69,6 +68,7 @@ services:
         class: %oro_email.form.type.autoresponse_template_choice.class%
         arguments:
             - @oro_security.security_facade
+            - @translator
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template_choice }
 
@@ -193,17 +193,6 @@ services:
         class: %oro_email.form.type.attachments.class%
         tags:
             - { name: form.type, alias: oro_email_attachments }
-
-    oro_email.form.type.contexts_select:
-        class: %oro_email.form.type.contexts_select.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_entity_config.config_manager
-            - @translator
-            - @oro_search.mapper
-            - @oro_security.security_facade
-        tags:
-            - { name: form.type, alias: oro_email_contexts_select }
 
     oro_email.form.type.email_link_to_scope:
         class: %oro_email.form.type.email_link_to_scope.class%

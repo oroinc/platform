@@ -56,7 +56,8 @@ class UpdateSchemaDoctrineListener
             }
 
             if ($event->getCommand() instanceof UpdateSchemaCommand) {
-                $entities = $this->registry->getRepository('OroSearchBundle:UpdateEntity')->findAll();
+                $entities = $this->registry->getManagerForClass('OroSearchBundle:UpdateEntity')
+                    ->getRepository('OroSearchBundle:UpdateEntity')->findAll();
                 if (count($entities)) {
                     $em = $this->registry->getManager();
                     foreach ($entities as $entity) {

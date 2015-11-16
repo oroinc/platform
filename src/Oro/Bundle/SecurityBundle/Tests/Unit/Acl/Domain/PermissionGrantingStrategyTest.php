@@ -262,11 +262,23 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $acl->insertClassAce($this->sid, 1, 1, false);
         $acl->insertClassAce($this->sid, 1, 2);
-        $this->assertFalse($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
+        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
 
         $acl->insertObjectAce($this->sid, 1, 0, false);
         $acl->insertObjectAce($anotherSid, 1, 1);
-        $this->assertFalse($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
+        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
+
+        // change the order of ACEs should not change result
+        $acl1 = $this->getAcl();
+        $acl1->insertClassAce($anotherSid, 1);
+
+        $acl1->insertClassAce($this->sid, 1, 1);
+        $acl1->insertClassAce($this->sid, 1, 2, false);
+        $this->assertTrue($this->strategy->isGranted($acl1, array(1), array($this->sid, $anotherSid)));
+
+        $acl1->insertObjectAce($anotherSid, 1, 0);
+        $acl1->insertObjectAce($this->sid, 1, 1, false);
+        $this->assertTrue($this->strategy->isGranted($acl1, array(1), array($this->sid, $anotherSid)));
     }
 
     public function testIsGrantedCallsAuditLoggerOnGrant()
