@@ -1,0 +1,22 @@
+oro_api:
+    relations:
+        Oro\Bundle\AddressBundle\Entity\AbstractAddress:
+            '0':
+                definition:
+                    exclusion_policy: none
+                    fields:
+                        owner:
+                            exclude: true
+                        country:
+                            fields: name
+                        region:
+                            fields: name
+        Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress:
+            '0':
+                definition:
+                    exclusion_policy: all
+                    fields:
+                        types:
+                            fields: name
+                            orderBy:
+                                name: ASC

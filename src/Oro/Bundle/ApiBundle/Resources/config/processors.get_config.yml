@@ -24,6 +24,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeDefinition
         arguments:
             - @oro_api.doctrine_helper
+            - @oro_api.config_bag
+            - @oro_entity.entity_hierarchy_provider.all
         tags:
             - { name: oro.api.processor, action: get_config, requestAction: get_list, priority: -30 }
 
