@@ -19,7 +19,25 @@ class StylesheetsType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(['styles']);
+        $resolver->setRequired(
+            [
+                'inputs'
+            ]
+        );
+        $resolver->setDefaults(
+            [
+                'filters' => [
+                    'cssrewrite',
+                    'lessphp',
+                    'cssmin',
+                ],
+                'output' => null,
+            ]
+        );
+
+        $resolver->setAllowedTypes('inputs', ['array', 'Oro\Component\Layout\OptionValueBag']);
+        $resolver->setAllowedTypes('filters', ['array', 'Oro\Component\Layout\OptionValueBag']);
+        $resolver->setAllowedTypes('output', ['null', 'string']);
     }
 
     /**
@@ -27,12 +45,24 @@ class StylesheetsType extends AbstractType
      */
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
-        $styles = $block->getOptions()['styles'];
-        if ($styles instanceof OptionValueBag) {
-            $styles = $styles->buildValue(new ArrayOptionValueBuilder());
+        $theme = $block->getContext()->get('theme');
+        
+        $inputs = $block->getOptions()['inputs'];
+        if ($inputs instanceof OptionValueBag) {
+            $inputs = $inputs->buildValue(new ArrayOptionValueBuilder());
         }
+        $view->vars['inputs'] = $inputs;
 
-        $view->vars['styles'] = $styles;
+        $filters = $block->getOptions()['filters'];
+        if ($filters instanceof OptionValueBag) {
+            $filters = $filters->buildValue(new ArrayOptionValueBuilder());
+        }
+        $view->vars['filters'] = $filters;
+
+        $view->vars['output'] = $block->getOptions()['output'];
+        if (!$view->vars['output']) {
+            $view->vars['output'] = 'css/layout/'.$theme.'/'.$view->vars['cache_key'].'.css';
+        }
     }
 
     /**

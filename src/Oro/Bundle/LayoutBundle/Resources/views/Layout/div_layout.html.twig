@@ -58,9 +58,7 @@
 {% endblock %}
 
 {% block stylesheets_widget %}
-    {% for style in styles %}
-        <link rel="stylesheet" href="{{ style }}" />
-    {% endfor %}
+    <link rel="stylesheet" href="{{ asset(output)}}" />
 {% endblock %}
 
 {% block style_widget %}
