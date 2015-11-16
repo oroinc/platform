@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ColumnManagerView;
+    var ColumnManagerCollectionView;
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var ColumnManagerItemView = require('./column-manager-item-view');
 
-    ColumnManagerView = BaseCollectionView.extend({
+    ColumnManagerCollectionView = BaseCollectionView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager-collection.html'),
         itemView: ColumnManagerItemView,
 
@@ -33,7 +33,7 @@ define(function(require) {
         initialize: function(options) {
             _.extend(this, _.pick(options, ['orderShift', 'filterModel']));
 
-            ColumnManagerView.__super__.initialize.apply(this, arguments);
+            ColumnManagerCollectionView.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -41,13 +41,13 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            ColumnManagerView.__super__.render.apply(this, arguments);
+            ColumnManagerCollectionView.__super__.render.apply(this, arguments);
             this.initSorting();
             return this;
         },
 
         initItemView: function() {
-            var itemView = ColumnManagerView.__super__.initItemView.apply(this, arguments);
+            var itemView = ColumnManagerCollectionView.__super__.initItemView.apply(this, arguments);
             itemView.setFilterModel(this.filterModel);
             return itemView;
         },
@@ -126,5 +126,5 @@ define(function(require) {
         }
     });
 
-    return ColumnManagerView;
+    return ColumnManagerCollectionView;
 });
