@@ -22,6 +22,8 @@ If you need to create own implementation of [MigrationQuery](./Migration/Migrati
 
 If you have several migration classes within the same version and you need to make sure that they will be executed in a specified order you can use [OrderedMigrationInterface](./Migration/OrderedMigrationInterface.php) interface.
 
+If you want to perform migration in a specified order in list of all migrations(from different bundles and versions) you can use [PrioritizedMigrationInterface](./Migration/PrioritizedMigrationInterface.php) interface. If migration do not implemented PrioritizedMigrationInterface it has priority 0 by default. The bigger number getPriority method returns, later a migration is executed.
+
 Example of migration file:
 
 ``` php
