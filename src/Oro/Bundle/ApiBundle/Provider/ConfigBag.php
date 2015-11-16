@@ -74,7 +74,7 @@ class ConfigBag
                 // skip current config because its version is greater that the requested version
                 continue;
             }
-            if (!$resultVersion || version_compare($configVersion, $resultVersion) > 0) {
+            if (null === $resultVersion || version_compare($configVersion, $resultVersion) > 0) {
                 $resultVersion = $configVersion;
                 $result        = $config;
             }
