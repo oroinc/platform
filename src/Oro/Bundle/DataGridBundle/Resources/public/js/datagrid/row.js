@@ -37,20 +37,8 @@ define([
             Row.__super__.initialize.apply(this, arguments);
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
-            this.listenTo(this.model, "backgrid:isSelected", this.onBackgridIsSelected);
             this.listenTo(this.model, "backgrid:selected", this.onBackgridSelected);
-        },
-
-        render: function () {
-            Row.__super__.render.apply(this, arguments);
-
-            var state = {selected: false};
-            this.model.trigger('backgrid:isSelected', this.model, state);
-
-            if (state.selected)
-                this.$el.addClass("row-selected");
-
-            return this;
+            this.listenTo(this.model, "backgrid:select", this.onBackgridSelect);
         },
 
         /**
@@ -72,17 +60,13 @@ define([
         },
 
         /**
-         * Handles row "backgrid:isSelected" event
+         * Handles row "backgrid:select" event
          *
-         * @param {Backbone.Model} model
-         * @param {Object} state - state of row
-         *  {
-         *      selected: true,// or false
-         *  }
+         * @param model
+         * @param selected
          */
-        onBackgridIsSelected: function (model, state) {
-            this.toggleSelectedRow(state.selected);
-
+        onBackgridSelect: function (model, state) {
+            this.toggleSelectedRow(state, model);
         },
 
         /**
@@ -92,15 +76,15 @@ define([
          * @param isChecked
          */
         onBackgridSelected: function (model, isChecked) {
-            this.toggleSelectedRow(isChecked);
+            this.toggleSelectedRow(isChecked, model);
         },
 
         /**
-         * Toggle selected row
+         * Toggle row selection marker
          *
          * @param {Boolean} isSelected
          */
-        toggleSelectedRow: function (isSelected) {
+        toggleSelectedRow: function (isSelected, model) {
             if (isSelected)
                 this.$el.addClass("row-selected");
             else
