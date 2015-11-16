@@ -20,6 +20,9 @@ class FormattersPass implements CompilerPassInterface
         $formatters     = [];
         $taggedServices = $container->findTaggedServiceIds(self::FORMATTER_TAG);
         foreach ($taggedServices as $id => $attributes) {
+            if ($container->hasDefinition($id)) {
+                $container->getDefinition($id)->setPublic(false);
+            }
             $formatters[$attributes[0]['formatter']] = new Reference($id);
         }
         if (empty($formatters)) {
