@@ -7,8 +7,20 @@ define([
     'oroui/js/app/views/loading-mask-view',
     'orocalendar/js/form-validation',
     'oroui/js/delete-confirmation',
-    'oroform/js/formatter/field'
-], function(_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
+    'oroform/js/formatter/field',
+    'oroactivity/js/app/components/activity-context-activity-component'
+], function(
+    _,
+    Backbone,
+    __,
+    routing,
+    DialogWidget,
+    LoadingMask,
+    FormValidation,
+    DeleteConfirmation,
+    fieldFormatter,
+    ActivityContextComponent
+) {
     'use strict';
 
     var $ = Backbone.$;
@@ -283,10 +295,21 @@ define([
         getEventView: function() {
             // fetch calendar related connection
             var connection = this.options.connections.findWhere({calendarUid: this.model.get('calendarUid')});
-            return this.viewTemplate(_.extend(this.model.toJSON(), {
+            var $element = $(this.viewTemplate(_.extend(this.model.toJSON(), {
                 formatter: fieldFormatter,
                 connection: connection ? connection.toJSON() : null
-            }));
+            })));
+
+            var $contextsSource = $element.find('.activity-context-activity');
+            var activityContext = new ActivityContextComponent({
+                _sourceElement: $contextsSource,
+                checkTarget: false,
+                activityClassAlias: 'calendarevents',
+                entityId: this.model.originalId
+            });
+            activityContext.contextsView.doRefresh();
+
+            return $element;
         },
 
         getEventForm: function() {

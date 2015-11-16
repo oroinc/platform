@@ -23,8 +23,7 @@ define([
             this.options = _.defaults(options || {}, this.options);
 
             this.template = _.template($('#activity-context-activity-list').html());
-            this.$container = options.$container;
-            this.$containerContextTargets = $(options.$container.context).find('.activity-context-activity-items');
+            this.$containerContextTargets = $(options.el).find('.activity-context-activity-items');
             this.collection = new ActivityContextActivityCollection('oro_api_delete_activity_relation');
             this.initEvents();
 
@@ -56,12 +55,14 @@ define([
                 id: this.options.entityId
             });
             var collection = this.collection;
+            var self = this;
             $.ajax({
                 method: 'GET',
                 url: url,
                 success: function(r) {
                     collection.reset();
                     collection.add(r);
+                    self.render();
                 }
             });
         },

@@ -21,13 +21,11 @@ define(function(require) {
         },
 
         initView: function() {
-            var $container = this.options._sourceElement.find('#' + this.options.container);
             var items = typeof this.options.contextTargets === 'undefined' ? [] : this.options.contextTargets;
             this.contextsView = new ActivityContextActivityView({
                 contextTargets: items,
                 entityId: this.options.entityId,
                 el: this.options._sourceElement,
-                $container: $container,
                 inputName: this.options.inputName,
                 target: this.options.target,
                 activityClass: this.options.activityClassAlias
