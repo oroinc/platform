@@ -20,6 +20,12 @@ class BuildFilters implements ProcessorInterface
             return;
         }
 
+        $entityClass = $context->getClassName();
+        if (!$entityClass) {
+            // an entity type is not specified
+            return;
+        }
+
         $context->setFilters(
             [
                 'exclusion_policy' => 'none',
