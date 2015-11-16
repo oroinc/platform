@@ -64,16 +64,11 @@ class AutocompleteController extends Controller
         $searchHandler = $this->get('oro_activity.form.handler.autocomplete');
         $searchHandler->setClass($activity);
 
-        if ($autocompleteRequest->isSearchById()) {
-            $result = $searchHandler->searchById($autocompleteRequest->getQuery());
-        } else {
-            $result = $searchHandler->search(
-                $autocompleteRequest->getQuery(),
-                $autocompleteRequest->getPage(),
-                $autocompleteRequest->getPerPage()
-            );
-        }
-
-        return new JsonResponse($result);
+        return new JsonResponse($searchHandler->search(
+            $autocompleteRequest->getQuery(),
+            $autocompleteRequest->getPage(),
+            $autocompleteRequest->getPerPage(),
+            $autocompleteRequest->isSearchById()
+        ));
     }
 }

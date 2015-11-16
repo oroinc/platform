@@ -141,22 +141,22 @@ class ContextSearchHandler implements ConverterInterface
     }
 
     /**
-     * Decodes targets query string and returns array of search result items
+     * Decodes targets json query string and returns targets array
      *
      * @param  $targetsString
-     * @return Item[]
+     * @return array
      */
     protected function decodeTargets($targetsString)
     {
-        $targets = explode(';', $targetsString);
-        $items = [];
+        $targetsJsonArray = explode(';', $targetsString);
+        $targetsArray = [];
 
-        foreach ($targets as $target) {
-            if (!$target) {
+        foreach ($targetsJsonArray as $targetJson) {
+            if (!$targetJson) {
                 continue;
             }
 
-            $target = json_decode($target, true);
+            $target = json_decode($targetJson, true);
 
             if (!isset($target['entityClass']) || !$target['entityClass']
                 || !isset($target['entityId']) || !$target['entityId']
@@ -164,23 +164,10 @@ class ContextSearchHandler implements ConverterInterface
                 continue;
             }
 
-            $item = new Item(
-                $this->objectManager,
-                $target['entityClass'],
-                $target['entityId']
-            );
-
-            $entity = $item->getEntity();
-            if (!$entity) {
-                continue;
-            }
-
-            $item->setRecordTitle($this->getEntityTitle($entity, $target['entityClass']));
-
-            $items[] = $item;
+            $targetsArray[] = $target;
         }
 
-        return $items;
+        return $targetsArray;
     }
 
     /**
@@ -227,9 +214,13 @@ class ContextSearchHandler implements ConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function search($query, $page, $perPage)
+    public function search($query, $page, $perPage, $searchById = false)
     {
-        $page        = (int)$page > 0 ? (int)$page : 1;
+        if ($searchById) {
+            return $this->searchById($query);
+        }
+
+        $page        = max((int)$page, 1);
         $perPage     = (int)$perPage > 0 ? (int)$perPage : 10;
         $firstResult = ($page - 1) * $perPage;
         $perPage++;
@@ -258,7 +249,7 @@ class ContextSearchHandler implements ConverterInterface
     }
 
     /**
-     * Search by string with entities class names and ids
+     * Search by json string with targets class names and ids
      *
      * @param string $targetsString
      *
@@ -266,8 +257,28 @@ class ContextSearchHandler implements ConverterInterface
      */
     public function searchById($targetsString)
     {
+        $targets = $this->decodeTargets($targetsString);
+        $items   = [];
+
+        foreach ($targets as $target) {
+            $item = new Item(
+                $this->objectManager,
+                $target['entityClass'],
+                $target['entityId']
+            );
+
+            $entity = $item->getEntity();
+            if (!$entity) {
+                continue;
+            }
+
+            $item->setRecordTitle($this->getEntityTitle($entity, $target['entityClass']));
+
+            $items[] = $item;
+        }
+
         return [
-            'results' => $this->convertItems($this->decodeTargets($targetsString)),
+            'results' => $this->convertItems($items),
             'more'    => false
         ];
     }
