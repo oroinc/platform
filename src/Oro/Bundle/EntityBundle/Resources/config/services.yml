@@ -236,7 +236,6 @@ services:
             - %database_driver%
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: config }
 
     oro_entity.migration.extension.change_type:
         class: %oro_entity.migration.extension.change_type.class%
