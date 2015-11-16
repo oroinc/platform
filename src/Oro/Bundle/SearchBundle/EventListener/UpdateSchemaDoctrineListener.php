@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 use Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Doctrine\ORM\EntityManager;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
@@ -56,16 +57,19 @@ class UpdateSchemaDoctrineListener
             }
 
             if ($event->getCommand() instanceof UpdateSchemaCommand) {
-                $entities = $this->registry->getManagerForClass('OroSearchBundle:UpdateEntity')
-                    ->getRepository('OroSearchBundle:UpdateEntity')->findAll();
+                /** @var EntityManager $searchEntityManager */
+                $searchEntityManager = $this->registry->getManagerForClass('OroSearchBundle:UpdateEntity');
+                $entities = $searchEntityManager->getRepository('OroSearchBundle:UpdateEntity')->findAll();
                 if (count($entities)) {
+                    /** @var EntityManager $em */
                     $em = $this->registry->getManager();
                     foreach ($entities as $entity) {
                         $job = new Job(ReindexCommand::COMMAND_NAME, ['class' => $entity->getEntity()]);
                         $em->persist($job);
-                        $em->remove($entity);
+                        $searchEntityManager->remove($entity);
                     }
-                    $em->flush($job);
+                    $em->flush();
+                    $searchEntityManager->flush();
                 }
             }
         }
