@@ -25,7 +25,8 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         // view annotations
         $this->assertEquals(
             [
-                'Oro\\Bundle\\LayoutBundle\\EventListener\\LayoutListener'
+                'Oro\\Bundle\\LayoutBundle\\EventListener\\LayoutListener',
+                'Oro\\Bundle\\LayoutBundle\\EventListener\\ThemeListener'
             ],
             $extension->getClassesToCompile(),
             'Failed asserting that @Layout annotation is enabled'

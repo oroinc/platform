@@ -32,6 +32,9 @@ class ExtensionPass implements CompilerPassInterface
             $taggedServices = $container->findTaggedServiceIds($extensionName);
 
             foreach ($taggedServices as $id => $tagAttributes) {
+                if ($container->hasDefinition($id)) {
+                    $container->getDefinition($id)->setPublic(false);
+                }
                 $params = [new Reference($id)];
                 if (!empty($tagAttributes[0]['priority'])) {
                     $params[] = (int) $tagAttributes[0]['priority'];

@@ -51,6 +51,8 @@ class OroEntityExtension extends Extension
             $hydrators[$key] = $value;
         }
         $container->setParameter('oro_entity.orm.hydrators', $hydrators);
+
+        $this->addClassesToCompile(['Oro\Bundle\EntityBundle\ORM\OroEntityManager']);
     }
 
     /**

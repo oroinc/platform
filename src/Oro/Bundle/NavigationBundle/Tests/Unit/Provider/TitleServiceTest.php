@@ -94,6 +94,12 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $breadcrumbLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $breadcrumbLink->expects($this->any())->method('getService')->willReturn($this->breadcrumbManager);
+
         $this->titleService = new TitleService(
             $this->annotationsReader,
             $this->configReader,
@@ -101,7 +107,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->serializer,
             $this->userConfigManager,
-            $this->breadcrumbManager,
+            $breadcrumbLink,
             $this->titleProvider
         );
     }
