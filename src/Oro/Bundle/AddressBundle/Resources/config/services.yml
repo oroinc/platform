@@ -11,6 +11,7 @@ services:
         arguments:
             - %oro_address.address.entity.class%
             - @doctrine.orm.entity_manager
+        public: false
         tags:
             - { name: oro_address.storage }
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\SoapBundle\EventListener;
 
 use Gedmo\Translatable\TranslatableListener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,17 +14,18 @@ class LocaleListener implements EventSubscriberInterface
 {
     const API_PREFIX = '/api/rest/';
 
-    /**
-     * @var TranslatableListener
-     */
-    protected $translatableListener;
+    /** @var TranslatableListener */
+    private $translatableListener = false;
+
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param TranslatableListener $translatableListener
+     * @param ContainerInterface $container
      */
-    public function __construct(TranslatableListener $translatableListener)
+    public function __construct(ContainerInterface $container)
     {
-        $this->translatableListener = $translatableListener;
+        $this->container = $container;
     }
 
     /**
@@ -36,7 +38,7 @@ class LocaleListener implements EventSubscriberInterface
         $locale = str_replace('-', '_', $request->query->get('locale'));
         if ($locale && $this->isApiRequest($request)) {
             $request->setLocale($locale);
-            $this->translatableListener->setTranslatableLocale($locale);
+            $this->getTranslatableListener()->setTranslatableLocale($locale);
         }
     }
 
@@ -59,5 +61,17 @@ class LocaleListener implements EventSubscriberInterface
             // must be registered after Symfony's original LocaleListener
             KernelEvents::REQUEST  => array(array('onKernelRequest', -17)),
         );
+    }
+
+    /**
+     * @return TranslatableListener
+     */
+    protected function getTranslatableListener()
+    {
+        if ($this->translatableListener === false) {
+            $this->translatableListener = $this->container->get('stof_doctrine_extensions.listener.translatable');
+        }
+
+        return $this->translatableListener;
     }
 }
