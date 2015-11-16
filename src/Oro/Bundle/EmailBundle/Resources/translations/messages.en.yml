@@ -81,6 +81,7 @@ oro:
             subject.label:       Subject
             content.label:       Content
             entity_name.label:   Entity name
+            entity_name.tooltip: Choose an entity this template is related to or keep it empty if this template is not related to any entity.
             type.label:          Type
             translations.label:  Translations
             organization.label:  Organization
@@ -214,15 +215,8 @@ oro:
         seen.label:               Is Seen
         thread_id.label:          Thread ID
         show_details.tooltip:     Show details
-        add_context.label:        Add Context
-        add_context_entity.label: Add Context Entity
         contexts:
-            label:                Context
-            placeholder:          Add Context
-            added:                The context has been added
-            added.already:        The context has already been added
-            type.not_supported:   The context type is not supported
-            removed:              The context has been removed
+            tooltip:              Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden
         empty_body:               Empty body
@@ -260,6 +254,8 @@ oro:
             mailbox_owner.label:      Mailbox Owner
             received_at.label:        Received At
             seen.label:               Seen
+            folders.label:            Folders
+            origin.label:             Email Origin
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes
@@ -282,6 +278,8 @@ oro:
                 default.label:        Do Nothing
             access:
                 label:                Access Management
+            auto_response_rules.label: Auto Response Rules
+            process_settings.label: Process Settings
         autoresponserule:
             entity_plural_label: Autoresponse Rules
             name.label:          Name

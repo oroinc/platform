@@ -7,6 +7,8 @@ use Oro\Component\Config\Resolver\ResolverInterface;
 
 class PlaceholderProvider
 {
+    const APPLICABLE = 'applicable';
+
     /** @var array */
     protected $placeholders;
 
@@ -79,11 +81,10 @@ class PlaceholderProvider
                 return null;
             }
         }
-        if (isset($item['applicable'])) {
-            $resolved = $this->resolver->resolve(['applicable' => $item['applicable']], $variables);
-            if ($resolved['applicable'] === true) {
+        if (array_key_exists(self::APPLICABLE, $item)) {
+            if ($this->resolveApplicable($item[self::APPLICABLE], $variables)) {
                 // remove 'applicable' attribute as it is not needed anymore
-                unset($item['applicable']);
+                unset($item[self::APPLICABLE]);
             } else {
                 // the requested item is not applicable in the current context
                 return null;
@@ -91,6 +92,30 @@ class PlaceholderProvider
         }
 
         return $this->resolver->resolve($item, $variables);
+    }
+
+    /**
+     * @param array|string $conditions
+     * @param array $variables
+     * @return bool
+     */
+    protected function resolveApplicable($conditions, array $variables)
+    {
+        $resolved = true;
+        $conditions = (array) $conditions;
+        foreach ($conditions as $condition) {
+            $resolved = $this->resolver->resolve(
+                [
+                    self::APPLICABLE => $condition
+                ],
+                $variables
+            )[self::APPLICABLE];
+            if (!$resolved) {
+                break;
+            }
+        }
+
+        return $resolved;
     }
 
     /**

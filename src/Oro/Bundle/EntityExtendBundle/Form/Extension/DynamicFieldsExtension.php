@@ -10,6 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -17,8 +19,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
@@ -68,7 +71,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $viewConfigProvider   = $this->configManager->getProvider('view');
 
-        $priorities  = [];
         $fields      = [];
         $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
@@ -85,14 +87,15 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 continue;
             }
 
-            $fields[]     = $fieldName;
-            $priorities[] = $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0);
+            $fields[$fieldName] = [
+                'priority' => $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0)
+            ];
         }
 
-        array_multisort($priorities, SORT_DESC, $fields);
+        ArrayUtil::sortBy($fields, true);
 
-        foreach ($fields as $field) {
-            $builder->add($field);
+        foreach ($fields as $fieldName => $priority) {
+            $builder->add($fieldName);
         }
     }
 
@@ -240,13 +243,14 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
         return
-            !$extendConfig->is('is_deleted')
-            && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-            && !$extendConfig->is('state', ExtendScope::STATE_NEW)
+            $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+            && ExtendHelper::isFieldAccessible($extendConfig)
             && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations, true)
             && (
                 !$extendConfig->has('target_entity')
-                || !$extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')
+                || ExtendHelper::isEntityAccessible(
+                    $extendConfigProvider->getConfig($extendConfig->get('target_entity'))
+                )
             );
     }
 

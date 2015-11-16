@@ -22,7 +22,7 @@ class ActivityController extends RestGetController
     /**
      * Get activity types.
      *
-     * @Get("/activities", name="")
+     * @Get("/activities")
      *
      * @ApiDoc(
      *      description="Get activity types",
@@ -43,7 +43,7 @@ class ActivityController extends RestGetController
      *
      * @param string $activity The type of the activity entity.
      *
-     * @Get("/activities/{activity}", name="")
+     * @Get("/activities/{activity}")
      *
      * @ApiDoc(
      *      description="Get entity types which can be associated with the specified activity type",

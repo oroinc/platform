@@ -46,13 +46,18 @@ class CalendarPropertyProviderTest extends \PHPUnit_Framework_TestCase
             $this->getFieldConfig('id', 'integer'),
             $this->getFieldConfig('targetCalendar', 'ref-one'),
             $this->getFieldConfig('visible', 'boolean'),
-            $this->getFieldConfig('many2one', 'manyToOne'),
-            $this->getFieldConfig('many2many', 'manyToMany'),
-            $this->getFieldConfig('one2many', 'oneToMany'),
-            $this->getFieldConfig('enum', 'enum'),
-            $this->getFieldConfig('multiEnum', 'multiEnum'),
-            $this->getFieldConfig('new', 'string', ['state' => ExtendScope::STATE_NEW]),
-            $this->getFieldConfig('deleted', 'string', ['is_deleted' => true]),
+            $this->getFieldConfig('many2one', 'manyToOne', ['is_extend' => true]),
+            $this->getFieldConfig('many2many', 'manyToMany', ['is_extend' => true]),
+            $this->getFieldConfig('one2many', 'oneToMany', ['is_extend' => true]),
+            $this->getFieldConfig('enum', 'enum', ['is_extend' => true]),
+            $this->getFieldConfig('multiEnum', 'multiEnum', ['is_extend' => true]),
+            $this->getFieldConfig('new', 'string', ['state' => ExtendScope::STATE_NEW, 'is_extend' => true]),
+            $this->getFieldConfig('deleted', 'string', ['is_deleted' => true, 'is_extend' => true]),
+            $this->getFieldConfig(
+                'new_to_be_deleted',
+                'string',
+                ['state' => ExtendScope::STATE_DELETE, 'is_extend' => true]
+            ),
         ];
 
         $this->configManager->expects($this->once())
