@@ -4,8 +4,8 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Doctrine\ORM\EntityManager;
+
 use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
