@@ -295,9 +295,6 @@ class Orm extends AbstractEngine
      */
     protected function clearSearchIndexForEntity($entityName)
     {
-        /** @var OroEntityManager $em */
-        $em = $this->registry->getManager();
-
         $query = <<<EOF
 DELETE FROM oro_search_index_integer  WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
 DELETE FROM oro_search_index_datetime WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
@@ -305,7 +302,8 @@ DELETE FROM oro_search_index_decimal  WHERE item_id IN (SELECT DISTINCT id FROM 
 DELETE FROM oro_search_index_text     WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
 DELETE FROM oro_search_item           WHERE entity = ?;
 EOF;
-        $em->getConnection()->executeQuery(
+
+        $this->getIndexManager()->getConnection()->executeQuery(
             $query,
             [$entityName, $entityName, $entityName, $entityName, $entityName],
             [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR]

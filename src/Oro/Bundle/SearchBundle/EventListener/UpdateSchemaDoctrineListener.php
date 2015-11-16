@@ -62,7 +62,7 @@ class UpdateSchemaDoctrineListener
                 $entities = $searchEntityManager->getRepository('OroSearchBundle:UpdateEntity')->findAll();
                 if (count($entities)) {
                     /** @var EntityManager $em */
-                    $em = $this->registry->getManager();
+                    $em = $this->registry->getManagerForClass('JMS\JobQueueBundle\Entity\Job');
                     foreach ($entities as $entity) {
                         $job = new Job(ReindexCommand::COMMAND_NAME, ['class' => $entity->getEntity()]);
                         $em->persist($job);
