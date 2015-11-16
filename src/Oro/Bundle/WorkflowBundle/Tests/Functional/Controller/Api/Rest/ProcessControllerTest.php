@@ -34,7 +34,7 @@ class ProcessControllerTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_workflow_api_rest_process_deactivate',
+                'oro_api_process_deactivate',
                 ['processDefinition' => $definitionName]
             )
         );
@@ -49,7 +49,7 @@ class ProcessControllerTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_workflow_api_rest_process_activate',
+                'oro_api_process_activate',
                 ['processDefinition' => $definitionName]
             )
         );

@@ -27,7 +27,7 @@ define([
         },
 
         /** @property {String} */
-        className: 'modal',
+        className: 'modal oro-modal-normal',
 
         initialize: function(options) {
             options = options || {};

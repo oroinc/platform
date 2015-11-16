@@ -17,7 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
@@ -107,10 +107,8 @@ class EntitiesController extends Controller
                 $fieldConfigId = $config->getId();
 
                 return
-                    !$config->is('state', ExtendScope::STATE_NEW)
-                    && !$config->is('is_deleted')
-                    && $fieldConfigId instanceof FieldConfigId
-                    && in_array($fieldConfigId->getFieldName(), (array)$relationConfig->get('target_detailed'));
+                    ExtendHelper::isFieldAccessible($config)
+                    && in_array($fieldConfigId->getFieldName(), (array)$relationConfig->get('target_detailed'), true);
             },
             $relationConfig->get('target_entity')
         );

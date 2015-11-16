@@ -25,7 +25,7 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
     /**
      * Get entity aliases.
      *
-     * @Get("/entities/aliases", name="")
+     * @Get("/entities/aliases")
      *
      * @ApiDoc(
      *      description="Get entity aliases",

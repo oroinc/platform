@@ -293,8 +293,8 @@ class ConfigFieldGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $uniqueFieldNameHelper = $this->get('oro_entity_extend.extend.unique_field_name_helper');
-        if (!$uniqueFieldNameHelper->isFieldCanRestore($field)) {
+        $fieldNameValidationHelper = $this->get('oro_entity_extend.extend.field_name_validation_helper');
+        if (!$fieldNameValidationHelper->canFieldBeRestored($field)) {
             return new JsonResponse(
                 [
                     'message'    => 'This field cannot be restored because a field with similar name exists.',

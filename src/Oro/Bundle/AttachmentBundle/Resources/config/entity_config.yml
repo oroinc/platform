@@ -70,6 +70,7 @@ oro_entity_config:
                 # the max size in megabytes of uploaded file
                 maxsize: # integer
                     options:
+                        value_type:         integer
                         allowed_type:       [file, image]
                     constraints:
                         - NotBlank:         ~
@@ -89,6 +90,7 @@ oro_entity_config:
                 # the thubnail picture width in pixels
                 width: # integer
                     options:
+                        value_type:         integer
                         allowed_type:       [image]
                     constraints:
                         - Type:
@@ -106,6 +108,7 @@ oro_entity_config:
                 # the thubnail picture height in pixels
                 height: # integer
                     options:
+                        value_type:         integer
                         allowed_type:       [image]
                     constraints:
                         - Type:

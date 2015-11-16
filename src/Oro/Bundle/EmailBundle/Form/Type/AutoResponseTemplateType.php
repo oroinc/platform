@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
@@ -55,9 +56,16 @@ class AutoResponseTemplateType extends AbstractType
     {
         $builder
             ->add('entityName', 'hidden', [
-                'data' => Email::ENTITY_CLASS,
+                'attr' => [
+                    'data-default-value' => Email::ENTITY_CLASS,
+                ],
                 'constraints' => [
-                    new Assert\IdenticalTo(['value' => Email::ENTITY_CLASS]),
+                    new Assert\Choice([
+                        'choices' => [
+                            '',
+                            Email::ENTITY_CLASS,
+                        ],
+                    ]),
                 ],
             ])
             ->add('type', 'choice', [
@@ -68,7 +76,6 @@ class AutoResponseTemplateType extends AbstractType
                     'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
                     'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
                 ],
-                'data'     => 'html',
                 'required' => true
             ])
             ->add('translations', 'oro_email_emailtemplate_translatation', [
@@ -79,7 +86,9 @@ class AutoResponseTemplateType extends AbstractType
                     'constraints' => [
                         new Assert\NotBlank(),
                     ],
-                    'data' => $this->cm->get('oro_email.signature', ''),
+                    'attr' => [
+                        'data-default-value' => $this->cm->get('oro_email.signature', ''),
+                    ],
                 ],
                 'subject_options' => [
                     'constraints' => [
@@ -96,6 +105,13 @@ class AutoResponseTemplateType extends AbstractType
             $form = $event->getForm();
             if ($form->has('owner')) {
                 $form->remove('owner');
+            }
+
+            if (!$event->getData()) {
+                $emailTemplate = new EmailTemplate();
+                $emailTemplate->setContent($this->cm->get('oro_email.signature', ''));
+                $emailTemplate->setEntityName(Email::ENTITY_CLASS);
+                $event->setData($emailTemplate);
             }
         });
 

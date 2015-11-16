@@ -26,9 +26,10 @@ class OrmEngineTest extends WebTestCase
 
     public function testSearchIndexRealTime()
     {
-        $entityManager         = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $searchItemRepository  = $entityManager->getRepository('OroSearchBundle:Item');
-        $searchIndexRepository = $entityManager->getRepository('OroSearchBundle:IndexText');
+        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $searchEntityManager = $this->getContainer()->get('doctrine')->getManagerForClass('OroSearchBundle:Item');
+        $searchItemRepository = $searchEntityManager->getRepository('OroSearchBundle:Item');
+        $searchIndexRepository = $searchEntityManager->getRepository('OroSearchBundle:IndexText');
 
         // ensure that search item doesn't exists
         $searchItem = $searchItemRepository->findOneBy(array('title' => self::ENTITY_TITLE));
