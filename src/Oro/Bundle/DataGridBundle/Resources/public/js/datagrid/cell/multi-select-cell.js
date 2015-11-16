@@ -42,8 +42,8 @@ define([
                 try {
                     value = JSON.parse(value);
                 } catch (e) {
-                    this.$el.html('');
-                    return;
+                    this.$el.html('Unexpected format');
+                    return this;
                 }
             }
 
@@ -52,13 +52,17 @@ define([
                 value = [];
             }
 
-            this.$el.html(value.length > 0 ? (
-                '<span class="multiselect-value-wrapper"><span class="value-item">' +
-                value
-                    .map(function(item) {return choices[item];})
-                    .join('</span><span class="value-item">') +
-                '</span></span>'
-            ) : '');
+            try {
+                this.$el.html(value.length > 0 ? (
+                    '<span class="multiselect-value-wrapper"><span class="value-item">' +
+                    value
+                        .map(function(item) {return choices[item];})
+                        .join('</span><span class="value-item">') +
+                    '</span></span>'
+                ) : '');
+            } catch (e) {
+                this.$el.html('Unexpected format');
+            }
             return this;
         }
     });
