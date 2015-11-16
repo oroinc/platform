@@ -1,3 +1,8 @@
+<div class="column-manager-search<% if (search.length === 0) { %> empty<% } %>">
+    <input type="text" data-role="column-manager-search" value="<%=search %>"
+            placeholder="<%= _.__('oro.datagrid.column_manager.filter.search_placeholder') %>" />
+    <a href="#" class="clear" data-role="column-manager-clear-search" title="<%= _.__('oro.datagrid.column_manager.clear_search_tooltip') %>">×</a>
+</div>
 <a href="#" class="column-filter-renderable-tab<% if (!renderable) { %> active<% } %>" data-role="column-manager-show-all">
     <%= _.__('oro.datagrid.column_manager.filter.all') %>
 </a>

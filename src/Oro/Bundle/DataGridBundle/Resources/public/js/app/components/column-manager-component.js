@@ -8,6 +8,7 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var ColumnFilterModel = require('orodatagrid/js/app/models/column-manager/column-filter-model');
     var ColumnFilterView = require('orodatagrid/js/app/views/column-manager/column-manager-filter-view');
+    var ColumnManagerCollectionView = require('orodatagrid/js/app/views/column-manager/column-manager-collection-view');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
 
     /**
@@ -54,7 +55,7 @@ define(function(require) {
             this._createViews(options);
 
             this.columnFilterModel.on('change', _.bind(function(model) {
-                this.columnManagerView.filter(_.bind(model.filterer, model));
+                this.columnManagerCollectionView.filter(_.bind(model.filterer, model));
             }, this));
 
             this._applyState(this.grid.collection, this.grid.collection.state);
@@ -82,7 +83,7 @@ define(function(require) {
          */
         delegateListeners: function() {
             this.listenTo(this.grid.collection, 'updateState', this._applyState);
-            this.listenTo(this.columnManagerView, 'reordered', this._pushState);
+            this.listenTo(this.columnManagerCollectionView, 'reordered', this._pushState);
             this.listenTo(this.managedColumns, 'change:renderable', this._pushState);
             this.listenTo(this.managedColumns, 'sort', function() {
                 this.columns.sort();
@@ -101,14 +102,17 @@ define(function(require) {
             // index of first manageable column
             var orderShift = this.managedColumns[0] ? this.managedColumns[0].get('order') : 0;
             this.columnManagerView = new ColumnManagerView({
-                el: options._sourceElement,
+                el: options._sourceElement
+            });
+            this.columnFilterView = new ColumnFilterView({
+                el: this.columnManagerView.$('.column-manager-filter').get(0),
+                model: this.columnFilterModel
+            });
+            this.columnManagerCollectionView = new ColumnManagerCollectionView({
+                el: this.columnManagerView.$('.column-manager-table').get(0),
                 collection: this.managedColumns,
                 filterModel: this.columnFilterModel,
                 orderShift: orderShift
-            });
-            this.columnFilterView = new ColumnFilterView({
-                el: this.columnManagerView.$el.find('.column-manager-filter').get(0),
-                model: this.columnFilterModel
             });
         },
 

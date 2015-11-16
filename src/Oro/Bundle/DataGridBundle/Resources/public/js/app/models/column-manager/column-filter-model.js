@@ -6,11 +6,19 @@ define(function(require) {
 
     ColumnFilterModel = BaseModel.extend({
         defaults: {
+            search: '',
             renderable: false
         },
 
         filterer: function(item) {
-            return !this.get('renderable') || item.get('renderable');
+            var search = this.get('search').toLowerCase();
+            if (search.length > 0 && item.get('label').toLowerCase().indexOf(search) === -1) {
+                return false;
+            }
+            if (this.get('renderable') && !item.get('renderable')) {
+                return false;
+            }
+            return true;
         }
     });
 
