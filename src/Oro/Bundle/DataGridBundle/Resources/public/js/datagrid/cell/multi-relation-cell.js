@@ -47,7 +47,7 @@ define([
                 try {
                     value = JSON.parse(value);
                 } catch (e) {
-                    this.$el.html('Unexpected format');
+                    this.$el.html('<span style="color:red">Unexpected format</span>');
                     return this;
                 }
             }
@@ -68,7 +68,7 @@ define([
                     '</span></span>'
                 ) : '');
             } catch (e) {
-                this.$el.html('Unexpected format');
+                this.$el.html('<span style="color:red">Unexpected format</span>');
             }
 
             return this;
