@@ -26,17 +26,25 @@ class OroApiExtension extends Extension
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
 
+        $this->loadApiConfiguration($container);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function loadApiConfiguration(ContainerBuilder $container)
+    {
         $configLoader = new CumulativeConfigLoader(
             'oro_api',
             new YamlCumulativeFileLoader('Resources/config/oro/api.yml')
         );
         $resources    = $configLoader->load($container);
-        $entityConfig = [];
+        $apiConfig    = [];
         foreach ($resources as $resource) {
-            $entityConfig = $this->mergeEntityConfiguration($resource, $entityConfig);
+            $apiConfig = $this->mergeApiConfiguration($resource, $apiConfig);
         }
         $configBagDef = $container->getDefinition('oro_api.config_bag');
-        $configBagDef->replaceArgument(0, $entityConfig);
+        $configBagDef->replaceArgument(0, $apiConfig);
     }
 
     /**
@@ -45,12 +53,12 @@ class OroApiExtension extends Extension
      *
      * @return array
      */
-    protected function mergeEntityConfiguration(CumulativeResourceInfo $resource, array $data)
+    protected function mergeApiConfiguration(CumulativeResourceInfo $resource, array $data)
     {
-        if (!empty($resource->data['oro_api']['entity'])) {
+        if (!empty($resource->data['oro_api'])) {
             $data = array_merge(
                 $data,
-                $resource->data['oro_api']['entity']
+                $resource->data['oro_api']
             );
         }
 
