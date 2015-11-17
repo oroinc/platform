@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
+use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 
 class OroLayoutExtension extends Extension
 {
@@ -23,10 +24,19 @@ class OroLayoutExtension extends Extension
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_layout',
-            new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
+            [
+                new FolderingCumulativeFileLoader(
+                    '{folder}',
+                    '\w+',
+                    new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
+                ),
+                new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
+            ]
         );
-        $resources    = $configLoader->load($container);
-        foreach ($resources as $resource) {
+        $themesResources    = $configLoader->load($container);
+        $existThemePaths = [];
+        foreach ($themesResources as $resource) {
+            $existThemePaths[$resource->path] = true;
             $configs[] = $resource->data['oro_layout'];
         }
 
@@ -94,9 +104,35 @@ class OroLayoutExtension extends Extension
              *    ]
              * ]
              */
-            $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resource->data);
+            $foundThemeLayoutUpdates = array_merge_recursive(
+                $foundThemeLayoutUpdates,
+                $this->filterThemeLayoutUpdates($existThemePaths, $resource->data)
+            );
         }
 
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
+    }
+
+    /**
+     * @param array $existThemePaths
+     * @param array $themes
+     * @return array
+     */
+    protected function filterThemeLayoutUpdates($existThemePaths, array $themes)
+    {
+        foreach ($themes as $theme => $themePaths) {
+            foreach ($themePaths as $pathIndex => $path) {
+                if (is_string($path) && isset($existThemePaths[$path])) {
+                    unset($themePaths[$pathIndex]);
+                }
+            }
+            if (empty($themePaths)) {
+                unset($themes[$theme]);
+            } else {
+                $themes[$theme] = $themePaths;
+            }
+        }
+
+        return $themes;
     }
 }

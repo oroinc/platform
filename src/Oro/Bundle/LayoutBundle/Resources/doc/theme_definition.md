@@ -8,7 +8,8 @@ Basically, think of a **theme** as a skin for your application. Files, that the 
 
 ## Configuration
 
-The configuration file should be placed at `Resources/config/oro/` and named `layout.yml`.
+The configuration file should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
+Deprecated method: placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`
 
 ### Themes configuration reference
 
@@ -27,7 +28,7 @@ You can find additional information if you execute the `app/console config:dump-
 **Example:**
 
 ```yaml
-# src/Acme/Bundle/DemoBundle/Resources/config/oro/layout.yml
+# src/Acme/Bundle/DemoBundle/Resources/views/layouts/base/theme.yml
 
 oro_layout:
     themes:
@@ -37,6 +38,10 @@ oro_layout:
             label:  ~ # this is a "hidden" theme
             groups: [ main ]
 
+# src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro/theme.yml
+
+oro_layout:
+    themes:
         oro:
             # Default layout theme for the Oro Platform
             label:  Oro Theme
@@ -44,6 +49,10 @@ oro_layout:
             parent: base
             groups: [ main ]
 
+# src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro-gold/theme.yml
+
+oro_layout:
+    themes:
         oro-gold:
             label:          Nice ORO gold theme
             directory:      OroGold

@@ -6,7 +6,8 @@ The following examples may help to start using layouts in your application.
 Create the layout theme
 -----------------------
 
-The theme definition should be placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`:
+The theme definition should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
+Deprecated method: placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`
 
 ```yaml
 oro_layout:
