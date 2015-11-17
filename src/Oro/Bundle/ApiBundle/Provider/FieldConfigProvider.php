@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Processor\Config\FieldConfigProcessor;
 use Oro\Bundle\ApiBundle\Processor\Config\GetFieldConfig\FieldConfigContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class FieldConfigProvider
 {
@@ -49,7 +50,16 @@ class FieldConfigProvider
 
         $this->processor->process($context);
 
-        $config = $context->getResult();
+        $config = [];
+        if ($context->hasResult()) {
+            $config[ConfigUtil::DEFINITION] = $context->getResult();
+        }
+        if ($context->hasFilters()) {
+            $config[ConfigUtil::FILTERS] = $context->getFilters();
+        }
+        if ($context->hasSorters()) {
+            $config[ConfigUtil::SORTERS] = $context->getSorters();
+        }
 
         $this->cache[$cacheKey] = $config;
 

@@ -44,7 +44,7 @@ class LoadFromMetadata implements ProcessorInterface
             ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_ALL,
             ConfigUtil::FIELDS           => count($targetIdFields) === 1
                 ? reset($targetIdFields)
-                : $targetIdFields
+                : array_fill_keys($targetIdFields, null)
         ];
         $context->setResult($config);
     }

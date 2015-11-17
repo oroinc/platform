@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigProcessor;
-use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigProvider

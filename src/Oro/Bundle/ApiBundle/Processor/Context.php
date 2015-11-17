@@ -12,6 +12,9 @@ class Context extends ApiContext
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
+    /** a configuration of an entity */
+    const CONFIG = 'config';
+
     /** a query is used to get result data */
     const QUERY = 'query';
 
@@ -96,6 +99,26 @@ class Context extends ApiContext
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * Gets a configuration of an entity
+     *
+     * @return array|null
+     */
+    public function getConfig()
+    {
+        return $this->get(self::CONFIG);
+    }
+
+    /**
+     * Sets a configuration of an entity
+     *
+     * @param array|null $config
+     */
+    public function setConfig($config)
+    {
+        $this->set(self::CONFIG, $config);
     }
 
     /**
