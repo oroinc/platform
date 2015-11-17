@@ -151,7 +151,7 @@ class ContextSearchHandler implements ConverterInterface
      *
      * @return array
      */
-    public function searchById($targetsString)
+    protected function searchById($targetsString)
     {
         $targets        = $this->decodeTargets($targetsString);
         $groupedTargets = $this->groupTargetsByEntityClasses($targets);
