@@ -19,7 +19,7 @@ define(function(require) {
 
         initialize: function(options) {
             ColumnManagerView.__super__.initialize.call(this, options);
-            this.filterer = _.bind(options.columnFilterModel.filterer);
+            this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);
             this.updateView = _.debounce(this.updateView, 50);
             this.listenTo(options.columnFilterModel, 'change', this.updateView);
         },
