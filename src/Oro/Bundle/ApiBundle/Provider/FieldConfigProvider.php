@@ -2,22 +2,21 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Bundle\ApiBundle\Processor\ConfigProcessor;
-use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Processor\FieldConfigProcessor;
+use Oro\Bundle\ApiBundle\Processor\GetFieldConfig\FieldConfigContext;
 
-class ConfigProvider
+class FieldConfigProvider
 {
-    /** @var ConfigProcessor */
+    /** @var FieldConfigProcessor */
     protected $processor;
 
     /** @var array */
     protected $cache = [];
 
     /**
-     * @param ConfigProcessor $processor
+     * @param FieldConfigProcessor $processor
      */
-    public function __construct(ConfigProcessor $processor)
+    public function __construct(FieldConfigProcessor $processor)
     {
         $this->processor = $processor;
     }
@@ -26,38 +25,31 @@ class ConfigProvider
      * Gets a config for the given version of an entity.
      *
      * @param string $className     The FQCN of an entity
+     * @param string $fieldName     The name of a field
      * @param string $version       The version of a config
      * @param string $requestType   The type of API request, for example "rest", "soap", "odata", etc.
      * @param string $requestAction The request action, for example "get", "get_list", etc.
      *
      * @return array|null
      */
-    public function getConfig($className, $version, $requestType, $requestAction)
+    public function getFieldConfig($className, $fieldName, $version, $requestType, $requestAction)
     {
-        $cacheKey = $requestType . $version . $className;
+        $cacheKey = $requestType . $version . $className . '::' . $fieldName;
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];
         }
 
-        /** @var ConfigContext $context */
+        /** @var FieldConfigContext $context */
         $context = $this->processor->createContext();
         $context->setVersion($version);
         $context->setRequestType($requestType);
         $context->setRequestAction($requestAction);
         $context->setClassName($className);
+        $context->setFieldName($fieldName);
 
         $this->processor->process($context);
 
-        $config = [];
-        if ($context->hasResult()) {
-            $config[ConfigUtil::DEFINITION] = $context->getResult();
-        }
-        if ($context->hasFilters()) {
-            $config[ConfigUtil::FILTERS] = $context->getFilters();
-        }
-        if ($context->hasSorters()) {
-            $config[ConfigUtil::SORTERS] = $context->getSorters();
-        }
+        $config = $context->getResult();
 
         $this->cache[$cacheKey] = $config;
 

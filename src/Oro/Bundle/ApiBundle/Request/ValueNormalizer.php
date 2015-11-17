@@ -16,9 +16,6 @@ class ValueNormalizer
     /** @var NormalizeValueProcessor */
     protected $processor;
 
-    /** @var NormalizeValueContext|null */
-    protected $context;
-
     /** @var string[] */
     protected $requirements = [];
 
@@ -42,9 +39,9 @@ class ValueNormalizer
      */
     public function normalizeValue($value, $dataType, $requestType, $arrayDelimiter = null)
     {
-        $this->doNormalization($dataType, $requestType, $value, $arrayDelimiter);
+        $context = $this->doNormalization($dataType, $requestType, $value, $arrayDelimiter);
 
-        return $this->context->getResult();
+        return $context->getResult();
     }
 
     /**
@@ -60,8 +57,9 @@ class ValueNormalizer
     {
         $requirementKey = $dataType . $requestType . (!empty($arrayDelimiter) ? $arrayDelimiter : '');
         if (!array_key_exists($requirementKey, $this->requirements)) {
-            $this->doNormalization($dataType, $requestType, null, $arrayDelimiter);
-            $this->requirements[$requirementKey] = $this->context->getRequirement() ?: self::DEFAULT_REQUIREMENT;
+            $context = $this->doNormalization($dataType, $requestType, null, $arrayDelimiter);
+
+            $this->requirements[$requirementKey] = $context->getRequirement() ?: self::DEFAULT_REQUIREMENT;
         }
 
         return $this->requirements[$requirementKey];
@@ -72,35 +70,31 @@ class ValueNormalizer
      * @param string      $requestType
      * @param mixed|null  $value
      * @param string|null $arrayDelimiter
+     *
+     * @return NormalizeValueContext
      */
     protected function doNormalization($dataType, $requestType, $value = null, $arrayDelimiter = null)
     {
-        if (null === $this->context) {
-            $this->context = $this->processor->createContext();
-        }
-        $this->context->setRequestType($requestType);
-        $this->context->setDataType($dataType);
-        $this->context->setResult($value);
-        $this->context->removeRequirement();
+        /** @var NormalizeValueContext $context */
+        $context = $this->processor->createContext();
+        $context->setRequestType($requestType);
+        $context->setDataType($dataType);
+        $context->setResult($value);
+        $context->removeRequirement();
 
-        $previousArrayAllowed   = $this->context->isArrayAllowed();
-        $previousArrayDelimiter = $this->context->getArrayDelimiter();
         if (!empty($arrayDelimiter)) {
-            $this->context->setArrayAllowed(true);
-            $this->context->setArrayDelimiter($arrayDelimiter);
+            $context->setArrayAllowed(true);
+            $context->setArrayDelimiter($arrayDelimiter);
         } else {
-            $this->context->setArrayAllowed(false);
-            $this->context->setArrayDelimiter(null);
+            $context->setArrayAllowed(false);
+            $context->setArrayDelimiter(null);
         }
         try {
-            $this->processor->process($this->context);
-            $this->context->setArrayAllowed($previousArrayAllowed);
-            $this->context->setArrayDelimiter($previousArrayDelimiter);
+            $this->processor->process($context);
         } catch (\Exception $e) {
-            $this->context->setArrayAllowed($previousArrayAllowed);
-            $this->context->setArrayDelimiter($previousArrayDelimiter);
-
             throw ExceptionHelper::getProcessorUnderlyingException($e);
         }
+
+        return $context;
     }
 }

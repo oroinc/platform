@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor;
+namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
+
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 class ConfigContext extends ApiContext
 {

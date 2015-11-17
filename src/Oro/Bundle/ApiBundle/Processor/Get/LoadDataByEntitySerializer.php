@@ -8,6 +8,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class LoadDataByEntitySerializer implements ProcessorInterface
 {
@@ -59,12 +60,18 @@ class LoadDataByEntitySerializer implements ProcessorInterface
             $context->getRequestType(),
             $context->getAction()
         );
-        if (empty($config['definition'])) {
+        if (null === $config) {
+            // a configuration was not found
+            return;
+        }
+
+        $definition = ConfigUtil::getDefinition($config);
+        if (empty($definition)) {
             // an entity does not have a configuration for the EntitySerializer
             return;
         }
 
-        $result = $this->entitySerializer->serialize($query, $config['definition']);
+        $result = $this->entitySerializer->serialize($query, $definition);
         if (empty($result)) {
             $result = null;
         } elseif (count($result) === 1) {

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\ConfigContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class NormalizeFilters implements ProcessorInterface
@@ -35,11 +35,9 @@ class NormalizeFilters implements ProcessorInterface
             return;
         }
 
-        $fields = !empty($filters['fields'])
-            ? $filters['fields']
-            : [];
+        $fields = ConfigUtil::getFields($filters);
 
-        if (isset($filters['exclusion_policy']) && $filters['exclusion_policy'] === 'all') {
+        if (ConfigUtil::isExcludeAll($filters)) {
             $fields = $this->removeExclusions($fields);
         } else {
             $entityClass = $context->getClassName();
@@ -52,8 +50,8 @@ class NormalizeFilters implements ProcessorInterface
 
         $context->setFilters(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => $fields
+                ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_ALL,
+                ConfigUtil::FIELDS           => $fields
             ]
         );
     }
@@ -104,7 +102,7 @@ class NormalizeFilters implements ProcessorInterface
             }
             if ($hasIndex) {
                 $filters[$fieldName] = [
-                    'data_type' => $mapping['type']
+                    ConfigUtil::DATA_TYPE => $mapping['type']
                 ];
             }
         }
@@ -132,8 +130,8 @@ class NormalizeFilters implements ProcessorInterface
                 $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
                 if (count($targetIdFieldNames) === 1) {
                     $filters[$fieldName] = [
-                        'data_type'   => $targetMetadata->getTypeOfField(reset($targetIdFieldNames)),
-                        'allow_array' => true
+                        ConfigUtil::DATA_TYPE   => $targetMetadata->getTypeOfField(reset($targetIdFieldNames)),
+                        ConfigUtil::ALLOW_ARRAY => true
                     ];
                 }
             }
@@ -152,7 +150,7 @@ class NormalizeFilters implements ProcessorInterface
         return array_filter(
             $filters,
             function (array $config) {
-                return !isset($config['exclude']) || !$config['exclude'];
+                return !ConfigUtil::isExclude($config);
             }
         );
     }

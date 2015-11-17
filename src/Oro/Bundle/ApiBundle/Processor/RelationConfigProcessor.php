@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Component\ChainProcessor\ActionProcessor;
-use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\GetRelationConfig\RelationConfigContext;
 
-class ConfigProcessor extends ActionProcessor
+class RelationConfigProcessor extends ActionProcessor
 {
     /**
      * {@inheritdoc}
      */
     protected function createContextObject()
     {
-        return new ConfigContext();
+        return new RelationConfigContext();
     }
 }

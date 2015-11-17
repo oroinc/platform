@@ -73,6 +73,18 @@ services:
         arguments:
             - @oro_api.get_config.processor
 
+    oro_api.field_config_provider:
+        class: Oro\Bundle\ApiBundle\Provider\FieldConfigProvider
+        public: false
+        arguments:
+            - @oro_api.get_field_config.processor
+
+    oro_api.relation_config_provider:
+        class: Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
+        public: false
+        arguments:
+            - @oro_api.get_relation_config.processor
+
     oro_api.entity_exclusion_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
         public: false

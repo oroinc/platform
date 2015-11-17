@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class RegisterFilters implements ProcessorInterface
 {
@@ -46,31 +47,37 @@ class RegisterFilters implements ProcessorInterface
             $context->getRequestType(),
             $context->getAction()
         );
-        if (empty($config['filters'])) {
+        if (null === $config) {
+            // a configuration was not found
+            return;
+        }
+
+        $filters = ConfigUtil::getFilters($config);
+        if (empty($filters)) {
             // a filters' configuration does not exist
             return;
         }
-        if (!isset($config['filters']['exclusion_policy']) || $config['filters']['exclusion_policy'] !== 'all') {
+
+        if (!ConfigUtil::isExcludeAll($filters)) {
             // it seems that filters' configuration was not normalized
             // default normalization can be found in {@see Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeFilters}
             throw new \RuntimeException(
                 sprintf(
                     'Expected "all" exclusion policy for filters. Got: %s.',
-                    isset($config['filters']['exclusion_policy']) ? $config['filters']['exclusion_policy'] : 'none'
+                    ConfigUtil::getExclusionPolicy($filters)
                 )
             );
         }
 
-        if (isset($config['filters']['fields'])) {
-            $filters = $context->getFilters();
-            foreach ($config['filters']['fields'] as $field => $fieldConfig) {
-                if ($filters->has($field)) {
-                    continue;
-                }
-                $filter = $this->createFilter($field, $fieldConfig);
-                if (null !== $filter) {
-                    $filters->add($field, $filter);
-                }
+        $fields           = ConfigUtil::getFields($filters);
+        $filterCollection = $context->getFilters();
+        foreach ($fields as $field => $fieldConfig) {
+            if ($filterCollection->has($field)) {
+                continue;
+            }
+            $filter = $this->createFilter($field, $fieldConfig);
+            if (null !== $filter) {
+                $filterCollection->add($field, $filter);
             }
         }
     }
@@ -83,20 +90,20 @@ class RegisterFilters implements ProcessorInterface
      */
     protected function createFilter($field, array $fieldConfig)
     {
-        $filter = $this->filterFactory->createFilter($fieldConfig['data_type']);
+        $filter = $this->filterFactory->createFilter($fieldConfig[ConfigUtil::DATA_TYPE]);
         if (null !== $filter) {
             if ($filter instanceof ComparisonFilter) {
                 $filter->setField($field);
             }
             if ($filter instanceof StandaloneFilter) {
-                if (isset($fieldConfig['allow_array'])) {
-                    $filter->setArrayAllowed($fieldConfig['allow_array']);
+                if (isset($fieldConfig[ConfigUtil::ALLOW_ARRAY])) {
+                    $filter->setArrayAllowed($fieldConfig[ConfigUtil::ALLOW_ARRAY]);
                 }
-                if (isset($fieldConfig['description'])) {
-                    $filter->setDescription($fieldConfig['description']);
+                if (isset($fieldConfig[ConfigUtil::DESCRIPTION])) {
+                    $filter->setDescription($fieldConfig[ConfigUtil::DESCRIPTION]);
                 }
-                if (isset($fieldConfig['default_value'])) {
-                    $filter->setDefaultValue($fieldConfig['default_value']);
+                if (isset($fieldConfig[ConfigUtil::DEFAULT_VALUE])) {
+                    $filter->setDefaultValue($fieldConfig[ConfigUtil::DEFAULT_VALUE]);
                 }
             }
         }
