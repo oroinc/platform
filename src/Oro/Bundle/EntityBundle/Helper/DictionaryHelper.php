@@ -4,22 +4,12 @@ namespace Oro\Bundle\EntityBundle\Helper;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 class DictionaryHelper
 {
     const DEFAULT_SEARCH_FIELD = 'label';
-
-    /** @var \Symfony\Component\PropertyAccess\PropertyAccessor */
-    protected $accessor;
-
-    public function __construct()
-    {
-        $this->accessor = PropertyAccess::createPropertyAccessor();
-    }
 
     /**
      * @param ClassMetadata $metadata
