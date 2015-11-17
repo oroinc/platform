@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CronBundle;
 
-use Symfony\Component\ClassLoader\MapClassLoader;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -14,13 +13,13 @@ class OroCronBundle extends Bundle
 {
     public function __construct()
     {
-        // Change path to JMSJobQueueBundle class file to set custom JobQueueBundle loader
-        $loader = new MapClassLoader(
-            [
-                'JMS\JobQueueBundle\JMSJobQueueBundle' =>  __DIR__ . '/JobQueueBundle/JMSJobQueueBundle.php'
-            ]
-        );
-        $loader->register(true);
+        // Change alias for JMSJobQueueBundle class to set custom JobQueueBundle loader
+        if (!class_exists('JMS\JobQueueBundle\JMSJobQueueBundle', false)) {
+            class_alias(
+                'Oro\Bundle\CronBundle\JobQueue\JMSJobQueueBundle',
+                'JMS\JobQueueBundle\JMSJobQueueBundle'
+            );
+        }
     }
 
     /**
