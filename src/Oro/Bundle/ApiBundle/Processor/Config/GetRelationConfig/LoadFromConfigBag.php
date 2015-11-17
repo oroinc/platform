@@ -45,25 +45,73 @@ class LoadFromConfigBag implements ProcessorInterface
             return;
         }
 
-        $config = $this->configBag->getRelationConfig($entityClass, $context->getVersion());
+        $config = $this->loadConfig($entityClass, $context->getVersion());
+        if (null !== $config) {
+            $this->addConfigToContext($context, $config);
+        }
+    }
+
+    /**
+     * @param RelationConfigContext $context
+     * @param array                 $config
+     */
+    protected function addConfigToContext(RelationConfigContext $context, array $config)
+    {
+        $hasDefinition = isset($config[ConfigUtil::DEFINITION]);
+        if ($hasDefinition) {
+            $context->setResult($config[ConfigUtil::DEFINITION]);
+        }
+        if (isset($config[ConfigUtil::FILTERS]) && null === $context->getFilters()) {
+            $context->setFilters($config[ConfigUtil::FILTERS]);
+        }
+        if (isset($config[ConfigUtil::SORTERS]) && null === $context->getSorters()) {
+            $context->setSorters($config[ConfigUtil::SORTERS]);
+        }
+        if ($hasDefinition) {
+            if (null === $context->getFilters()) {
+                $context->setFilters(ConfigUtil::getInitialConfig());
+            }
+            if (null === $context->getSorters()) {
+                $context->setSorters(ConfigUtil::getInitialConfig());
+            }
+        }
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $version
+     *
+     * @return array|null
+     */
+    protected function loadConfig($entityClass, $version)
+    {
+        $config = $this->configBag->getRelationConfig($entityClass, $version);
         if (null === $config || ConfigUtil::isRelationInherit($config)) {
             $parentClasses = $this->entityHierarchyProvider->getHierarchyForClassName($entityClass);
             foreach ($parentClasses as $parentClass) {
-                $parentConfig = $this->configBag->getRelationConfig($parentClass, $context->getVersion());
+                $parentConfig = $this->configBag->getRelationConfig($parentClass, $version);
                 if (!empty($parentConfig)) {
-                    if (null === $config) {
-                        $config = $parentConfig;
-                    } else {
-                        $config = array_merge_recursive($parentConfig, $config);
-                    }
+                    $config = $this->mergeConfigs($parentConfig, $config);
                     if (!ConfigUtil::isRelationInherit($parentConfig)) {
                         break;
                     }
                 }
             }
         }
-        if (null !== $config) {
-            $context->setResult($config);
-        }
+
+        return $config;
+    }
+
+    /**
+     * @param array      $parentConfig
+     * @param array|null $config
+     *
+     * @return array
+     */
+    protected function mergeConfigs($parentConfig, $config)
+    {
+        return null === $config
+            ? $parentConfig
+            : array_merge_recursive($parentConfig, $config);
     }
 }

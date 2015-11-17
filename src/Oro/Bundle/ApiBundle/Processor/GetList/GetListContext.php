@@ -12,9 +12,6 @@ class GetListContext extends Context
     /** @var FilterValueAccessorInterface */
     private $filterValues;
 
-    /** a configuration of an entity */
-    const CONFIG = 'config';
-
     /** a configuration of an entity filters */
     const CONFIG_FILTERS = 'configFilters';
 
@@ -29,26 +26,6 @@ class GetListContext extends Context
 
     /** a callback that can be used to calculate the total number of records in a list of entities */
     const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
-
-    /**
-     * Gets a configuration of an entity
-     *
-     * @return array|null
-     */
-    public function getConfig()
-    {
-        return $this->get(self::CONFIG);
-    }
-
-    /**
-     * Sets a configuration of an entity
-     *
-     * @param array|null $config
-     */
-    public function setConfig($config)
-    {
-        $this->set(self::CONFIG, $config);
-    }
 
     /**
      * Gets a configuration of an entity filters

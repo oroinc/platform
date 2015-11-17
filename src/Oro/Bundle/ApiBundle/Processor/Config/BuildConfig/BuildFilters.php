@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\BuildConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class BuildFilters implements ProcessorInterface
@@ -27,11 +27,6 @@ class BuildFilters implements ProcessorInterface
             return;
         }
 
-        $context->setFilters(
-            [
-                ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_NONE,
-                ConfigUtil::FIELDS           => []
-            ]
-        );
+        $context->setFilters(ConfigUtil::getInitialConfig());
     }
 }

@@ -22,6 +22,17 @@ final class ConfigUtil
     const INHERIT       = 'inherit';
 
     /**
+     * @return array
+     */
+    public static function getInitialConfig()
+    {
+        return [
+            self::EXCLUSION_POLICY => self::EXCLUSION_POLICY_NONE,
+            self::FIELDS           => []
+        ];
+    }
+
+    /**
      * @param array $config
      *
      * @return string

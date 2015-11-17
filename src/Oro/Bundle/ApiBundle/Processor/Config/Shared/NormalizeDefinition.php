@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\FieldConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -129,9 +130,7 @@ class NormalizeDefinition implements ProcessorInterface
             }
 
             if ($this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
-                $config = [
-                    ConfigUtil::EXCLUDE => true
-                ];
+                $config = [ConfigUtil::EXCLUDE => true];
             } else {
                 $config = $this->fieldConfigProvider->getFieldConfig(
                     $metadata->name,
@@ -174,9 +173,7 @@ class NormalizeDefinition implements ProcessorInterface
             if ($this->exclusionProvider->isIgnoredEntity($targetEntityClass)
                 || $this->exclusionProvider->isIgnoredRelation($metadata, $fieldName)
             ) {
-                $config = [
-                    ConfigUtil::EXCLUDE => true
-                ];
+                $config = [ConfigUtil::EXCLUDE => true];
             } else {
                 $config = $this->relationConfigProvider->getRelationConfig(
                     $targetEntityClass,

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config;
 
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
