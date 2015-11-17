@@ -1,24 +1,78 @@
-/** @lends MultiselectEditorView */
+/** @lends MultiRelationEditorView */
 define(function(require) {
     'use strict';
 
     /**
-     * @TODO FIX DOC
+     * Multi-relation content editor. Please note that it requires column data format
+     * corresponding to multi-relation-cell.
+     *
+     * ### Column configuration samples:
+     * ``` yml
+     * datagrid:
+     *   {grid-uid}:
+     *     inline_editing:
+     *       enable: true
+     *     # <grid configuration> goes here
+     *     columns:
+     *       # Sample 1. Full configuration
+     *       {column-name-1}:
+     *         inline_editing:
+     *           editor:
+     *             view: orodatagrid/js/app/views/editor/multi-relation-editor-view
+     *             view_options:
+     *               placeholder: '<placeholder>'
+     *               css_class_name: '<class-name>'
+     *               maximumSelectionLength: 3
+     *           validation_rules:
+     *             NotBlank: true
+     *         autocomplete_api_accessor:
+     *           # class: oroentity/js/tools/entity-select-search-api-accessor
+     *           # entity_select is default search api
+     *           # following options are specific only for entity-select-search-api-accessor
+     *           # please place here an options corresponding to specified class
+     *           entity_name: {corresponding-entity}
+     *           field_name: {corresponding-entity-field-name}
+     * ```
+     *
+     * ### Options in yml:
+     *
+     * Column option name                                  | Description
+     * :---------------------------------------------------|:-----------
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
+     * inline_editing.editor.view_options.maximumSelectionLength | Optional. Maximum selection length
+     * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
+     * inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
+     * inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
+     *
+     * ### Constructor parameters
+     *
+     * @class
+     * @param {Object} options - Options container
+     * @param {Object} options.model - Current row model
+     * @param {Backgrid.Cell} options.cell - Current datagrid cell
+     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.placeholder - Placeholder for an empty element
+     * @param {string} options.maximumSelectionLength - Maximum selection length
+     * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
+     * @param {Object} options.autocomplete_api_accessor - Autocomplete API specification.
+     *                                      Please see [list of search API's](../search-apis.md)
      *
      * @augments [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)
-     * @exports MultiselectEditorView
+     * @exports MultiRelationEditorView
      */
-    var MultiselectEditorView;
+    var MultiRelationEditorView;
     var RelatedIdRelationEditorView = require('./related-id-relation-editor-view');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var select2autosizer = require('../../../utils/select2-autosizer');
 
-    MultiselectEditorView = RelatedIdRelationEditorView.extend(/** @exports MultiselectEditorView.prototype */{
+    MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @exports MultiRelationEditorView.prototype */{
         className: 'multi-relation-editor',
         initialize: function(options) {
             options.ignore_value_field_name = true;
-            MultiselectEditorView.__super__.initialize.apply(this, arguments);
+            this.maximumSelectionLength = options.maximumSelectionLength;
+            MultiRelationEditorView.__super__.initialize.apply(this, arguments);
         },
 
         events: {
@@ -27,10 +81,6 @@ define(function(require) {
 
         listen: {
             'change:visibility': 'autoSize'
-        },
-
-        getAvailableOptions: function(options) {
-            return [];
         },
 
         autoSize: function() {
@@ -62,8 +112,9 @@ define(function(require) {
         },
 
         getSelect2Options: function() {
-            var options = MultiselectEditorView.__super__.getSelect2Options.apply(this, arguments);
+            var options = MultiRelationEditorView.__super__.getSelect2Options.apply(this, arguments);
             options.multiple = true;
+            options.maximumSelectionLength = this.maximumSelectionLength;
             return options;
         },
 
@@ -123,5 +174,5 @@ define(function(require) {
         }
     });
 
-    return MultiselectEditorView;
+    return MultiRelationEditorView;
 });

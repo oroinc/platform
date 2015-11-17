@@ -121,6 +121,8 @@ Editor                                                                      | De
 [select-editor-view](../../frontend/editor/select-editor-view.md)              | Editing select cells (predefined choices)
 [related-id-select-editor-view](../../frontend/editor/related-id-select-editor-view.md)   | Editing cells which already contain label (and no value) using predefined choices
 [related-id-relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md) | Editing cells which already contain label (and no value) using search api
+[multi-relation-editor-view](../../frontend/editor/multi-relation-editor-view.md) | Editing cells with specific format, for many to one relations.
+[multi-select-editor-view](../../frontend/editor/multi-select-editor-view.md) | Editing cells with specific format, for multiselect field.
 
 ## Supported search API's for `related-id-relation-editor-view`
 
