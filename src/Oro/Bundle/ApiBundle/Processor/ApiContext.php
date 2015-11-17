@@ -6,9 +6,6 @@ use Oro\Component\ChainProcessor\Context as BaseContext;
 
 abstract class ApiContext extends BaseContext
 {
-    /** a string that can be used to reference the latest API version */
-    const LATEST_VERSION = 'latest';
-
     /** the type of a request, for example "rest", "soap", "odata", etc. */
     const REQUEST_TYPE = 'requestType';
 
@@ -38,7 +35,7 @@ abstract class ApiContext extends BaseContext
     /**
      * Gets API version
      *
-     * @return string|null
+     * @return string
      */
     public function getVersion()
     {

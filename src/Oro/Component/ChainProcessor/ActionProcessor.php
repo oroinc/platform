@@ -21,6 +21,16 @@ class ActionProcessor extends ChainProcessor
     }
 
     /**
+     * Gets an action that is handled by the processor.
+     *
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
      * Creates an instance of Context this processor works with.
      *
      * @return Context

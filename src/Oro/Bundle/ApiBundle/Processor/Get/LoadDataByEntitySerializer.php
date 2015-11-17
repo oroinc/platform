@@ -7,25 +7,17 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 
 class LoadDataByEntitySerializer implements ProcessorInterface
 {
-    /** @var ConfigProvider */
-    protected $configProvider;
-
     /** @var EntitySerializer */
     protected $entitySerializer;
 
     /**
-     * @param ConfigProvider   $configProvider
      * @param EntitySerializer $entitySerializer
      */
-    public function __construct(
-        ConfigProvider $configProvider,
-        EntitySerializer $entitySerializer
-    ) {
-        $this->configProvider   = $configProvider;
+    public function __construct(EntitySerializer $entitySerializer)
+    {
         $this->entitySerializer = $entitySerializer;
     }
 
@@ -49,21 +41,17 @@ class LoadDataByEntitySerializer implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         if (!$entityClass) {
-            // no entity type specified
+            // an entity type is not specified
             return;
         }
 
-        $config = $this->configProvider->getConfig(
-            $entityClass,
-            $context->getVersion(),
-            $context->getRequestType()
-        );
-        if (empty($config['definition'])) {
-            // an entity does not have a configuration for the EntitySerializer
+        $config = $context->getConfig();
+        if (null === $config) {
+            // an entity configuration does not exist
             return;
         }
 
-        $result = $this->entitySerializer->serialize($query, $config['definition']);
+        $result = $this->entitySerializer->serialize($query, $config);
         if (empty($result)) {
             $result = null;
         } elseif (count($result) === 1) {

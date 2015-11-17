@@ -1,7 +1,6 @@
 oro_api:
     actions:
         get_list:
-            processor: oro_api.get_list.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -16,7 +15,6 @@ oro_api:
                 finalize:
                     priority: -80
         get:
-            processor: oro_api.get.processor
             processing_groups:
                 initialize:
                     priority: -10

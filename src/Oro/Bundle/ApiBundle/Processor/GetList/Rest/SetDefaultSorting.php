@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class SetDefaultSorting implements ProcessorInterface
@@ -62,7 +63,7 @@ class SetDefaultSorting implements ProcessorInterface
                             }
                         }
 
-                        return implode(',', $result);
+                        return implode(RestRequest::ARRAY_DELIMITER, $result);
                     }
                 )
             );

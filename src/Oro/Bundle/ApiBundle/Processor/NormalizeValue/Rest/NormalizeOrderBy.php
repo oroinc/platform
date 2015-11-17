@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Criteria;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
 
 /**
  * Normalizes a value of "orderBy" type for REST requests.
@@ -15,6 +16,8 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
  */
 class NormalizeOrderBy implements ProcessorInterface
 {
+    const REQUIREMENT = '-?[\w\.]+(,-?[\w\.]+)*';
+
     /**
      * {@inheritdoc}
      */
@@ -23,13 +26,13 @@ class NormalizeOrderBy implements ProcessorInterface
         /** @var NormalizeValueContext $context */
 
         if (!$context->hasRequirement()) {
-            $context->setRequirement('-?[\w\.]+(,-?[\w\.]+)*');
+            $context->setRequirement(self::REQUIREMENT);
         }
         if ($context->hasResult()) {
             $value = $context->getResult();
             if (null !== $value && is_string($value)) {
                 $orderBy = [];
-                $items   = explode(',', $value);
+                $items   = explode(RestRequest::ARRAY_DELIMITER, $value);
                 foreach ($items as $item) {
                     $item = trim($item);
                     if (0 === strpos($item, '-')) {

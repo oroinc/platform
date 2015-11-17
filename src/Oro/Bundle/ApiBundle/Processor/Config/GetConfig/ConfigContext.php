@@ -1,13 +1,16 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\BuildConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
-class BuildConfigContext extends ApiContext
+class ConfigContext extends ApiContext
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
+
+    /** the request action, for example "get", "get_list", etc. */
+    const REQUEST_ACTION = 'requestAction';
 
     /** a definition of filters */
     const FILTERS = 'filters';
@@ -33,6 +36,26 @@ class BuildConfigContext extends ApiContext
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * Gets the request action, for example "get", "get_list", etc.
+     *
+     * @return string
+     */
+    public function getRequestAction()
+    {
+        return $this->get(self::REQUEST_ACTION);
+    }
+
+    /**
+     * Sets the request action, for example "get", "get_list", etc.
+     *
+     * @param string $requestAction
+     */
+    public function setRequestAction($requestAction)
+    {
+        $this->set(self::REQUEST_ACTION, $requestAction);
     }
 
     /**

@@ -1,17 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared;
-
-use Doctrine\Common\Collections\Criteria;
+namespace Oro\Bundle\ApiBundle\Processor\GetList\Rest;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
-class BuildCriteria implements ProcessorInterface
+class NormalizeFilterValues implements ProcessorInterface
 {
     /** @var ValueNormalizer */
     protected $valueNormalizer;
@@ -29,17 +27,11 @@ class BuildCriteria implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var Context $context */
+        /** @var GetListContext $context */
 
         if ($context->hasQuery()) {
             // a query is already built
             return;
-        }
-
-        $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            $criteria = new Criteria();
-            $context->setCriteria($criteria);
         }
 
         $filterValues = $context->getFilterValues();
@@ -48,17 +40,16 @@ class BuildCriteria implements ProcessorInterface
             $filterValue = null;
             if ($filterValues->has($filterKey)) {
                 $filterValue = $filterValues->get($filterKey);
-                $value       = null;
                 if ($filter instanceof StandaloneFilter) {
                     $value = $this->valueNormalizer->normalizeValue(
                         $filterValue->getValue(),
                         $filter->getDataType(),
-                        $context->getRequestType()
+                        $context->getRequestType(),
+                        $filter->isArrayAllowed($filterValue->getOperator()) ? RestRequest::ARRAY_DELIMITER : null
                     );
+                    $filterValue->setValue($value);
                 }
-                $filterValue = new FilterValue($value, $filterValue->getOperator());
             }
-            $filter->apply($criteria, $filterValue);
         }
     }
 }

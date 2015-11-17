@@ -21,7 +21,6 @@ class Configuration implements ConfigurationInterface
                 ->example(
                     [
                         'get' => [
-                            'processor' => 'oro_api.get_list.processor',
                             'processing_groups' => [
                                 'load_data' => [
                                     'priority' => -10
@@ -36,11 +35,6 @@ class Configuration implements ConfigurationInterface
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->children()
-                        ->scalarNode('processor')
-                            ->info('An identifier of a processor service')
-                            ->isRequired()
-                            ->cannotBeEmpty()
-                        ->end()
                         ->arrayNode('processing_groups')
                             ->info('A list of groups by which child processors can be split')
                             ->useAttributeAsKey('name')

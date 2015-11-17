@@ -47,6 +47,9 @@ UPGRADE FROM 1.8 to 1.9
 
 ####EntityBundle
 - Methods `getSingleRootAlias`, `getPageOffset`, `applyJoins` and `normalizeCriteria` of `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` marked as deprecated. Use corresponding methods of `Oro\Bundle\EntityBundle\ORM\QueryUtils` instead.
+- `oro_entity.entity_hierarchy_provider` service was marked as private.
+- `oro_entity.entity_hierarchy_provider.class` parameter was removed.
+- `oro_entity.entity_hierarchy_provider.all` service was added. It can be used if you need a hierarchy of all entities but not only configurable ones.
 
 ####EntityConfigBundle
 - Removed `optionSet` field type deprecated since v1.4. Existing options sets are converted to `Select` or `Multi-Select` automatically during the Platform update.

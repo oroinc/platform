@@ -73,11 +73,30 @@ services:
         arguments:
             - @oro_api.get_config.processor
 
+    oro_api.field_config_provider:
+        class: Oro\Bundle\ApiBundle\Provider\FieldConfigProvider
+        public: false
+        arguments:
+            - @oro_api.get_field_config.processor
+
+    oro_api.relation_config_provider:
+        class: Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
+        public: false
+        arguments:
+            - @oro_api.get_relation_config.processor
+
     oro_api.entity_exclusion_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
         public: false
         calls:
             - [addProvider, [ @oro_entity.exclusion_provider.config ] ]
+            - [addProvider, [ @oro_api.exclusion_provider.by_alias ] ]
+
+    oro_api.exclusion_provider.by_alias:
+        class: Oro\Bundle\ApiBundle\Provider\AliasedEntityExclusionProvider
+        public: false
+        arguments:
+            - @oro_entity.entity_alias_resolver
 
     oro_api.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer
@@ -130,3 +149,21 @@ services:
             - @oro_api.value_normalizer
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    oro.api.filter_factory:
+        class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory
+        public: false
+
+    oro.api.filter_factory.default:
+        class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
+        public: false
+        calls:
+            - [addFilter, [ 'integer', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'unsignedInteger', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'string', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'boolean', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'datetime', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'entityAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+            - [addFilter, [ 'entityPluralAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+        tags:
+            - { name: oro.api.filter_factory, priority: -10 }

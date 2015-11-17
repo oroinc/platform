@@ -4,7 +4,6 @@ parameters:
     oro_entity.event_listener.custom_entity_grid_listener.class:                       Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
     oro_entity.event_listener.entity_relation_grid_listener.class:                     Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
     oro_entity.event_listener.entity_modify_created_updated_properties_listener.class: Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener
-    oro_entity.entity_hierarchy_provider.class:                                        Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
     oro_entity.exclusion_provider.config.class:                                        Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                                         Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
     oro_entity.dictionary_value_list_provider.class:                                   Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
@@ -198,10 +197,19 @@ services:
             - { name: oro_entity.virtual_relation_provider, priority: 0 }
 
     oro_entity.entity_hierarchy_provider:
-        class: %oro_entity.entity_hierarchy_provider.class%
+        class: Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
+        public: false
         arguments:
+            - @oro_entity.doctrine_helper
             - @oro_entity_config.provider.extend
-            - @doctrine
+
+    oro_entity.entity_hierarchy_provider.all:
+        class: Oro\Bundle\EntityBundle\Provider\AllEntityHierarchyProvider
+        public: false
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity_config.provider.extend
+            - @oro_entity_config.entity_manager_bag
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%

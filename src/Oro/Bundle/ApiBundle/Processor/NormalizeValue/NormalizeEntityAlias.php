@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
-class NormalizeEntityAlias implements ProcessorInterface
+class NormalizeEntityAlias extends AbstractProcessor
 {
+    const REQUIREMENT = '[a-zA-Z]\w+';
+
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
@@ -22,18 +22,40 @@ class NormalizeEntityAlias implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    protected function getDataTypeString()
     {
-        /** @var NormalizeValueContext $context */
+        return 'entity alias';
+    }
 
-        if (!$context->hasRequirement()) {
-            $context->setRequirement('[a-zA-Z]\w+');
-        }
-        if ($context->hasResult()) {
-            $value = $context->getResult();
-            if (null !== $value && false === strpos($value, '\\')) {
-                $context->setResult($this->entityAliasResolver->getClassByAlias($value));
-            }
-        }
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDataTypePluralString()
+    {
+        return 'entity aliases';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequirement()
+    {
+        return self::REQUIREMENT;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isValueNormalizationRequired($value)
+    {
+        return false === strpos($value, '\\');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function normalizeValue($value)
+    {
+        return $this->entityAliasResolver->getClassByAlias($value);
     }
 }

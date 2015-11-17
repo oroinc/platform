@@ -12,31 +12,86 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Configuration;
 
 class ConfigurationCompilerPass implements CompilerPassInterface
 {
+    const ACTION_PROCESSOR_TAG            = 'oro.api.action_processor';
     const ACTION_PROCESSOR_BAG_SERVICE_ID = 'oro_api.action_processor_bag';
     const PROCESSOR_BAG_SERVICE_ID        = 'oro_api.processor_bag';
+    const FILTER_FACTORY_TAG              = 'oro.api.filter_factory';
+    const FILTER_FACTORY_SERVICE_ID       = 'oro.api.filter_factory';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $config                       = $this->getConfig($container);
+        $config = $this->getConfig($container);
+        $this->registerProcessingGroups($container, $config);
+        $this->registerActionProcessors($container);
+        $this->registerFilterFactories($container);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    protected function registerProcessingGroups(ContainerBuilder $container, array $config)
+    {
+        $processorBagServiceDef = $this->findDefinition($container, self::PROCESSOR_BAG_SERVICE_ID);
+        if (null !== $processorBagServiceDef) {
+            foreach ($config['actions'] as $action => $actionConfig) {
+                if (isset($actionConfig['processing_groups'])) {
+                    foreach ($actionConfig['processing_groups'] as $group => $groupConfig) {
+                        $processorBagServiceDef->addMethodCall(
+                            'addGroup',
+                            [$group, $action, $groupConfig['priority']]
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function registerActionProcessors(ContainerBuilder $container)
+    {
         $actionProcessorBagServiceDef = $this->findDefinition($container, self::ACTION_PROCESSOR_BAG_SERVICE_ID);
-        $processorBagServiceDef       = $this->findDefinition($container, self::PROCESSOR_BAG_SERVICE_ID);
-        foreach ($config['actions'] as $action => $actionConfig) {
-            if (null !== $actionProcessorBagServiceDef) {
+        if (null !== $actionProcessorBagServiceDef) {
+            $taggedServices = $container->findTaggedServiceIds(self::ACTION_PROCESSOR_TAG);
+            foreach ($taggedServices as $id => $attributes) {
                 $actionProcessorBagServiceDef->addMethodCall(
                     'addProcessor',
-                    [$action, new Reference($actionConfig['processor'])]
+                    [new Reference($id)]
                 );
             }
-            if (null !== $processorBagServiceDef && isset($actionConfig['processing_groups'])) {
-                foreach ($actionConfig['processing_groups'] as $group => $groupConfig) {
-                    $processorBagServiceDef->addMethodCall(
-                        'addGroup',
-                        [$group, $action, $groupConfig['priority']]
-                    );
-                }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function registerFilterFactories(ContainerBuilder $container)
+    {
+        $filterFactoryServiceDef = $this->findDefinition($container, self::FILTER_FACTORY_SERVICE_ID);
+        if (null !== $filterFactoryServiceDef) {
+            // find factories
+            $factories      = [];
+            $taggedServices = $container->findTaggedServiceIds(self::FILTER_FACTORY_TAG);
+            foreach ($taggedServices as $id => $attributes) {
+                $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+                $factories[$priority][] = new Reference($id);
+            }
+            if (empty($factories)) {
+                return;
+            }
+
+            // sort by priority and flatten
+            krsort($factories);
+            $factories = call_user_func_array('array_merge', $factories);
+
+            // register
+            foreach ($factories as $factory) {
+                $filterFactoryServiceDef->addMethodCall('addFilterFactory', [$factory]);
             }
         }
     }

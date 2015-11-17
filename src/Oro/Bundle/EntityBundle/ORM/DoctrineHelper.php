@@ -206,15 +206,33 @@ class DoctrineHelper
     }
 
     /**
+     * Gets the EntityManager associated with a given entity or class.
+     *
      * @param string|object $entityOrClass
+     *
      * @return EntityManager
+     *
      * @throws Exception\NotManageableEntityException
      */
     public function getEntityManager($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
+        return $this->getEntityManagerForClass($this->getEntityClass($entityOrClass));
+    }
+
+    /**
+     * Gets the EntityManager associated with a given class.
+     *
+     * @param string $entityClass
+     * @param bool   $triggerException
+     *
+     * @return EntityManager|null
+     *
+     * @throws Exception\NotManageableEntityException
+     */
+    public function getEntityManagerForClass($entityClass, $triggerException = true)
+    {
         $entityManager = $this->getManagerForClass($entityClass);
-        if (!$entityManager) {
+        if (!$entityManager && $triggerException) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
 
@@ -312,18 +330,13 @@ class DoctrineHelper
 
     /**
      * @param string $entityClass
-     * @return EntityManager
+     *
+     * @return EntityManager|null
      */
     protected function getManagerForClass($entityClass)
     {
-        if (array_key_exists($entityClass, $this->managers) && $this->managers[$entityClass]->isOpen()) {
-            return $this->managers[$entityClass];
-        }
-
-        $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
-
-        if (null === $this->managers[$entityClass]) {
-            $this->managers[$entityClass] = $this->registry->getManager();
+        if (!array_key_exists($entityClass, $this->managers)) {
+            $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
         }
 
         return $this->managers[$entityClass];

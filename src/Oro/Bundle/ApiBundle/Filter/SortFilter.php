@@ -21,4 +21,12 @@ class SortFilter extends StandaloneFilter
             $criteria->orderBy($val);
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createExpression(FilterValue $value = null)
+    {
+        return null;
+    }
 }

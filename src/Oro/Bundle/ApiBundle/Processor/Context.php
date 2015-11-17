@@ -6,17 +6,11 @@ use Doctrine\Common\Collections\Criteria;
 
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
-use Oro\Bundle\ApiBundle\Filter\FilterCollection;
-use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
-use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 
 class Context extends ApiContext
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
-
-    /** a list of filters is used to add additional restrictions to a query is used to get result data */
-    const FILTERS = 'filters';
 
     /** a query is used to get result data */
     const QUERY = 'query';
@@ -30,38 +24,11 @@ class Context extends ApiContext
      */
     const INCLUDE_HEADER = 'X-Include';
 
-    /** @var FilterValueAccessorInterface */
-    private $filterValues;
-
     /** @var ParameterBagInterface */
     private $requestHeaders;
 
     /** @var ParameterBagInterface */
     private $responseHeaders;
-
-    /**
-     * Gets a collection of the FilterValue objects that contains all incoming filters
-     *
-     * @return FilterValueAccessorInterface
-     */
-    public function getFilterValues()
-    {
-        if (null === $this->filterValues) {
-            $this->filterValues = new NullFilterValueAccessor();
-        }
-
-        return $this->filterValues;
-    }
-
-    /**
-     * Sets an object that will be used to accessing incoming filters
-     *
-     * @param FilterValueAccessorInterface $accessor
-     */
-    public function setFilterValues(FilterValueAccessorInterface $accessor)
-    {
-        $this->filterValues = $accessor;
-    }
 
     /**
      * Gets headers an API request
@@ -129,20 +96,6 @@ class Context extends ApiContext
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
-    }
-
-    /**
-     * Gets a list of filters is used to add additional restrictions to a query is used to get result data
-     *
-     * @return FilterCollection
-     */
-    public function getFilters()
-    {
-        if (!$this->has(self::FILTERS)) {
-            $this->set(self::FILTERS, new FilterCollection());
-        }
-
-        return $this->get(self::FILTERS);
     }
 
     /**

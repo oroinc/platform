@@ -14,6 +14,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
+use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
@@ -33,7 +34,9 @@ class RestApiController extends FOSRestController
     public function cgetAction(Request $request)
     {
         $processor = $this->getProcessor($request);
+        /** @var GetListContext $context */
         $context = $this->getContext($processor, $request);
+        $context->setFilterValues(new RestFilterValueAccessor($request));
 
         $processor->process($context);
 
@@ -98,7 +101,6 @@ class RestApiController extends FOSRestController
         $context->setVersion($request->attributes->get('version'));
         $context->setClassName($request->attributes->get('entity'));
         $context->setRequestHeaders(new RestRequestHeaders($request));
-        $context->setFilterValues(new RestFilterValueAccessor($request));
 
         return $context;
     }

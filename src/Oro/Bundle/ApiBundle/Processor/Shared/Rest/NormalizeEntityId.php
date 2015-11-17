@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared;
+namespace Oro\Bundle\ApiBundle\Processor\Shared\Rest;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
@@ -8,6 +8,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -94,16 +95,16 @@ class NormalizeEntityId implements ProcessorInterface
      *
      * @return array
      *
-     * @throws \RuntimeException if the given entity id cannot be normalized
+     * @throws \UnexpectedValueException if the given entity id cannot be normalized
      */
     protected function normalizeCombinedEntityId($entityId, $idFields, ClassMetadata $metadata, $requestType)
     {
         $fieldMap   = array_flip($idFields);
         $normalized = [];
-        foreach (explode(',', $entityId) as $item) {
+        foreach (explode(RestRequest::ARRAY_DELIMITER, $entityId) as $item) {
             $val = explode('=', $item);
             if (count($val) !== 2) {
-                throw new \RuntimeException(
+                throw new \UnexpectedValueException(
                     sprintf(
                         'Unexpected identifier value "%s" for composite primary key of the entity "%s".',
                         $entityId,
@@ -116,7 +117,7 @@ class NormalizeEntityId implements ProcessorInterface
             $val = $val[1];
 
             if (!isset($fieldMap[$key])) {
-                throw new \RuntimeException(
+                throw new \UnexpectedValueException(
                     sprintf(
                         'The entity identifier contains the key "%s" '
                         . 'which is not defined in composite primary key of the entity "%s".',
@@ -131,7 +132,7 @@ class NormalizeEntityId implements ProcessorInterface
             unset($fieldMap[$key]);
         }
         if (!empty($fieldMap)) {
-            throw new \RuntimeException(
+            throw new \UnexpectedValueException(
                 sprintf(
                     'The entity identifier does not contain all keys '
                     . 'defined in composite primary key of the entity "%s".',
