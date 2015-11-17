@@ -149,6 +149,11 @@ define(function(require) {
             };
         },
 
+        /**
+         * Returns Select2 data from corresponding element
+         *
+         * @returns {Object}
+         */
         getSelect2Data: function() {
             return this.$('.select2-choice').data('select2-data');
         },
