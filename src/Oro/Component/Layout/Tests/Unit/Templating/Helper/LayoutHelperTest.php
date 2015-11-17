@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit\Templating\Helper;
 
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\Helper\LayoutHelper;
+use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 
 class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,6 +17,9 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutHelper */
     protected $helper;
 
+    /** @var \Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface */
+    protected $formRenderer;
+
     protected function setUp()
     {
         $this->renderer   = $this->getMock('Symfony\Component\Form\FormRendererInterface');
@@ -23,7 +27,9 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new LayoutHelper($this->renderer, $this->textHelper);
+        $this->formRenderer = $this->getMock('Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface');
+
+        $this->helper = new LayoutHelper($this->renderer, $this->textHelper, $this->formRenderer);
     }
 
     public function testGetName()
@@ -41,6 +47,17 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($view), $theme);
 
         $this->helper->setBlockTheme($view, $theme);
+    }
+
+    public function testSetFormTheme()
+    {
+        $theme = 'MyBundle:Layout\php';
+
+        $this->formRenderer->expects($this->once())
+            ->method('addDefaultThemes')
+            ->with($theme);
+
+        $this->helper->setFormTheme($theme);
     }
 
     public function testWidgetRendering()

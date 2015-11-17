@@ -14,7 +14,8 @@ class TwigLayoutRendererTest extends \PHPUnit_Framework_TestCase
         $innerRenderer->expects($this->once())
             ->method('setEnvironment')
             ->with($this->identicalTo($environment));
+        $formRenderer = $this->getMock('Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface');
 
-        new TwigLayoutRenderer($innerRenderer, $environment);
+        new TwigLayoutRenderer($innerRenderer, $formRenderer, $environment);
     }
 }
