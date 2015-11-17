@@ -5,13 +5,20 @@ namespace Oro\Bundle\ActivityBundle\Autocomplete;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
@@ -44,6 +51,9 @@ class ContextSearchHandler implements ConverterInterface
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
+    /** @var EntityNameResolver  */
+    protected $entityNameResolver;
+
     /** @var ObjectManager */
     protected $objectManager;
 
@@ -60,6 +70,7 @@ class ContextSearchHandler implements ConverterInterface
      * @param ActivityManager       $activityManager
      * @param ConfigManager         $configManager
      * @param EntityClassNameHelper $entityClassNameHelper
+     * @param EntityNameResolver    $entityNameResolver
      * @param ObjectManager         $objectManager
      * @param ObjectMapper          $mapper
      * @param string|null           $class
@@ -71,6 +82,7 @@ class ContextSearchHandler implements ConverterInterface
         ActivityManager $activityManager,
         ConfigManager $configManager,
         EntityClassNameHelper $entityClassNameHelper,
+        EntityNameResolver $entityNameResolver,
         ObjectManager $objectManager,
         ObjectMapper $mapper,
         $class = null
@@ -81,6 +93,7 @@ class ContextSearchHandler implements ConverterInterface
         $this->activityManager       = $activityManager;
         $this->configManager         = $configManager;
         $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->entityNameResolver    = $entityNameResolver;
         $this->objectManager         = $objectManager;
         $this->mapper                = $mapper;
         $this->class                 = $class;
@@ -92,123 +105,6 @@ class ContextSearchHandler implements ConverterInterface
     public function setClass($class)
     {
         $this->class = $class;
-    }
-
-    /**
-     * @param Item[] $items
-     *
-     * @return array
-     */
-    protected function convertItems(array $items)
-    {
-        $user = $this->token->getToken()->getUser();
-
-        $result = [];
-        /** @var Item $item */
-        foreach ($items as $item) {
-            // Exclude current user from result
-            if (ClassUtils::getClass($user) === $item->getEntityName() && $user->getId() === $item->getRecordId()) {
-                continue;
-            }
-
-            $result[] = $this->convertItem($item);
-        }
-
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function convertItem($item)
-    {
-        /** @var Item $item */
-        $text      = $item->getRecordTitle();
-        $className = $item->getEntityName();
-        if ($label = $this->getClassLabel($className)) {
-            $text .= ' (' . $label . ')';
-        }
-
-        return [
-            'id'   => json_encode(
-                [
-                    'entityClass' => $className,
-                    'entityId'    => $item->getRecordId(),
-                ]
-            ),
-            'text' => $text
-        ];
-    }
-
-    /**
-     * Decodes targets json query string and returns targets array
-     *
-     * @param  $targetsString
-     * @return array
-     */
-    protected function decodeTargets($targetsString)
-    {
-        $targetsJsonArray = explode(';', $targetsString);
-        $targetsArray = [];
-
-        foreach ($targetsJsonArray as $targetJson) {
-            if (!$targetJson) {
-                continue;
-            }
-
-            $target = json_decode($targetJson, true);
-
-            if (!isset($target['entityClass']) || !$target['entityClass']
-                || !isset($target['entityId']) || !$target['entityId']
-            ) {
-                continue;
-            }
-
-            $targetsArray[] = $target;
-        }
-
-        return $targetsArray;
-    }
-
-    /**
-     * Get entity string
-     *
-     * @param object $entity
-     * @param string $entityClass
-     *
-     * @return string
-     */
-    protected function getEntityTitle($entity, $entityClass)
-    {
-        $fields      = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
-        if ($fields) {
-            $title = [];
-            foreach ($fields as $field) {
-                $title[] = $this->mapper->getFieldValue($entity, $field);
-            }
-        } else {
-            $title = [(string) $entity];
-        }
-
-        return implode(' ', $title);
-    }
-
-    /**
-     * Gets label for the class
-     *
-     * @param string $className - FQCN
-     *
-     * @return string|null
-     */
-    protected function getClassLabel($className)
-    {
-        if (!$this->configManager->hasConfig($className)) {
-            return null;
-        }
-
-        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
-
-        return $this->translator->trans($label);
     }
 
     /**
@@ -257,30 +153,200 @@ class ContextSearchHandler implements ConverterInterface
      */
     public function searchById($targetsString)
     {
-        $targets = $this->decodeTargets($targetsString);
-        $items   = [];
+        $targets        = $this->decodeTargets($targetsString);
+        $groupedTargets = $this->groupTargetsByEntityClasses($targets);
+        $queryBuilder   = $this->getAssociatedTargetEntitiesQueryBuilder($groupedTargets);
+        $result         = $queryBuilder->getQuery()->getResult();
+        $items          = [];
 
-        foreach ($targets as $target) {
-            $item = new Item(
+        foreach ($result as $target) {
+            $items[] = new Item(
                 $this->objectManager,
-                $target['entityClass'],
-                $target['entityId']
+                $target['entity'],
+                $target['id'],
+                $target['title']
             );
-
-            $entity = $item->getEntity();
-            if (!$entity) {
-                continue;
-            }
-
-            $item->setRecordTitle($this->getEntityTitle($entity, $target['entityClass']));
-
-            $items[] = $item;
         }
 
         return [
             'results' => $this->convertItems($items),
             'more'    => false
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertItem($item)
+    {
+        /** @var Item $item */
+        $text      = $item->getRecordTitle();
+        $className = $item->getEntityName();
+        if ($label = $this->getClassLabel($className)) {
+            $text .= ' (' . $label . ')';
+        }
+
+        return [
+            'id'   => json_encode(
+                [
+                    'entityClass' => $className,
+                    'entityId'    => $item->getRecordId(),
+                ]
+            ),
+            'text' => $text
+        ];
+    }
+
+    /**
+     * @param Item[] $items
+     *
+     * @return array
+     */
+    protected function convertItems(array $items)
+    {
+        $user = $this->token->getToken()->getUser();
+
+        $result = [];
+        /** @var Item $item */
+        foreach ($items as $item) {
+            // Exclude current user from result
+            if (ClassUtils::getClass($user) === $item->getEntityName() && $user->getId() === $item->getRecordId()) {
+                continue;
+            }
+
+            $result[] = $this->convertItem($item);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Decodes targets json query string and returns targets array
+     *
+     * @param  $targetsString
+     *
+     * @return array
+     */
+    protected function decodeTargets($targetsString)
+    {
+        $targetsJsonArray = explode(';', $targetsString);
+        $targetsArray = [];
+
+        foreach ($targetsJsonArray as $targetJson) {
+            if (!$targetJson) {
+                continue;
+            }
+
+            $target = json_decode($targetJson, true);
+
+            if (!isset($target['entityClass']) || !$target['entityClass']
+                || !isset($target['entityId']) || !$target['entityId']
+            ) {
+                continue;
+            }
+
+            $targetsArray[] = $target;
+        }
+
+        return $targetsArray;
+    }
+
+    /**
+     * Groups linear array of targets to array with key as entity class and
+     * value as array of targets ids
+     *
+     * @param array $targetsArray
+     *
+     * @return array
+     */
+    protected function groupTargetsByEntityClasses(array $targetsArray)
+    {
+        $result = [];
+
+        foreach ($targetsArray as $target) {
+            if (!isset($result[$target['entityClass']])) {
+                $result[$target['entityClass']] = [];
+            }
+
+            $result[$target['entityClass']][] = $target['entityId'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Query builder to get target entities in a single query
+     *
+     * @param array $groupedTargets
+     *
+     * @return SqlQueryBuilder
+     * @throws \Doctrine\ORM\Query\QueryException
+     */
+    protected function getAssociatedTargetEntitiesQueryBuilder(array $groupedTargets)
+    {
+        /** @var EntityManager $objectManager */
+        $objectManager = $this->objectManager;
+
+        $selectStmt = null;
+        $subQueries = [];
+        foreach ($groupedTargets as $entityClass => $ids) {
+            $nameExpr = $this->entityNameResolver->getNameDQL($entityClass, 'e');
+            /** @var QueryBuilder $subQb */
+            $subQb    = $objectManager->getRepository($entityClass)->createQueryBuilder('e')
+                ->select(
+                    sprintf(
+                        'e.id AS id, \'%s\' AS entityClass, ' . ($nameExpr ?: '\'\'') . ' AS entityTitle',
+                        str_replace('\'', '\'\'', $entityClass)
+                    )
+                );
+            $subQb->where(
+                $subQb->expr()->in('e.id', $ids)
+            );
+
+            $subQuery     = $subQb->getQuery();
+            $subQueries[] = QueryUtils::getExecutableSql($subQuery);
+
+            if (empty($selectStmt)) {
+                $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
+                $selectStmt = sprintf(
+                    'entity.%s AS id, entity.%s AS entity, entity.%s AS title',
+                    QueryUtils::getColumnNameByAlias($mapping, 'id'),
+                    QueryUtils::getColumnNameByAlias($mapping, 'entityClass'),
+                    QueryUtils::getColumnNameByAlias($mapping, 'entityTitle')
+                );
+            }
+        }
+
+        $rsm = new ResultSetMapping();
+        $rsm
+            ->addScalarResult('id', 'id', Type::INTEGER)
+            ->addScalarResult('entity', 'entity')
+            ->addScalarResult('title', 'title');
+
+        $queryBuilder = new SqlQueryBuilder($objectManager, $rsm);
+        $queryBuilder
+            ->select($selectStmt)
+            ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
+
+        return $queryBuilder;
+    }
+
+    /**
+     * Gets label for the class
+     *
+     * @param string $className - FQCN
+     *
+     * @return string|null
+     */
+    protected function getClassLabel($className)
+    {
+        if (!$this->configManager->hasConfig($className)) {
+            return null;
+        }
+
+        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
+
+        return $this->translator->trans($label);
     }
 
     /**
