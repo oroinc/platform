@@ -176,3 +176,8 @@ oro:
             password_reseted.message: Your password was successfully reset. You may login now.
         user_bar_settings:
             title: User bar
+        image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size
+        invite.tooltip: When this option is selected, an invitation email will be send
+        api.tooltip_text: >
+            API key could be used for authentication in third party software.
+            Please keep your regular password in secret.

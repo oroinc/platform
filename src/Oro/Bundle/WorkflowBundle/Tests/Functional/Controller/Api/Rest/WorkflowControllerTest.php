@@ -132,7 +132,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_deactivate',
+                'oro_api_workflow_deactivate',
                 ['entityClass' => $this->entityClass]
             )
         );
@@ -150,7 +150,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_activate',
+                'oro_api_workflow_activate',
                 ['workflowDefinition' => LoadWorkflowDefinitions::NO_START_STEP]
             )
         );

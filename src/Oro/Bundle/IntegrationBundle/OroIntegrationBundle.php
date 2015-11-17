@@ -9,6 +9,7 @@ use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\TypesPass;
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\SettingsPass;
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\DeleteIntegrationProvidersPass;
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\ProcessorsPass;
+use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\BlockingJobsPass;
 
 class OroIntegrationBundle extends Bundle
 {
@@ -23,5 +24,6 @@ class OroIntegrationBundle extends Bundle
         $container->addCompilerPass(new DeleteIntegrationProvidersPass());
         $container->addCompilerPass(new SettingsPass());
         $container->addCompilerPass(new ProcessorsPass());
+        $container->addCompilerPass(new BlockingJobsPass());
     }
 }

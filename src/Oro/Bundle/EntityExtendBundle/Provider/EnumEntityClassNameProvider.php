@@ -6,7 +6,6 @@ use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\AbstractEntityClassNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implements EntityClassNameProviderInterface
@@ -77,20 +76,7 @@ class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implem
                 },
                 $this->configManager->getProvider('extend')->filter(
                     function (ConfigInterface $config) {
-                        if ($config->is('is_deleted') || $config->is('state', ExtendScope::STATE_NEW)) {
-                            // skip deleted and new entities
-                            return false;
-                        }
-                        if (!$config->is('is_extend')) {
-                            // skip non extendable entities
-                            return false;
-                        }
-                        if ($config->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
-                            // skip enums
-                            return false;
-                        }
-
-                        return true;
+                        return ExtendHelper::isEnumValueEntityAccessible($config);
                     }
                 )
             );

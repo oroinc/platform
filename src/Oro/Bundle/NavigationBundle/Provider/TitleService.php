@@ -10,12 +10,12 @@ use JMS\Serializer\Serializer;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NavigationBundle\Entity\Title;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Title\StoredTitle;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
-use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -85,9 +85,9 @@ class TitleService implements TitleServiceInterface
     protected $serializer = null;
 
     /**
-     * @var BreadcrumbManagerInterface
+     * @var ServiceLink
      */
-    protected $breadcrumbManager;
+    protected $breadcrumbManagerLink;
 
     /**
      * @var ConfigManager
@@ -101,11 +101,8 @@ class TitleService implements TitleServiceInterface
      * @param ObjectManager $em
      * @param Serializer $serializer
      * @param $userConfigManager
-     * @param BreadcrumbManager $breadcrumbManager
+     * @param ServiceLink $breadcrumbManagerLink
      * @param TitleProvider $titleProvider
-     *
-     * @deprecated since 1.8 $breadcrumbManager argument will be replaced with BreadcrumbManagerInterface
-     * @see \Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface
      */
     public function __construct(
         AnnotationsReader $reader,
@@ -114,7 +111,7 @@ class TitleService implements TitleServiceInterface
         ObjectManager $em,
         Serializer $serializer,
         $userConfigManager,
-        BreadcrumbManager $breadcrumbManager,
+        ServiceLink $breadcrumbManagerLink,
         TitleProvider $titleProvider
     ) {
         $this->readers = [$reader, $configReader];
@@ -122,7 +119,7 @@ class TitleService implements TitleServiceInterface
         $this->em = $em;
         $this->serializer = $serializer;
         $this->userConfigManager = $userConfigManager;
-        $this->breadcrumbManager = $breadcrumbManager;
+        $this->breadcrumbManagerLink = $breadcrumbManagerLink;
         $this->titleProvider = $titleProvider;
     }
 
@@ -215,7 +212,7 @@ class TitleService implements TitleServiceInterface
     {
         if (isset($values['titleTemplate'])
             && ($this->getTemplate() == null
-            || (isset($values['force']) && $values['force']))
+                || (isset($values['force']) && $values['force']))
         ) {
             $this->setTemplate($values['titleTemplate']);
         }
@@ -446,7 +443,7 @@ class TitleService implements TitleServiceInterface
      */
     protected function getBreadcrumbs($route)
     {
-        return $this->breadcrumbManager->getBreadcrumbLabels(
+        return $this->breadcrumbManagerLink->getService()->getBreadcrumbLabels(
             $this->userConfigManager->get('oro_navigation.breadcrumb_menu'),
             $route
         );

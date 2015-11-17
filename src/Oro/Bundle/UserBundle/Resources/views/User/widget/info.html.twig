@@ -2,10 +2,10 @@
 {% import 'OroTagBundle::macros.html.twig' as tag %}
 {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
-{% macro renderEmail(emailAddress, isPrimary) %}
+{% macro renderEmail(emailAddress, isPrimary, entity) %}
     {% import 'OroEmailBundle::macros.html.twig' as email %}
     {% if isPrimary %}<strong>{% endif %}
-        {{ email.email_address_simple(emailAddress) }}
+        {{ email.renderEmailWithActions(emailAddress, entity) }}
     {% if isPrimary %}</strong>{% endif %}
 {% endmacro %}
 
@@ -43,13 +43,13 @@
             {% endset %}
             {{ ui.renderProperty('oro.user.birthday.label'|trans, birthday_string) }}
 
-            {% set emails = [_self.renderEmail(entity.email, true)] %}
+            {% set emails = [_self.renderEmail(entity.email, true, entity)] %}
             {% for emailEntity in entity.emails %}
-                {% set emails = emails|merge([_self.renderEmail(emailEntity.email)]) %}
+                {% set emails = emails|merge([_self.renderEmail(emailEntity.email, false, entity)]) %}
             {% endfor %}
             {{ ui.renderHtmlProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
 
-            {{ ui.renderHtmlProperty('oro.user.phone.label'|trans, entity.phone ? ui.renderPhone(entity.phone) : null) }}
+            {{ ui.renderHtmlProperty('oro.user.phone.label'|trans, entity.phone ? ui.renderPhoneWithActions(entity.phone, entity) : null) }}
 
             {% if resource_granted('oro_user_role_view') %}
                 {% set roles = [] %}

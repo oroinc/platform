@@ -391,51 +391,6 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/context/{id}", name="oro_email_context", requirements={"id"="\d+"})
-     * @Template("OroEmailBundle:Email:context.html.twig")
-     * @AclAncestor("oro_email_email_view")
-     *
-     * @param Email $emailEntity
-     *
-     * @return array
-     */
-    public function contextAction(Email $emailEntity)
-    {
-        $entityTargets = $this->get('oro_entity.entity_context_provider')->getSupportedTargets($emailEntity);
-        return [
-            'sourceEntity' => $emailEntity,
-            'entityTargets' => $entityTargets,
-            'params' => [
-                'grid_path' => $this->generateUrl(
-                    'oro_email_context_grid',
-                    ['activityId' => $emailEntity->getId()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                )
-            ]
-        ];
-    }
-
-    /**
-     * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
-     * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
-     *
-     * @param string $entityClass
-     * @param string $activityId
-     *
-     * @return array
-     */
-    public function contextGridAction($activityId, $entityClass = null)
-    {
-        $gridName = $this->get('oro_entity.entity_context_provider')->getContextGridByEntity($entityClass);
-        return [
-            'gridName' => $gridName,
-            'multiselect' => false,
-            'params' => ['activityId' => $activityId],
-            'renderParams' => []
-        ];
-    }
-
-    /**
      * Togle user emails seen status
      *
      * @Route("/toggle-seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})

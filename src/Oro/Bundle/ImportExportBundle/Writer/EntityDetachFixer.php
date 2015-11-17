@@ -7,9 +7,10 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Finds detached properties in entity and reloads them from UnitOfWork.
@@ -20,23 +21,33 @@ use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 class EntityDetachFixer
 {
     /**
-     * @var EntityManager
+     * @var DoctrineHelper
      */
-    protected $entityManager;
+    protected $doctrineHelper;
 
     /**
-     * @var EntityFieldProvider
+     * @var FieldHelper
      */
-    protected $entityFieldProvider;
+    private $fieldHelper;
 
     /**
-     * @param EntityManager       $entityManager
-     * @param EntityFieldProvider $entityFieldProvider
+     * @var PropertyAccessor
      */
-    public function __construct(EntityManager $entityManager, EntityFieldProvider $entityFieldProvider)
-    {
-        $this->entityManager = $entityManager;
-        $this->entityFieldProvider = $entityFieldProvider;
+    protected $propertyAccessor;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param FieldHelper $fieldHelper
+     * @param PropertyAccessor $propertyAccessor
+     */
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        FieldHelper $fieldHelper,
+        PropertyAccessor $propertyAccessor
+    ) {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->fieldHelper = $fieldHelper;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -51,16 +62,16 @@ class EntityDetachFixer
             return;
         }
 
-        // we should use entityFieldProvider to get relations data to avoid deleted relations in result list
-        $relations = $this->entityFieldProvider->getRelations(ClassUtils::getClass($entity));
+        // we should use entityFieldProvider through fieldHelper
+        // to get relations data and avoid deleted relations in result list
+        $relations = $this->fieldHelper->getRelations(ClassUtils::getClass($entity));
         if (!$relations) {
             return;
         }
 
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($relations as $associationMapping) {
             $fieldName = $associationMapping['name'];
-            $value = $propertyAccessor->getValue($entity, $fieldName);
+            $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
             if ($value && is_object($value)) {
                 if ($value instanceof Collection) {
@@ -98,7 +109,7 @@ class EntityDetachFixer
     {
         if ($this->isEntityDetached($value)) {
             $value = $this->reloadEntity($value);
-            PropertyAccess::createPropertyAccessor()->setValue($entity, $fieldName, $value);
+            $this->propertyAccessor->setValue($entity, $fieldName, $value);
         } else {
             $this->fixEntityAssociationFields($value, $level - 1);
         }
@@ -111,8 +122,12 @@ class EntityDetachFixer
     protected function reloadEntity($entity)
     {
         $entityClass = ClassUtils::getClass($entity);
-        $id = $this->entityManager->getClassMetadata($entityClass)->getIdentifierValues($entity);
-        return $this->entityManager->find($entityClass, $id);
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->doctrineHelper->getEntityManager($entityClass);
+        $id = $entityManager->getClassMetadata($entityClass)->getIdentifierValues($entity);
+
+        return $entityManager->getReference($entityClass, $id);
     }
 
     /**
@@ -121,6 +136,8 @@ class EntityDetachFixer
      */
     protected function isEntityDetached($entity)
     {
-        return $this->entityManager->getUnitOfWork()->getEntityState($entity) == UnitOfWork::STATE_DETACHED;
+        $entityManager = $this->doctrineHelper->getEntityManager($entity);
+
+        return $entityManager->getUnitOfWork()->getEntityState($entity) === UnitOfWork::STATE_DETACHED;
     }
 }
