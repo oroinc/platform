@@ -70,7 +70,7 @@ define(function(require) {
                 helper: function(e, ui) {
                     placeholder = $('<tr />', {'class': 'sortable-placeholder'});
                     ui.children().each(function() {
-                        var width = $(this).width()
+                        var width = $(this).width();
                         $(this).width(width);
                         placeholder.append(
                             $('<td />').append(
