@@ -23,16 +23,23 @@ abstract class AbstractProcessor implements ProcessorInterface
     }
 
     /**
+     * Gets a human-readable representation of a data-type this normalization processor works with.
+     *
      * @return string
      */
     abstract protected function getDataTypeString();
 
     /**
+     * Gets a human-readable representation in plural of a data-type this normalization processor works with.
+     *
      * @return string
      */
     abstract protected function getDataTypePluralString();
 
     /**
+     * Adds to the context a regular expression that can be used to validate a value
+     * of a data-type this processor works with.
+     *
      * @param NormalizeValueContext $context
      */
     public function processRequirement(NormalizeValueContext $context)
@@ -64,7 +71,7 @@ abstract class AbstractProcessor implements ProcessorInterface
     }
 
     /**
-     * Does a value normalization if needed.
+     * Does a value normalization (conversion to a concrete data-type) if needed.
      *
      * @param NormalizeValueContext $context
      */
@@ -82,6 +89,8 @@ abstract class AbstractProcessor implements ProcessorInterface
     }
 
     /**
+     * Checks whether the given value need to be converted to a data-type this processor works with.
+     *
      * @param mixed $value
      *
      * @return bool
@@ -95,7 +104,7 @@ abstract class AbstractProcessor implements ProcessorInterface
      * @param string $value
      * @param string $arrayDelimiter
      *
-     * @return array
+     * @return mixed
      */
     protected function normalizeArrayValue($value, $arrayDelimiter)
     {

@@ -52,6 +52,7 @@ class RegisterFilters implements ProcessorInterface
         }
         if (!isset($config['filters']['exclusion_policy']) || $config['filters']['exclusion_policy'] !== 'all') {
             // it seems that filters' configuration was not normalized
+            // default normalization can be found in {@see Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeFilters}
             throw new \RuntimeException(
                 sprintf(
                     'Expected "all" exclusion policy for filters. Got: %s.',

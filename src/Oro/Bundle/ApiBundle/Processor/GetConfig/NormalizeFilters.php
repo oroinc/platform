@@ -126,12 +126,8 @@ class NormalizeFilters implements ProcessorInterface
                 // already defined
                 continue;
             }
-            $mapping  = $metadata->getAssociationMapping($fieldName);
-            $hasIndex = false;
+            $mapping = $metadata->getAssociationMapping($fieldName);
             if ($mapping['type'] & ClassMetadata::TO_ONE) {
-                $hasIndex = true;
-            }
-            if ($hasIndex) {
                 $targetMetadata     = $this->doctrineHelper->getEntityMetadata($mapping['targetEntity']);
                 $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
                 if (count($targetIdFieldNames) === 1) {
