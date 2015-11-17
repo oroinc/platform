@@ -291,10 +291,11 @@ services:
             - @session.flash_bag
             - @translator
 
-    oro_email.listener.datagrid.context.user:
-        class: %oro_email.listener.datagrid.context.class%
+    oro_activity.listener.datagrid.context.user:
+        class: %oro_activity.listener.datagrid.context.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_class_name_helper
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-for-context-grid, method: onBuildAfter }
 

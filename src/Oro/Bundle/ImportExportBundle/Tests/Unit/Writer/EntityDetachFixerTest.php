@@ -3,11 +3,13 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 
 class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
@@ -15,11 +17,11 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
-    protected $registry;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityFieldProvider */
-    protected $entityFieldProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldHelper */
+    protected $fieldHelper;
 
     /** @var EntityDetachFixer */
     protected $fixer;
@@ -29,27 +31,31 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->registry->expects($this->any())
-            ->method('getManager')
-            ->willReturn($this->entityManager);
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->willReturn($this->entityManager);
 
-        $this->entityFieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        
-        $this->fixer = new EntityDetachFixer($this->registry, $this->entityFieldProvider);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManager')
+            ->will($this->returnValue($this->entityManager));
+
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->fixer = new EntityDetachFixer(
+            $this->doctrineHelper,
+            $this->fieldHelper,
+            PropertyAccess::createPropertyAccessor()
+        );
     }
 
     public function testFixEntityAssociationFieldsLevel()
     {
         $entity = new \stdClass();
 
-        $this->entityFieldProvider->expects($this->never())
+        $this->fieldHelper->expects($this->never())
             ->method('getRelations');
         $this->fixer->fixEntityAssociationFields($entity, -1);
     }
@@ -69,7 +75,7 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
             $linkedEntity = $fieldValue;
         }
 
-        $this->entityFieldProvider->expects($this->once())
+        $this->fieldHelper->expects($this->once())
             ->method('getRelations')
             ->with(get_class($entity))
             ->will($this->returnValue([['name' => 'field']]));
@@ -100,7 +106,7 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($uow));
 
         $this->entityManager->expects($this->once())
-            ->method('find')
+            ->method('getReference')
             ->with(get_class($entity), 'id')
             ->will(
                 $this->returnCallback(

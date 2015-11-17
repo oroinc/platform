@@ -2,6 +2,9 @@
   .row-edit-mode {
     background: #FFFCEC;
   }
+  .view-mode > .icon-edit {
+    display: none !important;
+  }
   .editable {
     &.save-success {
       background: #F4FEE2;
@@ -12,11 +15,6 @@
     &.edit-mode {
       position: relative;
       background: #F4EFD4;
-      > .icon-edit {
-        display: none !important;
-      }
-    }
-    &.view-mode {
       > .icon-edit {
         display: none !important;
       }

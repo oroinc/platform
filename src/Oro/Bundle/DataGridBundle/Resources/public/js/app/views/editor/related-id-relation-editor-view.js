@@ -226,7 +226,8 @@ define(function(require) {
         },
 
         getChoiceLabel: function() {
-            return this.getSelect2Value().label;
+            var label = _.result(this.getSelect2Data(), 'label');
+            return label !== void 0 ? label : '';
         },
 
         getServerUpdateData: function() {

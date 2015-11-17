@@ -10,29 +10,22 @@ use Oro\Bundle\LocaleBundle\EventListener\LocaleListener;
 
 class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var LocaleListener
-     */
+    /** @var LocaleListener */
     protected $listener;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $localeSettings;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $transListener;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
-    /**
-     * @var string
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $container;
+
+    /** @var string */
     protected $defaultLocale;
 
     protected function setUp()
@@ -44,6 +37,26 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $this->router = $this->getMock('Symfony\Component\Routing\RequestContextAwareInterface');
 
         $this->defaultLocale = \Locale::getDefault();
+
+        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
+            ->setMethods(['get', 'getParameter'])
+            ->getMock();
+
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturnCallback(
+                function ($serviceName) {
+                    if ($serviceName === 'oro_locale.settings') {
+                        return $this->localeSettings;
+                    }
+                    if ($serviceName === 'stof_doctrine_extensions.listener.translatable') {
+                        return $this->transListener;
+                    }
+                    if ($serviceName === 'router') {
+                        return $this->router;
+                    }
+                }
+            );
     }
 
     protected function tearDown()
@@ -76,12 +89,11 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
             $this->localeSettings->expects($this->never())->method('getLocale');
         }
 
-        $this->listener = new LocaleListener(
-            $this->localeSettings,
-            $this->transListener,
-            $installed,
-            $this->router
-        );
+        $this->container->expects($this->any())
+            ->method('getParameter')
+            ->with('installed')
+            ->willReturn($installed);
+        $this->listener = new LocaleListener($this->container);
         $this->listener->onKernelRequest($this->createGetResponseEvent($request));
 
         if ($isSetLocale) {
@@ -118,11 +130,11 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnConsoleCommand()
     {
-        $this->listener = new LocaleListener(
-            $this->localeSettings,
-            $this->transListener,
-            true
-        );
+        $this->container->expects($this->any())
+            ->method('getParameter')
+            ->with('installed')
+            ->willReturn(true);
+        $this->listener = new LocaleListener($this->container);
 
         $event = $this
             ->getMockBuilder('Symfony\Component\Console\Event\ConsoleCommandEvent')

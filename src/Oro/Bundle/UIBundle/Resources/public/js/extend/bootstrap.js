@@ -118,6 +118,11 @@ define([
                     }
                 });
             }
+            // clear timeout if it exists
+            if (this.timeout) {
+                clearTimeout(this.timeout);
+                delete this.timeout;
+            }
             return method.apply(this, arguments);
         };
     };

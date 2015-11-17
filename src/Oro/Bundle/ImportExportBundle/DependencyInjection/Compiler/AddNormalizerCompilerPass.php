@@ -36,6 +36,9 @@ class AddNormalizerCompilerPass implements CompilerPassInterface
 
         $sortedServices = array();
         foreach ($services as $serviceId => $tags) {
+            if ($container->hasDefinition($serviceId)) {
+                $container->getDefinition($serviceId)->setPublic(false);
+            }
             foreach ($tags as $tag) {
                 $priority = isset($tag['priority']) ? $tag['priority'] : 0;
                 $sortedServices[$priority][] = new Reference($serviceId);
