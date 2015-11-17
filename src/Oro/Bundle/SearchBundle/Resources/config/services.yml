@@ -8,6 +8,9 @@ parameters:
     oro_search.formatter.result_formatter.class:          Oro\Bundle\SearchBundle\Formatter\ResultFormatter
     oro_search.prepare_result_item.listener.class:        Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener
 
+    oro_search.entity.item.class: Oro\Bundle\SearchBundle\Entity\Item
+    oro_search.entity.repository.search_index.class: Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository
+
     oro_search.extension.formatter.property.search_result_property.class: Oro\Bundle\SearchBundle\Extension\SearchResultProperty
     oro_search.extension.search_results.class:                            Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
 
@@ -175,3 +178,16 @@ services:
         calls:
             - [setMappingConfig, [%oro_search.entities_config%]]
 
+    oro_search.cache.doctrine_metadata:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'doctrine_metadata_search' ] ]
+
+    oro_search.entity.repository.search_index:
+        class: %oro_search.entity.repository.search_index.class%
+        factory: ["@doctrine", getRepository]
+        arguments:
+            - %oro_search.entity.item.class%
+            - 'search'
+        calls:
+            - [setRegistry, [@doctrine]]

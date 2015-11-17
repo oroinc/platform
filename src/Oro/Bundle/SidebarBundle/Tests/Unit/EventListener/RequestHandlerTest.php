@@ -36,12 +36,28 @@ class RequestHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->handler = new RequestHandler($this->widgetDefinitionsRegistry, $this->assetHelper);
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
+            ->setMethods(['get'])
+            ->getMock();
+        $container->expects($this->any())
+            ->method('get')
+            ->willReturnCallback(
+                function ($serviceName) {
+                    if ($serviceName === 'oro_sidebar.widget_definition.registry') {
+                        return $this->widgetDefinitionsRegistry;
+                    }
+                    if ($serviceName === 'assets.packages') {
+                        return $this->assetHelper;
+                    }
+                }
+            );
+
+        $this->handler = new RequestHandler($container);
     }
 
     /**
      * @param array $definitions
-     * @param bool $expects
+     * @param bool  $expects
      *
      * @dataProvider definitionDataProvider
      */
@@ -72,10 +88,10 @@ class RequestHandlerTest extends \PHPUnit_Framework_TestCase
     public function definitionDataProvider()
     {
         return [
-            'empty' => [[], 0],
-            'without icon' => [[['name' => 'widget']], 0],
-            'with icon' => [[['icon' => 'icon.png']], 1],
-            'two with icon' => [[['icon' => 'icon.png'], ['name' => 'widget']], 1],
+            'empty'          => [[], 0],
+            'without icon'   => [[['name' => 'widget']], 0],
+            'with icon'      => [[['icon' => 'icon.png']], 1],
+            'two with icon'  => [[['icon' => 'icon.png'], ['name' => 'widget']], 1],
             'two with icons' => [[['icon' => 'icon.png'], ['icon' => 'widget.png']], 2],
         ];
     }
