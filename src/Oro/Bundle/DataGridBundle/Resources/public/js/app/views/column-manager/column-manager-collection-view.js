@@ -57,6 +57,7 @@ define(function(require) {
          *  - allows to reorder columns
          */
         initSorting: function() {
+            var placeholder;
             this.$('tbody').sortable({
                 cursor: 'move',
                 delay: 25,
@@ -67,12 +68,23 @@ define(function(require) {
                 items: 'tr',
                 tolerance: 'pointer',
                 helper: function(e, ui) {
+                    placeholder = $('<tr />', {'class': 'sortable-placeholder'});
                     ui.children().each(function() {
-                        $(this).width($(this).width());
+                        var width = $(this).width()
+                        $(this).width(width);
+                        placeholder.append(
+                            $('<td />').append(
+                                $('<div/>').width(width)
+                            )
+                        );
                     });
+                    ui.parent().append(placeholder);
                     return ui;
                 },
-                stop: _.bind(this.onReorder, this)
+                stop: _.bind(function() {
+                    placeholder.remove();
+                    this.onReorder();
+                }, this)
             }).disableSelection();
         },
 
