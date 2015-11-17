@@ -109,7 +109,7 @@ class AttachmentManager
     public function preUpload(File $entity)
     {
         if ($entity->isEmptyFile()) {
-            if ($this->filesystem->has($entity->getFilename())) {
+            if ($entity->getFilename() && $this->filesystem->has($entity->getFilename())) {
                 $this->filesystem->delete($entity->getFilename());
             }
             $entity->setFilename(null);
