@@ -29,34 +29,22 @@ You can find additional information if you execute the `app/console config:dump-
 
 ```yaml
 # src/Acme/Bundle/DemoBundle/Resources/views/layouts/base/theme.yml
-
-oro_layout:
-    themes:
-        base:
-            # The layout theme that is used to add the page content and common page elements
-            # for all themes in "main" group
-            label:  ~ # this is a "hidden" theme
-            groups: [ main ]
+# The layout theme that is used to add the page content and common page elements
+# for all themes in "main" group
+label:  ~ # this is a "hidden" theme
+groups: [ main ]
 
 # src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro/theme.yml
-
-oro_layout:
-    themes:
-        oro:
-            # Default layout theme for the Oro Platform
-            label:  Oro Theme
-            icon:   bundles/oroui/themes/oro/images/favicon.ico
-            parent: base
-            groups: [ main ]
+# Default layout theme for the Oro Platform
+label:  Oro Theme
+icon:   bundles/oroui/themes/oro/images/favicon.ico
+parent: base
+groups: [ main ]
 
 # src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro-gold/theme.yml
-
-oro_layout:
-    themes:
-        oro-gold:
-            label:          Nice ORO gold theme
-            directory:      OroGold
-            parent:         oro
+label:          Nice ORO gold theme
+directory:      OroGold
+parent:         oro
 ```
 
 Where `base`, `oro` and `oro-gold` are unique theme identifiers.
