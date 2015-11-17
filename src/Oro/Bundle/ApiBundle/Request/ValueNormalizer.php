@@ -85,9 +85,6 @@ class ValueNormalizer
         if (!empty($arrayDelimiter)) {
             $context->setArrayAllowed(true);
             $context->setArrayDelimiter($arrayDelimiter);
-        } else {
-            $context->setArrayAllowed(false);
-            $context->setArrayDelimiter(null);
         }
         try {
             $this->processor->process($context);

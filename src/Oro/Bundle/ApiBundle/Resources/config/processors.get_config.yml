@@ -28,7 +28,7 @@ services:
             - @oro_api.relation_config_provider
             - @oro_api.entity_exclusion_provider
         tags:
-            - { name: oro.api.processor, action: get_config, requestAction: get_list, priority: -30 }
+            - { name: oro.api.processor, action: get_config, priority: -30 }
 
     oro_api.get_config.normalize_filters:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeFilters

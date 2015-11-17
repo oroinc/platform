@@ -7,26 +7,17 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class LoadDataByEntitySerializer implements ProcessorInterface
 {
-    /** @var ConfigProvider */
-    protected $configProvider;
-
     /** @var EntitySerializer */
     protected $entitySerializer;
 
     /**
-     * @param ConfigProvider   $configProvider
      * @param EntitySerializer $entitySerializer
      */
-    public function __construct(
-        ConfigProvider $configProvider,
-        EntitySerializer $entitySerializer
-    ) {
-        $this->configProvider   = $configProvider;
+    public function __construct(EntitySerializer $entitySerializer)
+    {
         $this->entitySerializer = $entitySerializer;
     }
 
@@ -54,25 +45,14 @@ class LoadDataByEntitySerializer implements ProcessorInterface
             return;
         }
 
-        $config = $this->configProvider->getConfig(
-            $entityClass,
-            $context->getVersion(),
-            $context->getRequestType(),
-            $context->getAction()
-        );
+        $config = $context->getConfig();
         if (null === $config) {
-            // a configuration was not found
-            return;
-        }
-
-        $definition = ConfigUtil::getDefinition($config);
-        if (empty($definition)) {
-            // an entity does not have a configuration for the EntitySerializer
+            // an entity configuration does not exist
             return;
         }
 
         $context->setResult(
-            $this->entitySerializer->serialize($query, $definition)
+            $this->entitySerializer->serialize($query, $config)
         );
 
         // data returned by the EntitySerializer are already normalized

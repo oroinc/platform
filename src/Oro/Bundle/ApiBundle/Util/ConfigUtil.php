@@ -24,30 +24,6 @@ final class ConfigUtil
     /**
      * @param array $config
      *
-     * @return array
-     */
-    public static function getDefinition(array $config)
-    {
-        return !empty($config[self::DEFINITION])
-            ? $config[self::DEFINITION]
-            : [];
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    public static function getFilters(array $config)
-    {
-        return !empty($config[self::FILTERS])
-            ? $config[self::FILTERS]
-            : [];
-    }
-
-    /**
-     * @param array $config
-     *
      * @return string
      */
     public static function getExclusionPolicy(array $config)

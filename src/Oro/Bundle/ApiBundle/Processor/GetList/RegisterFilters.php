@@ -7,7 +7,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class RegisterFilters implements ProcessorInterface
@@ -15,17 +14,12 @@ class RegisterFilters implements ProcessorInterface
     /** @var FilterFactoryInterface */
     protected $filterFactory;
 
-    /** @var ConfigProvider */
-    protected $configProvider;
-
     /**
      * @param FilterFactoryInterface $filterFactory
-     * @param ConfigProvider         $configProvider
      */
-    public function __construct(FilterFactoryInterface $filterFactory, ConfigProvider $configProvider)
+    public function __construct(FilterFactoryInterface $filterFactory)
     {
-        $this->filterFactory  = $filterFactory;
-        $this->configProvider = $configProvider;
+        $this->filterFactory = $filterFactory;
     }
 
     /**
@@ -41,43 +35,32 @@ class RegisterFilters implements ProcessorInterface
             return;
         }
 
-        $config = $this->configProvider->getConfig(
-            $entityClass,
-            $context->getVersion(),
-            $context->getRequestType(),
-            $context->getAction()
-        );
-        if (null === $config) {
-            // a configuration was not found
-            return;
-        }
-
-        $filters = ConfigUtil::getFilters($config);
-        if (empty($filters)) {
+        $configOfFilters = $context->getConfigOfFilters();
+        if (null === $configOfFilters) {
             // a filters' configuration does not exist
             return;
         }
 
-        if (!ConfigUtil::isExcludeAll($filters)) {
+        if (!ConfigUtil::isExcludeAll($configOfFilters)) {
             // it seems that filters' configuration was not normalized
             // default normalization can be found in {@see Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeFilters}
             throw new \RuntimeException(
                 sprintf(
                     'Expected "all" exclusion policy for filters. Got: %s.',
-                    ConfigUtil::getExclusionPolicy($filters)
+                    ConfigUtil::getExclusionPolicy($configOfFilters)
                 )
             );
         }
 
-        $fields           = ConfigUtil::getFields($filters);
-        $filterCollection = $context->getFilters();
+        $fields  = ConfigUtil::getFields($configOfFilters);
+        $filters = $context->getFilters();
         foreach ($fields as $field => $fieldConfig) {
-            if ($filterCollection->has($field)) {
+            if ($filters->has($field)) {
                 continue;
             }
             $filter = $this->createFilter($field, $fieldConfig);
             if (null !== $filter) {
-                $filterCollection->add($field, $filter);
+                $filters->add($field, $filter);
             }
         }
     }
