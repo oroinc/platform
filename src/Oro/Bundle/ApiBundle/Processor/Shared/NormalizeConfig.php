@@ -33,7 +33,7 @@ class NormalizeConfig implements ProcessorInterface
     {
         if (isset($config[ConfigUtil::FIELDS]) && is_array($config[ConfigUtil::FIELDS])) {
             foreach ($config[ConfigUtil::FIELDS] as $fieldName => &$fieldConfig) {
-                if (array_key_exists(ConfigUtil::DEFINITION, $fieldConfig)) {
+                if (is_array($fieldConfig) && array_key_exists(ConfigUtil::DEFINITION, $fieldConfig)) {
                     $fieldConfig = $fieldConfig[ConfigUtil::DEFINITION];
                     if (is_array($fieldConfig)) {
                         $this->normalizeConfig($fieldConfig);

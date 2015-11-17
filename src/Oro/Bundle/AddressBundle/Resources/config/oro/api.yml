@@ -14,9 +14,27 @@ oro_api:
         Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress:
             '0':
                 definition:
-                    exclusion_policy: all
+                    exclusion_policy: none
                     fields:
                         types:
                             fields: name
                             orderBy:
                                 name: ASC
+        Oro\Bundle\AddressBundle\Entity\AbstractEmail:
+            '0':
+                definition:
+                    exclusion_policy: all
+                    fields:
+                        email: ~
+                        primary: ~
+                    orderBy:
+                        primary: DESC
+        Oro\Bundle\AddressBundle\Entity\AbstractPhone:
+            '0':
+                definition:
+                    exclusion_policy: all
+                    fields:
+                        phone: ~
+                        primary: ~
+                    orderBy:
+                        primary: DESC

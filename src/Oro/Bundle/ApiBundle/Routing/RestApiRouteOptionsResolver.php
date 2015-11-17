@@ -87,6 +87,9 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
         }
 
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
+            $this->setVersionAttribute($route);
+            $this->setFormatAttribute($route);
+
             $entities = $this->getSupportedEntityClasses();
 
             if (!empty($entities)) {
@@ -148,8 +151,6 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
                 $strictRoute = $routes->cloneRoute($route);
                 $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $entity, $strictRoute->getPath()));
                 $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $entity);
-                $this->setVersionAttribute($strictRoute);
-                $this->setFormatAttribute($strictRoute);
                 if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
                     $this->setIdRequirement($strictRoute, $className);
                 }
