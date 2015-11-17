@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Controller;
 
+use JMS\Serializer\SerializationContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -116,6 +117,9 @@ class RestApiController extends FOSRestController
         $result = $context->getResult();
 
         $view = $this->view($result, $getStatusCode($result));
+        $serializationContext = new SerializationContext();
+        $serializationContext->setSerializeNull(true);
+        $view->setSerializationContext($serializationContext);
         $this->setResponseHeaders($view, $context);
 
         return $this->handleView($view);
