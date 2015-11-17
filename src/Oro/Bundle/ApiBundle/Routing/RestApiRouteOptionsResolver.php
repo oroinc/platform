@@ -13,7 +13,6 @@ use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
@@ -130,7 +129,7 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
         $routeName = $routes->getName($route);
 
         foreach ($entities as $className) {
-            $entity = $this->getEntityPluralAlias($className);
+            $entity = $this->entityAliasResolver->getPluralAlias($className);
             if (empty($entity)) {
                 continue;
             }
@@ -214,20 +213,6 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
                 self::ID_ATTRIBUTE,
                 implode(RestRequest::ARRAY_DELIMITER, $requirements)
             );
-        }
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return string|null
-     */
-    protected function getEntityPluralAlias($entityClass)
-    {
-        try {
-            return $this->entityAliasResolver->getPluralAlias($entityClass);
-        } catch (EntityAliasNotFoundException $e) {
-            return null;
         }
     }
 

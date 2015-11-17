@@ -26,6 +26,7 @@ services:
             - @oro_api.doctrine_helper
             - @oro_api.field_config_provider
             - @oro_api.relation_config_provider
+            - @oro_api.entity_exclusion_provider
         tags:
             - { name: oro.api.processor, action: get_config, requestAction: get_list, priority: -30 }
 

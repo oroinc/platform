@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Provider\FieldConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 class NormalizeDefinition implements ProcessorInterface
 {
@@ -22,19 +23,25 @@ class NormalizeDefinition implements ProcessorInterface
     /** @var RelationConfigProvider */
     protected $relationConfigProvider;
 
+    /** @var ExclusionProviderInterface */
+    protected $exclusionProvider;
+
     /**
-     * @param DoctrineHelper         $doctrineHelper
-     * @param FieldConfigProvider    $fieldConfigProvider
-     * @param RelationConfigProvider $relationConfigProvider
+     * @param DoctrineHelper             $doctrineHelper
+     * @param FieldConfigProvider        $fieldConfigProvider
+     * @param RelationConfigProvider     $relationConfigProvider
+     * @param ExclusionProviderInterface $exclusionProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         FieldConfigProvider $fieldConfigProvider,
-        RelationConfigProvider $relationConfigProvider
+        RelationConfigProvider $relationConfigProvider,
+        ExclusionProviderInterface $exclusionProvider
     ) {
         $this->doctrineHelper         = $doctrineHelper;
         $this->fieldConfigProvider    = $fieldConfigProvider;
         $this->relationConfigProvider = $relationConfigProvider;
+        $this->exclusionProvider      = $exclusionProvider;
     }
 
     /**
@@ -121,13 +128,20 @@ class NormalizeDefinition implements ProcessorInterface
                 continue;
             }
 
-            $definition[$fieldName] = $this->fieldConfigProvider->getFieldConfig(
-                $metadata->name,
-                $fieldName,
-                $version,
-                $requestType,
-                $requestAction
-            );
+            if ($this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
+                $config = [
+                    ConfigUtil::EXCLUDE => true
+                ];
+            } else {
+                $config = $this->fieldConfigProvider->getFieldConfig(
+                    $metadata->name,
+                    $fieldName,
+                    $version,
+                    $requestType,
+                    $requestAction
+                );
+            }
+            $definition[$fieldName] = $config;
         }
 
         return $definition;
@@ -156,13 +170,23 @@ class NormalizeDefinition implements ProcessorInterface
                 continue;
             }
 
-            $definition[$fieldName] = $this->relationConfigProvider->getRelationConfig(
-                $mapping['targetEntity'],
-                $fieldName,
-                $version,
-                $requestType,
-                $requestAction
-            );
+            $targetEntityClass = $mapping['targetEntity'];
+            if ($this->exclusionProvider->isIgnoredEntity($targetEntityClass)
+                || $this->exclusionProvider->isIgnoredRelation($metadata, $fieldName)
+            ) {
+                $config = [
+                    ConfigUtil::EXCLUDE => true
+                ];
+            } else {
+                $config = $this->relationConfigProvider->getRelationConfig(
+                    $targetEntityClass,
+                    $fieldName,
+                    $version,
+                    $requestType,
+                    $requestAction
+                );
+            }
+            $definition[$fieldName] = $config;
         }
 
         return $definition;

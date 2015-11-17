@@ -90,6 +90,13 @@ services:
         public: false
         calls:
             - [addProvider, [ @oro_entity.exclusion_provider.config ] ]
+            - [addProvider, [ @oro_api.exclusion_provider.by_alias ] ]
+
+    oro_api.exclusion_provider.by_alias:
+        class: Oro\Bundle\ApiBundle\Provider\AliasedEntityExclusionProvider
+        public: false
+        arguments:
+            - @oro_entity.entity_alias_resolver
 
     oro_api.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer
