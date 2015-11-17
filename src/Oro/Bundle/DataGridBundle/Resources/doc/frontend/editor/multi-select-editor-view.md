@@ -35,7 +35,7 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 
 ### Constructor parameters
 
-**Extends:** <code>[RelatedIdRelationEditorView](./related-id-relation-editor-view.md)</code>, <code>[RelatedIdRelationEditorView](./related-id-relation-editor-view.md)</code>  
+**Extends:** <code>[RelatedIdRelationEditorView](./related-id-relation-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
