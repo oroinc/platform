@@ -48,9 +48,6 @@ define(function(require) {
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      *
      * @augments [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)
-     * @exports MultiRelationEditorView
-     *
-     * @augments [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)
      * @exports MultiSelectEditorView
      */
     var MultiSelectEditorView;
