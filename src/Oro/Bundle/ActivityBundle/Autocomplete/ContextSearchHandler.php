@@ -275,6 +275,29 @@ class ContextSearchHandler implements ConverterInterface
     }
 
     /**
+     * Get dql entity search title
+     *
+     * @param $entityClass
+     * @param $alias
+     *
+     * @return string
+     */
+    protected function getNameDQL($entityClass, $alias)
+    {
+        $fields = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
+        if ($fields) {
+            $titleParts = [];
+            foreach ($fields as $field) {
+                $titleParts[] = $alias . '.' . $field;
+            }
+
+            return QueryUtils::buildConcatExpr($titleParts);
+        }
+
+        return $this->entityNameResolver->getNameDQL($entityClass, $alias);
+    }
+
+    /**
      * Query builder to get target entities in a single query
      *
      * @param array $groupedTargets
@@ -290,7 +313,7 @@ class ContextSearchHandler implements ConverterInterface
         $selectStmt = null;
         $subQueries = [];
         foreach ($groupedTargets as $entityClass => $ids) {
-            $nameExpr = $this->entityNameResolver->getNameDQL($entityClass, 'e');
+            $nameExpr = $this->getNameDQL($entityClass, 'e');
             /** @var QueryBuilder $subQb */
             $subQb    = $objectManager->getRepository($entityClass)->createQueryBuilder('e')
                 ->select(
