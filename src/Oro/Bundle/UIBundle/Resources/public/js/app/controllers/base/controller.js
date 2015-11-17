@@ -18,10 +18,10 @@ define(function(require) {
         beforeAction: function(params, route, options) {
             BaseController.__super__.beforeAction.apply(this, arguments);
 
-            var i;
             var self = this;
 
             return $.when.apply($, promiseLoads).then(function() {
+                var i;
                 // if it's first time route
                 if (!route.previous) {
                     // initializes page cache

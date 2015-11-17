@@ -546,8 +546,7 @@ services:
     oro_security.listener.context_listener:
         class: %oro_security.listener.context_listener.class%
         arguments:
-            - @security.token_storage
-            - @oro_organization.organization_manager
+            - @service_container
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
