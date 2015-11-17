@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetRelationConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Bundle\ApiBundle\Processor\FieldConfigProcessor;
-use Oro\Bundle\ApiBundle\Processor\GetFieldConfig\FieldConfigContext;
+use Oro\Bundle\ApiBundle\Processor\Config\FieldConfigProcessor;
+use Oro\Bundle\ApiBundle\Processor\Config\GetFieldConfig\FieldConfigContext;
 
 class FieldConfigProvider
 {

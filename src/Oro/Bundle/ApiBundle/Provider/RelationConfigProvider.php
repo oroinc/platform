@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Bundle\ApiBundle\Processor\GetRelationConfig\RelationConfigContext;
-use Oro\Bundle\ApiBundle\Processor\RelationConfigProcessor;
+use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\RelationConfigContext;
+use Oro\Bundle\ApiBundle\Processor\Config\RelationConfigProcessor;
 
 class RelationConfigProvider
 {

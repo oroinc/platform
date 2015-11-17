@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\BuildConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\BuildConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class BuildFilters implements ProcessorInterface
+class BuildDefinition implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
@@ -16,8 +16,8 @@ class BuildFilters implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        if ($context->hasFilters()) {
-            // a filters' definition is already built
+        if ($context->hasResult()) {
+            // a definition is already built
             return;
         }
 
@@ -27,7 +27,7 @@ class BuildFilters implements ProcessorInterface
             return;
         }
 
-        $context->setFilters(
+        $context->setResult(
             [
                 ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_NONE,
                 ConfigUtil::FIELDS           => []

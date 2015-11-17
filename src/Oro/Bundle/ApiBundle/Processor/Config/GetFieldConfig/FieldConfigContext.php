@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetRelationConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\GetFieldConfig;
 
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
-class RelationConfigContext extends ApiContext
+class FieldConfigContext extends ApiContext
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';

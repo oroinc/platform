@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 

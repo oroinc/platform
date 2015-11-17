@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetFieldConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\GetFieldConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
