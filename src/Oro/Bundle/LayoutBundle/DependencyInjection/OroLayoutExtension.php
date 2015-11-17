@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
@@ -27,7 +28,7 @@ class OroLayoutExtension extends Extension
             [
                 new FolderingCumulativeFileLoader(
                     '{folder}',
-                    '\w+',
+                    '[a-zA-Z][a-zA-Z0-9_\-:]*',
                     new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
                 ),
                 new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
@@ -37,7 +38,7 @@ class OroLayoutExtension extends Extension
         $existThemePaths = [];
         foreach ($themesResources as $resource) {
             $existThemePaths[$resource->path] = true;
-            $configs[] = $resource->data['oro_layout'];
+            $configs[] = $this->getThemeConfig($resource);
         }
 
         $configuration = new Configuration();
@@ -118,7 +119,7 @@ class OroLayoutExtension extends Extension
      * @param array $themes
      * @return array
      */
-    protected function filterThemeLayoutUpdates($existThemePaths, array $themes)
+    protected function filterThemeLayoutUpdates(array $existThemePaths, array $themes)
     {
         foreach ($themes as $theme => $themePaths) {
             foreach ($themePaths as $pathIndex => $path) {
@@ -134,5 +135,23 @@ class OroLayoutExtension extends Extension
         }
 
         return $themes;
+    }
+
+    /**
+     * @param CumulativeResourceInfo $resource
+     * @return array
+     */
+    protected function getThemeConfig(CumulativeResourceInfo $resource)
+    {
+        if ($resource->name === 'layout') {
+            return $resource->data['oro_layout'];
+        } else {
+            $themeName = basename(dirname($resource->path));
+            return [
+                'themes' => [
+                    $themeName => $resource->data
+                ]
+            ];
+        }
     }
 }
