@@ -145,6 +145,10 @@ class Configuration implements ConfigurationInterface
                         ->prototype('scalar')->end()
                         ->cannotBeEmpty()
                     ->end()
+                    ->arrayNode('data')
+                        ->prototype('array')
+                        ->info('Layout additional data')
+                    ->end()
                 ->end()
             ->end();
 
