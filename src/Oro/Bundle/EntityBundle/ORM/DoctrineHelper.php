@@ -24,7 +24,7 @@ class DoctrineHelper
      */
     public function __construct(ManagerRegistry $registry)
     {
-        $this->registry = $registry;
+       $this->registry = $registry;
     }
 
     /**
@@ -33,9 +33,16 @@ class DoctrineHelper
      */
     public function getEntityClass($entityOrClass)
     {
-        return is_object($entityOrClass)
-            ? ClassUtils::getClass($entityOrClass)
-            : ClassUtils::getRealClass($entityOrClass);
+        if (is_object($entityOrClass)) {
+            return ClassUtils::getClass($entityOrClass);
+        }
+
+        if (strpos($entityOrClass, ':') !== false) {
+            list($namespaceAlias, $simpleClassName) = explode(':', $entityOrClass, 2);
+            $entityOrClass =  $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
+        }
+
+        return ClassUtils::getRealClass($entityOrClass);
     }
 
     /**
