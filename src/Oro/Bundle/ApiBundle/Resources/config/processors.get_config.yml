@@ -39,7 +39,7 @@ services:
     oro_api.build_config.filters:
         class: Oro\Bundle\ApiBundle\Processor\Config\BuildConfig\BuildFilters
         tags:
-            - { name: oro.api.processor, action: build_config, requestAction: get_list, priority: -10 }
+            - { name: oro.api.processor, action: build_config, configSection: filters, priority: -10 }
 
     #
     # get_config
@@ -108,6 +108,6 @@ services:
         arguments:
             - @oro_api.doctrine_helper
         tags:
-            - { name: oro.api.processor, action: get_config, requestAction: get_list, priority: -50 }
-            - { name: oro.api.processor, action: get_field_config, requestAction: get_list, priority: -50 }
-            - { name: oro.api.processor, action: get_relation_config, requestAction: get_list, priority: -50 }
+            - { name: oro.api.processor, action: get_config, configSection: filters, priority: -50 }
+            - { name: oro.api.processor, action: get_field_config, configSection: filters, priority: -50 }
+            - { name: oro.api.processor, action: get_relation_config, configSection: filters, priority: -50 }

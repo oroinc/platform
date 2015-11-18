@@ -3,20 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config;
 
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigContext extends ApiContext
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
-    /** the request action, for example "get", "get_list", etc. */
-    const REQUEST_ACTION = 'requestAction';
-
-    /** a definition of filters */
-    const FILTERS = 'filters';
-
-    /** a definition of sorters */
-    const SORTERS = 'sorters';
+    /** a list of additional configuration sections that should be returned, for example "filters", "sorters", etc. */
+    const CONFIG_SECTION = 'configSection';
 
     /**
      * Gets FQCN of an entity.
@@ -39,23 +34,31 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets the request action, for example "get", "get_list", etc.
+     * Gets a list of requested additional configuration sections, for example "filters", "sorters", etc.
      *
-     * @return string
+     * @return string[]
      */
-    public function getRequestAction()
+    public function getConfigSections()
     {
-        return $this->get(self::REQUEST_ACTION);
+        $sections = $this->get(self::CONFIG_SECTION);
+
+        return null !== $sections
+            ? $sections
+            : [];
     }
 
     /**
-     * Sets the request action, for example "get", "get_list", etc.
+     * Sets additional configuration sections that you need to be returned, for example "filters", "sorters", etc.
      *
-     * @param string $requestAction
+     * @param string[] $sections
      */
-    public function setRequestAction($requestAction)
+    public function setConfigSections($sections)
     {
-        $this->set(self::REQUEST_ACTION, $requestAction);
+        if (empty($sections)) {
+            $this->remove(self::CONFIG_SECTION, $sections);
+        } else {
+            $this->set(self::CONFIG_SECTION, $sections);
+        }
     }
 
     /**
@@ -65,7 +68,7 @@ class ConfigContext extends ApiContext
      */
     public function hasFilters()
     {
-        return $this->has(self::FILTERS);
+        return $this->has(ConfigUtil::FILTERS);
     }
 
     /**
@@ -75,7 +78,7 @@ class ConfigContext extends ApiContext
      */
     public function getFilters()
     {
-        return $this->get(self::FILTERS);
+        return $this->get(ConfigUtil::FILTERS);
     }
 
     /**
@@ -85,7 +88,7 @@ class ConfigContext extends ApiContext
      */
     public function setFilters($filters)
     {
-        $this->set(self::FILTERS, $filters);
+        $this->set(ConfigUtil::FILTERS, $filters);
     }
 
     /**
@@ -95,7 +98,7 @@ class ConfigContext extends ApiContext
      */
     public function hasSorters()
     {
-        return $this->has(self::SORTERS);
+        return $this->has(ConfigUtil::SORTERS);
     }
 
     /**
@@ -105,7 +108,7 @@ class ConfigContext extends ApiContext
      */
     public function getSorters()
     {
-        return $this->get(self::SORTERS);
+        return $this->get(ConfigUtil::SORTERS);
     }
 
     /**
@@ -115,6 +118,6 @@ class ConfigContext extends ApiContext
      */
     public function setSorters($sorters)
     {
-        $this->set(self::SORTERS, $sorters);
+        $this->set(ConfigUtil::SORTERS, $sorters);
     }
 }

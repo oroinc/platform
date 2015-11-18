@@ -69,7 +69,7 @@ class NormalizeDefinition implements ProcessorInterface
                     $entityClass,
                     $context->getVersion(),
                     $context->getRequestType(),
-                    $context->getRequestAction()
+                    $context->getConfigSections()
                 );
             }
         }
@@ -83,11 +83,11 @@ class NormalizeDefinition implements ProcessorInterface
     }
 
     /**
-     * @param array  $definition
-     * @param string $entityClass
-     * @param string $version
-     * @param string $requestType
-     * @param string $requestAction
+     * @param array    $definition
+     * @param string   $entityClass
+     * @param string   $version
+     * @param string   $requestType
+     * @param string[] $configSections
      *
      * @return array
      */
@@ -96,12 +96,12 @@ class NormalizeDefinition implements ProcessorInterface
         $entityClass,
         $version,
         $requestType,
-        $requestAction
+        $configSections
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
 
-        $definition = $this->getFields($definition, $metadata, $version, $requestType, $requestAction);
-        $definition = $this->getAssociations($definition, $metadata, $version, $requestType, $requestAction);
+        $definition = $this->getFields($definition, $metadata, $version, $requestType, $configSections);
+        $definition = $this->getAssociations($definition, $metadata, $version, $requestType, $configSections);
 
         return $definition;
     }
@@ -111,7 +111,7 @@ class NormalizeDefinition implements ProcessorInterface
      * @param ClassMetadata $metadata
      * @param string        $version
      * @param string        $requestType
-     * @param string        $requestAction
+     * @param string[]      $configSections
      *
      * @return array
      */
@@ -120,7 +120,7 @@ class NormalizeDefinition implements ProcessorInterface
         ClassMetadata $metadata,
         $version,
         $requestType,
-        $requestAction
+        $configSections
     ) {
         $fieldNames = $metadata->getFieldNames();
         foreach ($fieldNames as $fieldName) {
@@ -137,7 +137,7 @@ class NormalizeDefinition implements ProcessorInterface
                     $fieldName,
                     $version,
                     $requestType,
-                    $requestAction
+                    $configSections
                 );
             }
             $definition[$fieldName] = $config;
@@ -151,7 +151,7 @@ class NormalizeDefinition implements ProcessorInterface
      * @param ClassMetadata $metadata
      * @param string        $version
      * @param string        $requestType
-     * @param string        $requestAction
+     * @param string[]      $configSections
      *
      * @return array
      */
@@ -160,12 +160,17 @@ class NormalizeDefinition implements ProcessorInterface
         ClassMetadata $metadata,
         $version,
         $requestType,
-        $requestAction
+        $configSections
     ) {
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $fieldName => $mapping) {
-            if (array_key_exists($fieldName, $definition)) {
-                // already defined
+            if (array_key_exists($fieldName, $definition)
+                && (
+                    !is_array($definition[$fieldName])
+                    || ConfigUtil::isRelationInitialized($definition[$fieldName])
+                )
+            ) {
+                // already defined and initialized
                 continue;
             }
 
@@ -180,8 +185,11 @@ class NormalizeDefinition implements ProcessorInterface
                     $fieldName,
                     $version,
                     $requestType,
-                    $requestAction
+                    $configSections
                 );
+                if (isset($definition[$fieldName]) && is_array($definition[$fieldName])) {
+                    $config = array_merge_recursive($config, [ConfigUtil::DEFINITION => $definition[$fieldName]]);
+                }
             }
             $definition[$fieldName] = $config;
         }

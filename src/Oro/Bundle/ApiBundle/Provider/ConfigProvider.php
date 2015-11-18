@@ -25,14 +25,14 @@ class ConfigProvider
     /**
      * Gets a config for the given version of an entity.
      *
-     * @param string $className     The FQCN of an entity
-     * @param string $version       The version of a config
-     * @param string $requestType   The type of API request, for example "rest", "soap", "odata", etc.
-     * @param string $requestAction The request action, for example "get", "get_list", etc.
+     * @param string   $className      The FQCN of an entity
+     * @param string   $version        The version of a config
+     * @param string   $requestType    The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string[] $configSections Additional configuration sections, for example "filters", "sorters", etc.
      *
      * @return array|null
      */
-    public function getConfig($className, $version, $requestType, $requestAction)
+    public function getConfig($className, $version, $requestType, array $configSections = [])
     {
         $cacheKey = $requestType . $version . $className;
         if (array_key_exists($cacheKey, $this->cache)) {
@@ -43,7 +43,7 @@ class ConfigProvider
         $context = $this->processor->createContext();
         $context->setVersion($version);
         $context->setRequestType($requestType);
-        $context->setRequestAction($requestAction);
+        $context->setConfigSections($configSections);
         $context->setClassName($className);
 
         $this->processor->process($context);
@@ -52,11 +52,10 @@ class ConfigProvider
         if ($context->hasResult()) {
             $config[ConfigUtil::DEFINITION] = $context->getResult();
         }
-        if ($context->hasFilters()) {
-            $config[ConfigUtil::FILTERS] = $context->getFilters();
-        }
-        if ($context->hasSorters()) {
-            $config[ConfigUtil::SORTERS] = $context->getSorters();
+        foreach ($configSections as $section) {
+            if ($context->has($section)) {
+                $config[$section] = $context->get($section);
+            }
         }
 
         $this->cache[$cacheKey] = $config;

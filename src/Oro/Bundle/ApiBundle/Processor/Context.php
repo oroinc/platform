@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Doctrine\Common\Collections\Criteria;
-
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use Oro\Bundle\ApiBundle\Util\Criteria;
 
 class Context extends ApiContext
 {
@@ -154,7 +153,7 @@ class Context extends ApiContext
     /**
      * Gets the Criteria object is used to add additional restrictions to a query is used to get result data
      *
-     * @return Criteria|null
+     * @return Criteria
      */
     public function getCriteria()
     {

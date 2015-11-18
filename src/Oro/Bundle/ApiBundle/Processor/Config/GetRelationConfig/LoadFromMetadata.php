@@ -28,7 +28,7 @@ class LoadFromMetadata implements ProcessorInterface
         /** @var RelationConfigContext $context */
 
         $config = $context->getResult();
-        if (null !== $config) {
+        if (null !== $config && ConfigUtil::isRelationInitialized($config)) {
             // a config already exists
             return;
         }
@@ -39,13 +39,19 @@ class LoadFromMetadata implements ProcessorInterface
             return;
         }
 
+        if (null === $config) {
+            $config = [];
+        }
+
         $targetIdFields = $this->doctrineHelper->getEntityIdentifierFieldNames($entityClass);
-        $config         = [
-            ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_ALL,
-            ConfigUtil::FIELDS           => count($targetIdFields) === 1
-                ? reset($targetIdFields)
-                : array_fill_keys($targetIdFields, null)
-        ];
+
+        if (!isset($config[ConfigUtil::EXCLUSION_POLICY])) {
+            $config[ConfigUtil::EXCLUSION_POLICY] = ConfigUtil::EXCLUSION_POLICY_ALL;
+        }
+        $config[ConfigUtil::FIELDS] = count($targetIdFields) === 1
+            ? reset($targetIdFields)
+            : array_fill_keys($targetIdFields, null);
+
         $context->setResult($config);
     }
 }

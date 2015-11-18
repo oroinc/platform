@@ -24,12 +24,29 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
             }
             if (!$context->has($key)) {
                 $result = self::ABSTAIN;
-            } elseif ($context->get($key) !== $value) {
+            } elseif (!$this->isMatch($value, $context->get($key))) {
                 $result = self::NOT_APPLICABLE;
                 break;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Checks if a value of a processor attribute matches a corresponding value from the context
+     *
+     * @param mixed $value
+     * @param mixed $contextValue
+     *
+     * @return bool
+     */
+    protected function isMatch($value, $contextValue)
+    {
+        if (is_array($contextValue)) {
+            return in_array($value, $contextValue, true);
+        }
+
+        return $contextValue === $value;
     }
 }

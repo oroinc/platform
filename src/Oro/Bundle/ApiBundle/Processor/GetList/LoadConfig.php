@@ -43,7 +43,7 @@ class LoadConfig implements ProcessorInterface
             $entityClass,
             $context->getVersion(),
             $context->getRequestType(),
-            $context->getAction()
+            [ConfigUtil::FILTERS, ConfigUtil::SORTERS]
         );
         if (null !== $config) {
             if (isset($config[ConfigUtil::DEFINITION])) {

@@ -16,6 +16,7 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $context->setAction('action1');
         $context->set('class', 'TestCls');
         $context->set('type', 'test');
+        $context->set('feature', ['feature1', 'feature3']);
 
         $processors = [
             'action1' => [
@@ -71,6 +72,18 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
                     'processor'  => 'processor13',
                     'attributes' => ['class' => 'TestCls', 'type' => 'another', 'another' => 'val']
                 ],
+                [
+                    'processor'  => 'processor14',
+                    'attributes' => ['class' => 'TestCls', 'feature' => 'feature1']
+                ],
+                [
+                    'processor'  => 'processor15',
+                    'attributes' => ['class' => 'TestCls', 'feature' => 'feature2']
+                ],
+                [
+                    'processor'  => 'processor16',
+                    'attributes' => ['class' => 'TestCls', 'feature' => 'feature3']
+                ],
             ]
         ];
 
@@ -90,6 +103,8 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
                 'processor5',
                 'processor7',
                 'processor10',
+                'processor14',
+                'processor16',
             ],
             $iterator
         );

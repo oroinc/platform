@@ -44,7 +44,7 @@ class NormalizeFilters implements ProcessorInterface
             $entityClass = $context->getClassName();
             if ($entityClass && $this->doctrineHelper->isManageableEntity($entityClass)) {
                 $fields = $this->removeExclusions(
-                    $this->completeFilters($fields, $entityClass)
+                    $this->completeFilters($fields, $entityClass, $context->getResult())
                 );
             }
         }
@@ -58,17 +58,26 @@ class NormalizeFilters implements ProcessorInterface
     }
 
     /**
-     * @param array  $filters
-     * @param string $entityClass
+     * @param array      $filters
+     * @param string     $entityClass
+     * @param array|null $config
      *
      * @return array
      */
-    protected function completeFilters(array $filters, $entityClass)
+    protected function completeFilters(array $filters, $entityClass, $config)
     {
         $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
 
         $filters = $this->getFieldFilters($filters, $metadata);
         $filters = $this->getAssociationFilters($filters, $metadata);
+
+        if (!empty($config)) {
+            foreach ($filters as $fieldName => &$fieldConfig) {
+                if ($this->isExcludedField($config, $fieldName)) {
+                    $fieldConfig[ConfigUtil::EXCLUDE] = true;
+                }
+            }
+        }
 
         return $filters;
     }
@@ -154,5 +163,34 @@ class NormalizeFilters implements ProcessorInterface
                 return !ConfigUtil::isExclude($config);
             }
         );
+    }
+
+    /**
+     * @param array  $config
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isExcludedField(array $config, $fieldName)
+    {
+        $result = false;
+        if (isset($config[ConfigUtil::FIELDS])) {
+            $fields = $config[ConfigUtil::FIELDS];
+            if (!array_key_exists($fieldName, $fields)) {
+                $result = true;
+            } else {
+                $fieldConfig = $fields[$fieldName];
+                if (is_array($fieldConfig)) {
+                    if (array_key_exists(ConfigUtil::DEFINITION, $fieldConfig)) {
+                        $fieldConfig = $fieldConfig[ConfigUtil::DEFINITION];
+                    }
+                    if (is_array($fieldConfig) && ConfigUtil::isExclude($fieldConfig)) {
+                        $result = true;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 }

@@ -7,16 +7,29 @@ oro_api:
                     fields:
                         owner:
                             exclude: true
-                        country:
-                            fields: name
-                        region:
-                            fields: name
         Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress:
+            '0':
+                definition:
+                    exclusion_policy: none
+                    fields:
+                        types:
+                            orderBy:
+                                name: ASC
+        Oro\Bundle\AddressBundle\Entity\AbstractEmail:
             '0':
                 definition:
                     exclusion_policy: all
                     fields:
-                        types:
-                            fields: name
-                            orderBy:
-                                name: ASC
+                        email: ~
+                        primary: ~
+                    orderBy:
+                        primary: DESC
+        Oro\Bundle\AddressBundle\Entity\AbstractPhone:
+            '0':
+                definition:
+                    exclusion_policy: all
+                    fields:
+                        phone: ~
+                        primary: ~
+                    orderBy:
+                        primary: DESC

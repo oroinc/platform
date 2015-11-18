@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
-class NormalizeCriteria implements ProcessorInterface
+class NormalizePaging implements ProcessorInterface
 {
     const UNLIMITED_RESULT = -1;
 
@@ -22,10 +22,6 @@ class NormalizeCriteria implements ProcessorInterface
         }
 
         $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            // no Criteria object
-            return;
-        }
 
         // check if a paging disabled
         if (self::UNLIMITED_RESULT === $criteria->getMaxResults()) {
