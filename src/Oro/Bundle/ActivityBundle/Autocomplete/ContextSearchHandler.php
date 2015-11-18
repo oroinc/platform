@@ -294,6 +294,7 @@ class ContextSearchHandler implements ConverterInterface
             $titleParts = [];
             foreach ($fields as $field) {
                 $titleParts[] = $alias . '.' . $field;
+                $titleParts[] = '\' \'';
             }
 
             return QueryUtils::buildConcatExpr($titleParts);
