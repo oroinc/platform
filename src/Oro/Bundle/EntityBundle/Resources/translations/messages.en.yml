@@ -33,6 +33,7 @@ oro:
                     items:
                         label: Label
                         description: Description
+                        description.tooltip: When filled in, description will be used as a field tooltip on entity forms
             datagrid:
                 field:
                     items:
