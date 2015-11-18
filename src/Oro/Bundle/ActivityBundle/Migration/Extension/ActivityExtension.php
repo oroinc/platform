@@ -93,21 +93,21 @@ class ActivityExtension implements ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      * @param string $targetTableName
-     * @param string $inheritenceTableName
+     * @param string $inheritanceTableName
      */
-    public function addInheritenceTargets(
+    public function addInheritanceTargets(
         Schema $schema,
         $targetTableName,
-        $inheritenceTableName
+        $inheritanceTableName
     ) {
         $targetTable = $schema->getTable($targetTableName);
 
         $options = new OroOptions();
-        $inheritenceClassName = $this->extendExtension->getEntityClassByTableName($inheritenceTableName);
+        $inheritanceClassName = $this->extendExtension->getEntityClassByTableName($inheritanceTableName);
         $options->append(
             'activity',
-            'inheritence_targets',
-            $inheritenceClassName
+            'inheritance_targets',
+            $inheritanceClassName
         );
 
         $targetTable->addOption(OroOptions::KEY, $options);

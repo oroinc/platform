@@ -1,18 +1,19 @@
 parameters:
-    oro_activity.manager.class:                         Oro\Bundle\ActivityBundle\Manager\ActivityManager
-    oro_activity.entity_config_dumper.extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityEntityConfigDumperExtension
-    oro_activity.entity_generator.extension.class:      Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension
-    oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
-    oro_activity.widget_provider.activities.class:      Oro\Bundle\UIBundle\Provider\ChainWidgetProvider
-    oro_activity.widget_provider.activities.main.class: Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
-    oro_activity.widget_provider.activities.menu.class: Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider
-    oro_activity.widget_provider.actions.class:         Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider
-    oro_activity.manager.activity.api.class:            Oro\Bundle\ActivityBundle\Entity\Manager\ActivityApiEntityManager
-    oro_activity.manager.activity_search.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager
-    oro_activity.manager.activity_entity.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager
-    oro_activity.handler.delete.activity_entity.class:  Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandler
-    oro_activity.form.handler.activity_entity.api.class:  Oro\Bundle\ActivityBundle\Form\Handler\ActivityEntityApiHandler
-    oro_activity.manager.activity_target.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
+    oro_activity.manager.class:                             Oro\Bundle\ActivityBundle\Manager\ActivityManager
+    oro_activity.entity_config_dumper.extension.class:      Oro\Bundle\ActivityBundle\Tools\ActivityEntityConfigDumperExtension
+    oro_activity.entity_generator.extension.class:          Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension
+    oro_activity.migration.extension.activity.class:        Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
+    oro_activity.widget_provider.activities.class:          Oro\Bundle\UIBundle\Provider\ChainWidgetProvider
+    oro_activity.widget_provider.activities.main.class:     Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
+    oro_activity.widget_provider.activities.menu.class:     Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider
+    oro_activity.widget_provider.actions.class:             Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider
+    oro_activity.manager.activity.api.class:                Oro\Bundle\ActivityBundle\Entity\Manager\ActivityApiEntityManager
+    oro_activity.manager.activity_search.api.class:         Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager
+    oro_activity.manager.activity_entity.api.class:         Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager
+    oro_activity.handler.delete.activity_entity.class:      Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandler
+    oro_activity.form.handler.activity_entity.api.class:    Oro\Bundle\ActivityBundle\Form\Handler\ActivityEntityApiHandler
+    oro_activity.manager.activity_target.api.class:         Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
+    oro_activity.helper.activity_inheritance_targets.class: Oro\Bundle\ActivityBundle\Helper\ActivityInheritanceTargetsHelper
 
 services:
     oro_activity.manager:
@@ -134,3 +135,9 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
+
+    oro_activity.helper.activity_inheritance_targets:
+        class: %oro_activity.helper.activity_inheritance_targets.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine.orm.entity_manager
