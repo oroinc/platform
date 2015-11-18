@@ -21,9 +21,6 @@ class GetListContext extends Context
     /** a list of filters is used to add additional restrictions to a query is used to get result data */
     const FILTERS = 'filters';
 
-    /** additional associations required to filter a list of entities */
-    const JOINS = 'joins';
-
     /** a callback that can be used to calculate the total number of records in a list of entities */
     const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
 
@@ -103,26 +100,6 @@ class GetListContext extends Context
     public function setFilterValues(FilterValueAccessorInterface $accessor)
     {
         $this->filterValues = $accessor;
-    }
-
-    /**
-     * Gets additional associations required to filter a list of entities
-     *
-     * @return array|null
-     */
-    public function getJoins()
-    {
-        return $this->get(self::JOINS);
-    }
-
-    /**
-     * Sets additional associations required to filter a list of entities
-     *
-     * @param array|null $joins
-     */
-    public function setJoins($joins)
-    {
-        $this->set(self::JOINS, $joins);
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Doctrine\Common\Collections\Criteria;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -45,12 +43,6 @@ class ProtectQueryByAcl implements ProcessorInterface
             return;
         }
 
-        $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            $criteria = new Criteria();
-            $context->setCriteria($criteria);
-        }
-
-        $this->aclHelper->applyAclToCriteria($entityClass, $criteria, $this->permission);
+        $this->aclHelper->applyAclToCriteria($entityClass, $context->getCriteria(), $this->permission);
     }
 }

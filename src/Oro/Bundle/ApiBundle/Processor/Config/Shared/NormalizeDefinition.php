@@ -164,8 +164,13 @@ class NormalizeDefinition implements ProcessorInterface
     ) {
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $fieldName => $mapping) {
-            if (array_key_exists($fieldName, $definition)) {
-                // already defined
+            if (array_key_exists($fieldName, $definition)
+                && (
+                    !is_array($definition[$fieldName])
+                    || ConfigUtil::isRelationInitialized($definition[$fieldName])
+                )
+            ) {
+                // already defined and initialized
                 continue;
             }
 
@@ -182,6 +187,9 @@ class NormalizeDefinition implements ProcessorInterface
                     $requestType,
                     $requestAction
                 );
+                if (isset($definition[$fieldName]) && is_array($definition[$fieldName])) {
+                    $config = array_merge_recursive($config, [ConfigUtil::DEFINITION => $definition[$fieldName]]);
+                }
             }
             $definition[$fieldName] = $config;
         }

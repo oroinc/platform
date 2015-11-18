@@ -38,14 +38,8 @@ class BuildQuery implements ProcessorInterface
         }
 
         $query = $this->doctrineHelper->getEntityRepository($entityClass)->createQueryBuilder('e');
-        $joins = $context->getJoins();
-        if ($joins) {
-            $this->doctrineHelper->applyJoins($query, $joins);
-        }
-        $criteria = $context->getCriteria();
-        if ($criteria) {
-            $query->addCriteria($criteria);
-        }
+        $this->doctrineHelper->applyCriteria($query, $context->getCriteria());
+
         $context->setQuery($query);
     }
 }

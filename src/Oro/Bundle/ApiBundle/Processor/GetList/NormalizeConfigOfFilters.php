@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\Criteria;
 
 class NormalizeConfigOfFilters implements ProcessorInterface
 {
@@ -52,7 +53,7 @@ class NormalizeConfigOfFilters implements ProcessorInterface
                     $this->collectFilters(
                         $configOfFilters,
                         $fieldConfig[ConfigUtil::FILTERS],
-                        (null !== $fieldPrefix ? $fieldPrefix . $fieldName : $fieldName) . '.'
+                        (null !== $fieldPrefix ? $fieldPrefix . $fieldName : $fieldName) . Criteria::FIELD_DELIMITER
                     );
                 }
             }
