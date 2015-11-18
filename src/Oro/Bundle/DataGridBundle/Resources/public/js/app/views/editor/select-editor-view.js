@@ -67,6 +67,10 @@ define(function(require) {
     SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
         className: 'select-editor',
 
+        SELECTED_ITEMS_H_MARGIN_BETWEEN: 5,
+        SELECTED_ITEMS_V_MARGIN_BETWEEN: 6,
+        SELECTED_ITEMS_H_INCREMENT: 2,
+
         initialize: function(options) {
             this.availableChoices = this.getAvailableOptions(options);
             this.prestine = true;
@@ -143,6 +147,15 @@ define(function(require) {
                 openOnEnter: false,
                 data: {results: this.availableChoices}
             };
+        },
+
+        /**
+         * Returns Select2 data from corresponding element
+         *
+         * @returns {Object}
+         */
+        getSelect2Data: function() {
+            return this.$('.select2-choice').data('select2-data');
         },
 
         dispose: function() {
