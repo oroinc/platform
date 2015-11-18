@@ -91,4 +91,20 @@ final class ConfigUtil
             !isset($config[self::INHERIT])
             || $config[self::INHERIT];
     }
+
+    /**
+     * @param array $config
+     *
+     * @return string
+     */
+    public static function isRelationInitialized(array $config)
+    {
+        return
+            isset($config[self::FIELDS])
+            || self::isExclude($config)
+            || (
+                isset($config[self::EXCLUSION_POLICY])
+                && $config[self::EXCLUSION_POLICY] !== self::EXCLUSION_POLICY_ALL
+            );
+    }
 }
