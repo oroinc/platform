@@ -24,7 +24,7 @@ class DumpConfigCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:api:config:debug')
+            ->setName('oro:api:config:dump')
             ->setDescription('Dumps API configuration.')
             ->addArgument(
                 'entity',
