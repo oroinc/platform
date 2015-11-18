@@ -40,7 +40,7 @@ class DoctrineHelper
 
         if (strpos($entityOrClass, ':') !== false) {
             list($namespaceAlias, $simpleClassName) = explode(':', $entityOrClass, 2);
-            $entityOrClass =  $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
+            return $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
         }
 
         return ClassUtils::getRealClass($entityOrClass);
