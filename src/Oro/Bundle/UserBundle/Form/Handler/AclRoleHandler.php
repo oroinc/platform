@@ -157,7 +157,11 @@ class AclRoleHandler
         }
 
         if ($className) {
+            // leave only fields privileges config
             $this->privilegeConfig = array_intersect_key($this->privilegeConfig, array_flip(['field']));
+        } else {
+            // unset field privileges config
+            unset($this->privilegeConfig['field']);
         }
 
         $this->form = $this->createRoleFormInstance($role, $this->privilegeConfig);

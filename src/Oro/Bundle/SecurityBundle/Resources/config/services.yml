@@ -589,5 +589,7 @@ services:
             - @oro_security.entity_security_metadata_provider
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.owner.ownership_decision_maker.chain
+        calls:
+            - [setEntityOwnerAccessor, [@oro_security.owner.entity_owner_accessor]]
         tags:
             - { name: oro_security.acl.extension, priority: 15 } # should be before EntityAclExtension
