@@ -307,7 +307,6 @@ define([
                 activityClassAlias: 'calendarevents',
                 entityId: this.model.originalId
             });
-            activityContext.contextsView.doRefresh();
 
             return $element;
         },
