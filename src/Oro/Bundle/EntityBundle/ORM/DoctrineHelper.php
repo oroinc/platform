@@ -24,7 +24,7 @@ class DoctrineHelper
      */
     public function __construct(ManagerRegistry $registry)
     {
-       $this->registry = $registry;
+        $this->registry = $registry;
     }
 
     /**
