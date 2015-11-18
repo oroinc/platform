@@ -67,6 +67,7 @@ define(function(require) {
                 containment: this.$('tbody'),
                 items: 'tr',
                 tolerance: 'pointer',
+                handle: '.handle',
                 helper: function(e, ui) {
                     placeholder = $('<tr />', {'class': 'sortable-placeholder'});
                     ui.children().each(function() {
