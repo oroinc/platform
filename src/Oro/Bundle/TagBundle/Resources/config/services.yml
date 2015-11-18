@@ -43,6 +43,7 @@ services:
             - @oro_search.mapper
             - @oro_security.security_facade
             - @router
+            - @oro_entity_config.provider.tag
 
     oro_tag.docrine.event.listener:
         class: %oro_tag.tag_listener.class%
