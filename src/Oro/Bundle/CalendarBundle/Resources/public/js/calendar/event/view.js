@@ -67,6 +67,10 @@ define([
         remove: function() {
             this.trigger('remove');
             this._hideMask();
+            if (this.activityContext) {
+                this.activityContext.dispose();
+                delete this.activityContext;
+            }
             Backbone.View.prototype.remove.apply(this, arguments);
         },
 
@@ -301,7 +305,7 @@ define([
             })));
 
             var $contextsSource = $element.find('.activity-context-activity');
-            var activityContext = new ActivityContextComponent({
+            this.activityContext = new ActivityContextComponent({
                 _sourceElement: $contextsSource,
                 checkTarget: false,
                 activityClassAlias: 'calendarevents',
