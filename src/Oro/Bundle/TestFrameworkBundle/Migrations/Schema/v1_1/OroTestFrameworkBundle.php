@@ -37,5 +37,11 @@ class OroTestFrameworkBundle implements Migration
             ['id'],
             ['onUpdate' => null, 'onDelete' => null]
         );
+        if (!$schema->hasTable('test_search_product')) {
+            $table = $schema->createTable('test_search_product');
+            $table->addColumn('id', 'integer', ['autoincrement' => true]);
+            $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+            $table->setPrimaryKey(['id']);
+        }
     }
 }
