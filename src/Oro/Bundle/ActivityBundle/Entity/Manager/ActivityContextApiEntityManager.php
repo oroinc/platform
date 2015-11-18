@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -15,6 +16,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
@@ -34,6 +36,12 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
+    /** @var ObjectMapper */
+    protected $mapper;
+
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @param ObjectManager         $om
      * @param ActivityManager       $activityManager
@@ -41,6 +49,8 @@ class ActivityContextApiEntityManager extends ApiEntityManager
      * @param ConfigManager         $configManager
      * @param RouterInterface       $router
      * @param EntityAliasResolver   $entityAliasResolver
+     * @param ObjectMapper          $objectMapper
+     * @param TranslatorInterface   $translator
      */
     public function __construct(
         ObjectManager $om,
@@ -48,7 +58,9 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         TokenStorageInterface $securityTokenStorage,
         ConfigManager $configManager,
         RouterInterface $router,
-        EntityAliasResolver $entityAliasResolver
+        EntityAliasResolver $entityAliasResolver,
+        ObjectMapper $objectMapper,
+        TranslatorInterface $translator
     ) {
         parent::__construct(null, $om);
 
@@ -57,6 +69,8 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $this->configManager        = $configManager;
         $this->router               = $router;
         $this->entityAliasResolver  = $entityAliasResolver;
+        $this->mapper               = $objectMapper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -123,6 +137,10 @@ class ActivityContextApiEntityManager extends ApiEntityManager
 
                     ]
                 );
+            }
+
+            if (!$this->mapper->getEntityMapParameter($item['entity'], 'title_fields')) {
+                $item['title'] = $this->translator->trans('oro.entity.item', ['%id%' => $item['id']]);
             }
 
             $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);

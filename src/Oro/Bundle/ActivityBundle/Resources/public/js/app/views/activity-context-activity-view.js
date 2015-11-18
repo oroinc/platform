@@ -23,8 +23,7 @@ define([
             this.options = _.defaults(options || {}, this.options);
 
             this.template = _.template($('#activity-context-activity-list').html());
-            this.$container = options.$container;
-            this.$containerContextTargets = $(options.$container.context).find('.activity-context-activity-items');
+            this.$containerContextTargets = $(options.el).find('.activity-context-activity-items');
             this.collection = new ActivityContextActivityCollection('oro_api_delete_activity_relation');
             this.initEvents();
 
@@ -38,12 +37,17 @@ define([
             }
 
             /**
-            * on adding activity item listen to "widget:doRefresh:activity-context-activity-list-widget"
-            */
+             * on adding activity item listen to "widget:doRefresh:activity-context-activity-list-widget"
+             */
             this.listenTo(mediator, 'widget:doRefresh:activity-context-activity-list-widget', this.doRefresh, this);
             this.listenTo(mediator, 'widget:doRefresh:activity-thread-context', this.doRefresh, this);
             ActivityContextActivityView.__super__.initialize.apply(this, arguments);
-            this.render();
+
+            if (!this.options.contextTargets) {
+                this.doRefresh();
+            } else {
+                this.render();
+            }
         },
 
         add: function(model) {
@@ -56,12 +60,14 @@ define([
                 id: this.options.entityId
             });
             var collection = this.collection;
+            var self = this;
             $.ajax({
                 method: 'GET',
                 url: url,
                 success: function(r) {
                     collection.reset();
                     collection.add(r);
+                    self.render();
                 }
             });
         },
