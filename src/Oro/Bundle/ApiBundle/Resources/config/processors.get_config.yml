@@ -59,6 +59,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, priority: -20 }
 
+    oro_api.get_config.normalize_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\NormalizeFilters
+        tags:
+            - { name: oro.api.processor, action: get_config, configSection: filters, priority: -100 }
+
     #
     # get_field_config
     #
@@ -88,11 +93,11 @@ services:
             - { name: oro.api.processor, action: get_relation_config, priority: -20 }
 
     #
-    # config normalization
+    # config completion
     #
 
-    oro_api.get_relation_config.normalize_definition:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeDefinition
+    oro_api.get_config.complete_definition:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition
         arguments:
             - @oro_api.doctrine_helper
             - @oro_api.field_config_provider
@@ -103,11 +108,18 @@ services:
             - { name: oro.api.processor, action: get_field_config, priority: -50 }
             - { name: oro.api.processor, action: get_relation_config, priority: -50 }
 
-    oro_api.get_relation_config.normalize_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeFilters
+    oro_api.get_config.complete_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters
         arguments:
             - @oro_api.doctrine_helper
         tags:
             - { name: oro.api.processor, action: get_config, configSection: filters, priority: -50 }
             - { name: oro.api.processor, action: get_field_config, configSection: filters, priority: -50 }
             - { name: oro.api.processor, action: get_relation_config, configSection: filters, priority: -50 }
+
+    oro_api.get_config.normalize_definition:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeDefinition
+        tags:
+            - { name: oro.api.processor, action: get_config, priority: -150 }
+            - { name: oro.api.processor, action: get_field_config, priority: -150 }
+            - { name: oro.api.processor, action: get_relation_config, priority: -150 }

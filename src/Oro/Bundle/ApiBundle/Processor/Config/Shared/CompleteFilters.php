@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class NormalizeFilters implements ProcessorInterface
+class CompleteFilters implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
