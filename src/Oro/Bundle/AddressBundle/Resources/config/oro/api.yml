@@ -7,17 +7,12 @@ oro_api:
                     fields:
                         owner:
                             exclude: true
-                        country:
-                            fields: name
-                        region:
-                            fields: name
         Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress:
             '0':
                 definition:
                     exclusion_policy: none
                     fields:
                         types:
-                            fields: name
                             orderBy:
                                 name: ASC
         Oro\Bundle\AddressBundle\Entity\AbstractEmail:
