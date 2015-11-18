@@ -124,15 +124,21 @@ class EmailType extends AbstractType
             ->add('signature', 'hidden')
             ->add(
                 'contexts',
-                'oro_email_contexts_select',
+                'oro_activity_contexts_select',
                 [
-                    'label'    => 'oro.email.contexts.label',
-                    'tooltip'  => 'oro.email.contexts.tooltip',
-                    'required' => false,
+                    'tooltip'   => 'oro.email.contexts.tooltip',
                     'read_only' => !$this->securityContext->isGranted(
                         'EDIT',
                         'entity:Oro\Bundle\EmailBundle\Entity\EmailUser'
                     ),
+                    'configs'   => [
+                        'containerCssClass' => 'taggable-email',
+                        'route_name'       => 'oro_activity_form_autocomplete_search',
+                        'route_parameters' => [
+                            'activity' => 'emails',
+                            'name'     => 'emails'
+                        ],
+                    ]
                 ]
             );
 

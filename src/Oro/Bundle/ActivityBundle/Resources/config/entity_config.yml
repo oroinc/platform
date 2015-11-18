@@ -14,6 +14,7 @@ oro_entity_config:
                             required:       false
                             label:          oro.activity.activities
                             association_class: activity
+                            tooltip:        oro.activity.entity_config.activity.entity.items.activities.tooltip
 
                 # target entity classes whose activities will be shown in current entity
                 # if entity one has relation with entity two and for both enabled activity

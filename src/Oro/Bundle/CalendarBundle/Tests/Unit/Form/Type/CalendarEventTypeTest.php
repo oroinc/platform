@@ -153,6 +153,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with(
                 array(
+                    'contexts_disabled'     => true,
                     'allow_change_calendar' => false,
                     'layout_template'       => false,
                     'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',

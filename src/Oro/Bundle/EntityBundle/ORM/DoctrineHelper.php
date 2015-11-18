@@ -15,6 +15,11 @@ use Oro\Bundle\EntityBundle\Exception;
 class DoctrineHelper
 {
     /**
+     * @var EntityManager[]
+     */
+    protected $managers = [];
+
+    /**
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -181,7 +186,7 @@ class DoctrineHelper
     {
         $entityClass = $this->getEntityClass($entityOrClass);
 
-        return null !== $this->registry->getManagerForClass($entityClass);
+        return null !== $this->getManagerForClass($entityClass);
     }
 
     /**
@@ -208,7 +213,7 @@ class DoctrineHelper
     public function getEntityManager($entityOrClass)
     {
         $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
+        $entityManager = $this->getManagerForClass($entityClass);
         if (!$entityManager) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
@@ -303,5 +308,24 @@ class DoctrineHelper
     public function normalizeCriteria($criteria)
     {
         return QueryUtils::normalizeCriteria($criteria);
+    }
+
+    /**
+     * @param string $entityClass
+     * @return EntityManager
+     */
+    protected function getManagerForClass($entityClass)
+    {
+        if (array_key_exists($entityClass, $this->managers) && $this->managers[$entityClass]->isOpen()) {
+            return $this->managers[$entityClass];
+        }
+
+        $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
+
+        if (null === $this->managers[$entityClass]) {
+            $this->managers[$entityClass] = $this->registry->getManager();
+        }
+
+        return $this->managers[$entityClass];
     }
 }
