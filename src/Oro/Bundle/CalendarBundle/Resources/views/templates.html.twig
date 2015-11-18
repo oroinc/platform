@@ -12,6 +12,9 @@
             <% } else { %>
                 <span class="context-label"><%= entity.get('title') %></span>
             <% } %>
+            <% if (editable) { %>
+                <i class="icon-remove"></i>
+            <% } %>
         </span>
     </div>
 </script>

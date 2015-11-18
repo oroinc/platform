@@ -309,7 +309,8 @@ define([
                 _sourceElement: $contextsSource,
                 checkTarget: false,
                 activityClassAlias: 'calendarevents',
-                entityId: this.model.originalId
+                entityId: this.model.originalId,
+                editable: this.model.get('editable')
             });
 
             return $element;

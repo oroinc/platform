@@ -25,6 +25,7 @@ define([
             this.template = _.template($('#activity-context-activity-list').html());
             this.$containerContextTargets = $(options.el).find('.activity-context-activity-items');
             this.collection = new ActivityContextActivityCollection('oro_api_delete_activity_relation');
+            this.editable = options.editable;
             this.initEvents();
 
             if (this.options.contextTargets) {
@@ -90,7 +91,8 @@ define([
             this.collection.on('add', function(model) {
                 var view = self.template({
                     entity: model,
-                    inputName: self.inputName
+                    inputName: self.inputName,
+                    editable: self.editable
                 });
 
                 var $view = $(view);
