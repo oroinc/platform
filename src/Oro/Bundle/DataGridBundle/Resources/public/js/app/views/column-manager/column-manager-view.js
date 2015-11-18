@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerView;
+    var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerView = BaseView.extend({
@@ -9,8 +10,7 @@ define(function(require) {
         autoRender: true,
         className: 'dropdown-menu',
         events: {
-            'click [data-role="column-manager-select-all"]': 'onSelectAll',
-            'click [data-role="column-manager-unselect-all"]': 'onUnselectAll'
+            'click [data-role="column-manager-select-all"]': 'onSelectAll'
         },
 
         listen: {
@@ -33,25 +33,13 @@ define(function(require) {
         updateView: function() {
             var models = this._getFilteredModels();
             var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable')}));
-            this.$('[data-role="column-manager-select-all"]').toggleClass('active', hasUnrenderable);
-            this.$('[data-role="column-manager-unselect-all"]')
-                .toggleClass('active', models.length > 0 && !hasUnrenderable);
+            this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
         },
 
         onSelectAll: function(e) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
                 model.set('renderable', true);
-            });
-            this.updateView();
-        },
-
-        onUnselectAll: function(e) {
-            e.preventDefault();
-            _.each(this._getFilteredModels().reverse(), function(model) {
-                if (!model.get('disabledVisibilityChange')) {
-                    model.set('renderable', false);
-                }
             });
             this.updateView();
         },

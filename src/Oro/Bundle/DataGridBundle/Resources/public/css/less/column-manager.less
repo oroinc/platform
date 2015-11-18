@@ -162,8 +162,9 @@
     position: relative;
     top: -10px;
     line-height: 0;
-    :not(.active) {
-      display: none;
+    .disabled {
+      color: lighten(@btnTextColor, 35%);
+      pointer-events: none;
     }
   }
   .column-filter-match {
