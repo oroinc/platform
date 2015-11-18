@@ -1,10 +1,12 @@
 <?php
+
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="test_search_product")
+ * @ORM\Entity
  */
 class Product implements TestFrameworkEntityInterface
 {

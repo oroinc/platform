@@ -1,6 +1,6 @@
 <?php
 
-namespace JMS\JobQueueBundle;
+namespace Oro\Bundle\CronBundle\JobQueue;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 
