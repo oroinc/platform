@@ -42,8 +42,7 @@ class LoadConfig implements ProcessorInterface
         $config = $this->configProvider->getConfig(
             $entityClass,
             $context->getVersion(),
-            $context->getRequestType(),
-            $context->getAction()
+            $context->getRequestType()
         );
         if (null !== $config && isset($config[ConfigUtil::DEFINITION])) {
             $context->setConfig($config[ConfigUtil::DEFINITION]);
