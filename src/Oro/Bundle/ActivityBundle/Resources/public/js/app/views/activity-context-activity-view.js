@@ -37,12 +37,17 @@ define([
             }
 
             /**
-            * on adding activity item listen to "widget:doRefresh:activity-context-activity-list-widget"
-            */
+             * on adding activity item listen to "widget:doRefresh:activity-context-activity-list-widget"
+             */
             this.listenTo(mediator, 'widget:doRefresh:activity-context-activity-list-widget', this.doRefresh, this);
             this.listenTo(mediator, 'widget:doRefresh:activity-thread-context', this.doRefresh, this);
             ActivityContextActivityView.__super__.initialize.apply(this, arguments);
-            this.render();
+
+            if (!this.options.contextTargets) {
+                this.doRefresh();
+            } else {
+                this.render();
+            }
         },
 
         add: function(model) {

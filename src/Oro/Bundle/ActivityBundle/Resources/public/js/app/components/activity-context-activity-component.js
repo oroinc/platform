@@ -21,7 +21,7 @@ define(function(require) {
         },
 
         initView: function() {
-            var items = typeof this.options.contextTargets === 'undefined' ? [] : this.options.contextTargets;
+            var items = typeof this.options.contextTargets === 'undefined' ? false : this.options.contextTargets;
             this.contextsView = new ActivityContextActivityView({
                 contextTargets: items,
                 entityId: this.options.entityId,

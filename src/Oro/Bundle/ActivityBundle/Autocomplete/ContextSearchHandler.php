@@ -182,6 +182,11 @@ class ContextSearchHandler implements ConverterInterface
         /** @var Item $item */
         $text      = $item->getRecordTitle();
         $className = $item->getEntityName();
+
+        if (strlen($text) === 0 || !$this->mapper->getEntityMapParameter($className, 'title_fields')) {
+            $text = $this->translator->trans('oro.entity.item', ['%id%' => $item->getRecordId()]);
+        }
+
         if ($label = $this->getClassLabel($className)) {
             $text .= ' (' . $label . ')';
         }
@@ -294,7 +299,7 @@ class ContextSearchHandler implements ConverterInterface
             return QueryUtils::buildConcatExpr($titleParts);
         }
 
-        return $this->entityNameResolver->getNameDQL($entityClass, $alias);
+        return false;
     }
 
     /**
