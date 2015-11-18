@@ -43,11 +43,8 @@ class BuildQuery implements ProcessorInterface
             return;
         }
 
-        $query    = $this->doctrineHelper->getEntityRepository($entityClass)->createQueryBuilder('e');
-        $criteria = $context->getCriteria();
-        if ($criteria) {
-            $query->addCriteria($criteria);
-        }
+        $query = $this->doctrineHelper->getEntityRepository($entityClass)->createQueryBuilder('e');
+        $this->doctrineHelper->applyCriteria($query, $context->getCriteria());
 
         $idFields = $this->doctrineHelper->getEntityIdentifierFieldNames($entityClass);
         if (count($idFields) === 1) {

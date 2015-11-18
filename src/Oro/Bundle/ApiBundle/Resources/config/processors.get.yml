@@ -12,6 +12,13 @@ services:
     #
     # initialize
     #
+    oro_api.get.initialize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
+
     oro_api.get.normalize_version:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
         tags:
@@ -73,6 +80,13 @@ services:
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: 50 }
+
+    oro_api.get.complete_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, priority: -5 }
 
     oro_api.get.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Get\BuildQuery

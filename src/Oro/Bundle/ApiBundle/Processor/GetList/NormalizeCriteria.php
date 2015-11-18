@@ -22,10 +22,6 @@ class NormalizeCriteria implements ProcessorInterface
         }
 
         $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            // no Criteria object
-            return;
-        }
 
         // check if a paging disabled
         if (self::UNLIMITED_RESULT === $criteria->getMaxResults()) {

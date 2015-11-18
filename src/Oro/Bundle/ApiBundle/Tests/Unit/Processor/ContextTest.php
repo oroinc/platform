@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Doctrine\Common\Collections\Criteria;
-
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 class ContextTest extends \PHPUnit_Framework_TestCase
@@ -178,7 +176,9 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($context->getCriteria());
 
-        $criteria = new Criteria();
+        $criteria = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\Criteria')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $context->setCriteria($criteria);
         $this->assertSame($criteria, $context->getCriteria());

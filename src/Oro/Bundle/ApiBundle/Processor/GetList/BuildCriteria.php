@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
-use Doctrine\Common\Collections\Criteria;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -21,12 +19,7 @@ class BuildCriteria implements ProcessorInterface
             return;
         }
 
-        $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            $criteria = new Criteria();
-            $context->setCriteria($criteria);
-        }
-
+        $criteria     = $context->getCriteria();
         $filterValues = $context->getFilterValues();
         $filters      = $context->getFilters();
         foreach ($filters as $filterKey => $filter) {

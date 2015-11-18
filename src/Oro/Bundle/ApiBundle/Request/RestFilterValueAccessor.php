@@ -67,7 +67,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         $parameters = [];
 
         $matchResult = preg_match_all(
-            '/(?P<name>([\w\d-]+(%5B[\w\d-]+%5D)*))'
+            '/(?P<name>([\w\d-\.]+(%5B[\w\d-\.]+%5D)*))'
             . '(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))'
             . '(?P<value>[^&]+)/',
             $this->request->getQueryString(),
