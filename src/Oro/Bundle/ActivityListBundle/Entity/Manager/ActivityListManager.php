@@ -108,7 +108,7 @@ class ActivityListManager
     public function getList($entityClass, $entityId, $filter, $page)
     {
         $qb = $this->getBaseQB($entityClass, $entityId);
-
+        $this->applyInheritanceActivity($qb, $entityClass, $entityId);
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
         $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
 
@@ -136,6 +136,7 @@ class ActivityListManager
     public function getListCount($entityClass, $entityId, $filter)
     {
         $qb = $this->getBaseQB($entityClass, $entityId);
+        $this->applyInheritanceActivity($qb, $entityClass, $entityId);
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
         $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
         $qb->resetDQLPart('orderBy');
@@ -153,6 +154,49 @@ class ActivityListManager
         $result = $statement->fetchColumn();
 
         return $result;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string  $entityClass
+     * @param integer $entityId
+     */
+    protected function applyInheritanceActivity(QueryBuilder $qb, $entityClass, $entityId)
+    {
+        $inheritanceTargets = [
+            [
+                'id' => [1, 3],
+                'classTarget' => 'opportunity_c8bd867a'
+            ],
+            [
+                'id' => [1, 3],
+                'classTarget' => 'contact_e8d5b2ba'
+            ]
+        ];
+
+        foreach($inheritanceTargets as $key => $inheritanceTarget) {
+            $alias = 'inh_'.$key;
+            $qb->leftJoin('activity.'.$inheritanceTarget['classTarget'], $alias);
+            if (array_key_exists('id', $inheritanceTarget) && !empty($inheritanceTarget['id'])) {
+                $paramName = sprintf('%s_%s', $alias, $key);
+
+                if ($this->config->get('oro_activity_list.grouping')) {
+                    $qb->orWhere(
+                        $qb->expr()->andX(
+                            $qb->expr()->andX(sprintf('%s.id in (:%s)', $alias, $paramName)),
+                            $qb->expr()->andX('activity.head = true')
+                        )
+                    );
+                } else {
+                    $qb->orWhere(
+                        $qb->expr()->andX(sprintf('%s.id in (:%s)', $alias, $paramName))
+                    );
+                }
+
+                $qb->setParameter($paramName, $inheritanceTarget['id']);
+            }
+        }
+
     }
 
     /**
