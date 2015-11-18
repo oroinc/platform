@@ -21,6 +21,12 @@ define(function(require) {
             'change:renderable model': 'updateView'
         },
 
+        render: function() {
+            ColumnManagerItemView.__super__.render.apply(this, arguments);
+            this.$el.toggleClass('renderable', this.model.get('renderable'));
+            return this;
+        },
+
         setFilterModel: function(filterModel) {
             this.filterModel = filterModel;
             this.listenTo(this.filterModel, 'change:search', this.render);
@@ -69,6 +75,7 @@ define(function(require) {
         updateView: function() {
             var renderable = this.model.get('renderable');
             this.$('input[type=checkbox][data-role=renderable]').prop('checked', renderable);
+            this.$el.toggleClass('renderable', renderable);
         }
     });
 

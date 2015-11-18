@@ -76,10 +76,22 @@
   td.title-cell {
     white-space: nowrap;
   }
+  td.visibility-cell {
+    text-align: center;
+  }
   td.sort-cell {
     white-space: nowrap;
+    text-align: center;
     .btn.move-up, .btn.move-down {
       padding: 0 4px;
+    }
+  }
+  tr.renderable {
+    td {
+      background: @rowHighlightBackground;
+    }
+    &:hover td {
+      background: @rowSelectedBackground;
     }
   }
   tr:first-child .btn.move-up,
@@ -88,6 +100,15 @@
     background-image: none;
     .opacity(65);
     .box-shadow(none);
+  }
+  tr.sortable-placeholder td {
+    height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top: 0 none;
+  }
+  .ui-sortable-placeholder {
+    border-top: 3px solid transparent;
   }
   .column-manager-filter {
     margin-top: 4px;
