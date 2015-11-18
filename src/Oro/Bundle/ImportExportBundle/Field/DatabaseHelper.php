@@ -15,6 +15,8 @@ class DatabaseHelper
 {
     /**
      * @var ManagerRegistry
+     *
+     * @deprecated since 1.9
      */
     protected $registry;
 
@@ -44,10 +46,10 @@ class DatabaseHelper
     protected $ownershipMetadataProviderLink;
 
     /**
-     * @param ManagerRegistry           $registry
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ServiceLink               $fieldHelperLink
-     * @param ServiceLink            $securityFacadeLink
+     * @param ManagerRegistry $registry
+     * @param DoctrineHelper $doctrineHelper
+     * @param ServiceLink $fieldHelperLink
+     * @param ServiceLink $securityFacadeLink
      * @param ServiceLink $ownershipMetadataProviderLink
      */
     public function __construct(
@@ -83,11 +85,11 @@ class DatabaseHelper
             $where[] = sprintf('e.%s = :%s', $field, $field);
         }
 
-        $storageKey = serialize($serializationCriteria);
+        $storageKey = $this->getStorageKey($serializationCriteria);
 
         if (empty($this->entities[$entityName]) || empty($this->entities[$entityName][$storageKey])) {
             /** @var EntityRepository $entityRepository */
-            $entityRepository = $this->registry->getRepository($entityName);
+            $entityRepository = $this->doctrineHelper->getEntityRepository($entityName);
             $queryBuilder = $entityRepository->createQueryBuilder('e')
                 ->andWhere(implode(' AND ', $where))
                 ->setParameters($criteria)
@@ -158,6 +160,14 @@ class DatabaseHelper
      */
     public function find($entityName, $identifier)
     {
+        $storageKey = $this->getStorageKey(
+            [$this->doctrineHelper->getSingleEntityIdentifierFieldName($entityName) => $identifier]
+        );
+
+        if (!empty($this->entities[$entityName][$storageKey])) {
+            return $this->entities[$entityName][$storageKey];
+        }
+
         $entity = $this->doctrineHelper->getEntity($entityName, $identifier);
 
         if ($entity && $this->shouldBeAddedOrganizationLimits($entityName)) {
@@ -173,7 +183,18 @@ class DatabaseHelper
             }
         }
 
+        $this->entities[$entityName][$storageKey] = $entity;
+
         return $entity;
+    }
+
+    /**
+     * @param array $criteria
+     * @return string
+     */
+    protected function getStorageKey(array $criteria = [])
+    {
+        return serialize($criteria);
     }
 
     /**
@@ -202,7 +223,7 @@ class DatabaseHelper
     public function isCascadePersist($entityName, $fieldName)
     {
         /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
+        $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
         return !empty($association['cascade']) && in_array('persist', $association['cascade']);
     }
@@ -215,7 +236,7 @@ class DatabaseHelper
     public function getInversedRelationFieldName($entityName, $fieldName)
     {
         /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
+        $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
 
         if (!empty($association['mappedBy'])) {
@@ -237,7 +258,7 @@ class DatabaseHelper
     public function isSingleInversedRelation($entityName, $fieldName)
     {
         /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
+        $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
 
         return in_array($association['type'], [ClassMetadata::ONE_TO_ONE, ClassMetadata::ONE_TO_MANY]);
@@ -250,7 +271,7 @@ class DatabaseHelper
     {
         $entityName = ClassUtils::getClass($entity);
         /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
+        $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $identifierField = $this->getIdentifierFieldName($entityName);
         $entityManager->getClassMetadata($entityName)->setIdentifierValues($entity, [$identifierField => null]);
     }
@@ -275,6 +296,9 @@ class DatabaseHelper
             && $this->ownershipMetadataProviderLink->getService()->getMetadata($entityName)->getOrganizationFieldName();
     }
 
+    /**
+     * @deprecated since 1.9
+     */
     public function getRegistry()
     {
         return $this->registry;

@@ -6,9 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueListProvider implements DictionaryValueListProviderInterface
@@ -37,15 +35,10 @@ class EnumValueListProvider implements DictionaryValueListProviderInterface
     public function supports($className)
     {
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        if (!$extendConfigProvider->hasConfig($className)) {
-            return false;
-        }
-        $extendConfig = $extendConfigProvider->getConfig($className);
-        if (!$this->isEnum($extendConfig)) {
-            return false;
-        }
 
-        return true;
+        return
+            $extendConfigProvider->hasConfig($className)
+            && ExtendHelper::isEnumValueEntityAccessible($extendConfigProvider->getConfig($className));
     }
 
     /**
@@ -98,28 +91,11 @@ class EnumValueListProvider implements DictionaryValueListProviderInterface
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
         foreach ($extendConfigProvider->getConfigs(null, true) as $extendConfig) {
-            if ($this->isEnum($extendConfig)) {
+            if (ExtendHelper::isEnumValueEntityAccessible($extendConfig)) {
                 $result[] = $extendConfig->getId()->getClassName();
             }
         }
 
         return $result;
-    }
-
-    /**
-     * @param ConfigInterface $extendConfig
-     *
-     * @return bool
-     */
-    protected function isEnum(ConfigInterface $extendConfig)
-    {
-        if (!$extendConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
-            return false;
-        }
-        if ($extendConfig->is('state', ExtendScope::STATE_NEW) || $extendConfig->is('is_deleted')) {
-            return false;
-        }
-
-        return true;
     }
 }

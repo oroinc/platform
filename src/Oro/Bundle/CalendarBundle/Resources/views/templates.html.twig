@@ -26,6 +26,7 @@
                 <% if (id == null || (id != null && editable)) { %>
                 <button class="btn" type="button" data-action-name="edit">{{ 'oro.ui.edit'|trans }}</button>
                 <% } %>
+                {% placeholder calendar_event_widget_view_actions_jstemplate %}
             </div>
         </div>
     </div>

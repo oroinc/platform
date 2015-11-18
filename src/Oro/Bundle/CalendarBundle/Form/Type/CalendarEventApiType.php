@@ -109,6 +109,7 @@ class CalendarEventApiType extends CalendarEventType
     {
         $resolver->setDefaults(
             array(
+                'contexts_disabled'    => true,
                 'data_class'           => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
                 'intention'            => 'calendar_event',
                 'csrf_protection'      => false,

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -126,10 +127,9 @@ class DynamicFieldsExtension extends \Twig_Extension
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $extendConfig->getId();
 
-        // skip system, new and deleted fields
+        // skip system and not accessible fields
         if (!$config->is('owner', ExtendScope::OWNER_CUSTOM)
-            || $config->is('state', ExtendScope::STATE_NEW)
-            || $config->is('is_deleted')
+            || !ExtendHelper::isFieldAccessible($config)
         ) {
             return false;
         }
@@ -139,10 +139,12 @@ class DynamicFieldsExtension extends \Twig_Extension
             return false;
         }
 
-        // skip relations if they are referenced to deleted entity
+        // skip relations if they are referenced to not accessible entity
         $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
-        if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations)
-            && $this->extendProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
+        if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations, true)
+            && !ExtendHelper::isEntityAccessible(
+                $this->extendProvider->getConfig($extendConfig->get('target_entity'))
+            )
         ) {
             return false;
         }

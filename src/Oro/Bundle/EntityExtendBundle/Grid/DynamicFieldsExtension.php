@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class DynamicFieldsExtension extends AbstractFieldsExtension
 {
@@ -60,9 +61,8 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         foreach ($fieldIds as $fieldId) {
             $extendConfig = $extendConfigProvider->getConfigById($fieldId);
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+                && ExtendHelper::isFieldAccessible($extendConfig)
                 && $datagridConfigProvider->getConfigById($fieldId)->is('is_visible')
-                && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-                && !$extendConfig->is('is_deleted')
             ) {
                 $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
                 $fields[] = [
