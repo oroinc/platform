@@ -191,9 +191,20 @@ class Theme
     /**
      * @return mixed[]
      */
-    public function getAllData()
+    public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setDataByKey($key, $value)
+    {
+        $this->data[$key] = $value;
+        return $this;
     }
 
     /**
@@ -201,7 +212,7 @@ class Theme
      * @param mixed $default
      * @return mixed|null
      */
-    public function getData($key, $default = null)
+    public function getDataByKey($key, $default = null)
     {
         if (array_key_exists($key, $this->data)) {
             return $this->data[$key];

@@ -91,10 +91,12 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
             'key' => 'value',
         ];
 
-        $this->assertEquals([], $this->theme->getAllData());
+        $this->assertEquals([], $this->theme->getData());
         $this->theme->setData($data);
-        $this->assertEquals($data, $this->theme->getAllData());
-        $this->assertEquals($data['key'], $this->theme->getData('key'));
-        $this->assertEquals('default value', $this->theme->getData('unknown key', 'default value'));
+        $this->assertEquals($data, $this->theme->getData());
+        $this->assertEquals($data['key'], $this->theme->getDataByKey('key'));
+        $this->assertEquals('default value', $this->theme->getDataByKey('unknown key', 'default value'));
+        $this->theme->setDataByKey('unknown key', 'unknown value');
+        $this->assertEquals('unknown value', $this->theme->getDataByKey('unknown key', 'default value'));
     }
 }
