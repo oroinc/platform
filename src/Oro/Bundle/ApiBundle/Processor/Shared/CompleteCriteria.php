@@ -8,12 +8,10 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\Criteria;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\FieldVisitor;
-use Oro\Bundle\ApiBundle\Util\Join;
 
 class CompleteCriteria implements ProcessorInterface
 {
     const JOIN_ALIAS_TEMPLATE = 'alias%d';
-    const PATH_DELIMITER      = '.';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -40,8 +38,34 @@ class CompleteCriteria implements ProcessorInterface
         }
 
         $criteria = $context->getCriteria();
-        $this->setJoinAliases($criteria->getJoins());
+        $this->setJoinAliases($criteria);
+        $this->completeJoins($criteria);
+    }
 
+    /**
+     * Sets missing join aliases
+     *
+     * @param Criteria $criteria
+     */
+    protected function setJoinAliases(Criteria $criteria)
+    {
+        $counter = 0;
+        $joins   = $criteria->getJoins();
+        foreach ($joins as $join) {
+            $counter++;
+            if (!$join->getAlias()) {
+                $join->setAlias(sprintf(self::JOIN_ALIAS_TEMPLATE, $counter));
+            }
+        }
+    }
+
+    /**
+     * Adds missing joins
+     *
+     * @param Criteria $criteria
+     */
+    protected function completeJoins(Criteria $criteria)
+    {
         $pathMap = $this->getJoinPathMap($criteria);
         if (!empty($pathMap)) {
             $this->sortJoinPathMap($pathMap);
@@ -49,10 +73,9 @@ class CompleteCriteria implements ProcessorInterface
                 if (!$criteria->hasJoin($path)) {
                     $parentAlias = empty($item['parent'])
                         ? Criteria::ROOT_ALIAS_PLACEHOLDER
-                        : $criteria->getJoin(implode(self::PATH_DELIMITER, $item['parent']))->getAlias();
-                    $joinExpr    = $parentAlias . '.' . $item['field'];
+                        : $criteria->getJoin(implode(Criteria::FIELD_DELIMITER, $item['parent']))->getAlias();
                     $criteria
-                        ->addLeftJoin($path, $joinExpr)
+                        ->addLeftJoin($path, $parentAlias . Criteria::FIELD_DELIMITER . $item['field'])
                         ->setAlias($item['field']);
                 }
             }
@@ -80,18 +103,18 @@ class CompleteCriteria implements ProcessorInterface
 
         $pathMap = [];
         foreach ($fields as $field) {
-            $lastDelimiter = strrpos($field, self::PATH_DELIMITER);
+            $lastDelimiter = strrpos($field, Criteria::FIELD_DELIMITER);
             if (false !== $lastDelimiter) {
                 $path = substr($field, 0, $lastDelimiter);
                 if (!isset($pathMap[$path])) {
-                    $pathMap[$path] = $this->buildPathMapValue($path);
+                    $pathMap[$path] = $this->buildJoinPathMapValue($path);
                 }
             }
         }
         $joinPaths = array_keys($criteria->getJoins());
         foreach ($joinPaths as $path) {
             if (!isset($pathMap[$path])) {
-                $pathMap[$path] = $this->buildPathMapValue($path);
+                $pathMap[$path] = $this->buildJoinPathMapValue($path);
             }
         }
 
@@ -103,9 +126,9 @@ class CompleteCriteria implements ProcessorInterface
      *
      * @return array
      */
-    protected function buildPathMapValue($path)
+    protected function buildJoinPathMapValue($path)
     {
-        $lastDelimiter = strrpos($path, self::PATH_DELIMITER);
+        $lastDelimiter = strrpos($path, Criteria::FIELD_DELIMITER);
         if (false === $lastDelimiter) {
             return [
                 'field'  => $path,
@@ -114,7 +137,7 @@ class CompleteCriteria implements ProcessorInterface
         } else {
             return [
                 'field'  => substr($path, $lastDelimiter + 1),
-                'parent' => explode(self::PATH_DELIMITER, $path)
+                'parent' => explode(Criteria::FIELD_DELIMITER, $path)
             ];
         }
     }
@@ -136,21 +159,5 @@ class CompleteCriteria implements ProcessorInterface
                 return ($aCount < $bCount) ? -1 : 1;
             }
         );
-    }
-
-    /**
-     * Sets missing join aliases
-     *
-     * @param Join[] $joins
-     */
-    protected function setJoinAliases(array $joins)
-    {
-        $counter = 0;
-        foreach ($joins as $join) {
-            $counter++;
-            if (!$join->getAlias()) {
-                $join->setAlias(sprintf(self::JOIN_ALIAS_TEMPLATE, $counter));
-            }
-        }
     }
 }

@@ -99,23 +99,10 @@ services:
         arguments:
             - @oro_api.value_normalizer
         tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, requestType: rest, priority: 80 }
+            - { name: oro.api.processor, action: get_list, group: build_query, requestType: rest, priority: 100 }
 
     oro_api.get_list.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\GetList\BuildCriteria
-        tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: 70 }
-
-    oro_api.get_list.normalize_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\NormalizeCriteria
-        tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: 60 }
-
-    oro_api.get_list.protect_query_by_acl:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
-        arguments:
-            - @oro_security.acl_helper
-            - VIEW
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: 50 }
 
@@ -124,14 +111,32 @@ services:
         arguments:
             - @oro_api.doctrine_helper
         tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: -5 }
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -50 }
+
+    oro_api.get_list.optimize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\OptimizeCriteria
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -60 }
+
+    oro_api.get_list.normalize_paging:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\NormalizePaging
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -60 }
+
+    oro_api.get_list.protect_query_by_acl:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
+        arguments:
+            - @oro_security.acl_helper
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -90 }
 
     oro_api.get_list.build_query:
         class: Oro\Bundle\ApiBundle\Processor\GetList\BuildQuery
         arguments:
             - @oro_api.doctrine_helper
         tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: -10 }
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -100 }
 
     #
     # load_data
