@@ -51,11 +51,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
 
-    oro_api.get.normalize_config:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeConfig
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: -50 }
-
     #
     # security_check
     #

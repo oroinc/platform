@@ -1,57 +1,58 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\Criteria;
 
-class NormalizeConfigOfFilters implements ProcessorInterface
+class NormalizeFilters implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var ConfigContext $context */
 
-        $configOfFilters = $context->getConfigOfFilters();
-        if (null === $configOfFilters) {
+        $filters = $context->getFilters();
+        if (null === $filters) {
             // a filters' configuration does not exist
             return;
         }
 
-        $config = $context->getConfig();
-        if (null === $config) {
+        $definition = $context->getResult();
+        if (null === $definition) {
             // an entity configuration does not exist
             return;
         }
 
-        $this->collectFilters($configOfFilters, $config);
-        $context->setConfigOfFilters($configOfFilters);
+        $this->collectFilters($filters, $definition);
+        $context->setFilters($filters);
     }
 
     /**
-     * @param array       $configOfFilters
-     * @param array       $config
+     * @param array       $filters
+     * @param array       $definition
      * @param string|null $fieldPrefix
      *
      * @return array
      */
-    protected function collectFilters(array &$configOfFilters, array $config, $fieldPrefix = null)
+    protected function collectFilters(array &$filters, array $definition, $fieldPrefix = null)
     {
-        if (isset($config[ConfigUtil::FIELDS]) && is_array($config[ConfigUtil::FIELDS])) {
-            foreach ($config[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
+        if (isset($definition[ConfigUtil::FIELDS]) && is_array($definition[ConfigUtil::FIELDS])) {
+            foreach ($definition[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
                 if (null !== $fieldPrefix) {
                     $field = $fieldPrefix . $fieldName;
-                    if (!isset($configOfFilters[ConfigUtil::FIELDS][$field])) {
-                        $configOfFilters[ConfigUtil::FIELDS][$field] = $fieldConfig;
+                    if (!isset($filters[ConfigUtil::FIELDS][$field])) {
+                        $filters[ConfigUtil::FIELDS][$field] = $fieldConfig;
                     }
                 }
                 if (array_key_exists(ConfigUtil::FILTERS, $fieldConfig)) {
                     $this->collectFilters(
-                        $configOfFilters,
+                        $filters,
                         $fieldConfig[ConfigUtil::FILTERS],
                         (null !== $fieldPrefix ? $fieldPrefix . $fieldName : $fieldName) . Criteria::FIELD_DELIMITER
                     );

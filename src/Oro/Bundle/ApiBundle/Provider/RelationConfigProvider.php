@@ -26,16 +26,15 @@ class RelationConfigProvider
      * Gets a config for the given version of an entity.
      *
      * @param string   $className      The FQCN of an entity
-     * @param string   $fieldName      The name of a field
      * @param string   $version        The version of a config
      * @param string   $requestType    The type of API request, for example "rest", "soap", "odata", etc.
      * @param string[] $configSections Additional configuration sections, for example "filters", "sorters", etc.
      *
      * @return array|null
      */
-    public function getRelationConfig($className, $fieldName, $version, $requestType, array $configSections = [])
+    public function getRelationConfig($className, $version, $requestType, array $configSections = [])
     {
-        $cacheKey = $requestType . $version . $className . '::' . $fieldName;
+        $cacheKey = $requestType . $version . $className;
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];
         }
@@ -46,7 +45,6 @@ class RelationConfigProvider
         $context->setRequestType($requestType);
         $context->setConfigSections($configSections);
         $context->setClassName($className);
-        $context->setFieldName($fieldName);
 
         $this->processor->process($context);
 
