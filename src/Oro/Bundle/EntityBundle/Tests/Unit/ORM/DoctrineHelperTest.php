@@ -101,8 +101,8 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'expectedClass' => 'ItemStubProxy',
             ],
             'short entity class' => [
-                'entity'        => 'OroEntityBundle:ItemStubProxy',
-                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStubProxy',
+                'entity'        => 'OroEntityBundle:ItemStub',
+                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
             ],
         ];
     }
