@@ -15,6 +15,8 @@ class Configuration implements ConfigurationInterface
     const BEHAVIOUR_ENABLE_ALL_VALUE        = 'enable_all';
     const ENABLED_CONFIG_PATH               = '[inline_editing][enable]';
     const DEFAULT_ROUTE                     = 'oro_api_patch_entity_data';
+    const CONFIG_ENTITY_NAME                = 'entity_name';
+    const CONFIG_EXTENDED_ENTITY_NAME       = 'extended_entity_name';
 
     /**
      * @var array
@@ -51,14 +53,17 @@ class Configuration implements ConfigurationInterface
             ->validate()
                 ->ifTrue(
                     function ($value) {
-                        return $value[self::CONFIG_KEY_ENABLE] == true && empty($value['entity_name']);
+                        return $value[self::CONFIG_KEY_ENABLE] == true && empty($value[self::CONFIG_ENTITY_NAME]);
                     }
                 )
-                ->thenInvalid('"entity_name" parameter must be not empty.')
+                ->thenInvalid(
+                    '"' . self::CONFIG_ENTITY_NAME . '" or "'
+                    . self::CONFIG_EXTENDED_ENTITY_NAME . '" parameter must be not empty.'
+                )
             ->end()
             ->children()
                 ->booleanNode('enable')->defaultFalse()->end()
-                ->scalarNode('entity_name')->end()
+                ->scalarNode(self::CONFIG_ENTITY_NAME)->end()
                 ->enumNode('behaviour')
                     ->values($this->behaviourConfigValues)
                     ->defaultValue(self::BEHAVIOUR_DEFAULT_VALUE)
