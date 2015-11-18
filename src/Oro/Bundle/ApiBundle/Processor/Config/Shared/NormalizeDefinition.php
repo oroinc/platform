@@ -182,7 +182,6 @@ class NormalizeDefinition implements ProcessorInterface
             } else {
                 $config = $this->relationConfigProvider->getRelationConfig(
                     $targetEntityClass,
-                    $fieldName,
                     $version,
                     $requestType,
                     $configSections
