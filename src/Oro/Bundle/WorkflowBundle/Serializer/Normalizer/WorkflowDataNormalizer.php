@@ -59,7 +59,7 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
         $workflow = $this->getWorkflow();
 
         foreach ($data as $attributeName => $attributeValue) {
-            // Skip removed attributes
+            // Skip attributes that already removed from configuration, they will be cleaned after next data update.
             if ($this->hasAttribute($workflow, $attributeName)) {
                 $attribute                        = $this->getAttribute($workflow, $attributeName);
                 $attributeValue                   = $this->denormalizeAttribute($workflow, $attribute, $attributeValue);
