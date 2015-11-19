@@ -29,11 +29,6 @@ class RegisterFilters implements ProcessorInterface
     {
         /** @var GetListContext $context */
 
-        if (!$context->hasConfigOfFilters()) {
-            // a filters' configuration does not exist
-            return;
-        }
-
         $configOfFilters = $context->getConfigOfFilters();
         if (empty($configOfFilters)) {
             // a filters' configuration does not contains any data
