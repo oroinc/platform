@@ -63,7 +63,7 @@ class CompleteDefinition implements ProcessorInterface
 
         if (!ConfigUtil::isExcludeAll($definition)) {
             $entityClass = $context->getClassName();
-            if ($entityClass && $this->doctrineHelper->isManageableEntity($entityClass)) {
+            if ($entityClass && $this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $fields = $this->completeDefinition(
                     $fields,
                     $entityClass,
@@ -98,7 +98,7 @@ class CompleteDefinition implements ProcessorInterface
         $requestType,
         $configSections
     ) {
-        $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         $definition = $this->getFields($definition, $metadata, $version, $requestType, $configSections);
         $definition = $this->getAssociations($definition, $metadata, $version, $requestType, $configSections);

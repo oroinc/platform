@@ -188,7 +188,7 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function setIdRequirement(Route $route, $entityClass)
     {
-        $metadata     = $this->doctrineHelper->getEntityMetadata($entityClass);
+        $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $idFields     = $metadata->getIdentifierFieldNames();
         $idFieldCount = count($idFields);
         if ($idFieldCount === 1) {

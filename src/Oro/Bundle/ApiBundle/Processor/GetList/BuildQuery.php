@@ -32,12 +32,12 @@ class BuildQuery implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->doctrineHelper->isManageableEntity($entityClass)) {
+        if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }
 
-        $query = $this->doctrineHelper->getEntityRepository($entityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
         $this->doctrineHelper->applyCriteria($query, $context->getCriteria());
 
         $context->setQuery($query);

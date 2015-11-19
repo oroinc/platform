@@ -180,20 +180,20 @@ class QueryUtils
     /**
      * Gets the root entity alias of the query.
      *
-     * @param QueryBuilder $qb
-     * @param bool         $triggerException
+     * @param QueryBuilder $qb             The query builder
+     * @param bool         $throwException Whether to throw exception in case the query does not have a root alias
      *
      * @return string|null
      *
      * @throws Exception\InvalidEntityException
      */
-    public static function getSingleRootAlias(QueryBuilder $qb, $triggerException = true)
+    public static function getSingleRootAlias(QueryBuilder $qb, $throwException = true)
     {
         $rootAliases = $qb->getRootAliases();
 
         $result = null;
         if (count($rootAliases) !== 1) {
-            if ($triggerException) {
+            if ($throwException) {
                 $errorReason = count($rootAliases) === 0
                     ? 'the query has no any root aliases'
                     : sprintf('the query has several root aliases. "%s"', implode(', ', $rootAliases));

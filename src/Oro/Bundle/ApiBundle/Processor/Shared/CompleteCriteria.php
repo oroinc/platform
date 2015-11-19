@@ -32,7 +32,7 @@ class CompleteCriteria implements ProcessorInterface
         /** @var Context $context */
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->doctrineHelper->isManageableEntity($entityClass)) {
+        if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }

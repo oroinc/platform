@@ -183,7 +183,7 @@ class RestApiDocHandler implements HandlerInterface
      */
     protected function addIdRequirement(ApiDoc $annotation, $entityClass, $requirement)
     {
-        $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $idFields = $metadata->getIdentifierFieldNames();
         $dataType = count($idFields) === 1
             ? $metadata->getTypeOfField(reset($idFields))

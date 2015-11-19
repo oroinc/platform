@@ -44,12 +44,12 @@ class NormalizeEntityId implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->doctrineHelper->isManageableEntity($entityClass)) {
+        if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }
 
-        $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $idFields = $metadata->getIdentifierFieldNames();
         if (count($idFields) === 1) {
             // single identifier

@@ -42,7 +42,7 @@ class CompleteFilters implements ProcessorInterface
             $fields = $this->removeExclusions($fields);
         } else {
             $entityClass = $context->getClassName();
-            if ($entityClass && $this->doctrineHelper->isManageableEntity($entityClass)) {
+            if ($entityClass && $this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $fields = $this->removeExclusions(
                     $this->completeFilters($fields, $entityClass, $context->getResult())
                 );
@@ -66,7 +66,7 @@ class CompleteFilters implements ProcessorInterface
      */
     protected function completeFilters(array $filters, $entityClass, $config)
     {
-        $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         $filters = $this->getFieldFilters($filters, $metadata);
         $filters = $this->getAssociationFilters($filters, $metadata);
@@ -136,7 +136,7 @@ class CompleteFilters implements ProcessorInterface
             }
             $mapping = $metadata->getAssociationMapping($fieldName);
             if ($mapping['type'] & ClassMetadata::TO_ONE) {
-                $targetMetadata     = $this->doctrineHelper->getEntityMetadata($mapping['targetEntity']);
+                $targetMetadata     = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
                 $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
                 if (count($targetIdFieldNames) === 1) {
                     $filters[$fieldName] = [

@@ -33,7 +33,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
         $context = $this->getContext();
 
         $this->doctrineHelper->expects($this->never())
-            ->method('getEntityMetadata');
+            ->method('getEntityMetadataForClass');
 
         $this->processor->process($context);
     }
@@ -44,7 +44,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
         $context->setId(123);
 
         $this->doctrineHelper->expects($this->never())
-            ->method('getEntityMetadata');
+            ->method('getEntityMetadataForClass');
 
         $this->processor->process($context);
     }
@@ -55,7 +55,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
         $context->setId('123');
 
         $this->doctrineHelper->expects($this->never())
-            ->method('getEntityMetadata');
+            ->method('getEntityMetadataForClass');
 
         $this->processor->process($context);
     }
@@ -67,12 +67,12 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
         $context->setId('123');
 
         $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
+            ->method('isManageableEntityClass')
             ->with('Test\Class')
             ->willReturn(false);
 
         $this->doctrineHelper->expects($this->never())
-            ->method('getEntityMetadata');
+            ->method('getEntityMetadataForClass');
 
         $this->processor->process($context);
     }
@@ -90,12 +90,12 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
+            ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadata')
+            ->method('getEntityMetadataForClass')
             ->with($entityClass)
             ->willReturn($metadata);
 
@@ -130,12 +130,12 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
+            ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadata')
+            ->method('getEntityMetadataForClass')
             ->with($entityClass)
             ->willReturn($metadata);
 

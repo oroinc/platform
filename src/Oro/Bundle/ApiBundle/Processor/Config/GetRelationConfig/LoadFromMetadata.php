@@ -34,7 +34,7 @@ class LoadFromMetadata implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->doctrineHelper->isManageableEntity($entityClass)) {
+        if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }
@@ -43,7 +43,7 @@ class LoadFromMetadata implements ProcessorInterface
             $config = [];
         }
 
-        $targetIdFields = $this->doctrineHelper->getEntityIdentifierFieldNames($entityClass);
+        $targetIdFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
 
         if (!isset($config[ConfigUtil::EXCLUSION_POLICY])) {
             $config[ConfigUtil::EXCLUSION_POLICY] = ConfigUtil::EXCLUSION_POLICY_ALL;
