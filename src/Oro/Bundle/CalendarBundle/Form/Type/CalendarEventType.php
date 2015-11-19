@@ -197,6 +197,7 @@ class CalendarEventType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                'contexts_disabled'     => true,
                 'allow_change_calendar' => false,
                 'layout_template'       => false,
                 'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',

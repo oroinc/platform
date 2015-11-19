@@ -803,6 +803,14 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testManagersCache()
+    {
+        $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->em);
+
+        $this->doctrineHelper->getEntityManager('\stdClass');
+        $this->doctrineHelper->getEntityManager('\stdClass');
+    }
+
     /**
      * @return array
      */

@@ -39,6 +39,9 @@ abstract class AbstractWidgetProviderPass implements CompilerPassInterface
         $providers      = [];
         $taggedServices = $container->findTaggedServiceIds($this->getProviderTagName());
         foreach ($taggedServices as $id => $attributes) {
+            if ($container->hasDefinition($id)) {
+                $container->getDefinition($id)->setPublic(false);
+            }
             $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
             $providers[$priority][] = new Reference($id);
         }

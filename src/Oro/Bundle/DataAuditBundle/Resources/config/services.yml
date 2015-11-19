@@ -71,7 +71,7 @@ services:
 
     oro_dataaudit.listener.kernel_listener:
         class:                                      %oro_dataaudit.listener.kernel_listener.class%
-        arguments:                                  [@oro_dataaudit.loggable.loggable_manager, @security.context]
+        arguments:                                  [@service_container]
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
 

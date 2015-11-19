@@ -35,7 +35,15 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->listener = new ContentProviderListener($this->contentProviderManager);
+
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $container->expects($this->any())->method('get')
+            ->with('oro_ui.content_provider.manager')
+            ->willReturn($this->contentProviderManager);
+
+        $this->listener = new ContentProviderListener($container);
     }
 
     public function testOnKernelViewNoData()

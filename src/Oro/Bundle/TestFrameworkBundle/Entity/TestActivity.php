@@ -10,7 +10,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * @ORM\Table(name="test_activity")
+ * @ORM\Table(
+ *     name="test_activity",
+ *     indexes={@ORM\Index(name="idx_test_activity_owner_id", columns={"owner_id"})}
+ * )
  * @ORM\Entity
  * @Config(
  *      defaultValues={

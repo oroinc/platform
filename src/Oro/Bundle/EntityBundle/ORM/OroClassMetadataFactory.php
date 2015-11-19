@@ -12,12 +12,19 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     /** @var EntityManagerInterface|null */
     protected $entityManager;
 
+    /** @var bool[] */
+    protected $isTransientCache = [];
+
+    /** @var OrmLogger */
+    protected $logger;
+
     /**
      * {@inheritdoc}
      */
     public function setEntityManager(EntityManagerInterface $em)
     {
         parent::setEntityManager($em);
+
         $this->entityManager = $em;
     }
 
@@ -26,15 +33,20 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      */
     public function getAllMetadata()
     {
-        if ($logger = $this->getProfilingLogger()) {
-            $logger->startGetAllMetadata();
-            $result = parent::getAllMetadata();
-            $logger->stopGetAllMetadata();
+        $logger = $this->getProfilingLogger();
 
-            return $result;
-        } else {
-            return parent::getAllMetadata();
+        if ($logger) {
+            $logger->startGetAllMetadata();
         }
+
+        $result = parent::getAllMetadata();
+
+        if ($logger) {
+            $logger->stopGetAllMetadata();
+        }
+
+        return $result;
+
     }
 
     /**
@@ -42,15 +54,19 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      */
     public function getMetadataFor($className)
     {
-        if ($logger = $this->getProfilingLogger()) {
-            $logger->startGetMetadataFor();
-            $result = parent::getMetadataFor($className);
-            $logger->stopGetMetadataFor();
+        $logger = $this->getProfilingLogger();
 
-            return $result;
-        } else {
-            return parent::getMetadataFor($className);
+        if ($logger) {
+            $logger->startGetMetadataFor();
         }
+
+        $result = parent::getMetadataFor($className);
+
+        if ($logger) {
+            $logger->stopGetMetadataFor();
+        }
+
+        return $result;
     }
 
     /**
@@ -58,15 +74,24 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      */
     public function isTransient($class)
     {
-        if ($logger = $this->getProfilingLogger()) {
-            $logger->startIsTransient();
-            $result = parent::isTransient($class);
-            $logger->stopIsTransient();
+        $logger = $this->getProfilingLogger();
 
-            return $result;
-        } else {
-            return parent::isTransient($class);
+        if ($logger) {
+            $logger->startIsTransient();
         }
+
+        if (array_key_exists($class, $this->isTransientCache)) {
+            $result = $this->isTransientCache[$class];
+        } else {
+            $result = parent::isTransient($class);
+            $this->isTransientCache[$class] = $result;
+        }
+
+        if ($logger) {
+            $logger->stopIsTransient();
+        }
+
+        return $result;
     }
 
     /**
@@ -76,14 +101,24 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      */
     protected function getProfilingLogger()
     {
+        if ($this->logger) {
+            return $this->logger;
+        }
+
+        if (false === $this->logger) {
+            return null;
+        }
+
         if (null === $this->entityManager) {
             return null;
         }
 
         $config = $this->entityManager->getConfiguration();
 
-        return $config instanceof OrmConfiguration
-            ? $config->getAttribute('OrmProfilingLogger')
-            : null;
+        $this->logger = $config instanceof OrmConfiguration
+            ? $config->getAttribute('OrmProfilingLogger', false)
+            : false;
+
+        return $this->logger;
     }
 }
