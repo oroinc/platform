@@ -73,6 +73,8 @@ oro:
         column_manager:
             title: "Table Settings"
             tooltip: "Use drag and drop to sort items"
+            select_all: "Select All"
+            unselect_all: "Unselect All"
             filter:
                 all: 'All'
                 selected: 'Selected'

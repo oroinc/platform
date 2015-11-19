@@ -52,11 +52,9 @@ define(function(require) {
 
             this.columnFilterModel = new ColumnFilterModel();
 
-            this._createViews(options);
+            this.filterer = _.bind(this.columnFilterModel.filterer, this.columnFilterModel);
 
-            this.columnFilterModel.on('change', _.bind(function(model) {
-                this.columnManagerCollectionView.filter(_.bind(model.filterer, model));
-            }, this));
+            this._createViews(options);
 
             this._applyState(this.grid.collection, this.grid.collection.state);
 
@@ -84,6 +82,8 @@ define(function(require) {
         delegateListeners: function() {
             this.listenTo(this.grid.collection, 'updateState', this._applyState);
             this.listenTo(this.columnManagerCollectionView, 'reordered', this._pushState);
+            this.listenTo(this.columnFilterModel, 'change', this.applyFilter);
+            this.listenTo(this.managedColumns, 'change', this.applyFilter);
             this.listenTo(this.managedColumns, 'change:renderable', this._pushState);
             this.listenTo(this.managedColumns, 'sort', function() {
                 this.columns.sort();
@@ -102,7 +102,9 @@ define(function(require) {
             // index of first manageable column
             var orderShift = this.managedColumns[0] ? this.managedColumns[0].get('order') : 0;
             this.columnManagerView = new ColumnManagerView({
-                el: options._sourceElement
+                el: options._sourceElement,
+                collection: this.managedColumns,
+                columnFilterModel: this.columnFilterModel
             });
             this.columnFilterView = new ColumnFilterView({
                 el: this.columnManagerView.$('.column-manager-filter').get(0),
@@ -187,6 +189,10 @@ define(function(require) {
             }, this);
 
             return state;
+        },
+
+        applyFilter: function() {
+            this.columnManagerCollectionView.filter(this.filterer);
         }
     });
 

@@ -158,6 +158,15 @@
         }
       }
   }
+  .column-manager-actions {
+    position: relative;
+    top: -10px;
+    line-height: 0;
+    .disabled {
+      color: lighten(@btnTextColor, 35%);
+      pointer-events: none;
+    }
+  }
   .column-filter-match {
     text-decoration: underline;
   }
