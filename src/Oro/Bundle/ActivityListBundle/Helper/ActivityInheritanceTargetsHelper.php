@@ -38,7 +38,8 @@ class ActivityInheritanceTargetsHelper
     {
         if ($this->configManager->hasConfigEntityModel($entityClass)) {
             $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
-            if (array_key_exists('inheritance_targets', $configValues)) {
+            if (is_array($configValues) && array_key_exists('inheritance_targets', $configValues)
+                && is_array($configValues['inheritance_targets'])) {
                 return true;
             }
         }
@@ -89,13 +90,8 @@ class ActivityInheritanceTargetsHelper
      */
     protected function getInheritanceTargetsRelations($entityClass)
     {
-        $filteredTargets = [];
-        if ($this->configManager->hasConfigEntityModel($entityClass)) {
-            $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
-            if (isset($configValues['inheritance_targets'])) {
-                $filteredTargets = $this->prepareTargetData($configValues['inheritance_targets']);
-            }
-        }
+        $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
+        $filteredTargets = $this->prepareTargetData($configValues['inheritance_targets']);
 
         return $filteredTargets;
     }
@@ -116,7 +112,7 @@ class ActivityInheritanceTargetsHelper
     }
 
     /**
-     * @param $inheritanceTargets
+     * @param array $inheritanceTargets
      *
      * @return array
      */
@@ -124,7 +120,9 @@ class ActivityInheritanceTargetsHelper
     {
         $filteredTargets = [];
         foreach ($inheritanceTargets as $value) {
-            if ($this->configManager->hasConfigEntityModel($value['target'])) {
+            if (is_array($value)
+                && array_key_exists('target', $value)
+                && $this->configManager->hasConfigEntityModel($value['target'])) {
                 $configTarget = $this
                     ->configManager
                     ->getEntityConfig('activity', $value['target'])
