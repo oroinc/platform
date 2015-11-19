@@ -1,9 +1,8 @@
 <?php
 
-namespace JMS\JobQueueBundle;
+namespace Oro\Bundle\CronBundle\JobQueue;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Doctrine\DBAL\Types\Type;
 
 use JMS\JobQueueBundle\DependencyInjection\CompilerPass\LinkGeneratorsPass;
 use JMS\JobQueueBundle\DependencyInjection\JMSJobQueueExtension;
@@ -47,16 +46,6 @@ class JMSJobQueueBundle extends Bundle
                 ['JMSJobQueueBundle' => 'JMS\JobQueueBundle\Entity']
             )
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function boot()
-    {
-        if (!Type::hasType('jms_job_safe_object')) {
-            Type::addType('jms_job_safe_object', 'Oro\Bundle\CronBundle\Entity\Type\SafeObjectType');
-        }
     }
 
     /**
