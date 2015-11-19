@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

@@ -14,10 +14,11 @@ use Oro\Bundle\EntityBundle\Exception;
 
 class DoctrineHelper
 {
-    /**
-     * @var EntityManager[]
-     */
-    protected $managers = [];
+    /** @var ManagerRegistry */
+    protected $registry;
+
+    /** @var EntityManager[] */
+    private $managers = [];
 
     /**
      * @param ManagerRegistry $registry
@@ -184,9 +185,13 @@ class DoctrineHelper
      */
     public function isManageableEntity($entityOrClass)
     {
-        $entityClass = $this->getEntityClass($entityOrClass);
+        try {
+            $this->getEntityManager($entityOrClass);
 
-        return null !== $this->getManagerForClass($entityClass);
+            return true;
+        } catch (Exception\NotManageableEntityException $e) {
+            return false;
+        }
     }
 
     /**
@@ -196,17 +201,13 @@ class DoctrineHelper
      */
     public function getEntityMetadata($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        if (!$entityManager) {
-            throw new Exception\NotManageableEntityException($entityClass);
-        }
+        $entityClass = $this->getEntityClass($entityOrClass);
 
-        return $entityManager->getClassMetadata($entityClass);
+        return $this->getEntityManager($entityClass)->getClassMetadata($entityClass);
     }
 
     /**
-     * Gets the EntityManager associated with a given entity or class.
+     * Gets the EntityManager associated with the given entity or class.
      *
      * @param string|object $entityOrClass
      *
@@ -216,27 +217,29 @@ class DoctrineHelper
      */
     public function getEntityManager($entityOrClass)
     {
-        return $this->getEntityManagerForClass($this->getEntityClass($entityOrClass));
+        return $this->getEntityManagerForClass(
+            $this->getEntityClass($entityOrClass)
+        );
     }
 
     /**
-     * Gets the EntityManager associated with a given class.
+     * Gets the EntityManager associated with the given class.
      *
      * @param string $entityClass
      * @param bool   $triggerException
      *
      * @return EntityManager|null
      *
-     * @throws Exception\NotManageableEntityException
+     * @throws Exception\NotManageableEntityException if the EntityManager was not found and $triggerException is TRUE
      */
     public function getEntityManagerForClass($entityClass, $triggerException = true)
     {
-        $entityManager = $this->getManagerForClass($entityClass);
-        if (!$entityManager && $triggerException) {
+        $manager = $this->getManagerForClass($entityClass);
+        if (null === $manager && $triggerException) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
 
-        return $entityManager;
+        return $manager;
     }
 
     /**
@@ -245,10 +248,9 @@ class DoctrineHelper
      */
     public function getEntityRepository($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->getEntityManager($entityClass);
+        $entityClass = $this->getEntityClass($entityOrClass);
 
-        return $entityManager->getRepository($entityClass);
+        return $this->getEntityManager($entityClass)->getRepository($entityClass);
     }
 
     /**
@@ -333,7 +335,7 @@ class DoctrineHelper
      *
      * @return EntityManager|null
      */
-    protected function getManagerForClass($entityClass)
+    private function getManagerForClass($entityClass)
     {
         if (!array_key_exists($entityClass, $this->managers)) {
             $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
