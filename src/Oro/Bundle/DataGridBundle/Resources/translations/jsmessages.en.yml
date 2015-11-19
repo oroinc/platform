@@ -62,6 +62,7 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.gridView.actions": "Options"
 "oro.datagrid.gridView.data_edited": "Edited"
 "oro.datagrid.gridView.save_name": "Save"
+"Unexpected format": Unexpected format
 oro:
     datagrid:
         inlineEditing:

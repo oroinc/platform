@@ -1,5 +1,5 @@
 <a name="module_MultiSelectEditorView"></a>
-## MultiSelectEditorView ⇐ <code>[RelatedIdRelationEditorView](./related-id-relation-editor-view.md)</code>
+## MultiSelectEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
 Multi-select content editor. Please note that it requires column data format
 corresponding to multi-select-cell.
 
@@ -35,7 +35,7 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 
 ### Constructor parameters
 
-**Extends:** <code>[RelatedIdRelationEditorView](./related-id-relation-editor-view.md)</code>  
+**Extends:** <code>[SelectEditorView](./select-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
