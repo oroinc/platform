@@ -22,7 +22,12 @@ class AclConditionalFactorBuilder
 {
     const EXPECTED_TYPE = 12;
 
+    /** @var PropertyAccessor */
+    protected $propertyAccessor;
+
     /**
+     * Params $query and $options is points to extend functionality
+     *
      * @param array $aclConditionalFactors
      * @param mixed $condition
      * @param AbstractQuery $query
@@ -44,6 +49,8 @@ class AclConditionalFactorBuilder
     }
 
     /**
+     * Params $query and $options is points to extend functionality
+     *
      * @param array $aclConditionalFactors
      * @param array $conditions
      * @param AbstractQuery $query
@@ -95,7 +102,7 @@ class AclConditionalFactorBuilder
             return null;
         }
 
-        if ($condition->getValue() == null && $condition->getEntityField() == null) {
+        if ($condition->getValue() === null && $condition->getEntityField() === null) {
             $expression = $this->getAccessDeniedExpression();
         } else {
             $expression = $this->getInExpression($condition);

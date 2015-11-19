@@ -36,8 +36,8 @@ datagrid:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   0: Inactive
-                   1: Active
+                   - Inactive
+                   - Active
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
