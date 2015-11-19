@@ -4,7 +4,9 @@ define(['jquery', 'underscore', 'oroui/js/mediator'
 
     var initHandler = function(collection) {
         collection.on('beforeReset', function(collection, resp) {
-            collection.state.totals = resp.options.totals;
+            if (resp.options) {
+                collection.state.totals = resp.options.totals;
+            }
         });
     };
 

@@ -158,6 +158,15 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                 this.inputName = options.inputName;
             }
 
+            if (options.state) {
+                if (options.state.currentPage) {
+                    options.state.currentPage = parseInt(options.state.currentPage);
+                }
+                if (options.state.pageSize) {
+                    options.state.pageSize = parseInt(options.state.pageSize);
+                }
+            }
+
             _.extend(this.queryParams, {
                 currentPage: this.inputName + '[_pager][_page]',
                 pageSize:    this.inputName + '[_pager][_per_page]',
@@ -799,6 +808,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
 
             return this;
         },
+
         /**
          * Clone collection
          *
@@ -916,6 +926,19 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                     order: index
                 }];
             }));
+        },
+
+        /**
+         * Specify models in correct format
+         *
+         * @param {Object} models
+         * @param {Object} options
+         * @returns {*|Backbone.Collection}
+         * @protected
+         */
+        _makeFullCollection: function(models, options) {
+            var correctModels = models[0] && _.has(models[0], 'data') ? models[0].data : models;
+            return PageableCollection.__super__._makeFullCollection.call(this, correctModels, options);
         }
     });
 
