@@ -164,7 +164,7 @@ define(function(require) {
         toggleFallback: function() {
             var hasVisibleItems = Boolean(this.visibleItems.length);
             // to hide table's header once no visible data
-            this.$list.closest('.table-wrapper').toggle(hasVisibleItems);
+            this.$('.table-wrapper').toggle(hasVisibleItems);
             ColumnManagerCollectionView.__super__.toggleFallback.apply(this, arguments);
         }
     });
