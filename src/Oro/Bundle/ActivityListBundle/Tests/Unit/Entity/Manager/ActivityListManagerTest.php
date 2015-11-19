@@ -79,8 +79,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper')
             ->disableOriginalConstructor()->getMock();
 
-//        $this->doctrineHelper->expects($this->any())->method('getEntityRepository')->willReturn($this->em);
-
         $this->activityListManager = new ActivityListManager(
             $this->securityFacade,
             $this->entityNameResolver,
