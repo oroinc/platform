@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
@@ -24,9 +25,6 @@ use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 
 class ActivityListManager
 {
-    /** @var EntityManager */
-    protected $em;
-
     /** @var Pager */
     protected $pager;
 
@@ -51,8 +49,10 @@ class ActivityListManager
     /** @var ActivityListAclCriteriaHelper */
     protected $activityListAclHelper;
 
+    /** @var ActivityInheritanceTargetsHelper */
+    protected $activityInheritanceTargetsHelper;
+
     /**
-     * @param Registry                      $doctrine
      * @param SecurityFacade                $securityFacade
      * @param EntityNameResolver            $entityNameResolver
      * @param Pager                         $pager
@@ -62,11 +62,11 @@ class ActivityListManager
      * @param CommentApiManager             $commentManager
      * @param DoctrineHelper                $doctrineHelper
      * @param ActivityListAclCriteriaHelper $aclHelper
+     * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        Registry $doctrine,
         SecurityFacade $securityFacade,
         EntityNameResolver $entityNameResolver,
         Pager $pager,
@@ -75,9 +75,9 @@ class ActivityListManager
         ActivityListFilterHelper $activityListFilterHelper,
         CommentApiManager $commentManager,
         DoctrineHelper $doctrineHelper,
-        ActivityListAclCriteriaHelper $aclHelper
+        ActivityListAclCriteriaHelper $aclHelper,
+        ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
     ) {
-        $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
         $this->entityNameResolver       = $entityNameResolver;
         $this->pager                    = $pager;
@@ -87,6 +87,7 @@ class ActivityListManager
         $this->commentManager           = $commentManager;
         $this->doctrineHelper           = $doctrineHelper;
         $this->activityListAclHelper    = $aclHelper;
+        $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
     }
 
     /**
@@ -94,7 +95,7 @@ class ActivityListManager
      */
     public function getRepository()
     {
-        return $this->em->getRepository(ActivityList::ENTITY_NAME);
+        return $this->doctrineHelper->getEntityRepository(ActivityList::ENTITY_NAME);
     }
 
     /**
@@ -108,7 +109,11 @@ class ActivityListManager
     public function getList($entityClass, $entityId, $filter, $page)
     {
         $qb = $this->getBaseQB($entityClass, $entityId);
-        $this->applyInheritanceActivity($qb, $entityClass, $entityId);
+        $this->activityInheritanceTargetsHelper
+            ->applyInheritanceActivity($qb, $entityClass, $entityId);
+        if ($this->config->get('oro_activity_list.grouping')) {
+            $qb->andWhere($qb->expr()->andX('activity.head = true'));
+        }
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
         $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
 
@@ -136,7 +141,11 @@ class ActivityListManager
     public function getListCount($entityClass, $entityId, $filter)
     {
         $qb = $this->getBaseQB($entityClass, $entityId);
-        $this->applyInheritanceActivity($qb, $entityClass, $entityId);
+        $this->activityInheritanceTargetsHelper
+            ->applyInheritanceActivity($qb, $entityClass, $entityId);
+        if ($this->config->get('oro_activity_list.grouping')) {
+            $qb->andWhere($qb->expr()->andX('activity.head = true'));
+        }
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
         $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
         $qb->resetDQLPart('orderBy');
@@ -154,49 +163,6 @@ class ActivityListManager
         $result = $statement->fetchColumn();
 
         return $result;
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param string  $entityClass
-     * @param integer $entityId
-     */
-    protected function applyInheritanceActivity(QueryBuilder $qb, $entityClass, $entityId)
-    {
-        $inheritanceTargets = [
-            [
-                'id' => [1, 3],
-                'classTarget' => 'opportunity_c8bd867a'
-            ],
-            [
-                'id' => [1, 3],
-                'classTarget' => 'contact_e8d5b2ba'
-            ]
-        ];
-
-        foreach($inheritanceTargets as $key => $inheritanceTarget) {
-            $alias = 'inh_'.$key;
-            $qb->leftJoin('activity.'.$inheritanceTarget['classTarget'], $alias);
-            if (array_key_exists('id', $inheritanceTarget) && !empty($inheritanceTarget['id'])) {
-                $paramName = sprintf('%s_%s', $alias, $key);
-
-                if ($this->config->get('oro_activity_list.grouping')) {
-                    $qb->orWhere(
-                        $qb->expr()->andX(
-                            $qb->expr()->andX(sprintf('%s.id in (:%s)', $alias, $paramName)),
-                            $qb->expr()->andX('activity.head = true')
-                        )
-                    );
-                } else {
-                    $qb->orWhere(
-                        $qb->expr()->andX(sprintf('%s.id in (:%s)', $alias, $paramName))
-                    );
-                }
-
-                $qb->setParameter($paramName, $inheritanceTarget['id']);
-            }
-        }
-
     }
 
     /**

@@ -14,7 +14,6 @@ parameters:
     oro_activity.form.handler.activity_entity.api.class:  Oro\Bundle\ActivityBundle\Form\Handler\ActivityEntityApiHandler
     oro_activity.manager.activity_target.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
     oro_activity.listener.datagrid.context.class: Oro\Bundle\ActivityBundle\EventListener\Datagrid\ContextGridListener
-    oro_activity.helper.activity_inheritance_targets.class: Oro\Bundle\ActivityBundle\Helper\ActivityInheritanceTargetsHelper
 services:
     oro_activity.manager:
         class: %oro_activity.manager.class%
@@ -157,8 +156,3 @@ services:
             - @router
             - @oro_entity.entity_alias_resolver
 
-    oro_activity.helper.activity_inheritance_targets:
-        class: %oro_activity.helper.activity_inheritance_targets.class%
-        arguments:
-            - @oro_entity_config.config_manager
-            - @doctrine.orm.entity_manager

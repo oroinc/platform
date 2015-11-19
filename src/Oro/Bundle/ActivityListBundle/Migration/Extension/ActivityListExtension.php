@@ -8,6 +8,7 @@ use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 
 class ActivityListExtension implements ExtendExtensionAwareInterface
 {
@@ -60,5 +61,34 @@ class ActivityListExtension implements ExtendExtensionAwareInterface
                 ]
             ]
         );
+    }
+
+    /**
+     * Add inheritance tables to target to show inherited activities
+     *
+     * @param Schema $schema
+     * @param string $targetTableName
+     * @param string $inheritanceTableName
+     * @param string[] $path
+     */
+    public function addInheritanceTargets(
+        Schema $schema,
+        $targetTableName,
+        $inheritanceTableName,
+        $path
+    ) {
+        $targetTable = $schema->getTable($targetTableName);
+
+        $options = new OroOptions();
+        $inheritance['target'] = $this->extendExtension->getEntityClassByTableName($inheritanceTableName);
+        $inheritance['path'] = $path;
+        $inheritances[] = $inheritance;
+        $options->append(
+            'activity',
+            'inheritance_targets',
+            $inheritances
+        );
+
+        $targetTable->addOption(OroOptions::KEY, $options);
     }
 }
