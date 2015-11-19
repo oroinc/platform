@@ -28,7 +28,8 @@ datagrid:
 
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
+inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.view_options.maximumSelectionLength | Optional. Maximum selection length
 inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
@@ -43,7 +44,8 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | options.model | <code>Object</code> | Current row model |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for an empty element |
+| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
+| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
 | options.maximumSelectionLength | <code>string</code> | Maximum selection length |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 

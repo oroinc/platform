@@ -50,7 +50,8 @@ define(function(require) {
      * :---------------------------------------------------|:---------------------------------------
      * inline_editing.editor.view_options.choices          | Key-value set of available choices
      * inline_editing.editor.view_options.value_field_name | Related value field name.
-     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
+     * inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
      *
@@ -62,7 +63,8 @@ define(function(require) {
      * @param {Object} options.model - Current row model
      * @param {Backgrid.Cell} options.cell - Current datagrid cell
      * @param {Backgrid.Column} options.column - Current datagrid column
-     * @param {string} options.placeholder - Placeholder for an empty element
+     * @param {string} options.placeholder - Placeholder translation key for an empty element
+     * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.choices - Key-value set of available choices
      * @param {Object} options.value_field_name - Related value field name
