@@ -4,8 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
@@ -15,8 +14,8 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
-    protected $registry;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityDetachFixer */
     protected $detachFixer;
@@ -33,13 +32,13 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->registry->expects($this->any())
-            ->method('getManager')
-            ->willReturn($this->entityManager);
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->willReturn($this->entityManager);
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManager')
+            ->will($this->returnValue($this->entityManager));
 
         $this->detachFixer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer')
             ->disableOriginalConstructor()
@@ -47,7 +46,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->contextRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
 
-        $this->writer = new EntityWriter($this->registry, $this->detachFixer, $this->contextRegistry);
+        $this->writer = new EntityWriter($this->doctrineHelper, $this->detachFixer, $this->contextRegistry);
     }
 
     /**
@@ -104,6 +103,55 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage entityName not resolved
+     */
+    public function testMissingClassName()
+    {
+        /** @var StepExecution $stepExecution */
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context->expects($this->once())
+            ->method('getConfiguration')
+            ->will($this->returnValue([]));
+
+        $this->contextRegistry->expects($this->once())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->will($this->returnValue($context));
+
+        $this->writer->setStepExecution($stepExecution);
+        $this->writer->write([]);
+    }
+
+    public function testClassResolvedOnce()
+    {
+        /** @var StepExecution $stepExecution */
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context->expects($this->once())
+            ->method('getConfiguration')
+            ->will($this->returnValue(['entityName' => '\stdClass']));
+
+        $this->contextRegistry->expects($this->once())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->will($this->returnValue($context));
+
+        $this->writer->setStepExecution($stepExecution);
+        $this->writer->write([]);
+
+        // trigger detection twice
+        $this->writer->write([]);
+    }
+
+    /**
      * @return array
      */
     public function configurationProvider()
@@ -112,6 +160,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
             'no clear flag'    => [[]],
             'clear flag false' => [[EntityWriter::SKIP_CLEAR => false]],
             'clear flag true'  => [[EntityWriter::SKIP_CLEAR => true]],
+            'className from config'  => [[EntityWriter::SKIP_CLEAR => true, 'entityName' => '\stdClass']],
         ];
     }
 }

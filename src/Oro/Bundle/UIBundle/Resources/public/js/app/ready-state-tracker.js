@@ -3,7 +3,7 @@ define([
 ], function($) {
     'use strict';
 
-    return {
+    var readyStateTracker = {
         deferreds: {},
         getDeferred: function(name) {
             if (!this.deferreds[name]) {
@@ -18,4 +18,12 @@ define([
             this.getDeferred(name).done($.proxy(cb, ctx || window));
         }
     };
+
+    if ($) {
+        $(function() {
+            readyStateTracker.markReady('dom');
+        });
+    }
+
+    return readyStateTracker;
 });

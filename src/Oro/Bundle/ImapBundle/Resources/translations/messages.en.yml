@@ -11,3 +11,4 @@ oro.imap:
         user.label: User
         password.label: Password
         connect_and_retrieve_folders: Check connection/Retrieve folders
+        tooltip: If the value is changed, new mailbox will be registered. All data from this mailbox will be lost

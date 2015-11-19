@@ -24,6 +24,9 @@ class ContentProviderPass implements CompilerPassInterface
         $contentProviderManagerDefinition = $container->getDefinition(self::CONTENT_PROVIDER_MANAGER_SERVICE);
         $taggedServices                   = $container->findTaggedServiceIds(self::CONTENT_PROVIDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
+            if ($container->hasDefinition($id)) {
+                $container->getDefinition($id)->setPublic(false);
+            }
             $isEnabled = true;
             foreach ($attributes as $attribute) {
                 if (array_key_exists('enabled', $attribute)) {

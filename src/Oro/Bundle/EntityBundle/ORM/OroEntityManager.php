@@ -25,6 +25,12 @@ class OroEntityManager extends EntityManager
      */
     protected $extendConfigProvider;
 
+    /** @var OrmLogger */
+    protected $logger;
+
+    /** @var array */
+    protected $loggingHydrators;
+
     public static function create($conn, Configuration $config, EventManager $eventManager = null)
     {
         if (!$config->getMetadataDriverImpl()) {
@@ -190,11 +196,17 @@ class OroEntityManager extends EntityManager
      */
     protected function getLoggingHydrators()
     {
+        if (is_array($this->loggingHydrators)) {
+            return $this->loggingHydrators;
+        }
+
         $config = $this->getConfiguration();
 
-        return $config instanceof OrmConfiguration
+        $this->loggingHydrators = $config instanceof OrmConfiguration
             ? $config->getAttribute('LoggingHydrators', [])
             : [];
+
+        return $this->loggingHydrators;
     }
 
     /**
@@ -204,10 +216,20 @@ class OroEntityManager extends EntityManager
      */
     protected function getProfilingLogger()
     {
+        if ($this->logger) {
+            return $this->logger;
+        }
+
+        if (false === $this->logger) {
+            return null;
+        }
+
         $config = $this->getConfiguration();
 
-        return $config instanceof OrmConfiguration
-            ? $config->getAttribute('OrmProfilingLogger')
-            : null;
+        $this->logger = $config instanceof OrmConfiguration
+            ? $config->getAttribute('OrmProfilingLogger', false)
+            : false;
+
+        return $this->logger;
     }
 }

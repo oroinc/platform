@@ -59,9 +59,9 @@ class SearchEntityConfigListener
      */
     protected function addPostponeJob($entityClass)
     {
-        $update = $this->registry->getRepository('OroSearchBundle:UpdateEntity')->find($entityClass);
+        $em = $this->registry->getManagerForClass('OroSearchBundle:UpdateEntity');
+        $update = $em->getRepository('OroSearchBundle:UpdateEntity')->find($entityClass);
         if (!$update) {
-            $em     = $this->registry->getManager();
             $update = new UpdateEntity();
             $update->setEntity($entityClass);
             $em->persist($update);

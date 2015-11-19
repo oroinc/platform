@@ -78,7 +78,7 @@ class AutoResponseRuleSubscriber implements EventSubscriberInterface
 
             return $qb
                 ->orderBy('e.name', 'ASC')
-                ->andWhere('e.entityName = :entityName')
+                ->andWhere('e.entityName = :entityName OR e.entityName IS NULL')
                 ->andWhere("e.organization = :organization")
                 ->andWhere($qb->expr()->orX(
                     $qb->expr()->eq('e.visible', ':visible'),

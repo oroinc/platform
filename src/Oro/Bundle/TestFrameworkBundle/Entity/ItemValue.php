@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -15,4 +16,9 @@ class ItemValue implements TestFrameworkEntityInterface
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Item", inversedBy="values")
+     */
+    protected $entity;
 }

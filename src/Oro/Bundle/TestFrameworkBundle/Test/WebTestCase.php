@@ -673,7 +673,8 @@ abstract class WebTestCase extends BaseWebTestCase
         try {
             \PHPUnit_Framework_TestCase::assertEquals(
                 $statusCode,
-                $response->getStatusCode()
+                $response->getStatusCode(),
+                $response->getContent()
             );
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             if ($statusCode < 400
