@@ -29,21 +29,19 @@ class RegisterFilters implements ProcessorInterface
     {
         /** @var GetListContext $context */
 
-        $entityClass = $context->getClassName();
-        if (!$entityClass) {
-            // an entity type is not specified
+        if (!$context->hasConfigOfFilters()) {
+            // a filters' configuration does not exist
             return;
         }
 
         $configOfFilters = $context->getConfigOfFilters();
-        if (null === $configOfFilters) {
-            // a filters' configuration does not exist
+        if (empty($configOfFilters)) {
+            // a filters' configuration does not contains any data
             return;
         }
 
         if (!ConfigUtil::isExcludeAll($configOfFilters)) {
             // it seems that filters' configuration was not normalized
-            // default normalization can be found in {@see Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeFilters}
             throw new \RuntimeException(
                 sprintf(
                     'Expected "all" exclusion policy for filters. Got: %s.',

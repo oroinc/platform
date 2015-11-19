@@ -17,7 +17,7 @@ class NormalizeIncludeHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWhenNoIncludeHeader()
     {
-        $context = new Context();
+        $context = $this->getContext();
 
         $this->processor->process($context);
 
@@ -26,7 +26,7 @@ class NormalizeIncludeHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWhenIncludeHeaderAlreadyNormalized()
     {
-        $context = new Context();
+        $context = $this->getContext();
         $context->getRequestHeaders()->set(Context::INCLUDE_HEADER, ['val1', 'val2']);
 
         $this->processor->process($context);
@@ -39,7 +39,7 @@ class NormalizeIncludeHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $context = new Context();
+        $context = $this->getContext();
         $context->getRequestHeaders()->set(Context::INCLUDE_HEADER, 'val1; val2');
 
         $this->processor->process($context);
@@ -48,5 +48,17 @@ class NormalizeIncludeHeaderTest extends \PHPUnit_Framework_TestCase
             ['val1', 'val2'],
             $context->getRequestHeaders()->get(Context::INCLUDE_HEADER)
         );
+    }
+
+    /**
+     * @return Context
+     */
+    protected function getContext()
+    {
+        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return new Context($configProvider);
     }
 }

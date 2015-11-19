@@ -6,17 +6,13 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class GetListContext extends Context
 {
     /** @var FilterValueAccessorInterface */
     private $filterValues;
-
-    /** a configuration of an entity filters */
-    const CONFIG_FILTERS = 'configFilters';
-
-    /** a configuration of an entity sorters */
-    const CONFIG_SORTERS = 'configSorters';
 
     /** a list of filters is used to add additional restrictions to a query is used to get result data */
     const FILTERS = 'filters';
@@ -25,43 +21,72 @@ class GetListContext extends Context
     const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
 
     /**
-     * Gets a configuration of an entity filters
+     * @param ConfigProvider $configProvider
+     */
+    public function __construct(ConfigProvider $configProvider)
+    {
+        parent::__construct($configProvider);
+        $this->setConfigSections([ConfigUtil::FILTERS, ConfigUtil::SORTERS]);
+    }
+
+    /**
+     * Checks whether a configuration of filters for an entity exists
+     *
+     * @return bool
+     */
+    public function hasConfigOfFilters()
+    {
+        return $this->hasConfigOf(ConfigUtil::FILTERS);
+    }
+
+    /**
+     * Gets a configuration of filters for an entity
      *
      * @return array|null
      */
     public function getConfigOfFilters()
     {
-        return $this->get(self::CONFIG_FILTERS);
+        return $this->getConfigOf(ConfigUtil::FILTERS);
     }
 
     /**
-     * Sets a configuration of an entity filters
+     * Sets a configuration of filters for an entity
      *
      * @param array|null $config
      */
     public function setConfigOfFilters($config)
     {
-        $this->set(self::CONFIG_FILTERS, $config);
+        $this->setConfigOf(ConfigUtil::FILTERS, $config);
     }
 
     /**
-     * Gets a configuration of an entity sorters
+     * Checks whether a configuration of sorters for an entity exists
+     *
+     * @return bool
+     */
+    public function hasConfigOfSorters()
+    {
+        return $this->hasConfigOf(ConfigUtil::SORTERS);
+    }
+
+    /**
+     * Gets a configuration of sorters for an entity
      *
      * @return array|null
      */
     public function getConfigOfSorters()
     {
-        return $this->get(self::CONFIG_SORTERS);
+        return $this->getConfigOf(ConfigUtil::SORTERS);
     }
 
     /**
-     * Sets a configuration of an entity sorters
+     * Sets a configuration of sorters for an entity
      *
      * @param array|null $config
      */
     public function setConfigOfSorters($config)
     {
-        $this->set(self::CONFIG_SORTERS, $config);
+        $this->setConfigOf(ConfigUtil::SORTERS, $config);
     }
 
     /**

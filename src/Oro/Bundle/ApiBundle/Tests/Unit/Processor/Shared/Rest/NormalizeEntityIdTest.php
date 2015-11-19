@@ -30,7 +30,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWhenNoId()
     {
-        $context = new SingleItemContext();
+        $context = $this->getContext();
 
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadata');
@@ -40,7 +40,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWhenIdAlreadyNormalized()
     {
-        $context = new SingleItemContext();
+        $context = $this->getContext();
         $context->setId(123);
 
         $this->doctrineHelper->expects($this->never())
@@ -51,7 +51,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWhenNoClass()
     {
-        $context = new SingleItemContext();
+        $context = $this->getContext();
         $context->setId('123');
 
         $this->doctrineHelper->expects($this->never())
@@ -62,7 +62,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessForNotManageableEntity()
     {
-        $context = new SingleItemContext();
+        $context = $this->getContext();
         $context->setClassName('Test\Class');
         $context->setId('123');
 
@@ -81,7 +81,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'Test\Class';
 
-        $context = new SingleItemContext();
+        $context = $this->getContext();
         $context->setClassName($entityClass);
         $context->setId('123');
 
@@ -121,7 +121,7 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'Test\Class';
 
-        $context = new SingleItemContext();
+        $context = $this->getContext();
         $context->setClassName($entityClass);
         $context->setId('id1=123,id2=456');
 
@@ -166,5 +166,17 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
             ['id1' => 123, 'id2' => 456],
             $context->getId()
         );
+    }
+
+    /**
+     * @return SingleItemContext
+     */
+    protected function getContext()
+    {
+        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return new SingleItemContext($configProvider);
     }
 }

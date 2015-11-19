@@ -5,6 +5,7 @@ services:
         arguments:
             - @oro_api.processor_bag
             - get
+            - @oro_api.config_provider
         tags:
             - { name: oro.api.action_processor }
 
@@ -43,13 +44,6 @@ services:
             - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: rest, priority: 10 }
-
-    oro_api.get.load_config:
-        class: Oro\Bundle\ApiBundle\Processor\Get\LoadConfig
-        arguments:
-            - @oro_api.config_provider
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
 
     #
     # security_check

@@ -3,16 +3,31 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
+
+    /** @var Context */
+    protected $context;
+
+    protected function setUp()
+    {
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context = new Context($this->configProvider);
+    }
+
     /**
      * keys of request headers should be are case insensitive
      */
     public function testRequestHeaders()
     {
-        $context = new Context();
-        $headers = $context->getRequestHeaders();
+        $headers = $this->context->getRequestHeaders();
 
         $key1   = 'test1';
         $key2   = 'test2';
@@ -71,8 +86,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     public function testResponseHeaders()
     {
-        $context = new Context();
-        $headers = $context->getResponseHeaders();
+        $headers = $this->context->getResponseHeaders();
 
         $key1   = 'test1';
         $key2   = 'test2';
@@ -132,56 +146,261 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testVersion()
     {
-        $context = new Context();
+        $this->assertNull($this->context->getVersion());
 
-        $this->assertNull($context->getVersion());
-
-        $context->setVersion('test');
-        $this->assertEquals('test', $context->getVersion());
-        $this->assertEquals('test', $context->get(Context::VERSION));
+        $this->context->setVersion('test');
+        $this->assertEquals('test', $this->context->getVersion());
+        $this->assertEquals('test', $this->context->get(Context::VERSION));
     }
 
     public function testClassName()
     {
-        $context = new Context();
+        $this->assertNull($this->context->getClassName());
 
-        $this->assertNull($context->getClassName());
+        $this->context->setClassName('test');
+        $this->assertEquals('test', $this->context->getClassName());
+        $this->assertEquals('test', $this->context->get(Context::CLASS_NAME));
+    }
 
-        $context->setClassName('test');
-        $this->assertEquals('test', $context->getClassName());
-        $this->assertEquals('test', $context->get(Context::CLASS_NAME));
+    public function testLoadConfigByGetConfig()
+    {
+        $config         = ConfigUtil::getInitialConfig();
+        $section1Config = ['test'];
+
+        $this->context->setVersion('1.1');
+        $this->context->setRequestType('rest');
+        $this->context->setConfigSections(['section1', 'section2']);
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\Class',
+                '1.1',
+                'rest',
+                ['section1', 'section2']
+            )
+            ->willReturn(
+                [
+                    ConfigUtil::DEFINITION => $config,
+                    'section1'             => $section1Config
+                ]
+            );
+
+        // test that a config is not loaded yet
+        $this->assertFalse($this->context->hasConfig());
+        $this->assertFalse($this->context->hasConfigOf('section1'));
+        $this->assertFalse($this->context->hasConfigOf('section2'));
+
+        $this->assertEquals($config, $this->context->getConfig()); // load config
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        $this->assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+
+        $this->assertTrue($this->context->hasConfigOf('section1'));
+        $this->assertEquals($section1Config, $this->context->getConfigOf('section1'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
+
+        $this->assertTrue($this->context->hasConfigOf('section2'));
+        $this->assertNull($this->context->getConfigOf('section2'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+
+        // test that a config is loaded only once
+        $this->assertEquals($config, $this->context->getConfig());
+    }
+
+    public function testLoadConfigByGetConfigOf()
+    {
+        $config         = ConfigUtil::getInitialConfig();
+        $section1Config = ['test'];
+
+        $this->context->setVersion('1.1');
+        $this->context->setRequestType('rest');
+        $this->context->setConfigSections(['section1', 'section2']);
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\Class',
+                '1.1',
+                'rest',
+                ['section1', 'section2']
+            )
+            ->willReturn(
+                [
+                    ConfigUtil::DEFINITION => $config,
+                    'section1'             => $section1Config
+                ]
+            );
+
+        // test that a config is not loaded yet
+        $this->assertFalse($this->context->hasConfig());
+        $this->assertFalse($this->context->hasConfigOf('section1'));
+        $this->assertFalse($this->context->hasConfigOf('section2'));
+
+        $this->assertEquals($section1Config, $this->context->getConfigOf('section1')); // load config
+        $this->assertTrue($this->context->hasConfigOf('section1'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
+
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertEquals($config, $this->context->getConfig());
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        $this->assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+
+        $this->assertTrue($this->context->hasConfigOf('section2'));
+        $this->assertNull($this->context->getConfigOf('section2'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+
+        // test that a config is loaded only once
+        $this->assertEquals($config, $this->context->getConfig());
+    }
+
+    public function testLoadConfigNoClassName()
+    {
+        $this->context->setConfigSections(['section1']);
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        // test that a config is not loaded yet
+        $this->assertFalse($this->context->hasConfig());
+        $this->assertFalse($this->context->hasConfigOf('section1'));
+
+        $this->assertNull($this->context->getConfig()); // load config
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+
+        $this->assertTrue($this->context->hasConfigOf('section1'));
+        $this->assertNull($this->context->getConfigOf('section1'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+    }
+
+    public function testConfigWhenItIsSetExplicitly()
+    {
+        $config = ConfigUtil::getInitialConfig();
+
+        $this->context->setConfigSections(['section1']);
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setConfig($config);
+
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertEquals($config, $this->context->getConfig());
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        $this->assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+
+        $this->assertTrue($this->context->hasConfigOf('section1'));
+        $this->assertNull($this->context->getConfigOf('section1'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+    }
+
+    public function testConfigWhenIsSetExplicitlyForSection()
+    {
+        $section1Config = ['test'];
+
+        $this->context->setConfigSections(['section1', 'section2']);
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setConfigOf('section1', $section1Config);
+
+        $this->assertTrue($this->context->hasConfigOf('section1'));
+        $this->assertEquals($section1Config, $this->context->getConfigOf('section1'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
+
+        $this->assertTrue($this->context->hasConfigOf('section2'));
+        $this->assertNull($this->context->getConfigOf('section2'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertNull($this->context->getConfig());
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetConfigOfUndefinedSection()
+    {
+        $this->context->setConfigSections(['section1']);
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->getConfigOf('undefined');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetConfigOfUndefinedSection()
+    {
+        $this->context->setConfigSections(['section1']);
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setConfigOf('undefined', []);
+    }
+
+    public function testConfigSections()
+    {
+        $this->assertSame([], $this->context->getConfigSections());
+        $this->assertNull($this->context->get(Context::CONFIG_SECTION));
+
+        $this->context->setConfigSections(['test']);
+        $this->assertEquals(['test'], $this->context->getConfigSections());
+        $this->assertEquals(['test'], $this->context->get(Context::CONFIG_SECTION));
+
+        $this->context->setConfigSections([]);
+        $this->assertSame([], $this->context->getConfigSections());
+        $this->assertNull($this->context->get(Context::CONFIG_SECTION));
     }
 
     public function testQuery()
     {
-        $context = new Context();
-
-        $this->assertFalse($context->hasQuery());
-        $this->assertNull($context->getQuery());
+        $this->assertFalse($this->context->hasQuery());
+        $this->assertNull($this->context->getQuery());
 
         $query = new \stdClass();
 
-        $context->setQuery($query);
-        $this->assertTrue($context->hasQuery());
-        $this->assertSame($query, $context->getQuery());
-        $this->assertSame($query, $context->get(Context::QUERY));
+        $this->context->setQuery($query);
+        $this->assertTrue($this->context->hasQuery());
+        $this->assertSame($query, $this->context->getQuery());
+        $this->assertSame($query, $this->context->get(Context::QUERY));
 
-        $context->setQuery(null);
-        $this->assertTrue($context->hasQuery());
+        $this->context->setQuery(null);
+        $this->assertTrue($this->context->hasQuery());
     }
 
     public function testCriteria()
     {
-        $context = new Context();
-
-        $this->assertNull($context->getCriteria());
+        $this->assertNull($this->context->getCriteria());
 
         $criteria = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\Criteria')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context->setCriteria($criteria);
-        $this->assertSame($criteria, $context->getCriteria());
-        $this->assertSame($criteria, $context->get(Context::CRITERIA));
+        $this->context->setCriteria($criteria);
+        $this->assertSame($criteria, $this->context->getCriteria());
+        $this->assertSame($criteria, $this->context->get(Context::CRITERIA));
     }
 }

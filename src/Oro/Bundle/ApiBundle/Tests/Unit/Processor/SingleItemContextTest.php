@@ -8,7 +8,11 @@ class SingleItemContextTest extends \PHPUnit_Framework_TestCase
 {
     public function testVersion()
     {
-        $context = new SingleItemContext();
+        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $context = new SingleItemContext($configProvider);
 
         $this->assertNull($context->getId());
 
