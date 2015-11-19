@@ -176,6 +176,9 @@ services:
 
     oro_help.form.tooltip_extension:
         class: %oro_form.extension.tooltip.class%
+        arguments:
+            - @oro_entity_config.provider.entity
+            - @translator.default
         tags:
             - { name: form.type_extension, alias: form }
 
