@@ -120,7 +120,7 @@ define(function(require) {
                 this.subview('loading').show();
             }
 
-            this.initPopover(this.$el);
+            this.initLayout();
         },
 
         fetchFromData: function() {
@@ -138,51 +138,6 @@ define(function(require) {
                 this.model.set('settings', settings);
             }
             this.trigger('close');
-        },
-
-        initPopover: function (container) {
-            var $items = container.find('[data-toggle="popover"]').filter(function() {
-                // skip already initialized popovers
-                return !$(this).data('popover');
-            });
-            $items.not('[data-close="false"]').each(function(i, el) {
-                //append close link
-                var content = $(el).data('content');
-                content += '<i class="icon-remove popover-close"></i>';
-                $(el).data('content', content);
-            });
-
-            $items.popover({
-                animation: false,
-                delay: {show: 0, hide: 0},
-                html: true,
-                container: false,
-                trigger: 'manual'
-            }).on('click.popover', function(e) {
-                $(this).popover('toggle');
-                e.preventDefault();
-            });
-
-            container.on('click.popover-hide', function(e) {
-                    var $target = $(e.target);
-                    $items.each(function() {
-                        //the 'is' for buttons that trigger popups
-                        //the 'has' for icons within a button that triggers a popup
-                        if (
-                            !$(this).is($target) &&
-                            $(this).has($target).length === 0 &&
-                            ($('.popover').has($target).length === 0 || $target.hasClass('popover-close'))
-                        ) {
-                            $(this).popover('hide');
-                        }
-                    });
-                }).on('click.popover-prevent', '.popover', function(e) {
-                if (e.target.tagName.toLowerCase() !== 'a') {
-                    e.preventDefault();
-                }
-            }).on('focus.popover-hide', 'select, input, textarea', function() {
-                $items.popover('hide');
-            });
         }
     });
 
