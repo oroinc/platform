@@ -1,12 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Provider;
+namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
+/**
+ * The implementation of ExclusionProviderInterface that can be used to ignore
+ * entities which do not have aliases.
+ */
 class AliasedEntityExclusionProvider implements ExclusionProviderInterface
 {
     /** @var EntityAliasResolver */
