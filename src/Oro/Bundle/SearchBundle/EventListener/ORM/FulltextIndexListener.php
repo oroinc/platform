@@ -41,8 +41,6 @@ class FulltextIndexListener
         }
 
         $classMetadata->table['options']['engine'] = PdoMysql::ENGINE_MYISAM;
-        $classMetadata->table['indexes']['value'] = [
-            'columns' => ['value']
-        ];
+        $classMetadata->table['indexes']['value'] = ['columns' => ['value']];
     }
 }
