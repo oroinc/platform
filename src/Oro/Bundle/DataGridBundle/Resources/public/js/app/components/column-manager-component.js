@@ -52,8 +52,6 @@ define(function(require) {
 
             this.columnFilterModel = new ColumnFilterModel();
 
-            this.filterer = _.bind(this.columnFilterModel.filterer, this.columnFilterModel);
-
             this._createViews(options);
 
             this._applyState(this.grid.collection, this.grid.collection.state);
@@ -82,8 +80,6 @@ define(function(require) {
         delegateListeners: function() {
             this.listenTo(this.grid.collection, 'updateState', this._applyState);
             this.listenTo(this.columnManagerCollectionView, 'reordered', this._pushState);
-            this.listenTo(this.columnFilterModel, 'change', this.applyFilter);
-            this.listenTo(this.managedColumns, 'change', this.applyFilter);
             this.listenTo(this.managedColumns, 'change:renderable', this._pushState);
             this.listenTo(this.managedColumns, 'sort', function() {
                 this.columns.sort();
@@ -189,10 +185,6 @@ define(function(require) {
             }, this);
 
             return state;
-        },
-
-        applyFilter: function() {
-            this.columnManagerCollectionView.filter(this.filterer);
         }
     });
 

@@ -14,13 +14,14 @@ define(function(require) {
         },
 
         listen: {
-            'change:renderable collection': 'updateView'
+            'change:renderable collection': 'onRenderableChange'
         },
 
         initialize: function(options) {
             ColumnManagerView.__super__.initialize.call(this, options);
             this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);
-            this.updateView = _.debounce(this.updateView, 50);
+            // to handle renderable change at once for multiple changes
+            this.onRenderableChange = _.debounce(this.onRenderableChange, 0);
             this.listenTo(options.columnFilterModel, 'change', this.updateView);
         },
 
@@ -30,10 +31,21 @@ define(function(require) {
             return this;
         },
 
+        /**
+         * Update filter view from its state
+         */
         updateView: function() {
             var models = this._getFilteredModels();
-            var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable')}));
+            var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable');}));
             this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
+        },
+
+        /**
+         * Handles renderable change of column models
+         *  - updates the view
+         */
+        onRenderableChange: function() {
+            this.updateView();
         },
 
         onSelectAll: function(e) {
@@ -41,7 +53,6 @@ define(function(require) {
             _.each(this._getFilteredModels(), function(model) {
                 model.set('renderable', true);
             });
-            this.updateView();
         },
 
         _getFilteredModels: function() {

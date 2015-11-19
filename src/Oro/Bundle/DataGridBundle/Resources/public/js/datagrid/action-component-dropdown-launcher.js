@@ -26,6 +26,11 @@ define(function(require) {
         /** @property {String} */
         wrapperClassName: undefined,
 
+        events: {
+            'click .dropdown-menu': 'onDropdownMenuClick',
+            'click [data-toggle=dropdown]': 'onDropdownToggleClick'
+        },
+
         /**
          * @inheritDoc
          */
@@ -37,9 +42,6 @@ define(function(require) {
                 this.wrapperClassName = options.wrapperClassName;
             }
             ActionComponentDropdownLauncher.__super__.initialize.call(this, options);
-            this.events = {
-                'click .dropdown-menu': 'onDropdownClick',
-            };
         },
 
         /**
@@ -76,11 +78,27 @@ define(function(require) {
         },
 
         /**
-         * Prevents dropdown from closing on click
+         * Focus first input once dropdown is opened
          *
          * @param {jQuery.Event} e
          */
-        onDropdownClick: function(e) {
+        onDropdownToggleClick: function(e) {
+            // inverse condition because this handler is bound first, before Bootstrap
+            if (!this.$el.is('.open')) {
+                var $elem = this.$('.dropdown-menu');
+                _.defer(function() {
+                    // focus input after Bootstrap opened dropdown menu
+                    $elem.focusFirstInput();
+                });
+            }
+        },
+
+        /**
+         * Prevents dropdown menu from closing on click
+         *
+         * @param {jQuery.Event} e
+         */
+        onDropdownMenuClick: function(e) {
             if (!this.$(e.target).is('.close')) {
                 e.stopPropagation();
             }

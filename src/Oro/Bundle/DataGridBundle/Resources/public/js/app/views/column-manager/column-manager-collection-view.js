@@ -5,6 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var ColumnFilterModel = require('orodatagrid/js/app/models/column-manager/column-filter-model');
     var ColumnManagerItemView = require('./column-manager-item-view');
 
     ColumnManagerCollectionView = BaseCollectionView.extend({
@@ -20,6 +21,10 @@ define(function(require) {
             'click tbody tr [data-role=moveDown]': 'onMoveDown'
         },
 
+        listen: {
+            'change collection': 'filter'
+        },
+
         /**
          * Number that is used to normalize order value
          *
@@ -28,16 +33,31 @@ define(function(require) {
         orderShift: 0,
 
         /**
+         * @type {ColumnFilterModel}
+         */
+        filterModel: null,
+
+        /**
          * @inheritDoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['orderShift', 'filterModel']));
-
+            if (!(this.filterModel instanceof ColumnFilterModel)) {
+                throw new TypeError('Invalid required option "filterModel"');
+            }
+            options.filterer = _.bind(this.filterModel.filterer, this.filterModel);
             ColumnManagerCollectionView.__super__.initialize.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
+         */
+        delegateListeners: function() {
+            this.listenTo(this.filterModel, 'change', this.filter);
+            return ColumnManagerCollectionView.__super__.delegateListeners.apply(this, arguments);
+        },
+
+        /**
          * @inheritDoc
          */
         render: function() {
@@ -136,6 +156,16 @@ define(function(require) {
                 this.collection.sort();
                 this.trigger('reordered');
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        toggleFallback: function() {
+            var hasVisibleItems = Boolean(this.visibleItems.length);
+            // to hide table's header once no visible data
+            this.$list.closest('.table-wrapper').toggle(hasVisibleItems);
+            ColumnManagerCollectionView.__super__.toggleFallback.apply(this, arguments);
         }
     });
 

@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerFilterView;
+    var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerFilterView = BaseView.extend({
@@ -18,6 +19,14 @@ define(function(require) {
 
         listen: {
             'change model': 'updateView'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function(options) {
+            this.onSearch = _.debounce(this.onSearch, 100);
+            ColumnManagerFilterView.__super__.initialize.apply(this, arguments);
         },
 
         updateView: function() {
