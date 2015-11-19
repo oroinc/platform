@@ -138,8 +138,18 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                 $isSingleRelation = $this->fieldHelper->isSingleRelation($field) && $singleRelationDeepLevel > 0;
                 $isMultipleRelation = $this->fieldHelper->isMultipleRelation($field) && $multipleRelationDeepLevel > 0;
 
+                /**
+                 * @todo: should be refactored during BAP-9349 implementation
+                 */
+                $isIdentifier = false;
+                if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
+                    $singleRelationDeepLevel++;
+                    $multipleRelationDeepLevel++;
+                    $isIdentifier = true;
+                }
+
                 // if relation must be included
-                if ($fullData && ($isSingleRelation || $isMultipleRelation)) {
+                if (($fullData || $isIdentifier)  && ($isSingleRelation || $isMultipleRelation)) {
                     $relatedEntityName = $field['related_entity_name'];
                     $fieldFullData = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
 
