@@ -87,6 +87,8 @@ class UrlExtension extends \Twig_Extension
                 return false;
             }
         }
+
+        // going out from secure connection to unsecure page on same domain is not local
         if (!empty($parts['scheme']) && $this->request->getScheme() === 'https') {
             if ($parts['scheme'] === 'http') {
                 return false;
