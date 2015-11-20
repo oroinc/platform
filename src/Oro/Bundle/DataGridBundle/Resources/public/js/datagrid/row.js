@@ -85,10 +85,7 @@ define([
          * @param {Boolean} isSelected
          */
         toggleSelectedRow: function (isSelected, model) {
-            if (isSelected)
-                this.$el.addClass("row-selected");
-            else
-                this.$el.removeClass("row-selected");
+            this.$el.toggleClass("row-selected", isSelected);
         },
 
         className: function() {

@@ -31,9 +31,13 @@ define([
                 throw new Error('Field selectors is not specified');
             }
             this.selectors = options.selectors;
+            this.grid = options.grid;
             this.confirmModal = {};
 
             ColumnFormListener.__super__.initialize.apply(this, arguments);
+
+            this.subscribeToGrid();
+            this.selectRows();
         },
 
         /**
@@ -46,6 +50,35 @@ define([
             mediator.bind('pagestate_restored', function() {
                 this._restoreState();
             }, this);
+        },
+
+        /**
+         * Subscribe to grid events
+         */
+        subscribeToGrid: function () {
+            this.grid.on('content:update', this.selectRows, this);
+            this.grid.on('dispose', this.unsubscribeFromGrid, this);
+        },
+
+        /**
+         * Unsubscribe from grid events
+         */
+        unsubscribeFromGrid: function () {
+            this.grid.off(null, null, this);
+        },
+
+        /**
+         * Selecting rows
+         */
+        selectRows: function () {
+            var columnName = this.columnName;
+
+            this.grid.collection.each(function (model, i) {
+                var isActive = model.get(columnName);
+
+                if (isActive)
+                    model.trigger("backgrid:select", model, true);
+            });
         },
 
         /**
@@ -80,6 +113,8 @@ define([
                     excluded = _.union(excluded, [id]);
                 }
             }
+
+            model.trigger('backgrid:select', model, isActive);
 
             this.set('included', included);
             this.set('excluded', excluded);
@@ -180,7 +215,8 @@ define([
             gridInitialization.done(function(grid) {
                 var listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
-                    gridName: grid.name
+                    gridName: grid.name,
+                    grid: grid
                 }, gridListenerOptions);
 
                 var listener = new ColumnFormListener(listenerOptions);
