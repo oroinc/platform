@@ -387,7 +387,15 @@ body .select2-container {
   color:#666;
   font-family: 'FontAwesome';
 }
-
+.icon-resize-vertical {
+  // because resize-vertical icon is too thin
+  padding: 0 3px;
+}
+.ui-sortable-handle {
+  cursor: move;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
 .dropdown-menu {
   .divider {
     border-bottom-color:#eee;

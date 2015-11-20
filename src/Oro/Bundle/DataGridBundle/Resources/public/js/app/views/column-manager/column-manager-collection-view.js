@@ -7,6 +7,7 @@ define(function(require) {
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var ColumnFilterModel = require('orodatagrid/js/app/models/column-manager/column-filter-model');
     var ColumnManagerItemView = require('./column-manager-item-view');
+    require('jquery-ui');
 
     ColumnManagerCollectionView = BaseCollectionView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager-collection.html'),
