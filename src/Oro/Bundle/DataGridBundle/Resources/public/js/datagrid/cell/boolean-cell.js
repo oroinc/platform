@@ -17,10 +17,6 @@ define([
         /** @property {Boolean} */
         listenRowClick: true,
 
-        events: {
-            'change :checkbox': 'onChange'
-        },
-
         /**
          * @inheritDoc
          */
@@ -28,8 +24,6 @@ define([
             if (this.column.get('editable')) {
                 // render a checkbox for editable cell
                 BooleanCell.__super__.render.apply(this, arguments);
-                var state = {selected: this.model.get(this.column.get("name"))};
-                this.model.trigger('backgrid:select', this.model, state.selected);
             } else {
                 // render a yes/no text for non editable cell
                 this.$el.empty();
@@ -61,21 +55,7 @@ define([
             if (!this.$el.is(e.target) && !this.$el.has(e.target).length) {
                 // click on another cell of a row
                 this.enterEditMode(e);
-                this.model.trigger('backgrid:select', this.model, this.model.get(this.column.get("name")));
             }
-        },
-
-        /**
-         * When the checkbox's value changes, this method will trigger a Backbone
-         * `backgrid:selected` event with a reference of the model and the
-         * checkbox's `checked` value.
-         */
-        onChange: function(e) {
-            this.model.trigger('backgrid:select', this.model, $(e.target).is(':checked'));
-        },
-
-        onClick: function () {
-            this.model.trigger('backgrid:select', this.model, this.model.get(this.column.get("name")));
         }
     });
 
