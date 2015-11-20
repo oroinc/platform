@@ -60,10 +60,7 @@ define([
 
             this.grid.collection.each(function(model) {
                 var isActive = model.get(columnName);
-
-                if (isActive) {
-                    model.trigger('backgrid:selected', model, true);
-                }
+                model.trigger('backgrid:selected', model, isActive);
             });
         },
 
