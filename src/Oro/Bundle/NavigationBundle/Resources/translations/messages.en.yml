@@ -10,7 +10,7 @@ oro:
             favorite.label: Favorites
             mostviewed.label: Most Viewed
         messages:
-            no_items: No items
+            no_items: You have no items yet
         shortcuts:
             title: Shortcuts
             example: "Example: Create user, Users list"

@@ -2,21 +2,16 @@
 
 namespace Oro\Bundle\TagBundle\Twig;
 
-use Symfony\Component\Routing\Router;
-
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 
 class TagExtension extends \Twig_Extension
 {
-    /**
-     * @var \Oro\Bundle\TagBundle\Entity\TagManager
-     */
+    /** @var TagManager */
     protected $manager;
 
     public function __construct(TagManager $manager)
     {
-        $this->manager    = $manager;
+        $this->manager = $manager;
     }
 
     /**
@@ -24,18 +19,20 @@ class TagExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            'oro_tag_get_list' => new \Twig_Function_Method($this, 'get')
-        );
+        return [
+            'oro_tag_get_list' => new \Twig_Function_Method($this, 'getList'),
+            'oro_is_taggable'  => new \Twig_Function_Method($this, 'isTaggable'),
+        ];
     }
 
     /**
      * Return array of tags
      *
-     * @param  Taggable $entity
+     * @param object $entity
+     *
      * @return array
      */
-    public function get(Taggable $entity)
+    public function getList($entity)
     {
         return $this->manager->getPreparedArray($entity);
     }
@@ -46,5 +43,15 @@ class TagExtension extends \Twig_Extension
     public function getName()
     {
         return 'oro_tag';
+    }
+
+    /**
+     * @param  object $entity
+     *
+     * @return bool
+     */
+    public function isTaggable($entity)
+    {
+        return $this->manager->isTaggable($entity);
     }
 }

@@ -161,7 +161,7 @@ class Tagging extends ExtendTagging
     public function setResource(Taggable $resource)
     {
         $this->entityName = ClassUtils::getClass($resource);
-        $this->recordId = $resource->getTaggableId();
+        $this->recordId = TagManager::getEntityId($resource);
     }
 
     /**

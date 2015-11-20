@@ -948,8 +948,8 @@
 
 {%- macro renderList(elements) -%}
     <ul class="extra-list">
-        {% for element in elements %}
+        {%- for element in elements %}
             <li class="extra-list-element">{{ element }}</li>
-        {% endfor %}
+        {% endfor -%}
     </ul>
 {% endmacro %}
