@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
 
 /**
  * The implementation of ExclusionProviderInterface that can be used to ignore
@@ -43,6 +44,11 @@ class IdentifierEventExclusionProvider implements ExclusionProviderInterface
             return false;
         }
 
-        return $associationName === ExtendHelper::buildAssociationName($mapping['targetEntity']);
+        $identifierEventAssociationName = ExtendHelper::buildAssociationName(
+            $mapping['targetEntity'],
+            IdentifierEventExtension::ASSOCIATION_KIND
+        );
+
+        return $associationName === $identifierEventAssociationName;
     }
 }
