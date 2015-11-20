@@ -134,22 +134,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider tagIdsProvider
-     */
-    public function testDeleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy, $expectedCallArg)
-    {
-        $repo = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\Repository\TagRepository')
-            ->disableOriginalConstructor()->getMock();
-        $repo->expects($this->once())->method('deleteTaggingByParams')
-            ->with($expectedCallArg, $entityName, $recordId, $createdBy);
-
-        $this->em->expects($this->once())->method('getRepository')
-            ->will($this->returnValue($repo));
-
-        $this->manager->deleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy);
-    }
-
-    /**
      * @return array
      */
     public function tagIdsProvider()
