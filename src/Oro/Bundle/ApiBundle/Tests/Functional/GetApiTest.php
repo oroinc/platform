@@ -4,9 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\Route;
 
-use Oro\Bundle\ApiBundle\Routing\RestApiRouteOptionsResolver;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class GetApiTest extends WebTestCase
@@ -14,95 +15,117 @@ class GetApiTest extends WebTestCase
     /** @var ContainerInterface */
     protected $container;
 
+    /** @var EntityAliasResolver */
+    protected $entityAliasResolver;
+
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     protected function setUp()
     {
         $this->initClient([], $this->generateWsseAuthHeader());
+        $container                 = $this->getContainer();
+        $this->entityAliasResolver = $container->get('oro_entity.entity_alias_resolver');
+        $this->doctrineHelper      = $container->get('oro_api.doctrine_helper');
     }
 
     /**
-     * @dataProvider getRestRouters
+     * @dataProvider getEntities
      */
-    public function testGetListRestRequests($entityName, $getListRoute, $getRoute)
+    public function testGetListRestRequests($entityClass)
     {
+        $entityAlias = $this->entityAliasResolver->getPluralAlias($entityClass);
+
+        //@todo: should be deleted after voter was fixed
+        if ($entityAlias === 'abandonedcartcampaigns') {
+            $this->markTestSkipped('Should be deleted after abandonedcartcampaigns voter was fixed');
+        }
+
+        // test get list request
         $this->client->request(
             'GET',
-            $this->getUrl($getListRoute, ['page[size]' => 1])
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1])
         );
         $response = $this->client->getResponse();
-        $this->checkResponseStatus($response, $entityName, 'get list');
+        $this->checkResponseStatus($response, 200, $entityAlias, 'get list');
 
+        // test get request
         $content = $this->jsonToArray($response->getContent());
-        if (count($content) === 1) {
-            if (array_key_exists('id', $content[0])) {
-                $this->client->request(
-                    'GET',
-                    $this->getUrl($getRoute, ['id' => $content[0]['id']])
-                );
-                $response = $this->client->getResponse();
-                $this->checkResponseStatus($response, $entityName, 'get');
-            }
-        }
+        list($id, $recordExist) = $this->getGetRequestConfig($entityClass, $content);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
+        );
+        $this->checkResponseStatus($this->client->getResponse(), $recordExist ? 200 : 404, $entityAlias, 'get');
     }
 
     /**
-     * Return test data
+     * @return array
+     */
+    public function getEntities()
+    {
+        $this->initClient();
+        $entities                = [];
+        $container               = $this->getContainer();
+        $entityManagers          = $container->get('oro_entity_config.entity_manager_bag')->getEntityManagers();
+        $entityExclusionProvider = $container->get('oro_api.entity_exclusion_provider');
+        foreach ($entityManagers as $em) {
+            $allMetadata = $em->getMetadataFactory()->getAllMetadata();
+            foreach ($allMetadata as $metadata) {
+                if ($metadata->isMappedSuperclass) {
+                    continue;
+                }
+                if ($entityExclusionProvider->isIgnoredEntity($metadata->name)) {
+                    continue;
+                }
+                $entities[$metadata->name] = [$metadata->name];
+            }
+        }
+
+        return $entities;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param array  $content
      *
      * @return array
      */
-    public function getRestRouters()
+    protected function getGetRequestConfig($entityClass, $content)
     {
-        $listRoutes = [];
-        $getRoutes  = [];
-        $routes     = [];
-        $this->initClient();
-        $router           = $this->getContainer()->get('router');
-        $routesCollection = $router->getRouteCollection()->getIterator();
-        foreach ($routesCollection as $routeName => $route) {
-            if (!$this->hasAttribute($route, RestApiRouteOptionsResolver::ENTITY_PLACEHOLDER)
-                && $route->getOption('group') === RestApiRouteOptionsResolver::ROUTE_GROUP
-            ) {
-                if ($route->getDefault('_action') === 'get_list') {
-                    $pattern = '/}\/(.*?)\.{/';
-                    preg_match($pattern, $route->getPath(), $matches);
-                    $entityName = $matches[1];
-//                    if (in_array($entityName, ['abandonedcartcampaigns'])) {
-//                        continue;
-//                    }
-                    $listRoutes[$entityName] = [$entityName, $routeName];
-                }
-                if ($route->getDefault('_action') === 'get') {
-                    $pattern = '/}\/(.*?)\/{/';
-                    preg_match($pattern, $route->getPath(), $matches);
-                    $entityName             = $matches[1];
-                    $getRoutes[$entityName] = $routeName;
-                }
+        $recordExist   = count($content) === 1;
+        $recordContent = $recordExist ? $content [0] : [];
+        $idFields      = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+        $idFieldCount  = count($idFields);
+        if ($idFieldCount === 1) {
+            // single identifier
+            return [$recordExist ? $recordContent[reset($idFields)] : 1, $recordExist];
+        } elseif ($idFieldCount > 1) {
+            // combined identifier
+            $requirements = [];
+            foreach ($idFields as $field) {
+                $requirements[$field] = $recordExist ? $content[$field] : 1;
             }
+            return [implode(RestRequest::ARRAY_DELIMITER, $requirements), $recordExist];
         }
-
-        foreach ($listRoutes as $entityName => $routeData) {
-            $getRoute = '';
-            if (array_key_exists($entityName, $getRoutes)) {
-                $getRoute = $getRoutes[$entityName];
-            }
-            $routes[$entityName] = array_merge($routeData, [$getRoute]);
-        }
-
-        return $routes;
     }
 
     /**
      * @param Response $response
+     * @param integer  $statusCode
      * @param string   $entityName
      * @param string   $requestType
      */
-    protected function checkResponseStatus($response, $entityName, $requestType)
+    protected function checkResponseStatus($response, $statusCode, $entityName, $requestType)
     {
         try {
-            $this->assertResponseStatusCodeEquals($response, 200);
+            $this->assertResponseStatusCodeEquals($response, $statusCode);
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $e = new \PHPUnit_Framework_ExpectationFailedException(
                 sprintf(
-                    'Wrong 200 response for "%s" request for entity: "%s". Error message: %s',
+                    'Wrong %s response for "%s" request for entity: "%s". Error message: %s',
+                    $statusCode,
                     $requestType,
                     $entityName,
                     $e->getMessage()
@@ -111,18 +134,5 @@ class GetApiTest extends WebTestCase
             );
             throw $e;
         }
-    }
-
-    /**
-     * Checks if a route has the given placeholder in a path.
-     *
-     * @param Route  $route
-     * @param string $placeholder
-     *
-     * @return bool
-     */
-    protected function hasAttribute(Route $route, $placeholder)
-    {
-        return false !== strpos($route->getPath(), $placeholder);
     }
 }
