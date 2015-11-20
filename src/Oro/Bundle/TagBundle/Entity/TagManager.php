@@ -77,6 +77,20 @@ class TagManager
     }
 
     /**
+     * @param $class
+     *
+     * @return bool
+     */
+    public function isEntityTaggable($class)
+    {
+        if (is_a($class, 'Oro\Bundle\TagBundle\Entity\Taggable', true)) {
+            return true;
+        }
+
+        return $this->tagConfigProvider->getConfig($class)->is('enabled');
+    }
+
+    /**
      * Checks if entity taggable
      *
      * @param object $entity
