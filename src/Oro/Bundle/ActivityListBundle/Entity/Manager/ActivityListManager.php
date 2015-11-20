@@ -108,14 +108,7 @@ class ActivityListManager
      */
     public function getList($entityClass, $entityId, $filter, $page)
     {
-        $qb = $this->getBaseQB($entityClass, $entityId);
-        $this->activityInheritanceTargetsHelper
-            ->applyInheritanceActivity($qb, $entityClass, $entityId);
-        if ($this->config->get('oro_activity_list.grouping')) {
-            $qb->andWhere($qb->expr()->andX('activity.head = true'));
-        }
-        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
-        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        $qb = $this->prepareQB($entityClass, $entityId, $filter);
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
@@ -140,14 +133,7 @@ class ActivityListManager
      */
     public function getListCount($entityClass, $entityId, $filter)
     {
-        $qb = $this->getBaseQB($entityClass, $entityId);
-        $this->activityInheritanceTargetsHelper
-            ->applyInheritanceActivity($qb, $entityClass, $entityId);
-        if ($this->config->get('oro_activity_list.grouping')) {
-            $qb->andWhere($qb->expr()->andX('activity.head = true'));
-        }
-        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
-        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        $qb = $this->prepareQB($entityClass, $entityId, $filter);
         $qb->resetDQLPart('orderBy');
 
         $query             = $qb->getQuery();
@@ -378,5 +364,25 @@ class ActivityListManager
         }
 
         return $relatedActivityEntities;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param int $entityId
+     * @param array $filter
+     *
+     * @return QueryBuilder
+     */
+    protected function prepareQB($entityClass, $entityId, $filter)
+    {
+        $qb = $this->getBaseQB($entityClass, $entityId);
+        $this->activityInheritanceTargetsHelper
+            ->applyInheritanceActivity($qb, $entityClass, $entityId);
+        if ($this->config->get('oro_activity_list.grouping')) {
+            $qb->andWhere($qb->expr()->andX('activity.head = true'));
+        }
+        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        return $qb;
     }
 }

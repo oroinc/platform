@@ -37,9 +37,8 @@ class ActivityInheritanceTargetsHelper
     public function hasInheritances($entityClass)
     {
         if ($this->configManager->hasConfigEntityModel($entityClass)) {
-            $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
-            if (is_array($configValues) && array_key_exists('inheritance_targets', $configValues)
-                && is_array($configValues['inheritance_targets'])) {
+            $configValues = $this->getConfigForClass($entityClass);
+            if ($this->hasValueInInheritanceTargets($configValues)) {
                 return true;
             }
         }
@@ -120,13 +119,8 @@ class ActivityInheritanceTargetsHelper
     {
         $filteredTargets = [];
         foreach ($inheritanceTargets as $value) {
-            if (is_array($value)
-                && array_key_exists('target', $value)
-                && $this->configManager->hasConfigEntityModel($value['target'])) {
-                $configTarget = $this
-                    ->configManager
-                    ->getEntityConfig('activity', $value['target'])
-                    ->getValues();
+            if ($this->hasConfigForInheritanceTarget($value)) {
+                $configTarget = $this->getConfigForClass($value['target']);
                 if (array_key_exists('activities', $configTarget)) {
                     $item['targetClass'] = $value['target'];
                     $item['targetClassAlias'] = $this->getAssociationName($value['target']);
@@ -164,5 +158,43 @@ class ActivityInheritanceTargetsHelper
             ->setParameter('entityId', $entityId);
 
         return $subQueryBuilder;
+    }
+
+    /**
+     * @param $configValues
+     *
+     * @return bool
+     */
+    protected function hasValueInInheritanceTargets($configValues)
+    {
+        return is_array($configValues) && array_key_exists('inheritance_targets', $configValues)
+        && is_array($configValues['inheritance_targets']);
+    }
+
+    /**
+     * @param $className
+     *
+     * @return array
+     */
+    protected function getConfigForClass($className)
+    {
+        return $this
+            ->configManager
+            ->getEntityConfig('activity', $className)
+            ->getValues();
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    protected function hasConfigForInheritanceTarget($value)
+    {
+        $result = is_array($value)
+            && array_key_exists('target', $value)
+            && $this->configManager->hasConfigEntityModel($value['target']);
+
+        return $result;
     }
 }

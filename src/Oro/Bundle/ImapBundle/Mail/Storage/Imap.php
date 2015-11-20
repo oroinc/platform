@@ -414,6 +414,6 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     protected function supportUidSearch()
     {
-        return true;
+        return false;
     }
 }
