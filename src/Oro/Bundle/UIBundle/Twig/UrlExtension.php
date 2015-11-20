@@ -74,7 +74,8 @@ class UrlExtension extends \Twig_Extension
         $this->request = $request;
     }
 
-    public function isUrlLocal($link) {
+    public function isUrlLocal($link)
+    {
         if (!$this->request) {
             return false;
         }
