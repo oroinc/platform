@@ -56,12 +56,37 @@
   th, td {
     display: table-cell;
   }
-  .table-wrapper {
+  .table-header-wrapper {
+    .border-top-left-radius(3px);
+    .border-top-right-radius(3px);
     border: 1px solid #ddd;
-    .border-radius(3px);
-    margin-top: 10px;
+    margin: 10px 0 0;
+  }
+  .table-wrapper {
+    .border-bottom-left-radius(3px);
+    .border-bottom-right-radius(3px);
+    border: 1px solid #ddd;
+    border-top: none;
+    max-height: 2000px;
+    overflow: auto;
+    overflow-x: hidden;
+    margin: 0;
+    .table {
+      margin-top: -1px;
+    }
+    .table th {
+      padding-top: 0;
+      padding-bottom: 0;
+      overflow: hidden;
+      span {
+        padding: 0;
+        line-height: 0;
+      }
+    }
   }
   .table {
+    .border-radius(3px);
+    overflow: hidden;
     margin-bottom: 0;
     label {
       margin-bottom: 0;

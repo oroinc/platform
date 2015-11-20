@@ -84,11 +84,15 @@ define(function(require) {
          */
         onDropdownToggleClick: function(e) {
             // inverse condition because this handler is bound first, before Bootstrap
+            var that = this;
             if (!this.$el.is('.open')) {
                 var $elem = this.$('.dropdown-menu');
                 _.defer(function() {
                     // focus input after Bootstrap opened dropdown menu
                     $elem.focusFirstInput();
+                    if (_.isFunction(that.component.updateViews)) {
+                        that.component.updateViews();
+                    }
                 });
             }
         },
