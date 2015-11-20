@@ -43,7 +43,7 @@ class TagConfigChoiceType extends AbstractConfigType
         $resolver->setNormalizers(
             [
                 'empty_value' => function (Options $options, $value) {
-                    return $this->isInheritTaggable($options) ? 'Yes' : $value;
+                    return $this->isImplementsTaggable($options) ? 'Yes' : $value;
                 },
             ]
         );
@@ -70,7 +70,7 @@ class TagConfigChoiceType extends AbstractConfigType
      */
     protected function isReadOnly($options)
     {
-        return $this->isInheritTaggable($options) || parent::isReadOnly($options);
+        return $this->isImplementsTaggable($options) || parent::isReadOnly($options);
     }
 
     /**
@@ -78,14 +78,14 @@ class TagConfigChoiceType extends AbstractConfigType
      *
      * @return bool
      */
-    protected function isInheritTaggable($options)
+    protected function isImplementsTaggable($options)
     {
         /** @var EntityConfigId $configId */
         $configId  = $options['config_id'];
         $className = $configId->getClassName();
 
         if (!empty($className)) {
-            return $this->tagManager->isInheritTaggable($className);
+            return $this->tagManager->isImplementsTaggable($className);
         }
 
         return false;

@@ -88,7 +88,7 @@ class TagManager
     {
         return
             $this->tagConfigProvider->getConfig($className)->is('enabled') ||
-            $this->isInheritTaggable($className);
+            $this->isImplementsTaggable($className);
     }
 
     /**
@@ -103,7 +103,7 @@ class TagManager
     {
         return
             $this->tagConfigProvider->getConfig($className)->is('immutable') ||
-            $this->isInheritTaggable($className);
+            $this->isImplementsTaggable($className);
     }
 
     /**
@@ -113,7 +113,7 @@ class TagManager
      *
      * @return bool
      */
-    public function isInheritTaggable($className)
+    public function isImplementsTaggable($className)
     {
         return is_a($className, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
     }
