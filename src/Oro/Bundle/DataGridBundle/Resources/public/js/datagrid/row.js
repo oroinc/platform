@@ -38,7 +38,6 @@ define([
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
-            this.listenTo(this.model, 'backgrid:select', this.onBackgridSelect);
         },
 
         /**
@@ -57,16 +56,6 @@ define([
 
             this.$el.html(fragment);
             this.trigger('columns:reorder');
-        },
-
-        /**
-         * Handles row "backgrid:select" event
-         *
-         * @param model
-         * @param selected
-         */
-        onBackgridSelect: function(model, state) {
-            this.toggleSelectedRow(state, model);
         },
 
         /**

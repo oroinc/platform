@@ -62,7 +62,7 @@ define([
                 var isActive = model.get(columnName);
 
                 if (isActive) {
-                    model.trigger('backgrid:select', model, true);
+                    model.trigger('backgrid:selected', model, true);
                 }
             });
         },
@@ -100,7 +100,7 @@ define([
                 }
             }
 
-            model.trigger('backgrid:select', model, isActive);
+            model.trigger('backgrid:selected', model, isActive);
 
             this.set('included', included);
             this.set('excluded', excluded);
