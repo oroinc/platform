@@ -102,4 +102,12 @@ class AclSecurityIdentity
     {
         return $this->username;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getIdentifier();
+    }
 }
