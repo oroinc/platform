@@ -42,6 +42,7 @@ oro:
             mark_visible_read.label: Mark Visible as Read
             amount_of_emails: Amount of Emails to Display
             default_action: Default Action
+            default_action_hint: Default action for widget in a state of extended sidebar
             reply_all: Reply All
             reply: Reply
             forward: Forward
