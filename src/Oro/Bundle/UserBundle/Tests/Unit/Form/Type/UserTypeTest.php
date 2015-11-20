@@ -121,6 +121,10 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($builder));
         $builder->expects($this->at(++$order))
             ->method('add')
+            ->with('tags', 'oro_tag_select')
+            ->will($this->returnValue($builder));
+        $builder->expects($this->at(++$order))
+            ->method('add')
             ->with('imapConfiguration', 'oro_imap_configuration')
             ->will($this->returnValue($builder));
         $builder->expects($this->at(++$order))

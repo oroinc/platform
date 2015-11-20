@@ -27,14 +27,16 @@ class TagListener implements ContainerAwareInterface
      */
     public function preRemove(LifecycleEventArgs $args)
     {
-        if ((null === $this->manager) && $this->container) {
+        if (is_null($this->manager) && $this->container) {
             $this->manager = $this->container->get('oro_tag.tag.manager');
         }
 
-        $entity = $args->getEntity();
-
-        if ($this->manager->isTaggable($args->getEntity())) {
-            $this->manager->deleteEntityTags($entity);
+        if (($resource = $args->getEntity()) && $resource instanceof Taggable) {
+            $this->manager->deleteTaggingByParams(
+                null,
+                ClassUtils::getClass($resource),
+                $resource->getTaggableId()
+            );
         }
     }
 
