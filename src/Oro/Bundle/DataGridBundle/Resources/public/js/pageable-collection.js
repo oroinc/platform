@@ -116,6 +116,13 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         urlParams: {},
 
         /**
+         * Whether need to show all records at one page
+         *
+         * @property {Boolean}
+         */
+        onePagePagination: false,
+
+        /**
          * Initialize basic parameters from source options
          *
          * @param models
@@ -167,6 +174,12 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                 }
             }
 
+            if (options.toolbarOptions && options.toolbarOptions.pagination) {
+                if (options.toolbarOptions.pagination.onePage) {
+                    this.onePagePagination = true;
+                }
+            }
+
             _.extend(this.queryParams, {
                 currentPage: this.inputName + '[_pager][_page]',
                 pageSize:    this.inputName + '[_pager][_per_page]',
@@ -176,7 +189,12 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
 
             this.on('remove', this.onRemove, this);
 
-            PageableCollection.__super__.initialize.call(this, models, options);
+            if (options.mode === 'server') {
+                PageableCollection.__super__.initialize.call(this, models, options);
+            } else {
+                var correctModels = this._getCorrectModels(models);
+                PageableCollection.__super__.initialize.call(this, correctModels, options);
+            }
 
             if (models.options) {
                 this.state.totals = models.options.totals;
@@ -483,9 +501,15 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                 (mode === 'infinite' ? links : true)) {
 
                 state.totalRecords = totalRecords = this.finiteInt(totalRecords, 'totalRecords');
-                state.pageSize = pageSize = this.finiteInt(pageSize, 'pageSize');
-                state.currentPage = currentPage = this.finiteInt(currentPage, 'currentPage');
                 state.firstPage = firstPage = this.finiteInt(firstPage, 'firstPage');
+
+                if (this.onePagePagination) {
+                    state.pageSize = pageSize = state.totalRecords;
+                    state.currentPage = currentPage = state.firstPage;
+                } else {
+                    state.pageSize = pageSize = this.finiteInt(pageSize, 'pageSize');
+                    state.currentPage = currentPage = this.finiteInt(currentPage, 'currentPage');
+                }
 
                 if (pageSize < 0) {
                     throw new RangeError('"pageSize" must be >= 0');
@@ -843,6 +867,22 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         },
 
         /**
+         *
+         * @param {Integer} pageSize
+         * @param {Object} options
+         * @returns {Object}
+         */
+        setPageSize: function(pageSize, options) {
+            this.state.pageSize = pageSize;
+            if (this.mode === 'server') {
+                this.fetch({reset: true});
+                return this.getPage(this.state.currentPage, options);
+            } else {
+                return PageableCollection.__super__.setPageSize.call(this, pageSize, options);
+            }
+        },
+
+        /**
          * Encodes passed state taking in account url parameters of the collection
          *
          * @param {Object} state
@@ -929,6 +969,25 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         },
 
         /**
+         * Get models in correct format
+         *
+         * @param {Object} models
+         * @returns {Object}
+         * @protected
+         */
+        _getCorrectModels: function(models) {
+            if (_.has(models, 'data')) {
+                return models.data;
+            }
+
+            if (models[0] && _.has(models[0], 'data')) {
+                return models[0].data;
+            }
+
+            return models;
+        },
+
+        /**
          * Specify models in correct format
          *
          * @param {Object} models
@@ -937,7 +996,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @protected
          */
         _makeFullCollection: function(models, options) {
-            var correctModels = models[0] && _.has(models[0], 'data') ? models[0].data : models;
+            var correctModels = this._getCorrectModels(models);
             return PageableCollection.__super__._makeFullCollection.call(this, correctModels, options);
         }
     });

@@ -201,7 +201,8 @@ define(function(require) {
                     sorters: {},
                     columns: {}
                 }, this.metadata.state),
-                initialState: this.metadata.initialState
+                initialState: this.metadata.initialState,
+                mode: this.metadata.mode || null
             }, this.metadata.options);
             return options;
         },
