@@ -25,6 +25,7 @@ class UrlExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_url_add_query', [$this, 'addQuery']),
+            new \Twig_SimpleFunction('oro_is_url_local', [$this, 'isUrlLocal']),
         ];
     }
 
@@ -71,5 +72,26 @@ class UrlExtension extends \Twig_Extension
     public function setRequest(Request $request = null)
     {
         $this->request = $request;
+    }
+
+    public function isUrlLocal($link) {
+        if (!$this->request) {
+            return false;
+        }
+
+        $parts = parse_url($link);
+
+        if (!empty($parts['host'])) {
+            if ($parts['host'] !== $this->request->getHttpHost()) {
+                return false;
+            }
+        }
+        if (!empty($parts['scheme']) && $this->request->getScheme() === 'https') {
+            if ($parts['scheme'] === 'http') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
