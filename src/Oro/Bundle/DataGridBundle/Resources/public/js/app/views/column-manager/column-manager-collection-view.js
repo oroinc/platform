@@ -23,7 +23,9 @@ define(function(require) {
         },
 
         listen: {
-            'change collection': 'filter'
+            'change collection': 'filter',
+            'visibilityChange': 'updateHeaderWidths',
+            'layout:reposition mediator': 'updateView'
         },
 
         /**
@@ -64,6 +66,7 @@ define(function(require) {
         render: function() {
             ColumnManagerCollectionView.__super__.render.apply(this, arguments);
             this.initSorting();
+            this.updateHeaderWidths();
             return this;
         },
 
@@ -165,8 +168,38 @@ define(function(require) {
         toggleFallback: function() {
             var hasVisibleItems = Boolean(this.visibleItems.length);
             // to hide table's header once no visible data
-            this.$('.table-wrapper').toggle(hasVisibleItems);
+            this.$('.table-header-wrapper, .table-wrapper').toggle(hasVisibleItems);
             ColumnManagerCollectionView.__super__.toggleFallback.apply(this, arguments);
+        },
+
+        updateView: function() {
+            this.adjustListHeight();
+            this.updateHeaderWidths();
+        },
+
+        updateHeaderWidths: function() {
+            var i;
+            var clientWidth;
+            var $wrapper = this.$('.table-wrapper');
+            var $table = $wrapper.children('table');
+            var tableThs = $table.find('thead th');
+            var headerThs = this.$('.table-header-wrapper tr th');
+            $wrapper.css('padding-right', 0);
+            clientWidth = $wrapper[0].clientWidth;
+            if (clientWidth > 0) {
+                $wrapper.css('padding-right', $table.width() - $wrapper[0].clientWidth + 'px');
+            }
+            for (i = 0; i < tableThs.length - 1; i += 1) {
+                $(headerThs[i]).width($(tableThs[i]).width());
+            }
+        },
+
+        adjustListHeight: function() {
+            var windowHeight = $('html').height();
+            var $wrapper = this.$('.table-wrapper');
+            var rect = $wrapper[0].getBoundingClientRect();
+            var margin = (this.$el.outerHeight(true) - rect.height) / 2;
+            $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin, 40) + 'px');
         }
     });
 

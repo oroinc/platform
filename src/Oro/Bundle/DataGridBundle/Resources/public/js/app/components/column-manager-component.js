@@ -114,6 +114,10 @@ define(function(require) {
             });
         },
 
+        updateViews: function() {
+            this.columnManagerCollectionView.updateView();
+        },
+
         /**
          * Updated columns state in grid collection
          *
