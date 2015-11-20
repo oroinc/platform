@@ -823,14 +823,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getTaggableId()
-    {
-        return $this->getId();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getId()
@@ -848,28 +840,6 @@ class User extends ExtendUser implements
         $this->id = $id;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTags()
-    {
-        if (!$this->tags) {
-            $this->tags = new ArrayCollection();
-        }
-
-        return $this->tags;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return User
-     */
-    public function setTags($tags)
-    {
-        $this->tags = $tags;
     }
 
     /**
