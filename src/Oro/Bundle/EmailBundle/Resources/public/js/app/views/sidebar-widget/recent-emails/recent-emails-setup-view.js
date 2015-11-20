@@ -119,6 +119,8 @@ define(function(require) {
                 }
                 this.subview('loading').show();
             }
+
+            this.initLayout();
         },
 
         fetchFromData: function() {
