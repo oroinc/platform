@@ -37,8 +37,8 @@ define([
             Row.__super__.initialize.apply(this, arguments);
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
-            this.listenTo(this.model, "backgrid:selected", this.onBackgridSelected);
-            this.listenTo(this.model, "backgrid:select", this.onBackgridSelect);
+            this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
+            this.listenTo(this.model, 'backgrid:select', this.onBackgridSelect);
         },
 
         /**
@@ -65,7 +65,7 @@ define([
          * @param model
          * @param selected
          */
-        onBackgridSelect: function (model, state) {
+        onBackgridSelect: function(model, state) {
             this.toggleSelectedRow(state, model);
         },
 
@@ -75,7 +75,7 @@ define([
          * @param model
          * @param isChecked
          */
-        onBackgridSelected: function (model, isChecked) {
+        onBackgridSelected: function(model, isChecked) {
             this.toggleSelectedRow(isChecked, model);
         },
 
@@ -84,8 +84,8 @@ define([
          *
          * @param {Boolean} isSelected
          */
-        toggleSelectedRow: function (isSelected, model) {
-            this.$el.toggleClass("row-selected", isSelected);
+        toggleSelectedRow: function(isSelected, model) {
+            this.$el.toggleClass('row-selected', isSelected);
         },
 
         className: function() {

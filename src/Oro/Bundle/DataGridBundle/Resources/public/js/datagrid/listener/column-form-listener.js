@@ -55,7 +55,7 @@ define([
         /**
          * Subscribe to grid events
          */
-        subscribeToGrid: function () {
+        subscribeToGrid: function() {
             this.grid.on('content:update', this.selectRows, this);
             this.grid.on('dispose', this.unsubscribeFromGrid, this);
         },
@@ -63,21 +63,22 @@ define([
         /**
          * Unsubscribe from grid events
          */
-        unsubscribeFromGrid: function () {
+        unsubscribeFromGrid: function() {
             this.grid.off(null, null, this);
         },
 
         /**
          * Selecting rows
          */
-        selectRows: function () {
+        selectRows: function() {
             var columnName = this.columnName;
 
-            this.grid.collection.each(function (model, i) {
+            this.grid.collection.each(function(model, i) {
                 var isActive = model.get(columnName);
 
-                if (isActive)
-                    model.trigger("backgrid:select", model, true);
+                if (isActive) {
+                    model.trigger('backgrid:select', model, true);
+                }
             });
         },
 
