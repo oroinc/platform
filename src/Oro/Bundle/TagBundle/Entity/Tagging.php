@@ -101,10 +101,9 @@ class Tagging extends ExtendTagging
     protected $recordId;
 
     /**
-     * @param Tag|null    $tag
-     * @param object|null $entity
+     * Constructor
      */
-    public function __construct(Tag $tag = null, $entity = null)
+    public function __construct(Tag $tag = null, Taggable $resource = null)
     {
         parent::__construct();
 
@@ -112,12 +111,8 @@ class Tagging extends ExtendTagging
             $this->setTag($tag);
         }
 
-        if ($entity != null) {
-            if ($entity instanceof Taggable) {
-                $this->setResource($entity);
-            } else {
-                $this->setEntity($entity);
-            }
+        if ($resource != null) {
+            $this->setResource($resource);
         }
 
         $this->setCreated(new \DateTime('now'));
@@ -161,18 +156,7 @@ class Tagging extends ExtendTagging
     public function setResource(Taggable $resource)
     {
         $this->entityName = ClassUtils::getClass($resource);
-        $this->recordId = TagManager::getEntityId($resource);
-    }
-
-    /**
-     * Sets the entity class and id
-     *
-     * @param object $entity
-     */
-    public function setEntity($entity)
-    {
-        $this->entityName = ClassUtils::getClass($entity);
-        $this->recordId   = $entity->getId();
+        $this->recordId = $resource->getTaggableId();
     }
 
     /**
