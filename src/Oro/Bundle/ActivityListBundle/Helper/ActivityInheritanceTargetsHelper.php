@@ -47,6 +47,9 @@ class ActivityInheritanceTargetsHelper
     }
 
     /**
+     * Apply to given query builder object additional conditions
+     * for integrate activity lists from inheritance targets
+     *
      * @param QueryBuilder $qb
      * @param string  $entityClass
      * @param integer $entityId
@@ -81,8 +84,6 @@ class ActivityInheritanceTargetsHelper
     }
 
     /**
-     * Get
-     *
      * @param string $entityClass
      *
      * @return array

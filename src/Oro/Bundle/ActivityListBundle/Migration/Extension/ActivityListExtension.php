@@ -67,9 +67,9 @@ class ActivityListExtension implements ExtendExtensionAwareInterface
      * Add inheritance tables to target to show inherited activities
      *
      * @param Schema $schema
-     * @param string $targetTableName
-     * @param string $inheritanceTableName
-     * @param string[] $path
+     * @param string $targetTableName Target entity table name
+     * @param string $inheritanceTableName Inheritance entity table name
+     * @param string[] $path Path of relations to target entity
      */
     public function addInheritanceTargets(
         Schema $schema,
