@@ -36,8 +36,8 @@ define([
 
             ColumnFormListener.__super__.initialize.apply(this, arguments);
 
-            this.subscribeToGrid();
             this.selectRows();
+            this.listenTo(options.grid.collection, 'sync', this.selectRows);
         },
 
         /**
@@ -53,27 +53,12 @@ define([
         },
 
         /**
-         * Subscribe to grid events
-         */
-        subscribeToGrid: function() {
-            this.grid.on('content:update', this.selectRows, this);
-            this.grid.on('dispose', this.unsubscribeFromGrid, this);
-        },
-
-        /**
-         * Unsubscribe from grid events
-         */
-        unsubscribeFromGrid: function() {
-            this.grid.off(null, null, this);
-        },
-
-        /**
          * Selecting rows
          */
         selectRows: function() {
             var columnName = this.columnName;
 
-            this.grid.collection.each(function(model, i) {
+            this.grid.collection.each(function(model) {
                 var isActive = model.get(columnName);
 
                 if (isActive) {
@@ -192,6 +177,17 @@ define([
          */
         _hasChanges: function() {
             return !_.isEmpty(this.get('included')) || !_.isEmpty(this.get('excluded'));
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            delete this.grid;
+            ColumnFormListener.__super__.dispose.apply(this, arguments);
         }
     });
 
