@@ -30,7 +30,7 @@ define([
         /**
          * @property {string}
          */
-        className: 'multiselect-cell',
+        className: 'multi-select-cell',
 
         /**
          * @property {string}
