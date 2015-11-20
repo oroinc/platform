@@ -31,9 +31,13 @@ define([
                 throw new Error('Field selectors is not specified');
             }
             this.selectors = options.selectors;
+            this.grid = options.grid;
             this.confirmModal = {};
 
             ColumnFormListener.__super__.initialize.apply(this, arguments);
+
+            this.selectRows();
+            this.listenTo(options.grid.collection, 'sync', this.selectRows);
         },
 
         /**
@@ -46,6 +50,18 @@ define([
             mediator.bind('pagestate_restored', function() {
                 this._restoreState();
             }, this);
+        },
+
+        /**
+         * Selecting rows
+         */
+        selectRows: function() {
+            var columnName = this.columnName;
+
+            this.grid.collection.each(function(model) {
+                var isActive = model.get(columnName);
+                model.trigger('backgrid:selected', model, isActive);
+            });
         },
 
         /**
@@ -80,6 +96,8 @@ define([
                     excluded = _.union(excluded, [id]);
                 }
             }
+
+            model.trigger('backgrid:selected', model, isActive);
 
             this.set('included', included);
             this.set('excluded', excluded);
@@ -156,6 +174,17 @@ define([
          */
         _hasChanges: function() {
             return !_.isEmpty(this.get('included')) || !_.isEmpty(this.get('excluded'));
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            delete this.grid;
+            ColumnFormListener.__super__.dispose.apply(this, arguments);
         }
     });
 
@@ -180,7 +209,8 @@ define([
             gridInitialization.done(function(grid) {
                 var listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
-                    gridName: grid.name
+                    gridName: grid.name,
+                    grid: grid
                 }, gridListenerOptions);
 
                 var listener = new ColumnFormListener(listenerOptions);
