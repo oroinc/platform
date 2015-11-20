@@ -65,16 +65,7 @@ define([
          * @param isChecked
          */
         onBackgridSelected: function(model, isChecked) {
-            this.toggleSelectedRow(isChecked, model);
-        },
-
-        /**
-         * Toggle row selection marker
-         *
-         * @param {Boolean} isSelected
-         */
-        toggleSelectedRow: function(isSelected, model) {
-            this.$el.toggleClass('row-selected', isSelected);
+            this.$el.toggleClass('row-selected', isChecked);
         },
 
         className: function() {
