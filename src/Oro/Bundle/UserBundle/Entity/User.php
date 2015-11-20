@@ -21,7 +21,6 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\TagBundle\Entity\Tag;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 
@@ -73,7 +72,6 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  * @JMS\ExclusionPolicy("ALL")
  */
 class User extends ExtendUser implements
-    Taggable,
     EmailOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,

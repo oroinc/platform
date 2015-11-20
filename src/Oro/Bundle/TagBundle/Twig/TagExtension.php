@@ -24,18 +24,19 @@ class TagExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            'oro_tag_get_list' => new \Twig_Function_Method($this, 'get')
-        );
+        return [
+            'oro_tag_get_list' => new \Twig_Function_Method($this, 'get'),
+            'is_entity_taggable'=> new \Twig_Function_Method($this, 'isEntityTaggable'),
+        ];
     }
 
     /**
      * Return array of tags
      *
-     * @param  Taggable $entity
+     * @param  object $entity
      * @return array
      */
-    public function get(Taggable $entity)
+    public function get($entity)
     {
         return $this->manager->getPreparedArray($entity);
     }
@@ -46,5 +47,15 @@ class TagExtension extends \Twig_Extension
     public function getName()
     {
         return 'oro_tag';
+    }
+
+    /**
+     * @param  object $entity
+     *
+     * @return bool
+     */
+    public function isEntityTaggable($entity)
+    {
+        return $this->manager->isTaggable($entity);
     }
 }
