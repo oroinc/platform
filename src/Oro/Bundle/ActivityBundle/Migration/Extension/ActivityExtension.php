@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityBundle\Migration\Extension;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
@@ -86,30 +85,5 @@ class ActivityExtension implements ExtendExtensionAwareInterface
                 ]
             ]
         );
-    }
-
-    /**
-     * Add inheritance tables to target to show inherited activities
-     *
-     * @param Schema $schema
-     * @param string $targetTableName
-     * @param string $inheritenceTableName
-     */
-    public function addInheritenceTargets(
-        Schema $schema,
-        $targetTableName,
-        $inheritenceTableName
-    ) {
-        $targetTable = $schema->getTable($targetTableName);
-
-        $options = new OroOptions();
-        $inheritenceClassName = $this->extendExtension->getEntityClassByTableName($inheritenceTableName);
-        $options->append(
-            'activity',
-            'inheritence_targets',
-            $inheritenceClassName
-        );
-
-        $targetTable->addOption(OroOptions::KEY, $options);
     }
 }

@@ -155,3 +155,4 @@ services:
             - @oro_entity_config.config_manager
             - @router
             - @oro_entity.entity_alias_resolver
+
