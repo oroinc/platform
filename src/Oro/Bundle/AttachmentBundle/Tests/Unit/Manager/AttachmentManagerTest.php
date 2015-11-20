@@ -225,7 +225,8 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('delete')
             ->with($this->attachment->getFilename());
 
-        $this->attachmentManager->preUpload($this->attachment);
+        $this->attachmentManager->preUpload($this->attachment); // delete should be called
+        $this->attachmentManager->preUpload($this->attachment); // delete shouldn't be called
 
         $this->assertNull($this->attachment->getFilename());
         $this->assertNull($this->attachment->getExtension());
