@@ -62,10 +62,10 @@ define([
          * Handles row "backgrid:selected" event
          *
          * @param model
-         * @param isChecked
+         * @param isSelected
          */
-        onBackgridSelected: function(model, isChecked) {
-            this.$el.toggleClass('row-selected', isChecked);
+        onBackgridSelected: function(model, isSelected) {
+            this.$el.toggleClass('row-selected', isSelected);
         },
 
         className: function() {
