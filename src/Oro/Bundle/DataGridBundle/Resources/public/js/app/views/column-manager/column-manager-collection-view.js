@@ -4,7 +4,6 @@ define(function(require) {
     var ColumnManagerCollectionView;
     var $ = require('jquery');
     var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var ColumnFilterModel = require('orodatagrid/js/app/models/column-manager/column-filter-model');
     var ColumnManagerItemView = require('./column-manager-item-view');
@@ -195,7 +194,7 @@ define(function(require) {
         },
 
         adjustListHeight: function() {
-            var windowHeight = $('html').height();;
+            var windowHeight = $('html').height();
             var $wrapper = this.$('.table-wrapper');
             var rect = $wrapper[0].getBoundingClientRect();
             var margin = (this.$el.outerHeight(true) - rect.height) / 2;
