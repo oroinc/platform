@@ -45,6 +45,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "tag"={
+ *              "immutable"=true
  *          }
  *      }
  * )

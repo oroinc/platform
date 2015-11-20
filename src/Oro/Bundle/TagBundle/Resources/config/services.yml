@@ -71,6 +71,14 @@ services:
         tags:
             - { name: form.type, alias: oro_tag_tag }
 
+    oro_tag.form.type.tag_config_choice:
+        class: Oro\Bundle\TagBundle\Form\Type\TagConfigChoiceType
+        arguments:
+            - @oro_entity_extend.association_type_helper
+            - @oro_tag.tag.manager
+        tags:
+            - { name: form.type, alias: oro_tag_config_choice }
+
     oro_tag.provider.search_provider:
         class: %oro_tag.provider.search_provider.class%
         arguments:
