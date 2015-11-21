@@ -22,7 +22,11 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChang
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateEmailOriginRelation as EmailOrigin;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_17\AddRelationToMailbox;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_16\AddRelationToMailbox;
+
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation as ChangeEmailUserFolderRelation;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -44,7 +48,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_17';
+        return 'v1_18';
     }
 
     /**
@@ -83,7 +87,6 @@ class OroUserBundleInstaller implements
         $this->createOroAccessGroupTable($schema);
         $this->createOroUserAccessGroupRoleTable($schema);
         $this->createOroAccessRoleTable($schema);
-        $this->createOroSessionTable($schema);
         $this->createOroUserStatusTable($schema);
 
         /** Foreign keys generation **/
@@ -117,6 +120,13 @@ class OroUserBundleInstaller implements
         AddRelationToMailbox::createOroEmailMailboxUsersTable($schema);
         AddRelationToMailbox::createOroEmailMailboxRolesTable($schema);
         AddRelationToMailbox::addOroEmailMailboxUsersAndRolesForeignKeys($schema);
+
+        // depends to the UserBundle
+        ChangeEmailUserFolderRelation::createOroEmailUserFoldersTable($schema);
+        ChangeEmailUserFolderRelation::addOroEmailUserFoldersForeignKeys($schema);
+        ChangeEmailUserFolderRelation::updateOroEmailUserTable($schema);
+        AddEmailUserColumn::updateOroEmailUserTable($schema);
+        DropEmailUserColumn::updateOroEmailUserTable($schema);
     }
 
     /**
@@ -285,21 +295,6 @@ class OroUserBundleInstaller implements
         $table->addColumn('role', 'string', ['length' => 30, 'precision' => 0]);
         $table->addColumn('label', 'string', ['length' => 30, 'precision' => 0]);
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
-        $table->setPrimaryKey(['id']);
-    }
-
-    /**
-     * Create oro_session table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroSessionTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_session');
-        $table->addColumn('id', 'string', ['length' => 255, 'precision' => 0]);
-        $table->addColumn('sess_data', 'text', ['precision' => 0]);
-        $table->addColumn('sess_time', 'integer', ['precision' => 0]);
-        $table->addColumn('sess_lifetime', 'integer', ['nullable' => false]);
         $table->setPrimaryKey(['id']);
     }
 

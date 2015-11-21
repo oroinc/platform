@@ -17,7 +17,8 @@ define([
         },
 
         execute: function(model, actionSyncObject) {
-            var removingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...'));
+            var removingMsg = messenger.notificationMessage('warning',
+                __('oro.calendar.flash_message.calendar_removing'));
             var $connection = this.connectionsView.findItem(model);
             try {
                 $connection.hide();
@@ -25,9 +26,8 @@ define([
                     wait: true,
                     success: _.bind(function() {
                         removingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was removed.'), {
-                            namespace: 'calendar-ns'
-                        });
+                        messenger.notificationFlashMessage('success',
+                            __('oro.calendar.flash_message.calendar_removed'), {namespace: 'calendar-ns'});
                         actionSyncObject.resolve();
                     }, this),
                     error: _.bind(function(model, response) {

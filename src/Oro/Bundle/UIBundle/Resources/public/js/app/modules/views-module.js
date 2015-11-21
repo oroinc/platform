@@ -1,4 +1,4 @@
-require([
+define([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page-view'
 ], function(BaseController, PageView) {

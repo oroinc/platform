@@ -11,4 +11,16 @@ class CategorizedRecipient extends Recipient
     {
         return $this->name;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        if (!$this->entity || !$this->entity->getOrganization()) {
+            return $this->getName();
+        }
+
+        return sprintf('%s (%s)', $this->getName(), $this->entity->getOrganization());
+    }
 }

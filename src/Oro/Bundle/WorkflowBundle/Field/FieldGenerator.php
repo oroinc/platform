@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Field;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -162,6 +162,6 @@ class FieldGenerator
     protected function hideRelationField($entityClass, $fieldName)
     {
         $fieldModel = $this->configManager->getConfigFieldModel($entityClass, $fieldName);
-        $fieldModel->setType(ConfigModelManager::MODE_HIDDEN);
+        $fieldModel->setType(ConfigModel::MODE_HIDDEN);
     }
 }

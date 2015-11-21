@@ -56,6 +56,7 @@ define(function(require) {
                         component.view.el.id === fieldId
                     ) {
                         component.view.tinymceInstance.execCommand('mceInsertContent', false, value);
+                        component.view.tinymceInstance.execCommand('mceFocus', false, value);
                     }
                 });
             }
@@ -66,6 +67,7 @@ define(function(require) {
                 this.forEachComponent(function(component) {
                     if (!_.isUndefined(component.view) &&
                         !_.isUndefined(component.view.tinymceConnected) &&
+                        !_.isNull(this.options.emailVariableView) &&
                         component.view.tinymceConnected === true
                     ) {
                         $(component.view.tinymceInstance.getBody()).on(
@@ -84,11 +86,15 @@ define(function(require) {
 
         _onTypeChange: function(e) {
             if (this.options.hasWysiwyg) {
-                var type = $(e.target).val();
-                if (type === 'txt') {
+                var target = $(e.target);
+                if (!target.is(':checked')) {
+                    return;
+                }
+
+                if (target.val() === 'txt') {
                     this._switchWysiwygEditor(false);
                 }
-                if (type === 'html') {
+                if (target.val() === 'html') {
                     this._switchWysiwygEditor(true);
                     this._onEditorBlur();
                 }

@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class EmailControllerTest extends WebTestCase
@@ -47,16 +46,22 @@ class EmailControllerTest extends WebTestCase
         $this->assertNotEmpty($emails);
         $this->assertCount(10, $emails);
 
-        $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId']);
+        $this->client->request('GET', $url . '?messageId=' . urlencode($emails[0]['messageId']));
         $this->assertCount(1, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId']);
+        $this->client->request('GET', $url . '?messageId<>' . urlencode($emails[0]['messageId']));
         $this->assertCount(9, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
+        $this->client->request(
+            'GET',
+            $url . '?messageId=' . urlencode($emails[0]['messageId'] . ',' . $emails[5]['messageId'])
+        );
         $this->assertCount(2, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
+        $this->client->request(
+            'GET',
+            $url . '?messageId<>' . urlencode($emails[0]['messageId'] . ',' . $emails[5]['messageId'])
+        );
         $this->assertCount(8, $this->getJsonResponseContent($this->client->getResponse(), 200));
     }
 
@@ -76,17 +81,6 @@ class EmailControllerTest extends WebTestCase
         $this->assertContains('Thank you for signing up to My Web Store!', $result['body']);
 
         return $result['id'];
-    }
-
-    public function testGetEmailContext()
-    {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_api_get_email_context', ['id' => $this->getReference('email_1')->getId()])
-        );
-
-        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(2, $entities);
     }
 
     public function testCreateEmail()

@@ -40,10 +40,14 @@ class MergeFieldType extends AbstractType
             'sourceEntity',
             'entity',
             array(
-                'class' => $metadata->getEntityMetadata()->getClassName(),
-                'choices' => $options['entities'],
-                'multiple' => false,
-                'expanded' => true,
+                'class'                   => $metadata->getEntityMetadata()->getClassName(),
+                'data_class'              => $metadata->getEntityMetadata()->getClassName(),
+                'choices'                 => $options['entities'],
+                'multiple'                => false,
+                'expanded'                => true,
+                'choices_as_values'       => true,
+                'ownership_disabled'      => true,
+                'dynamic_fields_disabled' => true,
             )
         );
 
@@ -58,7 +62,7 @@ class MergeFieldType extends AbstractType
                     'multiple' => false,
                     'expanded' => false,
                     'label'    => 'oro.entity_merge.form.strategy',
-                    'tooltip'  => 'oro.entity_merge.form.strategy_tooltip'
+                    'tooltip'  => 'oro.entity_merge.form.strategy.tooltip'
                 )
             );
         } else {

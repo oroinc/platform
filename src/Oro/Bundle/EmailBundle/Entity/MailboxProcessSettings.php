@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings;
 
 /**
@@ -24,6 +25,12 @@ abstract class MailboxProcessSettings extends ExtendMailboxProcessSettings
     protected $id;
 
     /**
+     * @var Mailbox
+     * @ORM\OneToOne(targetEntity="Mailbox", mappedBy="processSettings")
+     */
+    protected $mailbox;
+
+    /**
      * @return integer
      */
     public function getId()
@@ -37,6 +44,22 @@ abstract class MailboxProcessSettings extends ExtendMailboxProcessSettings
      * @return string
      */
     abstract public function getType();
+
+    /**
+     * @return Mailbox
+     */
+    public function getMailbox()
+    {
+        return $this->mailbox;
+    }
+
+    /**
+     * @param Mailbox $mailbox
+     */
+    public function setMailbox(Mailbox $mailbox = null)
+    {
+        $this->mailbox = $mailbox;
+    }
 
     /**
      * @return string

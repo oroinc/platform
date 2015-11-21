@@ -8,7 +8,6 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class ControllersTest extends WebTestCase

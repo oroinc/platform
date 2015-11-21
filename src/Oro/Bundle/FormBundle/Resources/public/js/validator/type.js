@@ -12,13 +12,16 @@ define(['underscore', 'orotranslation/js/translator'
     return [
         'Type',
         function(value, element, param) {
+            var result;
             switch (param.type) {
                 case 'integer':
                     var valueNumber = Number(value).toFixed();
-                    return String(valueNumber) === value;
+                    result = String(valueNumber) === value;
+                    break;
                 default:
-                    return true;
+                    result = true;
             }
+            return this.optional(element) || result;
         },
         function(param) {
             param = _.extend({}, defaultParam, param);

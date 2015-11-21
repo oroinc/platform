@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 
 class ExtendConfigLoader extends ConfigLoader
@@ -10,7 +11,7 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function hasEntityConfigs(ClassMetadataInfo $metadata)
+    protected function hasEntityConfigs(ClassMetadata $metadata)
     {
         return parent::hasEntityConfigs($metadata) && !ExtendHelper::isCustomEntity($metadata->getName());
     }
@@ -18,10 +19,20 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function hasFieldConfigs(ClassMetadataInfo $metadata, $fieldName)
+    protected function hasFieldConfigs(ClassMetadata $metadata, $fieldName)
     {
-        if ($this->isExtendField($metadata->getName(), $fieldName)) {
+        $className = $metadata->getName();
+        if ($this->isExtendField($className, $fieldName)) {
             return false;
+        }
+
+        // check for "snapshot" field of multi-enum type
+        $snapshotSuffixOffset = -strlen(ExtendHelper::ENUM_SNAPSHOT_SUFFIX);
+        if (substr($fieldName, $snapshotSuffixOffset) === ExtendHelper::ENUM_SNAPSHOT_SUFFIX) {
+            $guessedName = substr($fieldName, 0, $snapshotSuffixOffset);
+            if (!empty($guessedName) && $this->isExtendField($className, $guessedName)) {
+                return false;
+            }
         }
 
         return parent::hasFieldConfigs($metadata, $fieldName);
@@ -30,22 +41,23 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function hasAssociationConfigs(ClassMetadataInfo $metadata, $associationName)
+    protected function hasAssociationConfigs(ClassMetadata $metadata, $associationName)
     {
-        if ($this->isExtendField($metadata->getName(), $associationName)) {
+        $className = $metadata->getName();
+        if ($this->isExtendField($className, $associationName)) {
             return false;
         }
 
         // check for default field of oneToMany or manyToMany relation
         if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
             $guessedName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
-            if (!empty($guessedName) && $this->isExtendField($metadata->getName(), $guessedName)) {
+            if (!empty($guessedName) && $this->isExtendField($className, $guessedName)) {
                 return false;
             }
         }
         // check for inverse side field of oneToMany relation
         $targetClass = $metadata->getAssociationTargetClass($associationName);
-        $prefix = strtolower(ExtendHelper::getShortClassName($targetClass)) . '_';
+        $prefix      = strtolower(ExtendHelper::getShortClassName($targetClass)) . '_';
         if (strpos($associationName, $prefix) === 0) {
             $guessedName = substr($associationName, strlen($prefix));
             if (!empty($guessedName) && $this->isExtendField($targetClass, $guessedName)) {
@@ -61,6 +73,7 @@ class ExtendConfigLoader extends ConfigLoader
      *
      * @param string $className
      * @param string $fieldName
+     *
      * @return bool
      */
     protected function isExtendField($className, $fieldName)

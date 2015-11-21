@@ -66,6 +66,7 @@ class OroLayoutExtension extends Extension
         if (isset($config['active_theme'])) {
             $container->setParameter('oro_layout.default_active_theme', $config['active_theme']);
         }
+        $container->setParameter('oro_layout.debug', $config['debug']);
         $themeManagerDef = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
         $themeManagerDef->replaceArgument(1, $config['themes']);
 
@@ -97,5 +98,7 @@ class OroLayoutExtension extends Extension
         }
 
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
+
+        $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
@@ -42,8 +43,10 @@ class EmailUserListener
 
     /**
      * Send notification to clank that user have new emails
+     *
+     * @param PostFlushEventArgs $args
      */
-    public function postFlush()
+    public function postFlush(PostFlushEventArgs $args)
     {
         $usersWithNewEmails = [];
         if (!$this->processEmailUsersEntities) {
@@ -51,24 +54,25 @@ class EmailUserListener
         }
 
         /** @var EmailUser $entity */
-        foreach ($this->processEmailUsersEntities as $entity) {
-            $status = $entity['status'];
-            $entity = $entity['entity'];
-            if (!$entity->getOwner()) {
-                continue;
-            }
+        foreach ($this->processEmailUsersEntities as $item) {
+            $status = $item['status'];
+            $entity = $item['entity'];
 
-            $ownerId = $entity->getOwner()->getId();
-            if (array_key_exists($ownerId, $usersWithNewEmails) === true) {
-                $new = $usersWithNewEmails[$ownerId]['new'];
-                if ($status === self::ENTITY_STATUS_NEW) {
-                    $usersWithNewEmails[$ownerId]['new'] = $new + 1;
+            $em = $args->getEntityManager();
+            $ownerIds = $this->determineOwners($entity, $em);
+
+            foreach ($ownerIds as $ownerId) {
+                if (array_key_exists($ownerId, $usersWithNewEmails) === true) {
+                    $new = $usersWithNewEmails[$ownerId]['new'];
+                    if ($status === self::ENTITY_STATUS_NEW) {
+                        $usersWithNewEmails[$ownerId]['new'] = $new + 1;
+                    }
+                } else {
+                    $usersWithNewEmails[$ownerId] = [
+                        'entity' => $entity,
+                        'new' => $status === self::ENTITY_STATUS_NEW ? 1 : 0,
+                    ];
                 }
-            } else {
-                $usersWithNewEmails[$ownerId] = [
-                    'entity' => $entity,
-                    'new' => $status === self::ENTITY_STATUS_NEW ? 1 : 0
-                ];
             }
         }
 
@@ -78,7 +82,41 @@ class EmailUserListener
         $this->processEmailUsersEntities = [];
     }
 
+    /**
+     * @param EmailUser     $entity
+     * @param EntityManager $em
+     *
+     * @return array
+     */
+    protected function determineOwners(EmailUser $entity, EntityManager $em)
+    {
+        $ownerIds = [];
+        if ($entity->getOwner() !== null) {
+            $ownerIds[] = $entity->getOwner()->getId();
+        } else {
+            $mailbox = $entity->getMailboxOwner();
+            if ($mailbox !== null) {
+                $authorizedUsers = $mailbox->getAuthorizedUsers();
 
+                foreach ($authorizedUsers as $user) {
+                    $ownerIds[] = $user->getId();
+                }
+
+                $authorizedRoles = $mailbox->getAuthorizedRoles();
+                foreach ($authorizedRoles as $role) {
+                    $users = $em->getRepository('OroUserBundle:Role')
+                        ->getUserQueryBuilder($role)
+                        ->getQuery()->getResult();
+
+                    foreach ($users as $user) {
+                        $ownerIds[] = $user->getId();
+                    }
+                }
+            }
+        }
+
+        return array_unique($ownerIds);
+    }
 
     /**
      * Collect new EmailUser entities

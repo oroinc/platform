@@ -115,6 +115,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
         $parameters->expects($this->once())->method('add')->with($additionalParameters);
+        $parameters->expects($this->once())->method('all')->will($this->returnValue([]));
 
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridScope')
@@ -126,10 +127,17 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($gridFullName)
             ->will($this->returnValue($gridName));
 
-        $this->parametersFactory->expects($this->once())
+        $this->parametersFactory->expects($this->at(0))
             ->method('createParameters')
             ->with($gridFullName)
             ->will($this->returnValue($parameters));
+        $this->parametersFactory->expects($this->at(1))
+            ->method('createParameters')
+            ->with($gridName)
+            ->will($this->returnValue($parameters));
+        $this->parametersFactory
+            ->expects($this->exactly(2))
+            ->method('createParameters');
 
         $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
             ->disableOriginalConstructor()

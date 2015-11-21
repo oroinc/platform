@@ -3,8 +3,11 @@ namespaces:
     oro_entity_extend: Oro\Bundle\EntityExtendBundle\Validator\Constraints\
 
 Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
+    group_sequence: [FieldConfigModel, fieldName]
     constraints:
-        - doctrine:UniqueEntity: [fieldName, entity]
+        - oro_entity_extend:UniqueExtendEntityField: {groups: fieldName}
+        - oro_entity_extend:DefaultRelationField: {groups: fieldName}
+        - oro_entity_extend:MultiEnumSnapshotField: {groups: fieldName}
     properties:
         fieldName:
             - NotBlank: ~
@@ -31,3 +34,12 @@ Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
                 message: "This value should contain only alphabetic symbols and numbers."
             - oro_entity_extend:NotSqlKeyword: {groups: Sql}
             - oro_entity_extend:NotPhpKeyword: {groups: Php}
+
+Oro\Bundle\EntityExtendBundle\Model\EnumValue:
+    constraints:
+        - oro_entity_extend:EnumValue: ~
+    properties:
+        label:
+            - NotBlank: ~
+            - Length:
+                max: 255

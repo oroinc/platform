@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
@@ -456,7 +456,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->any())
             ->method('createConfigFieldModel')
-            ->with(self::CLASS_NAME, $testFieldName, 'string', ConfigModelManager::MODE_DEFAULT);
+            ->with(self::CLASS_NAME, $testFieldName, 'string', ConfigModel::MODE_DEFAULT);
         $this->configManager->expects($this->once())
             ->method('flush');
 

@@ -30,6 +30,8 @@ class AttachmentManager
     const READ_COUNT = 100000;
     const DEFAULT_IMAGE_WIDTH = 100;
     const DEFAULT_IMAGE_HEIGHT = 100;
+    const SMALL_IMAGE_WIDTH = 32;
+    const SMALL_IMAGE_HEIGHT = 32;
 
     /** @var Filesystem */
     protected $filesystem;
@@ -107,7 +109,7 @@ class AttachmentManager
     public function preUpload(File $entity)
     {
         if ($entity->isEmptyFile()) {
-            if ($this->filesystem->has($entity->getFilename())) {
+            if ($entity->getFilename() !== null && $this->filesystem->has($entity->getFilename())) {
                 $this->filesystem->delete($entity->getFilename());
             }
             $entity->setFilename(null);

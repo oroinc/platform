@@ -38,7 +38,7 @@
                 'iCss':  'icon-remove',
                 'id':    idButton,
                 'label': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
-                'path':  path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
+                'path':  path('oro_api_workflow_deactivate', {'entityClass': entity.relatedEntity}),
                 'title': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
             }) }}
             <script type="text/javascript">
@@ -72,7 +72,7 @@
                 'iCss':  'icon-ok',
                 'id':    idButton,
                 'label': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
-                'path':  path('oro_workflow_api_rest_workflow_activate', {'workflowDefinition': entity.name}),
+                'path':  path('oro_api_workflow_activate', {'workflowDefinition': entity.name}),
                 'title': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
             }) }}
             <script type="text/javascript">

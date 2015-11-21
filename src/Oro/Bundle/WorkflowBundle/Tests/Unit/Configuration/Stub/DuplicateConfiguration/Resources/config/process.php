@@ -15,7 +15,8 @@ return array(
             'exclude_definitions'   => [],
             'actions_configuration' => array(
                 array('@assign_value' => array('$entity.field', 'value'))
-            )
+            ),
+            'pre_conditions' => array()
         ),
         'another_definition' => array(
             'label'                 => 'Another definition',
@@ -23,7 +24,8 @@ return array(
             'actions_configuration' => array(),
             'enabled'               => true,
             'order'                 => 0,
-            'exclude_definitions'   => array()
+            'exclude_definitions'   => array(),
+            'pre_conditions' => array()
         )
     ),
     ProcessConfigurationProvider::NODE_TRIGGERS => array(

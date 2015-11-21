@@ -5,7 +5,6 @@ namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestCalendarEventTest extends WebTestCase
@@ -162,7 +161,8 @@ class RestCalendarEventTest extends WebTestCase
         );
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_calendarevents', $request) . '&createdAt>2014-03-04T20:00:00+0000'
+            $this->getUrl('oro_api_get_calendarevents', $request)
+            . '&createdAt>' . urlencode('2014-03-04T20:00:00+0000')
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -171,7 +171,8 @@ class RestCalendarEventTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_calendarevents', $request) . '&createdAt>2050-03-04T20:00:00+0000'
+            $this->getUrl('oro_api_get_calendarevents', $request)
+            . '&createdAt>' . urlencode('2050-03-04T20:00:00+0000')
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

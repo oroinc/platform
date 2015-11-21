@@ -1,8 +1,9 @@
 define([
     'underscore',
     'backgrid',
-    './footer-cell'
-], function(_, Backgrid, FooterCell) {
+    './footer-cell',
+    '../row'
+], function(_, Backgrid, FooterCell, Row) {
     'use strict';
 
     var FooterRow;
@@ -23,6 +24,8 @@ define([
         initialize: function(options) {
             this.options = options || {};
             FooterRow.__super__.initialize.apply(this, arguments);
+
+            this.listenTo(this.columns, 'sort', this.updateCellsOrder);
         },
 
         /**
@@ -47,7 +50,9 @@ define([
                 collection: this.collection,
                 rowName: this.options.rowName
             });
-        }
+        },
+
+        updateCellsOrder: Row.prototype.updateCellsOrder
     });
 
     return FooterRow;

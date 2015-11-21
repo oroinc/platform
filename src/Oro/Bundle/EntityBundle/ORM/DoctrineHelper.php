@@ -8,13 +8,18 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\Exception;
 
 class DoctrineHelper
 {
+    /** @var ManagerRegistry */
+    protected $registry;
+
+    /** @var EntityManager[] */
+    private $managers = [];
+
     /**
      * @param ManagerRegistry $registry
      */
@@ -73,30 +78,12 @@ class DoctrineHelper
      * @return string|null
      *
      * @throws Exception\InvalidEntityException
+     *
+     * @deprecated since 1.9. Use QueryUtils::getSingleRootAlias instead
      */
     public function getSingleRootAlias(QueryBuilder $qb, $triggerException = true)
     {
-        $rootAliases = $qb->getRootAliases();
-
-        $result = null;
-        if (count($rootAliases) !== 1) {
-            if ($triggerException) {
-                $errorReason = count($rootAliases) === 0
-                    ? 'the query has no any root aliases'
-                    : sprintf('the query has several root aliases. "%s"', implode(', ', $rootAliases));
-
-                throw new Exception\InvalidEntityException(
-                    sprintf(
-                        'Can\'t get single root alias for the given query. Reason: %s.',
-                        $errorReason
-                    )
-                );
-            }
-        } else {
-            $result = $rootAliases[0];
-        }
-
-        return $result;
+        return QueryUtils::getSingleRootAlias($qb, $triggerException);
     }
 
     /**
@@ -198,9 +185,13 @@ class DoctrineHelper
      */
     public function isManageableEntity($entityOrClass)
     {
-        $entityClass = $this->getEntityClass($entityOrClass);
+        try {
+            $this->getEntityManager($entityOrClass);
 
-        return null !== $this->registry->getManagerForClass($entityClass);
+            return true;
+        } catch (Exception\NotManageableEntityException $e) {
+            return false;
+        }
     }
 
     /**
@@ -210,13 +201,9 @@ class DoctrineHelper
      */
     public function getEntityMetadata($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        if (!$entityManager) {
-            throw new Exception\NotManageableEntityException($entityClass);
-        }
+        $entityClass = $this->getEntityClass($entityOrClass);
 
-        return $entityManager->getClassMetadata($entityClass);
+        return $this->getEntityManager($entityClass)->getClassMetadata($entityClass);
     }
 
     /**
@@ -226,13 +213,14 @@ class DoctrineHelper
      */
     public function getEntityManager($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        if (!$entityManager) {
+        $entityClass = $this->getEntityClass($entityOrClass);
+
+        $manager = $this->getManagerForClass($entityClass);
+        if (!$manager) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
 
-        return $entityManager;
+        return $manager;
     }
 
     /**
@@ -241,10 +229,9 @@ class DoctrineHelper
      */
     public function getEntityRepository($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->getEntityManager($entityClass);
+        $entityClass = $this->getEntityClass($entityOrClass);
 
-        return $entityManager->getRepository($entityClass);
+        return $this->getEntityManager($entityClass)->getRepository($entityClass);
     }
 
     /**
@@ -267,8 +254,7 @@ class DoctrineHelper
     public function getEntity($entityClass, $entityId)
     {
         return $this
-            ->getEntityManager($entityClass)
-            ->getRepository($entityClass)
+            ->getEntityRepository($entityClass)
             ->find($entityId);
     }
 
@@ -290,12 +276,12 @@ class DoctrineHelper
      * @param int $limit The maximum number of items per page
      *
      * @return int
+     *
+     * @deprecated since 1.9. Use QueryUtils::getPageOffset instead
      */
     public function getPageOffset($page, $limit)
     {
-        return $page > 0
-            ? ($page - 1) * $limit
-            : 0;
+        return QueryUtils::getPageOffset($page, $limit);
     }
 
     /**
@@ -303,41 +289,12 @@ class DoctrineHelper
      *
      * @param QueryBuilder $qb
      * @param array|null   $joins
+     *
+     * @deprecated since 1.9. Use QueryUtils::applyJoins instead
      */
     public function applyJoins(QueryBuilder $qb, $joins)
     {
-        if (empty($joins)) {
-            return;
-        }
-
-        $qb->distinct(true);
-        $rootAlias = $this->getSingleRootAlias($qb);
-        foreach ($joins as $key => $val) {
-            if (empty($val)) {
-                $qb->leftJoin($rootAlias . '.' . $key, $key);
-            } elseif (is_array($val)) {
-                if (isset($val['join'])) {
-                    $join = $val['join'];
-                    if (false === strpos($join, '.')) {
-                        $join = $rootAlias . '.' . $join;
-                    }
-                } else {
-                    $join = $rootAlias . '.' . $key;
-                }
-                $condition     = null;
-                $conditionType = null;
-                if (isset($val['condition'])) {
-                    $condition     = $val['condition'];
-                    $conditionType = Join::WITH;
-                }
-                if (isset($val['conditionType'])) {
-                    $conditionType = $val['conditionType'];
-                }
-                $qb->leftJoin($join, $key, $conditionType, $condition);
-            } else {
-                $qb->leftJoin($rootAlias . '.' . $val, $val);
-            }
-        }
+        QueryUtils::applyJoins($qb, $joins);
     }
 
     /**
@@ -346,20 +303,26 @@ class DoctrineHelper
      * @param Criteria|array|null $criteria
      *
      * @return Criteria
+     *
+     * @deprecated since 1.9. Use QueryUtils::normalizeCriteria instead
      */
     public function normalizeCriteria($criteria)
     {
-        if (null === $criteria) {
-            $criteria = new Criteria();
-        } elseif (is_array($criteria)) {
-            $newCriteria = new Criteria();
-            foreach ($criteria as $fieldName => $value) {
-                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
-            }
+        return QueryUtils::normalizeCriteria($criteria);
+    }
 
-            $criteria = $newCriteria;
+    /**
+     * @param string $entityClass
+     * @return EntityManager
+     */
+    private function getManagerForClass($entityClass)
+    {
+        if (array_key_exists($entityClass, $this->managers)) {
+            return $this->managers[$entityClass];
         }
 
-        return $criteria;
+        $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
+
+        return $this->managers[$entityClass];
     }
 }

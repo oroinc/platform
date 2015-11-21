@@ -1,35 +1,13 @@
 definitions:
-    email_auto_response:
-        label:   Email Auto Response
-        enabled: true
-        entity:  Oro\Bundle\EmailBundle\Entity\Email
-        actions_configuration:
-            - @tree:
-                conditions:
-                    @not_blank: [$emailBody]
-                actions:
-                    - @format_string:
-                        attribute: $.arguments
-                        string: '--id=%id%'
-                        arguments:
-                            id: $id
-                    - @create_entity:
-                        class: JMS\JobQueueBundle\Entity\Job
-                        attribute: $.syncJob
-                        flush: true
-                        arguments:
-                            - 'oro:email:autoresponse'
-                            - [$.arguments]
-
     sync_email_body_after_email_synchronize:
         label:   Sync Email Body After Email Sync
         enabled: true
         order:   100
         entity:  Oro\Bundle\EmailBundle\Entity\Email
+        pre_conditions:
+            @blank: [$emailBody]
         actions_configuration:
             - @tree:
-                conditions:
-                    @blank: [$emailBody]
                 actions:
                     - @format_string:
                         attribute: $.arguments
@@ -43,19 +21,23 @@ definitions:
                         arguments:
                             - 'oro:email:body-sync'
                             - [$.arguments]
+                            - true
+                            - 'default'
+                            - -50
 
     sync_email_flag_after_changed:
         label:   Sync Email Flag After Changed
         enabled: true
         order:   50
         entity:  Oro\Bundle\EmailBundle\Entity\EmailUser
+        pre_conditions:
+            @and:
+                - @not_empty: [$origin]
+                - @equal: [$origin.active, true]
         actions_configuration:
             - @tree:
                 conditions:
-                    @and:
-                        - @not_empty: [$folder.origin]
-                        - @equal: [$folder.origin.active, true]
-                        - @equal: [$seen, false]
+                    @equal: [$seen, false]
                 actions:
                     - @format_string:
                         attribute: $.arguments
@@ -71,10 +53,7 @@ definitions:
                             - ['--seen=false', $.arguments]
             - @tree:
                 conditions:
-                    @and:
-                        - @not_empty: [$folder.origin]
-                        - @equal: [$folder.origin.active, true]
-                        - @equal: [$seen, true]
+                    @equal: [$seen, true]
                 actions:
                     - @format_string:
                         attribute: $.arguments
@@ -90,13 +69,6 @@ definitions:
                             - ['--seen=true', $.arguments]
 
 triggers:
-    email_auto_response:
-        -
-            event: create
-        -
-            event: update
-            field: emailBody
-
     sync_email_body_after_email_synchronize:
         -
             event: create

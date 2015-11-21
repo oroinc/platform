@@ -74,11 +74,8 @@ class EmailController extends RestController
      *
      * @param string $id
      *
-     * @Get(
-     *      "/emails/{id}",
-     *      name="",
-     *      requirements={"id"="\d+"}
-     * )
+     * @Get("/emails/{id}", requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get email",
      *      resource=true
@@ -120,33 +117,6 @@ class EmailController extends RestController
     public function postAction()
     {
         return $this->handleCreateRequest();
-    }
-
-    /**
-     * Get email context data.
-     *
-     * @param int $id The email id
-     *
-     * @ApiDoc(
-     *      description="Get email context data",
-     *      resource=true
-     * )
-     *
-     * @AclAncestor("oro_email_email_view")
-     *
-     * @return Response
-     */
-    public function getContextAction($id)
-    {
-        /** @var Email $email */
-        $email = $this->getManager()->find($id);
-        if (!$email) {
-            return $this->buildNotFoundResponse();
-        }
-
-        $result = $this->getManager()->getEmailContext($email);
-
-        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
     }
 
     /**

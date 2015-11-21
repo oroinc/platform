@@ -6,13 +6,14 @@ use Symfony\Component\Form\Guess;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityBundle\Form\Guesser\AbstractFormGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityBundle\Form\Guesser\AbstractFormGuesser;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
 
 use Symfony\Component\Validator\Constraints\Length;
@@ -121,10 +122,6 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                 $options['empty_value'] = false;
                 $options['choices'] = ['No', 'Yes'];
                 break;
-            case 'optionSet':
-                $options['entityClassName'] = $className;
-                $options['entityFieldName'] = $fieldName;
-                break;
             case 'enum':
                 $options['enum_code'] = $this->enumConfigProvider->getConfig($className, $fieldName)
                     ->get('enum_code');
@@ -203,13 +200,14 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
     protected function isApplicableField(ConfigInterface $extendConfig)
     {
         return
-            !$extendConfig->is('is_deleted')
-            && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-            && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-            && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations)
+            $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+            && ExtendHelper::isFieldAccessible($extendConfig)
+            && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations, true)
             && (
                 !$extendConfig->has('target_entity')
-                || !$this->extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')
+                || ExtendHelper::isEntityAccessible(
+                    $this->extendConfigProvider->getConfig($extendConfig->get('target_entity'))
+                )
             );
     }
 }

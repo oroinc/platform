@@ -1,11 +1,15 @@
-define(['jquery', 'underscore'], function($, _) {
+define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
     'use strict';
 
     /**
      * @export oroui/js/tools
      * @name   oroui.tools
      */
-    return {
+    var tools = {};
+
+    _.extend(tools, Chaplin.utils);
+
+    _.extend(tools, {
         /** @type {boolean} */
         debug: false,
         /**
@@ -163,7 +167,7 @@ define(['jquery', 'underscore'], function($, _) {
          * Are we currently on mobile
          */
         isMobile: function() {
-            return $('body').hasClass('mobile-version');
+            return _.isMobile();
         },
 
         /**
@@ -201,6 +205,41 @@ define(['jquery', 'underscore'], function($, _) {
         },
 
         /**
+         * Loads single module through requireJS and returns promise
+         *
+         * @param {string} module name
+         * @return ($.Promise}
+         */
+        loadModule: function(module) {
+            var deferred = $.Deferred();
+            require([module], function(moduleRealization) {
+                deferred.resolve(moduleRealization);
+            }, function(e) {
+                deferred.reject(e);
+            });
+            return deferred.promise();
+        },
+
+        /**
+         * Loads single module through requireJS and replaces the property
+         *
+         * @param {Object} container where to replace property
+         * @param {string} property name to replace module ref to concrete realization
+         * @return ($.Promise}
+         */
+        loadModuleAndReplace: function(container, moduleProperty) {
+            if (_.isFunction(container[moduleProperty])) {
+                var deferred = $.Deferred();
+                deferred.resolve(container[moduleProperty]);
+                return deferred.promise();
+            }
+            return this.loadModule(container[moduleProperty]).then(function(realization) {
+                container[moduleProperty] = realization;
+                return realization;
+            });
+        },
+
+        /**
          * Check if current page is an error page (404, 503, 504, etc.)
          * @returns {boolean}
          */
@@ -229,5 +268,7 @@ define(['jquery', 'underscore'], function($, _) {
         ensureArray: function(value) {
             return _.isArray(value) ? value : [value];
         }
-    };
+    });
+
+    return tools;
 });

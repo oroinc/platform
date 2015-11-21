@@ -72,7 +72,7 @@ class QueryCountCalculator
                 list($params, $types) = QueryUtils::processParameterMappings($query, $parameterMappings);
 
                 $statement = $query->getEntityManager()->getConnection()->executeQuery(
-                    'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
+                    sprintf('SELECT COUNT(*) FROM (%s) AS e', $query->getSQL()),
                     $params,
                     $types
                 );

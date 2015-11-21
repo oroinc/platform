@@ -147,6 +147,9 @@ define(function(require) {
          * @inheritDoc
          */
         dispose: function() {
+            if (this.disposed) {
+                return;
+            }
             if (this.layout === 'fullscreen') {
                 // fullscreen layout has side effects, need to clean up
                 this.setLayout('default');
@@ -464,7 +467,10 @@ define(function(require) {
                 // load events from a server
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(this.updateEventsWithoutReload, this),
+                    success: _.bind(function() {
+                        this.updateEventsLoadedCache();
+                        this.updateEventsWithoutReload();
+                    }, this),
                     error: _.bind(function(collection, response) {
                         this.showLoadEventsError(response.responseJSON || {});
                         this._hideMask();
@@ -473,6 +479,15 @@ define(function(require) {
             } catch (err) {
                 this.showLoadEventsError(err);
             }
+        },
+
+        updateEventsLoadedCache: function() {
+            this.eventsLoaded = {};
+            this.options.connectionsOptions.collection.each(function(connectionModel) {
+                if (connectionModel.get('visible')) {
+                    this.eventsLoaded[connectionModel.get('calendarUid')] = true;
+                }
+            }, this);
         },
 
         updateEventsWithoutReload: function() {
@@ -487,13 +502,7 @@ define(function(require) {
                 var fcEvents;
 
                 if (this.enableEventLoading || _.size(this.eventsLoaded) === 0) {
-                    // data is loaded, need to update eventsLoaded
-                    this.eventsLoaded = {};
-                    this.options.connectionsOptions.collection.each(function(connectionModel) {
-                        if (connectionModel.get('visible')) {
-                            this.eventsLoaded[connectionModel.get('calendarUid')] = true;
-                        }
-                    }, this);
+                    this.updateEventsLoadedCache();
                 }
 
                 // prepare them for full calendar
@@ -898,10 +907,10 @@ define(function(require) {
                 case 'scroll':
                     height = 'auto';
                     contentHeight = 'auto';
-                    mediator.execute('layout:enablePageScroll', $calendarEl);
+                    mediator.execute('layout:enablePageScroll');
                     break;
                 case 'default':
-                    mediator.execute('layout:enablePageScroll', $calendarEl);
+                    mediator.execute('layout:enablePageScroll');
                     // default values
                     break;
                 default:

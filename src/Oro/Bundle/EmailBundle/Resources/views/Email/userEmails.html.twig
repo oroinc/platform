@@ -78,7 +78,7 @@
                                 button.html('{{ actionSync|raw }}');
                                 button.removeAttr('disabled');
 
-                                mediator.trigger('datagrid:doReset:{{ gridName }}');
+                                mediator.trigger('datagrid:doRefresh:{{ gridName }}');
 
                                 messenger.notificationFlashMessage(
                                     'success',

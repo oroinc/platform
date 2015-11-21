@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
@@ -47,6 +48,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * @var ContainerAwareInterface
      */
     private $container;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $configProvider;
 
     /**
      * @return OwnershipMetadataProvider
@@ -94,6 +100,18 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         }
 
         return $this->entityOwnerAccessor;
+    }
+
+    /**
+     * @return ConfigProvider
+     */
+    public function getSecurityConfigProvider()
+    {
+        if (!$this->configProvider) {
+            $this->configProvider = $this->getContainer()->get('oro_entity_config.provider.security');
+        }
+
+        return $this->configProvider;
     }
 
     /**
@@ -344,7 +362,8 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             return false;
         }
 
-        foreach ($this->getTreeProvider()->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
+        $businessUnits = $this->getTreeProvider()->getTree()->getUserBusinessUnitIds($userId, $organizationId);
+        foreach ($businessUnits as $buId) {
             if ($businessUnitId === $buId) {
                 return true;
             }

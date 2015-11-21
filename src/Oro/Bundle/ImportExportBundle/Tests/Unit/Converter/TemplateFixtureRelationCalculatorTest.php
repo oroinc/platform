@@ -81,9 +81,9 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit_Framework_TestCase
         $fixtureTwo->relationIterator = new \ArrayIterator(array(1, 2, 3, 4, 5));
 
         return array(
-            array(new \ArrayIterator(array($fixtureOne)), 'str', 0),
-            array(new \ArrayIterator(array($fixtureOne)), 'emptyRelationArray', 0),
-            array(new \ArrayIterator(array($fixtureOne)), 'emptyIterator', 0),
+            array(new \ArrayIterator(array($fixtureOne)), 'str', 1),
+            array(new \ArrayIterator(array($fixtureOne)), 'emptyRelationArray', 1),
+            array(new \ArrayIterator(array($fixtureOne)), 'emptyIterator', 1),
             array(new \ArrayIterator(array($fixtureOne)), 'relationArray', 2),
             array(new \ArrayIterator(array($fixtureOne, $fixtureTwo)), 'relationIterator', 5),
         );

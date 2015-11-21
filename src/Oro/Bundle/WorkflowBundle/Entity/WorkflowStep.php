@@ -22,6 +22,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          "note"={
  *              "immutable"=true
  *          },
+ *          "comment"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
  *              "immutable"=true
  *          },
@@ -193,5 +196,13 @@ class WorkflowStep
             ->setFinal($workflowStep->isFinal());
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->label;
     }
 }

@@ -27,6 +27,9 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
+
     protected function setUp()
     {
         $this->encryptor = new Mcrypt('someKey');
@@ -53,7 +56,13 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->setMethods(['hasConfig', 'getConfig', 'get'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -62,7 +71,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     protected function getExtensions()
     {
-        $tooltipExtension = new TooltipFormExtension();
+        $tooltipExtension = new TooltipFormExtension($this->configProvider, $this->translator);
 
         return array_merge(
             parent::getExtensions(),
@@ -204,7 +213,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     /**
      * In case when user or host field was changed new configuration should be created
-     * and old one will be not active
+     * and old one will be not active.
      */
     public function testCreatingNewConfiguration()
     {
@@ -218,6 +227,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit(
             array(
+                'useImap'        => 1,
                 'imapHost'       => 'someHost',
                 'imapPort'       => '123',
                 'smtpHost'       => '',
@@ -233,6 +243,39 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
         $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertTrue($form->getData()->isActive());
+    }
+
+    /**
+     * In case when user or host field was changed new configuration should NOT be created if imap and smtp
+     * are inactive.
+     */
+    public function testNotCreatingNewConfigurationWhenImapInactive()
+    {
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $form = $this->factory->create($type);
+
+        $entity = new UserEmailOrigin();
+        $entity->setImapHost('someHost');
+        $this->assertTrue($entity->isActive());
+
+        $form->setData($entity);
+        $form->submit(
+            array(
+                'useImap'        => 0,
+                'useSmtp'        => 0,
+                'imapHost'       => 'someHost',
+                'imapPort'       => '123',
+                'smtpHost'       => '',
+                'smtpPort'       => '',
+                'imapEncryption' => 'ssl',
+                'smtpEncryption' => 'ssl',
+                'user'           => 'someUser',
+                'password'       => 'somPassword'
+            )
+        );
+
+        $this->assertNotSame($entity, $form->getData());
+        $this->assertNull($form->getData());
     }
 
     /**
@@ -264,5 +307,11 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $this->assertNotSame($entity, $form->getData());
         $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertNull($form->getData());
+    }
+
+    public function testGetName()
+    {
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $this->assertEquals(ConfigurationType::NAME, $type->getName());
     }
 }

@@ -275,7 +275,7 @@ define(function(require) {
             if (adoptedActionsContainer.length > 0) {
                 var self = this;
                 var form = adoptedActionsContainer.closest('form');
-                var actions = adoptedActionsContainer.find('button, input, a');
+                var actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
 
                 if (form.length > 0) {
                     this.form = form;
@@ -284,7 +284,7 @@ define(function(require) {
                 _.each(actions, function(action, idx) {
                     var $action = $(action);
                     var actionId = $action.data('action-name') || 'adopted_action_' + idx;
-                    switch (action.type.toLowerCase()) {
+                    switch (action.type && action.type.toLowerCase()) {
                         case 'submit':
                             var submitReplacement = $('<input type="submit"/>');
                             submitReplacement.css({
@@ -620,7 +620,7 @@ define(function(require) {
          * Render widget
          */
         render: function() {
-            this.renderDeferred = $.Deferred();
+            this._deferredRender();
             var loadAllowed = !this.options.elementFirst ||
                     (this.options.elementFirst && !this.firstRun) ||
                         (this.$el && this.$el.length && this.$el.html().length === 0);
@@ -717,8 +717,8 @@ define(function(require) {
             delete this.loading;
             this.disposePageComponents();
             this.setContent(content, true);
-            if (this.renderDeferred) {
-                this.renderDeferred
+            if (this.deferredRender) {
+                this.deferredRender
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
                     .fail(function() {
                         throw new Error('Widget rendering failed');
@@ -763,9 +763,8 @@ define(function(require) {
 
         _afterLayoutInit: function() {
             this.widget.removeClass('invisible');
-            if (this.renderDeferred) {
-                this.renderDeferred.resolve();
-                delete this.renderDeferred;
+            if (this.deferredRender) {
+                this._resolveDeferredRender();
             }
         },
 

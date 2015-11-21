@@ -144,8 +144,8 @@ define(function(require) {
                 widget.listenTo(this, 'dispose', widget.dispose);
             }
 
-            if (widget.renderDeferred) {
-                widget.renderDeferred.done(_.bind(this._resolveDeferredInit, this));
+            if (widget.deferredRender) {
+                widget.deferredRender.done(_.bind(this._resolveDeferredInit, this));
             } else {
                 this._resolveDeferredInit();
             }

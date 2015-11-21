@@ -57,7 +57,7 @@ class WorkflowController extends Controller
                 'transition' => $transition,
                 'workflow' => $workflow,
                 'transitionUrl' => $this->generateUrl(
-                    'oro_workflow_api_rest_workflow_start',
+                    'oro_api_workflow_start',
                     $routeParams
                 ),
                 'transitionFormUrl' => $this->generateUrl(
@@ -97,7 +97,7 @@ class WorkflowController extends Controller
                 'transition' => $transition,
                 'workflow' => $workflow,
                 'transitionUrl' => $this->generateUrl(
-                    'oro_workflow_api_rest_workflow_transit',
+                    'oro_api_workflow_transit',
                     $routeParams
                 ),
                 'transitionFormUrl' => $this->generateUrl(

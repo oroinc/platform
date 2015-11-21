@@ -21,7 +21,7 @@ class AutoResponseRuleConditionType extends AbstractType
             ->add('field', 'choice', [
                 'choices' => [
                     'subject'   => 'oro.email.subject.label',
-                    'emailBody' => 'oro.email.email_body.label',
+                    'emailBody.bodyContent' => 'oro.email.email_body.label',
                     'fromName'  => 'From',
                     'cc.__index__.name'  => 'Cc',
                     'bcc.__index__.name' => 'Bcc',

@@ -8,18 +8,18 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class TagTransformer implements DataTransformerInterface
 {
-    /**
-     * @var TagManager
-     */
+    /**  @var TagManager */
     protected $manager;
 
-    /**
-     * @var Taggable
-     */
+    /** @var Taggable */
     protected $entity;
+
+    /** @var Organization|null */
+    protected $organization;
 
     public function __construct(TagManager $manager)
     {
@@ -44,7 +44,11 @@ class TagTransformer implements DataTransformerInterface
         if (is_array($value)) {
             $result = array();
             if ($this->entity) {
-                $result = $this->manager->getPreparedArray($this->entity, new ArrayCollection($value));
+                $result = $this->manager->getPreparedArray(
+                    $this->entity,
+                    new ArrayCollection($value),
+                    $this->organization
+                );
             }
             $value = json_encode($result);
         }
@@ -60,5 +64,13 @@ class TagTransformer implements DataTransformerInterface
     public function setEntity(Taggable $entity)
     {
         $this->entity = $entity;
+    }
+
+    /**
+     * @param Organization $organization
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
     }
 }

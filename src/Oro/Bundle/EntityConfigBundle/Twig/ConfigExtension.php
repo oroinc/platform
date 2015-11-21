@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
+
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Symfony\Component\Routing\RouterInterface;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ConfigExtension extends \Twig_Extension
 {
@@ -12,27 +17,39 @@ class ConfigExtension extends \Twig_Extension
 
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
+
     /** @var RouterInterface */
     private $router;
 
     /**
-     * @param ConfigManager $configManager
-     * @param RouterInterface $router
+     * @param ConfigManager         $configManager
+     * @param RouterInterface       $router
+     * @param EntityClassNameHelper $entityClassNameHelper
      */
-    public function __construct(ConfigManager $configManager, RouterInterface $router)
-    {
-        $this->configManager = $configManager;
-        $this->router = $router;
+    public function __construct(
+        ConfigManager $configManager,
+        RouterInterface $router,
+        EntityClassNameHelper $entityClassNameHelper
+    ) {
+        $this->configManager         = $configManager;
+        $this->router                = $router;
+        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {
         return self::NAME;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getFunctions()
     {
         return [
@@ -42,6 +59,7 @@ class ConfigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_field_config_value', [$this, 'getFieldConfigValue']),
             new \Twig_SimpleFunction('oro_entity_route', [$this, 'getClassRoute']),
             new \Twig_SimpleFunction('oro_entity_metadata_value', [$this, 'getClassMetadataValue']),
+            new \Twig_SimpleFunction('oro_entity_view_link', [$this, 'getViewLink']),
         ];
     }
 
@@ -134,7 +152,7 @@ class ConfigExtension extends \Twig_Extension
      * @param string $routeType Route Type
      * @param bool   $strict    Should exception be thrown if no route of given type found
      *
-     * @return string
+     * @return string|null
      */
     public function getClassRoute($className, $routeType = 'view', $strict = false)
     {
@@ -142,14 +160,61 @@ class ConfigExtension extends \Twig_Extension
             return null;
         }
 
-        $route = $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
-
-        if ($collection = $this->router->getRouteCollection()) {
-            if ($collection->get($route) === null) {
-                return null;
-            }
+        $entityMetadata = $this->configManager->getEntityMetadata($className);
+        if (!$entityMetadata) {
+            return null;
         }
 
-        return $route;
+        $route = $entityMetadata->getRoute($routeType, $strict);
+
+        return $route && $this->hasRoute($route)
+            ? $route
+            : null;
+    }
+
+    /**
+     * @param string $routeName
+     *
+     * @return bool
+     */
+    protected function hasRoute($routeName)
+    {
+        try {
+            $this->router->generate($routeName);
+        } catch (RouteNotFoundException $e) {
+            return false;
+        } catch (RoutingException $e) {
+            return true;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $className The entity class name
+     * @param int    $id        The entity id
+     *
+     * @return string|null
+     */
+    public function getViewLink($className, $id)
+    {
+        $route = $this->getClassRoute($className, 'view');
+        if ($route) {
+            return $this->router->generate($route, ['id' => $id]);
+        }
+
+        // Generate view link for the custom entity
+        if (ExtendHelper::isCustomEntity($className)) {
+            return $this->router->generate(
+                'oro_entity_view',
+                [
+                    'id'         => $id,
+                    'entityName' => $this->entityClassNameHelper->getUrlSafeClassName($className)
+
+                ]
+            );
+        }
+
+        return null;
     }
 }

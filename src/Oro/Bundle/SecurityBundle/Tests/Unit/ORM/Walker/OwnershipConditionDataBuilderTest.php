@@ -4,8 +4,11 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
 use Doctrine\ORM\Query\AST\PathExpression;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
@@ -17,13 +20,11 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 {
     const BUSINESS_UNIT = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit';
-    const ORGANIZATION = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
-    const USER = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User';
-    const TEST_ENTITY = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity';
+    const ORGANIZATION  = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
+    const USER          = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User';
+    const TEST_ENTITY   = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity';
 
-    /**
-     * @var OwnershipConditionDataBuilder
-     */
+    /** @var OwnershipConditionDataBuilder */
     private $builder;
 
     /** @var OwnershipMetadataProviderStub */
@@ -31,6 +32,9 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $securityContext;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $aclVoter;
@@ -82,6 +86,11 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $strategy = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface');
 
         $this->builder = new OwnershipConditionDataBuilder(
             $securityContextLink,
@@ -89,6 +98,9 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             $entityMetadataProvider,
             $this->metadataProvider,
             $treeProvider,
+            $this->registry,
+            $configProvider,
+            $strategy,
             $this->aclVoter
         );
     }
@@ -144,6 +156,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->tree->addBusinessUnitRelation('bu41', 'bu4');
         $this->tree->addBusinessUnitRelation('bu411', 'bu41');
 
+        $this->tree->buildTree();
+
         $this->tree->addUser('user1', null);
         $this->tree->addUser('user2', 'bu2');
         $this->tree->addUser('user3', 'bu3');
@@ -181,7 +195,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $accessLevel,
         $ownerType,
         $targetEntityClassName,
-        $expectedConstraint
+        $expectedConstraint,
+        $expectedGroup = ''
     ) {
         $this->buildTestTree();
 
@@ -220,9 +235,29 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->any())
             ->method('getOrganizationContext')
             ->will($this->returnValue($organization));
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $aclGroupProvider */
+        $aclGroupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $aclGroupProvider->expects($this->any())->method('getGroup')->willReturn($expectedGroup);
+
+        $this->builder->setAclGroupProvider($aclGroupProvider);
+
         $this->securityContext->expects($this->any())
             ->method('isGranted')
-            ->with($this->equalTo('VIEW'), $this->equalTo('entity:' . $targetEntityClassName))
+            ->with(
+                $this->equalTo('VIEW'),
+                $this->callback(
+                    function (ObjectIdentity $identity) use ($targetEntityClassName, $expectedGroup) {
+                        $this->assertEquals('entity', $identity->getIdentifier());
+                        $this->assertStringEndsWith($targetEntityClassName, $identity->getType());
+                        if ($expectedGroup) {
+                            $this->assertStringStartsWith($expectedGroup, $identity->getType());
+                        }
+
+                        return true;
+                    }
+                )
+            )
             ->will($this->returnValue($isGranted));
         $this->securityContext->expects($this->any())
             ->method('getToken')
@@ -522,6 +557,18 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             ),
             'TEST entity with GLOBAL ACL, user1, grant and BUSINESS_UNIT ownerType' => array(
                 'user1', '', true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+            ),
+            'TEST entity with GLOBAL ACL, user1, grant and BUSINESS_UNIT ownerType WITH custom group' => array(
+                'user1', '', true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null, 'custom_group'
+            ),
+            'access denied' => array(
+                'user4',
+                'org4',
+                false,
+                null,
+                null,
+                self::TEST_ENTITY,
+                [null, null, PathExpression::TYPE_STATE_FIELD, null, null, false]
             ),
         );
     }

@@ -1,6 +1,6 @@
 {% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.js.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI%}
-{% import 'OroEmailBundle::actions.html.twig' as EA %}
+{% import 'OroActivityBundle::macros.html.twig' as AC %}
 
 {% set entityClass = 'Oro\\Bundle\\EmailBundle\\Entity\\Email' %}
 {% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
@@ -21,27 +21,8 @@
 
 {% block activityActions %}
     {% set action %}
-        {% if resource_granted('oro_email_email_edit') %}
-            <a href="#" title="{{ 'oro.email.contexts.placeholder'|trans|raw }}"
-               data-url="<%= routing.generate('oro_email_context', {'id': relatedActivityId}) %>"
-               {{ UI.renderWidgetDataAttributes({
-                'type' : 'dialog',
-                'multiple' : true,
-                'refresh-widget-alias': 'activity-list-widget',
-                'options' : {
-                    'alias': 'email-context-dialog',
-                    'dialogOptions' : {
-                        'title' : 'oro.email.add_context_entity.label'|trans,
-                        'allowMaximize': true,
-                        'allowMinimize': true,
-                        'modal': true,
-                        'dblclick': 'maximize',
-                        'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000,
-                        'height': 600
-                    }
-                }
-               }) }}><i class="icon-link hide-text">{{ 'oro.email.contexts.placeholder'|trans|raw }}</i></a>
+        {% if resource_granted('oro_email_email_user_edit') %}
+            {{ AC.activity_context_link() }}
         {% endif %}
     {% endset %}
     {% set actions = [action] %}
