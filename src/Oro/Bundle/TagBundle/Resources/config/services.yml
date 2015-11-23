@@ -179,13 +179,6 @@ services:
           - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData }
           - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity }
 
-    oro_tag.grid.extension.tag_filter:
-        class: %oro_tag.grid.extension.tag_filter.class%
-        arguments:
-            - @oro_entity.orm.entity_class_resolver
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore }
-
     oro_tag.form.type.entity_tags_selector:
         class: %oro_tag.form.type.entity_tags_selector.class%
         arguments:
@@ -213,3 +206,11 @@ services:
             - @oro_security.acl_helper
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tag }
+
+    oro_tag.grid.tags_extension:
+        class: Oro\Bundle\TagBundle\Grid\TagsExtension
+        arguments:
+            - @oro_tag.tag.manager
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: oro_datagrid.extension }
