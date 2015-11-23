@@ -10,7 +10,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityExtendBundle\Form\Type\AbstractMultiChoiceType;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
@@ -59,7 +58,7 @@ class DictionaryFilterType extends AbstractMultiChoiceType
 
                     if (empty($options['dictionary_code'])) {
                         throw new InvalidOptionsException(
-                            'Either "class" or "dictionary_code" must option must be set.'
+                            'Either "class" or "dictionary_code" option must be set.'
                         );
                     }
 
