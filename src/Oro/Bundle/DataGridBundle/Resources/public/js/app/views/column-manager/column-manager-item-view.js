@@ -21,13 +21,42 @@ define(function(require) {
             'change:renderable model': 'updateView'
         },
 
+        render: function() {
+            ColumnManagerItemView.__super__.render.apply(this, arguments);
+            this.$el.toggleClass('renderable', this.model.get('renderable'));
+            return this;
+        },
+
+        setFilterModel: function(filterModel) {
+            this.filterModel = filterModel;
+            this.listenTo(this.filterModel, 'change:search', this.render);
+        },
+
         /**
          * @inheritDoc
          */
         getTemplateData: function() {
+            var searchString = this.filterModel.get('search');
             var data = ColumnManagerItemView.__super__.getTemplateData.call(this);
             data.cid = this.model.cid;
+            if (searchString.length > 0) {
+                data.label = this.highlightLabel(data.label, searchString);
+            }
             return data;
+        },
+
+        highlightLabel: function(label, searchString) {
+            var result = label;
+            var length = searchString.length;
+            var start = label.toLowerCase().indexOf(searchString.toLowerCase());
+            if (start !== -1) {
+                result = label.substr(0, start) +
+                    '<span class="column-filter-match">' +
+                    label.substr(start, length) +
+                    '</span>' +
+                    label.substr(start + length);
+            }
+            return result;
         },
 
         /**
@@ -46,6 +75,7 @@ define(function(require) {
         updateView: function() {
             var renderable = this.model.get('renderable');
             this.$('input[type=checkbox][data-role=renderable]').prop('checked', renderable);
+            this.$el.toggleClass('renderable', renderable);
         }
     });
 

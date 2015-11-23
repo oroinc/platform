@@ -1,9 +1,38 @@
 {% macro calendar_event_view_template(id) %}
+
+<script type="text/template" id="activity-context-activity-list">
+    <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
+        <span data-id="<%= entity.get('targetId') %>">
+            <span class="<%= entity.get('icon') %>"></span>
+
+            <% if (entity.get('link')) { %>
+                <a href="<%= entity.get('link') %>">
+                    <span class="context-label"><%= entity.get('title') %></span>
+                </a>
+            <% } else { %>
+                <span class="context-label"><%= entity.get('title') %></span>
+            <% } %>
+            <% if (editable) { %>
+                <i class="icon-remove"></i>
+            <% } %>
+        </span>
+    </div>
+</script>
+
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div class="widget-content">
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">
+                <!-- Activity contexts container -->
+                <div class="activity-context-activity" data-layout="separate">
+                    <div class="activity-context-activity-label">
+                        {{ 'oro.activity.contexts.label'|trans }}
+                    </div>
+                    <div class="activity-context-activity-items">
+                    </div>
+                </div>
+
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.title.label'|trans, '<%= formatter.string(title) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, '<%= formatter.text(description) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
@@ -50,6 +79,9 @@
             form_row(form.notifyInvitedUsers)
         ]
     %}
+    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+        {% set data = data|merge([form_row(child)]) %}
+    {% endfor %}
     <div class="widget-content">
         <div class="alert alert-error" style="display: none;"></div>
         <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="#">
