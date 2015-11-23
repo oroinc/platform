@@ -81,20 +81,19 @@ class UrlExtension extends \Twig_Extension
         }
 
         $parts = parse_url($link);
+        $isLocal = true;
 
-        if (!empty($parts['host'])) {
-            if ($parts['host'] !== $this->request->getHttpHost()) {
-                return false;
-            }
+        if (!empty($parts['host']) && $parts['host'] !== $this->request->getHost()) {
+            $isLocal = false;
+
+        } elseif (!empty($parts['port']) && $parts['port'] !== $this->request->getPort()) {
+            $isLocal = false;
+
+        } elseif (!empty($parts['scheme']) && $this->request->isSecure() && $parts['scheme'] !== 'https') {
+            // going out from secure connection to insecure page on same domain is not local
+            $isLocal = false;
         }
 
-        // going out from secure connection to unsecure page on same domain is not local
-        if (!empty($parts['scheme']) && $this->request->getScheme() === 'https') {
-            if ($parts['scheme'] === 'http') {
-                return false;
-            }
-        }
-
-        return true;
+        return $isLocal;
     }
 }
