@@ -23,6 +23,8 @@ class Imap extends \Zend\Mail\Storage\Imap
     const FLAGS            = 'FLAGS';
     const UID              = 'UID';
     const INTERNALDATE     = 'INTERNALDATE';
+    const IMAP4_REV_1      = 'IMAP4rev1';
+    const IMAP4            = 'IMAP4';
 
     /**
      * Indicates whether IMAP server can store the same message in different folders
@@ -414,6 +416,12 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     protected function supportUidSearch()
     {
+        if (in_array(self::IMAP4, $this->capability()) ||
+            in_array(self::IMAP4_REV_1, $this->capability())
+        ) {
+            return true;
+        }
+
         return false;
     }
 }
