@@ -62,6 +62,7 @@ class TagsExtension extends AbstractExtension
                         'frontend_type' => 'html',
                         'template'      => 'OroTagBundle:Datagrid:Property/tags.html.twig',
                         'editable'      => false,
+                        'translatable'  => true,
                         'renderable'    => true
                     ]
                 ]
@@ -125,6 +126,14 @@ class TagsExtension extends AbstractExtension
                 $rows
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPriority()
+    {
+        return 10;
     }
 
     /**
