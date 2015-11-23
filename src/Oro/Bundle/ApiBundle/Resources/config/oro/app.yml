@@ -1,7 +1,7 @@
 security:
     firewalls:
         api_wsse_secured:
-            pattern: ^/api/.*
+            pattern: ^/api/(?!(doc)).*
             wsse:
                 lifetime: 3600
                 realm:    "Secured API"
