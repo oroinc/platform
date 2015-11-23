@@ -100,7 +100,8 @@ class TagManager
             return true;
         }
 
-        return $this->tagConfigProvider->getConfig($class)->is('enabled');
+        return $this->tagConfigProvider->hasConfig($class)
+            && $this->tagConfigProvider->getConfig($class)->is('enabled');
     }
 
     /**
