@@ -196,6 +196,8 @@ services:
 
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
+        calls:
+            - [setDebug, [%kernel.debug%]]
 
     oro_integration.delete_manager:
         class: %oro_integration.delete_manager.class%
