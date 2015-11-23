@@ -27,11 +27,11 @@ parameters:
 
     # helper
     oro_activity_list.helper.acl_criteria.class: Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper
+    oro_activity_list.helper.activity_inheritance_targets.class: Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
         arguments:
-            - @doctrine
             - @oro_security.security_facade
             - @oro_entity.entity_name_resolver
             - @oro_datagrid.extension.pager.orm.pager
@@ -41,6 +41,7 @@ services:
             - @oro_comment.comment.api_manager
             - @oro_entity.doctrine_helper
             - @oro_activity_list.helper.acl_criteria
+            - @oro_activity_list.helper.activity_inheritance_targets
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
@@ -173,3 +174,9 @@ services:
         arguments:
             - @oro_security.acl_helper
             - @oro_entity_config.link.security_context
+
+    oro_activity_list.helper.activity_inheritance_targets:
+        class: %oro_activity_list.helper.activity_inheritance_targets.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine

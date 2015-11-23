@@ -11,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(
@@ -65,6 +66,13 @@ class Channel
      *
      * @ORM\Column(name="name", type="string", length=255)
      * @Oro\Versioned()
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $name;
 
@@ -469,5 +477,13 @@ class Channel
         $this->defaultBusinessUnitOwner = $defaultBusinessUnitOwner;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getName();
     }
 }
