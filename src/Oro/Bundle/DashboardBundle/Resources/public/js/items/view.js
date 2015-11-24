@@ -40,8 +40,8 @@ define([
 
             this.items = this._initializeItems(options.itemsData, options.baseName);
 
-            this._initializeFilter(this.items);
-            this._initializeItemGrid(this.items);
+            this._initializeFilter(this.items, options);
+            this._initializeItemGrid(this.items, options);
             this._toggleButtons();
 
             this.$dialog = this.$el.closest('.ui-dialog');
@@ -57,7 +57,7 @@ define([
             return items;
         },
 
-        _initializeFilter: function(items) {
+        _initializeFilter: function(items, options) {
             var selectTpl = _.template(Backbone.$(this.selectTplSelector).html());
             var select = selectTpl({
                 items: items
@@ -67,7 +67,8 @@ define([
             $filterContainer.prepend(select);
             this.itemSelect = $filterContainer.find('select');
             this.itemSelect.select2({
-                allowClear: true
+                allowClear: true,
+                placeholder: options.placeholder || null
             });
 
             items.on('change:show', function(model) {

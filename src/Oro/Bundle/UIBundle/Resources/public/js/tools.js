@@ -256,7 +256,7 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         safeRegExp: function(str, flags) {
             var expression;
             str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-            expression = new RegExp(str, flags);
+            expression = new RegExp('(' + str + ')', flags);
             return expression;
         },
 
