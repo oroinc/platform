@@ -78,7 +78,7 @@ class TagManager
 
     /**
      * Checks if entity taggable
-     * Entity is taggable if it inherit Taggable interface or it configured as taggable.
+     * Entity is taggable if it implements Taggable interface or it configured as taggable.
      *
      * @param string|object $className
      *
@@ -93,7 +93,7 @@ class TagManager
 
     /**
      * Checks if entity immutable
-     * For entities that inherit Taggable interface tags are always enabled.
+     * For entities that implements Taggable interface tags are always enabled.
      *
      * @param object|string $className
      *
@@ -107,7 +107,7 @@ class TagManager
     }
 
     /**
-     * Checks if entity class inherit Taggable interface
+     * Checks if entity class implements Taggable interface
      *
      * @param object|string $className
      *
