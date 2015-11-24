@@ -196,4 +196,12 @@ class AclObjectIdentity
     {
         return $this->entriesInheriting;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

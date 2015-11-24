@@ -85,6 +85,8 @@ oro:
         widget:
             big_number:
                 choose_metrics: Choose Metrics
+                metrics: Metrics
+                choose_metrics_placeholder: Choose Metrics...
                 metricName: Metric name
                 no_changes: No changes
                 compare_to.label: Compare to

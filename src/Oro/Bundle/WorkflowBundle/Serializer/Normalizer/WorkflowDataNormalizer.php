@@ -59,15 +59,30 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
         $workflow = $this->getWorkflow();
 
         foreach ($data as $attributeName => $attributeValue) {
-            $attribute = $this->getAttribute($workflow, $attributeName);
-            $attributeValue = $this->denormalizeAttribute($workflow, $attribute, $attributeValue);
-            $denormalizedData[$attributeName] = $attributeValue;
+            // Skip attributes that already removed from configuration, they will be cleaned after next data update.
+            if ($this->hasAttribute($workflow, $attributeName)) {
+                $attribute                        = $this->getAttribute($workflow, $attributeName);
+                $attributeValue                   = $this->denormalizeAttribute($workflow, $attribute, $attributeValue);
+                $denormalizedData[$attributeName] = $attributeValue;
+            }
         }
 
         /** @var WorkflowData $object */
         $object = new $class($denormalizedData);
         $object->setFieldsMapping($workflow->getAttributesMapping());
+
         return $object;
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param          $attributeName
+     *
+     * @return bool
+     */
+    protected function hasAttribute(Workflow $workflow, $attributeName)
+    {
+        return (bool)$workflow->getAttributeManager()->getAttribute($attributeName);
     }
 
     /**
