@@ -56,7 +56,7 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $pageSize = min($pageSize, $this->getRowsCount());
         $entityId = rand(1, $pageSize);
-        $gridPath = "{$this->gridPath}//table[contains(@class,'grid')]";
+        $gridPath = "{$this->getDataGridPath()}//table[contains(@class,'grid')]";
         /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element[] $entity */
         $entity = $this->test
             ->elements(
@@ -170,12 +170,13 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getRows($id = null)
     {
+        $gridPath = $this->getDataGridPath();
         if (is_null($id)) {
             $records = $this->test
-                ->elements($this->test->using('xpath')->value("{$this->gridPath}//table/tbody/tr"));
+                ->elements($this->test->using('xpath')->value("{$gridPath}//table/tbody/tr"));
         } else {
             $records = $this->test
-                ->elements($this->test->using('xpath')->value("{$this->gridPath}//table/tbody/tr[{$id}]"));
+                ->elements($this->test->using('xpath')->value("{$gridPath}//table/tbody/tr[{$id}]"));
         }
 
         return $records;
@@ -259,7 +260,7 @@ abstract class AbstractPageGrid extends AbstractPage
             }
             $xpath .=  "td[contains(.,'{$entityField}')]";
         }
-        $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]";
+        $xpath = "{$this->getDataGridPath()}//table/tbody/tr[{$xpath}]";
         return $this->isElementPresent($xpath);
     }
 
@@ -289,7 +290,7 @@ abstract class AbstractPageGrid extends AbstractPage
             $postFix = "/td[{$column}]";
         }
 
-        $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]{$postFix}";
+        $xpath = "{$this->getDataGridPath()}//table/tbody/tr[{$xpath}]{$postFix}";
         $element = $this->test->byXPath($xpath);
         $this->test->moveto($element);
         return $element;
@@ -387,9 +388,10 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getColumn($columnId)
     {
+        $gridPath = $this->getDataGridPath();
         $columnData = $this->test->elements(
             $this->test->using('xpath')
-                ->value("{$this->gridPath}//table/tbody/tr/td[not(contains(@style, 'display: none;'))][{$columnId}]")
+                ->value("{$gridPath}//table/tbody/tr/td[not(contains(@style, 'display: none;'))][{$columnId}]")
         );
         $rowData = array();
         foreach ($columnData as $value) {
@@ -419,7 +421,7 @@ abstract class AbstractPageGrid extends AbstractPage
                 $orderFull = $order;
         }
 
-        $theadPath = "{$this->gridPath}//table/thead[not(contains(@class,'thead-sizing'))]";
+        $theadPath = "{$this->getDataGridPath()}//table/thead[not(contains(@class,'thead-sizing'))]";
         //get current sort order status
         $current = $this->test->byXPath("{$theadPath}/tr/th[a[contains(., '{$columnName}')]]")
             ->attribute('class');
