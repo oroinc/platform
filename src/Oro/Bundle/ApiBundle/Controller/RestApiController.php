@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Controller;
 
-use JMS\Serializer\SerializationContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
-use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -44,7 +42,7 @@ class RestApiController extends FOSRestController
         return $this->buildGetResponse(
             $context,
             function ($result) {
-                return is_array($result) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND;
+                return is_array($result) ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
             }
         );
     }
@@ -70,7 +68,7 @@ class RestApiController extends FOSRestController
         return $this->buildGetResponse(
             $context,
             function ($result) {
-                return null !== $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND;
+                return null !== $result ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
             }
         );
     }
@@ -117,9 +115,7 @@ class RestApiController extends FOSRestController
         $result = $context->getResult();
 
         $view = $this->view($result, $getStatusCode($result));
-        $serializationContext = new SerializationContext();
-        $serializationContext->setSerializeNull(true);
-        $view->setSerializationContext($serializationContext);
+        $view->getSerializationContext()->setSerializeNull(true);
         $this->setResponseHeaders($view, $context);
 
         return $this->handleView($view);
