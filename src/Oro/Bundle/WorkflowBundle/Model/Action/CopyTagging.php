@@ -64,13 +64,13 @@ class CopyTagging extends AbstractAction
         $organization = $this->getOrganization($context);
 
         $this->tagManager->loadTagging($source, $organization);
-        $tags = $this->tagManager->getEntityTags($source);
+        $tags = $this->tagManager->getTags($source);
         $preparedTags = [
             'all'   => $tags->toArray(),
             'owner' => $tags->toArray(),
         ];
 
-        $this->tagManager->setEntityTags($destination, $preparedTags);
+        $this->tagManager->setTags($destination, $preparedTags);
         $this->tagManager->saveTagging($destination, true, $organization);
     }
 

@@ -34,7 +34,7 @@ class TagListener implements ContainerAwareInterface
         $entity = $args->getEntity();
 
         if ($this->manager->isTaggable($args->getEntity())) {
-            $this->manager->deleteEntityTags($entity);
+            $this->manager->deleteTagging($entity, []);
         }
     }
 

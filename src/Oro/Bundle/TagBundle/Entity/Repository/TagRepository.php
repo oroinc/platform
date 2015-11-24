@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\TagBundle\Entity\Taggable;
+use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -14,16 +14,21 @@ use Oro\Bundle\UserBundle\Entity\User;
 class TagRepository extends EntityRepository
 {
     /**
-     * returns tags related to entity
+     * Returns tags related to entity
+     *
+     * If $owner is null return all tags for entity.
+     * If $owner is not null and $all is true return all tags excluded $owner.
+     * If $owner is not null and $all is false return all $owner tags.
      *
      * @param string            $entityName
      * @param int               $entityId
      * @param User|null         $owner
      * @param bool|false        $all
      * @param Organization|null $organization
+     *
      * @return array
      */
-    public function getEntityTags(
+    public function getTags(
         $entityName,
         $entityId,
         User $owner = null,
@@ -52,25 +57,25 @@ class TagRepository extends EntityRepository
     /**
      * Remove tags related to entity
      *
-     * @param int[]         $tagIds
-     * @param string        $entityName
-     * @param int           $recordId
-     * @param User|null      $owner
+     * @param Tag[]|int[] $tags
+     * @param string      $entityName
+     * @param int         $recordId
+     * @param User|null   $owner
      *
      * @return int
      */
-    public function deleteEntityTags(array $tagIds, $entityName, $recordId, User $owner = null)
+    public function deleteTaggingByParams(array $tags, $entityName, $recordId, User $owner = null)
     {
         $builder = $this->_em->createQueryBuilder();
         $builder
             ->delete('OroTagBundle:Tagging', 't')
             ->where('t.entityName = :entityName')
-            ->setParameter('entityName', $entityName)
             ->andWhere('t.recordId = :recordId')
+            ->setParameter('entityName', $entityName)
             ->setParameter('recordId', $recordId);
 
-        if (!empty($tagIds)) {
-            $builder->andWhere($builder->expr()->in('t.tag', $tagIds));
+        if (!empty($tags)) {
+            $builder->andWhere($builder->expr()->in('t.tag', $tags));
         }
 
         if (null !== $owner) {
@@ -91,29 +96,12 @@ class TagRepository extends EntityRepository
      *
      * @return array
      *
-     * @deprecated Use {@see getEntityTags} instead
+     * @deprecated Use {@see getTags} instead
      */
     public function getTagging($resource, $createdBy = null, $all = false, Organization $organization = null)
     {
         $recordId = TagManager::getEntityId($resource);
 
-        return $this->getEntityTags(ClassUtils::getClass($resource), $recordId, $createdBy, $all, $organization);
-    }
-
-    /**
-     * Remove tagging related to tags by params
-     *
-     * @param array|int     $tagIds
-     * @param string        $entityName
-     * @param int           $recordId
-     * @param int|null      $createdBy
-     *
-     * @return array
-     *
-     * @deprecated Use {@see deleteEntityTags} instead
-     */
-    public function deleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy = null)
-    {
-        return $this->deleteEntityTags($tagIds, $entityName, $recordId, $createdBy);
+        return $this->getTags(ClassUtils::getClass($resource), $recordId, $createdBy, $all, $organization);
     }
 }
