@@ -2,12 +2,8 @@
 
 namespace Oro\Component\EntitySerializer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 
 /**
  * @todo: This is draft implementation of the entity serializer.
@@ -125,6 +121,9 @@ class EntitySerializer
     /** @var DataTransformerInterface */
     protected $dataTransformer;
 
+    /** @var QueryFactory */
+    protected $queryFactory;
+
     /** @var FieldAccessor */
     protected $fieldAccessor;
 
@@ -135,32 +134,30 @@ class EntitySerializer
     protected $dataNormalizer;
 
     /**
-     * @param ManagerRegistry            $doctrine
-     * @param DataAccessorInterface      $dataAccessor
-     * @param DataTransformerInterface   $dataTransformer
-     * @param QueryHintResolverInterface $queryHintResolver
+     * @param DoctrineHelper           $doctrineHelper
+     * @param DataAccessorInterface    $dataAccessor
+     * @param DataTransformerInterface $dataTransformer
+     * @param QueryFactory             $queryFactory
+     * @param FieldAccessor            $fieldAccessor
+     * @param ConfigNormalizer         $configNormalizer
+     * @param DataNormalizer           $dataNormalizer
      */
     public function __construct(
-        ManagerRegistry $doctrine,
+        DoctrineHelper $doctrineHelper,
         DataAccessorInterface $dataAccessor,
         DataTransformerInterface $dataTransformer,
-        QueryHintResolverInterface $queryHintResolver
+        QueryFactory $queryFactory,
+        FieldAccessor $fieldAccessor,
+        ConfigNormalizer $configNormalizer,
+        DataNormalizer $dataNormalizer
     ) {
-        $this->doctrineHelper    = new DoctrineHelper($doctrine);
-        $this->dataAccessor      = $dataAccessor;
-        $this->dataTransformer   = $dataTransformer;
-        $this->queryHintResolver = $queryHintResolver;
-        $this->fieldAccessor     = new FieldAccessor($this->doctrineHelper, $this->dataAccessor);
-        $this->configNormalizer  = new ConfigNormalizer();
-        $this->dataNormalizer    = new DataNormalizer();
-    }
-
-    /**
-     * @param EntityFieldFilterInterface $entityFieldFilter
-     */
-    public function setEntityFieldFilter(EntityFieldFilterInterface $entityFieldFilter)
-    {
-        $this->fieldAccessor->setEntityFieldFilter($entityFieldFilter);
+        $this->doctrineHelper   = $doctrineHelper;
+        $this->dataAccessor     = $dataAccessor;
+        $this->dataTransformer  = $dataTransformer;
+        $this->queryFactory     = $queryFactory;
+        $this->fieldAccessor    = $fieldAccessor;
+        $this->configNormalizer = $configNormalizer;
+        $this->dataNormalizer   = $dataNormalizer;
     }
 
     /**
@@ -174,7 +171,7 @@ class EntitySerializer
         $config = $this->configNormalizer->normalizeConfig($config);
 
         $this->updateQuery($qb, $config);
-        $data = $this->getQuery($qb, $config)->getResult();
+        $data = $this->queryFactory->getQuery($qb, $config)->getResult();
         $data = $this->serializeItems((array)$data, $this->doctrineHelper->getRootEntityClass($qb), $config);
 
         return $this->dataNormalizer->normalizeData($data, $config);
@@ -220,7 +217,7 @@ class EntitySerializer
 
         $result = [];
         if ($useIdAsKey) {
-            $idFieldName = $this->getEntityIdFieldName($entityClass);
+            $idFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
             foreach ($entities as $entity) {
                 $id          = $this->dataAccessor->getValue($entity, $idFieldName);
                 $result[$id] = $this->serializeItem($entity, $entityClass, $config);
@@ -359,40 +356,21 @@ class EntitySerializer
     /**
      * @param array $entityIds
      * @param array $mapping
-     *
-     * @return QueryBuilder
-     */
-    protected function getToManyAssociationQueryBuilder($entityIds, $mapping)
-    {
-        $entityIdField = $this->getEntityIdFieldName($mapping['sourceEntity']);
-
-        $qb = $this->doctrineHelper->getEntityRepository($mapping['targetEntity'])
-            ->createQueryBuilder('r')
-            ->select(sprintf('e.%s as entityId', $entityIdField))
-            ->where(sprintf('e.%s IN (:ids)', $entityIdField))
-            ->setParameter('ids', $entityIds);
-        if ($mapping['mappedBy'] && $mapping['type'] === ClassMetadata::ONE_TO_MANY) {
-            $qb->innerJoin($mapping['sourceEntity'], 'e', 'WITH', sprintf('r.%s = e', $mapping['mappedBy']));
-        } else {
-            $qb->innerJoin($mapping['sourceEntity'], 'e', 'WITH', sprintf('r MEMBER OF e.%s', $mapping['fieldName']));
-        }
-
-        return $qb;
-    }
-
-    /**
-     * @param array $entityIds
-     * @param array $mapping
      * @param array $config
      *
      * @return array
      */
     protected function getRelatedItemsBindings($entityIds, $mapping, $config)
     {
-        $qb = $this->getToManyAssociationQueryBuilder($entityIds, $mapping)
-            ->addSelect(sprintf('r.%s as relatedEntityId', $this->getEntityIdFieldName($mapping['targetEntity'])));
+        $qb = $this->queryFactory->getToManyAssociationQueryBuilder($mapping, $entityIds)
+            ->addSelect(
+                sprintf(
+                    'r.%s as relatedEntityId',
+                    $this->doctrineHelper->getEntityIdFieldName($mapping['targetEntity'])
+                )
+            );
 
-        $rows = $this->getQuery($qb, $config)->getScalarResult();
+        $rows = $this->queryFactory->getQuery($qb, $config)->getScalarResult();
 
         $result = [];
         foreach ($rows as $row) {
@@ -460,12 +438,12 @@ class EntitySerializer
     {
         $entityClass = $mapping['targetEntity'];
         $bindings    = $this->getRelatedItemsBindings($entityIds, $mapping, $config);
-        $qb          = $this->doctrineHelper->getEntityRepository($entityClass)
-            ->createQueryBuilder('r')
-            ->where(sprintf('r.%s IN (:ids)', $this->getEntityIdFieldName($entityClass)))
-            ->setParameter('ids', $this->getRelatedItemsIds($bindings));
+        $qb          = $this->queryFactory->getRelatedItemsQueryBuilder(
+            $entityClass,
+            $this->getRelatedItemsIds($bindings)
+        );
         $this->updateQuery($qb, $config);
-        $data = $this->getQuery($qb, $config)->getResult();
+        $data = $this->queryFactory->getQuery($qb, $config)->getResult();
 
         $result = [];
         if (!empty($data)) {
@@ -491,7 +469,7 @@ class EntitySerializer
      */
     protected function loadRelatedItemsForSimpleEntity($entityIds, $mapping, $config)
     {
-        $qb = $this->getToManyAssociationQueryBuilder($entityIds, $mapping);
+        $qb = $this->queryFactory->getToManyAssociationQueryBuilder($mapping, $entityIds);
         foreach (ConfigUtil::getArrayValue($config, ConfigUtil::ORDER_BY) as $field => $order) {
             $qb->addOrderBy(sprintf('r.%s', $field), $order);
         }
@@ -500,7 +478,7 @@ class EntitySerializer
             $qb->addSelect(sprintf('r.%s', $field));
         }
 
-        $items = $this->getQuery($qb, $config)->getArrayResult();
+        $items = $this->queryFactory->getQuery($qb, $config)->getArrayResult();
 
         $result      = [];
         $entityClass = $mapping['targetEntity'];
@@ -530,7 +508,7 @@ class EntitySerializer
      */
     protected function applyRelatedData(array &$result, $entityClass, $relatedData)
     {
-        $entityIdFieldName = $this->getEntityIdFieldName($entityClass);
+        $entityIdFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
         foreach ($result as &$resultItem) {
             if (!array_key_exists($entityIdFieldName, $resultItem)) {
                 throw new \RuntimeException(
@@ -577,7 +555,7 @@ class EntitySerializer
     protected function getEntityIds($entities, $entityClass)
     {
         $ids         = [];
-        $idFieldName = $this->getEntityIdFieldName($entityClass);
+        $idFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
         foreach ($entities as $entity) {
             $id = $this->dataAccessor->getValue($entity, $idFieldName);
             if (!isset($ids[$id])) {
@@ -586,33 +564,6 @@ class EntitySerializer
         }
 
         return array_values($ids);
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return string
-     */
-    protected function getEntityIdFieldName($entityClass)
-    {
-        return $this->doctrineHelper->getEntityMetadata($entityClass)->getSingleIdentifierFieldName();
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param array        $config
-     *
-     * @return Query
-     */
-    protected function getQuery(QueryBuilder $qb, $config)
-    {
-        $query = $qb->getQuery();
-        $this->queryHintResolver->resolveHints(
-            $query,
-            ConfigUtil::getArrayValue($config, ConfigUtil::HINTS)
-        );
-
-        return $query;
     }
 
     /**
