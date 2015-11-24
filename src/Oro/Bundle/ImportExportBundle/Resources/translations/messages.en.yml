@@ -14,6 +14,7 @@ oro:
             full.label:     "Export Fields"
             header.label:   "Column Name"
             identity.label: "Use as Identity Field"
+            identity_when_empty.label: "Use as Identity Field even if empty"
             order.label:    "Column Position"
             
         import:
