@@ -94,16 +94,9 @@ services:
         public: false
         arguments:
             - @doctrine
-            - @oro_api.entity_field_filter
             - @oro_api.entity_accessor
             - @oro_api.entity_data_transformer
             - @oro_entity.query_hint_resolver
-
-    oro_api.entity_field_filter:
-        class: Oro\Bundle\EntityExtendBundle\Serializer\ExtendEntityFieldFilter
-        public: false
-        arguments:
-            - @oro_entity_config.config_manager
 
     oro_api.entity_accessor:
         class: Oro\Component\EntitySerializer\EntityDataAccessor

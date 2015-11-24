@@ -136,14 +136,12 @@ class EntitySerializer
 
     /**
      * @param ManagerRegistry            $doctrine
-     * @param EntityFieldFilterInterface $entityFieldFilter
      * @param DataAccessorInterface      $dataAccessor
      * @param DataTransformerInterface   $dataTransformer
      * @param QueryHintResolverInterface $queryHintResolver
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        EntityFieldFilterInterface $entityFieldFilter,
         DataAccessorInterface $dataAccessor,
         DataTransformerInterface $dataTransformer,
         QueryHintResolverInterface $queryHintResolver
@@ -152,13 +150,17 @@ class EntitySerializer
         $this->dataAccessor      = $dataAccessor;
         $this->dataTransformer   = $dataTransformer;
         $this->queryHintResolver = $queryHintResolver;
-        $this->fieldAccessor     = new FieldAccessor(
-            $this->doctrineHelper,
-            $entityFieldFilter,
-            $this->dataAccessor
-        );
+        $this->fieldAccessor     = new FieldAccessor($this->doctrineHelper, $this->dataAccessor);
         $this->configNormalizer  = new ConfigNormalizer();
         $this->dataNormalizer    = new DataNormalizer();
+    }
+
+    /**
+     * @param EntityFieldFilterInterface $entityFieldFilter
+     */
+    public function setEntityFieldFilter(EntityFieldFilterInterface $entityFieldFilter)
+    {
+        $this->fieldAccessor->setEntityFieldFilter($entityFieldFilter);
     }
 
     /**

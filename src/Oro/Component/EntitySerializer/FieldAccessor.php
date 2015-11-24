@@ -9,25 +9,28 @@ class FieldAccessor
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityFieldFilterInterface */
-    protected $entityFieldFilter;
-
     /** @var DataAccessorInterface */
     protected $dataAccessor;
 
+    /** @var EntityFieldFilterInterface */
+    protected $entityFieldFilter;
+
     /**
-     * @param DoctrineHelper             $doctrineHelper
-     * @param EntityFieldFilterInterface $entityFieldFilter
-     * @param DataAccessorInterface      $dataAccessor
+     * @param DoctrineHelper        $doctrineHelper
+     * @param DataAccessorInterface $dataAccessor
      */
-    public function __construct(
-        DoctrineHelper $doctrineHelper,
-        EntityFieldFilterInterface $entityFieldFilter,
-        DataAccessorInterface $dataAccessor
-    ) {
-        $this->doctrineHelper    = $doctrineHelper;
+    public function __construct(DoctrineHelper $doctrineHelper, DataAccessorInterface $dataAccessor)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->dataAccessor   = $dataAccessor;
+    }
+
+    /**
+     * @param EntityFieldFilterInterface $entityFieldFilter
+     */
+    public function setEntityFieldFilter(EntityFieldFilterInterface $entityFieldFilter)
+    {
         $this->entityFieldFilter = $entityFieldFilter;
-        $this->dataAccessor      = $dataAccessor;
     }
 
     /**
@@ -186,6 +189,8 @@ class FieldAccessor
             return false;
         }
 
-        return $this->entityFieldFilter->isApplicableField($entityClass, $field);
+        return null !== $this->entityFieldFilter
+            ? $this->entityFieldFilter->isApplicableField($entityClass, $field)
+            : true;
     }
 }

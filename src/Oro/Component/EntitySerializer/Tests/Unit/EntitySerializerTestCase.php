@@ -68,11 +68,11 @@ abstract class EntitySerializerTestCase extends OrmTestCase
 
         $this->serializer = new EntitySerializer(
             $doctrine,
-            $this->entityFieldFilter,
             new EntityDataAccessor(),
             new EntityDataTransformer($this->container),
             $queryHintResolver
         );
+        $this->serializer->setEntityFieldFilter($this->entityFieldFilter);
     }
 
     /**

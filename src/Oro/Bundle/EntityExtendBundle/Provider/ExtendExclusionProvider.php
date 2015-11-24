@@ -70,6 +70,12 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
 
         return
             !ExtendHelper::isFieldAccessible($extendFieldConfig)
-            || $this->configManager->isHiddenModel($metadata->name, $associationName);
+            || $this->configManager->isHiddenModel($metadata->name, $associationName)
+            || (
+                $extendFieldConfig->has('target_entity')
+                && !ExtendHelper::isEntityAccessible(
+                    $this->configManager->getEntityConfig('extend', $extendFieldConfig->get('target_entity'))
+                )
+            );
     }
 }
