@@ -172,6 +172,35 @@ class ActivityManager
     }
 
     /**
+     * Removes all activity entity associations and associates with the given target entities
+     * If some target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object|object[]   $targetEntities
+     *
+     * @return bool TRUE if at least one association was changed; otherwise, FALSE
+     */
+    public function setActivityTargets(ActivityInterface $activityEntity, array $targetEntities)
+    {
+        $hasChanges = false;
+
+        $oldTargetEntities = $activityEntity->getActivityTargetEntities();
+
+        foreach ($oldTargetEntities as $oldTargetEntity) {
+            if (!in_array($oldTargetEntity, $targetEntities)) {
+                $this->removeActivityTarget($activityEntity, $oldTargetEntity);
+                $hasChanges = true;
+            }
+        }
+
+        if ($this->addActivityTargets($activityEntity, $targetEntities)) {
+            $hasChanges = true;
+        }
+
+        return $hasChanges;
+    }
+
+    /**
      * Removes an association of the given target entity with the activity entity
      * If the target entity has no association with the given activity entity it will be skipped
      *

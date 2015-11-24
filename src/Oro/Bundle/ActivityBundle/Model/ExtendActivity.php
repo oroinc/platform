@@ -69,4 +69,17 @@ trait ExtendActivity
     {
         return $this;
     }
+
+    /**
+     * Gets full target entities list associated with activity
+     * Please use this method carefully because of the performance reasons
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @return object[]
+     */
+    public function getActivityTargetEntities()
+    {
+        return [];
+    }
 }

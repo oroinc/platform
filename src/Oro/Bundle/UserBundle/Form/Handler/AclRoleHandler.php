@@ -162,7 +162,7 @@ class AclRoleHandler
      */
     public function createForm(AbstractRole $role, $className = null)
     {
-        $this->loadPrivilegeConfigPermissions(false, $className);
+        $this->loadPrivilegeConfigPermissions($className);
 
         $this->form = $this->createRoleFormInstance($role, $this->privilegeConfig);
 
@@ -180,7 +180,11 @@ class AclRoleHandler
         }
 
         if ($className) {
+            // leave only fields privileges config
             $this->privilegeConfig = array_intersect_key($this->privilegeConfig, array_flip(['field']));
+        } else {
+            // unset field privileges config
+            unset($this->privilegeConfig['field']);
         }
     }
 
@@ -218,13 +222,8 @@ class AclRoleHandler
 
                 return true;
             }
-        } elseif (empty($className)) {
-            $this->setRolePrivileges($role);
         } else {
-            $privileges = $this->getRolePrivileges($role, $className);
-
-            $sortedPrivileges = $this->filterPrivileges($privileges, $this->privilegeConfig['field']['types']);
-            $this->form->get('field')->setData($sortedPrivileges);
+            $this->setRolePrivileges($role, $className);
         }
 
         return false;

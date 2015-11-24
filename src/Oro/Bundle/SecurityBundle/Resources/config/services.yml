@@ -87,13 +87,14 @@ parameters:
 
     oro_security.placeholder.filter.class:                     Oro\Bundle\SecurityBundle\Placeholder\PlaceholderFilter
 
-    oro_security.workflow.action.remove_ace_share_scope.class: Oro\Bundle\SecurityBundle\Model\Action\RemoveAceByShareScopeAction
     oro_security.ace.query.manager.class:                      Oro\Bundle\SecurityBundle\Model\Action\AceQueryManager
 
     oro_security.datasource.share.class:                       Oro\Bundle\SecurityBundle\Extension\ShareDatasource
     oro_security.event_listener.share_grid_listener.class:     Oro\Bundle\SecurityBundle\EventListener\Datagrid\ShareGridListener
     oro_security_search.index.class:                           Oro\Bundle\SecurityBundle\Search\SecurityIndexer
     oro_security.formatter.share_formatter.class:              Oro\Bundle\SecurityBundle\Formatter\ShareFormatter
+
+    oro_security.listener.entity_config.class:                 Oro\Bundle\SecurityBundle\EventListener\EntityConfigListener
 
 services:
     oro_security.security_facade:
@@ -552,8 +553,7 @@ services:
     oro_security.listener.context_listener:
         class: %oro_security.listener.context_listener.class%
         arguments:
-            - @security.token_storage
-            - @oro_organization.organization_manager
+            - @service_container
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
@@ -651,6 +651,8 @@ services:
             - @oro_security.entity_security_metadata_provider
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.owner.ownership_decision_maker.chain
+        calls:
+            - [setEntityOwnerAccessor, [@oro_security.owner.entity_owner_accessor]]
         tags:
             - { name: oro_security.acl.extension, priority: 15 } # should be before EntityAclExtension
 
@@ -718,16 +720,6 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
 
-    oro_security.workflow.action.remove_ace_share_scope:
-        class: %oro_security.workflow.action.remove_ace_share_scope.class%
-        arguments:
-            - @oro_workflow.context_accessor
-            - @oro_security.ace.query.manager
-            - @doctrine.orm.entity_manager
-            - @security.acl.cache.doctrine
-        tags:
-            - { name: oro_workflow.action, alias: remove_ace_share_scope }
-
     oro_security.datasource.share:
         class: %oro_security.datasource.share.class%
         arguments:
@@ -760,3 +752,12 @@ services:
         arguments:
             - @translator
             - @oro_attachment.manager
+
+    oro_security.listener.entity_config:
+        class: %oro_security.listener.entity_config.class%
+        arguments:
+            - @oro_security.ace.query.manager
+            - @doctrine
+            - @security.acl.cache.doctrine
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlushConfig }

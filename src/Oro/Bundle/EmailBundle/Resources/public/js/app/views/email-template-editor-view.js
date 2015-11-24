@@ -86,11 +86,15 @@ define(function(require) {
 
         _onTypeChange: function(e) {
             if (this.options.hasWysiwyg) {
-                var type = $(e.target).val();
-                if (type === 'txt') {
+                var target = $(e.target);
+                if (!target.is(':checked')) {
+                    return;
+                }
+
+                if (target.val() === 'txt') {
                     this._switchWysiwygEditor(false);
                 }
-                if (type === 'html') {
+                if (target.val() === 'html') {
                     this._switchWysiwygEditor(true);
                     this._onEditorBlur();
                 }

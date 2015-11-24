@@ -2,10 +2,10 @@ define([
     'oroui/js/app/controllers/base/controller'
 ], function(BaseController) {
     'use strict';
-
     BaseController.loadBeforeAction([
         'jquery',
-        'orosidebar/js/app/components/sidebar-component'
+        'orosidebar/js/app/components/sidebar-component',
+        'ready!dom'
     ], function($, SidebarComponent) {
         $('.sidebar[data-page-component-options]').each(function(i, elem) {
             BaseController.addToReuse('emailNotification' + i, {
