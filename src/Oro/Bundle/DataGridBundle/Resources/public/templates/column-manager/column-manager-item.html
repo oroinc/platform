@@ -1,16 +1,16 @@
 <td class="title-cell">
     <label for="column-<%= cid  %>"><%= label %></label>
 </td>
-<td class="visibility-cell">
-    <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
-        <% if (obj.disabledVisibilityChange) {%>disabled<% } %>
-        <% if (obj.renderable) {%>checked<% } %>/>
-</td>
 <td class="sort-cell">
     <% if (!_.isMobile()) { %>
-    <span title="Move column"><i class="icon-list handle"></i></span>
+    <span title="Move column"><i class="icon-resize-vertical handle"></i></span>
     <% } else { %>
     <span class="btn move-up" data-role="moveUp" title="Move column up"><i class="icon-chevron-up"></i></span>
     <span class="btn move-down" data-role="moveDown" title="Move column down"><i class="icon-chevron-down"></i></span>
     <% } %>
+</td>
+<td class="visibility-cell">
+    <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
+    <% if (disabledVisibilityChange) {%>disabled<% } %>
+    <% if (renderable) {%>checked<% } %>/>
 </td>
