@@ -2,120 +2,63 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerView;
-    var $ = require('jquery');
     var _ = require('underscore');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var ColumnManagerItemView = require('./column-manager-item-view');
+    var BaseView = require('oroui/js/app/views/base/view');
 
-    ColumnManagerView = BaseCollectionView.extend({
+    ColumnManagerView = BaseView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager.html'),
-        itemView: ColumnManagerItemView,
-
+        autoRender: true,
         className: 'dropdown-menu',
-        listSelector: 'tbody',
-
         events: {
-            'click tbody tr [data-role=moveUp]': 'onMoveUp',
-            'click tbody tr [data-role=moveDown]': 'onMoveDown'
+            'click [data-role="column-manager-select-all"]': 'onSelectAll'
         },
 
-        /**
-         * Number that is used to normalize order value
-         *
-         * @type {number}
-         */
-        orderShift: 0,
+        listen: {
+            'change:renderable collection': 'onRenderableChange'
+        },
 
-        /**
-         * @inheritDoc
-         */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['orderShift']));
-
-            ColumnManagerView.__super__.initialize.apply(this, arguments);
+            ColumnManagerView.__super__.initialize.call(this, options);
+            this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);
+            // to handle renderable change at once for multiple changes
+            this.onRenderableChange = _.debounce(this.onRenderableChange, 0);
+            this.listenTo(options.columnFilterModel, 'change', this.updateView);
         },
 
-        /**
-         * @inheritDoc
-         * @inheritDoc
-         */
         render: function() {
-            ColumnManagerView.__super__.render.apply(this, arguments);
-            this.initSorting();
+            ColumnManagerView.__super__.render.call(this);
+            this.updateView();
             return this;
         },
 
         /**
-         * Initializes sorting widget for root element
-         *  - allows to reorder columns
+         * Update filter view from its state
          */
-        initSorting: function() {
-            this.$('tbody').sortable({
-                cursor: 'move',
-                delay: 25,
-                opacity: 0.7,
-                revert: 10,
-                axis: 'y',
-                containment: this.$('tbody'),
-                items: 'tr',
-                tolerance: 'pointer',
-                helper: function(e, ui) {
-                    ui.children().each(function() {
-                        $(this).width($(this).width());
-                    });
-                    return ui;
-                },
-                stop: _.bind(this.onReorder, this)
-            }).disableSelection();
+        updateView: function() {
+            var models = this._getFilteredModels();
+            var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable');}));
+            this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
         },
 
         /**
-         * Reorders columns elements (moves the element up)
-         *
-         * @param {jQuery.Event} e
+         * Handles renderable change of column models
+         *  - updates the view
          */
-        onMoveUp: function(e) {
-            var $elem = this.$(e.currentTarget).closest('tr');
-            var $prev = $elem.prev();
-            if ($prev.length) {
-                $elem.insertBefore($prev);
-                this.onReorder();
-            }
+        onRenderableChange: function() {
+            this.updateView();
         },
 
-        /**
-         * Reorders columns elements (moves the element down)
-         *
-         * @param {jQuery.Event} e
-         */
-        onMoveDown: function(e) {
-            var $elem = this.$(e.currentTarget).closest('tr');
-            var $next = $elem.next();
-            if ($next.length) {
-                $elem.insertAfter($next);
-                this.onReorder();
-            }
+        onSelectAll: function(e) {
+            e.preventDefault();
+            _.each(this._getFilteredModels(), function(model) {
+                model.set('renderable', true);
+            });
         },
 
-        /**
-         * Handles sorting change event and update order attribute for each column
-         */
-        onReorder: function() {
-            var reordered = false;
-            var columnsElements = this.$('tbody tr').toArray();
-
-            _.each(this.subviews, function(view) {
-                var order = columnsElements.indexOf(view.el) + this.orderShift;
-                if (view.model.get('order') !== order) {
-                    reordered = true;
-                    view.model.set('order', order);
-                }
-            }, this);
-
-            if (reordered) {
-                this.collection.sort();
-                this.trigger('reordered');
-            }
+        _getFilteredModels: function() {
+            return _.filter(this.collection.filter(this.filterer), function(model) {
+                return !model.get('disabledVisibilityChange');
+            });
         }
     });
 

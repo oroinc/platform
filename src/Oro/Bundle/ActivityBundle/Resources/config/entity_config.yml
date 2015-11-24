@@ -16,6 +16,12 @@ oro_entity_config:
                             association_class: activity
                             tooltip:        oro.activity.entity_config.activity.entity.items.activities.tooltip
 
+                # target entity classes whose activities will be shown in current entity
+                # if entity one has relation with entity two and for both enabled activity
+                # we can configure entity one using this option for show activities from related entity two
+                inheritance_targets: # array of strings
+                    options: []
+
                 # this attribute can be used to prohibit changing activity state (no matter whether
                 # it is enabled or not) for the entity
                 # if TRUE than no one activity state can be changed
