@@ -24,15 +24,15 @@ class TagsExtension extends AbstractExtension
     protected $entityClassResolver;
 
     /** @var TagManager */
-    protected $manager;
+    protected $tagManager;
 
     /**
-     * @param TagManager          $manager
+     * @param TagManager          $tagManager
      * @param EntityClassResolver $resolver
      */
-    public function __construct(TagManager $manager, EntityClassResolver $resolver)
+    public function __construct(TagManager $tagManager, EntityClassResolver $resolver)
     {
-        $this->manager             = $manager;
+        $this->tagManager          = $tagManager;
         $this->entityClassResolver = $resolver;
     }
 
@@ -41,8 +41,9 @@ class TagsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)
-        && $this->manager->isEntityTaggable($this->getEntityClassName($config));
+        return
+            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)
+            && $this->tagManager->isTaggable($this->getEntityClassName($config));
     }
 
     /**
@@ -103,9 +104,9 @@ class TagsExtension extends AbstractExtension
         );
         //@TODO Should we apply acl?
         $tags = array_reduce(
-            $this->manager->getTagsByEntityIds($this->getEntityClassName($config), $ids),
+            $this->tagManager->getTagsByEntityIds($this->getEntityClassName($config), $ids),
             function ($entitiesTags, $item) {
-                $entitiesTags[$item['recordId']][] = $item;
+                $entitiesTags[$item['entityId']][] = $item;
 
                 return $entitiesTags;
             },

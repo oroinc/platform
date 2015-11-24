@@ -77,10 +77,10 @@ class TagManager
     }
 
     /**
-     * @param string $entityClassName
-     * @param array  $ids
+     * @param @param string $entityClassName The FQCN of the entity
+     * @param array $ids
      *
-     * @return array
+     * @return array [id, name, entityId]
      */
     public function getTagsByEntityIds($entityClassName, array $ids)
     {
@@ -90,46 +90,47 @@ class TagManager
     }
 
     /**
-     * @param $class
      * Checks if entity taggable
      * Entity is taggable if it implements Taggable interface or it configured as taggable.
      *
-     * @param string|object $className
+     * @param string|object $entity
      *
      * @return bool
      */
-    public function isTaggable($className)
+    public function isTaggable($entity)
     {
         return
-            $this->tagConfigProvider->getConfig($className)->is('enabled') ||
-            $this->isImplementsTaggable($className);
+            $this->isImplementsTaggable($entity) ||
+            ($this->tagConfigProvider->hasConfig($entity) &&
+                $this->tagConfigProvider->getConfig($entity)->is('enabled')
+            );
     }
 
     /**
      * Checks if entity immutable
      * For entities that implements Taggable interface tags are always enabled.
      *
-     * @param object|string $className
+     * @param object|string $entity
      *
      * @return bool
      */
-    public function isImmutable($className)
+    public function isImmutable($entity)
     {
         return
-            $this->tagConfigProvider->getConfig($className)->is('immutable') ||
-            $this->isImplementsTaggable($className);
+            $this->tagConfigProvider->getConfig($entity)->is('immutable') ||
+            $this->isImplementsTaggable($entity);
     }
 
     /**
      * Checks if entity class implements Taggable interface
      *
-     * @param object|string $className
+     * @param object|string $entity
      *
      * @return bool
      */
-    public function isImplementsTaggable($className)
+    public function isImplementsTaggable($entity)
     {
-        return is_a($className, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
+        return is_a($entity, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
     }
 
     /**

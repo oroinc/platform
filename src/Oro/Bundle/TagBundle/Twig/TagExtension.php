@@ -7,11 +7,12 @@ use Oro\Bundle\TagBundle\Entity\TagManager;
 class TagExtension extends \Twig_Extension
 {
     /** @var TagManager */
-    protected $manager;
+    protected $tagManager;
 
-    public function __construct(TagManager $manager)
+    /** @param TagManager $tagManager */
+    public function __construct(TagManager $tagManager)
     {
-        $this->manager = $manager;
+        $this->tagManager = $tagManager;
     }
 
     /**
@@ -34,7 +35,7 @@ class TagExtension extends \Twig_Extension
      */
     public function getList($entity)
     {
-        return $this->manager->getPreparedArray($entity);
+        return $this->tagManager->getPreparedArray($entity);
     }
 
     /**
@@ -52,6 +53,6 @@ class TagExtension extends \Twig_Extension
      */
     public function isTaggable($entity)
     {
-        return $this->manager->isTaggable($entity);
+        return $this->tagManager->isTaggable($entity);
     }
 }
