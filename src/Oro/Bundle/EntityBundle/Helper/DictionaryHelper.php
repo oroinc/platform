@@ -28,15 +28,14 @@ class DictionaryHelper
     }
 
     /**
-     * @param ClassMetadata  $doctrineMetadata
-     * @param EntityMetadata $entityMetadata
+     * @param ClassMetadata $doctrineMetadata
+     * @param EntityMetadata|null $entityMetadata
      *
      * @return array
-     * @throws \LogicException
      */
-    public function getSearchFields(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
+    public function getSearchFields(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata = null)
     {
-        if (isset($entityMetadata->defaultValues['dictionary']['search_fields'])) {
+        if ($entityMetadata && isset($entityMetadata->defaultValues['dictionary']['search_fields'])) {
             $searchFields = $entityMetadata->defaultValues['dictionary']['search_fields'];
             if ($searchFields) {
                 return $searchFields;
