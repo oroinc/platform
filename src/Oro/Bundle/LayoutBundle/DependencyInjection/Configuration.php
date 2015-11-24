@@ -112,6 +112,10 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $node        = $treeBuilder->root('themes');
 
+        $dataTreeBuilder = new TreeBuilder();
+        $dataNode = $dataTreeBuilder->root('data');
+        $dataNode->info('Layout additional data')->end();
+
         $node
             ->useAttributeAsKey('theme-identifier')
             ->normalizeKeys(false)
@@ -145,12 +149,11 @@ class Configuration implements ConfigurationInterface
                         ->prototype('scalar')->end()
                         ->cannotBeEmpty()
                     ->end()
-                    ->arrayNode('data')
-                        ->prototype('array')
-                        ->info('Layout additional data')
-                    ->end()
+                    ->append($dataNode)
                 ->end()
             ->end();
+
+        $this->appendDataNodes($dataNode);
 
         $parentNode
             ->append($node)
@@ -163,5 +166,38 @@ class Configuration implements ConfigurationInterface
                     ->info('The identifier of the theme that should be used by default')
                 ->end()
             ->end();
+    }
+
+    /**
+     * @param ArrayNodeDefinition $dataNode
+     */
+    protected function appendDataNodes($dataNode)
+    {
+        $treeBuilder = new TreeBuilder();
+        $assetsNode = $treeBuilder->root('assets');
+
+        $assetsNode
+            ->useAttributeAsKey('asset-identifier')
+            ->normalizeKeys(false)
+            ->prototype('array')
+                ->children()
+                    ->arrayNode('inputs')
+                        ->info('Input assets list')
+                        ->prototype('scalar')->end()
+                        ->isRequired()
+                    ->end()
+                    ->arrayNode('filters')
+                        ->info('Filters to manipulate input assets')
+                        ->prototype('scalar')->end()
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('output')
+                        ->info('Output asset')
+                        ->isRequired()
+                    ->end()
+                ->end()
+            ->end();
+
+        $dataNode->append($assetsNode);
     }
 }
