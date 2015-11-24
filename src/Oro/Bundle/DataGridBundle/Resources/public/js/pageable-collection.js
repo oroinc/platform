@@ -879,7 +879,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @return {PageableCollection}
          */
         clone: function() {
-            var newCollection = new PageableCollection(this.toJSON(), this.options);
+            var newCollection = new PageableCollection(this.toJSON(), tools.deepClone(this.options));
             newCollection.state = tools.deepClone(this.state);
             newCollection.initialState = tools.deepClone(this.initialState);
             return newCollection;
@@ -1034,8 +1034,11 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                     r = t;
                 }
 
-                if (isNaN(l) && isNaN(r)) {
-                    return String(l).localeCompare(String(r));
+                if (isNaN(l)) {
+                    l = String(l).toLowerCase();
+                }
+                if (isNaN(r)) {
+                    r = String(r).toLowerCase();
                 }
 
                 if (l === r) {
