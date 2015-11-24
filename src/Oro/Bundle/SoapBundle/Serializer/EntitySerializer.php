@@ -37,8 +37,11 @@ class EntitySerializer extends BaseEntitySerializer
         QueryHintResolverInterface $queryHintResolver
     ) {
         $doctrineHelper = new DoctrineHelper($doctrine);
-        $fieldAccessor  = new FieldAccessor($doctrineHelper, $dataAccessor);
-        $fieldAccessor->setEntityFieldFilter(new ExtendEntityFieldFilter($configManager));
+        $fieldAccessor  = new FieldAccessor(
+            $doctrineHelper,
+            $dataAccessor,
+            new ExtendEntityFieldFilter($configManager)
+        );
         parent::__construct(
             $doctrineHelper,
             $dataAccessor,

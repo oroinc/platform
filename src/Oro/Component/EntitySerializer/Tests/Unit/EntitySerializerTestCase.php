@@ -71,10 +71,9 @@ abstract class EntitySerializerTestCase extends OrmTestCase
 
         $queryHintResolver = $this->getMock('Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface');
 
-        $doctrineHelper = new DoctrineHelper($doctrine);
-        $dataAccessor   = new EntityDataAccessor();
-        $fieldAccessor  = new FieldAccessor($doctrineHelper, $dataAccessor);
-        $fieldAccessor->setEntityFieldFilter($this->entityFieldFilter);
+        $doctrineHelper   = new DoctrineHelper($doctrine);
+        $dataAccessor     = new EntityDataAccessor();
+        $fieldAccessor    = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);
         $this->serializer = new EntitySerializer(
             $doctrineHelper,
             $dataAccessor,
