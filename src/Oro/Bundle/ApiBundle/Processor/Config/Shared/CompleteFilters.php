@@ -36,7 +36,7 @@ class CompleteFilters implements ProcessorInterface
             return;
         }
 
-        $fields = ConfigUtil::getFields($filters);
+        $fields = ConfigUtil::getArrayValue($filters, ConfigUtil::FIELDS);
 
         if (ConfigUtil::isExcludeAll($filters)) {
             $fields = $this->removeExclusions($fields);

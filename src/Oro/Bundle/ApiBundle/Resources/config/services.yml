@@ -86,6 +86,9 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
         public: false
 
+    oro_api.virtual_field_provider:
+        class: Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
+
     oro_api.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer
         public: false

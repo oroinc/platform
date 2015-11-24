@@ -68,6 +68,108 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                     'id'     => null,
                     'name'   => null,
                     'groups' => [
+                        'fields' => [
+                            'isException' => [
+                                'exclude' => true
+                            ]
+                        ]
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'     => 1,
+                    'name'   => 'user_name',
+                    'groups' => [
+                        [
+                            'id'     => 10,
+                            'name'   => 'group_name1',
+                            'label'  => 'group_label1',
+                            'public' => false,
+                        ],
+                        [
+                            'id'     => 20,
+                            'name'   => 'group_name2',
+                            'label'  => 'group_label2',
+                            'public' => true,
+                        ],
+                    ],
+                ]
+            ],
+            $result
+        );
+    }
+
+    /**
+     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
+     */
+    public function testManyToManyUnidirectionalDeprecated()
+    {
+        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
+            . ' FROM oro_test_serializer_user o0_'
+            . ' WHERE o0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'user_name',
+                    'category_name_2' => 'category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $this->setQueryExpectationAt(
+            $conn,
+            1,
+            'SELECT o0_.id AS id_0,'
+            . ' o1_.id AS id_1, o1_.name AS name_2, o1_.label AS label_3, o1_.public AS public_4'
+            . ' FROM oro_test_serializer_group o1_'
+            . ' INNER JOIN oro_test_serializer_user o0_ ON (EXISTS ('
+            . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
+            . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
+            . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)))'
+            . ' WHERE o0_.id IN (?)',
+            [
+                [
+                    'id_0'     => 1,
+                    'id_1'     => 10,
+                    'name_2'   => 'group_name1',
+                    'label_3'  => 'group_label1',
+                    'public_4' => 0,
+                ],
+                [
+                    'id_0'     => 1,
+                    'id_1'     => 20,
+                    'name_2'   => 'group_name2',
+                    'label_3'  => 'group_label2',
+                    'public_4' => true,
+                ],
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'     => null,
+                    'name'   => null,
+                    'groups' => [
                         'excluded_fields' => ['isException']
                     ],
                 ],
@@ -174,7 +276,10 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testManyToManyBidirectionalIdOnlyAndOrderBy()
+    /**
+     * @deprecated since 1.9. Use 'order_by' attribute instead of 'orderBy'
+     */
+    public function testManyToManyBidirectionalIdOnlyAndDeprecatedOrderBy()
     {
         $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -231,6 +336,80 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                     'products' => [
                         'fields'  => 'id',
                         'orderBy' => ['id' => 'DESC']
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'       => 1,
+                    'name'     => 'user_name',
+                    'products' => [20, 10]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testManyToManyBidirectionalIdOnlyAndOrderBy()
+    {
+        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
+            . ' FROM oro_test_serializer_user o0_'
+            . ' WHERE o0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'user_name',
+                    'category_name_2' => 'category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->setQueryExpectationAt(
+            $conn,
+            1,
+            'SELECT o0_.id AS id_0,'
+            . ' o1_.id AS id_1'
+            . ' FROM oro_test_serializer_product o1_'
+            . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
+            . ' WHERE o0_.id IN (?)'
+            . ' ORDER BY o1_.id DESC',
+            [
+                [
+                    'id_0' => 1,
+                    'id_1' => 20,
+                ],
+                [
+                    'id_0' => 1,
+                    'id_1' => 10,
+                ],
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => null,
+                    'name'     => null,
+                    'products' => [
+                        'fields'   => 'id',
+                        'order_by' => ['id' => 'DESC']
                     ],
                 ],
             ]

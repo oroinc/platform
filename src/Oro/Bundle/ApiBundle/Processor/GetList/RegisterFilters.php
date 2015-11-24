@@ -45,7 +45,7 @@ class RegisterFilters implements ProcessorInterface
             );
         }
 
-        $fields  = ConfigUtil::getFields($configOfFilters);
+        $fields  = ConfigUtil::getArrayValue($configOfFilters, ConfigUtil::FIELDS);
         $filters = $context->getFilters();
         foreach ($fields as $field => $fieldConfig) {
             if ($filters->has($field)) {
