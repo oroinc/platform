@@ -91,31 +91,45 @@ class TagManager
 
     /**
      * @param $class
+     * Checks if entity taggable
+     * Entity is taggable if it implements Taggable interface or it configured as taggable.
+     *
+     * @param string|object $className
      *
      * @return bool
      */
-    public function isEntityTaggable($class)
+    public function isTaggable($className)
     {
-        if (is_a($class, 'Oro\Bundle\TagBundle\Entity\Taggable', true)) {
-            return true;
-        }
-
-        return $this->tagConfigProvider->hasConfig($class)
-            && $this->tagConfigProvider->getConfig($class)->is('enabled');
+        return
+            $this->tagConfigProvider->getConfig($className)->is('enabled') ||
+            $this->isImplementsTaggable($className);
     }
 
     /**
-     * Checks if entity taggable
+     * Checks if entity immutable
+     * For entities that implements Taggable interface tags are always enabled.
      *
-     * @param object $entity
+     * @param object|string $className
      *
      * @return bool
      */
-    public function isTaggable($entity)
+    public function isImmutable($className)
     {
         return
-            $this->tagConfigProvider->getConfig($entity)->is('enabled') ||
-            $entity instanceof Taggable;
+            $this->tagConfigProvider->getConfig($className)->is('immutable') ||
+            $this->isImplementsTaggable($className);
+    }
+
+    /**
+     * Checks if entity class implements Taggable interface
+     *
+     * @param object|string $className
+     *
+     * @return bool
+     */
+    public function isImplementsTaggable($className)
+    {
+        return is_a($className, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
     }
 
     /**
