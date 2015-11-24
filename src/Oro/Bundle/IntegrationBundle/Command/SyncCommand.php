@@ -104,22 +104,23 @@ class SyncCommand extends AbstractSyncCronCommand
         $entityManager = $this->getService('doctrine.orm.entity_manager');
         $repository = $entityManager->getRepository('OroIntegrationBundle:Channel');
         $logger = new OutputLogger($output);
-        $exitCode = self::STATUS_SUCCESS;
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
+        $exitCode = self::STATUS_SUCCESS;
 
         if ($this->isJobRunning($integrationId)) {
             $logger->warning('Job already running. Terminating....');
-
             return self::STATUS_SUCCESS;
         }
 
         if ($integrationId) {
             $integration = $repository->getOrLoadById($integrationId);
+
             if (!$integration) {
                 $logger->critical(sprintf('Integration with given ID "%d" not found', $integrationId));
 
                 return self::STATUS_FAILED;
             }
+
             $integrations = [$integration];
         } else {
             $integrations = $repository->getConfiguredChannelsForSync(null, true);
@@ -129,20 +130,16 @@ class SyncCommand extends AbstractSyncCronCommand
         foreach ($integrations as $integration) {
             try {
                 $logger->info(sprintf('Run sync for "%s" integration.', $integration->getName()));
-
                 $this->updateToken($integration);
                 if ($batchSize) {
                     $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
                 }
-
                 $processor = $this->getSyncProcessor($integration, $logger);
                 $result = $processor->process($integration, $connector, $connectorParameters);
                 $exitCode = $result ?: self::STATUS_FAILED;
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
-
                 $exitCode = self::STATUS_FAILED;
-
                 continue;
             }
         }

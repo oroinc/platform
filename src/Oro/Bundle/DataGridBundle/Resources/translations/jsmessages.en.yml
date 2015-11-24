@@ -73,8 +73,17 @@ oro:
         column_manager:
             title: "Table Settings"
             tooltip: "Use drag and drop to sort items"
+            select_all: "Select All"
+            filter:
+                all: 'All'
+                selected: 'Selected'
+                select_all: 'Select All'
+                search_placeholder: "Quick Search"
+                clear_search_tooltip: "Clear Quick Search"
             column:
                 name: "Name"
                 show: "Show"
                 sort: "Sort"
+            close_tooltip: "Close Column Manager"
+            empty_list: "No columns found"
         not_number: Not a number

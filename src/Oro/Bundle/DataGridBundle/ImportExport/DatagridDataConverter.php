@@ -21,15 +21,15 @@ use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
-    /** @var array [{data_type} => {frontend_type}] */
+    /** @var array of [{frontend_type} => {data_type}] */
     protected static $formatFrontendTypesMap = [
-        DateTimeTypeFormatter::TYPE_DATE     => PropertyInterface::TYPE_DATE,
-        DateTimeTypeFormatter::TYPE_DATETIME => PropertyInterface::TYPE_DATETIME,
-        DateTimeTypeFormatter::TYPE_TIME     => PropertyInterface::TYPE_TIME,
-        NumberTypeFormatter::TYPE_DECIMAL    => PropertyInterface::TYPE_DECIMAL,
-        NumberTypeFormatter::TYPE_INTEGER    => PropertyInterface::TYPE_INTEGER,
-        NumberTypeFormatter::TYPE_PERCENT    => PropertyInterface::TYPE_PERCENT,
-        NumberTypeFormatter::TYPE_CURRENCY   => PropertyInterface::TYPE_CURRENCY
+        PropertyInterface::TYPE_DATE     => DateTimeTypeFormatter::TYPE_DATE,
+        PropertyInterface::TYPE_DATETIME => DateTimeTypeFormatter::TYPE_DATETIME,
+        PropertyInterface::TYPE_TIME     => DateTimeTypeFormatter::TYPE_TIME,
+        PropertyInterface::TYPE_DECIMAL  => NumberTypeFormatter::TYPE_DECIMAL,
+        PropertyInterface::TYPE_INTEGER  => NumberTypeFormatter::TYPE_INTEGER,
+        PropertyInterface::TYPE_PERCENT  => NumberTypeFormatter::TYPE_PERCENT,
+        PropertyInterface::TYPE_CURRENCY => NumberTypeFormatter::TYPE_CURRENCY,
     ];
 
     /**
@@ -138,8 +138,8 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         if (null !== $val) {
             $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
             switch ($frontendType) {
-                case in_array($frontendType, self::$formatFrontendTypesMap, true):
-                    $type      = array_search($frontendType, self::$formatFrontendTypesMap);
+                case array_key_exists($frontendType, self::$formatFrontendTypesMap):
+                    $type      = self::$formatFrontendTypesMap[$frontendType];
                     $formatter = $this->getFormatterForType($type);
                     $val       = $formatter->formatType($val, $type);
                     break;

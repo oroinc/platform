@@ -99,7 +99,24 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('name')
             ->prototype('array')
             ->children()
-                ->scalarNode('applicable')->end()
+                ->variableNode('applicable')
+                    ->validate()
+                        ->ifTrue(
+                            function ($v) {
+                                return !is_null($v) && !is_string($v) && !is_array($v);
+                            }
+                        )
+                        ->thenInvalid('The "applicable" must be a string or array, given %s.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(
+                            function ($v) {
+                                return empty($v);
+                            }
+                        )
+                        ->thenUnset()
+                    ->end()
+                ->end()
                 ->variableNode('acl')
                     ->beforeNormalization()
                         ->ifArray()

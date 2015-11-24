@@ -1,8 +1,9 @@
 define([
     'jquery',
+    'underscore',
     'oroui/js/mediator',
     'oroui/js/app/views/base/view'
-], function($, mediator, BaseView) {
+], function($, _, mediator, BaseView) {
     'use strict';
 
     var RoleView;
@@ -62,13 +63,15 @@ define([
             if (this.disposed) {
                 return;
             }
-            delete this.$form,
-                this.$label,
-                this.$privileges,
-                this.$appendUsers,
-                this.$removeUsers,
-                this.$token,
-                this.privileges;
+
+            delete this.$form;
+            delete this.$label;
+            delete this.$privileges;
+            delete this.$appendUsers;
+            delete this.$removeUsers;
+            delete this.$token;
+            delete this.privileges;
+
             RoleView.__super__.dispose.call(this);
         },
 
@@ -100,19 +103,28 @@ define([
                 url = (url.match(/^([^#]+)/) || [])[1];
             }
 
+            var options = {
+                url: url,
+                type: method || 'GET',
+                data: $.param(this.getData())
+            };
+            mediator.execute('submitPage', options);
+            this.dispose();
+        },
+
+        /**
+         * @returns {Object}
+         */
+        getData: function() {
             var data = {};
+
             data[this.options.formName + '[label]'] = this.$label.val();
             data[this.options.formName + '[privileges]'] = JSON.stringify(this.privileges);
             data[this.options.formName + '[appendUsers]'] = this.$appendUsers.val();
             data[this.options.formName + '[removeUsers]'] = this.$removeUsers.val();
             data[this.options.formName + '[_token]'] = this.$token.val();
-            var options = {
-                url: url,
-                type: method || 'GET',
-                data: $.param(data)
-            };
-            mediator.execute('submitPage', options);
-            this.dispose();
+
+            return data;
         },
 
         /**
@@ -122,7 +134,7 @@ define([
             if (this.disposed) {
                 return;
             }
-            var self = this;
+
             $.each(this.privileges, function(scopeName, privileges) {
                 $.each(privileges, function(key, privilege) {
                     if (privilege.identity.id === data.identityId) {

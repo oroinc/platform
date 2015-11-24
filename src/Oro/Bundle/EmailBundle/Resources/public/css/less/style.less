@@ -1,4 +1,4 @@
-@import "../../../oroui/css/less/mixins";
+@import "oroui/css/less/mixins";
 @import "./header";
 @import "./email-notification-menu";
 @import "./short-emails-list";
@@ -252,9 +252,6 @@
 .activity-list-widget {
   .email-info, .email-load-more {
     margin: 0 20px 0 0;
-  }
-  .email-context-activity-list {
-    padding: 0 @horizontalPadding;
   }
   .accordion-body > .message .email-content .comment {
     padding-right: 0;
@@ -586,71 +583,6 @@ a.attachment .icon .icon-link {
     top: -7px;
     left: 9px;
   }
-}
-
-.email-context-activity-list {
-  margin-bottom: 5px;
-}
-
-.email-context-activity-items .context-item {
-  display: inline-block;
-  margin-right: 8px;
-  font-size: 11px;
-}
-
-.context-item {
-  list-style: none;
-  cursor: pointer;
-  padding: 0 7px 0 7px;
-  white-space: nowrap;
-}
-
-.context-item:hover, .context-item.active {
-  background-color: #ebebeb;
-}
-
-.customer-content .context-item .icon-remove {
-  cursor: pointer;
-}
-
-.email-context-activity-label {
-  float: left;
-  margin-right: 10px;
-  font-size: 11px;
-  line-height: 14px;
-}
-
-.email-context-activity-items {
-  margin-left: 55px;
-  font-size: 11px;
-  line-height: 14px;
-}
-
-.email-context-activity-block {
-  .email-context-activity {
-    margin-top: 5px;
-    width: 720px;
-  }
-}
-
-.context-items-dropdown {
-  top: 35px;
-  left: 15px;
-}
-
-.email-context-current-block {
-  cursor: pointer;
-  background-color: #FFFFFF;
-  border: none;
-  outline: none;
-  margin: 10px 10px 15px 10px;
-  box-shadow: none;
-}
-
-.email-context-current-item {
-  font-size: 18px;
-  font-weight: bold;
-  color: #666666;
 }
 
 .attachment-list-popup {

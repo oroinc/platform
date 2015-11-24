@@ -7,8 +7,20 @@ define([
     'oroui/js/app/views/loading-mask-view',
     'orocalendar/js/form-validation',
     'oroui/js/delete-confirmation',
-    'oroform/js/formatter/field'
-], function(_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
+    'oroform/js/formatter/field',
+    'oroactivity/js/app/components/activity-context-activity-component'
+], function(
+    _,
+    Backbone,
+    __,
+    routing,
+    DialogWidget,
+    LoadingMask,
+    FormValidation,
+    DeleteConfirmation,
+    fieldFormatter,
+    ActivityContextComponent
+) {
     'use strict';
 
     var $ = Backbone.$;
@@ -33,7 +45,8 @@ define([
             loadingMaskContent: '.loading-content',
             backgroundColor: 'input[name$="[backgroundColor]"]',
             calendarUid: '[name*="calendarUid"]',
-            invitedUsers: 'input[name$="[invitedUsers]"]'
+            invitedUsers: 'input[name$="[invitedUsers]"]',
+            contexts: 'input[name$="[contexts]"]'
         },
 
         /** @property {Array} */
@@ -54,6 +67,10 @@ define([
         remove: function() {
             this.trigger('remove');
             this._hideMask();
+            if (this.activityContext) {
+                this.activityContext.dispose();
+                delete this.activityContext;
+            }
             Backbone.View.prototype.remove.apply(this, arguments);
         },
 
@@ -280,9 +297,23 @@ define([
         },
 
         getEventView: function() {
-            return this.viewTemplate(_.extend(this.model.toJSON(), {
-                formatter: fieldFormatter
-            }));
+            // fetch calendar related connection
+            var connection = this.options.connections.findWhere({calendarUid: this.model.get('calendarUid')});
+            var $element = $(this.viewTemplate(_.extend(this.model.toJSON(), {
+                formatter: fieldFormatter,
+                connection: connection ? connection.toJSON() : null
+            })));
+
+            var $contextsSource = $element.find('.activity-context-activity');
+            this.activityContext = new ActivityContextComponent({
+                _sourceElement: $contextsSource,
+                checkTarget: false,
+                activityClassAlias: 'calendarevents',
+                entityId: this.model.originalId,
+                editable: this.model.get('editable')
+            });
+
+            return $element;
         },
 
         getEventForm: function() {
@@ -316,6 +347,29 @@ define([
             form.find(this.selectors.invitedUsers).on('change', _.bind(function(e) {
                 this._toggleCalendarUidByInvitedUsers(form);
             }, this));
+
+            // Adds calendar event activity contexts items to the form
+            if (this.model.originalId) {
+                var contexts = form.find(this.selectors.contexts);
+                $.ajax({
+                    url: routing.generate('oro_api_get_activity_context', {
+                        activity: 'calendarevents', id: this.model.originalId
+                    }),
+                    type: 'GET',
+                    success: function(targets) {
+                        var targetsStrArray = [];
+                        targets.forEach(function(target) {
+                            var targetData = {
+                                entityClass: target.targetClassName.split('_').join('\\'),
+                                entityId: target.targetId
+                            };
+                            targetsStrArray.push(JSON.stringify(targetData));
+                        });
+                        contexts.val(targetsStrArray.join(';'));
+                        contexts.trigger('change');
+                    }
+                });
+            }
 
             return form;
         },

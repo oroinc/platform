@@ -249,7 +249,7 @@ class PropertyConfigContainer
      * @param string|ConfigIdInterface $type
      * @param string|null              $fieldType
      *
-     * @return bool
+     * @return array
      */
     public function getFormItems($type = self::TYPE_ENTITY, $fieldType = null)
     {

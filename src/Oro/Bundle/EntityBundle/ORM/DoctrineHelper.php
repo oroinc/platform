@@ -14,6 +14,12 @@ use Oro\Bundle\EntityBundle\Exception;
 
 class DoctrineHelper
 {
+    /** @var ManagerRegistry */
+    protected $registry;
+
+    /** @var EntityManager[] */
+    private $managers = [];
+
     /**
      * @param ManagerRegistry $registry
      */
@@ -28,9 +34,16 @@ class DoctrineHelper
      */
     public function getEntityClass($entityOrClass)
     {
-        return is_object($entityOrClass)
-            ? ClassUtils::getClass($entityOrClass)
-            : ClassUtils::getRealClass($entityOrClass);
+        if (is_object($entityOrClass)) {
+            return ClassUtils::getClass($entityOrClass);
+        }
+
+        if (strpos($entityOrClass, ':') !== false) {
+            list($namespaceAlias, $simpleClassName) = explode(':', $entityOrClass, 2);
+            return $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
+        }
+
+        return ClassUtils::getRealClass($entityOrClass);
     }
 
     /**
@@ -179,9 +192,13 @@ class DoctrineHelper
      */
     public function isManageableEntity($entityOrClass)
     {
-        $entityClass = $this->getEntityClass($entityOrClass);
+        try {
+            $this->getEntityManager($entityOrClass);
 
-        return null !== $this->registry->getManagerForClass($entityClass);
+            return true;
+        } catch (Exception\NotManageableEntityException $e) {
+            return false;
+        }
     }
 
     /**
@@ -191,13 +208,9 @@ class DoctrineHelper
      */
     public function getEntityMetadata($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        if (!$entityManager) {
-            throw new Exception\NotManageableEntityException($entityClass);
-        }
+        $entityClass = $this->getEntityClass($entityOrClass);
 
-        return $entityManager->getClassMetadata($entityClass);
+        return $this->getEntityManager($entityClass)->getClassMetadata($entityClass);
     }
 
     /**
@@ -207,13 +220,14 @@ class DoctrineHelper
      */
     public function getEntityManager($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        if (!$entityManager) {
+        $entityClass = $this->getEntityClass($entityOrClass);
+
+        $manager = $this->getManagerForClass($entityClass);
+        if (!$manager) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
 
-        return $entityManager;
+        return $manager;
     }
 
     /**
@@ -222,10 +236,9 @@ class DoctrineHelper
      */
     public function getEntityRepository($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->getEntityManager($entityClass);
+        $entityClass = $this->getEntityClass($entityOrClass);
 
-        return $entityManager->getRepository($entityClass);
+        return $this->getEntityManager($entityClass)->getRepository($entityClass);
     }
 
     /**
@@ -248,8 +261,7 @@ class DoctrineHelper
     public function getEntity($entityClass, $entityId)
     {
         return $this
-            ->getEntityManager($entityClass)
-            ->getRepository($entityClass)
+            ->getEntityRepository($entityClass)
             ->find($entityId);
     }
 
@@ -304,5 +316,20 @@ class DoctrineHelper
     public function normalizeCriteria($criteria)
     {
         return QueryUtils::normalizeCriteria($criteria);
+    }
+
+    /**
+     * @param string $entityClass
+     * @return EntityManager
+     */
+    private function getManagerForClass($entityClass)
+    {
+        if (array_key_exists($entityClass, $this->managers)) {
+            return $this->managers[$entityClass];
+        }
+
+        $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
+
+        return $this->managers[$entityClass];
     }
 }

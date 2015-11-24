@@ -279,6 +279,7 @@ define(function(require) {
         },
 
         onShowWidgetHover: function(cid, cord) {
+            var hoverView;
             var view = this;
 
             var widget = this.getWidgets().get(cid);
@@ -298,10 +299,10 @@ define(function(require) {
                     model: widget
                 });
             }
-
-            view.$el.append(view.hoverViews[cid].render().$el);
-
-            view.hoverViews[cid].setOffset({top: cord.top});
+            hoverView = view.hoverViews[cid];
+            view.$el.append(hoverView.render().$el);
+            hoverView.setOffset({top: cord.top});
+            hoverView.adjustMaxHeight();
         },
 
         onRefreshWidget: function(cid) {

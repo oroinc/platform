@@ -212,4 +212,12 @@ class Status
     {
         return $this->data;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getCode();
+    }
 }

@@ -175,6 +175,18 @@ class EmailUser
      * @param EmailFolder $folder
      *
      * @return $this
+     *
+     * @deprecated since 1.9. Use EmailUser::addFolder instead
+     */
+    public function setFolder(EmailFolder $folder)
+    {
+        return $this->addFolder($folder);
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
      */
     public function removeFolder(EmailFolder $folder)
     {
@@ -374,5 +386,13 @@ class EmailUser
         $this->origin = $origin;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
     }
 }

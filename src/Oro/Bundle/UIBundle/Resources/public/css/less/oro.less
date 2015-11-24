@@ -143,6 +143,8 @@ label, input, button, select, textarea { font-size:13px;}
         padding-top:7px;
         width: 100%;
         word-wrap: break-word;
+        padding-left: 5px; // to get nice hover background
+        box-sizing: border-box;
         &.html-content {
           overflow: auto;
         }
@@ -385,7 +387,15 @@ body .select2-container {
   color:#666;
   font-family: 'FontAwesome';
 }
-
+.icon-resize-vertical {
+  // because resize-vertical icon is too thin
+  padding: 0 3px;
+}
+.ui-sortable-handle {
+  cursor: move;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
 .dropdown-menu {
   .divider {
     border-bottom-color:#eee;
@@ -868,9 +878,10 @@ footer {
   border-radius: 0 0 3px 3px;
   border-bottom: 1px solid #e5e5e5;
 }
-.ui-dialog .widget-actions-section .btn,
-.ui-dialog .widget-actions-section a.action {
-  margin-left: 5px;
+.ui-dialog .widget-actions-section {
+  .btn, .action {
+    margin-left: 5px;
+  }
 }
 .ui-dialog .ui-resizable-se {
   height: 14px;
@@ -1352,11 +1363,7 @@ footer {
     height: 24px;
     line-height: 24px;
   }
-  > .row > .pull-left{
-    margin-top: 10px;
-    margin-bottom: 5px;
-  }
-  > .row > .pull-right{
+  > .row > div{
     margin-top: 10px;
     margin-bottom: 5px;
   }
@@ -1850,14 +1857,16 @@ footer {
   &.customer-simple {
     padding:0 4px 0 0;
   }
+  .top-row {
+    overflow: hidden;
+  }
   .sub-title {
     font-size: 17px;
     color: #999;
-    float: left;
+    display: inline-block;
     margin-bottom: 3px;
   }
   .separator {
-    float: left;
     padding: 0 3px;
     color: #999;
     font-size: 18px;
@@ -1867,7 +1876,8 @@ footer {
     font-size: 19px;
     min-height: 15px;
     line-height: 22px;
-    float: left;
+    display: inline-block;
+    float: none !important;
     font: bold 17px/18px Helvetica, Arial, sans-serif;
 
   }
@@ -1898,6 +1908,7 @@ footer {
     color: #777;
     li {
       padding: 0 10px;
+      margin-bottom: 4px;
       border-left: 1px solid #e6e6e6;
       font-size: 11px;
       line-height: 14px;
@@ -2115,7 +2126,7 @@ textarea {
     padding-top: 5px;
   }
   > input[type=checkbox]:only-child {
-    margin-top: 6px;
+    margin-top: 10px;
   }
 }
 .btn-group > .btn-small {
@@ -2999,12 +3010,12 @@ span.validation-failed {
 .popover {
   max-width: 315px; /* little increase to fit usual content */
   .popover-content {
-    padding: 6px 8px;
+    padding: 13px 30px 13px 15px;
+    height: 100%;
   }
   .oro-popover-content {
     overflow-y: auto;
-    margin-right: 15px;
-    max-height: 60px;
+    height: 100%;
   }
   .popover-close {
     position: absolute;
