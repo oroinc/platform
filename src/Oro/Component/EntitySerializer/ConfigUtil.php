@@ -30,6 +30,7 @@ class ConfigUtil
     const HINTS                = 'hints';
     const FIELDS               = 'fields';
     const ORDER_BY             = 'order_by';
+    const DATA_TRANSFORMER     = 'data_transformer';
     const POST_SERIALIZE       = 'post_serialize';
 
     const PATH_DELIMITER = '.';
