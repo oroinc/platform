@@ -14,13 +14,13 @@
     }
     &.edit-mode {
       position: relative;
-      background: #F4EFD4;
+      background: @rowSelectedBackground;
       > .icon-edit {
         display: none !important;
       }
     }
     &.view-mode:hover {
-      background: #F4EFD4;
+      background: @rowSelectedBackground;
       position: relative;
       > .icon-edit {
         display: block !important;
@@ -73,10 +73,10 @@
 }
 .grid thead th.header-cell-highlight {
   background-color: #FFFCEC;
-  background: -webkit-linear-gradient(top, #FFFCEC, #F4EFD4);
-  background: -o-linear-gradient(top, #FFFCEC,#F4EFD4);
-  background: -ms-linear-gradient(top, #FFFCEC,#F4EFD4);
-  background: linear-gradient(to bottom, #FFFCEC,#F4EFD4 );
+  background: -webkit-linear-gradient(top, #FFFCEC, @rowSelectedBackground);
+  background: -o-linear-gradient(top, #FFFCEC, @rowSelectedBackground);
+  background: -ms-linear-gradient(top, #FFFCEC, @rowSelectedBackground);
+  background: linear-gradient(to bottom, #FFFCEC, @rowSelectedBackground);
 }
 .icon-times:before {
   content: "\f00d";

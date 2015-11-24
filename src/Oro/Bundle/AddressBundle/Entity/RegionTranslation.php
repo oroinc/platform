@@ -26,4 +26,12 @@ class RegionTranslation extends AbstractTranslation
      * @ORM\Column(type="string", length=255)
      */
     protected $content;
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }
