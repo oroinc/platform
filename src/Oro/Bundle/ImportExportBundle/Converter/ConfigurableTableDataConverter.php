@@ -148,15 +148,6 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             if ($this->fieldHelper->isRelation($field)
                 && !$this->fieldHelper->processRelationAsScalar($entityName, $fieldName)
             ) {
-                /**
-                 * @todo: should be refactored during BAP-9349 implementation
-                 */
-                $isIdentifier = false;
-                if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
-                    $singleRelationDeepLevel++;
-                    $multipleRelationDeepLevel++;
-                    $isIdentifier = true;
-                }
                 list($relationRules, $relationBackendHeaders) = $this->getRelatedEntityRulesAndBackendHeaders(
                     $entityName,
                     $fullData,
@@ -164,8 +155,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     $multipleRelationDeepLevel,
                     $field,
                     $fieldHeader,
-                    $fieldOrder,
-                    $isIdentifier
+                    $fieldOrder
                 );
                 $rules = array_merge($rules, $relationRules);
                 $backendHeaders = array_merge($backendHeaders, $relationBackendHeaders);
@@ -403,7 +393,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $isMultipleRelation = $this->fieldHelper->isMultipleRelation($field) && $multipleRelationDeepLevel > 0;
 
         // if relation must be included
-        if (($fullData || $isIdentifier) && ($isSingleRelation || $isMultipleRelation)) {
+        if ($fullData && ($isSingleRelation || $isMultipleRelation)) {
             $relatedEntityName = $field['related_entity_name'];
             $fieldFullData = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
 
