@@ -262,6 +262,10 @@ define(function(require) {
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 
+            if (!CellEditorView) {
+                throw new Error('Editor view in not available for `' + cell.column.get('name') + '` column');
+            }
+
             var editorComponent = new CellEditorComponent(_.extend({}, editor.component_options, {
                 cell: cell,
                 view: CellEditorView,
