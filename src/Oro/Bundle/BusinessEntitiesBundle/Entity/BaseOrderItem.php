@@ -364,4 +364,12 @@ class BaseOrderItem
     {
         return $this->order;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getName();
+    }
 }

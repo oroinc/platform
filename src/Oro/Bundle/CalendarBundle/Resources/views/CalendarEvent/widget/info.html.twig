@@ -1,7 +1,14 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroActivityBundle::macros.html.twig' as AC %}
 
 <div class="widget-content form-horizontal box-content row-fluid">
     <div class="responsive-block">
+        {# Display contexts targets in the activity list item view #}
+        {% if renderContexts is defined and renderContexts %}
+            <div class="activity-context-activity-list">
+                {{ AC.activity_contexts(entity, target, true) }}
+            </div>
+        {% endif %}
         {{ UI.renderProperty('oro.calendar.calendarevent.title.label'|trans, entity.title) }}
         {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, entity.description|escape|nl2br) }}
         {{ UI.renderProperty('oro.calendar.calendarevent.start.label'|trans, entity.start|oro_format_datetime) }}

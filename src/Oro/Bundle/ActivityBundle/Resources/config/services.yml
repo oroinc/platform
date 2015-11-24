@@ -123,6 +123,9 @@ services:
             - @oro_activity.manager
             - @oro_entity_config.config_manager
             - @oro_entity.entity_class_name_helper
+            - @oro_entity.entity_name_resolver
+            - @doctrine.orm.entity_manager
+            - @oro_search.mapper
 
     oro_activity.form.handler.activity_entity.api:
         class: %oro_activity.form.handler.activity_entity.api.class%
@@ -163,3 +166,6 @@ services:
             - @oro_entity_config.config_manager
             - @router
             - @oro_entity.entity_alias_resolver
+            - @oro_search.mapper
+            - @translator
+            - @oro_entity.doctrine_helper
