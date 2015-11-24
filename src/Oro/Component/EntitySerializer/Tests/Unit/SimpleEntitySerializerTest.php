@@ -413,7 +413,183 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testSimpleEntityWithPostAction()
+    {
+        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT o0_.id AS id_0, o0_.name AS name_1,'
+            . ' o1_.name AS name_2,'
+            . ' o0_.category_name AS category_name_3'
+            . ' FROM oro_test_serializer_user o0_'
+            . ' LEFT JOIN oro_test_serializer_category o1_ ON o0_.category_name = o1_.name'
+            . ' WHERE o0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'user_name',
+                    'name_2'          => 'category_name',
+                    'category_name_3' => 'category_name'
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $this->setQueryExpectationAt(
+            $conn,
+            1,
+            'SELECT o0_.id AS id_0, o1_.name AS name_1'
+            . ' FROM oro_test_serializer_product o1_'
+            . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
+            . ' WHERE o0_.id IN (?)',
+            [
+                [
+                    'id_0'   => 1,
+                    'name_1' => 'product_name'
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => null,
+                    'name'     => null,
+                    'category' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'name' => null
+                        ],
+                        'post_serialize'   => function (array $result) {
+                            $result['additional'] = $result['name'] . '_additional';
+
+                            return $result;
+                        }
+                    ],
+                    'products' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'name' => null
+                        ],
+                        'post_serialize'   => function (array $result) {
+                            $result['additional'] = $result['name'] . '_additional';
+
+                            return $result;
+                        }
+                    ],
+                ],
+                'post_serialize'   => function (array $result) {
+                    $result['additional'] = $result['name'] . '_additional';
+
+                    return $result;
+                }
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'         => 1,
+                    'name'       => 'user_name',
+                    'category'   => [
+                        'name'       => 'category_name',
+                        'additional' => 'category_name_additional'
+                    ],
+                    'products'   => [
+                        [
+                            'name'       => 'product_name',
+                            'additional' => 'product_name_additional'
+                        ]
+                    ],
+                    'additional' => 'user_name_additional'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testPostActionForNullChild()
+    {
+        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT o0_.id AS id_0, o0_.name AS name_1,'
+            . ' o1_.name AS name_2,'
+            . ' o0_.category_name AS category_name_3'
+            . ' FROM oro_test_serializer_user o0_'
+            . ' LEFT JOIN oro_test_serializer_category o1_ ON o0_.category_name = o1_.name'
+            . ' WHERE o0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'user_name',
+                    'name_2'          => null,
+                    'category_name_3' => null
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => null,
+                    'name'     => null,
+                    'category' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'name' => null
+                        ],
+                        'post_serialize'   => function (array $result) {
+                            $result['additional'] = $result['name'] . '_additional';
+
+                            return $result;
+                        }
+                    ],
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'       => 1,
+                    'name'     => 'user_name',
+                    'category' => null
+                ]
+            ],
+            $result
+        );
+    }
+
+    /**
+     * @deprecated since 1.9. Use new signature of 'post_serialize' callback:
+     * function (array $item) : array
+     */
+    public function testSimpleEntityWithPostActionDeprecated()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
             ->where('e.id = :id')

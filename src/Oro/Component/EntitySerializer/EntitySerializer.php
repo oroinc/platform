@@ -241,9 +241,9 @@ class EntitySerializer
         }
 
         if (isset($config[ConfigUtil::POST_SERIALIZE])) {
-            $postSerialize = $config[ConfigUtil::POST_SERIALIZE];
+            $callback = $config[ConfigUtil::POST_SERIALIZE];
             foreach ($result as &$resultItem) {
-                $postSerialize($resultItem);
+                $resultItem = $this->postSerialize($resultItem, $callback);
             }
         }
 
@@ -278,6 +278,9 @@ class EntitySerializer
                                 $entityMetadata->getAssociationTargetClass($field),
                                 $targetConfig
                             );
+                            if (isset($targetConfig[ConfigUtil::POST_SERIALIZE])) {
+                                $value = $this->postSerialize($value, $targetConfig[ConfigUtil::POST_SERIALIZE]);
+                            }
                         } else {
                             $value = $this->dataTransformer->transform(
                                 $entityClass,
@@ -501,8 +504,18 @@ class EntitySerializer
 
         $result      = [];
         $entityClass = $mapping['targetEntity'];
-        foreach ($items as $item) {
-            $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config);
+        if (isset($config[ConfigUtil::POST_SERIALIZE])) {
+            $callback = $config[ConfigUtil::POST_SERIALIZE];
+            foreach ($items as $item) {
+                $result[$item['entityId']][] = $this->postSerialize(
+                    $this->serializeItem($item, $entityClass, $config),
+                    $callback
+                );
+            }
+        } else {
+            foreach ($items as $item) {
+                $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config);
+            }
         }
 
         return $result;
@@ -600,5 +613,33 @@ class EntitySerializer
         );
 
         return $query;
+    }
+
+    /**
+     * @param array    $item
+     * @param callable $callback
+     *
+     * @return array
+     */
+    protected function postSerialize(array $item, $callback)
+    {
+        // @deprecated since 1.9. New signature of 'post_serialize' callback is function (array $item) : array
+        // Old signature was function (array &$item) : void
+        // The following implementation supports both new and old signature of the callback
+        // Remove this implementation when a support of old signature will not be required
+        if ($callback instanceof \Closure) {
+            $handleResult = $callback($item);
+            if (null !== $handleResult) {
+                $item = $handleResult;
+            }
+        } else {
+            $item = call_user_func($callback, $item);
+        }
+
+        /* New implementation, uncomment it when a support of old signature will not be required
+        $item = call_user_func($callback, $item);
+        */
+
+        return $item;
     }
 }

@@ -32,6 +32,8 @@ class ConfigUtil
     const ORDER_BY             = 'order_by';
     const POST_SERIALIZE       = 'post_serialize';
 
+    const PATH_DELIMITER = '.';
+
     const PROPERTY_PATH = 'property_path';
     const EXCLUDE       = 'exclude';
 
@@ -148,6 +150,6 @@ class ConfigUtil
      */
     public static function explodeProperty($propertyPath)
     {
-        return explode('.', $propertyPath);
+        return explode(self::PATH_DELIMITER, $propertyPath);
     }
 }

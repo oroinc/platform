@@ -93,6 +93,7 @@ after:
 ```
     'isPrimary' => ['property_path' => 'primary']
 ```
+- The signature of `post_serialize` callback is changed. Old signature: `function (array &$item) : void`. New signature: `function (array $item) : array`.
 
 ####ImportExportBundle
 - `Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer`: the first argument of constructor `Doctrine\ORM\EntityManager $entityManager` replaced by `Oro\Bundle\EntityBundle\ORM\DoctrineHelper $doctrineHelper`
