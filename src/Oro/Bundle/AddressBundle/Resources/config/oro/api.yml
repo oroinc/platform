@@ -13,7 +13,7 @@ oro_api:
                     exclusion_policy: none
                     fields:
                         types:
-                            orderBy:
+                            order_by:
                                 name: ASC
         Oro\Bundle\AddressBundle\Entity\AbstractEmail:
             '0':
@@ -22,7 +22,7 @@ oro_api:
                     fields:
                         email: ~
                         primary: ~
-                    orderBy:
+                    order_by:
                         primary: DESC
         Oro\Bundle\AddressBundle\Entity\AbstractPhone:
             '0':
@@ -31,5 +31,5 @@ oro_api:
                     fields:
                         phone: ~
                         primary: ~
-                    orderBy:
+                    order_by:
                         primary: DESC

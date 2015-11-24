@@ -81,7 +81,18 @@ UPGRADE FROM 1.8 to 1.9
 - Add new form type: `oro_autocomplete`. See [text_autocomplete_form_type.md](./src/Oro/Bundle/FormBundle/Resources/doc/reference/text_autocomplete_form_type.md) for more detailed info.
 
 ####EntitySerializer component
+- `Oro\Component\EntitySerializer\EntitySerializer` class has a lot of changes. Check your inherited classes, if any.
 - `excluded_fields` attribute is marked as deprecated. Use `exclude` attribute for a field.
+- `orderBy` attribute is marked as deprecated. Use `order_by` attribute instead.
+- `result_name` attribute is marked as deprecated. Use `property_path` attribute instead.
+before:
+```
+    'primary' => ['result_name' => 'isPrimary']
+```
+after:
+```
+    'isPrimary' => ['property_path' => 'primary']
+```
 
 ####ImportExportBundle
 - `Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer`: the first argument of constructor `Doctrine\ORM\EntityManager $entityManager` replaced by `Oro\Bundle\EntityBundle\ORM\DoctrineHelper $doctrineHelper`

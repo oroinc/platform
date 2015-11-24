@@ -59,7 +59,7 @@ class CompleteDefinition implements ProcessorInterface
             return;
         }
 
-        $fields = ConfigUtil::getFields($definition);
+        $fields = ConfigUtil::getArrayValue($definition, ConfigUtil::FIELDS);
 
         if (!ConfigUtil::isExcludeAll($definition)) {
             $entityClass = $context->getClassName();
@@ -175,9 +175,7 @@ class CompleteDefinition implements ProcessorInterface
             }
 
             $targetEntityClass = $mapping['targetEntity'];
-            if ($this->exclusionProvider->isIgnoredEntity($targetEntityClass)
-                || $this->exclusionProvider->isIgnoredRelation($metadata, $fieldName)
-            ) {
+            if ($this->exclusionProvider->isIgnoredRelation($metadata, $fieldName)) {
                 $config = [ConfigUtil::EXCLUDE => true];
             } else {
                 $config = $this->relationConfigProvider->getRelationConfig(

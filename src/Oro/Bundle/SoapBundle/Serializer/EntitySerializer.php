@@ -33,10 +33,10 @@ class EntitySerializer extends BaseEntitySerializer
     ) {
         parent::__construct(
             $doctrine,
-            new ExtendEntityFieldFilter($configManager),
             $dataAccessor,
             $dataTransformer,
             $queryHintResolver
         );
+        $this->setEntityFieldFilter(new ExtendEntityFieldFilter($configManager));
     }
 }
