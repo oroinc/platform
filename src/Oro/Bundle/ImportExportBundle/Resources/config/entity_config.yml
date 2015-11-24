@@ -45,6 +45,20 @@ oro_entity_config:
                             empty_value:    false
                             required:       false
                             block:          import_export
+                identity_when_empty:
+                    options:
+                        value_type:         boolean
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, date, float, decimal, money, percent, enum]
+                    form:
+                        type:               choice
+                        options:
+                            label:          oro.importexport.entity_config.identity_when_empty.label
+                            choices:
+                                true:       'Yes'
+                                false:      'No'
+                            empty_value:    false
+                            required:       false
+                            block:          import_export
                 # is field must be excluded from import/export
                 excluded:
                     options:
