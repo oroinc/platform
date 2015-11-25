@@ -26,8 +26,6 @@ class EntityFieldValidator
      * @param $entity
      * @param $content
      *
-     * @return bool
-     *
      * @throws EntityHasFieldException
      * @throws FieldUpdateAccessException
      */
@@ -37,8 +35,6 @@ class EntityFieldValidator
         foreach ($keys as $fieldName) {
             $this->validateFieldName($entity, $fieldName);
         }
-
-        return true;
     }
 
     /**
@@ -59,8 +55,6 @@ class EntityFieldValidator
         if (!$this->hasAccessEditFiled($fieldName)) {
             throw new FieldUpdateAccessException('oro.entity.controller.message.access_denied', Codes::HTTP_FORBIDDEN);
         }
-
-        return true;
     }
 
     /**
