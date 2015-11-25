@@ -83,10 +83,10 @@ class NormalizeEntityMetadata implements ProcessorInterface
             return;
         }
 
-        $referencedProperty = array_pop($path);
+        $linkedProperty = array_pop($path);
         foreach ($path as $property) {
             if (!$classMetadata->hasAssociation($property)) {
-                // a referenced property is not an association, it may happen due invalid configuration
+                // a intermediate property is not an association, it may happen due invalid configuration
                 $classMetadata = null;
                 break;
             }
@@ -95,17 +95,17 @@ class NormalizeEntityMetadata implements ProcessorInterface
             );
         }
         if (null !== $classMetadata) {
-            if ($classMetadata->hasAssociation($referencedProperty)) {
+            if ($classMetadata->hasAssociation($linkedProperty)) {
                 $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
                     $classMetadata,
-                    $referencedProperty
+                    $linkedProperty
                 );
                 $associationMetadata->setName($name);
                 $entityMetadata->addAssociation($associationMetadata);
             } else {
                 $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
                     $classMetadata,
-                    $referencedProperty
+                    $linkedProperty
                 );
                 $fieldMetadata->setName($name);
                 $entityMetadata->addField($fieldMetadata);
