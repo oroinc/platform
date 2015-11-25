@@ -48,20 +48,22 @@
             }
 
             /**
-             * Add Header "Content-Type: application/vnd.api+json"
+             * Add Header "Content-Type: application/vnd.api+json" for JSON API resources (with route starting from '/api/{version}/')
              */
-            var headerKey = 'Content-Type',
+            var headerKey   = 'Content-Type',
                 headerValue = 'application/vnd.api+json',
                 headers = $(this).closest('.content').find('fieldset.headers'),
-                allHeaders = $('.tuple', headers),
                 emptyHeader = null,
-                checkHeaders = function (headers) {
-                    var hasHeader = false;
-                    $.each(headers, function (index, header) {
-                        if ($('input.key:text[value="' + headerKey + '"]', header).length
-                            && $('input.value:text[value="' + headerValue + '"]', header).length
-                        ) {
-                            return hasHeader = true;
+                isAllowedRoute = $(this).parents('li.operation').find('div.heading span.path').text().indexOf('/api/{version}/') !== -1,
+                isHeaderRequired = function () {
+                    if (!isAllowedRoute) {
+                        return false;
+                    }
+
+                    var needsHeader = true;
+                    $('.tuple', headers).each(function (index, header) {
+                        if ($('input.key:text[value="' + headerKey + '"]', header).length) {
+                            return needsHeader = false;
                         }
 
                         if (!emptyHeader
@@ -72,15 +74,14 @@
                         }
                     });
 
-                    return hasHeader;
+                    return needsHeader;
                 },
                 fillHeader = function (header) {
                     $('input.key', header).val(headerKey);
                     $('input.value', header).val(headerValue);
-                },
-                hasRequiredHeader = allHeaders.length ? checkHeaders(allHeaders) : false;
+                };
 
-            if (!hasRequiredHeader) {
+            if (isHeaderRequired()) {
                 if (emptyHeader) {
                     fillHeader(emptyHeader);
                 } else {
