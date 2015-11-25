@@ -110,7 +110,7 @@ class ConfigNormalizer
      */
     protected function applyPropertyPathConfig(array $config, $propertyPath)
     {
-        $properties = ConfigUtil::explodeProperty($propertyPath);
+        $properties = ConfigUtil::explodePropertyPath($propertyPath);
         $this->applyPropertyConfig($config, $properties[0]);
 
         $count = count($properties);
