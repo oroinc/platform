@@ -1,3 +1,7 @@
+nelmio_api_doc:
+    motd:
+        template: OroApiBundle::ApiDoc/motd.html.twig
+
 security:
     firewalls:
         api_wsse_secured:
