@@ -85,7 +85,7 @@ class DataNormalizer
     protected function extractValueByPropertyPath(array &$row, $propertyPath)
     {
         $result     = null;
-        $properties = ConfigUtil::explodeProperty($propertyPath);
+        $properties = ConfigUtil::explodePropertyPath($propertyPath);
         $lastIndex  = count($properties) - 1;
         $i          = 0;
         $path       = [];

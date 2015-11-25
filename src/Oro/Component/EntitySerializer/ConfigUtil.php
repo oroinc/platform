@@ -149,7 +149,7 @@ class ConfigUtil
      *
      * @return string[]
      */
-    public static function explodeProperty($propertyPath)
+    public static function explodePropertyPath($propertyPath)
     {
         return explode(self::PATH_DELIMITER, $propertyPath);
     }
