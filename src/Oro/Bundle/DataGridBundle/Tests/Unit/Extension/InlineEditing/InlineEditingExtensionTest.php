@@ -89,29 +89,13 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->processConfigs($config);
     }
 
-    public function testProcessConfigs()
+    /**
+     * @param array $configValues
+     * @param string $entityName
+     * @dataProvider setParametersDataProvider
+     */
+    public function testProcessConfigs(array $configValues, $entityName)
     {
-        $entityName = 'Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity';
-        $configValues = [
-            Configuration::BASE_CONFIG_KEY => [
-                'enable' => true,
-                'entity_name' => $entityName,
-            ],
-            FormatterConfiguration::COLUMNS_KEY => [
-                'testText' => ['label' => 'test_text'],
-                'testSelect' => [
-                    'label' => 'test_select',
-                    PropertyInterface::FRONTEND_TYPE_KEY => 'string',
-                ],
-                'testAnotherText' => [
-                    'label' => 'test_config_overwrite',
-                    'inline_editing' => ['enable' => false]
-                ],
-                'id' => ['label' => 'test_black_list'],
-                'updatedAt' => ['label' => 'test_black_list'],
-                'createdAt' => ['label' => 'test_black_list'],
-            ]
-        ];
         $config = DatagridConfiguration::create($configValues);
 
         $callback = $this->getProcessConfigsCallBack();
@@ -197,5 +181,83 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
 
             return [];
         };
+    }
+
+    public function setParametersDataProvider()
+    {
+        $entityName = 'Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity';
+
+        return [
+            'with entity_name' => [
+                [
+                    Configuration::BASE_CONFIG_KEY => [
+                        'enable' => true,
+                        'entity_name' => $entityName,
+                    ],
+                    FormatterConfiguration::COLUMNS_KEY => [
+                        'testText' => ['label' => 'test_text'],
+                        'testSelect' => [
+                            'label' => 'test_select',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'string',
+                        ],
+                        'testAnotherText' => [
+                            'label' => 'test_config_overwrite',
+                            'inline_editing' => ['enable' => false]
+                        ],
+                        'id' => ['label' => 'test_black_list'],
+                        'updatedAt' => ['label' => 'test_black_list'],
+                        'createdAt' => ['label' => 'test_black_list'],
+                    ]
+                ],
+                $entityName
+            ],
+            'without entity_name' => [
+                [
+                    Configuration::CONFIG_EXTENDED_ENTITY_NAME => $entityName,
+                    Configuration::BASE_CONFIG_KEY => [
+                        'enable' => true,
+                    ],
+                    FormatterConfiguration::COLUMNS_KEY => [
+                        'testText' => ['label' => 'test_text'],
+                        'testSelect' => [
+                            'label' => 'test_select',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'string',
+                        ],
+                        'testAnotherText' => [
+                            'label' => 'test_config_overwrite',
+                            'inline_editing' => ['enable' => false]
+                        ],
+                        'id' => ['label' => 'test_black_list'],
+                        'updatedAt' => ['label' => 'test_black_list'],
+                        'createdAt' => ['label' => 'test_black_list'],
+                    ]
+                ],
+                $entityName
+            ],
+            'entity_name & extended_entity_name' => [
+                [
+                    Configuration::CONFIG_EXTENDED_ENTITY_NAME => $entityName . '_test',
+                    Configuration::BASE_CONFIG_KEY => [
+                        'enable' => true,
+                        'entity_name' => $entityName,
+                    ],
+                    FormatterConfiguration::COLUMNS_KEY => [
+                        'testText' => ['label' => 'test_text'],
+                        'testSelect' => [
+                            'label' => 'test_select',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'string',
+                        ],
+                        'testAnotherText' => [
+                            'label' => 'test_config_overwrite',
+                            'inline_editing' => ['enable' => false]
+                        ],
+                        'id' => ['label' => 'test_black_list'],
+                        'updatedAt' => ['label' => 'test_black_list'],
+                        'createdAt' => ['label' => 'test_black_list'],
+                    ]
+                ],
+                $entityName
+            ]
+        ];
     }
 }

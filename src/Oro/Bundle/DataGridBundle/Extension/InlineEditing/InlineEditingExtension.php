@@ -52,8 +52,15 @@ class InlineEditingExtension extends AbstractExtension
     public function processConfigs(DatagridConfiguration $config)
     {
         $configItems   = $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, []);
-        $configuration = new Configuration(Configuration::BASE_CONFIG_KEY);
 
+        if (empty($configItems[Configuration::CONFIG_ENTITY_NAME])) {
+            $configItems[Configuration::CONFIG_ENTITY_NAME] = $config->offsetGetOr(
+                Configuration::CONFIG_EXTENDED_ENTITY_NAME,
+                null
+            );
+        }
+
+        $configuration = new Configuration(Configuration::BASE_CONFIG_KEY);
         $normalizedConfigItems = $this->validateConfiguration(
             $configuration,
             [Configuration::BASE_CONFIG_KEY => $configItems]
