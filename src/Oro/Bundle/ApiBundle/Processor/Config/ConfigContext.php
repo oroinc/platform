@@ -10,8 +10,8 @@ class ConfigContext extends ApiContext
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
-    /** a list of additional configuration sections that should be returned, for example "filters", "sorters", etc. */
-    const CONFIG_SECTION = 'configSection';
+    /** a list of additional configuration data that should be returned, for example "filters", "sorters", etc. */
+    const EXTRA = 'extra';
 
     /**
      * Gets FQCN of an entity.
@@ -34,30 +34,46 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets a list of requested additional configuration sections, for example "filters", "sorters", etc.
+     * Checks if the specified additional configuration data is requested.
+     *
+     * @param string $extra
+     *
+     * @return bool
+     */
+    public function hasExtra($extra)
+    {
+        $extras = $this->get(self::EXTRA);
+
+        return null !== $extras
+            ? in_array($extra, $extras, true)
+            : false;
+    }
+
+    /**
+     * Gets a list of requested additional configuration data, for example "filters", "sorters", etc.
      *
      * @return string[]
      */
-    public function getConfigSections()
+    public function getExtras()
     {
-        $sections = $this->get(self::CONFIG_SECTION);
+        $extras = $this->get(self::EXTRA);
 
-        return null !== $sections
-            ? $sections
+        return null !== $extras
+            ? $extras
             : [];
     }
 
     /**
-     * Sets additional configuration sections that you need to be returned, for example "filters", "sorters", etc.
+     * Sets additional configuration data that you need to be returned, for example "filters", "sorters", etc.
      *
-     * @param string[] $sections
+     * @param string[] $extras
      */
-    public function setConfigSections($sections)
+    public function setExtras($extras)
     {
-        if (empty($sections)) {
-            $this->remove(self::CONFIG_SECTION, $sections);
+        if (empty($extras)) {
+            $this->remove(self::EXTRA, $extras);
         } else {
-            $this->set(self::CONFIG_SECTION, $sections);
+            $this->set(self::EXTRA, $extras);
         }
     }
 

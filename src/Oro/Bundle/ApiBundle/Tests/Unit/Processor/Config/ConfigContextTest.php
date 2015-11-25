@@ -24,18 +24,18 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->context->get(ConfigContext::CLASS_NAME));
     }
 
-    public function testConfigSections()
+    public function testExtras()
     {
-        $this->assertSame([], $this->context->getConfigSections());
-        $this->assertNull($this->context->get(ConfigContext::CONFIG_SECTION));
+        $this->assertSame([], $this->context->getExtras());
+        $this->assertNull($this->context->get(ConfigContext::EXTRA));
 
-        $this->context->setConfigSections(['test']);
-        $this->assertEquals(['test'], $this->context->getConfigSections());
-        $this->assertEquals(['test'], $this->context->get(ConfigContext::CONFIG_SECTION));
+        $this->context->setExtras(['test']);
+        $this->assertEquals(['test'], $this->context->getExtras());
+        $this->assertEquals(['test'], $this->context->get(ConfigContext::EXTRA));
 
-        $this->context->setConfigSections([]);
-        $this->assertSame([], $this->context->getConfigSections());
-        $this->assertNull($this->context->get(ConfigContext::CONFIG_SECTION));
+        $this->context->setExtras([]);
+        $this->assertSame([], $this->context->getExtras());
+        $this->assertNull($this->context->get(ConfigContext::EXTRA));
     }
 
     public function testFilters()

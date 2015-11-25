@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -26,7 +27,7 @@ class GetListContext extends Context
     public function __construct(ConfigProvider $configProvider)
     {
         parent::__construct($configProvider);
-        $this->setConfigSections([ConfigUtil::FILTERS, ConfigUtil::SORTERS]);
+        $this->setConfigSections([ConfigExtra::FILTERS, ConfigExtra::SORTERS]);
     }
 
     /**

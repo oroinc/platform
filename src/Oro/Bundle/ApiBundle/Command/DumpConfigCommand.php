@@ -9,9 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
+use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
@@ -97,7 +97,7 @@ class DumpConfigCommand extends ContainerAwareCommand
             $entityClass,
             $version,
             $requestType,
-            [ConfigUtil::FILTERS, ConfigUtil::SORTERS]
+            [ConfigExtra::FILTERS, ConfigExtra::SORTERS, ConfigExtra::DESCRIPTIONS]
         );
 
         return [
@@ -127,7 +127,7 @@ class DumpConfigCommand extends ContainerAwareCommand
             $entityClass,
             $version,
             $requestType,
-            [ConfigUtil::FILTERS, ConfigUtil::SORTERS]
+            [ConfigExtra::FILTERS, ConfigExtra::SORTERS, ConfigExtra::DESCRIPTIONS]
         );
 
         return [

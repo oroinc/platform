@@ -28,11 +28,12 @@ class MetadataProvider
      * @param string     $className   The FQCN of an entity
      * @param string     $version     The version of a config
      * @param string     $requestType The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string[]   $extras      Additional metadata information, for example "descriptions"
      * @param array|null $config      The configuration of an entity
      *
      * @return EntityMetadata|null
      */
-    public function getMetadata($className, $version, $requestType, $config = null)
+    public function getMetadata($className, $version, $requestType, array $extras = [], $config = null)
     {
         $cacheKey = $requestType . $version . $className;
         if (array_key_exists($cacheKey, $this->cache)) {
@@ -44,6 +45,7 @@ class MetadataProvider
         $context->setVersion($version);
         $context->setRequestType($requestType);
         $context->setClassName($className);
+        $context->setExtras($extras);
         if (!empty($config)) {
             $context->setConfig($config);
         }

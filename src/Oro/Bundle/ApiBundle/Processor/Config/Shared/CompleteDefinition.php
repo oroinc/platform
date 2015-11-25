@@ -69,7 +69,7 @@ class CompleteDefinition implements ProcessorInterface
                     $entityClass,
                     $context->getVersion(),
                     $context->getRequestType(),
-                    $context->getConfigSections()
+                    $context->getExtras()
                 );
             }
         }
@@ -87,7 +87,7 @@ class CompleteDefinition implements ProcessorInterface
      * @param string   $entityClass
      * @param string   $version
      * @param string   $requestType
-     * @param string[] $configSections
+     * @param string[] $extras
      *
      * @return array
      */
@@ -96,12 +96,12 @@ class CompleteDefinition implements ProcessorInterface
         $entityClass,
         $version,
         $requestType,
-        $configSections
+        $extras
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $definition = $this->getFields($definition, $metadata, $version, $requestType, $configSections);
-        $definition = $this->getAssociations($definition, $metadata, $version, $requestType, $configSections);
+        $definition = $this->getFields($definition, $metadata, $version, $requestType, $extras);
+        $definition = $this->getAssociations($definition, $metadata, $version, $requestType, $extras);
 
         return $definition;
     }
@@ -111,7 +111,7 @@ class CompleteDefinition implements ProcessorInterface
      * @param ClassMetadata $metadata
      * @param string        $version
      * @param string        $requestType
-     * @param string[]      $configSections
+     * @param string[]      $extras
      *
      * @return array
      */
@@ -120,7 +120,7 @@ class CompleteDefinition implements ProcessorInterface
         ClassMetadata $metadata,
         $version,
         $requestType,
-        $configSections
+        $extras
     ) {
         $fieldNames = $metadata->getFieldNames();
         foreach ($fieldNames as $fieldName) {
@@ -137,7 +137,7 @@ class CompleteDefinition implements ProcessorInterface
                     $fieldName,
                     $version,
                     $requestType,
-                    $configSections
+                    $extras
                 );
             }
             $definition[$fieldName] = $config;
@@ -151,7 +151,7 @@ class CompleteDefinition implements ProcessorInterface
      * @param ClassMetadata $metadata
      * @param string        $version
      * @param string        $requestType
-     * @param string[]      $configSections
+     * @param string[]      $extras
      *
      * @return array
      */
@@ -160,7 +160,7 @@ class CompleteDefinition implements ProcessorInterface
         ClassMetadata $metadata,
         $version,
         $requestType,
-        $configSections
+        $extras
     ) {
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $fieldName => $mapping) {
@@ -178,7 +178,7 @@ class CompleteDefinition implements ProcessorInterface
                 $mapping['targetEntity'],
                 $version,
                 $requestType,
-                $configSections
+                $extras
             );
             if (isset($definition[$fieldName]) && is_array($definition[$fieldName])) {
                 $config = array_merge_recursive($config, [ConfigUtil::DEFINITION => $definition[$fieldName]]);

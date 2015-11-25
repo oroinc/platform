@@ -28,11 +28,11 @@ class RelationConfigProvider
      * @param string   $className      The FQCN of an entity
      * @param string   $version        The version of a config
      * @param string   $requestType    The type of API request, for example "rest", "soap", "odata", etc.
-     * @param string[] $configSections Additional configuration sections, for example "filters", "sorters", etc.
+     * @param string[] $extras Additional configuration data, for example "filters", "sorters", etc.
      *
      * @return array|null
      */
-    public function getRelationConfig($className, $version, $requestType, array $configSections = [])
+    public function getRelationConfig($className, $version, $requestType, array $extras = [])
     {
         $cacheKey = $requestType . $version . $className;
         if (array_key_exists($cacheKey, $this->cache)) {
@@ -43,7 +43,7 @@ class RelationConfigProvider
         $context = $this->processor->createContext();
         $context->setVersion($version);
         $context->setRequestType($requestType);
-        $context->setConfigSections($configSections);
+        $context->setExtras($extras);
         $context->setClassName($className);
 
         $this->processor->process($context);
@@ -52,10 +52,11 @@ class RelationConfigProvider
         if ($context->hasResult()) {
             $config[ConfigUtil::DEFINITION] = $context->getResult();
         }
-        foreach ($configSections as $section) {
-            if ($context->has($section)) {
-                $config[$section] = $context->get($section);
-            }
+        if ($context->hasFilters()) {
+            $config[ConfigUtil::FILTERS] = $context->getFilters();
+        }
+        if ($context->hasSorters()) {
+            $config[ConfigUtil::SORTERS] = $context->getSorters();
         }
 
         $this->cache[$cacheKey] = $config;

@@ -12,6 +12,9 @@ class MetadataContext extends ApiContext
     /** the configuration of an entity */
     const CONFIG = 'config';
 
+    /** additional metadata information that should be returned */
+    const EXTRA = 'extra';
+
     /**
      * Gets FQCN of an entity.
      *
@@ -50,5 +53,49 @@ class MetadataContext extends ApiContext
     public function setConfig($config)
     {
         $this->set(self::CONFIG, $config);
+    }
+
+    /**
+     * Checks if the specified additional metadata information is requested.
+     *
+     * @param string $extra
+     *
+     * @return bool
+     */
+    public function hasExtra($extra)
+    {
+        $extras = $this->get(self::EXTRA);
+
+        return null !== $extras
+            ? in_array($extra, $extras, true)
+            : false;
+    }
+
+    /**
+     * Gets requested additional metadata information.
+     *
+     * @return string[]
+     */
+    public function getExtras()
+    {
+        $extras = $this->get(self::EXTRA);
+
+        return null !== $extras
+            ? $extras
+            : [];
+    }
+
+    /**
+     * Sets additional metadata information that you need to be returned.
+     *
+     * @param string[] $extras
+     */
+    public function setExtras($extras)
+    {
+        if (empty($extras)) {
+            $this->remove(self::EXTRA, $extras);
+        } else {
+            $this->set(self::EXTRA, $extras);
+        }
     }
 }
