@@ -98,6 +98,7 @@ editor.view_options | {} | Specifies options to pass into the cell editor view
 Frontend type | Editor view
 :-------------|:-----------------------------------------------------------------
 string        | [text-editor-view](../../frontend/editor/text-editor-view.md)
+phone         | [text-editor-view](../../frontend/editor/text-editor-view.md)
 datetime      | [datetime-editor-view](../../frontend/editor/datetime-editor-view.md)
 date          | [date-editor-view](../../frontend/editor/date-editor-view.md)
 currency      | [number-editor-view](../../frontend/editor/number-editor-view.md)
@@ -113,7 +114,7 @@ Taken from [default-editors.md](../default-editors.md)
 
 Editor                                                                      | Description
 :---------------------------------------------------------------------------|:-----------------------------------------------------
-[text-editor-view](../../frontend/editor/text-editor-view.md)                  | Editing text cells
+[text-editor-view](../../frontend/editor/text-editor-view.md)                  | Editing text/phone cells
 [number-editor-view](../../frontend/editor/number-editor-view.md)              | Editing number/integer/decimal/currency cells
 [percent-editor-view](../../frontend/editor/percent-editor-view.md)            | Editing percent  cells
 [date-editor-view](../../frontend/editor/date-editor-view.md)                  | Editing date cells

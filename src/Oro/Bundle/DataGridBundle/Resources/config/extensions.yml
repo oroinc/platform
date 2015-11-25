@@ -12,6 +12,7 @@ parameters:
     oro_datagrid.extension.gridparams.class:       Oro\Bundle\DataGridBundle\Extension\GridParams\GridParamsExtension
     oro_datagrid.extension.totals.class:           Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension
     oro_datagrid.extension.columns.class:          Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension
+    oro_datagrid.extension.mode.class:             Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension
 
 services:
     oro_datagrid.extension.formatter:
@@ -112,5 +113,10 @@ services:
             - @oro_security.security_facade
             - @oro_security.acl_helper
             - @oro_datagrid.columns.helper
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.mode:
+        class: %oro_datagrid.extension.mode.class%
         tags:
             - { name: oro_datagrid.extension }

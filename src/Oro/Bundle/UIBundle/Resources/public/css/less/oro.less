@@ -387,7 +387,15 @@ body .select2-container {
   color:#666;
   font-family: 'FontAwesome';
 }
-
+.icon-resize-vertical {
+  // because resize-vertical icon is too thin
+  padding: 0 3px;
+}
+.ui-sortable-handle {
+  cursor: move;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
 .dropdown-menu {
   .divider {
     border-bottom-color:#eee;
@@ -3002,12 +3010,12 @@ span.validation-failed {
 .popover {
   max-width: 315px; /* little increase to fit usual content */
   .popover-content {
-    padding: 6px 8px;
+    padding: 13px 30px 13px 15px;
+    height: 100%;
   }
   .oro-popover-content {
     overflow-y: auto;
-    margin-right: 15px;
-    max-height: 60px;
+    height: 100%;
   }
   .popover-close {
     position: absolute;
