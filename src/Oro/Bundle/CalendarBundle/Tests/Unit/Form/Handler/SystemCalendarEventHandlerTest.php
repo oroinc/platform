@@ -24,6 +24,9 @@ class SystemCalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var CalendarEvent */
     protected $entity;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $activityManager;
+
     protected function setUp()
     {
         $this->form                = $this->getMockBuilder('Symfony\Component\Form\Form')
@@ -33,12 +36,16 @@ class SystemCalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->om                  = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->entity  = new CalendarEvent();
         $this->handler = new SystemCalendarEventHandler(
             $this->form,
             $this->request,
-            $this->om
+            $this->om,
+            $this->activityManager
         );
     }
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
@@ -25,6 +26,9 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var CalendarEvent */
     protected $obj;
 
+    /** @var ActivityManager */
+    protected $activityManager;
+
     protected function setUp()
     {
         $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
@@ -35,6 +39,9 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->emailSendProcessor = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -67,7 +74,13 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
         $this->emailSendProcessor->expects($this->once())
             ->method('sendInviteNotification');
 
-        $handler = new CalendarEventApiHandler($this->form, $this->request, $this->om, $this->emailSendProcessor);
+        $handler = new CalendarEventApiHandler(
+            $this->form,
+            $this->request,
+            $this->om,
+            $this->emailSendProcessor,
+            $this->activityManager
+        );
         $handler->process($this->obj);
     }
 
@@ -78,7 +91,13 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
         $this->emailSendProcessor->expects($this->once())
             ->method('sendUpdateParentEventNotification');
 
-        $handler = new CalendarEventApiHandler($this->form, $this->request, $this->om, $this->emailSendProcessor);
+        $handler = new CalendarEventApiHandler(
+            $this->form,
+            $this->request,
+            $this->om,
+            $this->emailSendProcessor,
+            $this->activityManager
+        );
         $handler->process($this->obj);
     }
 }

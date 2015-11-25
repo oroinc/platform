@@ -178,4 +178,12 @@ class BaseCart
     {
         return $this->taxAmount;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }
