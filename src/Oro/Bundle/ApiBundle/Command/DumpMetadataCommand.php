@@ -9,7 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -80,7 +79,7 @@ class DumpMetadataCommand extends ContainerAwareCommand
             $entityClass,
             $version,
             $requestType,
-            [ConfigExtra::DESCRIPTIONS],
+            [],
             $configProvider->getConfig($entityClass, $version, $requestType)
         );
 
