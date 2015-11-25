@@ -56,10 +56,6 @@
                 emptyHeader = null,
                 isAllowedRoute = $(this).parents('li.operation').find('div.heading span.path').text().indexOf('/api/{version}/') !== -1,
                 isHeaderRequired = function () {
-                    if (!isAllowedRoute) {
-                        return false;
-                    }
-
                     var needsHeader = true;
                     $('.tuple', headers).each(function (index, header) {
                         if ($('input.key:text[value="' + headerKey + '"]', header).length) {
@@ -81,7 +77,7 @@
                     $('input.value', header).val(headerValue);
                 };
 
-            if (isHeaderRequired()) {
+            if (isAllowedRoute && isHeaderRequired()) {
                 if (emptyHeader) {
                     fillHeader(emptyHeader);
                 } else {
