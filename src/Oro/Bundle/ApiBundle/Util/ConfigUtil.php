@@ -10,8 +10,12 @@ class ConfigUtil extends BaseConfigUtil
     const FILTERS    = 'filters';
     const SORTERS    = 'sorters';
 
-    const LABEL         = 'label';
-    const DESCRIPTION   = 'description';
+    /**
+     * a human-readable representation of an object like entity, field, filter, etc.
+     * can be a string or Label object.
+     */
+    const DESCRIPTION = 'description';
+
     const DATA_TYPE     = 'data_type';
     const DEFAULT_VALUE = 'default_value';
     const ALLOW_ARRAY   = 'allow_array';
