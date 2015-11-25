@@ -86,7 +86,7 @@ class NormalizeEntityMetadata implements ProcessorInterface
         $linkedProperty = array_pop($path);
         foreach ($path as $property) {
             if (!$classMetadata->hasAssociation($property)) {
-                // a intermediate property is not an association, it may happen due invalid configuration
+                // an intermediate property is not an association, it may happen due invalid configuration
                 $classMetadata = null;
                 break;
             }
