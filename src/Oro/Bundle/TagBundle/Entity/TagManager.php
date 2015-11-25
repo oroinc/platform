@@ -539,7 +539,7 @@ class TagManager
 
         $elements = $repository->getTags(
             ClassUtils::getClass($entity),
-            $entity->getId(),
+            self::getEntityId($entity),
             $owner,
             $all,
             $usedOrganization

@@ -251,3 +251,10 @@ services:
             - @oro_security.acl_helper
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tag }
+
+    oro_tag.view.eventlistener.tag_field:
+        class: Oro\Bundle\TagBundle\EventListener\TagFieldListener
+        arguments:
+            - @oro_tag.tag.manager
+        tags:
+            - { name: kernel.event_listener, event: entity_view.render.before, method: addTagField }

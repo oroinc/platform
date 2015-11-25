@@ -100,6 +100,8 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testAfterMergeEntity()
     {
+        $this->markTestSkipped('@todo: Should be fixed in CRM-4544');
+
         $this->entityData
             ->expects($this->any())
             ->method('getMasterEntity')

@@ -214,8 +214,6 @@ services:
             - @oro_user.form.user.api
             - @request
             - @oro_user.manager
-        tags:
-            - { name: oro_tag.tag_manager }
 
     oro_user.form.handler.role.api:
         class:                        %oro_user.form.handler.role.class%
