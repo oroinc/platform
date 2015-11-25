@@ -119,7 +119,7 @@ class TagManager
     }
 
     /**
-     * Checks if entity class implements Taggable interface.
+     * Checks if entity class implements Taggable interface
      *
      * @param object|string $className
      *
@@ -588,34 +588,5 @@ class TagManager
         }
 
         return $tagIds;
-    }
-
-    /**
-     * @param Tag[] $all
-     * @param Tag[] $owner
-     *
-     * @return Tag[]
-     */
-    protected function mergeTags($all, $owner)
-    {
-        if (empty($owner)) {
-            return $all;
-        }
-
-        if (empty($all)) {
-            return $owner;
-        }
-
-        $result = $owner;
-        foreach ($owner as $ownerTag) {
-            foreach ($all as $allTag) {
-                if ($ownerTag->getName() === $allTag->getName()) {
-                    continue;
-                }
-                $result[] = $allTag;
-            }
-        }
-
-        return $result;
     }
 }
