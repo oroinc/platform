@@ -26,7 +26,7 @@ datagrid:
       {column-name-label}:
         inline_editing:
           editor:
-            view: orodatagrid/js/app/views/editor/related-id-select-editor-view
+            view: oroform/js/app/views/editor/related-id-select-editor-view
             view_options:
               placeholder: '<placeholder>'
               css_class_name: '<class-name>'

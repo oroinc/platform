@@ -17,7 +17,7 @@ datagrid:
       {column-name-2}:
         inline_editing:
           editor:
-            view: orodatagrid/js/app/views/editor/percent-editor-view
+            view: oroform/js/app/views/editor/percent-editor-view
             view_options:
               placeholder: '<placeholder>'
               css_class_name: '<class-name>'
