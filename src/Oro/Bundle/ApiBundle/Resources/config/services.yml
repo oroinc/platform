@@ -37,6 +37,10 @@ services:
         arguments:
             - @doctrine
 
+    oro_api.entity_accessor:
+        class: Oro\Component\EntitySerializer\EntityDataAccessor
+        public: false
+
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
         public: false
@@ -93,16 +97,43 @@ services:
         class: Oro\Component\EntitySerializer\EntitySerializer
         public: false
         arguments:
-            - @doctrine
+            - @oro_api.entity_serializer.doctrine_helper
             - @oro_api.entity_accessor
-            - @oro_api.entity_data_transformer
+            - @oro_api.entity_serializer.data_transformer
+            - @oro_api.entity_serializer.query_factory
+            - @oro_api.entity_serializer.field_accessor
+            - @oro_api.entity_serializer.config_normalizer
+            - @oro_api.entity_serializer.data_normalizer
+
+    oro_api.entity_serializer.doctrine_helper:
+        class: Oro\Component\EntitySerializer\DoctrineHelper
+        public: false
+        arguments:
+            - @doctrine
+
+    oro_api.entity_serializer.query_factory:
+        class: Oro\Component\EntitySerializer\QueryFactory
+        public: false
+        arguments:
+            - @oro_api.entity_serializer.doctrine_helper
             - @oro_entity.query_hint_resolver
 
-    oro_api.entity_accessor:
-        class: Oro\Component\EntitySerializer\EntityDataAccessor
+    oro_api.entity_serializer.field_accessor:
+        class: Oro\Component\EntitySerializer\FieldAccessor
+        public: false
+        arguments:
+            - @oro_api.entity_serializer.doctrine_helper
+            - @oro_api.entity_accessor
+
+    oro_api.entity_serializer.config_normalizer:
+        class: Oro\Component\EntitySerializer\ConfigNormalizer
         public: false
 
-    oro_api.entity_data_transformer:
+    oro_api.entity_serializer.data_normalizer:
+        class: Oro\Component\EntitySerializer\DataNormalizer
+        public: false
+
+    oro_api.entity_serializer.data_transformer:
         class: Oro\Component\EntitySerializer\EntityDataTransformer
         public: false
         arguments:

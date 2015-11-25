@@ -10,12 +10,17 @@ class EntityDataTransformer implements DataTransformerInterface
     /** @var ContainerInterface */
     protected $container;
 
+    /** @var DataTransformerInterface */
+    protected $baseDataTransformer;
+
     /**
-     * @param ContainerInterface $container
+     * @param ContainerInterface            $container
+     * @param DataTransformerInterface|null $baseDataTransformer
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, DataTransformerInterface $baseDataTransformer = null)
     {
-        $this->container = $container;
+        $this->container           = $container;
+        $this->baseDataTransformer = $baseDataTransformer;
     }
 
     /**
@@ -23,22 +28,16 @@ class EntityDataTransformer implements DataTransformerInterface
      */
     public function transform($class, $property, $value, $config)
     {
-        if (isset($config['data_transformer'])) {
-            foreach ((array)$config['data_transformer'] as $transformerServiceId) {
+        if (isset($config[ConfigUtil::DATA_TRANSFORMER])) {
+            foreach ((array)$config[ConfigUtil::DATA_TRANSFORMER] as $transformerServiceId) {
                 $transformer = $this->container->get($transformerServiceId);
                 $value       = $this->transformByCustomTransformer($transformer, $class, $property, $value, $config);
             }
         }
 
-        if (is_object($value)) {
-            if (method_exists($value, '__toString')) {
-                $value = (string)$value;
-            } elseif ($value instanceof \DateTime) {
-                $value = $value->format('c');
-            }
-        }
-
-        return $value;
+        return null !== $this->baseDataTransformer
+            ? $this->baseDataTransformer->transform($class, $property, $value, $config)
+            : $value;
     }
 
     /**

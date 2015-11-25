@@ -16,20 +16,17 @@ class FieldAccessor
     protected $entityFieldFilter;
 
     /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param DataAccessorInterface $dataAccessor
+     * @param DoctrineHelper                  $doctrineHelper
+     * @param DataAccessorInterface           $dataAccessor
+     * @param EntityFieldFilterInterface|null $entityFieldFilter
      */
-    public function __construct(DoctrineHelper $doctrineHelper, DataAccessorInterface $dataAccessor)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->dataAccessor   = $dataAccessor;
-    }
-
-    /**
-     * @param EntityFieldFilterInterface $entityFieldFilter
-     */
-    public function setEntityFieldFilter(EntityFieldFilterInterface $entityFieldFilter)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        DataAccessorInterface $dataAccessor,
+        EntityFieldFilterInterface $entityFieldFilter = null
+    ) {
+        $this->doctrineHelper    = $doctrineHelper;
+        $this->dataAccessor      = $dataAccessor;
         $this->entityFieldFilter = $entityFieldFilter;
     }
 
