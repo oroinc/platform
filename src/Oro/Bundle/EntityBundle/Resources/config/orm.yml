@@ -5,6 +5,8 @@ parameters:
     oro_entity.doctrine_helper.class:                          Oro\Bundle\EntityBundle\ORM\DoctrineHelper
     oro_entity.entity_identifier_accessor.class:               Oro\Bundle\EntityBundle\ORM\EntityIdAccessor
     oro_entity.orm.entity_class_resolver.class:                Oro\Bundle\EntityBundle\ORM\EntityClassResolver
+    oro_entity.orm.abstract_native_query.class:                Oro\Bundle\EntityBundle\ORM\AbstractNativeQuery
+    oro_entity.orm.insert_from_select_query.class:             Oro\Bundle\EntityBundle\ORM\InsertFromSelectQuery
     oro_entity.query_hint_resolver.class:                      Oro\Component\DoctrineUtils\ORM\QueryHintResolver
 
 services:
@@ -25,3 +27,12 @@ services:
 
     oro_entity.query_hint_resolver:
         class: %oro_entity.query_hint_resolver.class%
+
+    oro_entity.orm.abstract_native_query:
+        class: %oro_entity.orm.abstract_native_query.class%
+        arguments:
+            - @doctrine
+
+    oro_entity.orm.insert_from_select_query:
+        class: %oro_entity.orm.insert_from_select_query.class%
+        parent: oro_entity.orm.abstract_native_query
