@@ -169,6 +169,7 @@ services:
         class: %oro_tag.event_listener.search_results_grid_listener.class%
         arguments:
           - @oro_tag.security_provider
+          - @oro_entity.entity_alias_resolver
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.tag-results-grid, method: onBuildAfter }
 
@@ -221,3 +222,33 @@ services:
             - @oro_security.acl_helper
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tag }
+
+    oro_tag.extension.grid.formatter.tag_search_result_property:
+        class: Oro\Bundle\TagBundle\Grid\Formatter\TagSearchResultProperty
+        arguments:
+            - @twig
+            - @oro_entity_config.provider.entity
+            - OroTagBundle:Search:searchResultItem.html.twig
+        calls:
+            - [setMappingProvider, [@oro_search.provider.search_mapping]]
+        tags:
+            - { name:  oro_datagrid.extension.formatter.property, type: tag-search-result }
+
+    oro_tag.provider.statistic:
+        class: Oro\Bundle\TagBundle\Provider\StatisticProvider
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_tag.security_provider
+            - @oro_entity_config.provider.entity
+            - @oro_entity.entity_alias_resolver
+
+
+    oro_tag.extension.tag_search_results:
+        class: Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension
+        arguments:
+            - @oro_search.formatter.result_formatter
+            - @doctrine.orm.entity_manager
+            - @oro_search.mapper
+            - @event_dispatcher
+        tags:
+            - { name: oro_datagrid.extension }
