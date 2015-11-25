@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
 
     /**
-     * Number cell content editor.
+     * Percent cell content editor.
      *
      * ### Column configuration samples:
      * ``` yml
@@ -15,12 +15,12 @@ define(function(require) {
      *     columns:
      *       # Sample 1. Mapped by number frontend type
      *       {column-name-1}:
-     *         frontend_type: <number/integer/decimal/currency>
+     *         frontend_type: percent
      *       # Sample 2. Full configuration
      *       {column-name-2}:
      *         inline_editing:
      *           editor:
-     *             view: orodatagrid/js/app/views/editor/number-editor-view
+     *             view: oroform/js/app/views/editor/percent-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
      *               css_class_name: '<class-name>'
@@ -46,67 +46,36 @@ define(function(require) {
      * @param {string} options.placeholder - Placeholder for an empty element
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      *
-     * @augments [TextEditorView](./text-editor-view.md)
-     * @exports NumberEditorView
+     * @augments [NumberEditorView](./number-editor-view.md)
+     * @exports PercentEditorView
      */
-    var NumberEditorView;
-    var TextEditorView = require('./text-editor-view');
-    var _ = require('underscore');
-    var NumberFormatter = require('orofilter/js/formatter/number-formatter');
+    var PercentEditorView;
+    var NumberEditorView = require('./number-editor-view');
 
-    NumberEditorView = TextEditorView.extend(/** @exports NumberEditorView.prototype */{
+    PercentEditorView = NumberEditorView.extend(/** @exports PercentEditorView.prototype */{
         className: 'number-editor',
-
-        initialize: function(options) {
-            this.formatter = new NumberFormatter(options);
-            NumberEditorView.__super__.initialize.apply(this, arguments);
-        },
-
-        getValue: function() {
-            var userInput = this.$('input[name=value]').val();
-            var parsed = this.formatter.toRaw(userInput);
-            return _.isNumber(parsed) ? parsed : NaN;
-        },
-
-        getValidationRules: function() {
-            var rules = NumberEditorView.__super__.getValidationRules.call(this);
-            rules.number = true;
-            return rules;
-        },
-
-        getFormattedValue: function() {
-            var raw = this.getModelValue();
-            if (isNaN(raw)) {
-                return '';
-            }
-
-            return this.formatter.fromRaw(raw);
-        },
 
         getModelValue: function() {
             var raw = this.model.get(this.column.get('name'));
-            return parseFloat(raw);
-        },
-
-        isChanged: function() {
-            var valueChanged = this.getValue() !== this.getModelValue();
-            return isNaN(this.getModelValue()) ?
-                this.$('input[name=value]').val() !== '' :
-                valueChanged;
-        },
-
-        getServerUpdateData: function() {
-            var data = {};
-            data[this.column.get('name')] = isNaN(this.getValue()) ? null : this.getValue();
-            return data;
+            return parseFloat(raw) * 100;
         },
 
         getModelUpdateData: function() {
             var data = {};
-            data[this.column.get('name')] = isNaN(this.getValue()) ? this.UNSET_FIELD_VALUE : this.getValue();
+            data[this.column.get('name')] = this.getValue() / 100;
             return data;
+        },
+
+        getFormattedValue: function() {
+
+            var raw = this.getModelValue();
+            if (isNaN(raw)) {
+                return '';
+            }
+            return String(raw);
         }
+
     });
 
-    return NumberEditorView;
+    return PercentEditorView;
 });

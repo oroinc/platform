@@ -24,7 +24,7 @@ datagrid:
       {column-name-3}:
         inline_editing:
           editor:
-            view: orodatagrid/js/app/views/editor/text-editor-view
+            view: oroform/js/app/views/editor/text-editor-view
             view_options:
               placeholder: '<placeholder>'
               css_class_name: '<class-name>'

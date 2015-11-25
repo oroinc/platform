@@ -11,7 +11,7 @@ define(function(require) {
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var backdropManager = require('oroui/js/tools/backdrop-manager');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
-    require('orodatagrid/js/app/views/editor/text-editor-view');
+    require('oroform/js/app/views/editor/text-editor-view');
 
     InlineEditingPlugin = BasePlugin.extend({
         /**
@@ -29,7 +29,7 @@ define(function(require) {
         /**
          * This view is used by default for editing
          */
-        DEFAULT_VIEW: 'orodatagrid/js/app/views/editor/text-editor-view',
+        DEFAULT_VIEW: 'oroform/js/app/views/editor/text-editor-view',
 
         /**
          * This view is used by default for editing
