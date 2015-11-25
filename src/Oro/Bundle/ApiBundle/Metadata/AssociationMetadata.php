@@ -31,7 +31,7 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
-     * Whether an association an association represents "to-many" or "to-one" relation.
+     * Whether an association represents "to-many" or "to-one" relation.
      *
      * @return bool
      */
