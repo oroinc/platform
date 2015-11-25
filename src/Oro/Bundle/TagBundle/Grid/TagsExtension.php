@@ -64,7 +64,7 @@ class TagsExtension extends AbstractExtension
                         'template'      => 'OroTagBundle:Datagrid:Property/tags.html.twig',
                         'editable'      => false,
                         'translatable'  => true,
-                        'renderable'    => true
+                        'renderable'    => false
                     ]
                 ]
             )
