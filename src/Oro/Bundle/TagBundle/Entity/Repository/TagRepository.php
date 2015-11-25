@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\EntityRepository;
@@ -14,13 +15,37 @@ use Oro\Bundle\UserBundle\Entity\User;
 class TagRepository extends EntityRepository
 {
     /**
+     * @param string $entityClassName
+     * @param array  $entityIds
+     * @param string $direction
+     *
+     * @return array [id, name, entityId]
+     */
+    public function getTagsByEntityIds($entityClassName, array $entityIds, $direction = Criteria::ASC)
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('t.id', 't.name', 't2.recordId AS entityId')
+            ->innerJoin(
+                't.tagging',
+                't2',
+                Join::WITH,
+                't2.recordId IN (:entityIds) AND t2.entityName = :entityClassName'
+            )
+            ->orderBy('t.name', $direction)
+            ->setParameter('entityIds', $entityIds)
+            ->setParameter('entityClassName', $entityClassName);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * Returns tags related to entity
      *
      * If $owner is null return all tags for entity.
      * If $owner is not null and $all is true return all tags excluded $owner.
      * If $owner is not null and $all is false return all $owner tags.
      *
-     * @param string            $entityName
+     * @param string            $entityClassName
      * @param int               $entityId
      * @param User|null         $owner
      * @param bool|false        $all
@@ -29,7 +54,7 @@ class TagRepository extends EntityRepository
      * @return array
      */
     public function getTags(
-        $entityName,
+        $entityClassName,
         $entityId,
         User $owner = null,
         $all = false,
@@ -37,9 +62,9 @@ class TagRepository extends EntityRepository
     ) {
         $qb = $this->createQueryBuilder('t')
             ->select('t')
-            ->innerJoin('t.tagging', 't2', Join::WITH, 't2.recordId = :recordId AND t2.entityName = :entityName')
-            ->setParameter('recordId', $entityId)
-            ->setParameter('entityName', $entityName);
+            ->innerJoin('t.tagging', 't2', Join::WITH, 't2.recordId = :entityId AND t2.entityName = :entityClassName')
+            ->setParameter('entityId', $entityId)
+            ->setParameter('entityClassName', $entityClassName);
 
         if (null !== $owner) {
             $qb->where('t2.owner ' . ($all ? '!=' : '=') . ' :owner')
@@ -58,21 +83,21 @@ class TagRepository extends EntityRepository
      * Remove tags related to entity
      *
      * @param Tag[]|int[] $tags
-     * @param string      $entityName
-     * @param int         $recordId
+     * @param string      $entityClassName
+     * @param int         $entityId
      * @param User|null   $owner
      *
      * @return int
      */
-    public function deleteTaggingByParams(array $tags, $entityName, $recordId, User $owner = null)
+    public function deleteTaggingByParams(array $tags, $entityClassName, $entityId, User $owner = null)
     {
         $builder = $this->_em->createQueryBuilder();
         $builder
             ->delete('OroTagBundle:Tagging', 't')
-            ->where('t.entityName = :entityName')
-            ->andWhere('t.recordId = :recordId')
-            ->setParameter('entityName', $entityName)
-            ->setParameter('recordId', $recordId);
+            ->where('t.entityName = :entityClassName')
+            ->andWhere('t.recordId = :entityId')
+            ->setParameter('entityClassName', $entityClassName)
+            ->setParameter('entityId', $entityId);
 
         if (!empty($tags)) {
             $builder->andWhere($builder->expr()->in('t.tag', $tags));

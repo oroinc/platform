@@ -89,45 +89,46 @@ class TagManager
     }
 
     /**
-     * Checks if entity taggable.
-     * Entity is taggable if it implements Taggable interface or it configured as taggable.
+     * @param @param string $entityClassName The FQCN of the entity
+     * @param array $ids
      *
-     * @param string|object $className
-     *
-     * @return bool
+     * @return array [id, name, entityId]
      */
-    public function isTaggable($className)
+    public function getTagsByEntityIds($entityClassName, array $ids)
     {
-        return
-            $this->tagConfigProvider->getConfig($className)->is('enabled') ||
-            $this->isImplementsTaggable($className);
+        $repository = $this->getTagsRepository();
+
+        return $repository->getTagsByEntityIds($entityClassName, $ids);
     }
 
     /**
-     * Checks if entity immutable.
-     * For entities that implements Taggable interface tags are always enabled.
+     * Checks if entity taggable.
+     * Entity is taggable if it implements Taggable interface or it configured as taggable.
      *
-     * @param object|string $className
+     * @param string|object $entity
      *
      * @return bool
      */
-    public function isImmutable($className)
+    public function isTaggable($entity)
     {
         return
-            $this->tagConfigProvider->getConfig($className)->is('immutable') ||
-            $this->isImplementsTaggable($className);
+            $this->isImplementsTaggable($entity) ||
+            (
+                $this->tagConfigProvider->hasConfig($entity) &&
+                $this->tagConfigProvider->getConfig($entity)->is('enabled')
+            );
     }
 
     /**
      * Checks if entity class implements Taggable interface
      *
-     * @param object|string $className
+     * @param object|string $entity
      *
      * @return bool
      */
-    public function isImplementsTaggable($className)
+    public function isImplementsTaggable($entity)
     {
-        return is_a($className, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
+        return is_a($entity, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
     }
 
     /**
@@ -206,9 +207,8 @@ class TagManager
      */
     public function deleteTagging($entity, $tags, User $owner = null)
     {
-        /** @var TagRepository $repository */
-        $repository = $this->em->getRepository($this->tagClass);
         $tagIds     = $this->prepareTagIds($tags);
+        $repository = $this->getTagsRepository();
 
         return $repository->deleteTaggingByParams(
             $tagIds,
@@ -268,7 +268,7 @@ class TagManager
             return [];
         }
 
-        $usedOrganization = $organization ?: $this->getOrganization();
+        $usedOrganization = $organization ? : $this->getOrganization();
 
         $names = array_unique(array_map('trim', $names));
         $tags  = $this->em->getRepository($this->tagClass)->findBy(
@@ -533,9 +533,8 @@ class TagManager
      */
     protected function fetchTags($entity, $owner, $all = false, Organization $organization = null)
     {
-        /** @var TagRepository $repository */
-        $repository       = $this->em->getRepository($this->tagClass);
-        $usedOrganization = $organization ?: $this->getOrganization();
+        $repository       = $this->getTagsRepository();
+        $usedOrganization = $organization ? : $this->getOrganization();
 
         $elements = $repository->getTags(
             ClassUtils::getClass($entity),
@@ -588,5 +587,15 @@ class TagManager
         }
 
         return $tagIds;
+    }
+
+    /**
+     * @return TagRepository
+     */
+    protected function getTagsRepository()
+    {
+        $repository = $this->em->getRepository($this->tagClass);
+
+        return $repository;
     }
 }
