@@ -11,10 +11,10 @@ use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Component\ChainProcessor\ActionProcessor;
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
-use Oro\Bundle\ApiBundle\Request\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;

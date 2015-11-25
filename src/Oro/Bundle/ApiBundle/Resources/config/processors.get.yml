@@ -112,7 +112,7 @@ services:
     oro_api.get.normalize_data:
         class: Oro\Bundle\ApiBundle\Processor\Get\NormalizeData
         arguments:
-            - @oro_api.item_normalizer
+            - @oro_api.object_normalizer
         tags:
             - { name: oro.api.processor, action: get, group: normalize_data, priority: -10 }
 

@@ -4,19 +4,19 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Normalizer\ItemNormalizer;
+use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 
 class NormalizeData implements ProcessorInterface
 {
-    /** @var ItemNormalizer */
-    protected $itemNormalizer;
+    /** @var ObjectNormalizer */
+    protected $objectNormalizer;
 
     /**
-     * @param ItemNormalizer $itemNormalizer
+     * @param ObjectNormalizer $objectNormalizer
      */
-    public function __construct(ItemNormalizer $itemNormalizer)
+    public function __construct(ObjectNormalizer $objectNormalizer)
     {
-        $this->itemNormalizer = $itemNormalizer;
+        $this->objectNormalizer = $objectNormalizer;
     }
 
     /**
@@ -37,7 +37,7 @@ class NormalizeData implements ProcessorInterface
 
         $normalizedData = [];
         foreach ($data as $key => $value) {
-            $normalizedData[$key] = $this->itemNormalizer->normalizeItem($value);
+            $normalizedData[$key] = $this->objectNormalizer->normalizeItem($value);
         }
         $context->setResult($normalizedData);
     }

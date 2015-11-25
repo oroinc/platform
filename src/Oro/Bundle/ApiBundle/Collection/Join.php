@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Util;
+namespace Oro\Bundle\ApiBundle\Collection;
 
 use Doctrine\ORM\Query\Expr\Join as BaseJoin;
 

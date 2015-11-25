@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 

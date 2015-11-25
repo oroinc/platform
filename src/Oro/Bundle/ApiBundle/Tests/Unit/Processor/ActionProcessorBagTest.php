@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ApiBundle\Request\ActionProcessorBag;
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
 
 class ActionProcessorBagTest extends \PHPUnit_Framework_TestCase
 {

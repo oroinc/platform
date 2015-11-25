@@ -6,7 +6,7 @@ parameters:
 
 services:
     oro_api.action_processor_bag:
-        class: Oro\Bundle\ApiBundle\Request\ActionProcessorBag
+        class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
 
     oro_api.processor_bag:
         class: Oro\Component\ChainProcessor\ProcessorBag
@@ -53,8 +53,8 @@ services:
         arguments:
             - @oro_api.normalize_value.processor
 
-    oro_api.item_normalizer:
-        class: Oro\Bundle\ApiBundle\Normalizer\ItemNormalizer
+    oro_api.object_normalizer:
+        class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer
         public: false
         arguments:
             - @oro_api.doctrine_helper

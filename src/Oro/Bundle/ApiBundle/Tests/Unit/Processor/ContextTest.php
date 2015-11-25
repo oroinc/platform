@@ -395,7 +395,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->context->getCriteria());
 
-        $criteria = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\Criteria')
+        $criteria = $this->getMockBuilder('Oro\Bundle\ApiBundle\Collection\Criteria')
             ->disableOriginalConstructor()
             ->getMock();
 

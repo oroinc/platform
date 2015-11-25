@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 
-class ExceptionHelper
+class ExceptionUtil
 {
     /**
      * Gets an exception that caused a processor failure.

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor;
-use Oro\Bundle\ApiBundle\Util\ExceptionHelper;
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 
 /**
  * Provides a way to convert incoming value to concrete data-type.
@@ -89,7 +89,7 @@ class ValueNormalizer
         try {
             $this->processor->process($context);
         } catch (\Exception $e) {
-            throw ExceptionHelper::getProcessorUnderlyingException($e);
+            throw ExceptionUtil::getProcessorUnderlyingException($e);
         }
 
         return $context;

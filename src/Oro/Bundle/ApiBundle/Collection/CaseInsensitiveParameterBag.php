@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor;
+namespace Oro\Bundle\ApiBundle\Collection;
 
 use Oro\Component\ChainProcessor\ParameterBag;
 

@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Util\Criteria;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class InitializeCriteria implements ProcessorInterface

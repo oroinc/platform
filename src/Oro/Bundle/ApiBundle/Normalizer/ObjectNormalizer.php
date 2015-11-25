@@ -7,7 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class ItemNormalizer
+class ObjectNormalizer
 {
     const MAX_NESTING_LEVEL = 1;
 
