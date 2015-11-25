@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,8 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
