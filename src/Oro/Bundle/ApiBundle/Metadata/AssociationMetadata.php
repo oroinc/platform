@@ -7,8 +7,8 @@ class AssociationMetadata extends PropertyMetadata
     /** FQCN of an association target */
     const TARGET_CLASS_NAME = 'targetClass';
 
-    /** a flag indicates an association is collection valued */
-    const COLLECTION_VALUED = 'collection';
+    /** a flag indicates if an association represents "to-many" or "to-one" relation */
+    const COLLECTION = 'collection';
 
     /**
      * Gets FQCN of an association target.
@@ -31,32 +31,22 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
-     * Whether an association is single valued.
+     * Whether an association an association represents "to-many" or "to-one" relation.
      *
      * @return bool
      */
-    public function isSingleValued()
+    public function isCollection()
     {
-        return !$this->isCollectionValued();
+        return (bool)$this->get(self::COLLECTION);
     }
 
     /**
-     * Whether an association is collection valued.
+     * Sets a flag indicates whether an association represents "to-many" or "to-one" relation.
      *
-     * @return bool
+     * @param bool $value TRUE for "to-many" relation, FALSE for "to-one" relation
      */
-    public function isCollectionValued()
+    public function setIsCollection($value)
     {
-        return $this->get(self::COLLECTION_VALUED);
-    }
-
-    /**
-     * Sets a flag indicates an association is collection or single valued.
-     *
-     * @param bool $type FALSE for single valued association, TRUE for collection valued association
-     */
-    public function setCollectionValued($type)
-    {
-        $this->set(self::COLLECTION_VALUED, $type);
+        $this->set(self::COLLECTION, $value);
     }
 }

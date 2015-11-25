@@ -83,33 +83,29 @@ class NormalizeEntityMetadata implements ProcessorInterface
             return;
         }
 
-        $count = count($path);
-        $i     = 0;
-        while ($i < $count - 1) {
-            $referencedName = $path[$i];
-            if (!$classMetadata->hasAssociation($referencedName)) {
-                // a referenced property is not an association; may be invalid configuration?
+        $referencedProperty = array_pop($path);
+        foreach ($path as $property) {
+            if (!$classMetadata->hasAssociation($property)) {
+                // a referenced property is not an association, it may happen due invalid configuration
                 $classMetadata = null;
                 break;
             }
             $classMetadata = $this->doctrineHelper->getEntityMetadataForClass(
-                $classMetadata->getAssociationTargetClass($referencedName)
+                $classMetadata->getAssociationTargetClass($property)
             );
-            $i++;
         }
         if (null !== $classMetadata) {
-            $referencedName = $path[$count - 1];
-            if ($classMetadata->hasAssociation($referencedName)) {
+            if ($classMetadata->hasAssociation($referencedProperty)) {
                 $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
                     $classMetadata,
-                    $referencedName
+                    $referencedProperty
                 );
                 $associationMetadata->setName($name);
                 $entityMetadata->addAssociation($associationMetadata);
             } else {
                 $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
                     $classMetadata,
-                    $referencedName
+                    $referencedProperty
                 );
                 $fieldMetadata->setName($name);
                 $entityMetadata->addField($fieldMetadata);

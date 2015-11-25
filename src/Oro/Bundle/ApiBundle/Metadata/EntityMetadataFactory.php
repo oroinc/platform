@@ -62,7 +62,7 @@ class EntityMetadataFactory
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
-        $associationMetadata->setCollectionValued($classMetadata->isCollectionValuedAssociation($associationName));
+        $associationMetadata->setIsCollection($classMetadata->isCollectionValuedAssociation($associationName));
 
         $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
         $targetIdFields = $targetMetadata->getIdentifierFieldNames();
