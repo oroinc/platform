@@ -174,19 +174,17 @@ class CompleteDefinition implements ProcessorInterface
                 continue;
             }
 
-            $targetEntityClass = $mapping['targetEntity'];
+            $config = $this->relationConfigProvider->getRelationConfig(
+                $mapping['targetEntity'],
+                $version,
+                $requestType,
+                $configSections
+            );
+            if (isset($definition[$fieldName]) && is_array($definition[$fieldName])) {
+                $config = array_merge_recursive($config, [ConfigUtil::DEFINITION => $definition[$fieldName]]);
+            }
             if ($this->exclusionProvider->isIgnoredRelation($metadata, $fieldName)) {
-                $config = [ConfigUtil::EXCLUDE => true];
-            } else {
-                $config = $this->relationConfigProvider->getRelationConfig(
-                    $targetEntityClass,
-                    $version,
-                    $requestType,
-                    $configSections
-                );
-                if (isset($definition[$fieldName]) && is_array($definition[$fieldName])) {
-                    $config = array_merge_recursive($config, [ConfigUtil::DEFINITION => $definition[$fieldName]]);
-                }
+                $config[ConfigUtil::DEFINITION][ConfigUtil::EXCLUDE] = true;
             }
             $definition[$fieldName] = $config;
         }
