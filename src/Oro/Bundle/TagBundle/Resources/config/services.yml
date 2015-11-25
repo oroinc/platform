@@ -7,7 +7,7 @@ parameters:
     oro_tag.tag.form.type.tag.api.class: Oro\Bundle\TagBundle\Form\Type\TagApiType
     oro_tag.tag.form.handler.tag.class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
 
-    oro_tag.tag.manager.api.class:  Oro\Bundle\TagBundle\Entity\TagEntityApiManager
+    oro_tag.tag.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_tag.tag.manager.class:  Oro\Bundle\TagBundle\Entity\TagManager
 
     oro_tag.autocomplete.tag.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
@@ -92,7 +92,6 @@ services:
         class: %oro_tag.tag.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @oro_tag.tag.manager
             - %oro_tag.tag.entity.class%
             - @doctrine.orm.entity_manager
 
@@ -127,22 +126,6 @@ services:
                 - Count:
                     min: 1
                     minMessage: "The 'targets' collection should contain at least one element"
-
-    oro_tag.form.handler.tag_entity.api:
-        class: Oro\Bundle\TagBundle\Form\Handler\TagEntityApiHandler
-        scope: request
-        arguments:
-            - @oro_activity.form.activity_entity.api
-            - @request
-            - @doctrine.orm.entity_manager
-            - @oro_tag.tag.manager
-
-    oro_tag.handler.tag_entity_delete.api:
-        class: Oro\Bundle\TagBundle\Form\Handler\TagEntityDeleteApiHandler
-        parent: oro_soap.handler.delete.abstract
-        calls:
-            - [setSecurityFacade, [@oro_security.security_facade]]
-            - [setTagManager, [@oro_tag.tag.manager]]
 
     # Autocomplete search handler
     oro_tag.autocomplete.tag.search_handler:
