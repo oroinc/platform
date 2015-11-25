@@ -77,45 +77,60 @@ class TagManager
     }
 
     /**
+     * @param @param string $entityClassName The FQCN of the entity
+     * @param array $ids
+     *
+     * @return array [id, name, entityId]
+     */
+    public function getTagsByEntityIds($entityClassName, array $ids)
+    {
+        $repository = $this->getTagsRepository();
+
+        return $repository->getTagsByEntityIds($entityClassName, $ids);
+    }
+
+    /**
      * Checks if entity taggable
      * Entity is taggable if it implements Taggable interface or it configured as taggable.
      *
-     * @param string|object $className
+     * @param string|object $entity
      *
      * @return bool
      */
-    public function isTaggable($className)
+    public function isTaggable($entity)
     {
         return
-            $this->tagConfigProvider->getConfig($className)->is('enabled') ||
-            $this->isImplementsTaggable($className);
+            $this->isImplementsTaggable($entity) ||
+            ($this->tagConfigProvider->hasConfig($entity) &&
+                $this->tagConfigProvider->getConfig($entity)->is('enabled')
+            );
     }
 
     /**
      * Checks if entity immutable
      * For entities that implements Taggable interface tags are always enabled.
      *
-     * @param object|string $className
+     * @param object|string $entity
      *
      * @return bool
      */
-    public function isImmutable($className)
+    public function isImmutable($entity)
     {
         return
-            $this->tagConfigProvider->getConfig($className)->is('immutable') ||
-            $this->isImplementsTaggable($className);
+            $this->tagConfigProvider->getConfig($entity)->is('immutable') ||
+            $this->isImplementsTaggable($entity);
     }
 
     /**
      * Checks if entity class implements Taggable interface
      *
-     * @param object|string $className
+     * @param object|string $entity
      *
      * @return bool
      */
-    public function isImplementsTaggable($className)
+    public function isImplementsTaggable($entity)
     {
-        return is_a($className, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
+        return is_a($entity, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
     }
 
     /**
@@ -138,8 +153,7 @@ class TagManager
      */
     public function deleteEntityTags($entity, array $tagIds = [], User $owner = null)
     {
-        /** @var TagRepository $repository */
-        $repository = $this->em->getRepository($this->tagClass);
+        $repository = $this->getTagsRepository();
 
         return $repository->deleteEntityTags(
             $tagIds,
@@ -192,7 +206,7 @@ class TagManager
             return [];
         }
 
-        $usedOrganization = $organization ?: $this->getOrganization();
+        $usedOrganization = $organization ? : $this->getOrganization();
 
         $names = array_unique(array_map('trim', $names));
         $tags  = $this->em->getRepository($this->tagClass)->findBy(
@@ -297,12 +311,12 @@ class TagManager
         $owner = $this->getUser();
 
         // Tag[]  - assigned to the entity.
-        $oldTags   = $this->fetchTags($entity, $owner, false, $organization);
+        $oldTags = $this->fetchTags($entity, $owner, false, $organization);
 
         // @todo: Should be refactored in CRM-4598.
         // Need to specify tags for update, cause when form submitted, taggable entity contains
         // information about [autocomplete = [], all => Tag[], owner => Tag[]] tags.
-        $newTags   = $this->getTags($entity);
+        $newTags = $this->getTags($entity);
 
         if (isset($newTags['all'], $newTags['owner'])) {
             $newOwnerTags = new ArrayCollection($newTags['owner']);
@@ -381,9 +395,8 @@ class TagManager
      */
     public function deleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy = null)
     {
-        $tagIds = $this->prepareTagIds($tagIds);
-        /** @var TagRepository $repository */
-        $repository = $this->em->getRepository($this->tagClass);
+        $tagIds     = $this->prepareTagIds($tagIds);
+        $repository = $this->getTagsRepository();
 
         return $repository->deleteEntityTags($tagIds, $entityName, $recordId, $createdBy);
     }
@@ -521,9 +534,8 @@ class TagManager
      */
     protected function fetchTags($entity, $owner, $all = false, Organization $organization = null)
     {
-        /** @var TagRepository $repository */
-        $repository       = $this->em->getRepository($this->tagClass);
-        $usedOrganization = $organization ?: $this->getOrganization();
+        $repository       = $this->getTagsRepository();
+        $usedOrganization = $organization ? : $this->getOrganization();
 
         $elements = $repository->getEntityTags(
             ClassUtils::getClass($entity),
@@ -558,6 +570,7 @@ class TagManager
 
     /**
      * @param $tagIds
+     *
      * @return int[]
      */
     protected function prepareTagIds($tagIds)
@@ -575,5 +588,15 @@ class TagManager
         }
 
         return $tagIds;
+    }
+
+    /**
+     * @return TagRepository
+     */
+    protected function getTagsRepository()
+    {
+        $repository = $this->em->getRepository($this->tagClass);
+
+        return $repository;
     }
 }
