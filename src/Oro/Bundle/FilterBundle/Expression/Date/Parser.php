@@ -20,11 +20,11 @@ class Parser
 
     /**
      * @param array $tokens
-     *
-     * @throws \LogicException
+     * @param bool $returnRawToken
      * @return mixed
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity) Luuu
      */
-    public function parse($tokens)
+    public function parse($tokens, $returnRawToken)
     {
         $this->validate($tokens);
         $RPNTokens = $this->convertExprToRPN($tokens);
@@ -49,6 +49,10 @@ class Parser
             foreach ($stack as $stackedResult) {
                 $result->merge($stackedResult);
             }
+        }
+
+        if ($returnRawToken) {
+            return $result;
         }
 
         return $result === null ? $result : $result->getValue();

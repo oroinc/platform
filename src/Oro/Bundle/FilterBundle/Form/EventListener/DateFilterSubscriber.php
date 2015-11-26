@@ -8,8 +8,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+use Carbon\Carbon;
+
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 
 class DateFilterSubscriber implements EventSubscriberInterface
 {
@@ -58,7 +62,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
         }
 
         $children = array_keys($form->get('value')->all());
-
+        $this->modifyEndDateForEqualType($data);
         // compile expressions
         $this->mapValues(
             $children,
@@ -163,6 +167,55 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
         foreach ($children as $child) {
             $form->add($child, 'choice', ['choices' => $choices]);
+        }
+    }
+
+    /**
+     * Modify filter when selected (source or value) and (equals or not equals) and today, start_of_* modifiers
+     * For example: equals today convert to between from 2015-11-25 00:00:00 to 2015-11-25 23:59:59
+     * It's normal user's expectations
+     *
+     * @param array $data
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function modifyEndDateForEqualType(&$data)
+    {
+        $validType =
+            $data['type'] == AbstractDateFilterType::TYPE_EQUAL ||
+            $data['type'] == AbstractDateFilterType::TYPE_NOT_EQUAL;
+        $validPart =
+            $data['part'] === DateModifierInterface::PART_SOURCE ||
+            $data['part'] === DateModifierInterface::PART_VALUE;
+
+        if (isset($data['value']) && $validType && $validPart) {
+            if ($data['type'] == AbstractDateFilterType::TYPE_EQUAL) {
+                $date = $data['value']['start'];
+            } else {
+                $date = $data['value']['end'];
+            }
+            $result = $this->expressionCompiler->compile($date, true);
+
+            if ($result instanceof ExpressionResult) {
+                switch ($result->getVariableType()) {
+                    case DateModifierInterface::VAR_TODAY:
+                    case DateModifierInterface::VAR_SOW:
+                    case DateModifierInterface::VAR_SOM:
+                    case DateModifierInterface::VAR_SOQ:
+                    case DateModifierInterface::VAR_SOY:
+                        /** @var Carbon $date */
+                        $date = $this->expressionCompiler->compile($date);
+                        $clonedDate = clone $date;
+                        if ($data['type'] == AbstractDateFilterType::TYPE_EQUAL) {
+                            $data['value']['end'] = $clonedDate->endOfDay()->format('Y-m-d H:i');
+                            $data['type'] = AbstractDateFilterType::TYPE_BETWEEN;
+                        } else {
+                            $data['type'] = AbstractDateFilterType::TYPE_NOT_BETWEEN;
+                            $data['value']['start'] = $data['value']['end'];
+                            $data['value']['end'] = $clonedDate->endOfDay()->format('Y-m-d H:i');
+                        }
+                        break;
+                }
+            }
         }
     }
 

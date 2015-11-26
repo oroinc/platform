@@ -99,7 +99,9 @@ define(function(require) {
             between:    1,
             notBetween: 2,
             moreThan:   3,
-            lessThan:   4
+            lessThan:   4,
+            equal:      5,
+            notEqual:   6
         },
 
         /**
@@ -187,6 +189,12 @@ define(function(require) {
                     this.$('.filter-separator, .filter-end-date').hide();
                     this.subview('end').setValue('');
                 } else if (this.typeValues.lessThan === type) {
+                    this.$('.filter-separator, .filter-start-date').hide();
+                    this.subview('start').setValue('');
+                } else if (this.typeValues.equal === type) {
+                    this.$('.filter-separator, .filter-end-date').hide();
+                    this.subview('end').setValue('');
+                } else if (this.typeValues.notEqual === type) {
                     this.$('.filter-separator, .filter-start-date').hide();
                     this.subview('start').setValue('');
                 }
