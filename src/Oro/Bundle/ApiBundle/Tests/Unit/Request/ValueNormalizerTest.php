@@ -41,15 +41,15 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 $this->addProcessor($processorBag, 'rest.boolean', DataType::BOOLEAN, RequestType::REST_JSON_API),
-                new Processor\Rest\NormalizeBoolean()
+                new Processor\RestJsonApi\NormalizeBoolean()
             ],
             [
                 $this->addProcessor($processorBag, 'rest.datetime', DataType::DATETIME, RequestType::REST_JSON_API),
-                new Processor\Rest\NormalizeDateTime()
+                new Processor\RestJsonApi\NormalizeDateTime()
             ],
             [
                 $this->addProcessor($processorBag, 'rest.order_by', DataType::ORDER_BY, RequestType::REST_JSON_API),
-                new Processor\Rest\NormalizeOrderBy()
+                new Processor\RestJsonApi\NormalizeOrderBy()
             ],
         ];
         foreach ($processorMap as $val) {
@@ -78,9 +78,9 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [ValueNormalizer::DEFAULT_REQUIREMENT, DataType::STRING, RequestType::REST_JSON_API],
             [Processor\NormalizeInteger::REQUIREMENT, DataType::INTEGER, RequestType::REST_JSON_API],
             [Processor\NormalizeUnsignedInteger::REQUIREMENT, DataType::UNSIGNED_INTEGER, RequestType::REST_JSON_API],
-            [Processor\Rest\NormalizeBoolean::REQUIREMENT, DataType::BOOLEAN, RequestType::REST_JSON_API],
-            [Processor\Rest\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, RequestType::REST_JSON_API],
-            [Processor\Rest\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, RequestType::REST_JSON_API],
+            [Processor\RestJsonApi\NormalizeBoolean::REQUIREMENT, DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [Processor\RestJsonApi\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, RequestType::REST_JSON_API],
+            [Processor\RestJsonApi\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, RequestType::REST_JSON_API],
         ];
     }
 
@@ -117,17 +117,17 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 RequestType::REST_JSON_API
             ],
             [
-                $this->getArrayRequirement(Processor\Rest\NormalizeBoolean::REQUIREMENT),
+                $this->getArrayRequirement(Processor\RestJsonApi\NormalizeBoolean::REQUIREMENT),
                 DataType::BOOLEAN,
                 RequestType::REST_JSON_API
             ],
             [
-                $this->getArrayRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
+                $this->getArrayRequirement(Processor\RestJsonApi\NormalizeDateTime::REQUIREMENT),
                 DataType::DATETIME,
                 RequestType::REST_JSON_API
             ],
             [
-                Processor\Rest\NormalizeOrderBy::REQUIREMENT,
+                Processor\RestJsonApi\NormalizeOrderBy::REQUIREMENT,
                 DataType::ORDER_BY,
                 RequestType::REST_JSON_API
             ],

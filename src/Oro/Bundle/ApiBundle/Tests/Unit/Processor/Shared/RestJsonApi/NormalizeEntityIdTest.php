@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
