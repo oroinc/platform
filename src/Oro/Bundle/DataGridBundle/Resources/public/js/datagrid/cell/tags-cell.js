@@ -37,7 +37,6 @@ define([
          */
         render: function() {
             var value = this.model.get(this.column.get('name'));
-            var value = TEST_DATA;
             var html = '';
 
             if (value === null || value === void 0) {
