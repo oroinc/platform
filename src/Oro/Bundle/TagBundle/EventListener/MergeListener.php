@@ -90,8 +90,8 @@ class MergeListener
 
         /* @var Taggable $masterEntity */
         $masterEntity = $entityData->getMasterEntity();
-        $masterTags   = $this->manager->getEntityTags($masterEntity)->getValues();
-        $this->manager->setEntityTags($masterEntity, ['all' => $masterTags, 'owner' => $masterTags]);
+        $masterTags   = $this->manager->getTags($masterEntity)->getValues();
+        $this->manager->setTags($masterEntity, ['all' => $masterTags, 'owner' => $masterTags]);
         $this->manager->saveTagging($masterEntity);
     }
 
