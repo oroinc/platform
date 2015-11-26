@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
 
     /**
-     * Multi-select content editor. Please note that it requires column data format
+     * Tags-select content editor. Please note that it requires column data format
      * corresponding to multi-select-cell.
      *
      * ### Column configuration samples:
