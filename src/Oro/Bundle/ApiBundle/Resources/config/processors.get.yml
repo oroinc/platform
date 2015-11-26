@@ -123,4 +123,9 @@ services:
     oro_api.get.validate_result:
         class: Oro\Bundle\ApiBundle\Processor\Get\ValidateResult
         tags:
-            - { name: oro.api.processor, action: get, group: finalize, priority: 250 }
+            - { name: oro.api.processor, action: get, group: finalize, priority: -250 }
+
+    oro_api.get.rest_json_api.validate_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\ValidateResultSchema
+        tags:
+            - { name: oro.api.processor, action: get, group: finalize, priority: -251 }
