@@ -37,63 +37,8 @@ define([
             Row.__super__.initialize.apply(this, arguments);
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
-            this.listenTo(this.model, "backgrid:isSelected", this.onBackgridIsSelected);
-            this.listenTo(this.model, "backgrid:selected", this.onBackgridSelected);
-            this.listenTo(this.model, "change:hasContact", this.onChangeHasContact);
-
-            this._initializeRenderEvents();
+            this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
         },
-
-        /**
-         * Initialize and wrap render events.
-         * Is helps to catch 'beforeRender|render|afterRender' events
-         *
-         * @private
-         */
-        _initializeRenderEvents: function () {
-            var _this = this;
-            _.bindAll(this, 'onBeforeRender', 'render', 'onAfterRender');
-            this.render = _.wrap(this.render, function(render) {
-                _this.onBeforeRender();
-                render();
-                _this.onAfterRender();
-                return _this;
-            });
-        },
-
-        /**
-         * Before render event callback
-         */
-        onBeforeRender: function () {
-
-        },
-
-        /**
-         * After render event callback
-         */
-        onAfterRender: function () {
-            this._setHighlightSelectedRows();
-        },
-
-        /**
-         * Set highlight selected rows
-         * @private
-         */
-        _setHighlightSelectedRows: function () {
-            var _this = this;
-
-            // Get first checkbox
-            var checkbox = this.$el.find('td:eq(0)').find('input[type=checkbox]');
-
-            // Exit when checkbox is not found
-            // Exit when the model does not have a hasContact attribute
-            if (!checkbox || this.model.get('hasContact') === undefined)
-                return;
-
-            // Set highlight selected row
-            this.toggleSelectedRow(this.model.get('hasContact'));
-        },
-
 
         /**
          * Handles columns sort event and updates order of cells
@@ -114,49 +59,13 @@ define([
         },
 
         /**
-         * Handles row "backgrid:isSelected" event
-         *
-         * @param {Backbone.Model} model
-         * @param {Object} state - state of row
-         *  {
-         *      selected: true,// or false
-         *  }
-         */
-        onBackgridIsSelected: function (model, state) {
-            this.toggleSelectedRow(state.selected);
-
-        },
-
-        /**
          * Handles row "backgrid:selected" event
          *
          * @param model
-         * @param isChecked
+         * @param isSelected
          */
-        onBackgridSelected: function (model, isChecked) {
-            this.toggleSelectedRow(isChecked);
-        },
-
-        /**
-         * Handles row "backgrid:hasContact" event
-         *
-         * @param {Backbone.Model} model
-         * @param {Boolean} hasContact
-         */
-        onChangeHasContact: function (model, hasContact) {
-            this.toggleSelectedRow(hasContact);
-        },
-
-        /**
-         * Toggle selected row
-         *
-         * @param {Boolean} isSelected
-         */
-        toggleSelectedRow: function (isSelected) {
-            if (isSelected)
-                this.$el.addClass("row-selected");
-            else
-                this.$el.removeClass("row-selected");
+        onBackgridSelected: function(model, isSelected) {
+            this.$el.toggleClass('row-selected', isSelected);
         },
 
         className: function() {

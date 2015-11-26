@@ -13,8 +13,6 @@ parameters:
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
     oro_integration.manager.fields_changes.class:                         Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager
 
-    oro_integration.manager.blocking_job.class:                           Oro\Bundle\IntegrationBundle\Manager\BlockingJob
-
     oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
     oro_integration.processor_registry.class:                             Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry
     oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
@@ -112,9 +110,6 @@ services:
             - @oro_integration.form.channel
             - @doctrine.orm.entity_manager
             - @event_dispatcher
-
-    oro_integration.manager.blocking_job:
-        class: %oro_integration.manager.blocking_job.class%
 
     oro_integration.manager.types_registry:
         class: %oro_integration.manager.types_registry.class%

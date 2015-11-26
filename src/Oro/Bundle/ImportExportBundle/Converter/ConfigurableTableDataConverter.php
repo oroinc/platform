@@ -382,7 +382,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $multipleRelationDeepLevel,
         $field,
         $fieldHeader,
-        $fieldOrder
+        $fieldOrder,
+        $isIdentifier = false
     ) {
         $fieldName = $field['name'];
         $relationRules = [];
