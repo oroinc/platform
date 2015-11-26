@@ -66,6 +66,9 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "form"={
  *              "form_type"="oro_user_select",
  *              "grid_name"="users-select-grid"
+ *          },
+ *          "tag"={
+ *              "enabled"=true
  *          }
  *      }
  * )
