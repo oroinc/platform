@@ -36,13 +36,7 @@ define([
          * @inheritDoc
          */
         render: function() {
-
-            var TEST_DATA = [
-                {id: 1, text: 'tag1'},
-                {id: 1, text: 'tag2'}
-            ];
-
-            //var value = this.model.get(this.column.get('name'));
+            var value = this.model.get(this.column.get('name'));
             var value = TEST_DATA;
             var html = '';
 
