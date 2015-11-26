@@ -1,26 +1,14 @@
 {% macro renderView(entity) %}
     {% set tagCloudElId = 'tags-' ~ random() %}
-    <div id="{{ tagCloudElId }}">
-        <div class="tag-view">
-            {% import _self as _ %}
-            {{ _.tagSortActions() }}
-
-            <div class="tags-holder"></div>
-        </div>
-    </div>
-
-    <script type="text/javascript">
-        require(['jquery', 'orotag/js/view'],
-        function($, TagView){
-            $(function() {
-                /** @type oro.tag.View */
-                var tagView = new TagView({
-                    el: '#{{ tagCloudElId }}'
-                });
-                tagView.getCollection().reset({{ oro_tag_get_list(entity)|json_encode|raw }});
-            });
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div class="tags-view-form-container" {{ UI.renderPageComponentAttributes({
+        'module': 'oroui/js/app/components/view-component',
+        'options': {
+            'view': 'orotag/js/app/views/viewer/tags-view',
+            'items': oro_tag_get_list(entity),
+            autoRender: true
+        }
+    }) }}></div>
 {% endmacro %}
 
 {#
