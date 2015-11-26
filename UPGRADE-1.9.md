@@ -32,6 +32,7 @@ UPGRADE FROM 1.8 to 1.9
 
 ####DataGridBundle
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
+- JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
  
 ####DistributionBundle:
 - Fix `priority` attribute handling for `routing.options_resolver` tag to be conform Symfony standards. New behaviour: the higher the priority, the sooner the resolver gets executed.

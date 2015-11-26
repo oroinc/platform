@@ -65,6 +65,12 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityClass($entityOrClass, $expectedClass)
     {
+        $this->registry->expects($this->any())
+            ->method('getAliasNamespace')
+            ->will($this->returnValueMap([
+                ['OroEntityBundle', 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub']
+            ]));
+
         $this->assertEquals(
             $expectedClass,
             $this->doctrineHelper->getEntityClass($entityOrClass)
@@ -92,6 +98,10 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             'proxy entity class' => [
                 'entity'        => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy',
                 'expectedClass' => 'ItemStubProxy',
+            ],
+            'short entity class' => [
+                'entity'        => 'OroEntityBundle:ItemStub',
+                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
             ],
         ];
     }
