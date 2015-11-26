@@ -91,18 +91,8 @@ class SetDescriptionForFields implements ProcessorInterface
             return $this->getFieldConfig($entityClass, reset($path));
         }
 
-        $classMetadata  = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $linkedProperty = array_pop($path);
-        foreach ($path as $property) {
-            if (!$classMetadata->hasAssociation($property)) {
-                // an intermediate property is not an association, it may happen due invalid configuration
-                $classMetadata = null;
-                break;
-            }
-            $classMetadata = $this->doctrineHelper->getEntityMetadataForClass(
-                $classMetadata->getAssociationTargetClass($property)
-            );
-        }
+        $classMetadata  = $this->doctrineHelper->findEntityMetadataByPath($entityClass, $path);
 
         return null !== $classMetadata
             ? $this->getFieldConfig($classMetadata->name, $linkedProperty)

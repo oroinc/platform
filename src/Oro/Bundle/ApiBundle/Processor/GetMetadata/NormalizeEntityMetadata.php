@@ -74,26 +74,8 @@ class NormalizeEntityMetadata implements ProcessorInterface
      */
     protected function addLinkedProperty(EntityMetadata $entityMetadata, $name, array $path)
     {
-        $classMetadata = $this->doctrineHelper->getEntityMetadataForClass(
-            $entityMetadata->getClassName(),
-            false
-        );
-        if (null === $classMetadata) {
-            // only manageable entities are supported
-            return;
-        }
-
         $linkedProperty = array_pop($path);
-        foreach ($path as $property) {
-            if (!$classMetadata->hasAssociation($property)) {
-                // an intermediate property is not an association, it may happen due invalid configuration
-                $classMetadata = null;
-                break;
-            }
-            $classMetadata = $this->doctrineHelper->getEntityMetadataForClass(
-                $classMetadata->getAssociationTargetClass($property)
-            );
-        }
+        $classMetadata  = $this->doctrineHelper->findEntityMetadataByPath($entityMetadata->getClassName(), $path);
         if (null !== $classMetadata) {
             if ($classMetadata->hasAssociation($linkedProperty)) {
                 $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(

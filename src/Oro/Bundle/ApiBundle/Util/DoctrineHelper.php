@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
@@ -11,6 +12,8 @@ use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 class DoctrineHelper extends BaseHelper
 {
     /**
+     * Adds criteria to the query.
+     *
      * @param QueryBuilder $qb
      * @param Criteria     $criteria
      */
@@ -41,7 +44,31 @@ class DoctrineHelper extends BaseHelper
     }
 
     /**
-     * Gets ORDER BY expression that can be used to sort a collection by entity identifier
+     * Gets the ORM metadata descriptor for target entity class of the given child association.
+     *
+     * @param string   $entityClass
+     * @param string[] $associationPath
+     *
+     * @return ClassMetadata|null
+     */
+    public function findEntityMetadataByPath($entityClass, array $associationPath)
+    {
+        $metadata = $this->getEntityMetadataForClass($entityClass, false);
+        if (null !== $metadata) {
+            foreach ($associationPath as $associationName) {
+                if (!$metadata->hasAssociation($associationName)) {
+                    $metadata = null;
+                    break;
+                }
+                $metadata = $this->getEntityMetadataForClass($metadata->getAssociationTargetClass($associationName));
+            }
+        }
+
+        return $metadata;
+    }
+
+    /**
+     * Gets ORDER BY expression that can be used to sort a collection by entity identifier.
      *
      * @param string $entityClass
      *
