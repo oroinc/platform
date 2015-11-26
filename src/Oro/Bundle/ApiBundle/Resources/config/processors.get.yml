@@ -43,7 +43,7 @@ services:
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: rest, priority: 10 }
+            - { name: oro.api.processor, action: get, group: initialize, requestType: rest_json_api, priority: 10 }
 
     #
     # security_check

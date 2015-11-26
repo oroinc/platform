@@ -164,21 +164,26 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadConfigByGetConfig()
     {
+        $version        = '1.1';
+        $requestType    = 'rest';
+        $entityClass    = 'Test\Class';
+        $configSections = ['section1', 'section2'];
+
         $config         = ConfigUtil::getInitialConfig();
         $section1Config = ['test'];
 
-        $this->context->setVersion('1.1');
-        $this->context->setRequestType('rest');
-        $this->context->setConfigSections(['section1', 'section2']);
-        $this->context->setClassName('Test\Class');
+        $this->context->setVersion($version);
+        $this->context->setRequestType($requestType);
+        $this->context->setConfigSections($configSections);
+        $this->context->setClassName($entityClass);
 
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                'Test\Class',
-                '1.1',
-                'rest',
-                ['section1', 'section2']
+                $entityClass,
+                $version,
+                $requestType,
+                $configSections
             )
             ->willReturn(
                 [
@@ -213,21 +218,26 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadConfigByGetConfigOf()
     {
+        $version        = '1.1';
+        $requestType    = 'rest';
+        $entityClass    = 'Test\Class';
+        $configSections = ['section1', 'section2'];
+
         $config         = ConfigUtil::getInitialConfig();
         $section1Config = ['test'];
 
-        $this->context->setVersion('1.1');
-        $this->context->setRequestType('rest');
-        $this->context->setConfigSections(['section1', 'section2']);
-        $this->context->setClassName('Test\Class');
+        $this->context->setVersion($version);
+        $this->context->setRequestType($requestType);
+        $this->context->setConfigSections($configSections);
+        $this->context->setClassName($entityClass);
 
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                'Test\Class',
-                '1.1',
-                'rest',
-                ['section1', 'section2']
+                $entityClass,
+                $version,
+                $requestType,
+                $configSections
             )
             ->willReturn(
                 [
