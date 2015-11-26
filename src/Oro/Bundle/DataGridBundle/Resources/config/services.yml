@@ -194,6 +194,9 @@ services:
 
     oro_datagrid.datagrid.inline_edit_column_options.multi_guesser:
         class: %oro_datagrid.datagrid.inline_edit_column_options.multi_guesser.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_security.acl_helper
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 92 }
 

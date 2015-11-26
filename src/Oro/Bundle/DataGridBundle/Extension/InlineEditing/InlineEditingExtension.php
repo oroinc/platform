@@ -85,7 +85,7 @@ class InlineEditingExtension extends AbstractExtension
         $blackList = $configuration->getBlackList();
 
         foreach ($columns as $columnName => &$column) {
-            if (!in_array($columnName, $blackList)) {
+            if (!in_array($columnName, $blackList, true)) {
                 $newColumn = $this->guesser->getColumnOptions($columnName, $configItems['entity_name'], $column);
 
                 //frontend type key must not be replaced with default value
