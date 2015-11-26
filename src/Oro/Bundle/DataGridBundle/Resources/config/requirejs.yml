@@ -40,6 +40,7 @@ config:
         'oro/datagrid/cell/select-row-cell': 'bundles/orodatagrid/js/datagrid/cell/select-row-cell.js'
         'oro/datagrid/cell/string-cell': 'bundles/orodatagrid/js/datagrid/cell/string-cell.js'
         'oro/datagrid/cell/phone-cell': 'bundles/orodatagrid/js/datagrid/cell/phone-cell.js'
+        'oro/datagrid/cell/relation-cell': 'bundles/orodatagrid/js/datagrid/cell/relation-cell.js'
         'oro/datagrid/cell/multi-select-cell': 'bundles/orodatagrid/js/datagrid/cell/multi-select-cell.js'
         'oro/datagrid/cell/multi-relation-cell': 'bundles/orodatagrid/js/datagrid/cell/multi-relation-cell.js'
         'orodatagrid/js/datagrid/formatter/cell-formatter': 'bundles/orodatagrid/js/datagrid/formatter/cell-formatter.js'
