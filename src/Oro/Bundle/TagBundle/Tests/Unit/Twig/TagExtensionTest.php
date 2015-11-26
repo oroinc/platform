@@ -44,7 +44,7 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('oro_tag_get_list', $this->extension->getFunctions());
     }
 
-    public function testGet()
+    public function testGetList()
     {
         $entity = $this->getMock('Oro\Bundle\TagBundle\Entity\Taggable');
 
@@ -52,6 +52,6 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getPreparedArray')
             ->with($entity);
 
-        $this->extension->get($entity);
+        $this->extension->getList($entity);
     }
 }

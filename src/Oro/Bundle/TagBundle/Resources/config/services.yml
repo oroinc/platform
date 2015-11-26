@@ -29,8 +29,6 @@ parameters:
 
     oro_tag.event_listener.merge_listener.class: Oro\Bundle\TagBundle\EventListener\MergeListener
 
-    oro_tag.grid.extension.tag_filter.class: Oro\Bundle\TagBundle\EventListener\TagsGridListener
-
     oro_tag.filter.tags.class: Oro\Bundle\TagBundle\Filter\TagsFilter
 
 services:
@@ -115,6 +113,19 @@ services:
             - @oro_tag.form.type.tag.api
             - @request
             - @doctrine.orm.entity_manager
+
+    oro_tag.form.tag_entity.api:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - targets
+            - 'oro_related_entity_standalone_collection_api'
+            - ~
+            - constraints:
+                - Count:
+                    min: 1
+                    minMessage: "The 'targets' collection should contain at least one element"
 
     # Autocomplete search handler
     oro_tag.autocomplete.tag.search_handler:
@@ -252,3 +263,10 @@ services:
             - @event_dispatcher
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_tag.view.eventlistener.tag_field:
+        class: Oro\Bundle\TagBundle\EventListener\TagFieldListener
+        arguments:
+            - @oro_tag.tag.manager
+        tags:
+            - { name: kernel.event_listener, event: entity_view.render.before, method: addTagField }
