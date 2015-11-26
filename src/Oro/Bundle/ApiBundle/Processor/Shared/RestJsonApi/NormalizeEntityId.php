@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\Rest;
+namespace Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 

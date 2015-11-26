@@ -38,12 +38,12 @@ services:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: 20 }
 
     oro_api.get_list.rest.set_default_paging:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultPaging
+        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\SetDefaultPaging
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest, priority: -10 }
 
     oro_api.get_list.rest.set_default_sorting:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultSorting
+        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\SetDefaultSorting
         arguments:
             - @oro_api.doctrine_helper
         tags:
@@ -57,7 +57,7 @@ services:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -100 }
 
     oro_api.get_list.rest.normalize_filter_keys:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\Rest\NormalizeFilterKeys
+        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\NormalizeFilterKeys
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest, priority: -110 }
 
@@ -79,7 +79,7 @@ services:
     #
 
     oro_api.get_list.normalize_filter_values:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\Rest\NormalizeFilterValues
+        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\NormalizeFilterValues
         arguments:
             - @oro_api.value_normalizer
         tags:

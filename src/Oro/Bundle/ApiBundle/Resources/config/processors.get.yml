@@ -38,7 +38,7 @@ services:
             - { name: oro.api.processor, action: get, group: initialize, priority: 20 }
 
     oro_api.get.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeEntityId
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId
         arguments:
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer

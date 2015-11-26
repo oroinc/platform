@@ -42,7 +42,7 @@ class DumpConfigCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'API request type',
-                RequestType::REST
+                RequestType::REST_JSON_API
             )
             ->addOption(
                 'section',

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeEntityId;
+use Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 
 class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase

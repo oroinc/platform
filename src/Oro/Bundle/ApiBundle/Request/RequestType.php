@@ -11,5 +11,5 @@ final class RequestType
      * REST API conforms JSON API specification
      * @see http://jsonapi.org
      */
-    const REST = 'rest';
+    const REST_JSON_API = 'rest';
 }

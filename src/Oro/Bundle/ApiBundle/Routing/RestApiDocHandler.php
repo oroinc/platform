@@ -144,7 +144,7 @@ class RestApiDocHandler implements HandlerInterface
         $context = $processor->createContext();
         $context->removeConfigSection(ConfigUtil::SORTERS);
         $context->addConfigExtra(ConfigExtra::DESCRIPTIONS);
-        $context->setRequestType(RequestType::REST);
+        $context->setRequestType(RequestType::REST_JSON_API);
         $context->setLastGroup('initialize');
         if ($entityClass) {
             $context->setClassName($entityClass);
@@ -269,7 +269,7 @@ class RestApiDocHandler implements HandlerInterface
                     'description' => $filter->getDescription(),
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
-                        RequestType::REST,
+                        RequestType::REST_JSON_API,
                         $filter->isArrayAllowed() ? RestRequest::ARRAY_DELIMITER : null
                     )
                 ];
