@@ -10,10 +10,7 @@ use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
 class TagSearchResultsGridListener
 {
-    /** @var string */
-    protected $paramName;
-
-    /** @var SecurityProvider  */
+    /** @var SecurityProvider */
     protected $securityProvider;
 
     /** @var EntityAliasResolver */
@@ -25,7 +22,7 @@ class TagSearchResultsGridListener
      */
     public function __construct(SecurityProvider $securityProvider, EntityAliasResolver $entityAliasResolver)
     {
-        $this->securityProvider = $securityProvider;
+        $this->securityProvider    = $securityProvider;
         $this->entityAliasResolver = $entityAliasResolver;
     }
 
@@ -37,10 +34,10 @@ class TagSearchResultsGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datagrid = $event->getDatagrid();
+        $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
-            $parameters = $datagrid->getParameters();
+            $parameters   = $datagrid->getParameters();
             $queryBuilder = $datasource->getQueryBuilder();
 
             $this->securityProvider->applyAcl($queryBuilder, 'tt');

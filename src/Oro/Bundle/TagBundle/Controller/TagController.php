@@ -77,7 +77,7 @@ class TagController extends Controller
         // path to datagrid subrequest
         $from = $request->get('from');
 
-        $provider = $this->get('oro_tag.provider.statistic');
+        $provider       = $this->get('oro_tag.provider.statistic');
         $groupedResults = $provider->getTagEntitiesStatistic($entity);
         $selectedResult = null;
 
@@ -87,7 +87,6 @@ class TagController extends Controller
                 break;
             }
         }
-
 
         return array(
             'tag'            => $entity,

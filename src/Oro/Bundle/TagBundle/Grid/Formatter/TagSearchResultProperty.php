@@ -20,9 +20,10 @@ class TagSearchResultProperty extends SearchResultProperty
      */
     public function __construct(\Twig_Environment $environment, ConfigProvider $configProvider, $defaultTemplate)
     {
-        $this->entityConfigProvider = $configProvider;
-        $this->defaultTemplate = $defaultTemplate;
         parent::__construct($environment, []);
+
+        $this->entityConfigProvider = $configProvider;
+        $this->defaultTemplate      = $defaultTemplate;
     }
 
     /**
@@ -30,7 +31,7 @@ class TagSearchResultProperty extends SearchResultProperty
      */
     public function getValue(ResultRecordInterface $record)
     {
-        $entity = $record->getValue('entity');
+        $entity      = $record->getValue('entity');
         $entityClass = ClassUtils::getRealClass($entity);
         if ($this->mappingProvider->isClassSupported($entityClass)) {
             return parent::getValue($record);
@@ -39,8 +40,8 @@ class TagSearchResultProperty extends SearchResultProperty
 
             return $this->getTemplate()->render(
                 [
-                    'entityType' => $this->entityConfigProvider->getConfig($entityClass)->get('label'),
-                    'entity' => $entity,
+                    'entityType'   => $this->entityConfigProvider->getConfig($entityClass)->get('label'),
+                    'entity'       => $entity,
                     'indexer_item' => $record->getValue('indexer_item')
                 ]
             );

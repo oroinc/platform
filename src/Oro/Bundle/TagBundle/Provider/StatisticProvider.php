@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TagBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TagBundle\Entity\Tag;
@@ -33,12 +34,11 @@ class StatisticProvider
         SecurityProvider $securityProvider,
         ConfigProvider $configProvider,
         EntityAliasResolver $entityAliasResolver
-    )
-    {
-        $this->em = $entityManager;
-        $this->securityProvider = $securityProvider;
+    ) {
+        $this->em                   = $entityManager;
+        $this->securityProvider     = $securityProvider;
         $this->entityConfigProvider = $configProvider;
-        $this->entityAliasResolver = $entityAliasResolver;
+        $this->entityAliasResolver  = $entityAliasResolver;
     }
 
     /**
@@ -52,13 +52,13 @@ class StatisticProvider
 
         return array_reduce(
             $groupedResult,
-            function($result, array $entityResult) {
+            function ($result, array $entityResult) {
                 $result['']['count'] += $entityResult['cnt'];
-                $entityClass = $entityResult['entityClass'];
-                $alias = $this->entityAliasResolver->getAlias($entityClass);
+                $entityClass    = $entityResult['entityClass'];
+                $alias          = $this->entityAliasResolver->getAlias($entityClass);
                 $result[$alias] = [
                     'count' => $entityResult['cnt'],
-                    'icon' => $this->entityConfigProvider->getConfig($entityClass)->get('icon'),
+                    'icon'  => $this->entityConfigProvider->getConfig($entityClass)->get('icon'),
                     'label' => $this->entityConfigProvider->getConfig($entityClass)->get('plural_label'),
                     'class' => true
                 ];

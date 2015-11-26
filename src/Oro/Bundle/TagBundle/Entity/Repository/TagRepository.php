@@ -24,7 +24,12 @@ class TagRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('t')
             ->select('t.id', 't.name', 't2.recordId AS entityId')
-            ->innerJoin('t.tagging', 't2', Join::WITH, 't2.recordId IN (:entityIds) AND t2.entityName = :entityClassName')
+            ->innerJoin(
+                't.tagging',
+                't2',
+                Join::WITH,
+                't2.recordId IN (:entityIds) AND t2.entityName = :entityClassName'
+            )
             ->orderBy('t.name', $direction)
             ->setParameter('entityIds', $entityIds)
             ->setParameter('entityClassName', $entityClassName);

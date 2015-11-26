@@ -54,7 +54,7 @@ class TagSearchResultsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
@@ -62,7 +62,7 @@ class TagSearchResultsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
@@ -72,10 +72,11 @@ class TagSearchResultsExtension extends AbstractExtension
         }
 
         $mappingConfig = $this->mapper->getMappingConfig();
+
         $rows = array_map(
             function (ResultRecordInterface $record) use ($mappingConfig) {
                 $entityClass = $record->getValue('entityName');
-                $entityId   = $record->getValue('recordId');
+                $entityId    = $record->getValue('recordId');
 
                 $entityConfig = array_key_exists($entityClass, $mappingConfig)
                     ? $entityConfig = $this->mapper->getEntityConfig($entityClass)
@@ -100,8 +101,8 @@ class TagSearchResultsExtension extends AbstractExtension
         /** @var ResultItem $item */
         foreach ($rows as $item) {
             $entityClass = $item->getEntityName();
-            $entityId   = $item->getRecordId();
-            $entity = $entities[$entityClass][$entityId];
+            $entityId    = $item->getRecordId();
+            $entity      = $entities[$entityClass][$entityId];
             $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item, $entity));
             $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
         }
