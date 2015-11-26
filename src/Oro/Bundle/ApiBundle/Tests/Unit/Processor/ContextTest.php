@@ -364,15 +364,71 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function testConfigSections()
     {
         $this->assertSame([], $this->context->getConfigSections());
-        $this->assertNull($this->context->get(Context::CONFIG_SECTION));
+        $this->assertNull($this->context->get(Context::CONFIG_SECTIONS));
 
         $this->context->setConfigSections(['test']);
         $this->assertEquals(['test'], $this->context->getConfigSections());
-        $this->assertEquals(['test'], $this->context->get(Context::CONFIG_SECTION));
+        $this->assertEquals(['test'], $this->context->get(Context::CONFIG_SECTIONS));
+
+        $this->assertTrue($this->context->hasConfigSection('test'));
+        $this->assertFalse($this->context->hasConfigSection('another'));
+
+        $this->context->addConfigSection('another');
+        $this->assertEquals(['test', 'another'], $this->context->getConfigSections());
+        $this->assertEquals(['test', 'another'], $this->context->get(Context::CONFIG_SECTIONS));
+
+        // test add of already existing section
+        $this->context->addConfigSection('another');
+        $this->assertEquals(['test', 'another'], $this->context->getConfigSections());
+        $this->assertEquals(['test', 'another'], $this->context->get(Context::CONFIG_SECTIONS));
+
+        $this->context->removeConfigSection('test');
+        $this->assertEquals(['another'], $this->context->getConfigSections());
+        $this->assertEquals(['another'], $this->context->get(Context::CONFIG_SECTIONS));
+
+        // test remove of non existing section
+        $this->context->removeConfigSection('test');
+        $this->assertEquals(['another'], $this->context->getConfigSections());
+        $this->assertEquals(['another'], $this->context->get(Context::CONFIG_SECTIONS));
 
         $this->context->setConfigSections([]);
         $this->assertSame([], $this->context->getConfigSections());
-        $this->assertNull($this->context->get(Context::CONFIG_SECTION));
+        $this->assertNull($this->context->get(Context::CONFIG_SECTIONS));
+    }
+
+    public function testConfigExtras()
+    {
+        $this->assertSame([], $this->context->getConfigExtras());
+        $this->assertNull($this->context->get(Context::CONFIG_EXTRAS));
+
+        $this->context->setConfigExtras(['test']);
+        $this->assertEquals(['test'], $this->context->getConfigExtras());
+        $this->assertEquals(['test'], $this->context->get(Context::CONFIG_EXTRAS));
+
+        $this->assertTrue($this->context->hasConfigExtra('test'));
+        $this->assertFalse($this->context->hasConfigExtra('another'));
+
+        $this->context->addConfigExtra('another');
+        $this->assertEquals(['test', 'another'], $this->context->getConfigExtras());
+        $this->assertEquals(['test', 'another'], $this->context->get(Context::CONFIG_EXTRAS));
+
+        // test add of already existing extra
+        $this->context->addConfigExtra('another');
+        $this->assertEquals(['test', 'another'], $this->context->getConfigExtras());
+        $this->assertEquals(['test', 'another'], $this->context->get(Context::CONFIG_EXTRAS));
+
+        $this->context->removeConfigExtra('test');
+        $this->assertEquals(['another'], $this->context->getConfigExtras());
+        $this->assertEquals(['another'], $this->context->get(Context::CONFIG_EXTRAS));
+
+        // test remove of non existing extra
+        $this->context->removeConfigExtra('test');
+        $this->assertEquals(['another'], $this->context->getConfigExtras());
+        $this->assertEquals(['another'], $this->context->get(Context::CONFIG_EXTRAS));
+
+        $this->context->setConfigExtras([]);
+        $this->assertSame([], $this->context->getConfigSections());
+        $this->assertNull($this->context->get(Context::CONFIG_EXTRAS));
     }
 
     public function testQuery()

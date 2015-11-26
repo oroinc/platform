@@ -18,7 +18,10 @@ class Context extends ApiContext
     const CONFIG_PREFIX = 'config_';
 
     /** a list of required additional configuration sections, for example "filters", "sorters", etc. */
-    const CONFIG_SECTION = 'configSection';
+    const CONFIG_SECTIONS = 'configSections';
+
+    /** a list of requests for additional configuration data, for example "descriptions" */
+    const CONFIG_EXTRAS = 'configExtras';
 
     /** a query is used to get result data */
     const QUERY = 'query';
@@ -72,7 +75,7 @@ class Context extends ApiContext
                 $entityClass,
                 $this->getVersion(),
                 $this->getRequestType(),
-                $this->getConfigSections()
+                array_unique(array_merge($this->getConfigSections(), $this->getConfigExtras()))
             );
         }
 
@@ -286,7 +289,7 @@ class Context extends ApiContext
      */
     public function getConfigSections()
     {
-        $sections = $this->get(self::CONFIG_SECTION);
+        $sections = $this->get(self::CONFIG_SECTIONS);
 
         return null !== $sections
             ? $sections
@@ -301,9 +304,115 @@ class Context extends ApiContext
     public function setConfigSections($sections)
     {
         if (empty($sections)) {
-            $this->remove(self::CONFIG_SECTION, $sections);
+            $this->remove(self::CONFIG_SECTIONS, $sections);
         } else {
-            $this->set(self::CONFIG_SECTION, $sections);
+            $this->set(self::CONFIG_SECTIONS, $sections);
+        }
+    }
+
+    /**
+     * Checks whether a section exists in a list of required additional configuration sections.
+     *
+     * @param string $section
+     *
+     * @return bool
+     */
+    public function hasConfigSection($section)
+    {
+        return in_array($section, $this->getConfigSections(), true);
+    }
+
+    /**
+     * Adds a section to a list of required additional configuration sections.
+     *
+     * @param string $section
+     */
+    public function addConfigSection($section)
+    {
+        $sections = $this->getConfigSections();
+        if (!in_array($section, $sections, true)) {
+            $sections[] = $section;
+            $this->setConfigSections($sections);
+        }
+    }
+
+    /**
+     * Removes a section from a list of required additional configuration sections.
+     *
+     * @param string $section
+     */
+    public function removeConfigSection($section)
+    {
+        $sections = $this->getConfigSections();
+        if (in_array($section, $sections, true)) {
+            $this->setConfigSections(array_values(array_diff($sections, [$section])));
+        }
+    }
+
+    /**
+     * Gets a list of requests for additional configuration data, for example "descriptions".
+     *
+     * @return string[]
+     */
+    public function getConfigExtras()
+    {
+        $extras = $this->get(self::CONFIG_EXTRAS);
+
+        return null !== $extras
+            ? $extras
+            : [];
+    }
+
+    /**
+     * Sets a list of requests for additional configuration data, for example "descriptions".
+     *
+     * @param string[] $extras
+     */
+    public function setConfigExtras($extras)
+    {
+        if (empty($extras)) {
+            $this->remove(self::CONFIG_EXTRAS, $extras);
+        } else {
+            $this->set(self::CONFIG_EXTRAS, $extras);
+        }
+    }
+
+    /**
+     * Checks whether some additional configuration data is requested.
+     *
+     * @param string $extra
+     *
+     * @return bool
+     */
+    public function hasConfigExtra($extra)
+    {
+        return in_array($extra, $this->getConfigExtras(), true);
+    }
+
+    /**
+     * Adds a request for some additional configuration data.
+     *
+     * @param string $extra
+     */
+    public function addConfigExtra($extra)
+    {
+        $extras = $this->getConfigExtras();
+        if (!in_array($extra, $extras, true)) {
+            $extras[] = $extra;
+            $this->setConfigExtras($extras);
+        }
+    }
+
+    /**
+     * Removes a request for some additional configuration data.
+     *
+     * @param string $extra
+     */
+    public function removeConfigExtra($extra)
+    {
+        $extras = $this->getConfigExtras();
+        if (in_array($extra, $extras, true)) {
+            $this->setConfigExtras(array_values(array_diff($extras, [$extra])));
         }
     }
 
