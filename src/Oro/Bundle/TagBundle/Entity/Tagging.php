@@ -84,12 +84,6 @@ class Tagging extends ExtendTagging
 
     /**
      * @var string
-     * @ORM\Column(name="alias", type="string", length=100)
-     */
-    protected $alias;
-
-    /**
-     * @var string
      * @ORM\Column(name="entity_name", type="string", length=100)
      */
     protected $entityName;
@@ -183,29 +177,6 @@ class Tagging extends ExtendTagging
     public function getEntityName()
     {
         return $this->entityName;
-    }
-
-    /**
-     * Setter for alias
-     *
-     * @param string $alias
-     * @return $this
-     */
-    public function setAlias($alias)
-    {
-        $this->alias = $alias;
-
-        return $this;
-    }
-
-    /**
-     * Getter for alias
-     *
-     * @return string
-     */
-    public function getAlias()
-    {
-        return $this->alias;
     }
 
     /**

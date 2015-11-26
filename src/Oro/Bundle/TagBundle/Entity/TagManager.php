@@ -488,8 +488,7 @@ class TagManager
                 continue;
             }
 
-            $alias   = $this->mapper->getEntityConfig(ClassUtils::getClass($entity));
-            $tagging = $this->createTagging($tag, $entity)->setAlias($alias['alias']);
+            $tagging = $this->createTagging($tag, $entity);
 
             $this->em->persist($tag);
             $this->em->persist($tagging);
