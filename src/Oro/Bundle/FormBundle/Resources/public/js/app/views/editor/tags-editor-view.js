@@ -4,7 +4,7 @@ define(function(require) {
 
     /**
      * Tags-select content editor. Please note that it requires column data format
-     * corresponding to multi-select-cell.
+     * corresponding to tags-cell.
      *
      * ### Column configuration samples:
      * ``` yml
@@ -18,7 +18,7 @@ define(function(require) {
      *       {column-name-1}:
      *         inline_editing:
      *           editor:
-     *             view: orodatagrid/js/app/views/editor/multi-relation-editor-view
+     *             view: orodatagrid/js/app/views/editor/tags-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
      *               css_class_name: '<class-name>'
@@ -53,7 +53,9 @@ define(function(require) {
      * @exports TagsEditorView
      */
     var TagsEditorView;
+    var RelatedIdRelationEditorView = require('./related-id-relation-editor-view');
     var SelectEditorView = require('./select-editor-view');
+    var tools = require('oroui/js/tools');
     var _ = require('underscore');
 
     TagsEditorView = SelectEditorView.extend(/** @exports TagsEditorView.prototype */{
@@ -86,16 +88,63 @@ define(function(require) {
             var value = this.model.get(this.options.column.get('name'));
 
             if (!_.isArray(value))
-                return [];
+                return {data: []};
 
-            return value.map(function (v, i, a) {
-                return v.id;
-            });
+            return {
+                data: value.map(function (v, i, a) {
+                    return {id: v.id};
+                })
+            }
         },
 
         getValue: function() {
             var selections = this.$('input[name=value]').select2('data');
-            return selections;
+            return {
+                data: selections.map(function(v) {
+                    return {id: v.id, text: v.text, locked: v.locked};
+                }),
+                count: selections.length
+            };
+        },
+        getInitialResultItem: function() {
+            var modelValue = this.getModelValue();
+            if (modelValue !== null && modelValue && modelValue.data) {
+                return modelValue.data;
+            } else {
+                return [];
+            }
+        },
+
+        getFormattedValue: function() {
+            return this.getInitialResultItem()
+                .map(function(item) {return item.id;})
+                .join(',');
+        },
+
+        filterInitialResultItem: function(choices) {
+            choices = _.clone(choices);
+            return choices;
+        },
+        getServerUpdateData: function() {
+            var data = {};
+            data[this.options.column.get('name')] = this.getValue();
+            return data;
+        },
+
+        getModelUpdateData: function() {
+            return this.getServerUpdateData();
+        }
+    }, {
+        DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
+        processColumnMetadata: function(columnMetadata) {
+            var apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
+            if (!_.isObject(apiSpec)) {
+                throw new Error('`autocomplete_api_accessor` is required option');
+            }
+            if (!apiSpec.class) {
+                apiSpec.class = RelatedIdRelationEditorView.DEFAULT_ACCESSOR_CLASS;
+            }
+            return tools.loadModuleAndReplace(apiSpec, 'class');
         }
     });
 
