@@ -69,7 +69,7 @@ class ActivityListRepository extends EntityRepository
         $grouping = false
     ) {
         $queryBuilder = $this->createQueryBuilder('activity')
-            ->join('activity.' . $this->getAssociationName($entityClass), 'r')
+            ->leftJoin('activity.' . $this->getAssociationName($entityClass), 'r')
             ->leftJoin('activity.activityOwners', 'ao')
             ->where('r.id = :entityId')
             ->setParameter('entityId', $entityId)
