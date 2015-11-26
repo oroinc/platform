@@ -20,6 +20,14 @@ class TagListener implements ContainerAwareInterface
     protected $container;
 
     /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
+    /**
      * @param LifecycleEventArgs $args
      */
     public function preRemove(LifecycleEventArgs $args)
@@ -32,13 +40,5 @@ class TagListener implements ContainerAwareInterface
         if ($this->tagManager->isTaggable($entity)) {
             $this->tagManager->deleteTagging($entity, []);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 }
