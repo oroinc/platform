@@ -7,6 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\FieldVisitor;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class CompleteCriteria implements ProcessorInterface
@@ -73,9 +74,9 @@ class CompleteCriteria implements ProcessorInterface
                 if (!$criteria->hasJoin($path)) {
                     $parentAlias = empty($item['parent'])
                         ? Criteria::ROOT_ALIAS_PLACEHOLDER
-                        : $criteria->getJoin(implode(Criteria::FIELD_DELIMITER, $item['parent']))->getAlias();
+                        : $criteria->getJoin(implode(ConfigUtil::PATH_DELIMITER, $item['parent']))->getAlias();
                     $criteria
-                        ->addLeftJoin($path, $parentAlias . Criteria::FIELD_DELIMITER . $item['field'])
+                        ->addLeftJoin($path, $parentAlias . ConfigUtil::PATH_DELIMITER . $item['field'])
                         ->setAlias($item['field']);
                 }
             }
@@ -103,7 +104,7 @@ class CompleteCriteria implements ProcessorInterface
 
         $pathMap = [];
         foreach ($fields as $field) {
-            $lastDelimiter = strrpos($field, Criteria::FIELD_DELIMITER);
+            $lastDelimiter = strrpos($field, ConfigUtil::PATH_DELIMITER);
             if (false !== $lastDelimiter) {
                 $path = substr($field, 0, $lastDelimiter);
                 if (!isset($pathMap[$path])) {
@@ -128,7 +129,7 @@ class CompleteCriteria implements ProcessorInterface
      */
     protected function buildJoinPathMapValue($path)
     {
-        $lastDelimiter = strrpos($path, Criteria::FIELD_DELIMITER);
+        $lastDelimiter = strrpos($path, ConfigUtil::PATH_DELIMITER);
         if (false === $lastDelimiter) {
             return [
                 'field'  => $path,
@@ -137,7 +138,7 @@ class CompleteCriteria implements ProcessorInterface
         } else {
             return [
                 'field'  => substr($path, $lastDelimiter + 1),
-                'parent' => explode(Criteria::FIELD_DELIMITER, $path)
+                'parent' => explode(ConfigUtil::PATH_DELIMITER, $path)
             ];
         }
     }

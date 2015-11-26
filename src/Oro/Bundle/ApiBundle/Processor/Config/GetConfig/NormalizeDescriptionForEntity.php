@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeDescription;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class NormalizeEntityDescription extends NormalizeDescription
+class NormalizeDescriptionForEntity extends NormalizeDescription
 {
     /**
      * {@inheritdoc}

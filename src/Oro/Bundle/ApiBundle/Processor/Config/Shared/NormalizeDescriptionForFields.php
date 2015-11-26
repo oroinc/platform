@@ -6,7 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class NormalizeFieldDescription extends NormalizeDescription
+class NormalizeDescriptionForFields extends NormalizeDescription
 {
     /**
      * {@inheritdoc}

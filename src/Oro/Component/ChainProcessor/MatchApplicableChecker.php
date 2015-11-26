@@ -19,7 +19,7 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
     {
         $result = self::APPLICABLE;
         foreach ($processorAttributes as $key => $value) {
-            if ($key === 'group' || !is_scalar($value)) {
+            if ($key === 'group' || (!is_scalar($value) && !is_array($value))) {
                 continue;
             }
             if (!$context->has($key)) {
@@ -44,7 +44,9 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
     protected function isMatch($value, $contextValue)
     {
         if (is_array($contextValue)) {
-            return in_array($value, $contextValue, true);
+            return is_array($value)
+                ? count(array_intersect($value, $contextValue)) === count($value)
+                : in_array($value, $contextValue, true);
         }
 
         return $contextValue === $value;

@@ -78,6 +78,12 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
                 }
 
                 unset($attributes['action'], $attributes['group'], $attributes['priority']);
+                $attributes = array_map(
+                    function ($val) {
+                        return is_string($val) && strpos($val, '&') ? explode('&', $val) : $val;
+                    },
+                    $attributes
+                );
 
                 $processorBagServiceDef->addMethodCall('addProcessor', [$id, $attributes, $action, $group, $priority]);
             }

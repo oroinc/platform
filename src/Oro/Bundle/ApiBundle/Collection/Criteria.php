@@ -9,7 +9,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class Criteria extends BaseCriteria
 {
-    const FIELD_DELIMITER          = '.';
     const ROOT_ALIAS_PLACEHOLDER   = '{root}';
     const ENTITY_ALIAS_PLACEHOLDER = '{entity}';
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class NormalizeFilters extends NormalizeChildSection
+class NormalizeDescriptionForFilters extends NormalizeDescription
 {
     /**
      * {@inheritdoc}
@@ -16,18 +16,15 @@ class NormalizeFilters extends NormalizeChildSection
         /** @var ConfigContext $context */
 
         $filters = $context->getFilters();
-        if (null === $filters) {
-            // a filters' configuration does not exist
+        if (empty($filters) || empty($filters[ConfigUtil::FIELDS])) {
+            // a configuration of filters does not exist
             return;
         }
 
-        $definition = $context->getResult();
-        if (null === $definition) {
-            // an entity configuration does not exist
-            return;
+        foreach ($filters[ConfigUtil::FIELDS] as &$filterConfig) {
+            $this->normalizeAttribute($filterConfig, ConfigUtil::DESCRIPTION);
         }
 
-        $this->collect($filters, ConfigUtil::FILTERS, $definition);
         $context->setFilters($filters);
     }
 }

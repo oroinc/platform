@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class LoadFieldDescription implements ProcessorInterface
+class SetDescriptionForFields implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;

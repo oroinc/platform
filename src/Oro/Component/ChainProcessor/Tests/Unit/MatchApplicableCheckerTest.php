@@ -10,6 +10,9 @@ use Oro\Component\ChainProcessor\ProcessorIterator;
 
 class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testMatchApplicableChecker()
     {
         $context = new Context();
@@ -84,6 +87,18 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
                     'processor'  => 'processor16',
                     'attributes' => ['class' => 'TestCls', 'feature' => 'feature3']
                 ],
+                [
+                    'processor'  => 'processor17',
+                    'attributes' => ['class' => 'TestCls', 'feature' => ['feature1', 'feature3']]
+                ],
+                [
+                    'processor'  => 'processor18',
+                    'attributes' => ['class' => 'TestCls', 'feature' => ['feature3', 'feature1']]
+                ],
+                [
+                    'processor'  => 'processor19',
+                    'attributes' => ['class' => 'TestCls', 'feature' => ['feature1', 'feature2']]
+                ],
             ]
         ];
 
@@ -105,6 +120,8 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
                 'processor10',
                 'processor14',
                 'processor16',
+                'processor17',
+                'processor18',
             ],
             $iterator
         );

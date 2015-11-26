@@ -51,7 +51,10 @@ class RegisterFilters implements ProcessorInterface
             if ($filters->has($field)) {
                 continue;
             }
-            $filter = $this->createFilter($field, $fieldConfig);
+            $filter = $this->createFilter(
+                !empty($fieldConfig[ConfigUtil::PROPERTY_PATH]) ? $fieldConfig[ConfigUtil::PROPERTY_PATH] : $field,
+                $fieldConfig
+            );
             if (null !== $filter) {
                 $filters->add($field, $filter);
             }

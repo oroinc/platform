@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\Label;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class LoadEntityDescription implements ProcessorInterface
+class SetDescriptionForEntity implements ProcessorInterface
 {
     /** @var ConfigProvider */
     protected $entityConfigProvider;

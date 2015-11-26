@@ -44,6 +44,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor', ['action' => 'action1', 'group' => 'group1', 'priority' => 123]);
         $processor1->addTag('processor', ['action' => 'action2', 'group' => 'group2', 'test_attr' => 'test']);
+        $processor1->addTag('processor', ['action' => 'action3', 'group' => 'group3', 'test_attr' => 'test1&test2']);
 
         $processor2 = new Definition('Test\Processor2');
         $processor2->addTag('processor', ['action' => 'action1']);
@@ -77,7 +78,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $compilerPass->process($container);
 
         $methodCalls = $processorBag->getMethodCalls();
-        $this->assertCount(6, $methodCalls);
+        $this->assertCount(7, $methodCalls);
         $this->assertEquals(
             [
                 'addProcessor',
@@ -108,6 +109,19 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
             [
                 'addProcessor',
                 [
+                    'processor1',
+                    ['test_attr' => ['test1', 'test2']],
+                    'action3',
+                    'group3',
+                    0,
+                ]
+            ],
+            $methodCalls[2]
+        );
+        $this->assertEquals(
+            [
+                'addProcessor',
+                [
                     'processor2',
                     [],
                     'action1',
@@ -115,7 +129,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
                     0,
                 ]
             ],
-            $methodCalls[2]
+            $methodCalls[3]
         );
         $this->assertEquals(
             [
@@ -128,7 +142,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
                     0,
                 ]
             ],
-            $methodCalls[3]
+            $methodCalls[4]
         );
         $this->assertEquals(
             [
@@ -138,7 +152,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
                     0
                 ]
             ],
-            $methodCalls[4]
+            $methodCalls[5]
         );
         $this->assertEquals(
             [
@@ -148,7 +162,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
                     123
                 ]
             ],
-            $methodCalls[5]
+            $methodCalls[6]
         );
     }
 
