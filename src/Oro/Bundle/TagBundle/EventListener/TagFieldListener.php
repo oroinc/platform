@@ -27,7 +27,7 @@ class TagFieldListener
     public function addTagField(BeforeViewRenderEvent $event)
     {
         $entity = $event->getEntity();
-        if ($this->tagManager->isTaggable($entity)) {
+        if ($entity && $this->tagManager->isTaggable($entity)) {
             $environment = $event->getTwigEnvironment();
             $data        = $event->getData();
 
