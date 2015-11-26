@@ -38,7 +38,7 @@ class DumpConfigCommand extends ContainerAwareCommand
                 Version::LATEST
             )
             ->addOption(
-                'requestType',
+                'request-type',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'API request type',
@@ -50,6 +50,12 @@ class DumpConfigCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'The configuration section. Can be "entities" or "relations"',
                 'entities'
+            )
+            ->addOption(
+                'with-descriptions',
+                null,
+                InputOption::VALUE_NONE,
+                'Whether human-readable descriptions should be added'
             );
     }
 
@@ -63,14 +69,19 @@ class DumpConfigCommand extends ContainerAwareCommand
 
         $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'));
         $version     = $input->getArgument('version');
-        $requestType = $input->getOption('requestType');
+        $requestType = $input->getOption('request-type');
+
+        $extras = [ConfigExtra::FILTERS, ConfigExtra::SORTERS];
+        if ($input->getOption('with-descriptions')) {
+            $extras[] = ConfigExtra::DESCRIPTIONS;
+        }
 
         switch ($input->getOption('section')) {
             case 'entities':
-                $config = $this->getConfig($entityClass, $version, $requestType);
+                $config = $this->getConfig($entityClass, $version, $requestType, $extras);
                 break;
             case 'relations':
-                $config = $this->getRelationConfig($entityClass, $version, $requestType);
+                $config = $this->getRelationConfig($entityClass, $version, $requestType, $extras);
                 break;
             default:
                 throw new \InvalidArgumentException(
@@ -78,27 +89,23 @@ class DumpConfigCommand extends ContainerAwareCommand
                 );
         }
 
-        $output->write(Yaml::dump($config, 100));
+        $output->write(Yaml::dump($config, 100, 4, true, true));
     }
 
     /**
-     * @param string $entityClass
-     * @param string $version
-     * @param string $requestType
+     * @param string   $entityClass
+     * @param string   $version
+     * @param string   $requestType
+     * @param string[] $extras
      *
      * @return array
      */
-    protected function getConfig($entityClass, $version, $requestType)
+    protected function getConfig($entityClass, $version, $requestType, $extras)
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
 
-        $config = $configProvider->getConfig(
-            $entityClass,
-            $version,
-            $requestType,
-            [ConfigExtra::FILTERS, ConfigExtra::SORTERS, ConfigExtra::DESCRIPTIONS]
-        );
+        $config = $configProvider->getConfig($entityClass, $version, $requestType, $extras);
 
         return [
             'oro_api' => [
@@ -112,23 +119,19 @@ class DumpConfigCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string $entityClass
-     * @param string $version
-     * @param string $requestType
+     * @param string   $entityClass
+     * @param string   $version
+     * @param string   $requestType
+     * @param string[] $extras
      *
      * @return array
      */
-    protected function getRelationConfig($entityClass, $version, $requestType)
+    protected function getRelationConfig($entityClass, $version, $requestType, $extras)
     {
         /** @var RelationConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.relation_config_provider');
 
-        $config = $configProvider->getRelationConfig(
-            $entityClass,
-            $version,
-            $requestType,
-            [ConfigExtra::FILTERS, ConfigExtra::SORTERS, ConfigExtra::DESCRIPTIONS]
-        );
+        $config = $configProvider->getRelationConfig($entityClass, $version, $requestType, $extras);
 
         return [
             'oro_api' => [

@@ -37,7 +37,7 @@ class DumpMetadataCommand extends ContainerAwareCommand
                 Version::LATEST
             )
             ->addOption(
-                'requestType',
+                'request-type',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'API request type',
@@ -55,10 +55,10 @@ class DumpMetadataCommand extends ContainerAwareCommand
 
         $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'));
         $version     = $input->getArgument('version');
-        $requestType = $input->getOption('requestType');
+        $requestType = $input->getOption('request-type');
 
         $metadata = $this->getMetadata($entityClass, $version, $requestType);
-        $output->write(Yaml::dump($metadata, 100));
+        $output->write(Yaml::dump($metadata, 100, 4, true, true));
     }
 
     /**

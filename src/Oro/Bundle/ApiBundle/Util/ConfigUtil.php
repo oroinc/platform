@@ -14,6 +14,18 @@ class ConfigUtil extends BaseConfigUtil
      * a human-readable representation of an object like entity, field, filter, etc.
      * can be a string or Label object.
      */
+    const LABEL = 'label';
+
+    /**
+     * a human-readable representation in plural of an entity.
+     * can be a string or Label object.
+     */
+    const PLURAL_LABEL = 'plural_label';
+
+    /**
+     * a human-readable description of an object like entity, field, filter, etc.
+     * can be a string or Label object.
+     */
     const DESCRIPTION = 'description';
 
     const DATA_TYPE     = 'data_type';

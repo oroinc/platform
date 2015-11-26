@@ -1,10 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Metadata;
+namespace Oro\Bundle\ApiBundle\Processor\Config;
+
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * This class represents a translatable string and can be used instead of a string attributes
- * in a configuration and metadata.
+ * in a configuration.
  */
 class Label
 {
@@ -37,6 +39,22 @@ class Label
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * Translates this label.
+     *
+     * @param TranslatorInterface $translator
+     *
+     * @return string
+     */
+    public function trans(TranslatorInterface $translator)
+    {
+        $result = $translator->trans($this->name);
+
+        return $result !== $this->name
+            ? $result
+            : '';
     }
 
     /**

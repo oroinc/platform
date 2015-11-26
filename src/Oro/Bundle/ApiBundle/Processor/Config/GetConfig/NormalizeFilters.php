@@ -42,21 +42,20 @@ class NormalizeFilters implements ProcessorInterface
      */
     protected function collectFilters(array &$filters, array $definition, $fieldPrefix = null)
     {
-        if (isset($definition[ConfigUtil::FIELDS]) && is_array($definition[ConfigUtil::FIELDS])) {
-            foreach ($definition[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
-                if (null !== $fieldPrefix) {
-                    $field = $fieldPrefix . $fieldName;
-                    if (!isset($filters[ConfigUtil::FIELDS][$field])) {
-                        $filters[ConfigUtil::FIELDS][$field] = $fieldConfig;
-                    }
+        $fields = ConfigUtil::getArrayValue($definition, ConfigUtil::FIELDS);
+        foreach ($fields as $fieldName => $fieldConfig) {
+            if (null !== $fieldPrefix) {
+                $field = $fieldPrefix . $fieldName;
+                if (!isset($filters[ConfigUtil::FIELDS][$field])) {
+                    $filters[ConfigUtil::FIELDS][$field] = $fieldConfig;
                 }
-                if (array_key_exists(ConfigUtil::FILTERS, $fieldConfig)) {
-                    $this->collectFilters(
-                        $filters,
-                        $fieldConfig[ConfigUtil::FILTERS],
-                        (null !== $fieldPrefix ? $fieldPrefix . $fieldName : $fieldName) . Criteria::FIELD_DELIMITER
-                    );
-                }
+            }
+            if (array_key_exists(ConfigUtil::FILTERS, $fieldConfig)) {
+                $this->collectFilters(
+                    $filters,
+                    $fieldConfig[ConfigUtil::FILTERS],
+                    (null !== $fieldPrefix ? $fieldPrefix . $fieldName : $fieldName) . Criteria::FIELD_DELIMITER
+                );
             }
         }
     }

@@ -116,7 +116,7 @@ class ConfigUtil
     }
 
     /**
-     * Returns the configuration of the specified field
+     * Returns a configuration of the specified field
      *
      * @param array  $config The config of an entity the specified field belongs
      * @param string $field  The name of the field
