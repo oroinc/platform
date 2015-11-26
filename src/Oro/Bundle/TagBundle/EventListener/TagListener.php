@@ -4,6 +4,7 @@ namespace Oro\Bundle\TagBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
@@ -14,10 +15,17 @@ class TagListener implements ContainerAwareInterface
     /** @var TagManager */
     protected $tagManager;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
+
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
+    /** @param TaggableHelper $helper */
+    public function __construct(TaggableHelper $helper)
+    {
+        $this->taggableHelper = $helper;
+    }
 
     /**
      * {@inheritdoc}
@@ -32,12 +40,11 @@ class TagListener implements ContainerAwareInterface
      */
     public function preRemove(LifecycleEventArgs $args)
     {
-        if ((null === $this->tagManager) && $this->container) {
-            $this->tagManager = $this->container->get('oro_tag.tag.manager');
-        }
-
         $entity = $args->getEntity();
-        if ($this->tagManager->isTaggable($entity)) {
+        if ($this->taggableHelper->isTaggable($entity)) {
+            if ((null === $this->tagManager) && $this->container) {
+                $this->tagManager = $this->container->get('oro_tag.tag.manager');
+            }
             $this->tagManager->deleteTagging($entity, []);
         }
     }

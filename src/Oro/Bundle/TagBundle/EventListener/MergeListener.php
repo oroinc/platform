@@ -8,6 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class MergeListener
 {
@@ -16,12 +17,17 @@ class MergeListener
     /** @var TagManager */
     protected $tagManager;
 
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
     /**
-     * @param TagManager $tagManager
+     * @param TagManager     $tagManager
+     * @param TaggableHelper $helper
      */
-    public function __construct(TagManager $tagManager)
+    public function __construct(TagManager $tagManager, TaggableHelper $helper)
     {
-        $this->tagManager = $tagManager;
+        $this->tagManager     = $tagManager;
+        $this->taggableHelper = $helper;
     }
 
     /**
@@ -96,6 +102,6 @@ class MergeListener
     {
         $className = $entityMetadata->getClassName();
 
-        return $this->tagManager->isTaggable($className);
+        return $this->taggableHelper->isTaggable($className);
     }
 }

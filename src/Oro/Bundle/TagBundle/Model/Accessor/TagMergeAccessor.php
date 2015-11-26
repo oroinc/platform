@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TagBundle\Model\Accessor;
 
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
@@ -12,12 +13,17 @@ class TagMergeAccessor implements AccessorInterface
     /** @var TagManager */
     protected $tagManager;
 
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
     /**
-     * @param TagManager $tagManager
+     * @param TagManager     $tagManager
+     * @param TaggableHelper $helper
      */
-    public function __construct(TagManager $tagManager)
+    public function __construct(TagManager $tagManager, TaggableHelper $helper)
     {
-        $this->tagManager = $tagManager;
+        $this->tagManager     = $tagManager;
+        $this->taggableHelper = $helper;
     }
 
     /**
@@ -26,7 +32,7 @@ class TagMergeAccessor implements AccessorInterface
     public function supports($entity, FieldMetadata $metadata)
     {
         return
-            $this->tagManager->isTaggable($entity) &&
+            $this->taggableHelper->isTaggable($entity) &&
             $metadata->getSourceClassName() === 'Oro\Bundle\TagBundle\Entity\Tag';
     }
 

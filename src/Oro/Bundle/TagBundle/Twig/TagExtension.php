@@ -3,16 +3,24 @@
 namespace Oro\Bundle\TagBundle\Twig;
 
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagExtension extends \Twig_Extension
 {
     /** @var TagManager */
     protected $tagManager;
 
-    /** @param TagManager $tagManager */
-    public function __construct(TagManager $tagManager)
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
+    /**
+     * @param TagManager     $tagManager
+     * @param TaggableHelper $helper
+     */
+    public function __construct(TagManager $tagManager, TaggableHelper $helper)
     {
-        $this->tagManager = $tagManager;
+        $this->tagManager     = $tagManager;
+        $this->taggableHelper = $helper;
     }
 
     /**
@@ -53,6 +61,6 @@ class TagExtension extends \Twig_Extension
      */
     public function isTaggable($entity)
     {
-        return $this->tagManager->isTaggable($entity);
+        return $this->taggableHelper->isTaggable($entity);
     }
 }

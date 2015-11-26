@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagsExtension extends AbstractExtension
 {
@@ -20,20 +21,25 @@ class TagsExtension extends AbstractExtension
     const FILTER_COLUMN_NAME      = 'tagname';
     const PROPERTY_ID_PATH        = '[properties][id]';
 
+    /** @var TagManager */
+    protected $tagManager;
+
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var TagManager */
-    protected $tagManager;
+    /** @var TaggableHelper */
+    protected $taggableHelper;
 
     /**
      * @param TagManager          $tagManager
      * @param EntityClassResolver $resolver
+     * @param TaggableHelper      $helper
      */
-    public function __construct(TagManager $tagManager, EntityClassResolver $resolver)
+    public function __construct(TagManager $tagManager, EntityClassResolver $resolver, TaggableHelper $helper)
     {
         $this->tagManager          = $tagManager;
         $this->entityClassResolver = $resolver;
+        $this->taggableHelper      = $helper;
     }
 
     /**
@@ -43,7 +49,7 @@ class TagsExtension extends AbstractExtension
     {
         return
             null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)
-            && $this->tagManager->isTaggable($this->getEntityClassName($config));
+            && $this->taggableHelper->isTaggable($this->getEntityClassName($config));
     }
 
     /**

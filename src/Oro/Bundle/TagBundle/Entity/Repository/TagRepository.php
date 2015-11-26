@@ -6,10 +6,11 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class TagRepository extends EntityRepository
@@ -91,12 +92,9 @@ class TagRepository extends EntityRepository
      */
     public function deleteTaggingByParams(array $tags, $entityClassName, $entityId, User $owner = null)
     {
-        $builder = $this->_em->createQueryBuilder();
-        $builder
-            ->delete('OroTagBundle:Tagging', 't')
-            ->where('t.entityName = :entityClassName')
+        $builder = $this
+            ->getDeleteTaggingQueryBuilder($entityClassName)
             ->andWhere('t.recordId = :entityId')
-            ->setParameter('entityClassName', $entityClassName)
             ->setParameter('entityId', $entityId);
 
         if (!empty($tags)) {
@@ -109,6 +107,19 @@ class TagRepository extends EntityRepository
         }
 
         return $builder->getQuery()->getResult();
+    }
+
+    /**
+     * @param string $entityClassName
+     *
+     * @return int
+     */
+    public function deleteTags($entityClassName)
+    {
+        return $this
+            ->getDeleteTaggingQueryBuilder($entityClassName)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -125,8 +136,21 @@ class TagRepository extends EntityRepository
      */
     public function getTagging($resource, $createdBy = null, $all = false, Organization $organization = null)
     {
-        $recordId = TagManager::getEntityId($resource);
+        $recordId = TaggableHelper::getEntityId($resource);
 
         return $this->getTags(ClassUtils::getClass($resource), $recordId, $createdBy, $all, $organization);
+    }
+
+    /**
+     * @param string $entityClassName
+     *
+     * @return QueryBuilder
+     */
+    protected function getDeleteTaggingQueryBuilder($entityClassName)
+    {
+        return $this->_em->createQueryBuilder()
+            ->delete('OroTagBundle:Tagging', 't')
+            ->where('t.entityName = :entityClassName')
+            ->setParameter('entityClassName', $entityClassName);
     }
 }

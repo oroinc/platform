@@ -5,27 +5,12 @@ namespace Oro\Bundle\TagBundle\Form\Type;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\TagBundle\Entity\TagManager;
-
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType;
-use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class TagConfigChoiceType extends AbstractConfigType
 {
-    /** @var TagManager */
-    protected $tagManager;
-
-    /**
-     * @param AssociationTypeHelper $typeHelper
-     * @param TagManager            $tagManager
-     */
-    public function __construct(AssociationTypeHelper $typeHelper, TagManager $tagManager)
-    {
-        parent::__construct($typeHelper);
-        $this->tagManager = $tagManager;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -85,7 +70,7 @@ class TagConfigChoiceType extends AbstractConfigType
         $className = $configId->getClassName();
 
         if (!empty($className)) {
-            return $this->tagManager->isImplementsTaggable($className);
+            return TaggableHelper::isImplementsTaggable($className);
         }
 
         return false;

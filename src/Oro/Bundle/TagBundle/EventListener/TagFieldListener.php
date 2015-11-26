@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\TagBundle\EventListener;
 
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
-
-use Oro\Bundle\TagBundle\Entity\TagManager;
 
 class TagFieldListener
 {
-    /** @var TagManager */
-    protected $tagManager;
+    /** @var TaggableHelper */
+    protected $taggableHelper;
 
-    /**
-     * @param TagManager $tagManager
-     */
-    public function __construct(TagManager $tagManager)
+    /** @param TaggableHelper $helper */
+    public function __construct(TaggableHelper $helper)
     {
-        $this->tagManager = $tagManager;
+        $this->taggableHelper = $helper;
     }
 
     /**
@@ -27,7 +24,7 @@ class TagFieldListener
     public function addTagField(BeforeViewRenderEvent $event)
     {
         $entity = $event->getEntity();
-        if ($entity && $this->tagManager->isTaggable($entity)) {
+        if ($entity && $this->taggableHelper->isTaggable($entity)) {
             $environment = $event->getTwigEnvironment();
             $data        = $event->getData();
 

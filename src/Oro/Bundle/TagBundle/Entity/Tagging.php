@@ -5,6 +5,7 @@ namespace Oro\Bundle\TagBundle\Entity;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Model\ExtendTagging;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -155,7 +156,7 @@ class Tagging extends ExtendTagging
     public function setResource(Taggable $resource)
     {
         $this->entityName = ClassUtils::getClass($resource);
-        $this->recordId = TagManager::getEntityId($resource);
+        $this->recordId   = TaggableHelper::getEntityId($resource);
     }
 
     /**
@@ -213,6 +214,7 @@ class Tagging extends ExtendTagging
      * Set created date
      *
      * @param \DateTime $date
+     *
      * @return $this
      */
     public function setCreated(\DateTime $date)
