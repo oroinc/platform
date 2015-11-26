@@ -88,7 +88,6 @@ class TagSearchResultsExtension extends AbstractExtension
                     $entityId,
                     null,
                     null,
-                    null,
                     $entityConfig
                 );
             },
