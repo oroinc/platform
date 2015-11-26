@@ -38,17 +38,17 @@ services:
     # REST API processors
     #
 
-    oro_api.normalize_value.rest.boolean:
+    oro_api.normalize_value.rest_json_api.boolean:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\RestJsonApi\NormalizeBoolean
         tags:
             - { name: oro.api.processor, action: normalize_value, requestType: rest_json_api, dataType: boolean, priority: -10 }
 
-    oro_api.normalize_value.rest.datetime:
+    oro_api.normalize_value.rest_json_api.datetime:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\RestJsonApi\NormalizeDateTime
         tags:
             - { name: oro.api.processor, action: normalize_value, requestType: rest_json_api, dataType: datetime, priority: -10 }
 
-    oro_api.normalize_value.rest.order_by:
+    oro_api.normalize_value.rest_json_api.order_by:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\RestJsonApi\NormalizeOrderBy
         tags:
             - { name: oro.api.processor, action: normalize_value, requestType: rest_json_api, dataType: orderBy, priority: -10 }

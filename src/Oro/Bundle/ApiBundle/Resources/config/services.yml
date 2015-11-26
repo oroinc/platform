@@ -1,8 +1,8 @@
 parameters:
-    # a list of supported formats of REST API requests delimited by |
-    oro_api.rest.formats: json
-    # default format of REST API requests
-    oro_api.rest.default_format: json
+    # a list of supported formats of REST API requests based on JSON API delimited by |
+    oro_api.rest_json_api.formats: json
+    # default format of REST API requests based on JSON API
+    oro_api.rest_json_api.default_format: json
 
 services:
     oro_api.action_processor_bag:
@@ -150,7 +150,7 @@ services:
         arguments:
             - @service_container
 
-    oro_api.rest_api_routing_options_resolver:
+    oro_api.rest_json_api.routing_options_resolver:
         class: Oro\Bundle\ApiBundle\Routing\RestApiRouteOptionsResolver
         public: false
         arguments:
@@ -159,12 +159,12 @@ services:
             - @oro_entity.entity_alias_resolver
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
-            - %oro_api.rest.formats%
-            - %oro_api.rest.default_format%
+            - %oro_api.rest_json_api.formats%
+            - %oro_api.rest_json_api.default_format%
         tags:
             - { name: routing.options_resolver, priority: -255 }
 
-    oro_api.rest_api_doc_handler:
+    oro_api.rest_json_api.doc_handler:
         class: Oro\Bundle\ApiBundle\Routing\RestApiDocHandler
         public: false
         arguments:
