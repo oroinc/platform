@@ -47,7 +47,7 @@ class TagManager
     /** @var ConfigProvider */
     protected $tagConfigProvider;
 
-    protected static $storage = [];
+    protected $storage = [];
 
     /**
      * @param EntityManager  $em
@@ -142,7 +142,10 @@ class TagManager
         if ($entity instanceof Taggable) {
             $entity->setTags($tags);
         } else {
-            self::$storage[ClassUtils::getRealClass($entity)][$this->getEntityId($entity)] = $tags;
+            $entityClassName = ClassUtils::getClass($entity);
+            $entityId        = $this->getEntityId($entity);
+
+            $this->storage[$entityClassName][$entityId] = $tags;
         }
     }
 
@@ -158,14 +161,16 @@ class TagManager
         if ($entity instanceof Taggable) {
             return $entity->getTags();
         } else {
-            if (!isset(self::$storage[ClassUtils::getRealClass($entity)][$this->getEntityId($entity)])) {
-                self::$storage[ClassUtils::getRealClass($entity)][$this->getEntityId($entity)] = $this->fetchTags(
+            $entityClassName = ClassUtils::getClass($entity);
+            $entityId        = $this->getEntityId($entity);
+            if (!isset($this->storage[$entityClassName][$entityId])) {
+                $this->storage[$entityClassName][$entityId] = $this->fetchTags(
                     $entity,
                     null
                 );
             }
 
-            return self::$storage[ClassUtils::getRealClass($entity)][$this->getEntityId($entity)];
+            return $this->storage[$entityClassName][$entityId];
         }
     }
 

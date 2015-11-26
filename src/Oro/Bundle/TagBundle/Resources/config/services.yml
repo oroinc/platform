@@ -240,3 +240,10 @@ services:
             - @oro_tag.tag.manager
         tags:
             - { name: kernel.event_listener, event: entity_view.render.before, method: addTagField }
+
+    oro_tag.merge.tag_merge_accessor:
+        class: Oro\Bundle\TagBundle\Model\Accessor\TagMergeAccessor
+        arguments:
+            - @oro_tag.tag.manager
+        tags:
+            - { name: oro_entity_merge.accessor }

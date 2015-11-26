@@ -7,26 +7,21 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 
 class MergeListener
 {
-    const GETTER     = 'getTags';
-    const SETTER     = 'setTags';
     const FIELD_NAME = 'tags';
 
-    /**
-     * @var TagManager
-     */
-    protected $manager;
+    /** @var TagManager */
+    protected $tagManager;
 
     /**
-     * @param TagManager $manager
+     * @param TagManager $tagManager
      */
-    public function __construct(TagManager $manager)
+    public function __construct(TagManager $tagManager)
     {
-        $this->manager = $manager;
+        $this->tagManager = $tagManager;
     }
 
     /**
@@ -42,13 +37,12 @@ class MergeListener
         }
 
         $fieldMetadataOptions = [
-            'display'       => true,
-            'getter'        => self::GETTER,
-            'setter'        => self::SETTER,
-            'field_name'    => self::FIELD_NAME,
-            'is_collection' => true,
-            'label'         => 'oro.tag.entity_plural_label',
-            'merge_modes'   => [MergeModes::REPLACE, MergeModes::UNITE]
+            'source_class_name' => 'Oro\Bundle\TagBundle\Entity\Tag',
+            'display'           => true,
+            'field_name'        => self::FIELD_NAME,
+            'is_collection'     => true,
+            'label'             => 'oro.tag.entity_plural_label',
+            'merge_modes'       => [MergeModes::REPLACE, MergeModes::UNITE]
         ];
 
         $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
@@ -70,8 +64,7 @@ class MergeListener
 
         $entities = $entityData->getEntities();
         foreach ($entities as $entity) {
-            /* @var Taggable $entity */
-            $this->manager->loadTagging($entity);
+            $this->tagManager->loadTagging($entity);
         }
     }
 
@@ -88,26 +81,21 @@ class MergeListener
             return;
         }
 
-        /* @var Taggable $masterEntity */
         $masterEntity = $entityData->getMasterEntity();
-        $masterTags   = $this->manager->getTags($masterEntity)->getValues();
-        $this->manager->setTags($masterEntity, ['all' => $masterTags, 'owner' => $masterTags]);
-        $this->manager->saveTagging($masterEntity);
+        $masterTags   = $this->tagManager->getTags($masterEntity)->getValues();
+        $this->tagManager->setTags($masterEntity, ['all' => $masterTags, 'owner' => $masterTags]);
+        $this->tagManager->saveTagging($masterEntity);
     }
 
     /**
      * @param EntityMetadata $entityMetadata
+     *
      * @return bool
      */
     private function isTaggable(EntityMetadata $entityMetadata)
     {
-        $className       = $entityMetadata->getClassName();
-        $classInterfaces = class_implements($className);
+        $className = $entityMetadata->getClassName();
 
-        if (isset($classInterfaces['Oro\Bundle\TagBundle\Entity\Taggable'])) {
-            return true;
-        }
-
-        return false;
+        return $this->tagManager->isTaggable($className);
     }
 }
