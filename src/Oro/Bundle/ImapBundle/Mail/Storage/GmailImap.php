@@ -61,12 +61,4 @@ class GmailImap extends Imap
             isset($data[self::X_GM_LABELS]) ? $data[self::X_GM_LABELS] : array()
         );
     }
-
-    /**
-     * @return bool
-     */
-    protected function supportUidSearch()
-    {
-        return true;
-    }
 }

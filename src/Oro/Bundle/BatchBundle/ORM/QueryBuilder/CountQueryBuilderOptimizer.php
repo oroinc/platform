@@ -48,8 +48,8 @@ class CountQueryBuilderOptimizer
      * Get optimized query builder for count calculation.
      *
      * @param QueryBuilder $queryBuilder
-     *
      * @return QueryBuilder
+     * @throws \Exception
      */
     public function getCountQueryBuilder(QueryBuilder $queryBuilder)
     {
@@ -114,13 +114,7 @@ class CountQueryBuilderOptimizer
             $this->addJoins($optimizedQueryBuilder, $originalQueryParts);
         }
         if (!$originalQueryParts['groupBy']) {
-            /** @var Expr\From $from */
-            foreach ($originalQueryParts['from'] as $from) {
-                $fieldNames = $this->context->getClassMetadata($from->getFrom())->getIdentifierFieldNames();
-                foreach ($fieldNames as $fieldName) {
-                    $fieldsToSelect[] = $from->getAlias() . '.' . $fieldName;
-                }
-            }
+            $fieldsToSelect = $this->getFieldsToSelect($originalQueryParts);
         }
 
         if ($originalQueryParts['where']) {
@@ -399,5 +393,39 @@ class CountQueryBuilderOptimizer
         }
 
         return $associations[$associationName]['type'];
+    }
+
+    /**
+     * Get SELECT fields for optimized Query Builder.
+     *
+     * By default all identifier fields are added.
+     * If some of them are selected as DISTINCT in original Query Builder,
+     * then them also should be selected as DISTINCT in optimized Query Builder.
+     *
+     * @param array $originalQueryParts
+     * @return array
+     */
+    protected function getFieldsToSelect(array $originalQueryParts)
+    {
+        $fieldsToSelect = [];
+        foreach ($originalQueryParts['from'] as $from) {
+            /** @var Expr\From $from */
+            $fieldNames = $this->context->getClassMetadata($from->getFrom())->getIdentifierFieldNames();
+            foreach ($fieldNames as $fieldName) {
+                $selectField = $from->getAlias() . '.' . $fieldName;
+                /** @var Expr\Select $originalSelect */
+                foreach ($originalQueryParts['select'] as $originalSelect) {
+                    foreach ($originalSelect->getParts() as $part) {
+                        if (strtolower((string)$part) === 'distinct ' . $selectField) {
+                            $selectField = 'DISTINCT ' . $selectField;
+                            break;
+                        }
+                    }
+                }
+                $fieldsToSelect[] = $selectField;
+            }
+        }
+
+        return $fieldsToSelect;
     }
 }
