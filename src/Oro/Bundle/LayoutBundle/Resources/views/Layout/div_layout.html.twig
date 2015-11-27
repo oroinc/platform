@@ -104,6 +104,10 @@
     {{ text|block_text(translation_domain) }}
 {%- endblock %}
 
+{% block html_widget -%}
+    {{ text|block_text(translation_domain)|raw }}
+{%- endblock %}
+
 {% block link_widget -%}
     <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
         {%- if icon is defined %}{{ block('icon_block') }}{% endif %}

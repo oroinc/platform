@@ -156,6 +156,7 @@ class RendererTest extends LayoutTestCase
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
             ->add('content', 'root', 'body')
+            ->add('top_content', 'content', 'html', ['text' => '<header>Renderer <b>Test</b>!</header>'])
             ->add('list', 'content', 'list')
             ->add(
                 'list_item_1',
@@ -331,6 +332,7 @@ class RendererTest extends LayoutTestCase
 <body class="test-body class2">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
     <input type="submit" name="btn2" value="Btn2"/>
+    <header>Renderer <b>Test</b>!</header>
     <ul>
         <li>Hi World!</li>
         <li class="list-item-2"><a href="http://example.com">Hi World!</a></li>
