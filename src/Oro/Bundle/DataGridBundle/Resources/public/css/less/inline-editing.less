@@ -138,4 +138,18 @@
       width: calc(~"100% - 61px")
     }
   }
+  &.tags-select-editor {
+    width: auto!important; // ignore cell width
+    min-width: 100px; // ignore min-width
+    .select2-container {
+      height: auto;
+      width: auto !important;
+    }
+    .select2-choices {
+      max-height: 40vh;
+      max-width: 20vw;
+      min-width: 130px;
+      overflow: auto;
+    }
+  }
 }
