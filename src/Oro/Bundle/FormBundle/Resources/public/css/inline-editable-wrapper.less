@@ -1,0 +1,26 @@
+.inline-editable-wrapper__start-editing-button {
+  display: none !important;
+  position: absolute;
+  top: 2px;
+  right: -1px;
+  width: 25px;
+  height: 25px;
+  line-height: 35px !important;
+  background-color: #fff !important;
+  text-align: center;
+  border: solid 1px #ddd !important;
+  border-radius: 4px;
+  padding-left: 2px;
+  &:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+}
+
+.inline-editable-wrapper:hover {
+  background: #f4efd4;
+  position: relative;
+  outline: 2px #f4efd4 solid;
+  .inline-editable-wrapper__start-editing-button {
+    display: block !important;
+  }
+}
