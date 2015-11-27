@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
@@ -21,6 +23,8 @@ use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 
 class RestApiController extends FOSRestController
 {
+    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+
     /**
      * Get a list of entities
      *
@@ -32,10 +36,13 @@ class RestApiController extends FOSRestController
      */
     public function cgetAction(Request $request)
     {
+        $this->validateRequest($request);
+
         $processor = $this->getProcessor($request);
         /** @var GetListContext $context */
         $context = $this->getContext($processor, $request);
         $context->setFilterValues(new RestFilterValueAccessor($request));
+        $context->getResponseHeaders()->set('Content-Type', self::JSON_API_CONTENT_TYPE);
 
         $processor->process($context);
 
@@ -58,10 +65,13 @@ class RestApiController extends FOSRestController
      */
     public function getAction(Request $request)
     {
+        $this->validateRequest($request);
+
         $processor = $this->getProcessor($request);
         /** @var GetContext $context */
         $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
+        $context->getResponseHeaders()->set('Content-Type', self::JSON_API_CONTENT_TYPE);
 
         $processor->process($context);
 
@@ -71,6 +81,45 @@ class RestApiController extends FOSRestController
                 return null !== $result ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
             }
         );
+    }
+
+    /**
+     * @param Request $request
+     */
+    protected function validateRequest(Request $request)
+    {
+        /**
+         * Servers MUST respond with a 415 Unsupported Media Type status code
+         *  if a request specifies the header Content-Type: application/vnd.api+json with any media type parameters.
+         */
+        $requestContentType = $request->headers->get('content-type');
+        if (false !== strpos($requestContentType, ';')) {
+            throw new UnsupportedMediaTypeHttpException(
+                'Request\'s "Content-Type" header should not contain any media type parameters.'
+            );
+        }
+
+        /**
+         * Clients MUST send all JSON API data in request documents with the header
+         *   Content-Type: application/vnd.api+json without any media type parameters.
+         */
+        if ($requestContentType !== self::JSON_API_CONTENT_TYPE) {
+            throw new UnsupportedMediaTypeHttpException(
+                'Unsupported Content-Type.'
+            );
+        }
+
+        /**
+         * Servers MUST respond with a 406 Not Acceptable status code if a request's Accept header contains only
+         *   the JSON API media type and all instances of that media type are modified with media type parameters.
+         */
+        $acceptHeader = array_map('trim', explode(',', $request->headers->get('accept')));
+        if (!array_intersect(['*/*', 'application/*', self::JSON_API_CONTENT_TYPE], $acceptHeader)) {
+            throw new NotAcceptableHttpException(
+                'Not supported "Accept" header or it contains the JSON API content type ' .
+                'and all instances of that are modified with media type parameters.'
+            );
+        }
     }
 
     /**
