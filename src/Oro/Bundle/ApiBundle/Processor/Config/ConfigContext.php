@@ -16,7 +16,7 @@ class ConfigContext extends ApiContext
     /**
      * Gets FQCN of an entity.
      *
-     * @return string|null
+     * @return string
      */
     public function getClassName()
     {

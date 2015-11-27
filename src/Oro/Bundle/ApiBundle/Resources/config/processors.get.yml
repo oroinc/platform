@@ -14,6 +14,12 @@ services:
     #
     # initialize
     #
+
+    oro_api.get.validate_class_name_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 255 }
+
     oro_api.get.initialize_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
         arguments:
@@ -38,14 +44,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 20 }
 
-    oro_api.get.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId
-        arguments:
-            - @oro_api.doctrine_helper
-            - @oro_api.value_normalizer
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: rest_json_api, priority: 10 }
-
     #
     # security_check
     #
@@ -62,6 +60,19 @@ services:
     #
     # build_query
     #
+
+    oro_api.get.validate_entity_id_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, priority: 255 }
+
+    oro_api.get.normalize_entity_id:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, requestType: rest_json_api, priority: 250 }
 
     oro_api.get.complete_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria

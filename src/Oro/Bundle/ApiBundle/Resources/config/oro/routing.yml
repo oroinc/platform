@@ -5,7 +5,7 @@ oro_rest_api_cget:
         _controller: OroApiBundle:RestApi:cget
         _action: get_list
     options:
-        group: rest_api
+        group: rest_json_api
 
 oro_rest_api_get:
     path: /api/{version}/{entity}/{id}.{_format}
@@ -14,4 +14,4 @@ oro_rest_api_get:
         _controller: OroApiBundle:RestApi:get
         _action: get
     options:
-        group: rest_api
+        group: rest_json_api

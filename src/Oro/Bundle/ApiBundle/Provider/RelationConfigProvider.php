@@ -34,6 +34,10 @@ class RelationConfigProvider
      */
     public function getRelationConfig($className, $version, $requestType, array $extras = [])
     {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty.');
+        }
+
         $cacheKey = $requestType . $version . $className;
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];

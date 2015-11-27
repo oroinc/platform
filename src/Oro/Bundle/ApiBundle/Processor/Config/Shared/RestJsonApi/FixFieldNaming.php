@@ -46,7 +46,7 @@ class FixFieldNaming implements ProcessorInterface
         $reservedFieldNames = array_intersect(array_keys($definition[ConfigUtil::FIELDS]), ['id', 'type']);
         foreach ($reservedFieldNames as $fieldName) {
             if ('type' === $fieldName
-                || ('id' === $fieldName && (!$entityClass || !$this->isIdentifierField($entityClass, $fieldName)))
+                || ('id' === $fieldName && !$this->isIdentifierField($entityClass, $fieldName))
             ) {
                 $this->renameReservedField($definition[ConfigUtil::FIELDS], $entityClass, $fieldName);
             }

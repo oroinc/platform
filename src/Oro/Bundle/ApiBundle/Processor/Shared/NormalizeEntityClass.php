@@ -29,8 +29,8 @@ class NormalizeEntityClass implements ProcessorInterface
         /** @var Context $context */
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || false !== strpos($entityClass, '\\')) {
-            // no entity class or it is already normalized
+        if (false !== strpos($entityClass, '\\')) {
+            // an entity class is already normalized
             return;
         }
 

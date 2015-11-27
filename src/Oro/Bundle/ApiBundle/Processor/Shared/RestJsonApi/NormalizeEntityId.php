@@ -38,13 +38,13 @@ class NormalizeEntityId implements ProcessorInterface
         /** @var SingleItemContext $context */
 
         $entityId = $context->getId();
-        if (null === $entityId || !is_string($entityId)) {
+        if (!is_string($entityId)) {
             // no entity identifier or it is already normalized
             return;
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }

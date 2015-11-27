@@ -83,17 +83,20 @@ class Context extends ApiContext
      */
     protected function loadConfig()
     {
-        // load config by a config provider
-        $config      = null;
         $entityClass = $this->getClassName();
-        if ($entityClass) {
-            $config = $this->configProvider->getConfig(
-                $entityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                array_unique(array_merge($this->getConfigSections(), $this->getConfigExtras()))
+        if (empty($entityClass)) {
+            throw new \RuntimeException(
+                'A class name must be set in the context before a configuration is loaded.'
             );
         }
+
+        // load config by a config provider
+        $config = $this->configProvider->getConfig(
+            $entityClass,
+            $this->getVersion(),
+            $this->getRequestType(),
+            array_unique(array_merge($this->getConfigSections(), $this->getConfigExtras()))
+        );
 
         // add loaded config sections to the context
         if (!empty($config)) {
@@ -130,18 +133,21 @@ class Context extends ApiContext
      */
     protected function loadMetadata()
     {
-        // load metadata by a metadata provider
-        $metadata    = null;
         $entityClass = $this->getClassName();
-        if ($entityClass) {
-            $metadata = $this->metadataProvider->getMetadata(
-                $entityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                $this->getMetadataExtras(),
-                $this->getConfig()
+        if (empty($entityClass)) {
+            throw new \RuntimeException(
+                'A class name must be set in the context before metadata are loaded.'
             );
         }
+
+        // load metadata by a metadata provider
+        $metadata = $this->metadataProvider->getMetadata(
+            $entityClass,
+            $this->getVersion(),
+            $this->getRequestType(),
+            $this->getMetadataExtras(),
+            $this->getConfig()
+        );
 
         // add loaded metadata to the context
         $this->set(self::METADATA, $metadata);
@@ -198,7 +204,7 @@ class Context extends ApiContext
     /**
      * Gets FQCN of an entity
      *
-     * @return string|null
+     * @return string
      */
     public function getClassName()
     {

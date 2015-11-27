@@ -12,7 +12,7 @@ class FieldConfigContext extends ConfigContext
     /**
      * Gets the name of a field.
      *
-     * @return string|null
+     * @return string
      */
     public function getFieldName()
     {

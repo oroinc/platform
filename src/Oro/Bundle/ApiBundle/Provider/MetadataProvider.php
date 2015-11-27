@@ -35,6 +35,10 @@ class MetadataProvider
      */
     public function getMetadata($className, $version, $requestType, array $extras = [], $config = null)
     {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty.');
+        }
+
         $cacheKey = $requestType . $version . $className;
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];

@@ -151,7 +151,7 @@ services:
             - @service_container
 
     oro_api.rest_json_api.routing_options_resolver:
-        class: Oro\Bundle\ApiBundle\Routing\RestApiRouteOptionsResolver
+        class: Oro\Bundle\ApiBundle\Routing\RestJsonApiRouteOptionsResolver
         public: false
         arguments:
             - @oro_entity_config.entity_manager_bag
@@ -165,7 +165,7 @@ services:
             - { name: routing.options_resolver, priority: -255 }
 
     oro_api.rest_json_api.doc_handler:
-        class: Oro\Bundle\ApiBundle\Routing\RestApiDocHandler
+        class: Oro\Bundle\ApiBundle\Routing\RestJsonApiDocHandler
         public: false
         arguments:
             - @oro_api.action_processor_bag
