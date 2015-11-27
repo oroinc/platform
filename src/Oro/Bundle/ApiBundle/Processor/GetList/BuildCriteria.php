@@ -36,7 +36,7 @@ class BuildCriteria implements ProcessorInterface
                     if (!array_key_exists($field, $sortersConfigFields)) {
                         throw new \InvalidArgumentException(
                             sprintf(
-                                'Sorting by the field "%s" does not supports',
+                                'Sorting by the field "%s" is not supported',
                                 $field
                             )
                         );
