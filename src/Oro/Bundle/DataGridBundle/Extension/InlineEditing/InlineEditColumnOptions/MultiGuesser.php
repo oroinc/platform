@@ -7,11 +7,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 
 /**
- * Class MultiGuesser
+ * Class MultiSelectGuesser
  * @package Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions
  */
-class MultiGuesser extends ChoicesGuesser
+class MultiSelectGuesser extends ChoicesGuesser
 {
+    const MULTI_SELECT = 'multi-select';
+
     const DEFAULT_EDITOR_VIEW = 'orodatagrid/js/app/views/editor/multi-select-editor-view';
 
     /**
@@ -26,8 +28,8 @@ class MultiGuesser extends ChoicesGuesser
             $column['frontend_type'] = 'multi-select';
         }
 
-        if (array_key_exists('frontend_type', $column)
-            && $column['frontend_type'] === 'multi-select'
+        if (array_key_exists(Configuration::FRONTEND_TYPE_NAME, $column)
+            && $column[Configuration::FRONTEND_TYPE_NAME] === 'multi-select'
             && $metadata->hasAssociation($columnName)
         ) {
             $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);

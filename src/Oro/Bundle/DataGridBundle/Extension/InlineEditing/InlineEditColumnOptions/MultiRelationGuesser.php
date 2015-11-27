@@ -10,6 +10,8 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
  */
 class MultiRelationGuesser implements GuesserInterface
 {
+    const MULTI_RELATION = 'multi-relation';
+
     const DEFAULT_EDITOR_VIEW = 'orodatagrid/js/app/views/editor/multi-relation-editor-view';
     const DEFAULT_API_ACCESSOR_CLASS = 'oroui/js/tools/search-api-accessor';
 
@@ -19,8 +21,10 @@ class MultiRelationGuesser implements GuesserInterface
     public function guessColumnOptions($columnName, $entityName, $column)
     {
         $result = [];
-        if (array_key_exists('frontend_type', $column) && $column['frontend_type'] === 'multi-relation') {
-            $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
+ 
+        if (array_key_exists(Configuration::FRONTEND_TYPE_NAME, $column) 
+            && $column[Configuration::FRONTEND_TYPE_NAME] === self::MULTI_RELATION) {
+           $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
             $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             $result = $this->guessApiAccessorClass($column, $isConfiguredInlineEdit, $result);
         }
