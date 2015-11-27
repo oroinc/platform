@@ -62,7 +62,9 @@ class DateFilterSubscriber implements EventSubscriberInterface
         }
 
         $children = array_keys($form->get('value')->all());
-        $this->modifyEndDateForEqualType($data);
+        if (isset($data['part']) && isset($data['type'])) {
+            $this->modifyEndDateForEqualType($data);
+        }
         // compile expressions
         $this->mapValues(
             $children,
