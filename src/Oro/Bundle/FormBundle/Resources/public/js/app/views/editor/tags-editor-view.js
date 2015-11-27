@@ -42,8 +42,8 @@ define(function(require) {
      * @class
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
-     * @param {Backgrid.Cell} options.cell - Current datagrid cell
-     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.fieldName - Field name to edit in model
+     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {string} options.maximumSelectionLength - Maximum selection length
@@ -60,14 +60,15 @@ define(function(require) {
 
     TagsEditorView = SelectEditorView.extend(/** @exports TagsEditorView.prototype */{
         className: 'tags-select-editor',
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options;
             TagsEditorView.__super__.initialize.apply(this, arguments);
         },
-        getAvailableOptions: function () {
-            var value = this.model.get(this.options.column.get('name'));
-            if (!_.isArray(value))
+        getAvailableOptions: function() {
+            var value = this.model.get(this.fieldName);
+            if (!_.isArray(value)) {
                 return [];
+            }
             return value;
         },
 
@@ -77,24 +78,25 @@ define(function(require) {
                 allowClear: false,
                 tokenSeparators:  [',', ' '],
                 data: {results: this.availableChoices},
-                createSearchChoice: function (term) {
-                    return { id: term, text: term, isNew: true };
+                createSearchChoice: function(term) {
+                    return {id: term, text: term, isNew: true};
                 }
-            }
+            };
             return options;
         },
 
         getModelValue: function() {
-            var value = this.model.get(this.options.column.get('name'));
+            var value = this.model.get(this.fieldName);
 
-            if (!_.isArray(value))
+            if (!_.isArray(value)) {
                 return {data: []};
+            }
 
             return {
-                data: value.map(function (v, i, a) {
-                    return {id: v.id};
+                data: value.map(function(value) {
+                    return {id: value.id};
                 })
-            }
+            };
         },
 
         getValue: function() {
@@ -127,7 +129,7 @@ define(function(require) {
         },
         getServerUpdateData: function() {
             var data = {};
-            data[this.options.column.get('name')] = this.getValue();
+            data[this.fieldName] = this.getValue();
             return data;
         },
 

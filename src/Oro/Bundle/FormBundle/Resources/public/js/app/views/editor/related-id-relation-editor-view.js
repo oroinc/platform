@@ -66,8 +66,8 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {Object} options.input_delay - Delay before user finished input and request sent to server
-     * @param {Backgrid.Cell} options.cell - Current datagrid cell
-     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.fieldName - Field name to edit in model
+     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder for an empty element
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.value_field_name - Related value field name
@@ -95,7 +95,7 @@ define(function(require) {
                 throw new Error('`value_field_name` option is required');
             }
 
-            var apiSpec = options.column.get('metadata').inline_editing.autocomplete_api_accessor;
+            var apiSpec = this.metadata.inline_editing.autocomplete_api_accessor;
             var AutocompleteApiAccessor = apiSpec['class'];
             this.autocompleteApiAccessor = new AutocompleteApiAccessor(apiSpec);
             this.perPage = options.per_page || this.DEFAULT_PER_PAGE;
@@ -113,7 +113,7 @@ define(function(require) {
         getInitialResultItem: function() {
             return {
                 id: this.getModelValue(),
-                label: this.model.get(this.column.get('name'))
+                label: this.model.get(this.fieldName)
             };
         },
 
@@ -144,8 +144,8 @@ define(function(require) {
                 if (_this.disposed) {
                     return;
                 }
-                if (options.term === '' && options.page === 1 && _this.column.emptyQueryRequest) {
-                    currentRequest = _this.column.emptyQueryRequest;
+                if (options.term === '' && options.page === 1 && _this.metadata.emptyQueryRequest) {
+                    currentRequest = _this.metadata.emptyQueryRequest;
                 } else {
                     currentRequest = _this.autocompleteApiAccessor.send(_.extend(_this.model.toJSON(), {
                         term: options.term,
@@ -154,7 +154,7 @@ define(function(require) {
                     }));
                     currentRequest.term = options.term;
                     if (options.term === '' && options.page === 1) {
-                        _this.column.emptyQueryRequest = currentRequest;
+                        _this.metadata.emptyQueryRequest = currentRequest;
                     }
                 }
                 currentRequest.done(function(response) {
@@ -238,7 +238,7 @@ define(function(require) {
 
         getModelUpdateData: function() {
             var data = this.getServerUpdateData();
-            data[this.column.get('name')] = this.getChoiceLabel();
+            data[this.fieldName] = this.getChoiceLabel();
             return data;
         }
     }, {

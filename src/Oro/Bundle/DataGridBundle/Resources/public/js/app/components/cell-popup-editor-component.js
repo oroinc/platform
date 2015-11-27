@@ -34,8 +34,8 @@ define(function(require) {
             var viewInstance = new View(_.extend({}, options.viewOptions, {
                 autoRender: true,
                 model: options.cell.model,
-                cell: options.cell,
-                column: options.cell.column
+                fieldName: options.cell.column.get('name'),
+                metadata: options.cell.column.get('metadata')
             }));
 
             viewInstance.$el.addClass('inline-editor-wrapper');
@@ -45,7 +45,7 @@ define(function(require) {
                     of: options.cell.$el
                 }
             });
-            this.resizeToCell(viewInstance);
+            this.resizeToCell(viewInstance, options.cell);
             this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             return viewInstance;
         },
@@ -53,8 +53,8 @@ define(function(require) {
         /**
          * Resizes editor to cell width
          */
-        resizeToCell: function(view) {
-            view.$el.width(view.cell.$el.outerWidth() + this.getWidthIncrement());
+        resizeToCell: function(view, cell) {
+            view.$el.width(cell.$el.outerWidth() + this.getWidthIncrement());
         },
 
         /**

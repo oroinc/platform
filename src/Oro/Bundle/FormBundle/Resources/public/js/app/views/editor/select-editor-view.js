@@ -50,8 +50,8 @@ define(function(require) {
      * @class
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
-     * @param {Backgrid.Cell} options.cell - Current datagrid cell
-     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.fieldName - Field name to edit in model
+     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder for an empty element
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.choices - Key-value set of available choices
@@ -74,7 +74,7 @@ define(function(require) {
         },
 
         getAvailableOptions: function(options) {
-            var choices = options.column.get('metadata').choices;
+            var choices = this.metadata.choices;
             var result = [];
             for (var id in choices) {
                 if (choices.hasOwnProperty(id)) {
