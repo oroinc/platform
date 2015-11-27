@@ -10,16 +10,22 @@ class GetListContextTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $metadataProvider;
+
     /** @var GetListContext */
     protected $context;
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+        $this->configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->context = new GetListContext($this->configProvider);
+        $this->context = new GetListContext($this->configProvider, $this->metadataProvider);
     }
 
     public function testDefaultAccessorConfigSections()

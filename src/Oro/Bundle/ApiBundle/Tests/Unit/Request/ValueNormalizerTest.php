@@ -40,16 +40,16 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 new Processor\NormalizeUnsignedInteger()
             ],
             [
-                $this->addProcessor($processorBag, 'rest.boolean', DataType::BOOLEAN, RequestType::REST),
-                new Processor\Rest\NormalizeBoolean()
+                $this->addProcessor($processorBag, 'rest.boolean', DataType::BOOLEAN, RequestType::REST_JSON_API),
+                new Processor\RestJsonApi\NormalizeBoolean()
             ],
             [
-                $this->addProcessor($processorBag, 'rest.datetime', DataType::DATETIME, RequestType::REST),
-                new Processor\Rest\NormalizeDateTime()
+                $this->addProcessor($processorBag, 'rest.datetime', DataType::DATETIME, RequestType::REST_JSON_API),
+                new Processor\RestJsonApi\NormalizeDateTime()
             ],
             [
-                $this->addProcessor($processorBag, 'rest.order_by', DataType::ORDER_BY, RequestType::REST),
-                new Processor\Rest\NormalizeOrderBy()
+                $this->addProcessor($processorBag, 'rest.order_by', DataType::ORDER_BY, RequestType::REST_JSON_API),
+                new Processor\RestJsonApi\NormalizeOrderBy()
             ],
         ];
         foreach ($processorMap as $val) {
@@ -74,13 +74,13 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function getRequirementProvider()
     {
         return [
-            [ValueNormalizer::DEFAULT_REQUIREMENT, 'unknownType', RequestType::REST],
-            [ValueNormalizer::DEFAULT_REQUIREMENT, DataType::STRING, RequestType::REST],
-            [Processor\NormalizeInteger::REQUIREMENT, DataType::INTEGER, RequestType::REST],
-            [Processor\NormalizeUnsignedInteger::REQUIREMENT, DataType::UNSIGNED_INTEGER, RequestType::REST],
-            [Processor\Rest\NormalizeBoolean::REQUIREMENT, DataType::BOOLEAN, RequestType::REST],
-            [Processor\Rest\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, RequestType::REST],
-            [Processor\Rest\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, RequestType::REST],
+            [ValueNormalizer::DEFAULT_REQUIREMENT, 'unknownType', RequestType::REST_JSON_API],
+            [ValueNormalizer::DEFAULT_REQUIREMENT, DataType::STRING, RequestType::REST_JSON_API],
+            [Processor\NormalizeInteger::REQUIREMENT, DataType::INTEGER, RequestType::REST_JSON_API],
+            [Processor\NormalizeUnsignedInteger::REQUIREMENT, DataType::UNSIGNED_INTEGER, RequestType::REST_JSON_API],
+            [Processor\RestJsonApi\NormalizeBoolean::REQUIREMENT, DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [Processor\RestJsonApi\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, RequestType::REST_JSON_API],
+            [Processor\RestJsonApi\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, RequestType::REST_JSON_API],
         ];
     }
 
@@ -99,37 +99,37 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 ValueNormalizer::DEFAULT_REQUIREMENT,
                 'unknownType',
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 ValueNormalizer::DEFAULT_REQUIREMENT,
                 DataType::STRING,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 $this->getArrayRequirement(Processor\NormalizeInteger::REQUIREMENT),
                 DataType::INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 $this->getArrayRequirement(Processor\NormalizeUnsignedInteger::REQUIREMENT),
                 DataType::UNSIGNED_INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
-                $this->getArrayRequirement(Processor\Rest\NormalizeBoolean::REQUIREMENT),
+                $this->getArrayRequirement(Processor\RestJsonApi\NormalizeBoolean::REQUIREMENT),
                 DataType::BOOLEAN,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
-                $this->getArrayRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
+                $this->getArrayRequirement(Processor\RestJsonApi\NormalizeDateTime::REQUIREMENT),
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
-                Processor\Rest\NormalizeOrderBy::REQUIREMENT,
+                Processor\RestJsonApi\NormalizeOrderBy::REQUIREMENT,
                 DataType::ORDER_BY,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
         ];
     }
@@ -159,40 +159,40 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function normalizeValueProvider()
     {
         return [
-            ['test', 'test', 'unknownType', RequestType::REST],
-            [null, null, DataType::STRING, RequestType::REST],
-            [null, null, DataType::INTEGER, RequestType::REST],
-            [null, null, DataType::UNSIGNED_INTEGER, RequestType::REST],
-            [null, null, DataType::BOOLEAN, RequestType::REST],
-            [null, null, DataType::DATETIME, RequestType::REST],
-            [null, null, DataType::ORDER_BY, RequestType::REST],
-            ['test', 'test', DataType::STRING, RequestType::REST],
-            [123, 123, DataType::INTEGER, RequestType::REST],
-            [[123, 456], [123, 456], DataType::INTEGER, RequestType::REST],
-            [0, '0', DataType::INTEGER, RequestType::REST],
-            [123, '123', DataType::INTEGER, RequestType::REST],
-            [-123, '-123', DataType::INTEGER, RequestType::REST],
-            [[123, -456], '123,-456', DataType::INTEGER, RequestType::REST],
-            [123, 123, DataType::UNSIGNED_INTEGER, RequestType::REST],
-            [[123, 456], [123, 456], DataType::UNSIGNED_INTEGER, RequestType::REST],
-            [0, '0', DataType::UNSIGNED_INTEGER, RequestType::REST],
-            [123, '123', DataType::UNSIGNED_INTEGER, RequestType::REST],
-            [[123, 456], '123,456', DataType::UNSIGNED_INTEGER, RequestType::REST],
-            [false, '0', DataType::BOOLEAN, RequestType::REST],
-            [false, false, DataType::BOOLEAN, RequestType::REST],
-            [false, 'false', DataType::BOOLEAN, RequestType::REST],
-            [false, 'no', DataType::BOOLEAN, RequestType::REST],
-            [true, true, DataType::BOOLEAN, RequestType::REST],
-            [true, '1', DataType::BOOLEAN, RequestType::REST],
-            [true, 'true', DataType::BOOLEAN, RequestType::REST],
-            [true, 'yes', DataType::BOOLEAN, RequestType::REST],
-            [[true, false], [true, false], DataType::BOOLEAN, RequestType::REST],
-            [[true, false], '1,0', DataType::BOOLEAN, RequestType::REST],
+            ['test', 'test', 'unknownType', RequestType::REST_JSON_API],
+            [null, null, DataType::STRING, RequestType::REST_JSON_API],
+            [null, null, DataType::INTEGER, RequestType::REST_JSON_API],
+            [null, null, DataType::UNSIGNED_INTEGER, RequestType::REST_JSON_API],
+            [null, null, DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [null, null, DataType::DATETIME, RequestType::REST_JSON_API],
+            [null, null, DataType::ORDER_BY, RequestType::REST_JSON_API],
+            ['test', 'test', DataType::STRING, RequestType::REST_JSON_API],
+            [123, 123, DataType::INTEGER, RequestType::REST_JSON_API],
+            [[123, 456], [123, 456], DataType::INTEGER, RequestType::REST_JSON_API],
+            [0, '0', DataType::INTEGER, RequestType::REST_JSON_API],
+            [123, '123', DataType::INTEGER, RequestType::REST_JSON_API],
+            [-123, '-123', DataType::INTEGER, RequestType::REST_JSON_API],
+            [[123, -456], '123,-456', DataType::INTEGER, RequestType::REST_JSON_API],
+            [123, 123, DataType::UNSIGNED_INTEGER, RequestType::REST_JSON_API],
+            [[123, 456], [123, 456], DataType::UNSIGNED_INTEGER, RequestType::REST_JSON_API],
+            [0, '0', DataType::UNSIGNED_INTEGER, RequestType::REST_JSON_API],
+            [123, '123', DataType::UNSIGNED_INTEGER, RequestType::REST_JSON_API],
+            [[123, 456], '123,456', DataType::UNSIGNED_INTEGER, RequestType::REST_JSON_API],
+            [false, '0', DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [false, false, DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [false, 'false', DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [false, 'no', DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [true, true, DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [true, '1', DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [true, 'true', DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [true, 'yes', DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [[true, false], [true, false], DataType::BOOLEAN, RequestType::REST_JSON_API],
+            [[true, false], '1,0', DataType::BOOLEAN, RequestType::REST_JSON_API],
             [
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 [
@@ -204,25 +204,25 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                     new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 ],
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
                 '2010-01-28',
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 '2010-01-28T15:00:00+00:00',
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 new \DateTime('2010-01-28T15:00:00+0200', new \DateTimeZone('UTC')),
                 '2010-01-28T15:00:00+02:00',
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 [
@@ -231,12 +231,17 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
                 '2010-01-28T15:00:00+00:00,2010-01-28T15:00:00+02:00',
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
-            [['fld1' => Criteria::ASC], ['fld1' => Criteria::ASC], DataType::ORDER_BY, RequestType::REST],
-            [['fld1' => Criteria::ASC], 'fld1', DataType::ORDER_BY, RequestType::REST],
-            [['fld1' => Criteria::DESC], '-fld1', DataType::ORDER_BY, RequestType::REST],
-            [['fld1' => Criteria::ASC, 'fld2' => Criteria::DESC], 'fld1,-fld2', DataType::ORDER_BY, RequestType::REST],
+            [['fld1' => Criteria::ASC], ['fld1' => Criteria::ASC], DataType::ORDER_BY, RequestType::REST_JSON_API],
+            [['fld1' => Criteria::ASC], 'fld1', DataType::ORDER_BY, RequestType::REST_JSON_API],
+            [['fld1' => Criteria::DESC], '-fld1', DataType::ORDER_BY, RequestType::REST_JSON_API],
+            [
+                ['fld1' => Criteria::ASC, 'fld2' => Criteria::DESC],
+                'fld1,-fld2',
+                DataType::ORDER_BY,
+                RequestType::REST_JSON_API
+            ],
         ];
     }
 
@@ -256,73 +261,73 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 'Expected integer value. Given "test"',
                 'test',
                 DataType::INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected integer value. Given "1a"',
                 '1a',
                 DataType::INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected an array of integers. Given "1,2a".',
                 '1,2a',
                 DataType::INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected unsigned integer value. Given "test"',
                 'test',
                 DataType::UNSIGNED_INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected unsigned integer value. Given "1a"',
                 '1a',
                 DataType::UNSIGNED_INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected an array of unsigned integers. Given "1,2a"',
                 '1,2a',
                 DataType::UNSIGNED_INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected unsigned integer value. Given "-1"',
                 '-1',
                 DataType::UNSIGNED_INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected an array of unsigned integers. Given "1,-1"',
                 '1,-1',
                 DataType::UNSIGNED_INTEGER,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected boolean value. Given "test"',
                 'test',
                 DataType::BOOLEAN,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected an array of booleans. Given "true,2"',
                 'true,2',
                 DataType::BOOLEAN,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected datetime value. Given "test"',
                 'test',
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
             [
                 'Expected an array of datetimes. Given "2010-01-28T15:00:00,test"',
                 '2010-01-28T15:00:00,test',
                 DataType::DATETIME,
-                RequestType::REST
+                RequestType::REST_JSON_API
             ],
         ];
     }

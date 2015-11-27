@@ -197,7 +197,7 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
                 self::ID_ATTRIBUTE,
                 $this->valueNormalizer->getRequirement(
                     $metadata->getTypeOfField(reset($idFields)),
-                    RequestType::REST
+                    RequestType::REST_JSON_API
                 )
             );
         } elseif ($idFieldCount > 1) {
@@ -207,7 +207,7 @@ class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
                 $requirements[] = $field . '='
                     . $this->valueNormalizer->getRequirement(
                         $metadata->getTypeOfField($field),
-                        RequestType::REST
+                        RequestType::REST_JSON_API
                     );
             }
             $route->setRequirement(

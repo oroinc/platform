@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\RestJsonApi;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeEntityId;
+use Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 
 class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
@@ -173,10 +173,13 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
      */
     protected function getContext()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new SingleItemContext($configProvider);
+        return new SingleItemContext($configProvider, $metadataProvider);
     }
 }

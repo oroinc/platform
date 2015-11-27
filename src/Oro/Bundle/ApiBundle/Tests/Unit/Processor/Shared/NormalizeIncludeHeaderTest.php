@@ -55,10 +55,13 @@ class NormalizeIncludeHeaderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getContext()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new Context($configProvider);
+        return new Context($configProvider, $metadataProvider);
     }
 }

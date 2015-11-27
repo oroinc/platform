@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest;
+namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\RestJsonApi;
 
 use Doctrine\Common\Collections\Criteria;
 

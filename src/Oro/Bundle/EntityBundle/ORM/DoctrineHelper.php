@@ -37,9 +37,16 @@ class DoctrineHelper
      */
     public function getEntityClass($entityOrClass)
     {
-        return is_object($entityOrClass)
-            ? ClassUtils::getClass($entityOrClass)
-            : ClassUtils::getRealClass($entityOrClass);
+        if (is_object($entityOrClass)) {
+            return ClassUtils::getClass($entityOrClass);
+        }
+
+        if (strpos($entityOrClass, ':') !== false) {
+            list($namespaceAlias, $simpleClassName) = explode(':', $entityOrClass, 2);
+            return $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
+        }
+
+        return ClassUtils::getRealClass($entityOrClass);
     }
 
     /**

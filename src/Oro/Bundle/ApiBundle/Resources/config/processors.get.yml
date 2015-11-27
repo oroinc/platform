@@ -6,6 +6,7 @@ services:
             - @oro_api.processor_bag
             - get
             - @oro_api.config_provider
+            - @oro_api.metadata_provider
         tags:
             - { name: oro.api.action_processor }
 
@@ -38,12 +39,12 @@ services:
             - { name: oro.api.processor, action: get, group: initialize, priority: 20 }
 
     oro_api.get.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeEntityId
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId
         arguments:
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: rest, priority: 10 }
+            - { name: oro.api.processor, action: get, group: initialize, requestType: rest_json_api, priority: 10 }
 
     #
     # security_check
@@ -123,4 +124,9 @@ services:
     oro_api.get.validate_result:
         class: Oro\Bundle\ApiBundle\Processor\Get\ValidateResult
         tags:
-            - { name: oro.api.processor, action: get, group: finalize, priority: 250 }
+            - { name: oro.api.processor, action: get, group: finalize, priority: -250 }
+
+    oro_api.get.rest_json_api.validate_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\ValidateResultSchema
+        tags:
+            - { name: oro.api.processor, action: get, group: finalize, priority: -251 }

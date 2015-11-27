@@ -7,19 +7,27 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Label;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class SetDescriptionForEntity implements ProcessorInterface
 {
+    /** @var EntityClassNameProviderInterface */
+    protected $entityClassNameProvider;
+
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
     /**
-     * @param ConfigProvider $entityConfigProvider
+     * @param EntityClassNameProviderInterface $entityClassNameProvider
+     * @param ConfigProvider                   $entityConfigProvider
      */
-    public function __construct(ConfigProvider $entityConfigProvider)
-    {
-        $this->entityConfigProvider = $entityConfigProvider;
+    public function __construct(
+        EntityClassNameProviderInterface $entityClassNameProvider,
+        ConfigProvider $entityConfigProvider
+    ) {
+        $this->entityClassNameProvider = $entityClassNameProvider;
+        $this->entityConfigProvider    = $entityConfigProvider;
     }
 
     /**
@@ -36,21 +44,27 @@ class SetDescriptionForEntity implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->entityConfigProvider->hasConfig($entityClass)) {
-            // only configurable entities are supported
+        if (!$entityClass) {
+            // an entity type is not specified
             return;
         }
 
-        $entityConfig = $this->entityConfigProvider->getConfig($entityClass);
-
         if (!isset($definition[ConfigUtil::LABEL])) {
-            $definition[ConfigUtil::LABEL] = new Label($entityConfig->get('label'));
+            $entityName = $this->entityClassNameProvider->getEntityClassName($entityClass);
+            if ($entityName) {
+                $definition[ConfigUtil::LABEL] = $entityName;
+            }
         }
         if (!isset($definition[ConfigUtil::PLURAL_LABEL])) {
-            $definition[ConfigUtil::PLURAL_LABEL] = new Label($entityConfig->get('plural_label'));
+            $entityPluralName = $this->entityClassNameProvider->getEntityClassPluralName($entityClass);
+            if ($entityPluralName) {
+                $definition[ConfigUtil::PLURAL_LABEL] = $entityPluralName;
+            }
         }
-        if (!isset($definition[ConfigUtil::DESCRIPTION])) {
-            $definition[ConfigUtil::DESCRIPTION] = new Label($entityConfig->get('description'));
+        if (!isset($definition[ConfigUtil::DESCRIPTION]) && $this->entityConfigProvider->hasConfig($entityClass)) {
+            $definition[ConfigUtil::DESCRIPTION] = new Label(
+                $this->entityConfigProvider->getConfig($entityClass)->get('description')
+            );
         }
 
         $context->setResult($definition);
