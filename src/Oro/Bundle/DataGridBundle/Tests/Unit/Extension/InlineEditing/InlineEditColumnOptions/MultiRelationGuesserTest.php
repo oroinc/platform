@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\RelationGuesser;
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiRelationGuesser;
 
 /**
- * Class RelationGuesserTest
+ * Class MultiRelationGuesserTest
  * @package Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption
  */
-class RelationGuesserTest extends \PHPUnit_Framework_TestCase
+class MultiRelationGuesserTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var RelationGuesser */
+    /** @var MultiRelationGuesser */
     protected $guesser;
 
     public function setUp()
     {
-        $this->guesser = new RelationGuesser();
+        $this->guesser = new MultiRelationGuesser();
     }
 
     /**
@@ -44,10 +44,10 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'not fill if configured' => [
                 [
-                    'frontend_type' => 'relation',
+                    'frontend_type' => 'multi-relation',
                     'inline_editing' => [
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/related-id-relation-editor-view'
+                            'view' => 'orodatagrid/js/app/views/editor/multi-relation-editor-view'
                         ],
                         'autocomplete_api_accessor' => [
                             'class' => 'oroui/js/tools/search-api-accessor'
@@ -57,11 +57,11 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'filled if empty' => [
-                ['frontend_type' => 'relation'],
+                ['frontend_type' => 'multi-relation'],
                 [
                     'inline_editing' => [
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/related-id-relation-editor-view'
+                            'view' => 'orodatagrid/js/app/views/editor/multi-relation-editor-view'
                         ],
                         'autocomplete_api_accessor' => [
                             'class' => 'oroui/js/tools/search-api-accessor'
@@ -71,7 +71,7 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'filled if empty view' => [
                 [
-                    'frontend_type' => 'relation',
+                    'frontend_type' => 'multi-relation',
                     'inline_editing' => [
                         'autocomplete_api_accessor' => [
                             'class' => 'oroui/js/tools/search-api-accessor'
@@ -81,17 +81,17 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
                 [
                     'inline_editing' => [
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/related-id-relation-editor-view'
+                            'view' => 'orodatagrid/js/app/views/editor/multi-relation-editor-view'
                         ]
                     ]
                 ]
             ],
             'filled if empty accessor' => [
                 [
-                    'frontend_type' => 'relation',
+                    'frontend_type' => 'multi-relation',
                     'inline_editing' => [
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/related-id-relation-editor-view'
+                            'view' => 'orodatagrid/js/app/views/editor/multi-relation-editor-view'
                         ]
                     ]
                 ],
