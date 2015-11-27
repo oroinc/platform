@@ -169,7 +169,7 @@ define(function(require) {
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
-            mediator.trigger('datagrid:rendered');
+            mediator.trigger('datagrid:rendered', grid);
 
             if (options.routerEnabled !== false) {
                 // trace collection changes
