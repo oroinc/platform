@@ -28,8 +28,8 @@ class MultiSelectGuesser extends ChoicesGuesser
             $column['frontend_type'] = 'multi-select';
         }
 
-        if (array_key_exists(Configuration::FRONTEND_TYPE_NAME, $column)
-            && $column[Configuration::FRONTEND_TYPE_NAME] === 'multi-select'
+        if (array_key_exists(Configuration::FRONTEND_TYPE_KEY, $column)
+            && $column[Configuration::FRONTEND_TYPE_KEY] === 'multi-select'
             && $metadata->hasAssociation($columnName)
         ) {
             $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);

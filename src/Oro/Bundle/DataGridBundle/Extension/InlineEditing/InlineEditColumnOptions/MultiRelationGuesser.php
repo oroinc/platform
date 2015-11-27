@@ -22,9 +22,9 @@ class MultiRelationGuesser implements GuesserInterface
     {
         $result = [];
  
-        if (array_key_exists(Configuration::FRONTEND_TYPE_NAME, $column) 
-            && $column[Configuration::FRONTEND_TYPE_NAME] === self::MULTI_RELATION) {
-           $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
+        if (array_key_exists(Configuration::FRONTEND_TYPE_KEY, $column)
+            && $column[Configuration::FRONTEND_TYPE_KEY] === self::MULTI_RELATION) {
+            $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
             $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             $result = $this->guessApiAccessorClass($column, $isConfiguredInlineEdit, $result);
         }
