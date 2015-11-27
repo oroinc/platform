@@ -31,9 +31,6 @@ class MultiSelectGuesser extends ChoicesGuesser
         $isConfigured = $isConfigured
             || isset($column[Configuration::BASE_CONFIG_KEY][Configuration::AUTOCOMPLETE_API_ACCESSOR_KEY]);
         if (!$isConfigured && $metadata->hasAssociation($columnName)) {
-            $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
-            $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
-
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_MANY) {
                 $targetEntity = $metadata->getAssociationTargetClass($columnName);
@@ -52,34 +49,14 @@ class MultiSelectGuesser extends ChoicesGuesser
 
                 $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::MULTI_SELECT;
+                $result[PropertyInterface::TYPE_KEY] = 'field';
 
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
                 $result[Configuration::CHOICES_KEY] = $this->getChoices($targetEntity, $keyField, $labelField);
+
+                $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
+                $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param $column
-     * @param $isConfiguredInlineEdit
-     * @param $result
-     *
-     * @return array
-     */
-    protected function guessEditorView($column, $isConfiguredInlineEdit, $result)
-    {
-        $isConfigured = $isConfiguredInlineEdit
-            && array_key_exists(Configuration::EDITOR_KEY, $column[Configuration::BASE_CONFIG_KEY]);
-        $isConfigured = $isConfigured
-            && array_key_exists(
-                Configuration::VIEW_KEY,
-                $column[Configuration::BASE_CONFIG_KEY][Configuration::EDITOR_KEY]
-            );
-        if (!$isConfigured) {
-            $result[Configuration::BASE_CONFIG_KEY][Configuration::EDITOR_KEY][Configuration::VIEW_KEY]
-                = static::DEFAULT_EDITOR_VIEW;
         }
 
         return $result;

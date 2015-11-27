@@ -74,6 +74,8 @@ define(function(require) {
         SELECTED_ITEMS_H_INCREMENT: 2,
 
         initialize: function(options) {
+
+            debugger;
             this.availableChoices = this.getAvailableOptions(options);
             this.prestine = true;
             SelectEditorView.__super__.initialize.apply(this, arguments);

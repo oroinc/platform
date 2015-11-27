@@ -104,7 +104,7 @@ define(function(require) {
             var select2Value = this.$('input[name=value]').val();
             var ids;
             if (select2Value !== '') {
-                ids = select2Value.split(',').map(function(id) {return parseInt(id);});
+                ids = select2Value.split(',').map(function(id) {return id;});
             } else {
                 ids = [];
             }
