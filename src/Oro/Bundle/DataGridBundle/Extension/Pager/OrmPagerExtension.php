@@ -10,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
@@ -68,8 +69,17 @@ class OrmPagerExtension extends AbstractExtension
                 $config->offsetGetByPath(Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH)
             );
         }
-        $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
-        $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
+
+        if ($config->offsetGetByPath(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH, false) ||
+            $config->offsetGetByPath(ModeExtension::MODE_OPTION_PATH) === ModeExtension::MODE_CLIENT
+        ) {
+            // no restrictions applied
+            $this->pager->setPage(0);
+            $this->pager->setMaxPerPage(0);
+        } else {
+            $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
+            $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
+        }
         $this->pager->init();
     }
 

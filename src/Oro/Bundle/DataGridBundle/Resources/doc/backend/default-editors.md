@@ -5,6 +5,7 @@ Maps frontend types to editor views
 
 * [defaultEditors](#module_defaultEditors) : <code>Object</code>
   * [.string](#module_defaultEditors.string) : <code>function</code>
+  * [.phone](#module_defaultEditors.phone) : <code>function</code>
   * [.datetime](#module_defaultEditors.datetime) : <code>function</code>
   * [.date](#module_defaultEditors.date) : <code>function</code>
   * [.currency](#module_defaultEditors.currency) : <code>function</code>
@@ -16,6 +17,11 @@ Maps frontend types to editor views
 
 <a name="module_defaultEditors.string"></a>
 ### defaultEditors.string : <code>function</code>
+Please see [text-editor-view](../frontend/editor/text-editor-view.md) for details
+
+**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+<a name="module_defaultEditors.phone"></a>
+### defaultEditors.phone : <code>function</code>
 Please see [text-editor-view](../frontend/editor/text-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  

@@ -3,12 +3,14 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityChangesetTransformer;
 
 class EntityChangesetTransformerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $doctrineHelper;
 
@@ -31,24 +33,19 @@ class EntityChangesetTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer = new EntityChangesetTransformer($this->doctrineHelper, $this->class);
     }
 
-    /**
-     * @dataProvider transformDataProvider
-     *
-     * @param mixed $value
-     * @param array $expected
-     */
-    public function testTransform($value, array $expected)
+    public function testTransform()
     {
-        $this->assertEquals($expected, $this->transformer->transform($value));
+        $data = ['some random data'];
+        $this->assertEquals($data, $this->transformer->transform($data));
     }
 
     /**
      * @dataProvider transformDataProvider
      *
      * @param mixed $expected
-     * @param array $value
+     * @param mixed $value
      */
-    public function testReverseTransform($expected, array $value)
+    public function testReverseTransform($expected, $value)
     {
         if (!$expected) {
             $expected = new ArrayCollection();
@@ -80,10 +77,10 @@ class EntityChangesetTransformerTest extends \PHPUnit_Framework_TestCase
                     '1' => ['entity' => $this->createDataObject(1), 'data' => ['test' => '123', 'test2' => 'val']],
                     '2' => ['entity' => $this->createDataObject(2), 'data' => ['test' => '12']]
                 ]),
-                [
-                    '1' => ['test' => '123', 'test2' => 'val'],
-                    '2' => ['test' => '12']
-                ]
+                new ArrayCollection([
+                    '1' => ['data' => ['test' => '123', 'test2' => 'val']],
+                    '2' => ['data' => ['test' => '12']]
+                ])
             ]
         ];
     }

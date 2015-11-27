@@ -263,4 +263,12 @@ class EmailBody
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

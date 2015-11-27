@@ -116,6 +116,7 @@ oro_entity_config:
                         type:               textarea
                         options:
                             label:          oro.entity.entity_config.entity.field.items.description
+                            tooltip:        oro.entity.entity_config.entity.field.items.description.tooltip
                             block:          general
                             required:       false
 
