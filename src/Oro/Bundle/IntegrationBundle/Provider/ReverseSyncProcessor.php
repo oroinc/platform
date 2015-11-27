@@ -16,11 +16,13 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
      * @param Integration $integration Integration object
      * @param string      $connector   Connector name
      * @param array       $parameters  Connector additional parameters
+     *
+     * @return bool
      */
     public function process(Integration $integration, $connector, array $parameters)
     {
         if (!$integration->isEnabled()) {
-            return;
+            return false;
         }
 
         try {
@@ -35,7 +37,7 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
 
-            return;
+            return false;
         }
 
         $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
@@ -55,12 +57,14 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
                 ),
         ];
 
-        $this->processExport($realConnector->getExportJobName(), $configuration);
+        return $this->processExport($realConnector->getExportJobName(), $configuration);
     }
 
     /**
      * @param string $jobName
-     * @param array $configuration
+     * @param array  $configuration
+     *
+     * @return bool
      */
     protected function processExport($jobName, array $configuration)
     {
@@ -97,6 +101,8 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
 
             $this->logger->error($exceptions);
         }
+
+        return $isSuccess;
     }
 
     /**
