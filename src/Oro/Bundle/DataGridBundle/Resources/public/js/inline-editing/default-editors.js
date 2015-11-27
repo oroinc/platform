@@ -17,6 +17,13 @@ define(function(require) {
         string: require('orodatagrid/js/app/views/editor/text-editor-view'),
 
         /**
+         * Please see [text-editor-view](../frontend/editor/text-editor-view.md) for details
+         *
+         * @type {function(new:TextEditorView)}
+         */
+        phone: require('orodatagrid/js/app/views/editor/text-editor-view'),
+
+        /**
          * Please see [datetime-editor-view](../frontend/editor/datetime-editor-view.md) for details
          *
          * @type {Function}

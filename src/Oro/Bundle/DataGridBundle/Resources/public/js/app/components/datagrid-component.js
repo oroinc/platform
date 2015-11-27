@@ -147,17 +147,29 @@ define(function(require) {
          * Build grid
          */
         build: function() {
+            var collectionModels;
             var collectionOptions;
             var grid;
 
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
+
+            collectionModels = {};
+            if (this.data && this.data.data) {
+                collectionModels = this.data.data;
+            }
+
+            collectionOptions = this.combineCollectionOptions();
+            if (this.data && this.data.options) {
+                _.extend(collectionOptions, this.data.options);
+            }
+
             if (!collection) {
                 // otherwise, create collection from metadata
-                collectionOptions = this.combineCollectionOptions();
-                collection = new PageableCollection(this.data, collectionOptions);
+                collection = new PageableCollection(collectionModels, collectionOptions);
             } else if (this.data) {
-                collection.reset(this.data, {parse: true});
+                _.extend(collectionOptions, {parse: true});
+                collection.reset(collectionModels, collectionOptions);
             }
 
             // create grid
@@ -201,7 +213,8 @@ define(function(require) {
                     sorters: {},
                     columns: {}
                 }, this.metadata.state),
-                initialState: this.metadata.initialState
+                initialState: this.metadata.initialState,
+                mode: this.metadata.mode || 'server'
             }, this.metadata.options);
             return options;
         },

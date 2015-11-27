@@ -37,6 +37,7 @@ define([
             Row.__super__.initialize.apply(this, arguments);
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
+            this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
         },
 
         /**
@@ -55,6 +56,16 @@ define([
 
             this.$el.html(fragment);
             this.trigger('columns:reorder');
+        },
+
+        /**
+         * Handles row "backgrid:selected" event
+         *
+         * @param model
+         * @param isSelected
+         */
+        onBackgridSelected: function(model, isSelected) {
+            this.$el.toggleClass('row-selected', isSelected);
         },
 
         className: function() {

@@ -44,6 +44,7 @@ class OroTestFrameworkBundleInstaller implements Installation, ActivityExtension
         $this->createTestWorkflowAwareEntityTable($schema);
         $this->createTestSearchItemTable($schema);
         $this->createTestSearchItemValueTable($schema);
+        $this->createTestSearchProductTable($schema);
         $this->createTestActivityTable($schema);
 
         /** Foreign keys generation **/
@@ -118,6 +119,19 @@ class OroTestFrameworkBundleInstaller implements Installation, ActivityExtension
         $table = $schema->createTable('test_search_item_value');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('entity_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create test_search_product table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestSearchProductTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_search_product');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
     }
 

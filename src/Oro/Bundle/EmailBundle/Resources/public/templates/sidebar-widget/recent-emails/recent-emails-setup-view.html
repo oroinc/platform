@@ -15,7 +15,11 @@
     </div>
     <div class="control-group">
         <div class="control-label wrap">
-            <label class="required"><%= _.__("oro.email.recent_emails_widget.default_action") %><em>*</em></label>
+            <label class="required">
+                <i class="icon-info-sign tooltip-icon" data-content="<%= _.__("oro.email.recent_emails_widget.default_action_hint") %>" data-toggle="popover"></i>
+                <%= _.__("oro.email.recent_emails_widget.default_action") %>
+                <em>*</em>
+            </label>
         </div>
         <div class="controls">
             <select name="defaultActionId"  class="select2">

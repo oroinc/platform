@@ -8,45 +8,46 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
 
 class CalendarEventApiHandler
 {
-    /**
-     * @var FormInterface
-     */
+    /** @var FormInterface */
     protected $form;
 
-    /**
-     * @var Request
-     */
+    /** @var Request */
     protected $request;
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $manager;
 
     /** @var EmailSendProcessor */
     protected $emailSendProcessor;
+
+    /** @var ActivityManager */
+    protected $activityManager;
 
     /**
      * @param FormInterface      $form
      * @param Request            $request
      * @param ObjectManager      $manager
      * @param EmailSendProcessor $emailSendProcessor
+     * @param ActivityManager    $activityManager
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         ObjectManager $manager,
-        EmailSendProcessor $emailSendProcessor
+        EmailSendProcessor $emailSendProcessor,
+        ActivityManager $activityManager
     ) {
-        $this->form    = $form;
-        $this->request = $request;
-        $this->manager = $manager;
-        $this->emailSendProcessor  = $emailSendProcessor;
+        $this->form               = $form;
+        $this->request            = $request;
+        $this->manager            = $manager;
+        $this->emailSendProcessor = $emailSendProcessor;
+        $this->activityManager    = $activityManager;
     }
 
     /**
@@ -68,6 +69,13 @@ class CalendarEventApiHandler
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
+                // TODO: should be refactored after finishing BAP-8722
+                // Contexts handling should be moved to common for activities form handler
+                if ($this->form->has('contexts')) {
+                    $contexts = $this->form->get('contexts')->getData();
+                    $this->activityManager->setActivityTargets($entity, $contexts);
+                }
+
                 $this->onSuccess(
                     $entity,
                     $originalChildren,

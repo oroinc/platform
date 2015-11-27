@@ -57,6 +57,21 @@ define(function(require) {
         template: require('tpl!orodatagrid/templates/datagrid/action-launcher.html'),
 
         /**
+         * Defines map of events => handlers
+         * @return {Object}
+         */
+        events: function() {
+            var events = {};
+            var linkSelector = '';
+            if (this.links) {
+                events['click .dropdown-toggle'] = 'onToggle';
+                linkSelector = ' .dropdown-menu a';
+            }
+            events['click' + linkSelector] = 'onClick';
+            return events;
+        },
+
+        /**
          * Initialize
          *
          * @param {Object} options
@@ -71,7 +86,6 @@ define(function(require) {
          * @throws {TypeError} If mandatory option is undefined
          */
         initialize: function(options) {
-            var linkSelector;
             var opts = options || {};
 
             if (!opts.action) {
@@ -114,14 +128,9 @@ define(function(require) {
                 this.onClickReturnValue = opts.onClickReturnValue;
             }
 
-            this.events = {};
-            linkSelector = '';
             if (_.has(opts, 'links')) {
-                this.events['click .dropdown-toggle'] = 'onToggle';
                 this.links = options.links;
-                linkSelector = ' .dropdown-menu a';
             }
-            this.events['click' + linkSelector] = 'onClick';
 
             this.action = opts.action;
             ActionLauncher.__super__.initialize.apply(this, arguments);
