@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -10,16 +11,22 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $metadataProvider;
+
     /** @var Context */
     protected $context;
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+        $this->configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->context = new Context($this->configProvider);
+        $this->context = new Context($this->configProvider, $this->metadataProvider);
     }
 
     /**
@@ -168,6 +175,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $requestType    = 'rest';
         $entityClass    = 'Test\Class';
         $configSections = ['section1', 'section2'];
+        $configExtras   = ['extra1'];
 
         $config         = ConfigUtil::getInitialConfig();
         $section1Config = ['test'];
@@ -175,6 +183,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setVersion($version);
         $this->context->setRequestType($requestType);
         $this->context->setConfigSections($configSections);
+        $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
         $this->configProvider->expects($this->once())
@@ -183,7 +192,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 $entityClass,
                 $version,
                 $requestType,
-                $configSections
+                array_merge($configSections, $configExtras)
             )
             ->willReturn(
                 [
@@ -315,7 +324,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
     }
 
-    public function testConfigWhenIsSetExplicitlyForSection()
+    public function testConfigWhenItIsSetExplicitlyForSection()
     {
         $section1Config = ['test'];
 
@@ -437,8 +446,129 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['another'], $this->context->get(Context::CONFIG_EXTRAS));
 
         $this->context->setConfigExtras([]);
-        $this->assertSame([], $this->context->getConfigSections());
+        $this->assertSame([], $this->context->getConfigExtras());
         $this->assertNull($this->context->get(Context::CONFIG_EXTRAS));
+    }
+
+    public function testLoadMetadata()
+    {
+        $version        = '1.1';
+        $requestType    = 'rest';
+        $entityClass    = 'Test\Class';
+        $configSections = ['section1', 'section2'];
+
+        $config         = ConfigUtil::getInitialConfig();
+        $metadata       = new EntityMetadata();
+        $metadataExtras = ['extra1'];
+
+        $this->context->setVersion($version);
+        $this->context->setRequestType($requestType);
+        $this->context->setConfigSections($configSections);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $entityClass,
+                $version,
+                $requestType,
+                $configSections
+            )
+            ->willReturn([ConfigUtil::DEFINITION => $config]);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(
+                $entityClass,
+                $version,
+                $requestType,
+                $metadataExtras,
+                $config
+            )
+            ->willReturn($metadata);
+
+        // test that metadata are not loaded yet
+        $this->assertFalse($this->context->hasMetadata());
+
+        $this->assertSame($metadata, $this->context->getMetadata()); // load metadata
+        $this->assertTrue($this->context->hasMetadata());
+        $this->assertTrue($this->context->has(Context::METADATA));
+        $this->assertSame($metadata, $this->context->get(Context::METADATA));
+
+        $this->assertEquals($config, $this->context->getConfig());
+
+        // test that metadata are loaded only once
+        $this->assertSame($metadata, $this->context->getMetadata());
+    }
+
+    public function testLoadMetadataNoClassName()
+    {
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+        $this->metadataProvider->expects($this->never())
+            ->method('getMetadata');
+
+        // test that metadata are not loaded yet
+        $this->assertFalse($this->context->hasMetadata());
+
+        $this->assertNull($this->context->getMetadata()); // load metadata
+        $this->assertTrue($this->context->hasMetadata());
+        $this->assertTrue($this->context->has(Context::METADATA));
+        $this->assertNull($this->context->get(Context::METADATA));
+    }
+
+    public function testMetadataWhenItIsSetExplicitly()
+    {
+        $metadata = new EntityMetadata();
+
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+        $this->metadataProvider->expects($this->never())
+            ->method('getMetadata');
+
+        $this->context->setMetadata($metadata);
+
+        $this->assertTrue($this->context->hasMetadata());
+        $this->assertSame($metadata, $this->context->getMetadata());
+        $this->assertTrue($this->context->has(Context::METADATA));
+        $this->assertSame($metadata, $this->context->get(Context::METADATA));
+    }
+
+    public function testMetadataExtras()
+    {
+        $this->assertSame([], $this->context->getMetadataExtras());
+        $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
+
+        $this->context->setMetadataExtras(['test']);
+        $this->assertEquals(['test'], $this->context->getMetadataExtras());
+        $this->assertEquals(['test'], $this->context->get(Context::METADATA_EXTRAS));
+
+        $this->assertTrue($this->context->hasMetadataExtra('test'));
+        $this->assertFalse($this->context->hasMetadataExtra('another'));
+
+        $this->context->addMetadataExtra('another');
+        $this->assertEquals(['test', 'another'], $this->context->getMetadataExtras());
+        $this->assertEquals(['test', 'another'], $this->context->get(Context::METADATA_EXTRAS));
+
+        // test add of already existing extra
+        $this->context->addMetadataExtra('another');
+        $this->assertEquals(['test', 'another'], $this->context->getMetadataExtras());
+        $this->assertEquals(['test', 'another'], $this->context->get(Context::METADATA_EXTRAS));
+
+        $this->context->removeMetadataExtra('test');
+        $this->assertEquals(['another'], $this->context->getMetadataExtras());
+        $this->assertEquals(['another'], $this->context->get(Context::METADATA_EXTRAS));
+
+        // test remove of non existing extra
+        $this->context->removeMetadataExtra('test');
+        $this->assertEquals(['another'], $this->context->getMetadataExtras());
+        $this->assertEquals(['another'], $this->context->get(Context::METADATA_EXTRAS));
+
+        $this->context->setMetadataExtras([]);
+        $this->assertSame([], $this->context->getMetadataExtras());
+        $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
     }
 
     public function testQuery()

@@ -6,21 +6,31 @@ use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
 class GetProcessor extends ActionProcessor
 {
     /** @var ConfigProvider */
     protected $configProvider;
 
+    /** @var MetadataProvider */
+    protected $metadataProvider;
+
     /**
-     * @param ProcessorBag   $processorBag
-     * @param string         $action
-     * @param ConfigProvider $configProvider
+     * @param ProcessorBag     $processorBag
+     * @param string           $action
+     * @param ConfigProvider   $configProvider
+     * @param MetadataProvider $metadataProvider
      */
-    public function __construct(ProcessorBag $processorBag, $action, ConfigProvider $configProvider)
-    {
+    public function __construct(
+        ProcessorBag $processorBag,
+        $action,
+        ConfigProvider $configProvider,
+        MetadataProvider $metadataProvider
+    ) {
         parent::__construct($processorBag, $action);
-        $this->configProvider = $configProvider;
+        $this->configProvider   = $configProvider;
+        $this->metadataProvider = $metadataProvider;
     }
 
     /**
@@ -28,6 +38,6 @@ class GetProcessor extends ActionProcessor
      */
     protected function createContextObject()
     {
-        return new GetContext($this->configProvider);
+        return new GetContext($this->configProvider, $this->metadataProvider);
     }
 }

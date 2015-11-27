@@ -6,18 +6,33 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 
 class SingleItemContextTest extends \PHPUnit_Framework_TestCase
 {
-    public function testVersion()
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $metadataProvider;
+
+    /** @var SingleItemContext */
+    protected $context;
+
+    protected function setUp()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+        $this->configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = new SingleItemContext($configProvider);
+        $this->context = new SingleItemContext($this->configProvider, $this->metadataProvider);
+    }
 
-        $this->assertNull($context->getId());
+    public function testId()
+    {
+        $this->assertNull($this->context->getId());
 
-        $context->setId('test');
-        $this->assertEquals('test', $context->getId());
-        $this->assertEquals('test', $context->get(SingleItemContext::ID));
+        $this->context->setId('test');
+        $this->assertEquals('test', $this->context->getId());
+        $this->assertEquals('test', $this->context->get(SingleItemContext::ID));
     }
 }

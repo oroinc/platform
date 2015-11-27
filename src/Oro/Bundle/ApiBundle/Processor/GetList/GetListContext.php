@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class GetListContext extends Context
@@ -22,11 +23,12 @@ class GetListContext extends Context
     const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider   $configProvider
+     * @param MetadataProvider $metadataProvider
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
-        parent::__construct($configProvider);
+        parent::__construct($configProvider, $metadataProvider);
         $this->setConfigSections([ConfigExtra::FILTERS, ConfigExtra::SORTERS]);
     }
 

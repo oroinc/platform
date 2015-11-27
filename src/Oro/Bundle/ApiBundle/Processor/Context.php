@@ -2,13 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Context extends ApiContext
 {
     /** FQCN of an entity */
@@ -22,6 +27,12 @@ class Context extends ApiContext
 
     /** a list of requests for additional configuration data, for example "descriptions" */
     const CONFIG_EXTRAS = 'configExtras';
+
+    /** metadata of an entity */
+    const METADATA = 'metadata';
+
+    /** a list of requests for additional metadata info */
+    const METADATA_EXTRAS = 'metadataExtras';
 
     /** a query is used to get result data */
     const QUERY = 'query';
@@ -38,6 +49,9 @@ class Context extends ApiContext
     /** @var ConfigProvider */
     protected $configProvider;
 
+    /** @var MetadataProvider */
+    protected $metadataProvider;
+
     /** @var ParameterBagInterface */
     private $requestHeaders;
 
@@ -45,11 +59,13 @@ class Context extends ApiContext
     private $responseHeaders;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider   $configProvider
+     * @param MetadataProvider $metadataProvider
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
-        $this->configProvider = $configProvider;
+        $this->configProvider   = $configProvider;
+        $this->metadataProvider = $metadataProvider;
     }
 
     /**
@@ -107,6 +123,28 @@ class Context extends ApiContext
                 $this->set($key, null);
             }
         }
+    }
+
+    /**
+     * Loads an entity metadata
+     */
+    protected function loadMetadata()
+    {
+        // load metadata by a metadata provider
+        $metadata    = null;
+        $entityClass = $this->getClassName();
+        if ($entityClass) {
+            $metadata = $this->metadataProvider->getMetadata(
+                $entityClass,
+                $this->getVersion(),
+                $this->getRequestType(),
+                $this->getMetadataExtras(),
+                $this->getConfig()
+            );
+        }
+
+        // add loaded metadata to the context
+        $this->set(self::METADATA, $metadata);
     }
 
     /**
@@ -413,6 +451,107 @@ class Context extends ApiContext
         $extras = $this->getConfigExtras();
         if (in_array($extra, $extras, true)) {
             $this->setConfigExtras(array_values(array_diff($extras, [$extra])));
+        }
+    }
+
+    /**
+     * Checks whether metadata of an entity exists
+     *
+     * @return bool
+     */
+    public function hasMetadata()
+    {
+        return $this->has(self::METADATA);
+    }
+
+    /**
+     * Gets metadata of an entity
+     *
+     * @return EntityMetadata|null
+     */
+    public function getMetadata()
+    {
+        if (!$this->has(self::METADATA)) {
+            $this->loadMetadata();
+        }
+
+        return $this->get(self::METADATA);
+    }
+
+    /**
+     * Sets metadata of an entity
+     *
+     * @param EntityMetadata|null $config
+     */
+    public function setMetadata($config)
+    {
+        $this->set(self::METADATA, $config);
+    }
+
+    /**
+     * Gets a list of requests for additional metadata info.
+     *
+     * @return string[]
+     */
+    public function getMetadataExtras()
+    {
+        $extras = $this->get(self::METADATA_EXTRAS);
+
+        return null !== $extras
+            ? $extras
+            : [];
+    }
+
+    /**
+     * Sets a list of requests for additional metadata info.
+     *
+     * @param string[] $extras
+     */
+    public function setMetadataExtras($extras)
+    {
+        if (empty($extras)) {
+            $this->remove(self::METADATA_EXTRAS, $extras);
+        } else {
+            $this->set(self::METADATA_EXTRAS, $extras);
+        }
+    }
+
+    /**
+     * Checks whether some additional metadata info is requested.
+     *
+     * @param string $extra
+     *
+     * @return bool
+     */
+    public function hasMetadataExtra($extra)
+    {
+        return in_array($extra, $this->getMetadataExtras(), true);
+    }
+
+    /**
+     * Adds a request for some additional metadata info.
+     *
+     * @param string $extra
+     */
+    public function addMetadataExtra($extra)
+    {
+        $extras = $this->getMetadataExtras();
+        if (!in_array($extra, $extras, true)) {
+            $extras[] = $extra;
+            $this->setMetadataExtras($extras);
+        }
+    }
+
+    /**
+     * Removes a request for some additional metadata info.
+     *
+     * @param string $extra
+     */
+    public function removeMetadataExtra($extra)
+    {
+        $extras = $this->getMetadataExtras();
+        if (in_array($extra, $extras, true)) {
+            $this->setMetadataExtras(array_values(array_diff($extras, [$extra])));
         }
     }
 

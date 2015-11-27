@@ -6,6 +6,7 @@ services:
             - @oro_api.processor_bag
             - get
             - @oro_api.config_provider
+            - @oro_api.metadata_provider
         tags:
             - { name: oro.api.action_processor }
 
