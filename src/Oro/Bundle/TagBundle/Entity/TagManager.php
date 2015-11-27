@@ -409,6 +409,19 @@ class TagManager
         return $this->getComparePredicate($tag);
     }
 
+
+    /**
+     * Deletes tags related to given entity class.
+     *
+     * @param string $entityClassName
+     *
+     * @return int
+     */
+    public function deleteTags($entityClassName)
+    {
+        return $this->getTagsRepository()->deleteTags($entityClassName);
+    }
+
     /**
      * @param Tag $tag
      *

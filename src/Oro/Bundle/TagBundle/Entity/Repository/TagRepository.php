@@ -110,6 +110,8 @@ class TagRepository extends EntityRepository
     }
 
     /**
+     * Deletes tags related to given entity class.
+     *
      * @param string $entityClassName
      *
      * @return int

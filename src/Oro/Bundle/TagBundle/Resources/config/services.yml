@@ -287,3 +287,10 @@ services:
         class: Oro\Bundle\TagBundle\Helper\TaggableHelper
         arguments:
             - @oro_entity_config.provider.tag
+
+    oro_tag.eventlistener.entity_config:
+        class: Oro\Bundle\TagBundle\EventListener\EntityConfigListener
+        arguments:
+            - @oro_tag.tag.manager
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlush }

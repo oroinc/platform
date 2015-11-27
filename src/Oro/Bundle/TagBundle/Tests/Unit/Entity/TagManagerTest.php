@@ -26,9 +26,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $mapper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -37,21 +34,12 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $user;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $tagConfigProvider;
-
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
-            ->disableOriginalConstructor()->getMock();
-
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->tagConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
 
         $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
@@ -70,10 +58,8 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
             $this->em,
             'Oro\Bundle\TagBundle\Entity\Tag',
             'Oro\Bundle\TagBundle\Entity\Tagging',
-            $this->mapper,
             $this->securityFacade,
-            $this->router,
-            $this->tagConfigProvider
+            $this->router
         );
     }
 

@@ -21,7 +21,7 @@ class TagSearchResultsGridListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $datagrid;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasResolver*/
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasResolver */
     protected $entityAliasResolver;
 
     /** @var TagSearchResultsGridListener */
