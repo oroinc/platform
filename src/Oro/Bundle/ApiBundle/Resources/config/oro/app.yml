@@ -27,7 +27,9 @@ oro_api:
                 normalize_data:
                     priority: -50
                 finalize:
-                    priority: -80
+                    priority: -60
+                normalize_result:
+                    priority: -70
         get:
             processing_groups:
                 initialize:
@@ -42,3 +44,5 @@ oro_api:
                     priority: -50
                 finalize:
                     priority: -60
+                normalize_result:
+                    priority: -70
