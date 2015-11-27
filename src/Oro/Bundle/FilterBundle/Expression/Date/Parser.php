@@ -24,7 +24,7 @@ class Parser
      * @return mixed
      * @SuppressWarnings(PHPMD.CyclomaticComplexity) Luuu
      */
-    public function parse($tokens, $returnRawToken)
+    public function parse($tokens, $returnRawToken = false)
     {
         $this->validate($tokens);
         $RPNTokens = $this->convertExprToRPN($tokens);
