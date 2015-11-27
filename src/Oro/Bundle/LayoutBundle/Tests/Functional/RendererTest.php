@@ -274,6 +274,13 @@ class RendererTest extends LayoutTestCase
                 'button'
             )
             ->add(
+                'input_text',
+                'content',
+                'input',
+                ['name' => 'search'],
+                'button'
+            )
+            ->add(
                 'block_tag',
                 'content',
                 'block',
@@ -346,6 +353,7 @@ class RendererTest extends LayoutTestCase
 <body class="test-body class2">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
     <input type="button" value="Block button" class="content_input"></input>
+    <input type="text" name="search"></input>
     <input type="submit" name="btn2" value="Btn2"/>
     <header>Renderer <b>Test</b>!</header>
     <ul>

@@ -41,6 +41,17 @@
     <i class="icon-{{ icon }}{% if icon_class is defined %} {{ icon_class }}{% endif %}"></i>
 {%- endblock %}
 
+{% block input_widget -%}
+    {% if attr.placeholder is defined %}
+        {% set attr = attr|merge({
+            placeholder: attr.placeholder|block_text(translation_domain)
+        }) %}
+    {% endif %}
+    {{ block_widget(block, {
+        attr: attr
+    }) }}
+{%- endblock %}
+
 {% block container_widget -%}
     {% for child in block if child.vars.visible -%}
         {{ block_widget(child) }}

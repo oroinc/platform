@@ -16,19 +16,24 @@ class BaseType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
+        $resolver->setOptional(
             [
-                'tag' => null,
-                'attr' => [],
-                'label_attr' => [],
+                'vars',
+                'tag',
+                'attr',
+                'label',
+                'label_attr',
+                'translation_domain',
+                'class_prefix'
             ]
         );
-        $resolver->setOptional(['vars', 'label', 'translation_domain', 'class_prefix']);
         $resolver->setAllowedTypes(
             [
                 'vars'       => 'array',
+                'tag'        => 'string',
                 'attr'       => 'array',
-                'label_attr' => 'array'
+                'label_attr' => 'array',
+                'class_prefix' => 'string'
             ]
         );
     }
@@ -46,11 +51,11 @@ class BaseType extends AbstractType
         // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
         $view->vars['block'] = $view;
 
-        $view->vars['tag'] = $options['tag'];
+        $view->vars['tag'] = isset($options['tag']) ? $options['tag'] : null;
         $view->vars['class_prefix'] = null;
         if (isset($options['class_prefix'])) {
             $view->vars['class_prefix'] = $options['class_prefix'];
-        } elseif($view->parent) {
+        } elseif ($view->parent) {
             $view->vars['class_prefix'] = $view->parent->vars['class_prefix'];
         }
 
@@ -62,6 +67,7 @@ class BaseType extends AbstractType
         // add label text and attributes if specified
         if (isset($options['label'])) {
             $view->vars['label'] = $options['label'];
+            $view->vars['label_attr'] = [];
             if (isset($options['label_attr'])) {
                 $view->vars['label_attr'] = $options['label_attr'];
             }
