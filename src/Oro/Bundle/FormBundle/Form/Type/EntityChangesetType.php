@@ -4,10 +4,9 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToJsonTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityChangesetTransformer;
 
 class EntityChangesetType extends AbstractType
@@ -30,10 +29,9 @@ class EntityChangesetType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['class']);
-        $resolver->setDefaults(['data_class' => null, 'mapped' => false]);
     }
 
     /**
@@ -41,9 +39,7 @@ class EntityChangesetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->addViewTransformer(new EntityChangesetTransformer($this->doctrineHelper, $options['class']))
-            ->addViewTransformer(new ArrayToJsonTransformer());
+        $builder->addViewTransformer(new EntityChangesetTransformer($this->doctrineHelper, $options['class']), true);
     }
 
     /**
@@ -59,6 +55,6 @@ class EntityChangesetType extends AbstractType
      */
     public function getParent()
     {
-        return 'hidden';
+        return DataChangesetType::NAME;
     }
 }

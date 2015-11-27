@@ -52,8 +52,15 @@ class InlineEditingExtension extends AbstractExtension
     public function processConfigs(DatagridConfiguration $config)
     {
         $configItems   = $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, []);
-        $configuration = new Configuration(Configuration::BASE_CONFIG_KEY);
 
+        if (empty($configItems[Configuration::CONFIG_ENTITY_KEY])) {
+            $configItems[Configuration::CONFIG_ENTITY_KEY] = $config->offsetGetOr(
+                Configuration::CONFIG_EXTENDED_ENTITY_KEY,
+                null
+            );
+        }
+
+        $configuration = new Configuration(Configuration::BASE_CONFIG_KEY);
         $normalizedConfigItems = $this->validateConfiguration(
             $configuration,
             [Configuration::BASE_CONFIG_KEY => $configItems]
@@ -62,7 +69,7 @@ class InlineEditingExtension extends AbstractExtension
         $isGranted = $this->securityFacade->isGranted('EDIT', 'entity:' . $configItems['entity_name']);
         //according to ACL disable inline editing for the whole grid
         if (!$isGranted) {
-            $normalizedConfigItems[Configuration::CONFIG_KEY_ENABLE] = false;
+            $normalizedConfigItems[Configuration::CONFIG_ENABLE_KEY] = false;
         }
 
         // replace config values by normalized, extra keys passed directly
