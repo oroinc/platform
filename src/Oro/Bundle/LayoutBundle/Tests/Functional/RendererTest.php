@@ -155,7 +155,7 @@ class RendererTest extends LayoutTestCase
                 ]
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
-            ->add('content', 'root', 'body')
+            ->add('content', 'root', 'body', ['class_prefix' => 'content'])
             ->add('top_content', 'content', 'html', ['text' => '<header>Renderer <b>Test</b>!</header>'])
             ->add('list', 'content', 'list')
             ->add(
@@ -273,6 +273,20 @@ class RendererTest extends LayoutTestCase
                 ['type' => 'input', 'action' => 'submit', 'name' => 'btn2', 'text' => 'Btn2'],
                 'button'
             )
+            ->add(
+                'block_tag',
+                'content',
+                'block',
+                [
+                    'tag' => 'input',
+                    'attr' => [
+                        'type' => 'button',
+                        'value' => 'Block button',
+                        'class' => '{{ class_prefix }}_input',
+                    ]
+                ],
+                'button'
+            )
             // test manipulations of 'class' attribute
             ->appendOption('content', 'attr.class', ['@join' => [' ', 'class1', 'class2']])
             ->replaceOption('content', 'attr.class', 'class1', ['@value' => ['$context.body_class']])
@@ -331,6 +345,7 @@ class RendererTest extends LayoutTestCase
     </head>
 <body class="test-body class2">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
+    <input type="button" value="Block button" class="content_input"></input>
     <input type="submit" name="btn2" value="Btn2"/>
     <header>Renderer <b>Test</b>!</header>
     <ul>
