@@ -6,8 +6,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQuery;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\Testing\WebTestCase;
 
 /**
  * @dbIsolation
@@ -32,12 +32,12 @@ class InsertFromSelectQueryTest extends WebTestCase
 
     public function testExecute()
     {
-        $register = $this->getContainer()->get('doctrine');
+        $registry = $this->getContainer()->get('doctrine');
 
         $decimalValue = 12345678.29;
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $register
+        $queryBuilder = $registry
             ->getManagerForClass('OroUserBundle:User')
             ->getRepository('OroUserBundle:User')
             ->createQueryBuilder('u')
@@ -67,11 +67,11 @@ class InsertFromSelectQueryTest extends WebTestCase
         );
 
         /** @var User[] $result */
-        $users = $register->getManagerForClass('OroUserBundle:User')
+        $users = $registry->getManagerForClass('OroUserBundle:User')
             ->getRepository('OroUserBundle:User')->findAll();
 
         /** @var Item[] $items */
-        $items = $register->getManagerForClass('OroTestFrameworkBundle:Item')
+        $items = $registry->getManagerForClass('OroTestFrameworkBundle:Item')
             ->getRepository('OroTestFrameworkBundle:Item')->findAll();
 
         $this->assertCount(count($users), $items);
