@@ -8,13 +8,16 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOpti
  */
 class MultiRelationGuesser implements GuesserInterface
 {
+    const MULTI_RELATION = 'multi-relation';
+
     /**
      * {@inheritdoc}
      */
     public function guessColumnOptions($columnName, $entityName, $column)
     {
         $result = [];
-        if (array_key_exists('frontend_type', $column) && $column['frontend_type'] === 'multi-relation') {
+        if (array_key_exists(Configuration::FRONTEND_TYPE_NAME, $column)
+            && $column[Configuration::FRONTEND_TYPE_NAME] === self::MULTI_RELATION) {
         }
 
         return $result;

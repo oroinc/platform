@@ -213,7 +213,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'without entity_name' => [
                 [
-                    Configuration::CONFIG_EXTENDED_ENTITY_NAME => $entityName,
+                    Configuration::CONFIG_EXTENDED_ENTITY_KEY => $entityName,
                     Configuration::BASE_CONFIG_KEY => [
                         'enable' => true,
                     ],
@@ -236,7 +236,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'entity_name & extended_entity_name' => [
                 [
-                    Configuration::CONFIG_EXTENDED_ENTITY_NAME => $entityName . '_test',
+                    Configuration::CONFIG_EXTENDED_ENTITY_KEY => $entityName . '_test',
                     Configuration::BASE_CONFIG_KEY => [
                         'enable' => true,
                         'entity_name' => $entityName,
