@@ -2,6 +2,7 @@ parameters:
     oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
     oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
     oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
+    oro_importexport.writer.insert_from_select_query.class:   Oro\Bundle\ImportExportBundle\Writer\InsertFromSelectWriter
 
 services:
     oro_importexport.template_fixture.entity_registry:
@@ -47,3 +48,9 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: percent, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: integer, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: decimal, format_type: excel }
+
+    oro_importexport.writer.insert_from_select_query:
+        class: %oro_importexport.writer.insert_from_select_query.class%
+        arguments:
+            - @oro_entity.orm.insert_from_select_query
+        abstract: true
