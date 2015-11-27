@@ -261,6 +261,20 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         },
 
         /**
+         * Generates Version 4 UUIDs (https://en.wikipedia.org/wiki/Universally_unique_identifier)
+         * @return {string}
+         */
+        createUUID: function() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                // jshint -W016
+                var r = Math.random() * 16 | 0;
+                var v = c === 'x' ? r : (r & 0x3 | 0x8);
+                // jshint +W016
+                return v.toString(16);
+            });
+        },
+
+        /**
          * Checks input values and if it isn't an array wraps it
          *
          * @returns {Array}

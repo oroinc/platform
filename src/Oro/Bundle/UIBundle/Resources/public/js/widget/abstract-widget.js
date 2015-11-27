@@ -5,6 +5,7 @@ define(function(require) {
     var document = window.document;
     var $ = require('jquery');
     var _ = require('underscore');
+    var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
     var mediator = require('oroui/js/mediator');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
@@ -227,13 +228,7 @@ define(function(require) {
          * @private
          */
         _getUniqueIdentifier: function() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                // jshint -W016
-                var r = Math.random() * 16 | 0;
-                var v = c === 'x' ? r : (r & 0x3 | 0x8);
-                // jshint +W016
-                return v.toString(16);
-            });
+            return tools.createUUID();
         },
 
         /**
