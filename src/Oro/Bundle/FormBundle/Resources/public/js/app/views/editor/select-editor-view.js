@@ -68,9 +68,9 @@ define(function(require) {
         className: 'select-editor',
 
         initialize: function(options) {
+            SelectEditorView.__super__.initialize.apply(this, arguments);
             this.availableChoices = this.getAvailableOptions(options);
             this.prestine = true;
-            SelectEditorView.__super__.initialize.apply(this, arguments);
         },
 
         getAvailableOptions: function(options) {
