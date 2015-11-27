@@ -72,7 +72,7 @@ define(function(require) {
         formName: void 0,
 
         /**
-         * @param {Object} Options passed to the constructor
+         * @param {Object} options passed to the constructor
          */
         initialize: function(options) {
             if (!options) {

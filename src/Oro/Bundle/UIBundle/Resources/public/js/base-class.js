@@ -22,6 +22,9 @@ define(function(require) {
 
     BaseClass.prototype = {
         initialize: function(options) {
+            if (!options) {
+                options = {};
+            }
             if (options.listen) {
                 this.on(options.listen);
             }
