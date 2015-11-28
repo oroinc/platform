@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -75,12 +76,13 @@ class DumpMetadataCommand extends ContainerAwareCommand
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
 
+        $config   = $configProvider->getConfig($entityClass, $version, $requestType);
         $metadata = $metadataProvider->getMetadata(
             $entityClass,
             $version,
             $requestType,
             [],
-            $configProvider->getConfig($entityClass, $version, $requestType)
+            null !== $config && isset($config[ConfigUtil::DEFINITION]) ? $config[ConfigUtil::DEFINITION] : null
         );
 
         return [

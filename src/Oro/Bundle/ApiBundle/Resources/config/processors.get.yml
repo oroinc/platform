@@ -67,10 +67,9 @@ services:
             - { name: oro.api.processor, action: get, group: build_query, priority: 255 }
 
     oro_api.get.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_api.value_normalizer
+            - @oro_api.rest.entity_id_transformer
         tags:
             - { name: oro.api.processor, action: get, group: build_query, requestType: rest_json_api, priority: 250 }
 
@@ -140,6 +139,13 @@ services:
     #
     # normalize_result
     #
+
+    oro_api.get.rest_json_api.build_json_api_document:
+        class: Oro\Bundle\ApiBundle\Processor\Get\RestJsonApi\BuildJsonApiDocument
+        arguments:
+            - @oro_api.rest_json_api.document_builder_factory
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, priority: -10 }
 
     oro_api.get.rest_json_api.validate_result_schema:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\ValidateResultSchema

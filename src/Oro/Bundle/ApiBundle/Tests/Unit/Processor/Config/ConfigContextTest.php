@@ -27,7 +27,7 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
     public function testExtras()
     {
         $this->assertSame([], $this->context->getExtras());
-        $this->assertNull($this->context->get(ConfigContext::EXTRA));
+        $this->assertSame([], $this->context->get(ConfigContext::EXTRA));
 
         $this->context->setExtras(['test']);
         $this->assertEquals(['test'], $this->context->getExtras());
@@ -35,7 +35,7 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setExtras([]);
         $this->assertSame([], $this->context->getExtras());
-        $this->assertNull($this->context->get(ConfigContext::EXTRA));
+        $this->assertSame([], $this->context->get(ConfigContext::EXTRA));
     }
 
     public function testFilters()

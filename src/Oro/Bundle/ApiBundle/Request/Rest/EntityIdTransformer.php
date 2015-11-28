@@ -1,18 +1,17 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi;
+namespace Oro\Bundle\ApiBundle\Request\Rest;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class NormalizeEntityId implements ProcessorInterface
+class EntityIdTransformer implements EntityIdTransformerInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -33,57 +32,39 @@ class NormalizeEntityId implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function transform($id)
     {
-        /** @var SingleItemContext $context */
+        return is_array($id)
+            ? http_build_query($id, '', ',')
+            : (string)$id;
+    }
 
-        $entityId = $context->getId();
-        if (!is_string($entityId)) {
-            // no entity identifier or it is already normalized
-            return;
+    /**
+     * {@inheritdoc}
+     */
+    public function reverseTransform($entityClass, $value)
+    {
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+            $idFields = $metadata->getIdentifierFieldNames();
+            $value    = count($idFields) === 1
+                ? $this->reverseTransformSingleId($value, $metadata->getTypeOfField(reset($idFields)))
+                : $this->reverseTransformCombinedEntityId($value, $idFields, $metadata);
         }
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $idFields = $metadata->getIdentifierFieldNames();
-        if (count($idFields) === 1) {
-            // single identifier
-            $context->setId(
-                $this->normalizeValue(
-                    $entityId,
-                    $metadata->getTypeOfField(reset($idFields)),
-                    $context->getRequestType()
-                )
-            );
-        } else {
-            // combined identifier
-            $context->setId(
-                $this->normalizeCombinedEntityId(
-                    $entityId,
-                    $idFields,
-                    $metadata,
-                    $context->getRequestType()
-                )
-            );
-        }
+        return $value;
     }
 
     /**
      * @param mixed  $value
      * @param string $dataType
-     * @param string $requestType
      *
      * @return mixed
      */
-    protected function normalizeValue($value, $dataType, $requestType)
+    protected function reverseTransformSingleId($value, $dataType)
     {
         return $dataType !== DataType::STRING
-            ? $this->valueNormalizer->normalizeValue($value, $dataType, $requestType)
+            ? $this->valueNormalizer->normalizeValue($value, $dataType, RequestType::REST_JSON_API)
             : $value;
     }
 
@@ -91,13 +72,12 @@ class NormalizeEntityId implements ProcessorInterface
      * @param string        $entityId
      * @param string[]      $idFields
      * @param ClassMetadata $metadata
-     * @param string        $requestType
      *
      * @return array
      *
      * @throws \UnexpectedValueException if the given entity id cannot be normalized
      */
-    protected function normalizeCombinedEntityId($entityId, $idFields, ClassMetadata $metadata, $requestType)
+    protected function reverseTransformCombinedEntityId($entityId, $idFields, ClassMetadata $metadata)
     {
         $fieldMap   = array_flip($idFields);
         $normalized = [];
@@ -127,7 +107,10 @@ class NormalizeEntityId implements ProcessorInterface
                 );
             }
 
-            $normalized[$key] = $this->normalizeValue($val, $metadata->getTypeOfField($key), $requestType);
+            $dataType         = $metadata->getTypeOfField($key);
+            $normalized[$key] = $dataType !== DataType::STRING
+                ? $this->valueNormalizer->normalizeValue($val, $dataType, RequestType::REST_JSON_API)
+                : $val;
 
             unset($fieldMap[$key]);
         }

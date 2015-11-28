@@ -40,14 +40,14 @@ class NormalizeEntityMetadata implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        if (empty($config) || empty($config[ConfigUtil::DEFINITION])) {
+        if (empty($config)) {
             // a configuration does not exist
             return;
         }
 
         /** @var EntityMetadata $entityMetadata */
         $entityMetadata = $context->getResult();
-        $this->normalizeMetadata($entityMetadata, $config[ConfigUtil::DEFINITION]);
+        $this->normalizeMetadata($entityMetadata, $config);
     }
 
     /**

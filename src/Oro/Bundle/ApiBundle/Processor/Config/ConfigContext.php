@@ -13,6 +13,11 @@ class ConfigContext extends ApiContext
     /** a list of additional configuration data that should be returned, for example "filters", "sorters", etc. */
     const EXTRA = 'extra';
 
+    public function __construct()
+    {
+        $this->set(self::EXTRA, []);
+    }
+
     /**
      * Gets FQCN of an entity.
      *
@@ -42,11 +47,7 @@ class ConfigContext extends ApiContext
      */
     public function hasExtra($extra)
     {
-        $extras = $this->get(self::EXTRA);
-
-        return null !== $extras
-            ? in_array($extra, $extras, true)
-            : false;
+        return in_array($extra, $this->get(self::EXTRA), true);
     }
 
     /**
@@ -56,11 +57,7 @@ class ConfigContext extends ApiContext
      */
     public function getExtras()
     {
-        $extras = $this->get(self::EXTRA);
-
-        return null !== $extras
-            ? $extras
-            : [];
+        return $this->get(self::EXTRA);
     }
 
     /**
@@ -70,11 +67,7 @@ class ConfigContext extends ApiContext
      */
     public function setExtras($extras)
     {
-        if (empty($extras)) {
-            $this->remove(self::EXTRA, $extras);
-        } else {
-            $this->set(self::EXTRA, $extras);
-        }
+        $this->set(self::EXTRA, $extras);
     }
 
     /**
