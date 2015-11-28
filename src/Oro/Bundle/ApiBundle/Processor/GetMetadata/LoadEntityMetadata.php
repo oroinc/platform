@@ -33,7 +33,7 @@ class LoadEntityMetadata implements ProcessorInterface
         /** @var MetadataContext $context */
 
         if ($context->hasResult()) {
-            // metadata already loaded
+            // metadata is already loaded
             return;
         }
 

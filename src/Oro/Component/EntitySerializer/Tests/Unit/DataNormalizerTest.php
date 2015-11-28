@@ -131,6 +131,30 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'property_path_with_null_child_id'                => [
+                'config'       => [
+                    'fields' => [
+                        'id'      => null,
+                        'contact' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                            'property_path'    => 'id'
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'      => 123,
+                        'contact' => null
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'          => 123,
+                        'contact'     => null
+                    ]
+                ]
+            ],
             'property_path_without_child'                     => [
                 'config'       => [
                     'fields' => [

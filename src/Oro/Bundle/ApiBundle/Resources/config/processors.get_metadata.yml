@@ -14,6 +14,13 @@ services:
         tags:
             - { name: oro.api.processor, action: get_metadata, priority: -10 }
 
+    oro_api.get_metadata.load_related_entity_metadata:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadRelatedEntityMetadata
+        arguments:
+            - @oro_api.metadata_provider
+        tags:
+            - { name: oro.api.processor, action: get_metadata, priority: -20 }
+
     oro_api.get_metadata.normalize_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeMetadata
         tags:

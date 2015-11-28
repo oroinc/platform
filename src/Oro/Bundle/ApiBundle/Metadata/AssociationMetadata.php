@@ -10,6 +10,29 @@ class AssociationMetadata extends PropertyMetadata
     /** a flag indicates if an association represents "to-many" or "to-one" relation */
     const COLLECTION = 'collection';
 
+    /** @var EntityMetadata|null */
+    private $targetMetadata;
+
+    /**
+     * Gets metadata of an association target.
+     *
+     * @return EntityMetadata|null
+     */
+    public function getTargetMetadata()
+    {
+        return $this->targetMetadata;
+    }
+
+    /**
+     * Sets metadata of an association target.
+     *
+     * @param EntityMetadata $targetMetadata
+     */
+    public function setTargetMetadata(EntityMetadata $targetMetadata)
+    {
+        $this->targetMetadata = $targetMetadata;
+    }
+
     /**
      * Gets FQCN of an association target.
      *
@@ -48,5 +71,19 @@ class AssociationMetadata extends PropertyMetadata
     public function setIsCollection($value)
     {
         $this->set(self::COLLECTION, $value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray()
+    {
+        $result = parent::toArray();
+
+        if (null !== $this->targetMetadata) {
+            $result['targetMetadata'] = $this->targetMetadata->toArray();
+        }
+
+        return $result;
     }
 }

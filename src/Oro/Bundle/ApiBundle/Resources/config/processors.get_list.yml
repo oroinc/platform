@@ -192,6 +192,13 @@ services:
     # normalize_result
     #
 
+    oro_api.get_list.rest_json_api.build_json_api_document:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\BuildJsonApiDocument
+        arguments:
+            - @oro_api.rest_json_api.document_builder_factory
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_result, priority: -10 }
+
     oro_api.get_list.rest_json_api.validate_result_schema:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\ValidateResultSchema
         tags:

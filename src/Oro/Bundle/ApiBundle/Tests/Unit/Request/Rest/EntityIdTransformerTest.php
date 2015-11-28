@@ -1,11 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\RestJsonApi;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\NormalizeEntityId;
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer;
 
-class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
+class EntityIdTransformerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -13,8 +12,8 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $valueNormalizer;
 
-    /** @var NormalizeEntityId */
-    protected $processor;
+    /** @var EntityIdTransformer */
+    protected $entityIdTransformer;
 
     protected function setUp()
     {
@@ -25,46 +24,30 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new NormalizeEntityId($this->doctrineHelper, $this->valueNormalizer);
+        $this->entityIdTransformer = new EntityIdTransformer($this->doctrineHelper, $this->valueNormalizer);
     }
 
-    public function testProcessWhenNoId()
+    /**
+     * @dataProvider transformProvider
+     */
+    public function testTransform($id, $expectedResult)
     {
-        $context = $this->getContext();
-
-        $this->doctrineHelper->expects($this->never())
-            ->method('getEntityMetadataForClass');
-
-        $this->processor->process($context);
+        $result = $this->entityIdTransformer->transform($id);
+        $this->assertSame($expectedResult, $result);
     }
 
-    public function testProcessWhenIdAlreadyNormalized()
+    public function transformProvider()
     {
-        $context = $this->getContext();
-        $context->setId(123);
-
-        $this->doctrineHelper->expects($this->never())
-            ->method('getEntityMetadataForClass');
-
-        $this->processor->process($context);
+        return [
+            [123, '123'],
+            [['id1' => 123, 'id2' => 456], 'id1=123,id2=456'],
+        ];
     }
 
-    public function testProcessWhenNoClass()
+    public function testReverseTransformForNotManageableEntity()
     {
-        $context = $this->getContext();
-        $context->setId('123');
-
-        $this->doctrineHelper->expects($this->never())
-            ->method('getEntityMetadataForClass');
-
-        $this->processor->process($context);
-    }
-
-    public function testProcessForNotManageableEntity()
-    {
-        $context = $this->getContext();
-        $context->setClassName('Test\Class');
-        $context->setId('123');
+        $entityClass = 'Test\Class';
+        $value       = '123';
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -74,16 +57,14 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadataForClass');
 
-        $this->processor->process($context);
+        $result = $this->entityIdTransformer->reverseTransform($entityClass, $value);
+        $this->assertSame($value, $result);
     }
 
-    public function testProcessForSingleIdentifier()
+    public function testReverseTransformForSingleIdentifier()
     {
         $entityClass = 'Test\Class';
-
-        $context = $this->getContext();
-        $context->setClassName($entityClass);
-        $context->setId('123');
+        $value       = '123';
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
@@ -112,18 +93,14 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
             ->with('123', 'integer')
             ->willReturn(123);
 
-        $this->processor->process($context);
-
-        $this->assertSame(123, $context->getId());
+        $result = $this->entityIdTransformer->reverseTransform($entityClass, $value);
+        $this->assertSame(123, $result);
     }
 
-    public function testProcessForCompositeIdentifier()
+    public function testReverseTransformForCompositeIdentifier()
     {
         $entityClass = 'Test\Class';
-
-        $context = $this->getContext();
-        $context->setClassName($entityClass);
-        $context->setId('id1=123,id2=456');
+        $value       = 'id1=123,id2=456';
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
@@ -160,26 +137,10 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
             ->with('456', 'integer')
             ->willReturn(456);
 
-        $this->processor->process($context);
-
+        $result = $this->entityIdTransformer->reverseTransform($entityClass, $value);
         $this->assertSame(
             ['id1' => 123, 'id2' => 456],
-            $context->getId()
+            $result
         );
-    }
-
-    /**
-     * @return SingleItemContext
-     */
-    protected function getContext()
-    {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return new SingleItemContext($configProvider, $metadataProvider);
     }
 }
