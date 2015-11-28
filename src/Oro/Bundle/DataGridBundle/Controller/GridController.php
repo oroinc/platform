@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -36,10 +37,8 @@ class GridController extends Controller
      * @return Response
      * @throws \LogicException
      */
-    public function massActionAction($gridName, $actionName)
+    public function massActionAction(Request $request, $gridName, $actionName)
     {
-        $request = $this->getRequest();
-
         /** @var MassActionParametersParser $massActionParametersParser */
         $parametersParser = $this->get('oro_datagrid.mass_action.parameters_parser');
         $parameters       = $parametersParser->parse($request);

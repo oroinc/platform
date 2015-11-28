@@ -25,9 +25,9 @@ class SearchController extends Controller
      *      group_name=""
      * )
      */
-    public function ajaxAdvancedSearchAction()
+    public function ajaxAdvancedSearchAction(Request $request)
     {
-        return $this->getRequest()->isXmlHttpRequest()
+        return $request->isXmlHttpRequest()
             ? new JsonResponse(
                 $this->get('oro_search.index')->advancedSearch(
                     $this->getRequest()->get('query')

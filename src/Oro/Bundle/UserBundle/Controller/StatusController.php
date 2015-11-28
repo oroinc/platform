@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -19,13 +20,13 @@ class StatusController extends Controller
      * @Route("/", name="oro_user_status_list", defaults={"limit"=10})
      * @Template
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         return array(
             'user' => $this->getUser(),
             'statuses' => $this->get('knp_paginator')->paginate(
                 $this->getUser()->getStatuses(),
-                $this->getRequest()->get('page', 1),
+                $request->get('page', 1),
                 $this->getRequest()->get('limit')
             )
 

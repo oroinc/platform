@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
@@ -31,11 +32,11 @@ class WidgetController extends Controller
      * @Template
      * @AclAncestor("oro_workflow")
      */
-    public function stepFormAction(WorkflowItem $workflowItem)
+    public function stepFormAction(Request $request, WorkflowItem $workflowItem)
     {
         $this->get('oro_workflow.http.workflow_item_validator')->validate($workflowItem);
 
-        $showStepName = $this->getRequest()->get('stepName', $workflowItem->getCurrentStepName());
+        $showStepName = $request->get('stepName', $workflowItem->getCurrentStepName());
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');

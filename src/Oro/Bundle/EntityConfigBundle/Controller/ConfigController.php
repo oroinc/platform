@@ -78,11 +78,9 @@ class ConfigController extends Controller
      * )
      * @Template()
      */
-    public function updateAction($id)
+    public function updateAction(Request $request, $id)
     {
         $entity  = $this->getDoctrine()->getRepository(EntityConfigModel::ENTITY_NAME)->find($id);
-        $request = $this->getRequest();
-
         $form = $this->createForm(
             'oro_entity_config_type',
             null,

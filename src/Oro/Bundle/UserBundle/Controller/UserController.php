@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\PersistentCollection;
 
@@ -69,7 +70,7 @@ class UserController extends Controller
      * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"})
      * @AclAncestor("oro_user_user_update")
      */
-    public function apigenAction(User $user)
+    public function apigenAction(Request $request, User $user)
     {
         if (!$api = $user->getApi()) {
             $api = new UserApi();
@@ -83,7 +84,7 @@ class UserController extends Controller
         $em->persist($api);
         $em->flush();
 
-        return $this->getRequest()->isXmlHttpRequest()
+        return $request->isXmlHttpRequest()
             ? new JsonResponse($api->getApiKey())
             : $this->forward('OroUserBundle:User:view', array('user' => $user));
     }

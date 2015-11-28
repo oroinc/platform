@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\SecurityContext;
 
@@ -16,9 +17,8 @@ class SecurityController extends Controller
      * @Route("/login", name="oro_user_security_login")
      * @Template
      */
-    public function loginAction()
+    public function loginAction(Request $request)
     {
-        $request = $this->getRequest();
         $session = $request->getSession();
 
         // get the error if any (works with forward and redirect -- see below)

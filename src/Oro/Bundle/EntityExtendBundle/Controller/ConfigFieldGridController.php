@@ -51,7 +51,7 @@ class ConfigFieldGridController extends Controller
      *
      * @Template
      */
-    public function createAction(EntityConfigModel $entity)
+    public function createAction(Request $request, EntityConfigModel $entity)
     {
         /** @var ExtendManager $extendManager */
         $extendManager = $this->get('oro_entity_extend.extend.extend_manager');
@@ -77,8 +77,6 @@ class ConfigFieldGridController extends Controller
             $newFieldModel,
             array('class_name' => $entity->getClassName())
         );
-        $request = $this->getRequest();
-
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
 

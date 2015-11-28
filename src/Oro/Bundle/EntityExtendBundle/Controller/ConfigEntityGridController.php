@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -47,7 +48,7 @@ class ConfigEntityGridController extends Controller
      * )
      * @Template
      */
-    public function uniqueAction(EntityConfigModel $entity)
+    public function uniqueAction(Request $request, EntityConfigModel $entity)
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->get('oro_entity_config.provider.extend');
@@ -55,8 +56,6 @@ class ConfigEntityGridController extends Controller
         $fieldConfigIds = $configProvider->getIds($entity->getClassName());
 
         $data = $entityConfig->has('unique_key') ? $entityConfig->get('unique_key') : array();
-
-        $request = $this->getRequest();
 
         $form = $this->createForm(
             new UniqueKeyCollectionType(

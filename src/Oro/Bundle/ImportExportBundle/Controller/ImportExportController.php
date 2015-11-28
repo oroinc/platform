@@ -34,9 +34,9 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_import")
      * @Template
      */
-    public function importFormAction()
+    public function importFormAction(Request $request)
     {
-        $entityName = $this->getRequest()->get('entity');
+        $entityName = $request->get('entity');
 
         $importForm = $this->createForm('oro_importexport_import', null, array('entityName' => $entityName));
 

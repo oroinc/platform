@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -30,9 +31,9 @@ class ResetController extends Controller
      * @Route("/send-email", name="oro_user_reset_send_email")
      * @Method({"POST"})
      */
-    public function sendEmailAction()
+    public function sendEmailAction(Request $request)
     {
-        $username = $this->getRequest()->request->get('username');
+        $username = $request->request->get('username');
         $user = $this->get('oro_user.manager')->findUserByUsernameOrEmail($username);
 
         if (null === $user) {

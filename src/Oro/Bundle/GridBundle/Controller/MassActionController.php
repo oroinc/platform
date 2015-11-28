@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\GridBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,10 +21,8 @@ class MassActionController extends Controller
      * @return Response
      * @throws \LogicException
      */
-    public function massActionAction($gridName, $actionName)
+    public function massActionAction(Request $request, $gridName, $actionName)
     {
-        $request = $this->getRequest();
-
         /** @var MassActionParametersParser $massActionParametersParser */
         $parametersParser = $this->get('oro_grid.mass_action.parameters_parser');
         $parameters = $parametersParser->parse($request);
