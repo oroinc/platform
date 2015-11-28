@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,6 +13,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpMetadataCommand extends ContainerAwareCommand
