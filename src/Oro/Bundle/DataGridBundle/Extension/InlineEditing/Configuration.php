@@ -23,7 +23,9 @@ class Configuration implements ConfigurationInterface
     const CLASS_KEY                     = 'class';
     const EDITOR_KEY                    = 'editor';
     const VIEW_KEY                      = 'view';
-    const FRONTEND_TYPE_KEY             = 'frontend_type';
+    const VIEW_OPTIONS_KEY              = 'view_options';
+    const VALUE_FIELD_NAME_KEY          = 'value_field_name';
+    const CHOICES_KEY                   = 'choices';
 
     /**
      * @var array
