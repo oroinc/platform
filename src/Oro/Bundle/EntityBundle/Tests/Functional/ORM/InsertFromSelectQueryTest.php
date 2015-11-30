@@ -44,7 +44,7 @@ class InsertFromSelectQueryTest extends WebTestCase
             ->select('u.email')
             ->addSelect('u.id')
             ->addSelect("$decimalValue")
-            ->addSelect('u.id')
+            ->addSelect('(TRUE)')
             ->addSelect('u.createdAt')
             ->addSelect('u.id')
             ->addSelect('IDENTITY(u.organization)')
