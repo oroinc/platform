@@ -89,6 +89,7 @@ define(function(require) {
         DEFAULT_PER_PAGE: 20,
         input_delay: 250,
         initialize: function(options) {
+            RelatedIdRelationEditorView.__super__.initialize.apply(this, arguments);
             if (options.value_field_name) {
                 this.valueFieldName = options.value_field_name;
             } else {
@@ -102,8 +103,6 @@ define(function(require) {
             if (options.input_delay) {
                 this.input_delay = options.input_delay;
             }
-
-            RelatedIdRelationEditorView.__super__.initialize.apply(this, arguments);
         },
 
         getAvailableOptions: function(options) {

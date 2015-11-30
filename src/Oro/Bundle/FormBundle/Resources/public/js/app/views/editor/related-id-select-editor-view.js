@@ -77,12 +77,12 @@ define(function(require) {
     RelatedIdSelectEditorView = SelectEditorView.extend(/** @exports RelatedIdSelectEditorView.prototype */{
 
         initialize: function(options) {
+            RelatedIdSelectEditorView.__super__.initialize.apply(this, arguments);
             if (options.value_field_name) {
                 this.valueFieldName = options.value_field_name;
             } else {
                 throw new Error('`value_field_name` option is required');
             }
-            RelatedIdSelectEditorView.__super__.initialize.apply(this, arguments);
         },
 
         getAvailableOptions: function(options) {
