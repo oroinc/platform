@@ -24,7 +24,7 @@ class InsertFromSelectQuery extends AbstractNativeQuery
 
         $selectQuery = $selectQueryBuilder->getQuery();
 
-        $sql = sprintf('insert %s (%s) %s', $insertToTableName, implode(', ', $columns), $selectQuery->getSQL());
+        $sql = sprintf('insert into %s (%s) %s', $insertToTableName, implode(', ', $columns), $selectQuery->getSQL());
 
         list($params, $types) = $this->processParameterMappings($selectQuery);
 
