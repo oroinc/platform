@@ -28,14 +28,6 @@ abstract class AbstractNativeQueryWriter implements ItemWriterInterface
     }
 
     /**
-     * @return string
-     */
-    protected function getEntityName()
-    {
-        return $this->entityName;
-    }
-
-    /**
      * @param array $item
      * @return QueryBuilder
      * @throws \InvalidArgumentException

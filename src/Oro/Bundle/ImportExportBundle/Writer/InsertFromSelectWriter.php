@@ -36,7 +36,7 @@ class InsertFromSelectWriter extends AbstractNativeQueryWriter
                 $this->cleanUp($item);
             }
 
-            $this->insertFromSelectQuery->execute($this->getEntityName(), $this->fields, $this->getQueryBuilder($item));
+            $this->insertFromSelectQuery->execute($this->entityName, $this->fields, $this->getQueryBuilder($item));
         }
     }
 

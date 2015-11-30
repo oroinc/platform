@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\ORM;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQuery;
@@ -15,9 +16,14 @@ use Oro\Bundle\UserBundle\Entity\User;
 class InsertFromSelectQueryTest extends WebTestCase
 {
     /**
+     * @var ManagerRegistry
+     */
+    protected $registry;
+
+    /**
      * @var InsertFromSelectQuery
      */
-    protected $helper;
+    protected $query;
 
     public function setUp()
     {
@@ -27,17 +33,22 @@ class InsertFromSelectQueryTest extends WebTestCase
             'Oro\Bundle\TestFrameworkBundle\Fixtures\LoadUserData'
         ]);
 
-        $this->helper = new InsertFromSelectQuery($this->getContainer()->get('doctrine'));
+        $this->registry = $this->getContainer()->get('doctrine');
+
+        $this->query = new InsertFromSelectQuery($this->registry);
     }
 
     public function testExecute()
     {
-        $registry = $this->getContainer()->get('doctrine');
-
         $decimalValue = 12345678.29;
 
+        $group = $this->registry
+            ->getManagerForClass('OroUserBundle:Group')
+            ->getRepository('OroUserBundle:Group')
+            ->findOneBy(['name' => 'Administrators']);
+
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $registry
+        $queryBuilder = $this->registry
             ->getManagerForClass('OroUserBundle:User')
             ->getRepository('OroUserBundle:User')
             ->createQueryBuilder('u')
@@ -48,11 +59,14 @@ class InsertFromSelectQueryTest extends WebTestCase
             ->addSelect('u.createdAt')
             ->addSelect('u.id')
             ->addSelect('IDENTITY(u.organization)')
-            ->where('u.createdAt < :datetime')
+            ->innerJoin('u.groups', 'g')
+            ->where('u.createdAt <= :datetime')
+            ->andWhere('g = :group')
             ->setParameter('datetime', new \DateTime())
+            ->setParameter('group', $group)
         ;
 
-        $this->helper->execute(
+        $this->query->execute(
             'OroTestFrameworkBundle:Item',
             [
                 'stringValue',
@@ -67,13 +81,14 @@ class InsertFromSelectQueryTest extends WebTestCase
         );
 
         /** @var User[] $result */
-        $users = $registry->getManagerForClass('OroUserBundle:User')
+        $users = $this->registry->getManagerForClass('OroUserBundle:User')
             ->getRepository('OroUserBundle:User')->findAll();
 
         /** @var Item[] $items */
-        $items = $registry->getManagerForClass('OroTestFrameworkBundle:Item')
+        $items = $this->registry->getManagerForClass('OroTestFrameworkBundle:Item')
             ->getRepository('OroTestFrameworkBundle:Item')->findAll();
 
+        $this->assertNotEmpty($items);
         $this->assertCount(count($users), $items);
 
         foreach ($users as $index => $user) {

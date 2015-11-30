@@ -19,15 +19,11 @@ class InsertFromSelectQuery extends AbstractNativeQuery
     public function execute($className, array $fields, QueryBuilder $selectQueryBuilder)
     {
         $insertToTableName = $this->getTableName($className);
-
         $columns = $this->getColumns($className, $fields);
-
         $selectQuery = $selectQueryBuilder->getQuery();
 
         $sql = sprintf('insert into %s (%s) %s', $insertToTableName, implode(', ', $columns), $selectQuery->getSQL());
-
         list($params, $types) = $this->processParameterMappings($selectQuery);
-
         // No possibility to use createNativeQuery with rsm http://www.doctrine-project.org/jira/browse/DDC-962
         $this->getManager($className)->getConnection()->executeUpdate($sql, $params, $types);
     }
@@ -42,7 +38,7 @@ class InsertFromSelectQuery extends AbstractNativeQuery
         $result = [];
 
         foreach ($fields as $field) {
-            if (!isset($this->tablesColumns[$className]) || !isset($this->tablesColumns[$className][$field])) {
+            if (!isset($this->tablesColumns[$className][$field])) {
                 if ($this->getClassMetadata($className)->hasAssociation($field)) {
                     $mapping = $this->getClassMetadata($className)->getAssociationMapping($field);
                     $this->tablesColumns[$className][$field] = array_shift($mapping['joinColumnFieldNames']);
