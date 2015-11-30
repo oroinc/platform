@@ -30,15 +30,14 @@ class MultiSelectGuesser extends ChoicesGuesser
         if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_MANY) {
-                $targetEntity = $metadata->getAssociationTargetClass($columnName);
-
-                $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
-                $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
-
                 $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::MULTI_SELECT;
                 $result[PropertyInterface::TYPE_KEY] = 'field';
 
+
+                $targetEntity = $metadata->getAssociationTargetClass($columnName);
+                $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
+                $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
                 $result[Configuration::CHOICES_KEY] = $this->getChoices($targetEntity, $keyField, $labelField);
 

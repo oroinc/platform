@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -48,17 +47,16 @@ class ChoicesGuesser implements GuesserInterface
         if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
-                $targetEntity = $metadata->getAssociationTargetClass($columnName);
-
-                $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
-                $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
-
                 $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::SELECT;
                 $result[PropertyInterface::TYPE_KEY] = 'field';
 
+                $targetEntity = $metadata->getAssociationTargetClass($columnName);
+                $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
+                $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
                 $result[Configuration::CHOICES_KEY] = $this->getChoices($targetEntity, $keyField, $labelField);
+
                 $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
                 $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             }
