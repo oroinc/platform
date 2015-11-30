@@ -25,27 +25,15 @@ class MultiSelectGuesser extends ChoicesGuesser
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $metadata = $entityManager->getClassMetadata($entityName);
-        $result = [];
 
-        $isConfigured = isset($column[Configuration::BASE_CONFIG_KEY][Configuration::EDITOR_KEY]);
-        $isConfigured = $isConfigured
-            || isset($column[Configuration::BASE_CONFIG_KEY][Configuration::AUTOCOMPLETE_API_ACCESSOR_KEY]);
-        if (!$isConfigured && $metadata->hasAssociation($columnName)) {
+        $result = [];
+        if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_MANY) {
                 $targetEntity = $metadata->getAssociationTargetClass($columnName);
 
                 $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
-                if (
-                    isset($column[Configuration::BASE_CONFIG_KEY]
-                        [Configuration::VIEW_OPTIONS_KEY][Configuration::VALUE_FIELD_NAME_KEY])
-                ) {
-                    $labelField =
-                        $column[Configuration::BASE_CONFIG_KEY]
-                            [Configuration::VIEW_OPTIONS_KEY][Configuration::VALUE_FIELD_NAME_KEY];
-                } else {
-                    $labelField = $this->guessLabelField($targetEntityMetadata, $columnName);
-                }
+                $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
 
                 $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::MULTI_SELECT;
