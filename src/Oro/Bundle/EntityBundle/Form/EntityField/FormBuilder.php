@@ -153,7 +153,8 @@ class FormBuilder
             'type' => 'entity',
         ];
 
-        if ($fieldInfo['type'] == 2) {
+        if ($fieldInfo['type'] === ClassMetadataInfo::MANY_TO_ONE
+            || $fieldInfo['type'] === ClassMetadataInfo::ONE_TO_ONE) {
             $data['options'] = [
                 'class' => $fieldInfo['targetEntity'],
                 'choice_label' => $fieldInfo['joinColumns'][0]['referencedColumnName']
