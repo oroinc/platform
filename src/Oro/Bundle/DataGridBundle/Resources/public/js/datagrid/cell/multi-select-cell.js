@@ -1,7 +1,8 @@
 define([
     'backgrid',
-    'underscore'
-], function(Backgrid, _) {
+    'underscore',
+    'orotranslation/js/translator'
+], function(Backgrid, _, __) {
     'use strict';
 
     var MultiSelectCell;
@@ -29,7 +30,12 @@ define([
         /**
          * @property {string}
          */
-        className: 'multiselect-cell',
+        className: 'multi-select-cell',
+
+        /**
+         * @property {string}
+         */
+        ERROR_HTML: '<span style="color:red">' + __('Unexpected format') + '</span>',
 
         /**
          * @inheritDoc
@@ -42,7 +48,7 @@ define([
                 try {
                     value = JSON.parse(value);
                 } catch (e) {
-                    this.$el.html('<span style="color:red">Unexpected format</span>');
+                    this.$el.html(this.ERROR_HTML);
                     return this;
                 }
             }
@@ -52,17 +58,20 @@ define([
                 value = [];
             }
 
+            var html;
             try {
-                this.$el.html(value.length > 0 ? (
+                html = value.length > 0 ? (
                     '<span class="multiselect-value-wrapper"><span class="value-item">' +
                     value
                         .map(function(item) {return choices[item];})
                         .join('</span><span class="value-item">') +
                     '</span></span>'
-                ) : '');
+                ) : '';
             } catch (e) {
-                this.$el.html('<span style="color:red">Unexpected format</span>');
+                html = this.ERROR_HTML;
             }
+
+            this.$el.html(html);
 
             return this;
         }
