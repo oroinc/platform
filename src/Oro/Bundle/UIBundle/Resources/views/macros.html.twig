@@ -137,7 +137,7 @@
         {% set data = data|striptags('<a>')|raw|nl2br %}
     {% endif %}
 
-    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label html-content wysiwyg-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
