@@ -9,11 +9,11 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagVirtualRelationProvider implements VirtualRelationProviderInterface
 {
-    /** @var TaggableHelper */
-    protected $taggableHelper;
-
     const RELATION_NAME = 'tags_virtual';
     const TARGET_ALIAS  = 'virtualTag';
+
+    /** @var TaggableHelper */
+    protected $taggableHelper;
 
     /** @param TaggableHelper $helper */
     public function __construct(TaggableHelper $helper)
@@ -26,7 +26,7 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
      */
     public function isVirtualRelation($className, $fieldName)
     {
-        return $this->isTaggableEntity($className) && $fieldName === self::RELATION_NAME;
+        return $this->isTaggable($className) && $fieldName === self::RELATION_NAME;
     }
 
     /**
@@ -47,7 +47,7 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
      */
     public function getVirtualRelations($className)
     {
-        if ($this->isTaggableEntity($className)) {
+        if ($this->isTaggable($className)) {
             return [self::RELATION_NAME => $this->getRelationDefinition($className)];
         }
 
@@ -69,7 +69,7 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
      *
      * @return bool
      */
-    protected function isTaggableEntity($className)
+    protected function isTaggable($className)
     {
         return $this->taggableHelper->isTaggable($className);
     }

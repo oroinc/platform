@@ -110,13 +110,13 @@ class TagRepository extends EntityRepository
     }
 
     /**
-     * Deletes tags related to given entity class.
+     * Deletes tags relations for given entity class.
      *
      * @param string $entityClassName
      *
      * @return int
      */
-    public function deleteTags($entityClassName)
+    public function deleteRelations($entityClassName)
     {
         return $this
             ->getDeleteTaggingQueryBuilder($entityClassName)

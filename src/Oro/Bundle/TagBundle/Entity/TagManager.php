@@ -8,13 +8,13 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -411,15 +411,15 @@ class TagManager
 
 
     /**
-     * Deletes tags related to given entity class.
+     * Deletes tags relations for given entity class.
      *
      * @param string $entityClassName
      *
      * @return int
      */
-    public function deleteTags($entityClassName)
+    public function deleteRelations($entityClassName)
     {
-        return $this->getTagsRepository()->deleteTags($entityClassName);
+        return $this->getTagsRepository()->deleteRelations($entityClassName);
     }
 
     /**
