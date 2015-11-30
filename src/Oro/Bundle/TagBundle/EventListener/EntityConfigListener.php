@@ -17,7 +17,11 @@ class EntityConfigListener
         $this->tagManager = $tagManager;
     }
 
-    /** @param PostFlushConfigEvent $event */
+    /**
+     * Deletes tags relations for $className in cases when "tagging" option has been disabled for it.
+     *
+     * @param PostFlushConfigEvent $event
+     */
     public function postFlush(PostFlushConfigEvent $event)
     {
         foreach ($event->getModels() as $model) {
@@ -29,7 +33,7 @@ class EntityConfigListener
                 );
 
                 if (isset($changeSet['enabled']) && $changeSet['enabled'][0] && (!$changeSet['enabled'][1])) {
-                    $this->tagManager->deleteTags($className);
+                    $this->tagManager->deleteRelations($className);
                 }
             }
         }
