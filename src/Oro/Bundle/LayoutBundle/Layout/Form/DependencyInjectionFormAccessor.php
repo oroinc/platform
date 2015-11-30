@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Form;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 
-class DependencyInjectionFormAccessor extends AbstractFormAccessor
+class DependencyInjectionFormAccessor extends AbstractFormAccessor implements ConfigurableFormAccessorInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -60,5 +60,13 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor
     public function toString()
     {
         return $this->hash;
+    }
+
+    /**
+     * @param mixed $formData
+     */
+    public function setFormData($formData)
+    {
+        $this->form->setData($formData);
     }
 }

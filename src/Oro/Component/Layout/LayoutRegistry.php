@@ -124,7 +124,7 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function buildBlock($name, BlockBuilderInterface $builder, array $options)
+    public function buildBlock($name, BlockBuilderInterface $builder, array &$options)
     {
         $extensions = isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]
