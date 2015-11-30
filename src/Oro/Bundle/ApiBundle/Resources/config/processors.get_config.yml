@@ -81,6 +81,20 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: sorters, priority: -100 }
 
+    oro_api.get_config.remove_duplicate_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\RemoveDuplicateFilters
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: filters, priority: -110 }
+
+    oro_api.get_config.remove_duplicate_sorters:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\RemoveDuplicateSorters
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: sorters, priority: -110 }
+
     oro_api.get_config.set_description_for_entity:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDescriptionForEntity
         arguments:
