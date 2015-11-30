@@ -48,7 +48,7 @@ class OroTagBundleInstaller implements Installation
         $table->addColumn('created', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('entity_name', 'string', ['length' => 100]);
         $table->addColumn('record_id', 'integer', []);
-        $table->addIndex(['entity_name'], 'entity_name_idx', []);
+        $table->addIndex(['entity_name', 'record_id'], 'entity_name_idx', []);
         $table->addIndex(['tag_id'], 'idx_50107502bad26311', []);
         $table->addIndex(['user_owner_id'], 'idx_501075029eb185f9', []);
         $table->addUniqueIndex(['tag_id', 'entity_name', 'record_id', 'user_owner_id'], 'tagging_idx');
