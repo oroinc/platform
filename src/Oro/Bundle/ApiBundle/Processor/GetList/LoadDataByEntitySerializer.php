@@ -39,12 +39,6 @@ class LoadDataByEntitySerializer implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$entityClass) {
-            // an entity type is not specified
-            return;
-        }
-
         $config = $context->getConfig();
         if (null === $config) {
             // an entity configuration does not exist

@@ -37,12 +37,7 @@ class LoadVirtualFields implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$entityClass) {
-            // an entity type is not specified
-            return;
-        }
-
+        $entityClass   = $context->getClassName();
         $virtualFields = $this->virtualFieldProvider->getVirtualFields($entityClass);
         if (!empty($virtualFields)) {
             foreach ($virtualFields as $field) {

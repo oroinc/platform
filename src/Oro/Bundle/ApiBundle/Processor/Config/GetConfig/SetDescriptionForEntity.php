@@ -44,11 +44,6 @@ class SetDescriptionForEntity implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass) {
-            // an entity type is not specified
-            return;
-        }
-
         if (!isset($definition[ConfigUtil::LABEL])) {
             $entityName = $this->entityClassNameProvider->getEntityClassName($entityClass);
             if ($entityName) {

@@ -33,12 +33,12 @@ class LoadEntityMetadata implements ProcessorInterface
         /** @var MetadataContext $context */
 
         if ($context->hasResult()) {
-            // metadata already loaded
+            // metadata is already loaded
             return;
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }

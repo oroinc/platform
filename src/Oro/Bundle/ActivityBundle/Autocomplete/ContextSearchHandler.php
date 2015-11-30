@@ -74,6 +74,8 @@ class ContextSearchHandler implements ConverterInterface
      * @param ObjectManager         $objectManager
      * @param ObjectMapper          $mapper
      * @param string|null           $class
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         TokenStorageInterface $token,
@@ -280,16 +282,16 @@ class ContextSearchHandler implements ConverterInterface
     }
 
     /**
-     * Get dql entity search title
+     * Returns a DQL expression that can be used to get a text representation of the given type of entities.
      *
-     * @param $entityClass
-     * @param $alias
+     * @param string $className The FQCN of the entity
+     * @param string $alias     The alias in SELECT or JOIN statement
      *
-     * @return string
+     * @return string|false
      */
-    protected function getNameDQL($entityClass, $alias)
+    protected function getNameDQL($className, $alias)
     {
-        $fields = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
+        $fields = $this->mapper->getEntityMapParameter($className, 'title_fields');
         if ($fields) {
             $titleParts = [];
             foreach ($fields as $field) {

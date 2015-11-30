@@ -31,14 +31,8 @@ class BuildQuery implements ProcessorInterface
             return;
         }
 
-        $entityId = $context->getId();
-        if (null === $entityId) {
-            // no entity identifier
-            return;
-        }
-
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }
@@ -46,6 +40,7 @@ class BuildQuery implements ProcessorInterface
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
         $this->doctrineHelper->applyCriteria($query, $context->getCriteria());
 
+        $entityId = $context->getId();
         $idFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
         if (count($idFields) === 1) {
             // single identifier

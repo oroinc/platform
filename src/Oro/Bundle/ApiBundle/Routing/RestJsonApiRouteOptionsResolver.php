@@ -17,9 +17,9 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 
-class RestApiRouteOptionsResolver implements RouteOptionsResolverInterface
+class RestJsonApiRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP         = 'rest_api';
+    const ROUTE_GROUP         = RequestType::REST_JSON_API;
     const ENTITY_ATTRIBUTE    = 'entity';
     const ENTITY_PLACEHOLDER  = '{entity}';
     const ID_ATTRIBUTE        = 'id';

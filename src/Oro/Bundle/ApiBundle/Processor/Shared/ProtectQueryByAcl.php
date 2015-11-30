@@ -37,12 +37,10 @@ class ProtectQueryByAcl implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$entityClass) {
-            // an entity type is not specified
-            return;
-        }
-
-        $this->aclHelper->applyAclToCriteria($entityClass, $context->getCriteria(), $this->permission);
+        $this->aclHelper->applyAclToCriteria(
+            $context->getClassName(),
+            $context->getCriteria(),
+            $this->permission
+        );
     }
 }

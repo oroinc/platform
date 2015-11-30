@@ -22,14 +22,14 @@ class NormalizeMetadata implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        if (empty($config) || empty($config[ConfigUtil::DEFINITION])) {
+        if (empty($config)) {
             // a configuration does not exist
             return;
         }
 
         /** @var EntityMetadata $entityMetadata */
         $entityMetadata = $context->getResult();
-        $this->normalizeMetadata($entityMetadata, $config[ConfigUtil::DEFINITION]);
+        $this->normalizeMetadata($entityMetadata, $config);
     }
 
     /**
@@ -50,6 +50,16 @@ class NormalizeMetadata implements ProcessorInterface
                 if (count($path) === 1) {
                     $this->renameProperty($entityMetadata, reset($path), $fieldName);
                 }
+            }
+        }
+
+        if (ConfigUtil::isExcludeAll($config)) {
+            $toRemoveFieldNames = array_diff(
+                array_merge(array_keys($entityMetadata->getFields()), array_keys($entityMetadata->getAssociations())),
+                array_keys($fields)
+            );
+            foreach ($toRemoveFieldNames as $fieldName) {
+                $this->removeProperty($entityMetadata, $fieldName);
             }
         }
     }

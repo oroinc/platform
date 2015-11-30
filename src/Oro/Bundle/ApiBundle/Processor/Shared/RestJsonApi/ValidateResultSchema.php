@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Normalizer\RestJsonApi\ResultUtil;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDocument;
 
 class ValidateResultSchema implements ProcessorInterface
 {
@@ -18,7 +18,7 @@ class ValidateResultSchema implements ProcessorInterface
             throw new \RuntimeException('The result must be an array.');
         }
 
-        $rootSections = [ResultUtil::DATA, ResultUtil::ERRORS, ResultUtil::META];
+        $rootSections = [JsonApiDocument::DATA, JsonApiDocument::ERRORS, JsonApiDocument::META];
         if (count(array_intersect(array_keys($result), $rootSections)) === 0) {
             throw new \RuntimeException(
                 sprintf(
@@ -28,22 +28,22 @@ class ValidateResultSchema implements ProcessorInterface
             );
         }
 
-        if (array_key_exists(ResultUtil::DATA, $result) && array_key_exists(ResultUtil::ERRORS, $result)) {
+        if (array_key_exists(JsonApiDocument::DATA, $result) && array_key_exists(JsonApiDocument::ERRORS, $result)) {
             throw new \RuntimeException(
                 sprintf(
                     'The sections "%s" and "%s" must not coexist in the result.',
-                    ResultUtil::DATA,
-                    ResultUtil::ERRORS
+                    JsonApiDocument::DATA,
+                    JsonApiDocument::ERRORS
                 )
             );
         }
 
-        if (array_key_exists(ResultUtil::INCLUDED, $result) && !array_key_exists(ResultUtil::DATA, $result)) {
+        if (array_key_exists(JsonApiDocument::INCLUDED, $result) && !array_key_exists(JsonApiDocument::DATA, $result)) {
             throw new \RuntimeException(
                 sprintf(
                     'The result can contain the "%s" section only together with the "%s" section.',
-                    ResultUtil::INCLUDED,
-                    ResultUtil::DATA
+                    JsonApiDocument::INCLUDED,
+                    JsonApiDocument::DATA
                 )
             );
         }
