@@ -69,80 +69,22 @@ class CompleteSorters implements ProcessorInterface
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $sorters = $this->getFieldSorters($sorters, $metadata);
-        $sorters = $this->getAssociationSorters($sorters, $metadata);
+        $fields = array_merge(
+            array_keys($this->doctrineHelper->getIndexedFields($metadata)),
+            array_keys($this->doctrineHelper->getIndexedRelations($metadata))
+        );
+        foreach ($fields as $fieldName) {
+            if (array_key_exists($fieldName, $sorters)) {
+                // already defined
+                continue;
+            }
+            $sorters[$fieldName] = [];
+        }
 
         if (!empty($config)) {
             foreach ($sorters as $fieldName => &$fieldConfig) {
                 if ($this->isExcludedField($config, $fieldName)) {
                     $fieldConfig[ConfigUtil::EXCLUDE] = true;
-                }
-            }
-        }
-
-        return $sorters;
-    }
-
-    /**
-     * @param array         $sorters
-     * @param ClassMetadata $metadata
-     *
-     * @return array
-     */
-    protected function getFieldSorters(array $sorters, ClassMetadata $metadata)
-    {
-        $indexedColumns = [];
-        $ids = $metadata->getIdentifierFieldNames();
-        foreach ($ids as $pk) {
-            $indexedColumns[] = $pk;
-        }
-        if (isset($metadata->table['indexes'])) {
-            foreach ($metadata->table['indexes'] as $index) {
-                $indexedColumns[] = reset($index['columns']);
-            }
-        }
-        $fieldNames = $metadata->getFieldNames();
-        foreach ($fieldNames as $fieldName) {
-            if (array_key_exists($fieldName, $sorters)) {
-                // already defined
-                continue;
-            }
-
-            $mapping  = $metadata->getFieldMapping($fieldName);
-            $hasIndex = false;
-            if (isset($mapping['unique']) && true === $mapping['unique']) {
-                $hasIndex = true;
-            } elseif (in_array($mapping['columnName'], $indexedColumns)) {
-                $hasIndex = true;
-            }
-            if ($hasIndex) {
-                $sorters[$fieldName] = [];
-            }
-        }
-
-        return $sorters;
-    }
-
-    /**
-     * @param array         $sorters
-     * @param ClassMetadata $metadata
-     *
-     * @return array
-     */
-    protected function getAssociationSorters(array $sorters, ClassMetadata $metadata)
-    {
-        $fieldNames = $metadata->getAssociationNames();
-        foreach ($fieldNames as $fieldName) {
-            if (isset($filters[$fieldName])) {
-                // already defined
-                continue;
-            }
-            $mapping = $metadata->getAssociationMapping($fieldName);
-            if ($mapping['type'] & ClassMetadata::TO_ONE) {
-                $targetMetadata     = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
-                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
-                if (count($targetIdFieldNames) === 1) {
-                    $sorters[$fieldName] = [];
                 }
             }
         }

@@ -88,4 +88,74 @@ class DoctrineHelper extends BaseHelper
 
         return $orderBy;
     }
+
+    /**
+     * Gets array with indexed fields
+     *
+     * @param ClassMetadata $metadata
+     * @param bool|true     $includeIdentifiers
+     *
+     * @return array
+     *      key - field name
+     *      value - field type
+     */
+    public function getIndexedFields(ClassMetadata $metadata, $includeIdentifiers = true)
+    {
+        $fields = [];
+        $indexedColumns = [];
+        if ($includeIdentifiers) {
+            $ids = $metadata->getIdentifierFieldNames();
+            foreach ($ids as $pk) {
+                $indexedColumns[$pk] = true;
+            }
+        }
+
+        if (isset($metadata->table['indexes'])) {
+            foreach ($metadata->table['indexes'] as $index) {
+                $indexedColumns[reset($index['columns'])] = true;
+            }
+        }
+        $fieldNames = $metadata->getFieldNames();
+        foreach ($fieldNames as $fieldName) {
+            $mapping  = $metadata->getFieldMapping($fieldName);
+            $hasIndex = false;
+            if (isset($mapping['unique']) && true === $mapping['unique']) {
+                $hasIndex = true;
+            } elseif (array_key_exists($mapping['columnName'], $indexedColumns)) {
+                $hasIndex = true;
+            }
+            if ($hasIndex) {
+                $fields[$fieldName] = $mapping['type'];
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Gets array with indexed -to-one relations
+     *
+     * @param ClassMetadata $metadata
+     *
+     * @return array
+     *      key - field name
+     *      value - type of target field
+     */
+    public function getIndexedRelations(ClassMetadata $metadata)
+    {
+        $relations = [];
+        $fieldNames = $metadata->getAssociationNames();
+        foreach ($fieldNames as $fieldName) {
+            $mapping = $metadata->getAssociationMapping($fieldName);
+            if ($mapping['type'] & ClassMetadata::TO_ONE) {
+                $targetMetadata     = $this->getEntityMetadataForClass($mapping['targetEntity']);
+                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+                if (count($targetIdFieldNames) === 1) {
+                    $relations[$fieldName] = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
+                }
+            }
+        }
+
+        return $relations;
+    }
 }
