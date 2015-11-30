@@ -35,6 +35,7 @@ class TagEntityApiHandler extends ApiFormHandler
         TaggableHelper $helper
     ) {
         parent::__construct($form, $request, $entityManager);
+
         $this->tagManager = $tagManager;
         $this->taggableHelper  = $helper;
     }
@@ -56,19 +57,10 @@ class TagEntityApiHandler extends ApiFormHandler
     public function process($entity)
     {
         if (!$this->taggableHelper->isTaggable($entity)) {
-            // @todo: Should throw exception if entity is not taggable.
+            throw new \LogicException('Target entity should be taggable.');
         }
 
-        $entity = $this->prepareFormData($entity);
-
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($this->request);
-            if ($this->form->isValid()) {
-                return $this->onSuccess($entity) ?: $entity;
-            }
-        }
-
-        return null;
+        return parent::process($entity);
     }
 
     /**
