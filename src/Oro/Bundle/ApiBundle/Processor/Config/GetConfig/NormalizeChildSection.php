@@ -66,7 +66,7 @@ abstract class NormalizeChildSection implements ProcessorInterface
                 $path = $pathPrefix . $fieldPath;
                 if ($path !== $field) {
                     $config[ConfigUtil::PROPERTY_PATH] = $path;
-                } elseif (array_key_exists(ConfigUtil::PROPERTY_PATH, $config)) {
+                } elseif (is_array($config) && array_key_exists(ConfigUtil::PROPERTY_PATH, $config)) {
                     unset($config[ConfigUtil::PROPERTY_PATH]);
                 }
                 $sectionConfig[ConfigUtil::FIELDS][$field] = $config;
