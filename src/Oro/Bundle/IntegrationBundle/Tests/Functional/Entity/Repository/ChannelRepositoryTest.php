@@ -89,39 +89,4 @@ class ChannelRepositoryTest extends WebTestCase
             ]
         ];
     }
-
-    /**
-     * @dataProvider getGetFirstRunningSyncJobDataProvider
-     *
-     * @param string      $command
-     * @param string      $expectedJob
-     * @param string|null $integration
-     */
-    public function testGetFirstRunningSyncJob($command, $expectedJob, $integration = null)
-    {
-        $integration = $integration ? $this->getReference($integration)->getId() : null;
-
-        $actual = $this->repository->getFirstRunningSyncJob($command, $integration);
-
-        $this->assertEquals($this->getReference($expectedJob), $actual);
-    }
-
-    public function getGetFirstRunningSyncJobDataProvider()
-    {
-        return [
-            [
-                'command' => 'first_test_command',
-                'expectedJob' => 'oro_integration:first_running_job'
-            ],
-            [
-                'command' => 'second_test_command',
-                'expectedJob' => 'oro_integration:third_running_job'
-            ],
-            [
-                'command' => 'third_test_command',
-                'expectedJob' => 'oro_integration:running_job_for_foo_integration',
-                'integration' => 'oro_integration:foo_integration',
-            ]
-        ];
-    }
 }
