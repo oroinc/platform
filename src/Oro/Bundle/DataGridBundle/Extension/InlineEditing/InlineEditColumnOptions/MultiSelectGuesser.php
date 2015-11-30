@@ -34,7 +34,6 @@ class MultiSelectGuesser extends ChoicesGuesser
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::MULTI_SELECT;
                 $result[PropertyInterface::TYPE_KEY] = 'field';
 
-
                 $targetEntity = $metadata->getAssociationTargetClass($columnName);
                 $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
                 $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
