@@ -21,10 +21,10 @@ class TagEntityApiHandler extends ApiFormHandler
     protected $taggableHelper;
 
     /**
-     * @param FormInterface   $form
-     * @param Request         $request
-     * @param ObjectManager   $entityManager
-     * @param TagManager      $tagManager
+     * @param FormInterface  $form
+     * @param Request        $request
+     * @param ObjectManager  $entityManager
+     * @param TagManager     $tagManager
      * @param TaggableHelper $helper
      */
     public function __construct(
@@ -36,8 +36,8 @@ class TagEntityApiHandler extends ApiFormHandler
     ) {
         parent::__construct($form, $request, $entityManager);
 
-        $this->tagManager = $tagManager;
-        $this->taggableHelper  = $helper;
+        $this->tagManager     = $tagManager;
+        $this->taggableHelper = $helper;
     }
 
     /**
