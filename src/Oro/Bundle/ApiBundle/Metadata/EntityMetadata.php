@@ -59,6 +59,47 @@ class EntityMetadata extends ParameterBag
     }
 
     /**
+     * Checks whether metadata of the given field or association exists.
+     *
+     * @param string $propertyName
+     *
+     * @return bool
+     */
+    public function hasProperty($propertyName)
+    {
+        return $this->hasField($propertyName) || $this->hasAssociation($propertyName);
+    }
+
+    /**
+     * Removes metadata of a field or association.
+     *
+     * @param string $propertyName
+     */
+    public function removeProperty($propertyName)
+    {
+        if ($this->hasField($propertyName)) {
+            $this->removeField($propertyName);
+        } elseif ($this->hasAssociation($propertyName)) {
+            $this->removeAssociation($propertyName);
+        }
+    }
+
+    /**
+     * Renames a field or association.
+     *
+     * @param string $oldName
+     * @param string $newName
+     */
+    public function renameProperty($oldName, $newName)
+    {
+        if ($this->hasField($oldName)) {
+            $this->renameField($oldName, $newName);
+        } elseif ($this->hasAssociation($oldName)) {
+            $this->renameAssociation($oldName, $newName);
+        }
+    }
+
+    /**
      * Gets metadata for all fields.
      *
      * @return FieldMetadata[]
