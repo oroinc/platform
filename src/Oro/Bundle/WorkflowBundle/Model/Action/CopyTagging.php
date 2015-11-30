@@ -9,6 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
@@ -21,17 +22,25 @@ class CopyTagging extends AbstractAction
     /** @var TagManager */
     protected $tagManager;
 
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
     /** @var array */
     protected $options = [];
 
     /**
      * @param ContextAccessor $contextAccessor
-     * @param TagManager $tagManager
+     * @param TagManager      $tagManager
+     * @param TaggableHelper  $taggableHelper
      */
-    public function __construct(ContextAccessor $contextAccessor, TagManager $tagManager)
-    {
+    public function __construct(
+        ContextAccessor $contextAccessor,
+        TagManager $tagManager,
+        TaggableHelper $taggableHelper
+    ) {
         parent::__construct($contextAccessor);
-        $this->tagManager = $tagManager;
+        $this->tagManager     = $tagManager;
+        $this->taggableHelper = $taggableHelper;
     }
 
     /**
@@ -91,7 +100,7 @@ class CopyTagging extends AbstractAction
     }
 
     /**
-     * @param mixed $context
+     * @param mixed  $context
      * @param string $path
      *
      * @return Taggable
@@ -99,12 +108,14 @@ class CopyTagging extends AbstractAction
     protected function getTaggable($context, $path)
     {
         $object = $this->getObject($context, $path);
-        if (!$object instanceof Taggable) {
-            throw new LogicException(sprintf(
-                'Object in path "%s" in "copy_tagging" action have to implement
-                "Oro\Bundle\TagBundle\Entity\TagManager" interface',
-                $path
-            ));
+
+        if (!$this->taggableHelper->isTaggable($object)) {
+            throw new LogicException(
+                sprintf(
+                    'Object in path "%s" in "copy_tagging" action should be taggable.',
+                    $path
+                )
+            );
         }
 
         return $object;
