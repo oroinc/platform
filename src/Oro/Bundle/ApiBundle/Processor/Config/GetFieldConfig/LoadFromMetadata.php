@@ -12,17 +12,9 @@ class LoadFromMetadata implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var FieldConfigContext $context */
-
         $config = $context->getResult();
         if (null !== $config) {
             // a config already exists
-            return;
-        }
-
-        $entityClass = $context->getClassName();
-        if (!$entityClass) {
-            // an entity type is not specified
             return;
         }
 

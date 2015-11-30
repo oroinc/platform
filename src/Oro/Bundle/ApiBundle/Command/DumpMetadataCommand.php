@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpMetadataCommand extends ContainerAwareCommand
@@ -75,12 +76,13 @@ class DumpMetadataCommand extends ContainerAwareCommand
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
 
+        $config   = $configProvider->getConfig($entityClass, $version, $requestType);
         $metadata = $metadataProvider->getMetadata(
             $entityClass,
             $version,
             $requestType,
             [],
-            $configProvider->getConfig($entityClass, $version, $requestType)
+            null !== $config && isset($config[ConfigUtil::DEFINITION]) ? $config[ConfigUtil::DEFINITION] : null
         );
 
         return [

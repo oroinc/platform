@@ -21,7 +21,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
-class RestApiDocHandler implements HandlerInterface
+class RestJsonApiDocHandler implements HandlerInterface
 {
     const ID_DESCRIPTION      = 'The identifier of an entity';
     const VERSION_DESCRIPTION = 'The API version';
@@ -85,7 +85,7 @@ class RestApiDocHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if ($route->getOption('group') !== RestApiRouteOptionsResolver::ROUTE_GROUP) {
+        if ($route->getOption('group') !== RestJsonApiRouteOptionsResolver::ROUTE_GROUP) {
             return;
         }
         $action = $route->getDefault('_action');
@@ -94,26 +94,27 @@ class RestApiDocHandler implements HandlerInterface
         }
 
         $entityClass = $this->getEntityClass($route);
-        $config      = $this->getConfig($action, $entityClass);
-        $this->setDescription($annotation, $action, (array)$config->getConfig(), $entityClass);
-        if ($entityClass && $this->hasAttribute($route, RestApiRouteOptionsResolver::ID_PLACEHOLDER)) {
-            $this->addIdRequirement(
-                $annotation,
-                $entityClass,
-                $route->getRequirement(RestApiRouteOptionsResolver::ID_ATTRIBUTE)
-            );
+        if ($entityClass) {
+            $config = $this->getConfig($action, $entityClass);
+            $this->setDescription($annotation, $action, (array)$config->getConfig(), $entityClass);
+            if ($this->hasAttribute($route, RestJsonApiRouteOptionsResolver::ID_PLACEHOLDER)) {
+                $this->addIdRequirement(
+                    $annotation,
+                    $entityClass,
+                    $route->getRequirement(RestJsonApiRouteOptionsResolver::ID_ATTRIBUTE)
+                );
+            }
+            if ($config->hasConfigSection(ConfigUtil::FILTERS) && method_exists($config, 'getFilters')) {
+                $this->addFilters($annotation, $config->getFilters());
+            }
         }
-        $versionRequirement = $route->getRequirement(RestApiRouteOptionsResolver::VERSION_ATTRIBUTE);
+        $versionRequirement = $route->getRequirement(RestJsonApiRouteOptionsResolver::VERSION_ATTRIBUTE);
         if ($versionRequirement) {
             $this->addVersionRequirement($annotation, $versionRequirement);
         }
-        $formatRequirement = $route->getRequirement(RestApiRouteOptionsResolver::FORMAT_ATTRIBUTE);
+        $formatRequirement = $route->getRequirement(RestJsonApiRouteOptionsResolver::FORMAT_ATTRIBUTE);
         if ($formatRequirement) {
             $this->addFormatRequirement($annotation, $formatRequirement);
-        }
-
-        if ($config->hasConfigSection(ConfigUtil::FILTERS) && method_exists($config, 'getFilters')) {
-            $this->addFilters($annotation, $config->getFilters());
         }
     }
 
@@ -124,7 +125,7 @@ class RestApiDocHandler implements HandlerInterface
      */
     protected function getEntityClass(Route $route)
     {
-        $pluralAlias = $route->getDefault(RestApiRouteOptionsResolver::ENTITY_ATTRIBUTE);
+        $pluralAlias = $route->getDefault(RestJsonApiRouteOptionsResolver::ENTITY_ATTRIBUTE);
 
         return $pluralAlias
             ? $this->entityAliasResolver->getClassByPluralAlias($pluralAlias)
@@ -209,7 +210,7 @@ class RestApiDocHandler implements HandlerInterface
     protected function addVersionRequirement(ApiDoc $annotation, $requirement)
     {
         $annotation->addRequirement(
-            RestApiRouteOptionsResolver::VERSION_ATTRIBUTE,
+            RestJsonApiRouteOptionsResolver::VERSION_ATTRIBUTE,
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType(DataType::STRING),
                 'requirement' => $requirement,
@@ -225,7 +226,7 @@ class RestApiDocHandler implements HandlerInterface
     protected function addFormatRequirement(ApiDoc $annotation, $requirement)
     {
         $annotation->addRequirement(
-            RestApiRouteOptionsResolver::FORMAT_ATTRIBUTE,
+            RestJsonApiRouteOptionsResolver::FORMAT_ATTRIBUTE,
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType(DataType::STRING),
                 'requirement' => $requirement,
@@ -248,7 +249,7 @@ class RestApiDocHandler implements HandlerInterface
             : DataType::STRING;
 
         $annotation->addRequirement(
-            RestApiRouteOptionsResolver::ID_ATTRIBUTE,
+            RestJsonApiRouteOptionsResolver::ID_ATTRIBUTE,
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
                 'requirement' => $requirement,

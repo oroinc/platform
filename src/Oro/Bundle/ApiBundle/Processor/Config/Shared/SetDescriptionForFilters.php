@@ -43,7 +43,7 @@ class SetDescriptionForFilters implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->entityConfigProvider->hasConfig($entityClass)) {
+        if (!$this->entityConfigProvider->hasConfig($entityClass)) {
             // only configurable entities are supported
             return;
         }

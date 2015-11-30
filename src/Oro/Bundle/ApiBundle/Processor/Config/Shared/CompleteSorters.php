@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
@@ -43,7 +42,7 @@ class CompleteSorters implements ProcessorInterface
             $fields = $this->removeExclusions($sorters);
         } else {
             $entityClass = $context->getClassName();
-            if ($entityClass && $this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $fields = $this->removeExclusions(
                     $this->completeSorters($fields, $entityClass, $context->getResult())
                 );

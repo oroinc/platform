@@ -35,6 +35,13 @@ class FieldConfigProvider
      */
     public function getFieldConfig($className, $fieldName, $version, $requestType, array $extras = [])
     {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty.');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty.');
+        }
+
         $cacheKey = $requestType . $version . $className . '::' . $fieldName;
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];

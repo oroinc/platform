@@ -42,7 +42,7 @@ class CompleteFilters implements ProcessorInterface
             $fields = $this->removeExclusions($fields);
         } else {
             $entityClass = $context->getClassName();
-            if ($entityClass && $this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $fields = $this->removeExclusions(
                     $this->completeFilters($fields, $entityClass, $context->getResult())
                 );

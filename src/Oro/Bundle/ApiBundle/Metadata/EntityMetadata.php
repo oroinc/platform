@@ -40,6 +40,8 @@ class EntityMetadata extends ParameterBag
 
     /**
      * Gets identifier field names.
+     *
+     * @return string[]
      */
     public function getIdentifierFieldNames()
     {
@@ -200,6 +202,9 @@ class EntityMetadata extends ParameterBag
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function toArray()
     {
         $result = parent::toArray();

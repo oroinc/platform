@@ -40,7 +40,7 @@ class SetDefaultSorting implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }

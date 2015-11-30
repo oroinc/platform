@@ -44,7 +44,7 @@ services:
     oro_api.build_config.sorters:
         class: Oro\Bundle\ApiBundle\Processor\Config\BuildConfig\BuildSorters
         tags:
-            - { name: oro.api.processor, action: build_config, configSection: sorters, priority: -10 }
+            - { name: oro.api.processor, action: build_config, extra: sorters, priority: -10 }
 
     #
     # get_config
@@ -154,7 +154,8 @@ services:
         arguments:
             - @oro_api.doctrine_helper
         tags:
-            - { name: oro.api.processor, action: get_config, configSection: sorters, priority: -50 }
+            - { name: oro.api.processor, action: get_config, extra: sorters, priority: -50 }
+            - { name: oro.api.processor, action: get_relation_config, extra: filters, priority: -50 }
 
     oro_api.get_config.rest_json_api.fix_field_naming:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\RestJsonApi\FixFieldNaming

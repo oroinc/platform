@@ -279,26 +279,13 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($config, $this->context->getConfig());
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A class name must be set in the context before a configuration is loaded.
+     */
     public function testLoadConfigNoClassName()
     {
-        $this->context->setConfigSections(['section1']);
-
-        $this->configProvider->expects($this->never())
-            ->method('getConfig');
-
-        // test that a config is not loaded yet
-        $this->assertFalse($this->context->hasConfig());
-        $this->assertFalse($this->context->hasConfigOf('section1'));
-
-        $this->assertNull($this->context->getConfig()); // load config
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
-
-        $this->assertTrue($this->context->hasConfigOf('section1'));
-        $this->assertNull($this->context->getConfigOf('section1'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+        $this->context->getConfig();
     }
 
     public function testConfigWhenItIsSetExplicitly()
@@ -501,20 +488,13 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($metadata, $this->context->getMetadata());
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A class name must be set in the context before metadata are loaded.
+     */
     public function testLoadMetadataNoClassName()
     {
-        $this->configProvider->expects($this->never())
-            ->method('getConfig');
-        $this->metadataProvider->expects($this->never())
-            ->method('getMetadata');
-
-        // test that metadata are not loaded yet
-        $this->assertFalse($this->context->hasMetadata());
-
-        $this->assertNull($this->context->getMetadata()); // load metadata
-        $this->assertTrue($this->context->hasMetadata());
-        $this->assertTrue($this->context->has(Context::METADATA));
-        $this->assertNull($this->context->get(Context::METADATA));
+        $this->context->getMetadata();
     }
 
     public function testMetadataWhenItIsSetExplicitly()

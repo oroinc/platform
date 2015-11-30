@@ -32,13 +32,7 @@ class LoadFromConfigBag implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$entityClass) {
-            // an entity type is not specified
-            return;
-        }
-
-        $config = $this->configBag->getConfig($entityClass, $context->getVersion());
+        $config = $this->configBag->getConfig($context->getClassName(), $context->getVersion());
         if (null !== $config) {
             $context->setResult($config);
         }
