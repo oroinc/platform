@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\ORM\QueryBuilder;
 
-class InsertFromSelectQuery extends AbstractNativeQuery
+class InsertFromSelectQueryExecutor extends AbstractNativeQueryExecutor
 {
     /**
      * @var array

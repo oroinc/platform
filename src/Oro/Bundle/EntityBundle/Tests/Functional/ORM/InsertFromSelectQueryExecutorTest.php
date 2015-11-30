@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\ORM;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQuery;
+use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @dbIsolation
  */
-class InsertFromSelectQueryTest extends WebTestCase
+class InsertFromSelectQueryExecutorTest extends WebTestCase
 {
     /**
      * @var ManagerRegistry
@@ -21,9 +21,9 @@ class InsertFromSelectQueryTest extends WebTestCase
     protected $registry;
 
     /**
-     * @var InsertFromSelectQuery
+     * @var InsertFromSelectQueryExecutor
      */
-    protected $query;
+    protected $queryExecutor;
 
     public function setUp()
     {
@@ -35,7 +35,7 @@ class InsertFromSelectQueryTest extends WebTestCase
 
         $this->registry = $this->getContainer()->get('doctrine');
 
-        $this->query = new InsertFromSelectQuery($this->registry);
+        $this->queryExecutor = new InsertFromSelectQueryExecutor($this->registry);
     }
 
     public function testExecute()
@@ -66,7 +66,7 @@ class InsertFromSelectQueryTest extends WebTestCase
             ->setParameter('group', $group)
         ;
 
-        $this->query->execute(
+        $this->queryExecutor->execute(
             'OroTestFrameworkBundle:Item',
             [
                 'stringValue',

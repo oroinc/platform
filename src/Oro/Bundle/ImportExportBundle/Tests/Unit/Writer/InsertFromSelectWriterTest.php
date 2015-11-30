@@ -5,16 +5,16 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQuery;
+use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
 use Oro\Bundle\ImportExportBundle\Writer\AbstractNativeQueryWriter;
 use Oro\Bundle\ImportExportBundle\Writer\InsertFromSelectWriter;
 
 class InsertFromSelectWriterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var InsertFromSelectQuery|\PHPUnit_Framework_MockObject_MockObject
+     * @var InsertFromSelectQueryExecutor|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $query;
+    protected $queryExecutor;
 
     /**
      * @var InsertFromSelectWriter
@@ -26,10 +26,10 @@ class InsertFromSelectWriterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->query = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\InsertFromSelectQuery')
+        $this->queryExecutor = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor')
             ->disableOriginalConstructor()->getMock();
 
-        $this->writer = new InsertFromSelectWriter($this->query);
+        $this->writer = new InsertFromSelectWriter($this->queryExecutor);
     }
 
     public function testWrite()
@@ -59,11 +59,11 @@ class InsertFromSelectWriterTest extends \PHPUnit_Framework_TestCase
         $this->writer->setEntityName($entityName);
         $this->writer->setFields($fields);
 
-        $this->query->expects($this->at(0))
+        $this->queryExecutor->expects($this->at(0))
             ->method('execute')
             ->with($entityName, $fields, $firstQueryBuilder);
 
-        $this->query->expects($this->at(1))
+        $this->queryExecutor->expects($this->at(1))
             ->method('execute')
             ->with($entityName, $fields, $secondQueryBuilder);
 

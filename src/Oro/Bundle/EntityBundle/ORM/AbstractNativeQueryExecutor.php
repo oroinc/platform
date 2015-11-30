@@ -9,7 +9,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
 
-abstract class AbstractNativeQuery
+abstract class AbstractNativeQueryExecutor
 {
     /**
      * @var ManagerRegistry
