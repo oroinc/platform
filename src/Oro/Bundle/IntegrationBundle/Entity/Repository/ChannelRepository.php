@@ -24,33 +24,10 @@ class ChannelRepository extends EntityRepository
     public function getRunningSyncJobsCount($commandName, $integrationId = null)
     {
         /** @var QueryBuilder $qb */
-        $qb = $this->getRunningSyncJobsQB($commandName, $integrationId)
-            ->select('count(j.id)');
-
-        return (int)$qb->getQuery()->getSingleScalarResult();
-    }
-
-    /**
-     * @param string $commandName
-     * @param int|null $integrationId
-     * @return Job|null
-     */
-    public function getFirstRunningSyncJob($commandName, $integrationId = null)
-    {
-        /** @var QueryBuilder $qb */
-        $qb = $this->getRunningSyncJobsQB($commandName, $integrationId)
-            ->setMaxResults(1)
-            ->orderBy('j.id');
-
-        return $qb->getQuery()->getOneOrNullResult();
-    }
-
-    protected function getRunningSyncJobsQB($commandName, $integrationId = null)
-    {
-        /** @var QueryBuilder $qb */
         $qb = $this->getEntityManager()
             ->getRepository('JMSJobQueueBundle:Job')
             ->createQueryBuilder('j')
+            ->select('count(j.id)')
             ->andWhere('j.command=:commandName')
             ->andWhere('j.state=:stateName')
             ->setParameter('commandName', $commandName)
@@ -73,7 +50,7 @@ class ChannelRepository extends EntityRepository
                 ->setParameter('noIntegrationIdType2', '%-i=%');
         }
 
-        return $qb;
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
     /**
