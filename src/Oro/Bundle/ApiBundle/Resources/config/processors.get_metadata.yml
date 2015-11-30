@@ -6,30 +6,41 @@ services:
             - @oro_api.processor_bag
             - get_metadata
 
+    #
+    # get_metadata
+    #
+
+    oro_api.get_config.load_from_config_bag:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadFromConfigBag
+        arguments:
+            - @oro_api.config_bag
+        tags:
+            - { name: oro.api.processor, action: get_metadata, priority: -10 }
+
     oro_api.get_metadata.load_entity_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadEntityMetadata
         arguments:
             - @oro_api.doctrine_helper
             - @oro_api.entity_metadata_factory
         tags:
-            - { name: oro.api.processor, action: get_metadata, priority: -10 }
+            - { name: oro.api.processor, action: get_metadata, priority: -20 }
 
     oro_api.get_metadata.load_related_entity_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadRelatedEntityMetadata
         arguments:
             - @oro_api.metadata_provider
         tags:
-            - { name: oro.api.processor, action: get_metadata, priority: -20 }
+            - { name: oro.api.processor, action: get_metadata, priority: -30 }
 
     oro_api.get_metadata.normalize_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeMetadata
         tags:
-            - { name: oro.api.processor, action: get_metadata, priority: -50 }
+            - { name: oro.api.processor, action: get_metadata, priority: -100 }
 
-    oro_api.get_metadata.normalize_entity_metadata:
-        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeEntityMetadata
+    oro_api.get_metadata.normalize_linked_properties:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeLinkedProperties
         arguments:
             - @oro_api.doctrine_helper
             - @oro_api.entity_metadata_factory
         tags:
-            - { name: oro.api.processor, action: get_metadata, priority: -60 }
+            - { name: oro.api.processor, action: get_metadata, priority: -110 }

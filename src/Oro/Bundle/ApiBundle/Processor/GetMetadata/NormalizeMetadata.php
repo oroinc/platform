@@ -7,6 +7,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Does the following normalizations of metadata:
+ * * removes excluded fields
+ * * renames fields based on 'property_path' attribute
+ */
 class NormalizeMetadata implements ProcessorInterface
 {
     /**
@@ -44,11 +49,11 @@ class NormalizeMetadata implements ProcessorInterface
                 continue;
             }
             if (ConfigUtil::isExclude($fieldConfig)) {
-                $this->removeProperty($entityMetadata, $fieldName);
+                $entityMetadata->removeProperty($fieldName);
             } elseif (isset($fieldConfig[ConfigUtil::PROPERTY_PATH])) {
                 $path = ConfigUtil::explodePropertyPath($fieldConfig[ConfigUtil::PROPERTY_PATH]);
                 if (count($path) === 1) {
-                    $this->renameProperty($entityMetadata, reset($path), $fieldName);
+                    $entityMetadata->renameProperty($entityMetadata, reset($path), $fieldName);
                 }
             }
         }
@@ -59,35 +64,8 @@ class NormalizeMetadata implements ProcessorInterface
                 array_keys($fields)
             );
             foreach ($toRemoveFieldNames as $fieldName) {
-                $this->removeProperty($entityMetadata, $fieldName);
+                $entityMetadata->removeProperty($fieldName);
             }
-        }
-    }
-
-    /**
-     * @param EntityMetadata $entityMetadata
-     * @param string         $name
-     */
-    protected function removeProperty(EntityMetadata $entityMetadata, $name)
-    {
-        if ($entityMetadata->hasField($name)) {
-            $entityMetadata->removeField($name);
-        } elseif ($entityMetadata->hasAssociation($name)) {
-            $entityMetadata->removeAssociation($name);
-        }
-    }
-
-    /**
-     * @param EntityMetadata $entityMetadata
-     * @param string         $oldName
-     * @param string         $newName
-     */
-    protected function renameProperty(EntityMetadata $entityMetadata, $oldName, $newName)
-    {
-        if ($entityMetadata->hasField($oldName)) {
-            $entityMetadata->renameField($oldName, $newName);
-        } elseif ($entityMetadata->hasAssociation($oldName)) {
-            $entityMetadata->renameAssociation($oldName, $newName);
         }
     }
 }

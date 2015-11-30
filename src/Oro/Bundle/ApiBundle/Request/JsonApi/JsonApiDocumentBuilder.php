@@ -147,9 +147,7 @@ class JsonApiDocumentBuilder
     {
         $result = [];
         if (null === $metadata) {
-            foreach ($object as $name => $value) {
-                $result[self::ATTRIBUTES][$name] = $value;
-            }
+            $result[self::ATTRIBUTES] = $object;
         } else {
             $result[self::TYPE] = $this->getEntityType($metadata->getClassName());
             $result[self::ID]   = $this->getEntityIdFromArrayObject($object, $metadata);
