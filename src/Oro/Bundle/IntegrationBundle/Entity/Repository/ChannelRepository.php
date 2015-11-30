@@ -53,6 +53,74 @@ class ChannelRepository extends EntityRepository
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
+
+    /**
+     * @param string[]|string $commandName
+     * @param string $arguments
+     * @param string[]|string $states
+     *
+     * @return QueryBuilder
+     */
+    protected function getQBSyncJobs($commandName, $arguments, $states)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getEntityManager()
+            ->getRepository('JMSJobQueueBundle:Job')
+            ->createQueryBuilder('j');
+
+        if (is_array($commandName)) {
+            $qb->andWhere('j.command in (:commandName)');
+        } else {
+            $qb->andWhere('j.command=:commandName');
+        }
+
+        if (is_array($states)) {
+            $qb->andWhere('j.state in (:stateName)');
+        } else {
+            $qb->andWhere('j.state=:stateName');
+        }
+
+        $qb->setParameter('stateName', $states)
+            ->setParameter('commandName', $commandName);
+
+        if (!empty($arguments)) {
+            $qb->andWhere($qb->expr()->like('cast(j.args as text)', ':args'))
+                ->setParameter('args', '%' . $arguments . '%');
+        }
+
+        return $qb;
+    }
+
+    /**
+     * @param string $commandName
+     * @param string $arguments
+     * @param string[] $states
+     *
+     * @return QueryBuilder
+     */
+    protected function getQBSyncJobsCount($commandName, $arguments, $states)
+    {
+        $qb = $this->getQBSyncJobs($commandName, $arguments, $states);
+        $qb->select('count(j.id)');
+
+        return $qb;
+    }
+
+    /**
+     * @param string $commandName
+     * @param string[] $states
+     * @param string $arguments
+     *
+     * @return int
+     */
+    public function getSyncJobsCount($commandName, $states, $arguments)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getQBSyncJobsCount($commandName, $arguments, $states);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
     /**
      * Returns latest status for integration's connector and code if it exists.
      *
