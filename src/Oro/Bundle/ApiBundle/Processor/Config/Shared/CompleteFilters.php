@@ -39,11 +39,11 @@ class CompleteFilters implements ProcessorInterface
         $fields = ConfigUtil::getArrayValue($filters, ConfigUtil::FIELDS);
 
         if (ConfigUtil::isExcludeAll($filters)) {
-            $fields = $this->removeExclusions($fields);
+            $fields = ConfigUtil::removeExclusions($fields);
         } else {
             $entityClass = $context->getClassName();
             if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-                $fields = $this->removeExclusions(
+                $fields = ConfigUtil::removeExclusions(
                     $this->completeFilters($fields, $entityClass, $context->getResult())
                 );
             }
@@ -73,7 +73,7 @@ class CompleteFilters implements ProcessorInterface
 
         if (!empty($config)) {
             foreach ($filters as $fieldName => &$fieldConfig) {
-                if ($this->isExcludedField($config, $fieldName)) {
+                if (ConfigUtil::isExcludedField($config, $fieldName)) {
                     $fieldConfig[ConfigUtil::EXCLUDE] = true;
                 }
             }
@@ -90,7 +90,7 @@ class CompleteFilters implements ProcessorInterface
      */
     protected function getFieldFilters(array $filters, ClassMetadata $metadata)
     {
-        $indexedFields = $this->doctrineHelper->getIndexedFields($metadata, false);
+        $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
         foreach ($indexedFields as $fieldName => $type) {
             if (array_key_exists($fieldName, $filters)) {
                 // already defined
@@ -112,7 +112,7 @@ class CompleteFilters implements ProcessorInterface
      */
     protected function getAssociationFilters(array $filters, ClassMetadata $metadata)
     {
-        $relations = $this->doctrineHelper->getIndexedRelations($metadata);
+        $relations = $this->doctrineHelper->getIndexedAssociations($metadata);
         foreach ($relations as $fieldName => $dataType) {
             if (array_key_exists($fieldName, $filters)) {
                 // already defined
@@ -126,49 +126,5 @@ class CompleteFilters implements ProcessorInterface
         }
 
         return $filters;
-    }
-
-    /**
-     * @param array $filters
-     *
-     * @return array
-     */
-    protected function removeExclusions(array $filters)
-    {
-        return array_filter(
-            $filters,
-            function (array $config) {
-                return !ConfigUtil::isExclude($config);
-            }
-        );
-    }
-
-    /**
-     * @param array  $config
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    protected function isExcludedField(array $config, $fieldName)
-    {
-        $result = false;
-        if (isset($config[ConfigUtil::FIELDS])) {
-            $fields = $config[ConfigUtil::FIELDS];
-            if (!array_key_exists($fieldName, $fields)) {
-                $result = true;
-            } else {
-                $fieldConfig = $fields[$fieldName];
-                if (is_array($fieldConfig)) {
-                    if (array_key_exists(ConfigUtil::DEFINITION, $fieldConfig)) {
-                        $fieldConfig = $fieldConfig[ConfigUtil::DEFINITION];
-                    }
-                    if (is_array($fieldConfig) && ConfigUtil::isExclude($fieldConfig)) {
-                        $result = true;
-                    }
-                }
-            }
-        }
-
-        return $result;
     }
 }
