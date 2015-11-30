@@ -36,13 +36,19 @@ class TagListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPreRemove()
     {
+        $helper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $helper->expects($this->once())
+            ->method('isTaggable')
+            ->with($this->resource)
+            ->willReturn(true);
+
         $manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $manager->expects($this->once())
-            ->method('isTaggable')
-            ->with($this->resource)
-            ->will($this->returnValue(true));
+
         $manager->expects($this->once())
             ->method('deleteTagging')
             ->with($this->resource, []);
@@ -53,7 +59,7 @@ class TagListenerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_tag.tag.manager'))
             ->will($this->returnValue($manager));
 
-        $this->listener = new TagListener();
+        $this->listener = new TagListener($helper);
         $this->listener->setContainer($container);
 
         $args = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')

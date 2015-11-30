@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Twig\TagExtension;
 
 class TagExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TagExtension
-     */
+    /** @var TagExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TagManager */
     protected $manager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TaggableHelper */
+    protected $helper;
 
     /**
      * Set up test environment
@@ -25,7 +26,11 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new TagExtension($this->manager);
+        $this->helper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->extension = new TagExtension($this->manager, $this->helper);
     }
 
     protected function tearDown()
@@ -41,7 +46,8 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFunctions()
     {
-        $this->assertArrayHasKey('oro_tag_get_list', $this->extension->getFunctions());
+        $functionsKeys = array_keys($this->extension->getFunctions());
+        $this->assertEquals(['oro_tag_get_list', 'oro_is_taggable'], $functionsKeys);
     }
 
     public function testGetList()

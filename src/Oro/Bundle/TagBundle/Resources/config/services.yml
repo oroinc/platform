@@ -38,15 +38,15 @@ services:
             - @doctrine.orm.entity_manager
             - %oro_tag.tag.entity.class%
             - %oro_tag.tagging.entity.class%
-            - @oro_search.mapper
             - @oro_security.security_facade
             - @router
-            - @oro_entity_config.provider.tag
 
     oro_tag.docrine.event.listener:
         class: %oro_tag.tag_listener.class%
+        arguments:
+            - @oro_tag.helper.taggable_helper
         calls:
-            - [ setContainer, [ @service_container ] ]
+            - [setContainer, [@service_container]]
         tags:
             - { name: doctrine.event_listener, event: preRemove }
 
@@ -73,7 +73,6 @@ services:
         class: Oro\Bundle\TagBundle\Form\Type\TagConfigChoiceType
         arguments:
             - @oro_entity_extend.association_type_helper
-            - @oro_tag.tag.manager
         tags:
             - { name: form.type, alias: oro_tag_config_choice }
 
@@ -168,6 +167,7 @@ services:
         class: %oro_tag.twig.tag.extension.class%
         arguments:
             - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
         tags:
             - { name: twig.extension }
 
@@ -180,6 +180,7 @@ services:
         class: %oro_tag.event_listener.search_results_grid_listener.class%
         arguments:
           - @oro_tag.security_provider
+          - @oro_entity.entity_alias_resolver
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.tag-results-grid, method: onBuildAfter }
 
@@ -193,6 +194,7 @@ services:
         class: %oro_tag.event_listener.merge_listener.class%
         arguments:
           - @oro_tag.tag.manager
+          - @oro_tag.helper.taggable_helper
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata }
           - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData }
@@ -213,6 +215,8 @@ services:
 
     oro_tag.provider.virtual_relation.tags:
         class: %oro_tag.provider.virtual_relation.tags.class%
+        arguments:
+            - @oro_tag.helper.taggable_helper
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
@@ -231,13 +235,43 @@ services:
         arguments:
             - @oro_tag.tag.manager
             - @oro_entity.orm.entity_class_resolver
+            - @oro_tag.helper.taggable_helper
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_tag.extension.grid.formatter.tag_search_result_property:
+        class: Oro\Bundle\TagBundle\Grid\Formatter\TagSearchResultProperty
+        arguments:
+            - @twig
+            - @oro_entity_config.provider.entity
+            - OroTagBundle:Search:searchResultItem.html.twig
+        calls:
+            - [setMappingProvider, [@oro_search.provider.search_mapping]]
+        tags:
+            - { name:  oro_datagrid.extension.formatter.property, type: tag-search-result }
+
+    oro_tag.provider.statistic:
+        class: Oro\Bundle\TagBundle\Provider\StatisticProvider
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_tag.security_provider
+            - @oro_entity_config.provider.entity
+            - @oro_entity.entity_alias_resolver
+
+    oro_tag.extension.tag_search_results:
+        class: Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension
+        arguments:
+            - @oro_search.formatter.result_formatter
+            - @doctrine.orm.entity_manager
+            - @oro_search.mapper
+            - @event_dispatcher
         tags:
             - { name: oro_datagrid.extension }
 
     oro_tag.view.eventlistener.tag_field:
         class: Oro\Bundle\TagBundle\EventListener\TagFieldListener
         arguments:
-            - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
         tags:
             - { name: kernel.event_listener, event: entity_view.render.before, method: addTagField }
 
@@ -245,5 +279,18 @@ services:
         class: Oro\Bundle\TagBundle\Model\Accessor\TagMergeAccessor
         arguments:
             - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
         tags:
             - { name: oro_entity_merge.accessor }
+
+    oro_tag.helper.taggable_helper:
+        class: Oro\Bundle\TagBundle\Helper\TaggableHelper
+        arguments:
+            - @oro_entity_config.provider.tag
+
+    oro_tag.eventlistener.entity_config:
+        class: Oro\Bundle\TagBundle\EventListener\EntityConfigListener
+        arguments:
+            - @oro_tag.tag.manager
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlush }

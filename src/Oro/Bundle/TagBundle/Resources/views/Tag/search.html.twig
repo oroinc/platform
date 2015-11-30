@@ -25,17 +25,23 @@
             <div class="oro-page-sidebar search-entity-types-column dropdown">
                 <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
                     <i class="icon-filter"></i>
-                    {% if selectedResult.class %}{{ selectedResult.label }}{% else %}{{ 'oro.search.result.all'|trans }}{% endif %}
-                    ({{ selectedResult.count }}) <i class="icon-sort-down"></i>
+                    {% if selectedResult.label is defined and selectedResult.count is defined%}
+                        {{ selectedResult.label|trans}}
+                        {% set selectedResultCount = selectedResult.count %}
+                    {% else %}
+                        {{ 'oro.search.result.all'|trans }}
+                        {% set selectedResultCount = groupedResults[''].count %}
+                    {% endif %}
+                    ({{ selectedResultCount }}) <i class="icon-sort-down"></i>
                 </a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                 {% for alias, type in groupedResults %}
                     {% set selected = alias == from %}
-                    {% if type.class %}
+                    {% if type.class is defined %}
                         {% set label = type.label %}
                         {% set iconClass = type.icon %}
                     {% else %}
-                        {% set label = 'oro.search.result.all'|trans %}
+                        {% set label = 'oro.search.result.all' %}
                         {% set iconClass = 'icon-search' %}
                     {% endif %}
 
@@ -47,7 +53,7 @@
                         <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}">
                             {% if selected %}<i class="icon-chevron-right pull-right"></i>{% endif %}
                             <i class="{{ iconClass }}"></i>
-                            {{ label }} ({{ type.count }})
+                            {{ label|trans }} ({{ type.count }})
                         </a>
                     </li>
                 {% endfor %}

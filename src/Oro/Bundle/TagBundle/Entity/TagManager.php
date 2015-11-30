@@ -13,9 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -35,17 +34,11 @@ class TagManager
     /** @var string */
     protected $taggingClass;
 
-    /** @var ObjectMapper */
-    protected $mapper;
-
     /** @var SecurityFacade */
     protected $securityFacade;
 
     /** @var Router */
     protected $router;
-
-    /** @var ConfigProvider */
-    protected $tagConfigProvider;
 
     protected $storage = [];
 
@@ -53,39 +46,21 @@ class TagManager
      * @param EntityManager  $em
      * @param string         $tagClass     - FQCN
      * @param string         $taggingClass - FQCN
-     * @param ObjectMapper   $mapper
      * @param SecurityFacade $securityFacade
      * @param Router         $router
-     * @param ConfigProvider $tagConfigProvider
      */
     public function __construct(
         EntityManager $em,
         $tagClass,
         $taggingClass,
-        ObjectMapper $mapper,
         SecurityFacade $securityFacade,
-        Router $router,
-        ConfigProvider $tagConfigProvider
+        Router $router
     ) {
-        $this->em                = $em;
-        $this->tagClass          = $tagClass;
-        $this->taggingClass      = $taggingClass;
-        $this->mapper            = $mapper;
-        $this->securityFacade    = $securityFacade;
-        $this->router            = $router;
-        $this->tagConfigProvider = $tagConfigProvider;
-    }
-
-    /**
-     * @todo: Should be implemented another approach for accessing entity identifier?
-     *
-     * @param object $entity
-     *
-     * @return int
-     */
-    public static function getEntityId($entity)
-    {
-        return $entity instanceof Taggable ? $entity->getTaggableId() : $entity->getId();
+        $this->em             = $em;
+        $this->tagClass       = $tagClass;
+        $this->taggingClass   = $taggingClass;
+        $this->securityFacade = $securityFacade;
+        $this->router         = $router;
     }
 
     /**
@@ -102,36 +77,6 @@ class TagManager
     }
 
     /**
-     * Checks if entity taggable.
-     * Entity is taggable if it implements Taggable interface or it configured as taggable.
-     *
-     * @param string|object $entity
-     *
-     * @return bool
-     */
-    public function isTaggable($entity)
-    {
-        return
-            $this->isImplementsTaggable($entity) ||
-            (
-                $this->tagConfigProvider->hasConfig($entity) &&
-                $this->tagConfigProvider->getConfig($entity)->is('enabled')
-            );
-    }
-
-    /**
-     * Checks if entity class implements Taggable interface
-     *
-     * @param object|string $entity
-     *
-     * @return bool
-     */
-    public function isImplementsTaggable($entity)
-    {
-        return is_a($entity, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
-    }
-
-    /**
      * Sets tags for $entity
      *
      * @param object           $entity
@@ -143,7 +88,7 @@ class TagManager
             $entity->setTags($tags);
         } else {
             $entityClassName = ClassUtils::getClass($entity);
-            $entityId        = $this->getEntityId($entity);
+            $entityId        = TaggableHelper::getEntityId($entity);
 
             $this->storage[$entityClassName][$entityId] = $tags;
         }
@@ -162,7 +107,7 @@ class TagManager
             return $entity->getTags();
         } else {
             $entityClassName = ClassUtils::getClass($entity);
-            $entityId        = $this->getEntityId($entity);
+            $entityId        = TaggableHelper::getEntityId($entity);
             if (!isset($this->storage[$entityClassName][$entityId])) {
                 $this->storage[$entityClassName][$entityId] = $this->fetchTags(
                     $entity,
@@ -218,7 +163,7 @@ class TagManager
         return $repository->deleteTaggingByParams(
             $tagIds,
             ClassUtils::getClass($entity),
-            self::getEntityId($entity),
+            TaggableHelper::getEntityId($entity),
             $owner
         );
     }
@@ -227,9 +172,9 @@ class TagManager
      * Remove tagging related to tags by params
      *
      * @param Collection|Tag[]|int[] $tagIds
-     * @param string           $entityName
-     * @param int              $recordId
-     * @param User             $createdBy
+     * @param string                 $entityName
+     * @param int                    $recordId
+     * @param User                   $createdBy
      *
      * @return int
      *
@@ -345,7 +290,7 @@ class TagManager
                     // only use tagging entities that related to current entity
                     return
                         $tagging->getEntityName() === ClassUtils::getClass($entity) &&
-                        $tagging->getRecordId() === $this->getEntityId($entity);
+                        $tagging->getRecordId() === TaggableHelper::getEntityId($entity);
                 }
             );
 
@@ -464,6 +409,19 @@ class TagManager
         return $this->getComparePredicate($tag);
     }
 
+
+    /**
+     * Deletes tags relations for given entity class.
+     *
+     * @param string $entityClassName
+     *
+     * @return int
+     */
+    public function deleteRelations($entityClassName)
+    {
+        return $this->getTagsRepository()->deleteRelations($entityClassName);
+    }
+
     /**
      * @param Tag $tag
      *
@@ -493,8 +451,7 @@ class TagManager
                 continue;
             }
 
-            $alias   = $this->mapper->getEntityConfig(ClassUtils::getClass($entity));
-            $tagging = $this->createTagging($tag, $entity)->setAlias($alias['alias']);
+            $tagging = $this->createTagging($tag, $entity);
 
             $this->em->persist($tag);
             $this->em->persist($tagging);
@@ -543,7 +500,7 @@ class TagManager
 
         $elements = $repository->getTags(
             ClassUtils::getClass($entity),
-            self::getEntityId($entity),
+            TaggableHelper::getEntityId($entity),
             $owner,
             $all,
             $usedOrganization
