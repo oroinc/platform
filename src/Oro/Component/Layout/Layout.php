@@ -16,6 +16,9 @@ class Layout
     /** @var array */
     protected $themes = [];
 
+    /** @var array */
+    protected $formThemes = [];
+
     /**
      * @param BlockView                       $view
      * @param LayoutRendererRegistryInterface $rendererRegistry
@@ -45,6 +48,7 @@ class Layout
         foreach ($this->themes as $theme) {
             $renderer->setBlockTheme($theme[0], $theme[1]);
         }
+        $renderer->setFormTheme($this->formThemes);
 
         return $renderer->renderBlock($this->view);
     }
@@ -78,6 +82,21 @@ class Layout
             : $this->view;
 
         $this->themes[] = [$view, $themes];
+
+        return $this;
+    }
+
+    /**
+     * Sets the theme(s) to be used for rendering forms
+     *
+     * @param string|string[] $themes  The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     *
+     * @return self
+     */
+    public function setFormTheme($themes)
+    {
+        $themes = is_array($themes) ? $themes : [$themes];
+        $this->formThemes = array_merge($this->formThemes, $themes);
 
         return $this;
     }

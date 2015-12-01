@@ -1601,6 +1601,21 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
+    public function testSetFormTheme()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->setFormTheme(['MyBundle:Layout:form_theme1.html.twig', 'MyBundle:Layout:form_theme2.html.twig']);
+
+        $this->getLayoutView();
+
+        $formThemes = $this->rawLayoutBuilder->getRawLayout()->getFormThemes();
+        $this->assertSame(
+            ['MyBundle:Layout:form_theme1.html.twig', 'MyBundle:Layout:form_theme2.html.twig'],
+            $formThemes
+        );
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
