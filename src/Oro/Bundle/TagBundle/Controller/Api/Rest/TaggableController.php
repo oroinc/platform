@@ -19,7 +19,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 class TaggableController extends RestController
 {
     /**
-     * Adds/updates tags to the target entity.
+     * Sets tags to the target entity.
      *
      * @param string $entity   The type of the target entity.
      * @param int    $entityId The id of the target entity.
@@ -27,7 +27,7 @@ class TaggableController extends RestController
      * @Post("/tags/{entity}/{entityId}")
      *
      * @ApiDoc(
-     *      description="Adds tags to the target entity",
+     *      description="Sets tags to the target entity",
      *      resource=true
      * )
      *

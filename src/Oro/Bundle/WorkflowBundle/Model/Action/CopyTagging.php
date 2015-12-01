@@ -7,7 +7,6 @@ use LogicException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
@@ -15,8 +14,8 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class CopyTagging extends AbstractAction
 {
-    const PATH_SOURCE = 'source';
-    const PATH_DESTINATION = 'destination';
+    const PATH_SOURCE       = 'source';
+    const PATH_DESTINATION  = 'destination';
     const PATH_ORGANIZATION = 'organization';
 
     /** @var TagManager */
@@ -68,12 +67,12 @@ class CopyTagging extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $source = $this->getTaggable($context, static::PATH_SOURCE);
-        $destination = $this->getTaggable($context, static::PATH_DESTINATION);
+        $source       = $this->getTaggable($context, static::PATH_SOURCE);
+        $destination  = $this->getTaggable($context, static::PATH_DESTINATION);
         $organization = $this->getOrganization($context);
 
         $this->tagManager->loadTagging($source, $organization);
-        $tags = $this->tagManager->getTags($source);
+        $tags         = $this->tagManager->getTags($source);
         $preparedTags = [
             'all'   => $tags->toArray(),
             'owner' => $tags->toArray(),
@@ -103,7 +102,7 @@ class CopyTagging extends AbstractAction
      * @param mixed  $context
      * @param string $path
      *
-     * @return Taggable
+     * @return object
      */
     protected function getTaggable($context, $path)
     {
@@ -122,7 +121,7 @@ class CopyTagging extends AbstractAction
     }
 
     /**
-     * @param mixed $context
+     * @param mixed  $context
      * @param string $path
      *
      * @return object|null
