@@ -59,7 +59,6 @@ define(function(require) {
     TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
         className: 'tags-select-editor',
         initialize: function(options) {
-            this.options = options;
             TagsEditorView.__super__.initialize.apply(this, arguments);
         }
     }, {

@@ -5,7 +5,21 @@
         'module': 'oroform/js/app/components/inline-editable-view-component',
         options: {
             'frontend_type': 'tags',
-            value: oro_tag_get_list(entity)
+            value: oro_tag_get_list(entity),
+            metadata: {
+                inline_editing: {
+                    enable: true,
+                    save_api_accessor: {
+                        not_array: true,
+                        route: 'oro_activity_view_activities'
+                    },
+                    autocomplete_api_accessor: {
+                        class: 'oroui/js/tools/search-api-accessor',
+                        search_handler_name: 'tags',
+                        label_field_name: 'value'
+                    }
+                }
+            }
         }
     }) }}></div>
 {% endmacro %}

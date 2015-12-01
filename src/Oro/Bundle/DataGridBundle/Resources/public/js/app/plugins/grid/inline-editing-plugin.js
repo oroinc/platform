@@ -137,7 +137,7 @@ define(function(require) {
 
         initPopover: function() {
             this.main.$el.popover({
-                content: __('oro.datagrid.inlineEditing.helpMessage'),
+                content: __('oro.form.inlineEditing.helpMessage'),
                 container: document.body,
                 selector: 'td.editable',
                 placement: 'bottom',
@@ -349,8 +349,8 @@ define(function(require) {
                 serverUpdateData = newData;
             }
             this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
-                    processingMessage: __('oro.datagrid.inlineEditing.saving_progress'),
-                    preventWindowUnload: __('oro.datagrid.inlineEditing.inline_edits')
+                    processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                    preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
                 })
                 .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
@@ -459,7 +459,7 @@ define(function(require) {
         },
 
         _onRequireJsError: function() {
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.loadingError'));
+            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.loadingError'));
         },
 
         /**
@@ -578,7 +578,7 @@ define(function(require) {
                     _this.cell.$el.removeClass('save-success');
                 }, 2000);
             }
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.successMessage'));
+            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },
 
         onSaveError: function(jqXHR) {
