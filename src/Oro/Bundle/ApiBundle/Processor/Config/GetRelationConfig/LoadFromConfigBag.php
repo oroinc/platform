@@ -80,13 +80,13 @@ class LoadFromConfigBag implements ProcessorInterface
     protected function loadConfig($entityClass, $version)
     {
         $config = $this->configBag->getRelationConfig($entityClass, $version);
-        if (null === $config || ConfigUtil::isRelationInherit($config)) {
+        if (null === $config || ConfigUtil::isInherit($config)) {
             $parentClasses = $this->entityHierarchyProvider->getHierarchyForClassName($entityClass);
             foreach ($parentClasses as $parentClass) {
                 $parentConfig = $this->configBag->getRelationConfig($parentClass, $version);
                 if (!empty($parentConfig)) {
                     $config = $this->mergeConfigs($parentConfig, $config);
-                    if (!ConfigUtil::isRelationInherit($parentConfig)) {
+                    if (!ConfigUtil::isInherit($parentConfig)) {
                         break;
                     }
                 }

@@ -49,7 +49,7 @@ class ConfigUtil extends BaseConfigUtil
      *
      * @return bool
      */
-    public static function isRelationInherit(array $config)
+    public static function isInherit(array $config)
     {
         return
             !isset($config[self::INHERIT])
