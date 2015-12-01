@@ -59,3 +59,15 @@ oro:
             label_date_var.this_year:     current year
             label_date_var.this_fdq:      first day of quarter
             label_date_var.this_fmq:      first month of quarter
+            label_date_var.january:       january
+            label_date_var.february:      february
+            label_date_var.march:         march
+            label_date_var.april:         april
+            label_date_var.may:           may
+            label_date_var.june:          june
+            label_date_var.july:          july
+            label_date_var.august:        august
+            label_date_var.september:     september
+            label_date_var.october:       october
+            label_date_var.november:      november
+            label_date_var.december:      december

@@ -44,17 +44,6 @@ define(function(require) {
          */
         checkConsistency: function(target) {
             dateTimePickerViewMixin.checkConsistency.apply(this, arguments);
-
-            var date = this.$frontDateField.val();
-            var time = this.$frontTimeField.val();
-            var isVariable = this.dateVariableHelper.isDateVariable(date);
-            var isValidDate = moment(date, this.getDateFormat(), true).isValid();
-            var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
-
-            if (!target && !isVariable && (!isValidDate || !isValidTime)) {
-                this.$frontDateField.val('');
-                this.$frontTimeField.val('');
-            }
         },
 
         /**

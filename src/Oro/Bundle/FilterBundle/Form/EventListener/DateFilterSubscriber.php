@@ -63,7 +63,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
         $children = array_keys($form->get('value')->all());
         if (isset($data['part']) && isset($data['type'])) {
-            $this->modifyEndDateForEqualType($data);
+            $this->modifyDateForEqualType($data);
         }
         // compile expressions
         $this->mapValues(
@@ -180,7 +180,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
      * @param array $data
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function modifyEndDateForEqualType(&$data)
+    private function modifyDateForEqualType(&$data)
     {
         $validType =
             $data['type'] == AbstractDateFilterType::TYPE_EQUAL ||
