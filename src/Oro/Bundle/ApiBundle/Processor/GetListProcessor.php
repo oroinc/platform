@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
-class GetListProcessor extends ActionProcessor
+class GetListProcessor extends RequestActionProcessor
 {
     /** @var ConfigProvider */
     protected $configProvider;
