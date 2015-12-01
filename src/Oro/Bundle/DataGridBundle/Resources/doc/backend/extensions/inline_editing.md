@@ -85,7 +85,9 @@ datagrid:
                         view_options:
                             {key}: {value}
                     autocomplete_api_accessor:
-                        class: oroui/js/tools/search-api-accessor
+                        # configure autocomplete api accessor 
+                        # for example
+                        # class: oroui/js/tools/search-api-accessor
 ```
 
 Options name | Default value | Description
@@ -116,7 +118,7 @@ datagrid:
                         view: orodatagrid/js/app/views/editor/select-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
-                choices: 
+                choices: # can be used service as data provider @service->getDataMethod
                     {key}: {value}
 ```
 
@@ -130,14 +132,14 @@ datagrid:
         # <grid configuration> goes here
         columns:
             {column-name}:
-                frontend_type: select
+                frontend_type: multi-select
                 inline_editing:
                     enable: true
                     editor:
                         view: orodatagrid/js/app/views/editor/multi-select-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
-                choices: 
+                choices: # can be used service as data provider @service->getDataMethod
                     {key}: {value}
 ```
 
@@ -150,6 +152,7 @@ datagrid:
         # <grid configuration> goes here
         columns:
             {column-name}:
+                frontend_type: relation
                 inline_editing:
                     enable: true
                     editor:
@@ -167,6 +170,7 @@ datagrid:
         # <grid configuration> goes here
         columns:
             {column-name}:
+                frontend_type: multi-relation
                 inline_editing:
                     enable: true
                     editor:
@@ -189,6 +193,9 @@ integer       | [number-editor-view](../../frontend/editor/number-editor-view.md
 decimal       | [number-editor-view](../../frontend/editor/number-editor-view.md)
 percent       | [percent-editor-view](../../frontend/editor/percent-editor-view.md)
 select        | [select-editor-view](../../frontend/editor/select-editor-view.md)
+multi-select  | [multi-select-editor-view](../../frontend/editor/multi-select-editor-view.md)
+relation      | [relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md)
+multi-relation | [multi-relation-editor-view](../../frontend/editor/multi-relation-editor-view.md)
 
 Taken from [default-editors.md](../default-editors.md)
 
