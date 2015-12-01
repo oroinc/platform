@@ -14,7 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  */
 class Integrations extends AbstractPageFilteredGrid
 {
-    const NEW_ENTITY_BUTTON = "//a[@title='Create entity']";
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Integration']";
     const URL = 'integration';
 
     public function entityNew()
@@ -25,5 +25,16 @@ class Integrations extends AbstractPageFilteredGrid
     public function entityView()
     {
         new Integration($this->test);
+    }
+
+    /**
+     * @param $integration
+     * @return Integration
+     */
+    public function edit($integration)
+    {
+        $this->open($integration);
+
+        return new Integration($this->test);
     }
 }

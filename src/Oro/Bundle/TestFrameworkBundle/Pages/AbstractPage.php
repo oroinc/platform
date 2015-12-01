@@ -239,12 +239,29 @@ JS;
         $renderedMessages = array();
         /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $messageElement */
         foreach ($this->test->elements($messageCssSelector) as $messageElement) {
-            $renderedMessages[] = trim($messageElement->attribute('innerHTML'));
+            $renderedMessages[] = $this->trimHTML(trim($messageElement->attribute('innerHTML')));
         }
 
         PHPUnit_Framework_Assert::assertContains($expectedMessage, $renderedMessages, $message);
 
         return $this;
+    }
+
+    /**
+     * Method trims html tags form string, used in assertMessage function
+     * @param $value
+     * @return string
+     */
+    protected function trimHTML($value)
+    {
+        $config = \HTMLPurifier_Config::createDefault();
+        $config->set('Cache.DefinitionImpl', null);
+        $config->set('HTML.AllowedElements', '');
+        $config->set('HTML.AllowedAttributes', '');
+        $config->set('URI.AllowedSchemes', []);
+        $purifier = new \HTMLPurifier($config);
+
+        return $purifier->purify($value);
     }
 
     /**

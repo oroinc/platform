@@ -41,7 +41,7 @@ oro_workflow_api_rest_workflowdefinition_get: # a copy of oro_api_workflow_defin
     path:            /api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}
     methods:         [GET]
     defaults:
-        _controller: OroCRMProOutlookBundle:Api\Rest\WorkflowDefinition:get
+        _controller: OroWorkflowBundle:Api\Rest\WorkflowDefinition:get
         _format:     json
         version:     latest
     requirements:
