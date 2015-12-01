@@ -87,7 +87,6 @@ class RestApiController extends FOSRestController
         /** @var Context $context */
         $context = $processor->createContext();
         $context->setRequestType(RequestType::REST_PLAIN);
-        $context->setVersion($request->attributes->get('version'));
         $context->setClassName($request->attributes->get('entity'));
         $context->setRequestHeaders(new RestRequestHeaders($request));
 

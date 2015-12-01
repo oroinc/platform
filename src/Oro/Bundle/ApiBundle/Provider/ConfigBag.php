@@ -71,6 +71,8 @@ class ConfigBag
             // no config for the requested class
             return null;
         }
+        $result = $this->config[$section][$className];
+        /* @todo: API version is not supported for now
         // normalize the version if needed
         if ($version === Version::LATEST) {
             $version = null;
@@ -96,6 +98,7 @@ class ConfigBag
         if (null !== $result && empty($result)) {
             $result = null;
         }
+        */
 
         return $result;
     }

@@ -16,6 +16,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
         $config = [];
         foreach (['metadata', 'entities', 'relations'] as $section) {
             $config[$section] = [
+                /* @todo: API version is not supported for now
                 'Test\Class1' => [
                     '0' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]],
                 ],
@@ -24,6 +25,13 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
                     '1.0' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.0' => []]]],
                     '1.5' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.5' => []]]],
                     '2.0' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]],
+                ],
+                */
+                'Test\Class1' => [
+                    ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]],
+                ],
+                'Test\Class2' => [
+                    ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]],
                 ],
             ];
         }
@@ -104,6 +112,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
     public function getConfigProvider()
     {
         return [
+            /* @todo: API version is not supported for now
             ['Test\Class1', '0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]]],
             ['Test\Class1', '1.0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]]],
             ['Test\Class1', Version::LATEST, [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]]],
@@ -115,6 +124,9 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
             ['Test\Class2', '1.6', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.5' => []]]]],
             ['Test\Class2', '2.0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]]],
             ['Test\Class2', '2.1', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]]],
+            ['Test\Class2', Version::LATEST, [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]]],
+            */
+            ['Test\Class1', '1.0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]]],
             ['Test\Class2', Version::LATEST, [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]]],
         ];
     }

@@ -11,7 +11,6 @@ use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
@@ -25,9 +24,6 @@ class RestJsonApiRouteOptionsResolver implements RouteOptionsResolverInterface
     const ID_ATTRIBUTE        = 'id';
     const ID_PLACEHOLDER      = '{id}';
     const FORMAT_ATTRIBUTE    = '_format';
-    const VERSION_ATTRIBUTE   = 'version';
-    const VERSION_REQUIREMENT = 'latest|v\d+(\.\d+)*';
-    const DEFAULT_VERSION     = Version::LATEST;
 
     /** @var EntityManagerBag */
     protected $entityManagerBag;
@@ -87,7 +83,6 @@ class RestJsonApiRouteOptionsResolver implements RouteOptionsResolverInterface
         }
 
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
-            $this->setVersionAttribute($route);
             $this->setFormatAttribute($route);
 
             $entities = $this->getSupportedEntityClasses();
@@ -162,15 +157,6 @@ class RestJsonApiRouteOptionsResolver implements RouteOptionsResolverInterface
                 );
             }
         }
-    }
-
-    /**
-     * @param Route $route
-     */
-    protected function setVersionAttribute(Route $route)
-    {
-        $route->setRequirement(self::VERSION_ATTRIBUTE, self::VERSION_REQUIREMENT);
-        $route->setDefault(self::VERSION_ATTRIBUTE, self::DEFAULT_VERSION);
     }
 
     /**

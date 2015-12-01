@@ -20,25 +20,25 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
 
-    oro_api.get.validate_class_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 210 }
-
     oro_api.get.validate_request_type_exists:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 210 }
 
+    oro_api.get.validate_class_name_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 210 }
+
+    oro_api.get.normalize_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
+
     oro_api.get.initialize_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
         arguments:
             - @oro_entity.orm.entity_class_resolver
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
-
-    oro_api.get.normalize_version:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
 

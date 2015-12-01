@@ -23,9 +23,8 @@ use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class RestJsonApiDocHandler implements HandlerInterface
 {
-    const ID_DESCRIPTION      = 'The identifier of an entity';
-    const VERSION_DESCRIPTION = 'The API version';
-    const FORMAT_DESCRIPTION  = 'The response format';
+    const ID_DESCRIPTION     = 'The identifier of an entity';
+    const FORMAT_DESCRIPTION = 'The response format';
 
     protected $templates = [
         'get'      => [
@@ -107,10 +106,6 @@ class RestJsonApiDocHandler implements HandlerInterface
             if ($config->hasConfigSection(ConfigUtil::FILTERS) && method_exists($config, 'getFilters')) {
                 $this->addFilters($annotation, $config->getFilters());
             }
-        }
-        $versionRequirement = $route->getRequirement(RestJsonApiRouteOptionsResolver::VERSION_ATTRIBUTE);
-        if ($versionRequirement) {
-            $this->addVersionRequirement($annotation, $versionRequirement);
         }
         $formatRequirement = $route->getRequirement(RestJsonApiRouteOptionsResolver::FORMAT_ATTRIBUTE);
         if ($formatRequirement) {
@@ -201,22 +196,6 @@ class RestJsonApiDocHandler implements HandlerInterface
         if ($documentation) {
             $annotation->setDocumentation($documentation);
         }
-    }
-
-    /**
-     * @param ApiDoc $annotation
-     * @param string $requirement
-     */
-    protected function addVersionRequirement(ApiDoc $annotation, $requirement)
-    {
-        $annotation->addRequirement(
-            RestJsonApiRouteOptionsResolver::VERSION_ATTRIBUTE,
-            [
-                'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType(DataType::STRING),
-                'requirement' => $requirement,
-                'description' => self::VERSION_DESCRIPTION
-            ]
-        );
     }
 
     /**
