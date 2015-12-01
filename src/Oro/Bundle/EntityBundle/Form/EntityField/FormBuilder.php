@@ -63,7 +63,14 @@ class FormBuilder
     public function getForm($entity)
     {
         $form = $this->formFactory
-            ->createBuilder('form', $entity, ['csrf_protection' => false])
+            ->createBuilder(
+                'form',
+                $entity,
+                [
+                    'csrf_protection' => false,
+                    'dynamic_fields_disabled' => true
+                ]
+            )
             ->getForm();
 
         return $form;
@@ -158,6 +165,14 @@ class FormBuilder
             $data['options'] = [
                 'class' => $fieldInfo['targetEntity'],
                 'choice_label' => $fieldInfo['joinColumns'][0]['referencedColumnName']
+            ];
+        }
+
+        if ($fieldInfo['type'] === ClassMetadataInfo::MANY_TO_MANY) {
+            $data['options'] = [
+                'class' => $fieldInfo['targetEntity'],
+                'choice_label' => $fieldInfo['joinTable']['joinColumns'][0]['referencedColumnName'],
+                'multiple' => true
             ];
         }
 
