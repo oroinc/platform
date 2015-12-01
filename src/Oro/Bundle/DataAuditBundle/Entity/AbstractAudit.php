@@ -12,7 +12,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
- * @ORM\MappedSuperclass()
  * @ORM\Entity()
  * @ORM\Table(name="oro_audit", indexes={
  *      @ORM\Index(name="idx_oro_audit_logged_at", columns={"logged_at"}),
@@ -20,7 +19,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
  * })
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({"audit" = "Audit"})
+ * @ORM\DiscriminatorMap({"audit" = "Oro\Bundle\DataAuditBundle\Entity\Audit"})
  */
 abstract class AbstractAudit extends AbstractLogEntry
 {
@@ -48,7 +47,11 @@ abstract class AbstractAudit extends AbstractLogEntry
     /**
      * @var AbstractAuditField[]|Collection
      *
-     * @ORM\OneToMany(targetEntity="AbstractAuditField", mappedBy="audit", cascade={"persist"})
+     * @ORM\OneToMany(
+     *     targetEntity="Oro\Bundle\DataAuditBundle\Entity\AuditField",
+     *     mappedBy="audit",
+     *     cascade={"persist"}
+     * )
      */
     protected $fields;
 
@@ -88,7 +91,13 @@ abstract class AbstractAudit extends AbstractLogEntry
      * @param mixed $oldValue
      * @return AbstractAuditField
      */
-    abstract protected function getAuditFieldInstance(AbstractAudit $audit, $field, $dataType, $newValue, $oldValue);
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAuditFieldInstance(AbstractAudit $audit, $field, $dataType, $newValue, $oldValue)
+    {
+        return new AuditField($audit, $field, $dataType, $newValue, $oldValue);
+    }
 
     /**
      * Constructor

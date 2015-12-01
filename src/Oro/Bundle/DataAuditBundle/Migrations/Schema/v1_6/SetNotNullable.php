@@ -27,11 +27,5 @@ class SetNotNullable implements Migration, OrderedMigrationInterface
             ->setType(Type::getType(Type::STRING))
             ->setOptions(['length' => 255, 'notnull' => true]);
         $auditTable->addIndex(['type'], 'idx_oro_audit_type');
-
-        $auditFieldTable = $schema->getTable('oro_audit_field');
-        $auditFieldTable->getColumn('type')
-            ->setType(Type::getType(Type::STRING))
-            ->setOptions(['length' => 255, 'notnull' => true]);
-        $auditFieldTable->addIndex(['type'], 'idx_oro_audit_field_type');
     }
 }

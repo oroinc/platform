@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation\Type;
@@ -68,13 +67,6 @@ class Audit extends AbstractAudit
     protected $version;
 
     /**
-     * @var AuditField[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="AuditField", mappedBy="audit", cascade={"persist"})
-     */
-    protected $fields;
-
-    /**
      * @var string $username
      *
      * @Soap\ComplexType("string", nillable=true)
@@ -90,14 +82,6 @@ class Audit extends AbstractAudit
      * @SerializedName("username")
      */
     protected $user;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAuditFieldInstance(AbstractAudit $audit, $field, $dataType, $newValue, $oldValue)
-    {
-        return new AuditField($audit, $field, $dataType, $newValue, $oldValue);
-    }
 
     /**
      * {@inheritdoc}

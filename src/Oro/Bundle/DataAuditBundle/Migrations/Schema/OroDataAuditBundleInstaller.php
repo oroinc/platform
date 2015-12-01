@@ -114,9 +114,6 @@ class OroDataAuditBundleInstaller implements Installation
             'comment' => '(DC2Type:json_array)',
         ]);
         $auditFieldTable->setPrimaryKey(['id']);
-        $auditFieldTable->addColumn('type', 'string', ['length' => 255]);
-
-        $auditFieldTable->addIndex(['type'], 'idx_oro_audit_field_type');
         $auditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
 
         $auditFieldTable->addForeignKeyConstraint(
