@@ -19,6 +19,8 @@ class EntityDataControllerTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
             'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadUserData',
+            'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadRoleData',
+            'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadBusinessUnitData'
         ]);
     }
 
@@ -138,23 +140,10 @@ class EntityDataControllerTest extends WebTestCase
                 '',
                 'test',
                 Codes::HTTP_BAD_REQUEST
-            ],
-//            'choices' => [
-//                'Oro\Bundle\UserBundle\Entity\User',
-//                '',
-//                '',
-//                '',
-//                Codes::HTTP_NO_CONTENT
-//            ],
-//            'choices multi' => [
-//                'Oro\Bundle\UserBundle\Entity\User',
-//                '',
-//                '',
-//                '',
-//                Codes::HTTP_NO_CONTENT
-//            ]
+            ]
         ];
     }
+
 
     /**
      * @param string $className
@@ -168,12 +157,23 @@ class EntityDataControllerTest extends WebTestCase
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $reference = $this->getReference($reference);
         $classNameSafe = $this->getContainer()
             ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName($className);
         $id = $user->getId();
         $fieldName = $field;
-        $content = sprintf('{"%s":"%s"}', $fieldName, $reference->getId());
+
+        if (is_array($reference)) {
+            $ids = [];
+            foreach ($reference as $items) {
+                $ids[] = $this->getReference($items)->getId();
+            }
+
+            $content = sprintf('{"%s":[%s]}', $fieldName, implode(',', $ids));
+        } else {
+            $reference = $this->getReference($reference);
+            $content = sprintf('{"%s":"%s"}', $fieldName, $reference->getId());
+        }
+
         $this->client->request(
             'PATCH',
             $this->getUrl('oro_api_patch_entity_data', [
@@ -193,7 +193,12 @@ class EntityDataControllerTest extends WebTestCase
             $repository = $this->getContainer()->get('doctrine')->getRepository($className);
             $object = $repository->find($id);
             $accessor = PropertyAccess::createPropertyAccessor();
-            $this->assertEquals($reference->getId(), $accessor->getValue($object, $field)->getId());
+
+            if (is_array($reference)) {
+                $this->assertEquals(count($reference), count($accessor->getValue($object, $field)));
+            } else {
+                $this->assertEquals($reference->getId(), $accessor->getValue($object, $field)->getId());
+            }
         }
         if ($responseCode === Codes::HTTP_BAD_REQUEST) {
             $response = $this->getJsonResponseContent(
@@ -220,8 +225,20 @@ class EntityDataControllerTest extends WebTestCase
                 'Oro\Bundle\UserBundle\Entity\User',
                 'groups',
                 'status1',
-                Codes::HTTP_INTERNAL_SERVER_ERROR
+                Codes::HTTP_BAD_REQUEST
             ],
+            'entity many to many' => [
+                'Oro\Bundle\UserBundle\Entity\User',
+                'roles',
+                ['ROLE_TEST_1', 'ROLE_TEST_2'],
+                Codes::HTTP_NO_CONTENT
+            ],
+            'entity many to one' => [
+                'Oro\Bundle\UserBundle\Entity\User',
+                'owner',
+                'TestBusinessUnit',
+                Codes::HTTP_NO_CONTENT
+            ]
         ];
     }
 }
