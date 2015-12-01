@@ -74,34 +74,25 @@ define(function(require) {
      * @param {Object} options.autocomplete_api_accessor - Autocomplete API specification.
      *                                      Please see [list of search API's](../search-apis.md)
      *
-     * @augments [SelectEditorView](./select-editor-view.md)
+     * @augments [AbstractRelationEditorView](./abstract-relation-editor-view.md)
      * @exports RelatedIdRelationEditorView
      */
     var RelatedIdRelationEditorView;
-    var SelectEditorView = require('./select-editor-view');
+    var AbstractRelationEditorView = require('./abstract-relation-editor-view');
     var _ = require('underscore');
-    var tools = require('oroui/js/tools');
     require('jquery.select2');
 
-    RelatedIdRelationEditorView = SelectEditorView.extend(/** @exports RelatedIdRelationEditorView.prototype */{
+    RelatedIdRelationEditorView =
+        AbstractRelationEditorView.extend(/** @exports RelatedIdRelationEditorView.prototype */{
         DEFAULT_ID_PROPERTY: 'id',
         DEFAULT_TEXT_PROPERTY: 'text',
         DEFAULT_PER_PAGE: 20,
-        input_delay: 250,
         initialize: function(options) {
             RelatedIdRelationEditorView.__super__.initialize.apply(this, arguments);
             if (options.value_field_name) {
                 this.valueFieldName = options.value_field_name;
             } else {
                 throw new Error('`value_field_name` option is required');
-            }
-
-            var apiSpec = this.metadata.inline_editing.autocomplete_api_accessor;
-            var AutocompleteApiAccessor = apiSpec['class'];
-            this.autocompleteApiAccessor = new AutocompleteApiAccessor(apiSpec);
-            this.perPage = options.per_page || this.DEFAULT_PER_PAGE;
-            if (options.input_delay) {
-                this.input_delay = options.input_delay;
             }
         },
 
@@ -136,58 +127,6 @@ define(function(require) {
 
         getSelect2Options: function() {
             var _this = this;
-            var currentRequest = null;
-            var currentTerm = null;
-
-            var makeRequest = function(options) {
-                if (_this.disposed) {
-                    return;
-                }
-                if (options.term === '' && options.page === 1 && _this.metadata.emptyQueryRequest) {
-                    currentRequest = _this.metadata.emptyQueryRequest;
-                } else {
-                    currentRequest = _this.autocompleteApiAccessor.send(_.extend(_this.model.toJSON(), {
-                        term: options.term,
-                        page: options.page,
-                        per_page: _this.perPage
-                    }));
-                    currentRequest.term = options.term;
-                    if (options.term === '' && options.page === 1) {
-                        _this.metadata.emptyQueryRequest = currentRequest;
-                    }
-                }
-                currentRequest.done(function(response) {
-                    if (_this.disposed) {
-                        return;
-                    }
-                    if (currentTerm === options.term) {
-                        if (options.term === '' && options.page === 1) {
-                            _this.availableChoices = _this.addInitialResultItem(response.results);
-                        } else if (options.term === '' && options.page !== 1) {
-                            _this.availableChoices = _this.filterInitialResultItem(response.results);
-                        } else {
-                            _this.availableChoices = _.clone(response.results);
-                        }
-                        options.callback({
-                            results: _this.availableChoices,
-                            more: response.more
-                        });
-                    }
-                });
-                currentRequest.fail(function(ajax) {
-                    if (ajax.statusText !== 'abort') {
-                        if (!_this.disposed) {
-                            options.callback({
-                                results: [],
-                                more: false
-                            });
-                        }
-                        throw Error('Cannot load choices for autocomplete');
-                    }
-                });
-            };
-
-            var debouncedMakeRequest = _.debounce(makeRequest, this.input_delay);
             return {
                 placeholder: this.placeholder || ' ',
                 allowClear: true,
@@ -203,18 +142,22 @@ define(function(require) {
                 initSelection: function(element, callback) {
                     callback(_this.getInitialResultItem());
                 },
-                ajax: {
-                    quietMillis: 250
-                },
                 query: function(options) {
-                    if (currentRequest && currentRequest.term !== '') {
-                        currentRequest.abort();
+                    _this.currentTerm = options.term;
+                    if (_this.currentRequest && _this.currentRequest.term !== '' &&
+                        _this.currentRequest.state() !== 'resolved') {
+                        _this.currentRequest.abort();
                     }
-                    currentTerm = options.term;
-                    if (options.term !== '') {
-                        debouncedMakeRequest(options);
+                    var autoCompleteUrlParameters = _.extend(_this.model.toJSON(), {
+                        term: options.term,
+                        page: options.page,
+                        per_page: _this.perPage
+                    });
+                    if (options.term !== '' &&
+                        !_this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
+                        _this.debouncedMakeRequest(options, autoCompleteUrlParameters);
                     } else {
-                        makeRequest(options);
+                        _this.makeRequest(options, autoCompleteUrlParameters);
                     }
                 }
             };
@@ -241,17 +184,7 @@ define(function(require) {
             return data;
         }
     }, {
-        DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
-        processColumnMetadata: function(columnMetadata) {
-            var apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
-            if (!_.isObject(apiSpec)) {
-                throw new Error('`autocomplete_api_accessor` is required option');
-            }
-            if (!apiSpec.class) {
-                apiSpec.class = RelatedIdRelationEditorView.DEFAULT_ACCESSOR_CLASS;
-            }
-            return tools.loadModuleAndReplace(apiSpec, 'class');
-        }
+        processColumnMetadata: AbstractRelationEditorView.processColumnMetadata
     });
 
     return RelatedIdRelationEditorView;

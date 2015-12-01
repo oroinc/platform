@@ -49,105 +49,21 @@ define(function(require) {
      * @param {string} options.maximumSelectionLength - Maximum selection length
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      *
-     * @augments [SelectEditorView](./select-editor-view.md)
+     * @augments [AbstractRelationEditorView](./abstract-relation-editor-view.md)
      * @exports TagsEditorView
      */
     var TagsEditorView;
-    var RelatedIdRelationEditorView = require('oroform/js/app/views/editor/related-id-relation-editor-view');
-    var SelectEditorView = require('oroform/js/app/views/editor/select-editor-view');
-    var tools = require('oroui/js/tools');
-    var _ = require('underscore');
+    var AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
+    // var _ = require('underscore');
 
-    TagsEditorView = SelectEditorView.extend(/** @exports TagsEditorView.prototype */{
+    TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
         className: 'tags-select-editor',
         initialize: function(options) {
             this.options = options;
             TagsEditorView.__super__.initialize.apply(this, arguments);
-        },
-        getAvailableOptions: function() {
-            var value = this.model.get(this.fieldName);
-            if (!_.isArray(value)) {
-                return [];
-            }
-            return value;
-        },
-
-        getSelect2Options: function() {
-            var options = {
-                tags: true,
-                allowClear: false,
-                tokenSeparators:  [',', ' '],
-                data: {results: this.availableChoices},
-                createSearchChoice: function(term) {
-                    return {id: term, text: term, isNew: true};
-                }
-            };
-            return options;
-        },
-
-        getModelValue: function() {
-            var value = this.model.get(this.fieldName);
-
-            if (!_.isArray(value)) {
-                return {data: []};
-            }
-
-            return {
-                data: value.map(function(value) {
-                    return {id: value.id};
-                })
-            };
-        },
-
-        getValue: function() {
-            var selections = this.$('input[name=value]').select2('data');
-            return {
-                data: selections.map(function(v) {
-                    return {id: v.id, text: v.text, locked: v.locked};
-                }),
-                count: selections.length
-            };
-        },
-        getInitialResultItem: function() {
-            var modelValue = this.getModelValue();
-            if (modelValue !== null && modelValue && modelValue.data) {
-                return modelValue.data;
-            } else {
-                return [];
-            }
-        },
-
-        getFormattedValue: function() {
-            return this.getInitialResultItem()
-                .map(function(item) {return item.id;})
-                .join(',');
-        },
-
-        filterInitialResultItem: function(choices) {
-            choices = _.clone(choices);
-            return choices;
-        },
-        getServerUpdateData: function() {
-            var data = {};
-            data[this.fieldName] = this.getValue();
-            return data;
-        },
-
-        getModelUpdateData: function() {
-            return this.getServerUpdateData();
         }
     }, {
-        DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
-        processColumnMetadata: function(columnMetadata) {
-            var apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
-            if (!_.isObject(apiSpec)) {
-                throw new Error('`autocomplete_api_accessor` is required option');
-            }
-            if (!apiSpec.class) {
-                apiSpec.class = RelatedIdRelationEditorView.DEFAULT_ACCESSOR_CLASS;
-            }
-            return tools.loadModuleAndReplace(apiSpec, 'class');
-        }
+        processColumnMetadata: AbstractRelationEditorView.processColumnMetadata
     });
 
     return TagsEditorView;
