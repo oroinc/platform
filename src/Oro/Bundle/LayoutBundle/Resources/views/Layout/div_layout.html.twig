@@ -59,6 +59,7 @@
 
 {% block style_widget %}
     {% if attr.href is defined and attr.href is not empty %}
+        {% set attr = attr|merge({href: asset(attr.href)}) %}
         <link rel="stylesheet"{{ block('block_attributes') }}/>
     {% else %}
         <style{{ block('block_attributes') }}>

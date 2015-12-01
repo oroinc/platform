@@ -1055,7 +1055,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                                 'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
-                                    'attr'  => ['class' => 'test_class1 test_class2']
+                                    'attr'  => ['class' => 'test_class1']
                                 ]
                             ]
                         ]

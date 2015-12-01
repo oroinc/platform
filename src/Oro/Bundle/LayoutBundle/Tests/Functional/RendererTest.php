@@ -322,7 +322,7 @@ class RendererTest extends LayoutTestCase
         <style type="text/css" scoped="scoped">
             body { color: red; }
         </style>
-        <link rel="stylesheet" type="text/css" href="test.css"/>
+        <link rel="stylesheet" type="text/css" href="/test.css"/>
         <script type="text/javascript" async="async">
             alert('test');
         </script>
