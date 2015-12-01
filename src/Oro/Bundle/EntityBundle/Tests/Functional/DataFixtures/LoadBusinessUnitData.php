@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures;
