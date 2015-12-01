@@ -8,39 +8,59 @@ define(function(require) {
 
     /**
      * Base class that implement extending in backbone way.
-     * Also connects [Backbone events API](http://backbonejs.org/#Events) and
-     * [Chaplin's declarative event bindings](https://goo.gl/9bEXVT) by default.
+     * Implements [Backbone events API](http://backbonejs.org/#Events), Chaplin's
+     * [declarative event bindings](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#listen) and
+     * [Chaplin.EventBroker API](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.event_broker.md)
+     *
      *
      * @class
      * @param {Object} options - Options container
-     * @param {string} options.listen - Optional. Events to bind
+     * @param {Object} options.listen - Optional. Events to bind
      * @exports BaseClass
      */
-    var BaseClass = function() {
-        this.initialize.apply(this, arguments);
-    };
+    function BaseClass(options) {
+        this.cid = _.uniqueId('class');
+        if (!options) {
+            options = {};
+        }
+        this.initialize(options);
+        if (options.listen) {
+            this.on(options.listen);
+        }
+        this.delegateListeners();
+    }
 
     BaseClass.prototype = {
+        constructor: BaseClass,
+
+        /**
+         * Flag shows if the component is disposed or not
+         */
+        disposed: false,
+
         initialize: function(options) {
-            if (!options) {
-                options = {};
-            }
-            if (options.listen) {
-                this.on(options.listen);
-            }
-            this.delegateListeners();
+            // should be defined in descendants
         },
+
         dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            this.trigger('dispose', this);
+            this.unsubscribeAllEvents();
             this.stopListening();
-            delete this._events;
+            this.off();
+
+            this.disposed = true;
+            return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
         }
     };
 
-    _.extend(BaseClass.prototype, Backbone.Events, {
-        constructor: BaseClass,
-        delegateListeners: Chaplin.View.prototype.delegateListeners,
-        delegateListener: Chaplin.View.prototype.delegateListener
-    });
+    _.extend(BaseClass.prototype,
+        Backbone.Events,
+        Chaplin.EventBroker,
+        _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener'])
+    );
 
     BaseClass.extend = Backbone.Model.extend;
 
