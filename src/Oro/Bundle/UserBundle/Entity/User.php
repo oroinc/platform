@@ -20,7 +20,6 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 
@@ -357,11 +356,6 @@ class User extends ExtendUser implements
      * )
      */
     protected $emails;
-
-    /**
-     * @var Tag[]
-     */
-    protected $tags;
 
     /**
      * @var BusinessUnit[]|Collection
