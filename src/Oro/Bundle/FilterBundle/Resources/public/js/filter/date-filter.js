@@ -323,10 +323,10 @@ define(function(require) {
 
                 switch (type) {
                     case this.typeValues.moreThan.toString():
-                        hint += [__('more than'), start].join(' ');
+                        hint += [__('later than'), start].join(' ');
                         break;
                     case this.typeValues.lessThan.toString():
-                        hint += [__('less than'), end].join(' ');
+                        hint += [__('earlier than'), end].join(' ');
                         break;
                     case this.typeValues.notBetween.toString():
                         if (start && end) {
