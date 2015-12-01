@@ -17,7 +17,36 @@ define([
         /**
          @property {(Backgrid.CellFormatter|Object|string)}
          */
-        formatter: new CellFormatter()
+        formatter: new CellFormatter(),
+
+        /**
+         * @inheritDoc
+         */
+        render: function() {
+            var render = StringCell.__super__.render.apply(this, arguments);
+
+            this.enterEditMode();
+
+            return render;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        enterEditMode: function() {
+            if (this.column.get('editable')) {
+                StringCell.__super__.enterEditMode.apply(this, arguments);
+            }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        exitEditMode: function() {
+            if (!this.column.get('editable')) {
+                StringCell.__super__.exitEditMode.apply(this, arguments);
+            }
+        }
     });
 
     return StringCell;
