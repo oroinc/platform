@@ -114,7 +114,7 @@ class Configuration implements ConfigurationInterface
 
         $dataTreeBuilder = new TreeBuilder();
         $dataNode = $dataTreeBuilder->root('data');
-        $dataNode->info('Layout additional data')->end();
+        $dataNode->info('Layout theme additional data')->end();
 
         $node
             ->useAttributeAsKey('theme-identifier')

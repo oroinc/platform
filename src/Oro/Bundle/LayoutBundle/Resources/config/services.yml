@@ -147,6 +147,5 @@ services:
         class: %oro_layout.assetic.layout_resource.class%
         arguments:
             - @oro_layout.theme_manager
-            - @oro_layout.layout_manager
         tags:
             - { name: assetic.formula_resource, loader: layout }

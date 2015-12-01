@@ -31,7 +31,7 @@ class Theme
     /** @var string[] */
     protected $groups = [];
 
-    /** @var mixed[] */
+    /** @var array */
     protected $data = [];
 
     /**
@@ -181,7 +181,7 @@ class Theme
     }
 
     /**
-     * @param mixed[] $data
+     * @param array $data
      */
     public function setData(array $data)
     {
@@ -189,7 +189,7 @@ class Theme
     }
 
     /**
-     * @return mixed[]
+     * @return array
      */
     public function getData()
     {

@@ -7,7 +7,7 @@ use Oro\Component\Layout\Exception\InvalidArgumentException;
 
 class ArrayOptionValueBuilder implements OptionValueBuilderInterface
 {
-    /** @var mixed[] */
+    /** @var array */
     protected $values = [];
 
     /**

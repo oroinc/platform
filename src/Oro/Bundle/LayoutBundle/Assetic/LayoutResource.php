@@ -9,6 +9,8 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
 class LayoutResource implements ResourceInterface
 {
+    const RESOURCE_ALIAS = 'layout';
+
     /** @var ThemeManager */
     protected $themeManager;
 
@@ -33,7 +35,7 @@ class LayoutResource implements ResourceInterface
      */
     public function __toString()
     {
-        return 'layout';
+        return self::RESOURCE_ALIAS;
     }
 
     /**
@@ -58,7 +60,7 @@ class LayoutResource implements ResourceInterface
         $formulae = [];
         $assets = $theme->getDataByKey('assets', []);
         foreach ($assets as $assetKey => $asset) {
-            $name = 'layout_' . $theme->getName(). '_' . $assetKey;
+            $name = self::RESOURCE_ALIAS . '_' . $theme->getName(). '_' . $assetKey;
             $formulae[$name] = [
                 $asset['inputs'],
                 $asset['filters'],
