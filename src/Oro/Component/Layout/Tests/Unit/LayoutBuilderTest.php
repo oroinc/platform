@@ -253,6 +253,13 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('setBlockTheme')
             ->with('TestTheme3', 'test_block');
 
+        $this->layoutManipulator->expects($this->at(4))
+            ->method('setFormTheme')
+            ->with('TestFormTheme1');
+        $this->layoutManipulator->expects($this->at(5))
+            ->method('setFormTheme')
+            ->with(['TestFormTheme2']);
+
         $this->layoutManipulator->expects($this->once())
             ->method('applyChanges')
             ->with($this->identicalTo($context), false);
@@ -281,7 +288,6 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-
         $layout->expects($this->at(0))
             ->method('setBlockTheme')
             ->with(['RootTheme1', 'RootTheme2', 'RootTheme3'], $this->identicalTo(null));
@@ -291,11 +297,26 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $layout->expects($this->exactly(2))
             ->method('setBlockTheme');
 
+        $rawLayout->expects($this->once())
+            ->method('getFormThemes')
+            ->will(
+                $this->returnValue(
+                    ['TestFormTheme1', 'TestFormTheme2']
+                )
+            );
+        $layout->expects($this->at(2))
+            ->method('setFormTheme')
+            ->with(['TestFormTheme1', 'TestFormTheme2']);
+        $layout->expects($this->once())
+            ->method('setFormTheme');
+
         $this->layoutBuilder
             ->setBlockTheme('RootTheme1')
             ->setBlockTheme(['RootTheme2', 'RootTheme3'])
             ->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block')
-            ->setBlockTheme('TestTheme3', 'test_block');
+            ->setBlockTheme('TestTheme3', 'test_block')
+            ->setFormTheme('TestFormTheme1')
+            ->setFormTheme(['TestFormTheme2']);
 
         $result = $this->layoutBuilder->getLayout($context, $rootId);
         $this->assertSame($layout, $result);
