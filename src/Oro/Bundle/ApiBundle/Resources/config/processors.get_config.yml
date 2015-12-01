@@ -54,6 +54,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag
         arguments:
             - @oro_api.config_bag
+            - @oro_entity.entity_hierarchy_provider.all
         tags:
             - { name: oro.api.processor, action: get_config, priority: -10 }
 
