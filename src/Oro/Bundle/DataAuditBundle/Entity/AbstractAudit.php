@@ -91,9 +91,6 @@ abstract class AbstractAudit extends AbstractLogEntry
      * @param mixed $oldValue
      * @return AbstractAuditField
      */
-    /**
-     * {@inheritdoc}
-     */
     protected function getAuditFieldInstance(AbstractAudit $audit, $field, $dataType, $newValue, $oldValue)
     {
         return new AuditField($audit, $field, $dataType, $newValue, $oldValue);
