@@ -1,7 +1,9 @@
 parameters:
-    oro_layout.layout_factory_builder.class:    Oro\Component\Layout\LayoutFactoryBuilder
-    oro_layout.layout_manager.class:            Oro\Component\Layout\LayoutManager
-    oro_layout.form_layout_builder.class:       Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder
+    oro_layout.layout_factory_builder.class:            Oro\Component\Layout\LayoutFactoryBuilder
+    oro_layout.layout_manager.class:                    Oro\Component\Layout\LayoutManager
+    oro_layout.form_layout_builder.class:               Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder
+    oro_layout.assetic.layout_formula_loader.class:     Oro\Bundle\LayoutBundle\Assetic\LayoutFormulaLoader
+    oro_layout.assetic.layout_resource.class:           Oro\Bundle\LayoutBundle\Assetic\LayoutResource
 
 services:
     oro_layout.extension:
@@ -133,3 +135,17 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder
         tags:
             - { name: oro_layout.expression.encoder, format: json }
+
+    oro_layout.assetic.layout_formula_loader:
+        public: false
+        class: %oro_layout.assetic.layout_formula_loader.class%
+        tags:
+            - { name: assetic.formula_loader, alias: layout }
+
+    oro_layout.assetic.layout_resource:
+        public: false
+        class: %oro_layout.assetic.layout_resource.class%
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: assetic.formula_resource, loader: layout }
