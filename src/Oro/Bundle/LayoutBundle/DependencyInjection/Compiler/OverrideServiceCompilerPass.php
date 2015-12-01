@@ -21,7 +21,7 @@ class OverrideServiceCompilerPass implements CompilerPassInterface
         $this->changeService(
             $container,
             'templating.form.engine',
-            'oro_layout.php.templating.form.engine'
+            'oro_layout.templating.form.engine'
         );
     }
 
@@ -35,9 +35,7 @@ class OverrideServiceCompilerPass implements CompilerPassInterface
         $service = $container->getDefinition($serviceName);
         $newService = $container->getDefinition($newServiceName);
 
-        if ($service && $newService) {
-            $container->removeDefinition($serviceName);
-            $container->setDefinition($serviceName, $newService);
-        }
+        $container->removeDefinition($serviceName);
+        $container->setDefinition($serviceName, $newService);
     }
 }

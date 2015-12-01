@@ -3,6 +3,7 @@ parameters:
     oro_layout.php.renderer.engine.class:    Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine
     oro_layout.php.layout_renderer.class:    Oro\Component\Layout\LayoutRenderer
     oro_layout.php.templating.helper.class:  Oro\Component\Layout\Templating\Helper\LayoutHelper
+    oro_layout.templating.form.engine.class: Oro\Bundle\LayoutBundle\Form\RendererEngine\TemplatingRendererEngine
 
 services:
     oro_layout.php.renderer:
@@ -34,8 +35,8 @@ services:
         tags:
              - { name: templating.helper, alias: layout }
 
-    oro_layout.php.templating.form.engine:
-        class: Oro\Bundle\LayoutBundle\Form\RendererEngine\TemplatingRendererEngine
+    oro_layout.templating.form.engine:
+        class: %oro_layout.templating.form.engine.class%
         arguments:
             - @templating.engine.php
             - %templating.helper.form.resources%

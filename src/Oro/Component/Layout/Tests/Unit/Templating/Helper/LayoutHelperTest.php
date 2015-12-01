@@ -2,22 +2,25 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Templating\Helper;
 
+use Symfony\Component\Form\FormRendererInterface;
+
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\Templating\Helper\LayoutHelper;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Oro\Component\Layout\Templating\Helper\LayoutHelper;
+use Oro\Component\Layout\Templating\TextHelper;
 
 class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormRendererInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TextHelper */
     protected $textHelper;
 
     /** @var LayoutHelper */
     protected $helper;
 
-    /** @var \Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface */
+    /** @var FormRendererEngineInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $formRenderer;
 
     protected function setUp()

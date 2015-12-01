@@ -28,7 +28,7 @@ abstract class RendererEngineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface
+     * @return FormRendererEngineInterface
      */
     abstract public function createRendererEngine();
 }

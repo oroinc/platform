@@ -36,7 +36,7 @@ class OverrideServiceCompilerPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('templating.form.engine', $phpFormEngine);
 
         $newPhpFormEngine = new Definition('\OroLayoutPhpFormEngineClass');
-        $container->setDefinition('oro_layout.php.templating.form.engine', $newPhpFormEngine);
+        $container->setDefinition('oro_layout.templating.form.engine', $newPhpFormEngine);
 
         $this->pass->process($container);
 

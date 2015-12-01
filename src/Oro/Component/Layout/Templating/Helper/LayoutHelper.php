@@ -20,7 +20,7 @@ class LayoutHelper extends Helper
     /** @var TextHelper */
     private $textHelper;
 
-    /** @var \Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface */
+    /** @var FormRendererEngineInterface */
     private $formRendererEngine;
 
     /**
