@@ -1,4 +1,8 @@
 {% block block_widget -%}
+    {% if tag %}
+        <{{ tag }}{{ block('block_attributes') }}>
+        </{{ tag }}>
+    {% endif %}
 {%- endblock %}
 
 {% block block_label -%}
@@ -6,7 +10,7 @@
         {%- if label is empty -%}
             {% set label = id|humanize %}
         {%- endif -%}
-        <label{% if label_attr is defined %}{% for attrname, attrvalue in label_attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}{% endif %}>{{ label|block_text(translation_domain) }}</label>
+        <label{{ block('block_label_attributes') }}>{{ label|block_text(translation_domain) }}</label>
     {%- endif %}
 {%- endblock %}
 
@@ -16,11 +20,36 @@
 {%- endblock %}
 
 {% block block_attributes -%}
+    {% if attr.class is defined %}
+        {% set attr = attr|merge({
+            class: attr.class|replace({'{{ class_prefix }}': class_prefix})
+        }) %}
+    {% endif %}
     {% for attrname, attrvalue in attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
+{%- endblock %}
+
+{% block block_label_attributes -%}
+    {% if label_attr.class is defined %}
+        {% set label_attr = label_attr|merge({
+            class: label_attr.class|replace({'{{ class_prefix }}': class_prefix})
+        }) %}
+    {% endif %}
+    {% for attrname, attrvalue in label_attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
 {%- endblock %}
 
 {% block icon_block -%}
     <i class="icon-{{ icon }}{% if icon_class is defined %} {{ icon_class }}{% endif %}"></i>
+{%- endblock %}
+
+{% block input_widget -%}
+    {% if attr.placeholder is defined %}
+        {% set attr = attr|merge({
+            placeholder: attr.placeholder|block_text(translation_domain)
+        }) %}
+    {% endif %}
+    {{ block_widget(block, {
+        attr: attr
+    }) }}
 {%- endblock %}
 
 {% block container_widget -%}
@@ -49,6 +78,7 @@
 
 {% block script_widget %}
     {% if attr.src is defined and attr.src is not empty %}
+        {% set attr = attr|merge({src: asset(attr.src)}) %}
         <script{{ block('block_attributes') }}></script>
     {% else %}
         <script{{ block('block_attributes') }}>
@@ -102,6 +132,10 @@
 
 {% block text_widget -%}
     {{ text|block_text(translation_domain) }}
+{%- endblock %}
+
+{% block html_widget -%}
+    {{ text|block_text(translation_domain)|raw }}
 {%- endblock %}
 
 {% block link_widget -%}
