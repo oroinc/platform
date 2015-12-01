@@ -36,6 +36,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
+            var waitors = [];
             options.metadata = $.extend(true, {}, this.METADATA_DEFAULTS, options.metadata);
             this.fieldName = options.fieldName || 'value';
             // frontend type mapped to viewer/editor/reader
@@ -57,16 +58,17 @@ define(function(require) {
                 fieldName: 'value'
             }));
             if (this.classes.editor.processMetadata) {
-                this.classes.editor.processMetadata(this.metadata);
+                waitors.push(this.classes.editor.processMetadata(this.metadata));
             }
             this.wrapper.on('start-editing', this.enterEditMode, this);
-            tools.loadModuleAndReplace(options.metadata.inline_editing.save_api_accessor, 'class').done(
+            waitors.push(tools.loadModuleAndReplace(options.metadata.inline_editing.save_api_accessor, 'class').then(
                 _.bind(function() {
                     var ConcreteApiAccessor = options.metadata.inline_editing.save_api_accessor['class'];
                     this.saveApiAccessor = new ConcreteApiAccessor(
                         _.omit(options.metadata.inline_editing.save_api_accessor, 'class'));
                 }, this)
-            );
+            ));
+            this.deferredInit = $.when.apply($, waitors);
         },
 
         enterEditMode: function() {
@@ -77,6 +79,8 @@ define(function(require) {
                 fieldName: this.fieldName,
                 metadata: this.metadata
             }));
+
+            this.editorView = viewInstance;
 
             viewInstance.$el.addClass('inline-editor-wrapper');
 
@@ -104,8 +108,8 @@ define(function(require) {
         },
 
         exitEditMode: function() {
-            this.view.dispose();
             this.overlay.remove();
+            this.editorView.dispose();
         },
 
         saveCurrentCellAndExit: function() {

@@ -44,7 +44,7 @@ define(function(require) {
          * @type {number}
          * @protected
          */
-        counter: 0,
+        counter: 1, // should start from 1 for easier usage (0 == false)
         /**
          * True if resource is created
          * @type {boolean}
