@@ -184,7 +184,7 @@ define(function(require) {
             return data;
         }
     }, {
-        processColumnMetadata: AbstractRelationEditorView.processColumnMetadata
+        processMetadata: AbstractRelationEditorView.processMetadata
     });
 
     return RelatedIdRelationEditorView;

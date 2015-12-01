@@ -93,7 +93,7 @@ define(function(require) {
         }
     }, {
         DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
-        processColumnMetadata: function(columnMetadata) {
+        processMetadata: function(columnMetadata) {
             var apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
             if (!_.isObject(apiSpec)) {
                 throw new Error('`autocomplete_api_accessor` is required option');

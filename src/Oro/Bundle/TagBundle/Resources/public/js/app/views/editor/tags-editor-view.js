@@ -63,7 +63,7 @@ define(function(require) {
             TagsEditorView.__super__.initialize.apply(this, arguments);
         }
     }, {
-        processColumnMetadata: AbstractRelationEditorView.processColumnMetadata
+        processMetadata: AbstractRelationEditorView.processMetadata
     });
 
     return TagsEditorView;
