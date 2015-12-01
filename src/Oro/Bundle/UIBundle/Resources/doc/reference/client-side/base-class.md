@@ -1,12 +1,13 @@
 <a name="module_BaseClass"></a>
 ## BaseClass
 Base class that implement extending in backbone way.
-Also connects [Backbone events API](http://backbonejs.org/#Events) and
-[Chaplin's declarative event bindings](https://goo.gl/9bEXVT) by default.
+Implements [Backbone events API](http://backbonejs.org/#Events), Chaplin's
+[declarative event bindings](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#listen) and
+[Chaplin.EventBroker API](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.event_broker.md)
 
 
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
-| options.listen | <code>string</code> | Optional. Events to bind |
+| options.listen | <code>Object</code> | Optional. Events to bind |
 
