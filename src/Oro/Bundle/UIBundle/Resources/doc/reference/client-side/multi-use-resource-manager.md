@@ -6,10 +6,10 @@ Use case:
 ```javascript
 var backdropManager = new MultiUseResourceManager({
     listen: {
-        'construct': function() {
+        'constructResource': function() {
             $(document.body).addClass('backdrop');
         },
-        'dispose': function() {
+        'disposeResource': function() {
             $(document.body).removeClass('backdrop');
         }
     }
