@@ -41,7 +41,7 @@ oro:
             label_date_part.value:        value
             label_date_part.dayofweek:    day of week
             label_date_part.week:         week
-            label_date_part.day:          day
+            label_date_part.day:          day of month
             label_date_part.month:        month
             label_date_part.quarter:      quarter
             label_date_part.dayofyear:    day of year
@@ -53,8 +53,9 @@ oro:
             label_date_var.soq:           start of the quarter
             label_date_var.soy:           start of the year
             label_date_var.this_day:      current day
+            label_date_var.this_day_w_y:  this day without year
             label_date_var.this_week:     current week
-            label_date_var.this_month:    current month
+            label_date_var.this_month:    current month without year
             label_date_var.this_quarter:  current quarter
             label_date_var.this_year:     current year
             label_date_var.this_fdq:      first day of quarter
