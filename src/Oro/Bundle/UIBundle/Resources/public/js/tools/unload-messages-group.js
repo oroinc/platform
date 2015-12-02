@@ -6,10 +6,10 @@ define(function(require) {
     var MultiUseResourceManager = require('./multi-use-resource-manager');
     var UnloadMessagesGroup = MultiUseResourceManager.extend({
         listen: {
-            'construct': function() {
+            'constructResource': function() {
                 $(window).on('beforeunload', this.onBeforeUnload);
             },
-            'dispose': function() {
+            'disposeResource': function() {
                 $(window).off('beforeunload', this.onBeforeUnload);
             }
         },
