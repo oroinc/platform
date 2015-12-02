@@ -216,11 +216,21 @@ class EntitySerializer
         if ($useIdAsKey) {
             $idFieldName = $this->getEntityIdFieldName($entityClass);
             foreach ($entities as $entity) {
+                // if AuthenticationChecker injected, check if entity allowed to be viewed
+                if ($this->authChecker && !$this->authChecker->isGranted('VIEW', $entity)) {
+                    continue;
+                }
+
                 $id          = $this->dataAccessor->getValue($entity, $idFieldName);
                 $result[$id] = $this->serializeItem($entity, $entityClass, $config);
             }
         } else {
             foreach ($entities as $entity) {
+                // if AuthenticationChecker injected, check if entity allowed to be viewed
+                if ($this->authChecker && !$this->authChecker->isGranted('VIEW', $entity)) {
+                    continue;
+                }
+
                 $result[] = $this->serializeItem($entity, $entityClass, $config);
             }
         }
