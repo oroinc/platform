@@ -80,6 +80,8 @@ services:
             - @oro_soap.entity_accessor
             - @oro_soap.entity_data_transformer
             - @oro_entity.query_hint_resolver
+        calls:
+            - [setAuthenticationChecker, [@security.authorization_checker]]
 
     oro_soap.entity_accessor:
         class: %oro_soap.entity_accessor.class%
