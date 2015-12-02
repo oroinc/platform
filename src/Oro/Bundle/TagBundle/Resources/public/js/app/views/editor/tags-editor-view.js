@@ -80,6 +80,7 @@ define(function(require) {
                 openOnEnter: false,
                 selectOnBlur: false,
                 multiple: true,
+                id: 'label',
                 formatSelection: function(item) {
                     return item.label;
                 },
@@ -132,13 +133,24 @@ define(function(require) {
 
         getServerUpdateData: function() {
             var data = {};
-            data[this.valueFieldName] = this.getValue();
+            var select2Data = this.$('.select2-container').select2('data');
+            data[this.fieldName] = select2Data.map(function(item) {
+                return {
+                    name: item.label
+                };
+            });
             return data;
         },
 
         getModelUpdateData: function() {
-            var data = this.getServerUpdateData();
-            data[this.fieldName] = this.getChoiceLabel();
+            var data = {};
+            var select2Data = this.$('.select2-container').select2('data');
+            data[this.fieldName] = select2Data.map(function(item) {
+                return {
+                    id: item.id,
+                    name: item.label
+                };
+            });
             return data;
         }
     }, {

@@ -110,6 +110,7 @@ define(function(require) {
         exitEditMode: function() {
             this.overlay.remove();
             this.editorView.dispose();
+            delete this.editorView;
         },
 
         saveCurrentCellAndExit: function() {
@@ -118,20 +119,19 @@ define(function(require) {
         },
 
         saveCurrentCell: function() {
-
-            if (!this.editModeEnabled) {
+            if (!this.editorView) {
                 throw Error('Edit mode disabled');
             }
-            if (!this.editorComponent.view.isChanged()) {
+            if (!this.editorView.isChanged()) {
                 return true;
             }
-            if (!this.editorComponent.view.isValid()) {
-                this.editorComponent.view.focus();
+            if (!this.editorView.isValid()) {
+                this.editorView.focus();
                 return false;
             }
             var wrapper = this.wrapper;
-            var serverUpdateData = this.editorComponent.view.getServerUpdateData();
-            var modelUpdateData = this.editorComponent.view.getModelUpdateData();
+            var serverUpdateData = this.editorView.getServerUpdateData();
+            var modelUpdateData = this.editorView.getModelUpdateData();
             wrapper.$el.addClass('loading');
             var ctx = {
                 wrapper: wrapper,
