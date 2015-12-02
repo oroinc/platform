@@ -387,7 +387,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setClassName('Test\Class');
         // set "known" sections
-        $this->context->setConfigSections([ConfigExtra::FILTERS, ConfigExtra::SORTERS]);
+        $this->context->setConfigSections([ConfigUtil::FILTERS, ConfigUtil::SORTERS]);
 
         $this->configProvider->expects($this->once())
             ->method('getConfig')
@@ -423,7 +423,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setClassName('Test\Class');
         // set "known" sections
-        $this->context->setConfigSections([ConfigExtra::FILTERS, ConfigExtra::SORTERS]);
+        $this->context->setConfigSections([ConfigUtil::FILTERS, ConfigUtil::SORTERS]);
 
         $this->configProvider->expects($this->never())
             ->method('getConfig');

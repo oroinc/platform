@@ -7,7 +7,5 @@ namespace Oro\Bundle\ApiBundle\Provider;
  */
 class ConfigExtra
 {
-    const FILTERS      = 'filters';
-    const SORTERS      = 'sorters';
     const DESCRIPTIONS = 'descriptions';
 }

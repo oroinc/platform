@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class GetListContext extends Context
 {
@@ -19,7 +19,7 @@ class GetListContext extends Context
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
         parent::__construct($configProvider, $metadataProvider);
-        $this->setConfigSections([ConfigExtra::FILTERS, ConfigExtra::SORTERS]);
+        $this->setConfigSections([ConfigUtil::FILTERS, ConfigUtil::SORTERS]);
     }
 
     /**

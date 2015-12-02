@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpConfigCommand extends ContainerAwareCommand
@@ -74,7 +75,7 @@ class DumpConfigCommand extends ContainerAwareCommand
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
 
-        $extras = [ConfigExtra::FILTERS, ConfigExtra::SORTERS];
+        $extras = [ConfigUtil::FILTERS, ConfigUtil::SORTERS];
         if ($input->getOption('with-descriptions')) {
             $extras[] = ConfigExtra::DESCRIPTIONS;
         }
