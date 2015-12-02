@@ -86,7 +86,6 @@ define(function(require) {
         AbstractRelationEditorView.extend(/** @exports RelatedIdRelationEditorView.prototype */{
         DEFAULT_ID_PROPERTY: 'id',
         DEFAULT_TEXT_PROPERTY: 'text',
-        DEFAULT_PER_PAGE: 20,
         initialize: function(options) {
             RelatedIdRelationEditorView.__super__.initialize.apply(this, arguments);
             if (options.value_field_name) {

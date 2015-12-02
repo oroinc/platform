@@ -54,13 +54,84 @@ define(function(require) {
      */
     var TagsEditorView;
     var AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
-    // var _ = require('underscore');
+    var _ = require('underscore');
 
     TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
         className: 'tags-select-editor',
+        DEFAULT_PER_PAGE: 20,
         initialize: function(options) {
             TagsEditorView.__super__.initialize.apply(this, arguments);
+        },
+
+        getInitialResultItem: function() {
+            return this.getModelValue().map(function(item) {
+                return {
+                    id: item.id,
+                    label: item.name
+                };
+            });
+        },
+
+        getSelect2Options: function() {
+            var _this = this;
+            return {
+                placeholder: this.placeholder || ' ',
+                allowClear: true,
+                openOnEnter: false,
+                selectOnBlur: false,
+                multiple: true,
+                formatSelection: function(item) {
+                    return item.label;
+                },
+                formatResult: function(item) {
+                    return item.label;
+                },
+                initSelection: function(element, callback) {
+                    callback(_this.getInitialResultItem());
+                },
+                query: function(options) {
+                    _this.currentTerm = options.term;
+                    if (_this.currentRequest && _this.currentRequest.term !== '' &&
+                        _this.currentRequest.state() !== 'resolved') {
+                        _this.currentRequest.abort();
+                    }
+                    var autoCompleteUrlParameters = _.extend(_this.model.toJSON(), {
+                        term: options.term,
+                        page: options.page,
+                        per_page: _this.perPage
+                    });
+                    if (options.term !== '' &&
+                        !_this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
+                        _this.debouncedMakeRequest(options, autoCompleteUrlParameters);
+                    } else {
+                        _this.makeRequest(options, autoCompleteUrlParameters);
+                    }
+                }
+            };
+        },
+
+        getModelValue: function() {
+            return this.model.get(this.fieldName) || [];
+        },
+
+        getFormattedValue: function() {
+            return this.getModelValue().map(function(item) {
+                return item.id;
+            }).join(',');
+        },
+
+        getServerUpdateData: function() {
+            var data = {};
+            data[this.valueFieldName] = this.getValue();
+            return data;
+        },
+
+        getModelUpdateData: function() {
+            var data = this.getServerUpdateData();
+            data[this.fieldName] = this.getChoiceLabel();
+            return data;
         }
+
     }, {
         processMetadata: AbstractRelationEditorView.processMetadata
     });

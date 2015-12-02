@@ -40,6 +40,7 @@ define(function(require) {
     AbstractRelationEditorView = SelectEditorView.extend(/** @exports AbstractRelationEditorView.prototype */{
         input_delay: 250,
         currentTerm: '',
+        DEFAULT_PER_PAGE: 20,
         initialize: function(options) {
             AbstractRelationEditorView.__super__.initialize.apply(this, arguments);
             var apiSpec = this.metadata.inline_editing.autocomplete_api_accessor;
@@ -53,6 +54,14 @@ define(function(require) {
 
         getAvailableOptions: function(options) {
             return [];
+        },
+
+        addInitialResultItem: function(results) {
+            return _.clone(results);
+        },
+
+        filterInitialResultItem: function(results) {
+            return _.clone(results);
         },
 
         makeRequest: function(options, autoCompleteUrlParameters) {
