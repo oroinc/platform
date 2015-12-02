@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  * An instance of this class can be added to the config extras of the Context
  * to set the maximum number of related entities that can be loaded.
  */
-class RelatedEntitiesLimitConfigExtra implements ConfigExtraInterface
+class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
 {
-    const NAME = 'related_entities_limit';
+    const NAME = 'max_related_entities';
 
     /** @var int */
     protected $maxRelatedEntities;
@@ -21,6 +21,16 @@ class RelatedEntitiesLimitConfigExtra implements ConfigExtraInterface
     public function __construct($maxRelatedEntities)
     {
         $this->maxRelatedEntities = $maxRelatedEntities;
+    }
+
+    /**
+     * Gets the maximum number of related entities that can be retrieved
+     *
+     * @return int
+     */
+    public function getMaxRelatedEntities()
+    {
+        return $this->maxRelatedEntities;
     }
 
     /**
