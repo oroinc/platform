@@ -100,6 +100,13 @@ class CalendarEventHandler
             if ($this->form->isValid()) {
                 $this->ensureCalendarSet($entity);
 
+                // TODO: should be refactored after finishing BAP-8722
+                // Contexts handling should be moved to common for activities form handler
+                if ($this->form->has('contexts')) {
+                    $contexts = $this->form->get('contexts')->getData();
+                    $this->activityManager->setActivityTargets($entity, $contexts);
+                }
+
                 $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($this->request);
                 if ($targetEntityClass) {
                     $targetEntityId = $this->entityRoutingHelper->getEntityId($this->request);

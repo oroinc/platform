@@ -71,11 +71,7 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('where')
             ->will($this->returnSelf());
 
-        $qb->expects($this->once())
-            ->method('join')
-            ->will($this->returnSelf());
-
-        $qb->expects($this->once())
+        $qb->expects($this->exactly(2))
             ->method('leftJoin')
             ->will($this->returnSelf());
 

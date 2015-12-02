@@ -22,6 +22,7 @@ Table of content
         - [Sorter](./Resources/doc/backend/extensions/sorter.md)
         - [Toolbar](./Resources/doc/backend/extensions/toolbar.md)
         - [Totals](./Resources/doc/backend/extensions/totals.md)
+        - [Mode](./Resources/doc/backend/extensions/mode.md)
     - [References in YAML configuration](./Resources/doc/backend/references_in_configuration.md)
 - Frontend
     - [Datagrid](./Resources/doc/frontend/datagrid.md)
