@@ -245,3 +245,9 @@ services:
         class: %oro_calendar.system_calendar_event.datagrid_helper.class%
         arguments:
             - @oro_security.security_facade
+
+    oro_calendar.provider.calendar_event_guests:
+        class: Oro\Bundle\CalendarBundle\Provider\CalendarEventGuestsProvider
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_name_resolver
