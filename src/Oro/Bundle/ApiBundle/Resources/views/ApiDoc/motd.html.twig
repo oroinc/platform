@@ -48,13 +48,15 @@
             }
 
             /**
-             * Add Header "Content-Type: application/vnd.api+json" for JSON API resources (with route starting from '/api/{version}/')
+             * Add Header "Content-Type: application/vnd.api+json" for JSON API resources
+             * (with route is not starting with '/api/rest/')
              */
             var headerKey   = 'Content-Type',
                 headerValue = 'application/vnd.api+json',
                 headers = $(this).closest('.content').find('fieldset.headers'),
                 emptyHeader = null,
-                isAllowedRoute = $(this).parents('li.operation').find('div.heading span.path').text().indexOf('/api/{version}/') !== -1,
+                routePath = $(this).parents('li.operation').find('div.heading span.path').text(),
+                isAllowedRoute = routePath.indexOf('/api/rest/') === -1,
                 isHeaderRequired = function () {
                     var needsHeader = true;
                     $('.tuple', headers).each(function (index, header) {

@@ -31,12 +31,13 @@ class DumpMetadataCommand extends ContainerAwareCommand
                 InputArgument::REQUIRED,
                 'The entity class name or alias'
             )
-            ->addArgument(
-                'version',
-                InputArgument::OPTIONAL,
-                'API version',
-                Version::LATEST
-            )
+            // @todo: API version is not supported for now
+            //->addArgument(
+            //    'version',
+            //    InputArgument::OPTIONAL,
+            //    'API version',
+            //    Version::LATEST
+            //)
             ->addOption(
                 'request-type',
                 null,
@@ -55,8 +56,10 @@ class DumpMetadataCommand extends ContainerAwareCommand
         $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
 
         $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'));
-        $version     = $input->getArgument('version');
         $requestType = $input->getOption('request-type');
+        // @todo: API version is not supported for now
+        //$version     = $input->getArgument('version');
+        $version = Version::LATEST;
 
         $metadata = $this->getMetadata($entityClass, $version, $requestType);
         $output->write(Yaml::dump($metadata, 100, 4, true, true));
@@ -88,9 +91,7 @@ class DumpMetadataCommand extends ContainerAwareCommand
         return [
             'oro_api' => [
                 'metadata' => [
-                    $entityClass => [
-                        $version => null !== $metadata ? $metadata->toArray() : null
-                    ]
+                    $entityClass => null !== $metadata ? $metadata->toArray() : null
                 ]
             ]
         ];

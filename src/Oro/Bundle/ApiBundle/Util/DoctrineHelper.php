@@ -90,31 +90,31 @@ class DoctrineHelper extends BaseHelper
     }
 
     /**
-     * Gets array with indexed fields
+     * Gets a list of all indexed fields
      *
      * @param ClassMetadata $metadata
-     * @param bool|true     $includeIdentifiers
      *
-     * @return array
-     *      key - field name
-     *      value - field type
+     * @return array [field name => field data-type, ...]
      */
-    public function getIndexedFields(ClassMetadata $metadata, $includeIdentifiers = true)
+    public function getIndexedFields(ClassMetadata $metadata)
     {
-        $fields = [];
         $indexedColumns = [];
-        if ($includeIdentifiers) {
-            $ids = $metadata->getIdentifierFieldNames();
-            foreach ($ids as $pk) {
-                $indexedColumns[$pk] = true;
-            }
+
+        $idFieldNames = $metadata->getIdentifierFieldNames();
+        if (count($idFieldNames) > 0) {
+            $indexedColumns[reset($idFieldNames)] = true;
         }
 
         if (isset($metadata->table['indexes'])) {
             foreach ($metadata->table['indexes'] as $index) {
-                $indexedColumns[reset($index['columns'])] = true;
+                $firstFieldName = reset($index['columns']);
+                if (!isset($indexedColumns[$firstFieldName])) {
+                    $indexedColumns[$firstFieldName] = true;
+                }
             }
         }
+
+        $fields     = [];
         $fieldNames = $metadata->getFieldNames();
         foreach ($fieldNames as $fieldName) {
             $mapping  = $metadata->getFieldMapping($fieldName);
@@ -133,17 +133,15 @@ class DoctrineHelper extends BaseHelper
     }
 
     /**
-     * Gets array with indexed -to-one relations
+     * Gets a list of all indexed associations
      *
      * @param ClassMetadata $metadata
      *
-     * @return array
-     *      key - field name
-     *      value - type of target field
+     * @return array [field name => target field data-type, ...]
      */
-    public function getIndexedRelations(ClassMetadata $metadata)
+    public function getIndexedAssociations(ClassMetadata $metadata)
     {
-        $relations = [];
+        $relations  = [];
         $fieldNames = $metadata->getAssociationNames();
         foreach ($fieldNames as $fieldName) {
             $mapping = $metadata->getAssociationMapping($fieldName);

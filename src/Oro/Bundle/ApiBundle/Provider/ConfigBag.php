@@ -18,6 +18,19 @@ class ConfigBag
     }
 
     /**
+     * Gets metadata for the given version of a class
+     *
+     * @param string $className The FQCN of an entity
+     * @param string $version   The version of metadata
+     *
+     * @return array|null
+     */
+    public function getMetadata($className, $version)
+    {
+        return $this->findConfig('metadata', $className, $version);
+    }
+
+    /**
      * Gets a configuration for the given version of a class
      *
      * @param string $className The FQCN of an entity
@@ -58,6 +71,8 @@ class ConfigBag
             // no config for the requested class
             return null;
         }
+        $result = $this->config[$section][$className];
+        /* @todo: API version is not supported for now
         // normalize the version if needed
         if ($version === Version::LATEST) {
             $version = null;
@@ -83,6 +98,7 @@ class ConfigBag
         if (null !== $result && empty($result)) {
             $result = null;
         }
+        */
 
         return $result;
     }

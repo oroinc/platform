@@ -1,35 +1,31 @@
 oro_api:
     relations:
         Oro\Bundle\AddressBundle\Entity\AbstractAddress:
-            '0':
-                definition:
-                    exclusion_policy: none
-                    fields:
-                        owner:
-                            exclude: true
+            definition:
+                exclusion_policy: none
+                fields:
+                    owner:
+                        exclude: true
         Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress:
-            '0':
-                definition:
-                    exclusion_policy: none
-                    fields:
-                        types:
-                            order_by:
-                                name: ASC
+            definition:
+                exclusion_policy: none
+                fields:
+                    types:
+                        order_by:
+                            name: ASC
         Oro\Bundle\AddressBundle\Entity\AbstractEmail:
-            '0':
-                definition:
-                    exclusion_policy: all
-                    fields:
-                        email: ~
-                        primary: ~
-                    order_by:
-                        primary: DESC
+            definition:
+                exclusion_policy: all
+                fields:
+                    email: ~
+                    primary: ~
+                order_by:
+                    primary: DESC
         Oro\Bundle\AddressBundle\Entity\AbstractPhone:
-            '0':
-                definition:
-                    exclusion_policy: all
-                    fields:
-                        phone: ~
-                        primary: ~
-                    order_by:
-                        primary: DESC
+            definition:
+                exclusion_policy: all
+                fields:
+                    phone: ~
+                    primary: ~
+                order_by:
+                    primary: DESC

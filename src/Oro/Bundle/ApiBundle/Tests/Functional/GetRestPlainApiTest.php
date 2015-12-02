@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class GetApiTest extends WebTestCase
+class GetRestPlainApiTest extends WebTestCase
 {
     /** @var ContainerInterface */
     protected $container;
@@ -107,6 +107,7 @@ class GetApiTest extends WebTestCase
             foreach ($idFields as $field) {
                 $requirements[$field] = $recordExist ? $content[$field] : 1;
             }
+
             return [implode(RestRequest::ARRAY_DELIMITER, $requirements), $recordExist];
         }
     }

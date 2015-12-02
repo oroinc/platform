@@ -31,12 +31,13 @@ class DumpConfigCommand extends ContainerAwareCommand
                 InputArgument::REQUIRED,
                 'The entity class name or alias'
             )
-            ->addArgument(
-                'version',
-                InputArgument::OPTIONAL,
-                'API version',
-                Version::LATEST
-            )
+            // @todo: API version is not supported for now
+            //->addArgument(
+            //    'version',
+            //    InputArgument::OPTIONAL,
+            //    'API version',
+            //    Version::LATEST
+            //)
             ->addOption(
                 'request-type',
                 null,
@@ -68,8 +69,10 @@ class DumpConfigCommand extends ContainerAwareCommand
         $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
 
         $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'));
-        $version     = $input->getArgument('version');
         $requestType = $input->getOption('request-type');
+        // @todo: API version is not supported for now
+        //$version     = $input->getArgument('version');
+        $version = Version::LATEST;
 
         $extras = [ConfigExtra::FILTERS, ConfigExtra::SORTERS];
         if ($input->getOption('with-descriptions')) {
@@ -110,9 +113,7 @@ class DumpConfigCommand extends ContainerAwareCommand
         return [
             'oro_api' => [
                 'entities' => [
-                    $entityClass => [
-                        $version => $config
-                    ]
+                    $entityClass => $config
                 ]
             ]
         ];
@@ -136,9 +137,7 @@ class DumpConfigCommand extends ContainerAwareCommand
         return [
             'oro_api' => [
                 'relations' => [
-                    $entityClass => [
-                        $version => $config
-                    ]
+                    $entityClass => $config
                 ]
             ]
         ];

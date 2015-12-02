@@ -1,5 +1,5 @@
 oro_rest_api_cget:
-    path: /api/{version}/{entity}.{_format}
+    path: /api/{entity}.{_format}
     methods: [GET]
     defaults:
         _controller: OroApiBundle:RestApi:cget
@@ -8,7 +8,7 @@ oro_rest_api_cget:
         group: rest_json_api
 
 oro_rest_api_get:
-    path: /api/{version}/{entity}/{id}.{_format}
+    path: /api/{entity}/{id}.{_format}
     methods: [GET]
     defaults:
         _controller: OroApiBundle:RestApi:get

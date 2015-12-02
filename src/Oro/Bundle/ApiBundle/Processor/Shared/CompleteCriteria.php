@@ -92,15 +92,7 @@ class CompleteCriteria implements ProcessorInterface
      */
     protected function getJoinPathMap(Criteria $criteria)
     {
-        $whereExpr = $criteria->getWhereExpression();
-        if (!$whereExpr) {
-            return [];
-        }
-
-        $visitor = new FieldVisitor();
-        $visitor->dispatch($whereExpr);
-
-        $fields = $visitor->getFields();
+        $fields = $this->getFields($criteria);
 
         $pathMap = [];
         foreach ($fields as $field) {
@@ -120,6 +112,32 @@ class CompleteCriteria implements ProcessorInterface
         }
 
         return $pathMap;
+    }
+
+    /**
+     * @param Criteria $criteria
+     *
+     * @return string[]
+     */
+    protected function getFields(Criteria $criteria)
+    {
+        $fields    = [];
+        $whereExpr = $criteria->getWhereExpression();
+        if ($whereExpr) {
+            $visitor = new FieldVisitor();
+            $visitor->dispatch($whereExpr);
+            $fields = $visitor->getFields();
+        }
+        $orderBy = $criteria->getOrderings();
+        if (!empty($orderBy)) {
+            foreach ($orderBy as $field => $direction) {
+                if (!in_array($field, $fields, true)) {
+                    $fields[] = $field;
+                }
+            }
+        }
+
+        return $fields;
     }
 
     /**

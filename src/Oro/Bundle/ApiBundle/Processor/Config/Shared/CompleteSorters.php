@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
@@ -39,11 +37,11 @@ class CompleteSorters implements ProcessorInterface
         $fields = ConfigUtil::getArrayValue($sorters, ConfigUtil::FIELDS);
 
         if (ConfigUtil::isExcludeAll($sorters)) {
-            $fields = $this->removeExclusions($sorters);
+            $fields = ConfigUtil::removeExclusions($sorters);
         } else {
             $entityClass = $context->getClassName();
             if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-                $fields = $this->removeExclusions(
+                $fields = ConfigUtil::removeExclusions(
                     $this->completeSorters($fields, $entityClass, $context->getResult())
                 );
             }
@@ -70,68 +68,24 @@ class CompleteSorters implements ProcessorInterface
 
         $fields = array_merge(
             array_keys($this->doctrineHelper->getIndexedFields($metadata)),
-            array_keys($this->doctrineHelper->getIndexedRelations($metadata))
+            array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
         );
         foreach ($fields as $fieldName) {
             if (array_key_exists($fieldName, $sorters)) {
                 // already defined
                 continue;
             }
-            $sorters[$fieldName] = [];
+            $sorters[$fieldName] = null;
         }
 
         if (!empty($config)) {
             foreach ($sorters as $fieldName => &$fieldConfig) {
-                if ($this->isExcludedField($config, $fieldName)) {
+                if (ConfigUtil::isExcludedField($config, $fieldName)) {
                     $fieldConfig[ConfigUtil::EXCLUDE] = true;
                 }
             }
         }
 
         return $sorters;
-    }
-
-    /**
-     * @param array $sorters
-     *
-     * @return array
-     */
-    protected function removeExclusions(array $sorters)
-    {
-        return array_filter(
-            $sorters,
-            function (array $config) {
-                return !ConfigUtil::isExclude($config);
-            }
-        );
-    }
-
-    /**
-     * @param array  $config
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    protected function isExcludedField(array $config, $fieldName)
-    {
-        $result = false;
-        if (isset($config[ConfigUtil::FIELDS])) {
-            $fields = $config[ConfigUtil::FIELDS];
-            if (!array_key_exists($fieldName, $fields)) {
-                $result = true;
-            } else {
-                $fieldConfig = $fields[$fieldName];
-                if (is_array($fieldConfig)) {
-                    if (array_key_exists(ConfigUtil::DEFINITION, $fieldConfig)) {
-                        $fieldConfig = $fieldConfig[ConfigUtil::DEFINITION];
-                    }
-                    if (is_array($fieldConfig) && ConfigUtil::isExclude($fieldConfig)) {
-                        $result = true;
-                    }
-                }
-            }
-        }
-
-        return $result;
     }
 }

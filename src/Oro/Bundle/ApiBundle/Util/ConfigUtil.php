@@ -49,7 +49,7 @@ class ConfigUtil extends BaseConfigUtil
      *
      * @return bool
      */
-    public static function isRelationInherit(array $config)
+    public static function isInherit(array $config)
     {
         return
             !isset($config[self::INHERIT])
@@ -70,5 +70,53 @@ class ConfigUtil extends BaseConfigUtil
                 isset($config[self::EXCLUSION_POLICY])
                 && $config[self::EXCLUSION_POLICY] !== self::EXCLUSION_POLICY_ALL
             );
+    }
+
+    /**
+     * Removes all fields marked with 'exclude' attribute.
+     *
+     * @param array $fields
+     *
+     * @return array
+     */
+    public static function removeExclusions(array $fields)
+    {
+        return array_filter(
+            $fields,
+            function ($config) {
+                return !is_array($config) || !self::isExclude($config);
+            }
+        );
+    }
+
+    /**
+     * Checks whether an entity has the given field and it is not marked with 'exclude' attribute.
+     *
+     * @param array  $config The config of an entity
+     * @param string $field  The name of the field
+     *
+     * @return bool
+     */
+    public static function isExcludedField(array $config, $field)
+    {
+        $result = false;
+        if (isset($config[ConfigUtil::FIELDS])) {
+            $fields = $config[ConfigUtil::FIELDS];
+            if (!array_key_exists($field, $fields)) {
+                $result = true;
+            } else {
+                $fieldConfig = $fields[$field];
+                if (is_array($fieldConfig)) {
+                    if (array_key_exists(ConfigUtil::DEFINITION, $fieldConfig)) {
+                        $fieldConfig = $fieldConfig[ConfigUtil::DEFINITION];
+                    }
+                    if (is_array($fieldConfig) && ConfigUtil::isExclude($fieldConfig)) {
+                        $result = true;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 }

@@ -9,7 +9,15 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class NormalizeEntityMetadata implements ProcessorInterface
+/**
+ * Expands metadata of root entity adding fields which are aliases on child associations.
+ * For example if there is a configuration of field like:
+ * addressName:
+ *      property_path: address.name
+ * we need to add the 'addressName' field and its metadata should be based on metadata
+ * of 'name' field of 'address' association.
+ */
+class NormalizeLinkedProperties implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -58,7 +66,10 @@ class NormalizeEntityMetadata implements ProcessorInterface
     {
         $fields = ConfigUtil::getArrayValue($config, ConfigUtil::FIELDS);
         foreach ($fields as $fieldName => $fieldConfig) {
-            if (null !== $fieldConfig && isset($fieldConfig[ConfigUtil::PROPERTY_PATH])) {
+            if (!$entityMetadata->hasProperty($fieldName)
+                && null !== $fieldConfig
+                && isset($fieldConfig[ConfigUtil::PROPERTY_PATH])
+            ) {
                 $path = ConfigUtil::explodePropertyPath($fieldConfig[ConfigUtil::PROPERTY_PATH]);
                 if (count($path) > 1) {
                     $this->addLinkedProperty($entityMetadata, $fieldName, $path);
@@ -69,27 +80,30 @@ class NormalizeEntityMetadata implements ProcessorInterface
 
     /**
      * @param EntityMetadata $entityMetadata
-     * @param string         $name
-     * @param string[]       $path
+     * @param string         $propertyName
+     * @param string[]       $propertyPath
      */
-    protected function addLinkedProperty(EntityMetadata $entityMetadata, $name, array $path)
+    protected function addLinkedProperty(EntityMetadata $entityMetadata, $propertyName, array $propertyPath)
     {
-        $linkedProperty = array_pop($path);
-        $classMetadata  = $this->doctrineHelper->findEntityMetadataByPath($entityMetadata->getClassName(), $path);
+        $linkedProperty = array_pop($propertyPath);
+        $classMetadata  = $this->doctrineHelper->findEntityMetadataByPath(
+            $entityMetadata->getClassName(),
+            $propertyPath
+        );
         if (null !== $classMetadata) {
             if ($classMetadata->hasAssociation($linkedProperty)) {
                 $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
                     $classMetadata,
                     $linkedProperty
                 );
-                $associationMetadata->setName($name);
+                $associationMetadata->setName($propertyName);
                 $entityMetadata->addAssociation($associationMetadata);
             } else {
                 $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
                     $classMetadata,
                     $linkedProperty
                 );
-                $fieldMetadata->setName($name);
+                $fieldMetadata->setName($propertyName);
                 $entityMetadata->addField($fieldMetadata);
             }
         }
