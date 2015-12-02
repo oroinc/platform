@@ -72,6 +72,7 @@ class ValueNormalizer
      * @param string|null $arrayDelimiter
      *
      * @return NormalizeValueContext
+     * @throws \Exception
      */
     protected function doNormalization($dataType, $requestType, $value = null, $arrayDelimiter = null)
     {
