@@ -126,6 +126,7 @@ define(function(require) {
         dispose: function() {
             if (this.isCreated) {
                 this.trigger('disposeResource');
+                this.isCreated = false;
             }
             MultiUseResourceManager.__super__.dispose.call(this);
         }
