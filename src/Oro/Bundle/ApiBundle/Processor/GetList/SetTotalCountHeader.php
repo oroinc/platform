@@ -7,11 +7,11 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\DoctrineUtils\ORM\SqlQuery;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
-use Oro\Bundle\EntityBundle\ORM\SqlQuery;
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 
 class SetTotalCountHeader implements ProcessorInterface
 {

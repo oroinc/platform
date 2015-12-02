@@ -5,8 +5,11 @@ namespace Oro\Component\EntitySerializer;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 class QueryFactory
 {
@@ -54,9 +57,16 @@ class QueryFactory
 
         $qb = $this->doctrineHelper->getEntityRepository($associationMapping['targetEntity'])
             ->createQueryBuilder('r')
-            ->select(sprintf('e.%s as entityId', $entityIdField))
-            ->where(sprintf('e.%s IN (:ids)', $entityIdField))
-            ->setParameter('ids', $entityIds);
+            ->select(sprintf('e.%s as entityId', $entityIdField));
+        if (count($entityIds) === 1) {
+            $qb
+                ->where(sprintf('e.%s = :id', $entityIdField))
+                ->setParameter('id', reset($entityIds));
+        } else {
+            $qb
+                ->where(sprintf('e.%s IN (:ids)', $entityIdField))
+                ->setParameter('ids', $entityIds);
+        }
         if ($associationMapping['mappedBy'] && $associationMapping['type'] === ClassMetadata::ONE_TO_MANY) {
             $qb->innerJoin(
                 $associationMapping['sourceEntity'],
@@ -74,6 +84,77 @@ class QueryFactory
         }
 
         return $qb;
+    }
+
+    /**
+     * @param array $associationMapping
+     * @param array $entityIds
+     * @param array $config
+     *
+     * @return array [['entityId' => mixed, 'relatedEntityId' => mixed], ...]
+     */
+    public function getRelatedItemsIds($associationMapping, $entityIds, $config)
+    {
+        $limit = isset($config[ConfigUtil::MAX_RESULTS])
+            ? $config[ConfigUtil::MAX_RESULTS]
+            : -1;
+        if ($limit > 0 && count($entityIds) > 1) {
+            $selectStmt = null;
+            $subQueries = [];
+            foreach ($entityIds as $id) {
+                $subQuery = $this->getRelatedItemsIdsQuery($associationMapping, [$id], $config);
+                $subQuery->setMaxResults($limit);
+                $subQueries[] = QueryUtils::getExecutableSql($subQuery);
+                if (null === $selectStmt) {
+                    $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
+                    $selectStmt = sprintf(
+                        'entity.%s AS entityId, entity.%s AS relatedEntityId',
+                        QueryUtils::getColumnNameByAlias($mapping, 'entityId'),
+                        QueryUtils::getColumnNameByAlias($mapping, 'relatedEntityId')
+                    );
+                }
+            }
+            $rsm = new ResultSetMapping();
+            $rsm
+                ->addScalarResult('entityId', 'entityId')
+                ->addScalarResult('relatedEntityId', 'relatedEntityId');
+            $qb = new SqlQueryBuilder(
+                $this->doctrineHelper->getEntityManager($associationMapping['targetEntity']),
+                $rsm
+            );
+            $qb
+                ->select($selectStmt)
+                ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
+            $rows = $qb->getQuery()->getScalarResult();
+        } else {
+            $query = $this->getRelatedItemsIdsQuery($associationMapping, $entityIds, $config);
+            if ($limit >= 0) {
+                $query->setMaxResults($limit);
+            }
+            $rows = $query->getScalarResult();
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array $associationMapping
+     * @param array $entityIds
+     * @param array $config
+     *
+     * @return Query
+     */
+    protected function getRelatedItemsIdsQuery($associationMapping, $entityIds, $config)
+    {
+        $qb = $this->getToManyAssociationQueryBuilder($associationMapping, $entityIds)
+            ->addSelect(
+                sprintf(
+                    'r.%s as relatedEntityId',
+                    $this->doctrineHelper->getEntityIdFieldName($associationMapping['targetEntity'])
+                )
+            );
+
+        return $this->getQuery($qb, $config);
     }
 
     /**

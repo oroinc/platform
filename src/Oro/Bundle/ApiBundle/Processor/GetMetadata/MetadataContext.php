@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
+use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 class MetadataContext extends ApiContext
@@ -12,8 +13,11 @@ class MetadataContext extends ApiContext
     /** the configuration of an entity */
     const CONFIG = 'config';
 
-    /** additional metadata information that should be returned */
+    /** additional metadata information that should be retrieved */
     const EXTRA = 'extra';
+
+    /** @var MetadataExtraInterface[] */
+    protected $extras = [];
 
     public function __construct()
     {
@@ -61,34 +65,48 @@ class MetadataContext extends ApiContext
     }
 
     /**
-     * Checks if the specified additional metadata information is requested.
+     * Checks if the specified additional metadata is requested.
      *
-     * @param string $extra
+     * @param string $extraName
      *
      * @return bool
      */
-    public function hasExtra($extra)
+    public function hasExtra($extraName)
     {
-        return in_array($extra, $this->get(self::EXTRA), true);
+        return in_array($extraName, $this->get(self::EXTRA), true);
     }
 
     /**
-     * Gets requested additional metadata information.
+     * Gets a list of requested additional metadata.
      *
-     * @return string[]
+     * @return MetadataExtraInterface[]
      */
     public function getExtras()
     {
-        return $this->get(self::EXTRA);
+        return $this->extras;
     }
 
     /**
-     * Sets additional metadata information that you need to be returned.
+     * Sets additional metadata that you need.
      *
-     * @param string[] $extras
+     * @param MetadataExtraInterface[] $extras
+     *
+     * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setExtras($extras)
+    public function setExtras(array $extras)
     {
-        $this->set(self::EXTRA, $extras);
+        $names = [];
+        foreach ($extras as $extra) {
+            if (!$extra instanceof MetadataExtraInterface) {
+                throw new \InvalidArgumentException(
+                    'Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".'
+                );
+            }
+            $names[] = $extra->getName();
+            $extra->configureContext($this);
+        }
+
+        $this->extras = $extras;
+        $this->set(self::EXTRA, $names);
     }
 }

@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
+namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
+
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
 class QueryUtilsTest extends \PHPUnit_Framework_TestCase
 {
@@ -97,7 +98,7 @@ class QueryUtilsTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
+     * @expectedException \Doctrine\ORM\Query\QueryException
      * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has several root aliases. "root_alias1, root_alias1".
      */
     // @codingStandardsIgnoreEnd
@@ -116,7 +117,7 @@ class QueryUtilsTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
+     * @expectedException \Doctrine\ORM\Query\QueryException
      * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has no any root aliases.
      */
     // @codingStandardsIgnoreEnd

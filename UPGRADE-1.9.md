@@ -47,7 +47,10 @@ UPGRADE FROM 1.8 to 1.9
 - Bundle now contains configuration of security firewall `embedded_form`
 
 ####EntityBundle
-- Methods `getSingleRootAlias`, `getPageOffset`, `applyJoins` and `normalizeCriteria` of `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` marked as deprecated. Use corresponding methods of `Oro\Bundle\EntityBundle\ORM\QueryUtils` instead.
+- Class `Oro\Bundle\EntityBundle\ORM\QueryUtils` marked as deprecated. Use `Oro\Component\DoctrineUtils\ORM\QueryUtils` instead.
+- Class `Oro\Bundle\EntityBundle\ORM\SqlQuery` marked as deprecated. Use `Oro\Component\DoctrineUtils\ORM\SqlQuery` instead.
+- Class `Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder` marked as deprecated. Use `Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder` instead.
+- Methods `getSingleRootAlias`, `getPageOffset`, `applyJoins` and `normalizeCriteria` of `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` marked as deprecated. Use corresponding methods of `Oro\Component\DoctrineUtils\ORM\QueryUtils` instead.
 - `oro_entity.entity_hierarchy_provider` service was marked as private.
 - `oro_entity.entity_hierarchy_provider.class` parameter was removed.
 - `oro_entity.entity_hierarchy_provider.all` service was added. It can be used if you need a hierarchy of all entities but not only configurable ones.

@@ -2,16 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigContext extends ApiContext
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
-    /** a list of additional configuration data that should be returned, for example "filters", "sorters", etc. */
+    /** the maximum number of related entities that can be retrieved */
+    const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
+
+    /** a list of additional configuration data that should be retrieved */
     const EXTRA = 'extra';
+
+    /** @var ConfigExtraInterface[] */
+    protected $extras = [];
 
     public function __construct()
     {
@@ -39,35 +47,69 @@ class ConfigContext extends ApiContext
     }
 
     /**
+     * Gets the maximum number of related entities that can be retrieved
+     *
+     * @return int|null
+     */
+    public function getMaxRelatedEntities()
+    {
+        return $this->get(self::MAX_RELATED_ENTITIES);
+    }
+
+    /**
+     * Sets the maximum number of related entities that can be retrieved
+     *
+     * @param int $limit
+     */
+    public function setMaxRelatedEntities($limit)
+    {
+        $this->set(self::MAX_RELATED_ENTITIES, $limit);
+    }
+
+    /**
      * Checks if the specified additional configuration data is requested.
      *
-     * @param string $extra
+     * @param string $extraName
      *
      * @return bool
      */
-    public function hasExtra($extra)
+    public function hasExtra($extraName)
     {
-        return in_array($extra, $this->get(self::EXTRA), true);
+        return in_array($extraName, $this->get(self::EXTRA), true);
     }
 
     /**
-     * Gets a list of requested additional configuration data, for example "filters", "sorters", etc.
+     * Gets a list of requested additional configuration data.
      *
-     * @return string[]
+     * @return ConfigExtraInterface[]
      */
     public function getExtras()
     {
-        return $this->get(self::EXTRA);
+        return $this->extras;
     }
 
     /**
-     * Sets additional configuration data that you need to be returned, for example "filters", "sorters", etc.
+     * Sets additional configuration data that you need.
      *
-     * @param string[] $extras
+     * @param ConfigExtraInterface[] $extras
+     *
+     * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setExtras($extras)
+    public function setExtras(array $extras)
     {
-        $this->set(self::EXTRA, $extras);
+        $names = [];
+        foreach ($extras as $extra) {
+            if (!$extra instanceof ConfigExtraInterface) {
+                throw new \InvalidArgumentException(
+                    'Expected an array of "Oro\Bundle\ApiBundle\Config\ConfigExtraInterface".'
+                );
+            }
+            $names[] = $extra->getName();
+            $extra->configureContext($this);
+        }
+
+        $this->extras = $extras;
+        $this->set(self::EXTRA, $names);
     }
 
     /**
@@ -77,7 +119,7 @@ class ConfigContext extends ApiContext
      */
     public function hasFilters()
     {
-        return $this->has(ConfigUtil::FILTERS);
+        return $this->has(FiltersConfigExtra::NAME);
     }
 
     /**
@@ -87,7 +129,7 @@ class ConfigContext extends ApiContext
      */
     public function getFilters()
     {
-        return $this->get(ConfigUtil::FILTERS);
+        return $this->get(FiltersConfigExtra::NAME);
     }
 
     /**
@@ -97,7 +139,7 @@ class ConfigContext extends ApiContext
      */
     public function setFilters($filters)
     {
-        $this->set(ConfigUtil::FILTERS, $filters);
+        $this->set(FiltersConfigExtra::NAME, $filters);
     }
 
     /**
@@ -107,7 +149,7 @@ class ConfigContext extends ApiContext
      */
     public function hasSorters()
     {
-        return $this->has(ConfigUtil::SORTERS);
+        return $this->has(SortersConfigExtra::NAME);
     }
 
     /**
@@ -117,7 +159,7 @@ class ConfigContext extends ApiContext
      */
     public function getSorters()
     {
-        return $this->get(ConfigUtil::SORTERS);
+        return $this->get(SortersConfigExtra::NAME);
     }
 
     /**
@@ -127,6 +169,6 @@ class ConfigContext extends ApiContext
      */
     public function setSorters($sorters)
     {
-        $this->set(ConfigUtil::SORTERS, $sorters);
+        $this->set(SortersConfigExtra::NAME, $sorters);
     }
 }

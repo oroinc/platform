@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\EntityBundle\ORM\SqlQuery;
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\SqlQuery;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 class LoadDataBySqlQuery implements ProcessorInterface
 {

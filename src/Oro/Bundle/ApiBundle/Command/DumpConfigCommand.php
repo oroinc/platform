@@ -9,7 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
+use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -74,9 +76,9 @@ class DumpConfigCommand extends ContainerAwareCommand
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
 
-        $extras = [ConfigExtra::FILTERS, ConfigExtra::SORTERS];
+        $extras = [new FiltersConfigExtra(), new SortersConfigExtra()];
         if ($input->getOption('with-descriptions')) {
-            $extras[] = ConfigExtra::DESCRIPTIONS;
+            $extras[] = new DescriptionsConfigExtra();
         }
 
         switch ($input->getOption('section')) {

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\FieldConfigProcessor;
 use Oro\Bundle\ApiBundle\Processor\Config\GetFieldConfig\FieldConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -25,11 +26,11 @@ class FieldConfigProvider
     /**
      * Gets a config for the given version of an entity.
      *
-     * @param string   $className   The FQCN of an entity
-     * @param string   $fieldName   The name of a field
-     * @param string   $version     The version of a config
-     * @param string   $requestType The type of API request, for example "rest", "soap", "odata", etc.
-     * @param string[] $extras      Additional configuration data, for example "filters", "sorters", etc.
+     * @param string                 $className   The FQCN of an entity
+     * @param string                 $fieldName   The name of a field
+     * @param string                 $version     The version of a config
+     * @param string                 $requestType The type of API request, for example "rest", "soap", "odata", etc.
+     * @param ConfigExtraInterface[] $extras      Additional configuration data.
      *
      * @return array|null
      */

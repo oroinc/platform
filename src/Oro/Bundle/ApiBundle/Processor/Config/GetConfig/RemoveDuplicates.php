@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
+use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 
 abstract class RemoveDuplicates implements ProcessorInterface
 {
