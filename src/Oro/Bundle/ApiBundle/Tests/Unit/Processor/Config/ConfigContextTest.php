@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config;
 
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigContextTest extends \PHPUnit_Framework_TestCase
@@ -24,23 +27,26 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->context->get(ConfigContext::CLASS_NAME));
     }
 
-    public function testMaxRelatedResults()
+    public function testMaxRelatedEntities()
     {
-        $this->assertNull($this->context->getMaxRelatedResults());
+        $this->assertNull($this->context->getMaxRelatedEntities());
 
-        $this->context->setMaxRelatedResults(123);
-        $this->assertEquals(123, $this->context->getMaxRelatedResults());
-        $this->assertEquals(123, $this->context->get(ConfigContext::MAX_RELATED_RESULTS));
+        $this->context->setMaxRelatedEntities(123);
+        $this->assertEquals(123, $this->context->getMaxRelatedEntities());
+        $this->assertEquals(123, $this->context->get(ConfigContext::MAX_RELATED_ENTITIES));
     }
 
     public function testExtras()
     {
         $this->assertSame([], $this->context->getExtras());
         $this->assertSame([], $this->context->get(ConfigContext::EXTRA));
+        $this->assertFalse($this->context->has('test'));
 
-        $this->context->setExtras(['test']);
-        $this->assertEquals(['test'], $this->context->getExtras());
+        $extras = [new TestConfigExtra('test')];
+        $this->context->setExtras($extras);
+        $this->assertEquals($extras, $this->context->getExtras());
         $this->assertEquals(['test'], $this->context->get(ConfigContext::EXTRA));
+        $this->assertTrue($this->context->has('test'));
 
         $this->context->setExtras([]);
         $this->assertSame([], $this->context->getExtras());
@@ -57,7 +63,7 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setFilters($filters);
         $this->assertTrue($this->context->hasFilters());
         $this->assertEquals($filters, $this->context->getFilters());
-        $this->assertEquals($filters, $this->context->get(ConfigUtil::FILTERS));
+        $this->assertEquals($filters, $this->context->get(FiltersConfigExtra::NAME));
 
         $this->context->setFilters(null);
         $this->assertTrue($this->context->hasFilters());
@@ -73,7 +79,7 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setSorters($sorters);
         $this->assertTrue($this->context->hasSorters());
         $this->assertEquals($sorters, $this->context->getSorters());
-        $this->assertEquals($sorters, $this->context->get(ConfigUtil::SORTERS));
+        $this->assertEquals($sorters, $this->context->get(SortersConfigExtra::NAME));
 
         $this->context->setSorters(null);
         $this->assertTrue($this->context->hasSorters());

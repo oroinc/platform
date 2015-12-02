@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class GetListContextTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,11 +29,11 @@ class GetListContextTest extends \PHPUnit_Framework_TestCase
         $this->context = new GetListContext($this->configProvider, $this->metadataProvider);
     }
 
-    public function testDefaultAccessorConfigSections()
+    public function testDefaultAccessorConfigExtras()
     {
         $this->assertEquals(
-            [ConfigUtil::FILTERS, ConfigUtil::SORTERS],
-            $this->context->getConfigSections()
+            [new FiltersConfigExtra(), new SortersConfigExtra()],
+            $this->context->getConfigExtras()
         );
     }
 

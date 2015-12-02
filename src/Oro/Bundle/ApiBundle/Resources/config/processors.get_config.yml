@@ -96,8 +96,8 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: sorters, priority: -110 }
 
-    oro_api.get_config.set_max_related_results:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedResults
+    oro_api.get_config.set_max_related_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities
         arguments:
             - @oro_api.doctrine_helper
         tags:

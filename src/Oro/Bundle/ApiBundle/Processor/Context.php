@@ -2,10 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
@@ -26,10 +31,7 @@ class Context extends ApiContext
     /** a prefix for all configuration sections */
     const CONFIG_PREFIX = 'config_';
 
-    /** a list of required additional configuration sections, for example "filters", "sorters", etc. */
-    const CONFIG_SECTIONS = 'configSections';
-
-    /** a list of requests for additional configuration data, for example "descriptions" */
+    /** a list of requests for additional configuration data */
     const CONFIG_EXTRAS = 'configExtras';
 
     /** metadata of an entity */
@@ -45,7 +47,7 @@ class Context extends ApiContext
     const CRITERIA = 'criteria';
 
     /** the maximum number of related entities that can be retrieved */
-    const MAX_RELATED_RESULTS = 'maxRelatedResults';
+    const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
 
     /**
      * this header can be used to request additional data like "total count"
@@ -88,7 +90,7 @@ class Context extends ApiContext
      */
     public function hasConfigOfFilters()
     {
-        return $this->hasConfigOf(ConfigUtil::FILTERS);
+        return $this->hasConfigOf(FiltersConfigExtra::NAME);
     }
 
     /**
@@ -98,7 +100,7 @@ class Context extends ApiContext
      */
     public function getConfigOfFilters()
     {
-        return $this->getConfigOf(ConfigUtil::FILTERS);
+        return $this->getConfigOf(FiltersConfigExtra::NAME);
     }
 
     /**
@@ -108,7 +110,7 @@ class Context extends ApiContext
      */
     public function setConfigOfFilters($config)
     {
-        $this->setConfigOf(ConfigUtil::FILTERS, $config);
+        $this->setConfigOf(FiltersConfigExtra::NAME, $config);
     }
 
     /**
@@ -118,7 +120,7 @@ class Context extends ApiContext
      */
     public function hasConfigOfSorters()
     {
-        return $this->hasConfigOf(ConfigUtil::SORTERS);
+        return $this->hasConfigOf(SortersConfigExtra::NAME);
     }
 
     /**
@@ -128,7 +130,7 @@ class Context extends ApiContext
      */
     public function getConfigOfSorters()
     {
-        return $this->getConfigOf(ConfigUtil::SORTERS);
+        return $this->getConfigOf(SortersConfigExtra::NAME);
     }
 
     /**
@@ -138,7 +140,7 @@ class Context extends ApiContext
      */
     public function setConfigOfSorters($config)
     {
-        $this->setConfigOf(ConfigUtil::SORTERS, $config);
+        $this->setConfigOf(SortersConfigExtra::NAME, $config);
     }
 
     /**
@@ -206,7 +208,7 @@ class Context extends ApiContext
             $entityClass,
             $this->getVersion(),
             $this->getRequestType(),
-            array_unique(array_merge($this->getConfigSections(), $this->getConfigExtras()))
+            $this->getConfigExtras()
         );
 
         // add loaded config sections to the context
@@ -230,11 +232,13 @@ class Context extends ApiContext
      */
     protected function ensureAllConfigSectionsSet()
     {
-        $configSections = $this->getConfigSections();
-        foreach ($configSections as $section) {
-            $key = self::CONFIG_PREFIX . $section;
-            if (!$this->has($key)) {
-                $this->set($key, null);
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface) {
+                $key = self::CONFIG_PREFIX . $configExtra->getName();
+                if (!$this->has($key)) {
+                    $this->set($key, null);
+                }
             }
         }
     }
@@ -376,12 +380,12 @@ class Context extends ApiContext
      * @param string $configSection
      *
      * @return bool
+     *
+     * @throws \InvalidArgumentException if undefined configuration section is specified
      */
     public function hasConfigOf($configSection)
     {
-        if (!in_array($configSection, $this->getConfigSections(), true)) {
-            throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
-        }
+        $this->assertConfigSection($configSection);
 
         return $this->has(self::CONFIG_PREFIX . $configSection);
     }
@@ -397,9 +401,7 @@ class Context extends ApiContext
      */
     public function getConfigOf($configSection)
     {
-        if (!in_array($configSection, $this->getConfigSections(), true)) {
-            throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
-        }
+        $this->assertConfigSection($configSection);
 
         $key = self::CONFIG_PREFIX . $configSection;
         if (!$this->has($key)) {
@@ -423,9 +425,7 @@ class Context extends ApiContext
      */
     public function setConfigOf($configSection, $config)
     {
-        if (!in_array($configSection, $this->getConfigSections(), true)) {
-            throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
-        }
+        $this->assertConfigSection($configSection);
 
         $this->set(self::CONFIG_PREFIX . $configSection, $config);
 
@@ -438,76 +438,9 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a list of required additional configuration sections, for example "filters", "sorters", etc.
+     * Gets a list of requests for additional configuration data.
      *
-     * @return string[]
-     */
-    public function getConfigSections()
-    {
-        $sections = $this->get(self::CONFIG_SECTIONS);
-
-        return null !== $sections
-            ? $sections
-            : [];
-    }
-
-    /**
-     * Sets a list of required additional configuration sections, for example "filters", "sorters", etc.
-     *
-     * @param string[] $sections
-     */
-    public function setConfigSections($sections)
-    {
-        if (empty($sections)) {
-            $this->remove(self::CONFIG_SECTIONS, $sections);
-        } else {
-            $this->set(self::CONFIG_SECTIONS, $sections);
-        }
-    }
-
-    /**
-     * Checks whether a section exists in a list of required additional configuration sections.
-     *
-     * @param string $section
-     *
-     * @return bool
-     */
-    public function hasConfigSection($section)
-    {
-        return in_array($section, $this->getConfigSections(), true);
-    }
-
-    /**
-     * Adds a section to a list of required additional configuration sections.
-     *
-     * @param string $section
-     */
-    public function addConfigSection($section)
-    {
-        $sections = $this->getConfigSections();
-        if (!in_array($section, $sections, true)) {
-            $sections[] = $section;
-            $this->setConfigSections($sections);
-        }
-    }
-
-    /**
-     * Removes a section from a list of required additional configuration sections.
-     *
-     * @param string $section
-     */
-    public function removeConfigSection($section)
-    {
-        $sections = $this->getConfigSections();
-        if (in_array($section, $sections, true)) {
-            $this->setConfigSections(array_values(array_diff($sections, [$section])));
-        }
-    }
-
-    /**
-     * Gets a list of requests for additional configuration data, for example "descriptions".
-     *
-     * @return string[]
+     * @return ConfigExtraInterface[]
      */
     public function getConfigExtras()
     {
@@ -519,12 +452,22 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a list of requests for additional configuration data, for example "descriptions".
+     * Sets a list of requests for additional configuration data.
      *
-     * @param string[] $extras
+     * @param ConfigExtraInterface[] $extras
+     *
+     * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setConfigExtras($extras)
+    public function setConfigExtras(array $extras)
     {
+        foreach ($extras as $configExtra) {
+            if (!$configExtra instanceof ConfigExtraInterface) {
+                throw new \InvalidArgumentException(
+                    'Expected an array of "Oro\Bundle\ApiBundle\Config\ConfigExtraInterface".'
+                );
+            }
+        }
+
         if (empty($extras)) {
             $this->remove(self::CONFIG_EXTRAS, $extras);
         } else {
@@ -535,40 +478,56 @@ class Context extends ApiContext
     /**
      * Checks whether some additional configuration data is requested.
      *
-     * @param string $extra
+     * @param string $extraName
      *
      * @return bool
      */
-    public function hasConfigExtra($extra)
+    public function hasConfigExtra($extraName)
     {
-        return in_array($extra, $this->getConfigExtras(), true);
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra->getName() === $extraName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Adds a request for some additional configuration data.
      *
-     * @param string $extra
+     * @param ConfigExtraInterface $extra
+     *
+     * @throws \InvalidArgumentException if a config extra with the same name already exists
      */
-    public function addConfigExtra($extra)
+    public function addConfigExtra(ConfigExtraInterface $extra)
     {
-        $extras = $this->getConfigExtras();
-        if (!in_array($extra, $extras, true)) {
-            $extras[] = $extra;
-            $this->setConfigExtras($extras);
+        if ($this->hasConfigExtra($extra->getName())) {
+            throw new \InvalidArgumentException(
+                sprintf('The "%s" config extra already exists.', $extra->getName())
+            );
         }
+        $extras   = $this->getConfigExtras();
+        $extras[] = $extra;
+        $this->setConfigExtras($extras);
     }
 
     /**
      * Removes a request for some additional configuration data.
      *
-     * @param string $extra
+     * @param string $extraName
      */
-    public function removeConfigExtra($extra)
+    public function removeConfigExtra($extraName)
     {
-        $extras = $this->getConfigExtras();
-        if (in_array($extra, $extras, true)) {
-            $this->setConfigExtras(array_values(array_diff($extras, [$extra])));
+        $configExtras = $this->getConfigExtras();
+        $keys         = array_keys($configExtras);
+        foreach ($keys as $key) {
+            if ($configExtras[$key]->getName() === $extraName) {
+                unset($configExtras[$key]);
+            }
         }
+        $this->setConfigExtras(array_values($configExtras));
     }
 
     /**
@@ -608,7 +567,7 @@ class Context extends ApiContext
     /**
      * Gets a list of requests for additional metadata info.
      *
-     * @return string[]
+     * @return MetadataExtraInterface[]
      */
     public function getMetadataExtras()
     {
@@ -622,10 +581,20 @@ class Context extends ApiContext
     /**
      * Sets a list of requests for additional metadata info.
      *
-     * @param string[] $extras
+     * @param MetadataExtraInterface[] $extras
+     *
+     * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setMetadataExtras($extras)
+    public function setMetadataExtras(array $extras)
     {
+        foreach ($extras as $configExtra) {
+            if (!$configExtra instanceof MetadataExtraInterface) {
+                throw new \InvalidArgumentException(
+                    'Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".'
+                );
+            }
+        }
+
         if (empty($extras)) {
             $this->remove(self::METADATA_EXTRAS, $extras);
         } else {
@@ -636,40 +605,56 @@ class Context extends ApiContext
     /**
      * Checks whether some additional metadata info is requested.
      *
-     * @param string $extra
+     * @param string $extraName
      *
      * @return bool
      */
-    public function hasMetadataExtra($extra)
+    public function hasMetadataExtra($extraName)
     {
-        return in_array($extra, $this->getMetadataExtras(), true);
+        $metadataExtras = $this->getMetadataExtras();
+        foreach ($metadataExtras as $metadataExtra) {
+            if ($metadataExtra->getName() === $extraName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Adds a request for some additional metadata info.
      *
-     * @param string $extra
+     * @param MetadataExtraInterface $extra
+     *
+     * @throws \InvalidArgumentException if a metadata extra with the same name already exists
      */
-    public function addMetadataExtra($extra)
+    public function addMetadataExtra(MetadataExtraInterface $extra)
     {
-        $extras = $this->getMetadataExtras();
-        if (!in_array($extra, $extras, true)) {
-            $extras[] = $extra;
-            $this->setMetadataExtras($extras);
+        if ($this->hasMetadataExtra($extra->getName())) {
+            throw new \InvalidArgumentException(
+                sprintf('The "%s" metadata extra already exists.', $extra->getName())
+            );
         }
+        $extras   = $this->getMetadataExtras();
+        $extras[] = $extra;
+        $this->setMetadataExtras($extras);
     }
 
     /**
      * Removes a request for some additional metadata info.
      *
-     * @param string $extra
+     * @param string $extraName
      */
-    public function removeMetadataExtra($extra)
+    public function removeMetadataExtra($extraName)
     {
-        $extras = $this->getMetadataExtras();
-        if (in_array($extra, $extras, true)) {
-            $this->setMetadataExtras(array_values(array_diff($extras, [$extra])));
+        $metadataExtras = $this->getMetadataExtras();
+        $keys           = array_keys($metadataExtras);
+        foreach ($keys as $key) {
+            if ($metadataExtras[$key]->getName() === $extraName) {
+                unset($metadataExtras[$key]);
+            }
         }
+        $this->setMetadataExtras(array_values($metadataExtras));
     }
 
     /**
@@ -727,9 +712,9 @@ class Context extends ApiContext
      *
      * @return int|null
      */
-    public function getMaxRelatedResults()
+    public function getMaxRelatedEntities()
     {
-        return $this->get(self::MAX_RELATED_RESULTS);
+        return $this->get(self::MAX_RELATED_ENTITIES);
     }
 
     /**
@@ -737,8 +722,28 @@ class Context extends ApiContext
      *
      * @param int $limit
      */
-    public function setMaxRelatedResults($limit)
+    public function setMaxRelatedEntities($limit)
     {
-        $this->set(self::MAX_RELATED_RESULTS, $limit);
+        $this->set(self::MAX_RELATED_ENTITIES, $limit);
+    }
+
+    /**
+     * @param string $configSection
+     *
+     * @throws \InvalidArgumentException if undefined configuration section is specified
+     */
+    protected function assertConfigSection($configSection)
+    {
+        $valid        = false;
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface && $configSection === $configExtra->getName()) {
+                $valid = true;
+                break;
+            }
+        }
+        if (!$valid) {
+            throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
+        }
     }
 }

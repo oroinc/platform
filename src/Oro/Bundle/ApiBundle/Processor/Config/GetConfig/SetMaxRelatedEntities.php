@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class SetMaxRelatedResults implements ProcessorInterface
+class SetMaxRelatedEntities implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -29,8 +29,8 @@ class SetMaxRelatedResults implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        $maxRelatedResults = $context->getMaxRelatedResults();
-        if (null === $maxRelatedResults || $maxRelatedResults < 0) {
+        $maxRelatedEntities = $context->getMaxRelatedEntities();
+        if (null === $maxRelatedEntities || $maxRelatedEntities < 0) {
             // there is no limit to the number of related entities
             return;
         }
@@ -47,7 +47,7 @@ class SetMaxRelatedResults implements ProcessorInterface
             return;
         }
 
-        $this->setLimits($definition, $entityClass, $maxRelatedResults);
+        $this->setLimits($definition, $entityClass, $maxRelatedEntities);
         $context->setResult($definition);
     }
 

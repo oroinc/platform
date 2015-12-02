@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ContextTest extends \PHPUnit_Framework_TestCase
@@ -172,18 +174,20 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadConfigByGetConfig()
     {
-        $version        = '1.1';
-        $requestType    = 'rest';
-        $entityClass    = 'Test\Class';
-        $configSections = ['section1', 'section2'];
-        $configExtras   = ['extra1'];
+        $version      = '1.1';
+        $requestType  = 'rest';
+        $entityClass  = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2'),
+            new TestConfigExtra('extra1')
+        ];
 
         $config         = ConfigUtil::getInitialConfig();
         $section1Config = ['test'];
 
         $this->context->setVersion($version);
         $this->context->setRequestType($requestType);
-        $this->context->setConfigSections($configSections);
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
@@ -193,7 +197,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 $entityClass,
                 $version,
                 $requestType,
-                array_merge($configSections, $configExtras)
+                $configExtras
             )
             ->willReturn(
                 [
@@ -228,17 +232,20 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadConfigByGetConfigOf()
     {
-        $version        = '1.1';
-        $requestType    = 'rest';
-        $entityClass    = 'Test\Class';
-        $configSections = ['section1', 'section2'];
+        $version      = '1.1';
+        $requestType  = 'rest';
+        $entityClass  = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
 
         $config         = ConfigUtil::getInitialConfig();
         $section1Config = ['test'];
 
         $this->context->setVersion($version);
         $this->context->setRequestType($requestType);
-        $this->context->setConfigSections($configSections);
+        $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
         $this->configProvider->expects($this->once())
@@ -247,7 +254,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 $entityClass,
                 $version,
                 $requestType,
-                $configSections
+                $configExtras
             )
             ->willReturn(
                 [
@@ -293,7 +300,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $config = ConfigUtil::getInitialConfig();
 
-        $this->context->setConfigSections(['section1']);
+        $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
 
         $this->configProvider->expects($this->never())
@@ -316,7 +323,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $section1Config = ['test'];
 
-        $this->context->setConfigSections(['section1', 'section2']);
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
+
+        $this->context->setConfigExtras($configExtras);
         $this->context->setClassName('Test\Class');
 
         $this->configProvider->expects($this->never())
@@ -345,7 +357,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetConfigOfUndefinedSection()
     {
-        $this->context->setConfigSections(['section1']);
+        $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
 
         $this->configProvider->expects($this->never())
@@ -359,7 +371,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetConfigOfUndefinedSection()
     {
-        $this->context->setConfigSections(['section1']);
+        $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
 
         $this->configProvider->expects($this->never())
@@ -387,7 +399,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setClassName('Test\Class');
         // set "known" sections
-        $this->context->setConfigSections([ConfigUtil::FILTERS, ConfigUtil::SORTERS]);
+        $this->context->setConfigExtras([new FiltersConfigExtra(), new SortersConfigExtra()]);
 
         $this->configProvider->expects($this->once())
             ->method('getConfig')
@@ -395,8 +407,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         // test that a config is not loaded yet
         $this->assertFalse($this->context->hasConfig());
-        foreach ($this->context->getConfigSections() as $section) {
-            $this->assertFalse($this->context->{'hasConfigOf' . lcfirst($section)}());
+        foreach ($this->context->getConfigExtras() as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface) {
+                $this->assertFalse($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
+            }
         }
 
         $suffix = lcfirst($configSection);
@@ -406,10 +420,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->context->hasConfig());
         $this->assertEquals($mainConfig, $this->context->getConfig());
 
-        foreach ($this->context->getConfigSections() as $section) {
-            if ($section !== $configSection) {
-                $this->assertTrue($this->context->{'hasConfigOf' . lcfirst($section)}());
-                $this->assertNull($this->context->{'getConfigOf' . lcfirst($section)}());
+        foreach ($this->context->getConfigExtras() as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface && $configExtra->getName() !== $configSection) {
+                $this->assertTrue($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
+                $this->assertNull($this->context->{'getConfigOf' . lcfirst($configExtra->getName())}());
             }
         }
     }
@@ -423,7 +437,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setClassName('Test\Class');
         // set "known" sections
-        $this->context->setConfigSections([ConfigUtil::FILTERS, ConfigUtil::SORTERS]);
+        $this->context->setConfigExtras([new FiltersConfigExtra(), new SortersConfigExtra()]);
 
         $this->configProvider->expects($this->never())
             ->method('getConfig');
@@ -434,10 +448,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->context->{'hasConfigOf' . $suffix}());
         $this->assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}());
 
-        foreach ($this->context->getConfigSections() as $section) {
-            if ($section !== $configSection) {
-                $this->assertTrue($this->context->{'hasConfigOf' . lcfirst($section)}());
-                $this->assertNull($this->context->{'getConfigOf' . lcfirst($section)}());
+        foreach ($this->context->getConfigExtras() as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface && $configExtra->getName() !== $configSection) {
+                $this->assertTrue($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
+                $this->assertNull($this->context->{'getConfigOf' . lcfirst($configExtra->getName())}());
             }
         }
 
@@ -448,8 +462,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function configSectionProvider()
     {
         return [
-            [ConfigUtil::FILTERS],
-            [ConfigUtil::SORTERS]
+            [FiltersConfigExtra::NAME],
+            [SortersConfigExtra::NAME]
         ];
     }
 
@@ -478,90 +492,79 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($accessor, $this->context->getFilterValues());
     }
 
-    public function testConfigSections()
-    {
-        $this->assertSame([], $this->context->getConfigSections());
-        $this->assertNull($this->context->get(Context::CONFIG_SECTIONS));
-
-        $this->context->setConfigSections(['test']);
-        $this->assertEquals(['test'], $this->context->getConfigSections());
-        $this->assertEquals(['test'], $this->context->get(Context::CONFIG_SECTIONS));
-
-        $this->assertTrue($this->context->hasConfigSection('test'));
-        $this->assertFalse($this->context->hasConfigSection('another'));
-
-        $this->context->addConfigSection('another');
-        $this->assertEquals(['test', 'another'], $this->context->getConfigSections());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::CONFIG_SECTIONS));
-
-        // test add of already existing section
-        $this->context->addConfigSection('another');
-        $this->assertEquals(['test', 'another'], $this->context->getConfigSections());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::CONFIG_SECTIONS));
-
-        $this->context->removeConfigSection('test');
-        $this->assertEquals(['another'], $this->context->getConfigSections());
-        $this->assertEquals(['another'], $this->context->get(Context::CONFIG_SECTIONS));
-
-        // test remove of non existing section
-        $this->context->removeConfigSection('test');
-        $this->assertEquals(['another'], $this->context->getConfigSections());
-        $this->assertEquals(['another'], $this->context->get(Context::CONFIG_SECTIONS));
-
-        $this->context->setConfigSections([]);
-        $this->assertSame([], $this->context->getConfigSections());
-        $this->assertNull($this->context->get(Context::CONFIG_SECTIONS));
-    }
-
     public function testConfigExtras()
     {
         $this->assertSame([], $this->context->getConfigExtras());
         $this->assertNull($this->context->get(Context::CONFIG_EXTRAS));
 
-        $this->context->setConfigExtras(['test']);
-        $this->assertEquals(['test'], $this->context->getConfigExtras());
-        $this->assertEquals(['test'], $this->context->get(Context::CONFIG_EXTRAS));
+        $configExtras = [new TestConfigExtra('test')];
+        $this->context->setConfigExtras($configExtras);
+        $this->assertEquals($configExtras, $this->context->getConfigExtras());
+        $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         $this->assertTrue($this->context->hasConfigExtra('test'));
         $this->assertFalse($this->context->hasConfigExtra('another'));
 
-        $this->context->addConfigExtra('another');
-        $this->assertEquals(['test', 'another'], $this->context->getConfigExtras());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::CONFIG_EXTRAS));
+        $anotherConfigExtra = new TestConfigExtra('another');
+        $configExtras[]     = $anotherConfigExtra;
+        $this->context->addConfigExtra($anotherConfigExtra);
+        $this->assertEquals($configExtras, $this->context->getConfigExtras());
+        $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
-        // test add of already existing extra
-        $this->context->addConfigExtra('another');
-        $this->assertEquals(['test', 'another'], $this->context->getConfigExtras());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::CONFIG_EXTRAS));
-
+        unset($configExtras[0]);
+        $configExtras = array_values($configExtras);
         $this->context->removeConfigExtra('test');
-        $this->assertEquals(['another'], $this->context->getConfigExtras());
-        $this->assertEquals(['another'], $this->context->get(Context::CONFIG_EXTRAS));
+        $this->assertEquals($configExtras, $this->context->getConfigExtras());
+        $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         // test remove of non existing extra
         $this->context->removeConfigExtra('test');
-        $this->assertEquals(['another'], $this->context->getConfigExtras());
-        $this->assertEquals(['another'], $this->context->get(Context::CONFIG_EXTRAS));
+        $this->assertEquals($configExtras, $this->context->getConfigExtras());
+        $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         $this->context->setConfigExtras([]);
         $this->assertSame([], $this->context->getConfigExtras());
         $this->assertNull($this->context->get(Context::CONFIG_EXTRAS));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Config\ConfigExtraInterface".
+     */
+    public function testSetInvalidConfigExtras()
+    {
+        $this->context->setConfigExtras(['test']);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "test" config extra already exists.
+     */
+    public function testAddDuplicateConfigExtra()
+    {
+        $configExtras = [new TestConfigExtra('test')];
+        $this->context->setConfigExtras($configExtras);
+
+        $this->context->addConfigExtra(new TestConfigExtra('test'));
+    }
+
     public function testLoadMetadata()
     {
-        $version        = '1.1';
-        $requestType    = 'rest';
-        $entityClass    = 'Test\Class';
-        $configSections = ['section1', 'section2'];
+        $version      = '1.1';
+        $requestType  = 'rest';
+        $entityClass  = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
 
         $config         = ConfigUtil::getInitialConfig();
         $metadata       = new EntityMetadata();
-        $metadataExtras = ['extra1'];
+        $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);
         $this->context->setRequestType($requestType);
-        $this->context->setConfigSections($configSections);
+        $this->context->setConfigExtras($configExtras);
         $this->context->setMetadataExtras($metadataExtras);
         $this->context->setClassName($entityClass);
 
@@ -571,7 +574,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 $entityClass,
                 $version,
                 $requestType,
-                $configSections
+                $configExtras
             )
             ->willReturn([ConfigUtil::DEFINITION => $config]);
         $this->metadataProvider->expects($this->once())
@@ -632,34 +635,55 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $this->context->getMetadataExtras());
         $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
 
-        $this->context->setMetadataExtras(['test']);
-        $this->assertEquals(['test'], $this->context->getMetadataExtras());
-        $this->assertEquals(['test'], $this->context->get(Context::METADATA_EXTRAS));
+        $metadataExtras = [new TestMetadataExtra('test')];
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->assertEquals($metadataExtras, $this->context->getMetadataExtras());
+        $this->assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         $this->assertTrue($this->context->hasMetadataExtra('test'));
         $this->assertFalse($this->context->hasMetadataExtra('another'));
 
-        $this->context->addMetadataExtra('another');
-        $this->assertEquals(['test', 'another'], $this->context->getMetadataExtras());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::METADATA_EXTRAS));
+        $anotherMetadataExtra = new TestMetadataExtra('another');
+        $metadataExtras[]     = $anotherMetadataExtra;
+        $this->context->addMetadataExtra($anotherMetadataExtra);
+        $this->assertEquals($metadataExtras, $this->context->getMetadataExtras());
+        $this->assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
-        // test add of already existing extra
-        $this->context->addMetadataExtra('another');
-        $this->assertEquals(['test', 'another'], $this->context->getMetadataExtras());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::METADATA_EXTRAS));
-
+        unset($metadataExtras[0]);
+        $metadataExtras = array_values($metadataExtras);
         $this->context->removeMetadataExtra('test');
-        $this->assertEquals(['another'], $this->context->getMetadataExtras());
-        $this->assertEquals(['another'], $this->context->get(Context::METADATA_EXTRAS));
+        $this->assertEquals($metadataExtras, $this->context->getMetadataExtras());
+        $this->assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         // test remove of non existing extra
         $this->context->removeMetadataExtra('test');
-        $this->assertEquals(['another'], $this->context->getMetadataExtras());
-        $this->assertEquals(['another'], $this->context->get(Context::METADATA_EXTRAS));
+        $this->assertEquals($metadataExtras, $this->context->getMetadataExtras());
+        $this->assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         $this->context->setMetadataExtras([]);
         $this->assertSame([], $this->context->getMetadataExtras());
         $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".
+     */
+    public function testSetInvalidMetadataExtras()
+    {
+        $this->context->setMetadataExtras(['test']);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "test" metadata extra already exists.
+     */
+    public function testAddDuplicateMetadataExtra()
+    {
+        $metadataExtras = [new TestMetadataExtra('test')];
+        $this->context->setMetadataExtras($metadataExtras);
+
+        $this->context->addMetadataExtra(new TestMetadataExtra('test'));
     }
 
     public function testQuery()
@@ -691,12 +715,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($criteria, $this->context->get(Context::CRITERIA));
     }
 
-    public function testMaxRelatedResults()
+    public function testMaxRelatedEntities()
     {
-        $this->assertNull($this->context->getMaxRelatedResults());
+        $this->assertNull($this->context->getMaxRelatedEntities());
 
-        $this->context->setMaxRelatedResults(123);
-        $this->assertEquals(123, $this->context->getMaxRelatedResults());
-        $this->assertEquals(123, $this->context->get(Context::MAX_RELATED_RESULTS));
+        $this->context->setMaxRelatedEntities(123);
+        $this->assertEquals(123, $this->context->getMaxRelatedEntities());
+        $this->assertEquals(123, $this->context->get(Context::MAX_RELATED_ENTITIES));
     }
 }

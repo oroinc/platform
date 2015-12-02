@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Processor\MetadataProcessor;
 
@@ -25,11 +26,11 @@ class MetadataProvider
     /**
      * Gets metadata for the given version of an entity.
      *
-     * @param string     $className   The FQCN of an entity
-     * @param string     $version     The version of a config
-     * @param string     $requestType The type of API request, for example "rest", "soap", "odata", etc.
-     * @param string[]   $extras      Additional metadata information, for example "descriptions"
-     * @param array|null $config      The configuration of an entity
+     * @param string                   $className   The FQCN of an entity
+     * @param string                   $version     The version of a config
+     * @param string                   $requestType The type of API request, for example "rest", "soap", "odata", etc.
+     * @param MetadataExtraInterface[] $extras      Additional metadata information
+     * @param array|null               $config      The configuration of an entity
      *
      * @return EntityMetadata|null
      */
