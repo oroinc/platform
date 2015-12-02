@@ -11,11 +11,10 @@
                 inline_editing: {
                     enable: true,
                     save_api_accessor: {
-                        not_array: true,
                         route: 'oro_api_post_taggable',
                         http_method: 'POST',
                         default_route_parameters: {
-                            entity: oro_class_alias(entity),
+                            entity: oro_class_name(entity, true),
                             entityId: entity.id
                         }
                     },

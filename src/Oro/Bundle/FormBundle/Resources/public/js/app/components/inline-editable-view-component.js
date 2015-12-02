@@ -169,11 +169,11 @@ define(function(require) {
         }
     }, {
         onSaveSuccess: function() {
-            if (!this.cell.disposed && this.cell.$el) {
+            if (!this.wrapper.disposed && this.wrapper.$el) {
                 var _this = this;
-                this.cell.$el.addClass('save-success');
+                this.wrapper.$el.addClass('save-success');
                 _.delay(function() {
-                    _this.cell.$el.removeClass('save-success');
+                    _this.wrapper.$el.removeClass('save-success');
                 }, 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
@@ -181,14 +181,14 @@ define(function(require) {
 
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
-            if (!this.cell.disposed && this.cell.$el) {
+            if (!this.wrapper.disposed && this.wrapper.$el) {
                 var _this = this;
-                this.cell.$el.addClass('save-fail');
+                this.wrapper.$el.addClass('save-fail');
                 _.delay(function() {
-                    _this.cell.$el.removeClass('save-fail');
+                    _this.wrapper.$el.removeClass('save-fail');
                 }, 2000);
             }
-            this.cell.model.set(this.oldState);
+            this.wrapper.model.set(this.oldState);
             this.main.trigger('content:update');
 
             var errors = [];
