@@ -134,7 +134,7 @@ class RestRequestHeaders extends AbstractParameterBag
         }
 
         $result = 0;
-        foreach ($this->parameters as $key => $parameter) {
+        foreach ($this->parameters as $parameter) {
             if (false !== $parameter) {
                 $result++;
             }

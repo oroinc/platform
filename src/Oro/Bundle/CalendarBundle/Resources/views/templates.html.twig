@@ -38,6 +38,7 @@
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
+                {% placeholder calendar_event_widget_view_additional_properties %}
             </div>
             <div class="widget-actions form-actions" style="display: none;">
                 <% if (id != null && removable) { %>

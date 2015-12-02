@@ -6,6 +6,9 @@ use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
+use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -13,6 +16,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class Context extends ApiContext
 {
@@ -49,6 +53,12 @@ class Context extends ApiContext
      */
     const INCLUDE_HEADER = 'X-Include';
 
+    /** a list of filters is used to add additional restrictions to a query is used to get result data */
+    const FILTERS = 'filters';
+
+    /** @var FilterValueAccessorInterface */
+    private $filterValues;
+
     /** @var ConfigProvider */
     protected $configProvider;
 
@@ -69,6 +79,104 @@ class Context extends ApiContext
     {
         $this->configProvider   = $configProvider;
         $this->metadataProvider = $metadataProvider;
+    }
+
+    /**
+     * Checks whether a configuration of filters for an entity exists
+     *
+     * @return bool
+     */
+    public function hasConfigOfFilters()
+    {
+        return $this->hasConfigOf(ConfigUtil::FILTERS);
+    }
+
+    /**
+     * Gets a configuration of filters for an entity
+     *
+     * @return array|null
+     */
+    public function getConfigOfFilters()
+    {
+        return $this->getConfigOf(ConfigUtil::FILTERS);
+    }
+
+    /**
+     * Sets a configuration of filters for an entity
+     *
+     * @param array|null $config
+     */
+    public function setConfigOfFilters($config)
+    {
+        $this->setConfigOf(ConfigUtil::FILTERS, $config);
+    }
+
+    /**
+     * Checks whether a configuration of sorters for an entity exists
+     *
+     * @return bool
+     */
+    public function hasConfigOfSorters()
+    {
+        return $this->hasConfigOf(ConfigUtil::SORTERS);
+    }
+
+    /**
+     * Gets a configuration of sorters for an entity
+     *
+     * @return array|null
+     */
+    public function getConfigOfSorters()
+    {
+        return $this->getConfigOf(ConfigUtil::SORTERS);
+    }
+
+    /**
+     * Sets a configuration of sorters for an entity
+     *
+     * @param array|null $config
+     */
+    public function setConfigOfSorters($config)
+    {
+        $this->setConfigOf(ConfigUtil::SORTERS, $config);
+    }
+
+    /**
+     * Gets a list of filters is used to add additional restrictions to a query is used to get result data
+     *
+     * @return FilterCollection
+     */
+    public function getFilters()
+    {
+        if (!$this->has(self::FILTERS)) {
+            $this->set(self::FILTERS, new FilterCollection());
+        }
+
+        return $this->get(self::FILTERS);
+    }
+
+    /**
+     * Gets a collection of the FilterValue objects that contains all incoming filters
+     *
+     * @return FilterValueAccessorInterface
+     */
+    public function getFilterValues()
+    {
+        if (null === $this->filterValues) {
+            $this->filterValues = new NullFilterValueAccessor();
+        }
+
+        return $this->filterValues;
+    }
+
+    /**
+     * Sets an object that will be used to accessing incoming filters
+     *
+     * @param FilterValueAccessorInterface $accessor
+     */
+    public function setFilterValues(FilterValueAccessorInterface $accessor)
+    {
+        $this->filterValues = $accessor;
     }
 
     /**

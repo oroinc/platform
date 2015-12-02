@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ContextTest extends \PHPUnit_Framework_TestCase
@@ -365,6 +366,116 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig');
 
         $this->context->setConfigOf('undefined', []);
+    }
+
+    /**
+     * @dataProvider configSectionProvider
+     */
+    public function testLoadKnownSectionConfigByGetConfigOf($configSection)
+    {
+        $mainConfig    = ConfigUtil::getInitialConfig();
+        $sectionConfig = ConfigUtil::getInitialConfig();
+
+        $mainConfig[ConfigUtil::FIELDS]['field1']    = null;
+        $mainConfig[ConfigUtil::FIELDS]['field2']    = null;
+        $sectionConfig[ConfigUtil::FIELDS]['field1'] = null;
+
+        $config = [
+            ConfigUtil::DEFINITION => $mainConfig,
+            $configSection         => $sectionConfig
+        ];
+
+        $this->context->setClassName('Test\Class');
+        // set "known" sections
+        $this->context->setConfigSections([ConfigExtra::FILTERS, ConfigExtra::SORTERS]);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($config);
+
+        // test that a config is not loaded yet
+        $this->assertFalse($this->context->hasConfig());
+        foreach ($this->context->getConfigSections() as $section) {
+            $this->assertFalse($this->context->{'hasConfigOf' . lcfirst($section)}());
+        }
+
+        $suffix = lcfirst($configSection);
+        $this->assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}()); // load config
+        $this->assertTrue($this->context->{'hasConfigOf' . $suffix}());
+
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertEquals($mainConfig, $this->context->getConfig());
+
+        foreach ($this->context->getConfigSections() as $section) {
+            if ($section !== $configSection) {
+                $this->assertTrue($this->context->{'hasConfigOf' . lcfirst($section)}());
+                $this->assertNull($this->context->{'getConfigOf' . lcfirst($section)}());
+            }
+        }
+    }
+
+    /**
+     * @dataProvider configSectionProvider
+     */
+    public function testConfigWhenIsSetExplicitlyForKnownSection($configSection)
+    {
+        $sectionConfig = ConfigUtil::getInitialConfig();
+
+        $this->context->setClassName('Test\Class');
+        // set "known" sections
+        $this->context->setConfigSections([ConfigExtra::FILTERS, ConfigExtra::SORTERS]);
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $suffix = lcfirst($configSection);
+        $this->context->{'setConfigOf' . $suffix}($sectionConfig);
+
+        $this->assertTrue($this->context->{'hasConfigOf' . $suffix}());
+        $this->assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}());
+
+        foreach ($this->context->getConfigSections() as $section) {
+            if ($section !== $configSection) {
+                $this->assertTrue($this->context->{'hasConfigOf' . lcfirst($section)}());
+                $this->assertNull($this->context->{'getConfigOf' . lcfirst($section)}());
+            }
+        }
+
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertNull($this->context->getConfig());
+    }
+
+    public function configSectionProvider()
+    {
+        return [
+            [ConfigUtil::FILTERS],
+            [ConfigUtil::SORTERS]
+        ];
+    }
+
+    public function testFilters()
+    {
+        $testFilter = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+
+        $this->assertNotNull($this->context->getFilters());
+
+        $this->context->getFilters()->set('test', $testFilter);
+        $this->assertSame($testFilter, $this->context->getFilters()->get('test'));
+    }
+
+    public function testDefaultAccessorForFilterValues()
+    {
+        $this->assertNotNull($this->context->getFilterValues());
+        $this->assertFalse($this->context->getFilterValues()->has('test'));
+        $this->assertNull($this->context->getFilterValues()->get('test'));
+    }
+
+    public function testFilterValues()
+    {
+        $accessor = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
+        $this->context->setFilterValues($accessor);
+
+        $this->assertSame($accessor, $this->context->getFilterValues());
     }
 
     public function testConfigSections()
