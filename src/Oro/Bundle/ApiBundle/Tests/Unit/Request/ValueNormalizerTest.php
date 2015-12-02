@@ -41,15 +41,15 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 $this->addProcessor($processorBag, 'rest.boolean', DataType::BOOLEAN, [RequestType::REST]),
-                new Processor\RestJsonApi\NormalizeBoolean()
+                new Processor\Rest\NormalizeBoolean()
             ],
             [
                 $this->addProcessor($processorBag, 'rest.datetime', DataType::DATETIME, [RequestType::REST]),
-                new Processor\RestJsonApi\NormalizeDateTime()
+                new Processor\Rest\NormalizeDateTime()
             ],
             [
                 $this->addProcessor($processorBag, 'rest.order_by', DataType::ORDER_BY, [RequestType::REST]),
-                new Processor\RestJsonApi\NormalizeOrderBy()
+                new Processor\Rest\NormalizeOrderBy()
             ],
         ];
         foreach ($processorMap as $val) {
@@ -78,9 +78,9 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [ValueNormalizer::DEFAULT_REQUIREMENT, DataType::STRING, [RequestType::REST]],
             [Processor\NormalizeInteger::REQUIREMENT, DataType::INTEGER, [RequestType::REST]],
             [Processor\NormalizeUnsignedInteger::REQUIREMENT, DataType::UNSIGNED_INTEGER, [RequestType::REST]],
-            [Processor\RestJsonApi\NormalizeBoolean::REQUIREMENT, DataType::BOOLEAN, [RequestType::REST]],
-            [Processor\RestJsonApi\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
-            [Processor\RestJsonApi\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, [RequestType::REST]],
+            [Processor\Rest\NormalizeBoolean::REQUIREMENT, DataType::BOOLEAN, [RequestType::REST]],
+            [Processor\Rest\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
+            [Processor\Rest\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, [RequestType::REST]],
         ];
     }
 
@@ -117,17 +117,17 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\RestJsonApi\NormalizeBoolean::REQUIREMENT),
+                $this->getArrayRequirement(Processor\Rest\NormalizeBoolean::REQUIREMENT),
                 DataType::BOOLEAN,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\RestJsonApi\NormalizeDateTime::REQUIREMENT),
+                $this->getArrayRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
                 DataType::DATETIME,
                 [RequestType::REST]
             ],
             [
-                Processor\RestJsonApi\NormalizeOrderBy::REQUIREMENT,
+                Processor\Rest\NormalizeOrderBy::REQUIREMENT,
                 DataType::ORDER_BY,
                 [RequestType::REST]
             ],
