@@ -153,7 +153,7 @@ define(function(require) {
             this.$('input.select2-input').off(this.eventNamespace());
             this.$('input[name=value]').select2('destroy');
             // due to bug in select2
-            $('body > .select2-drop-mask').remove();
+            $('body > .select2-drop-mask, body > .select2-drop').remove();
             SelectEditorView.__super__.dispose.call(this);
         },
 

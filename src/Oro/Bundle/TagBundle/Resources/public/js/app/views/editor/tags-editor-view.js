@@ -91,6 +91,12 @@ define(function(require) {
                 },
                 query: function(options) {
                     _this.currentTerm = options.term;
+                    _this.currentData = null;
+                    _this.currentCallback = options.callback;
+                    options.callback = function(data) {
+                        _this.currentData = data;
+                        _this.showResults();
+                    };
                     if (_this.currentRequest && _this.currentRequest.term !== '' &&
                         _this.currentRequest.state() !== 'resolved') {
                         _this.currentRequest.abort();
@@ -108,6 +114,10 @@ define(function(require) {
                     }
                 }
             };
+        },
+
+        showResults: function() {
+            this.currentCallback(this.currentData);
         },
 
         getModelValue: function() {
@@ -131,7 +141,6 @@ define(function(require) {
             data[this.fieldName] = this.getChoiceLabel();
             return data;
         }
-
     }, {
         processMetadata: AbstractRelationEditorView.processMetadata
     });
