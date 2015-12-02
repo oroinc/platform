@@ -83,11 +83,11 @@ class CompleteDefinition implements ProcessorInterface
     }
 
     /**
-     * @param array    $definition
-     * @param string   $entityClass
-     * @param string   $version
-     * @param string   $requestType
-     * @param string[] $extras
+     * @param array  $definition
+     * @param string $entityClass
+     * @param string $version
+     * @param string $requestType
+     * @param array  $extras
      *
      * @return array
      */
@@ -111,7 +111,7 @@ class CompleteDefinition implements ProcessorInterface
      * @param ClassMetadata $metadata
      * @param string        $version
      * @param string        $requestType
-     * @param string[]      $extras
+     * @param array         $extras
      *
      * @return array
      */
@@ -151,7 +151,7 @@ class CompleteDefinition implements ProcessorInterface
      * @param ClassMetadata $metadata
      * @param string        $version
      * @param string        $requestType
-     * @param string[]      $extras
+     * @param array         $extras
      *
      * @return array
      */
