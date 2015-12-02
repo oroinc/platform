@@ -451,7 +451,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             'SELECT o0_.id AS id_0, o1_.name AS name_1'
             . ' FROM oro_test_serializer_product o1_'
             . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
-            . ' WHERE o0_.id IN (?)',
+            . ' WHERE o0_.id = ?',
             [
                 [
                     'id_0'   => 1,

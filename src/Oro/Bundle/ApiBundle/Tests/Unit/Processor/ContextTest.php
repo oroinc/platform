@@ -579,4 +579,13 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($criteria, $this->context->getCriteria());
         $this->assertSame($criteria, $this->context->get(Context::CRITERIA));
     }
+
+    public function testMaxRelatedResults()
+    {
+        $this->assertNull($this->context->getMaxRelatedResults());
+
+        $this->context->setMaxRelatedResults(123);
+        $this->assertEquals(123, $this->context->getMaxRelatedResults());
+        $this->assertEquals(123, $this->context->get(Context::MAX_RELATED_RESULTS));
+    }
 }

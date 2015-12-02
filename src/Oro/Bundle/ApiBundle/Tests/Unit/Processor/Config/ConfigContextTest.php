@@ -24,6 +24,15 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->context->get(ConfigContext::CLASS_NAME));
     }
 
+    public function testMaxRelatedResults()
+    {
+        $this->assertNull($this->context->getMaxRelatedResults());
+
+        $this->context->setMaxRelatedResults(123);
+        $this->assertEquals(123, $this->context->getMaxRelatedResults());
+        $this->assertEquals(123, $this->context->get(ConfigContext::MAX_RELATED_RESULTS));
+    }
+
     public function testExtras()
     {
         $this->assertSame([], $this->context->getExtras());

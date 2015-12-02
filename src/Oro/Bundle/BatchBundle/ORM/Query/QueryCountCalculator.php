@@ -6,8 +6,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
-use Oro\Bundle\EntityBundle\ORM\SqlQuery;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 
 /**
  * Calculates total count of query records
@@ -85,7 +85,8 @@ class QueryCountCalculator
             } else {
                 throw new \InvalidArgumentException(
                     sprintf(
-                        'Expected instance of Doctrine\ORM\Query or Oro\Bundle\EntityBundle\ORM\SqlQuery, "%s" given',
+                        'Expected instance of Doctrine\ORM\Query'
+                        . ' or Oro\Component\DoctrineUtils\ORM\SqlQuery, "%s" given',
                         is_object($query) ? get_class($query) : gettype($query)
                     )
                 );

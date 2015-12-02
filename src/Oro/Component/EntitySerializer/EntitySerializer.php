@@ -362,15 +362,7 @@ class EntitySerializer
      */
     protected function getRelatedItemsBindings($entityIds, $mapping, $config)
     {
-        $qb = $this->queryFactory->getToManyAssociationQueryBuilder($mapping, $entityIds)
-            ->addSelect(
-                sprintf(
-                    'r.%s as relatedEntityId',
-                    $this->doctrineHelper->getEntityIdFieldName($mapping['targetEntity'])
-                )
-            );
-
-        $rows = $this->queryFactory->getQuery($qb, $config)->getScalarResult();
+        $rows = $this->queryFactory->getRelatedItemsIds($mapping, $entityIds, $config);
 
         $result = [];
         foreach ($rows as $row) {
@@ -419,12 +411,25 @@ class EntitySerializer
             $mapping      = $entityMetadata->getAssociationMapping($field);
             $targetConfig = ConfigUtil::getFieldConfig($config, $field);
 
-            $relatedData[$field] = $this->hasAssociations($mapping['targetEntity'], $targetConfig)
-                ? $this->loadRelatedItems($entityIds, $mapping, $targetConfig)
-                : $this->loadRelatedItemsForSimpleEntity($entityIds, $mapping, $targetConfig);
+            $relatedData[$field] = $this->isSingleStepLoading($mapping['targetEntity'], $targetConfig)
+                ? $this->loadRelatedItemsForSimpleEntity($entityIds, $mapping, $targetConfig)
+                : $this->loadRelatedItems($entityIds, $mapping, $targetConfig);
         }
 
         return $relatedData;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param array  $config
+     *
+     * @return bool
+     */
+    protected function isSingleStepLoading($entityClass, $config)
+    {
+        return
+            (!isset($config[ConfigUtil::MAX_RESULTS]) || $config[ConfigUtil::MAX_RESULTS] < 0)
+            && !$this->hasAssociations($entityClass, $config);
     }
 
     /**

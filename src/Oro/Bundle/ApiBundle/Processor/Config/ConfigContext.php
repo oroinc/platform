@@ -10,6 +10,9 @@ class ConfigContext extends ApiContext
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
+    /** the maximum number of related entities that can be retrieved */
+    const MAX_RELATED_RESULTS = 'maxRelatedResults';
+
     /** a list of additional configuration data that should be returned, for example "filters", "sorters", etc. */
     const EXTRA = 'extra';
 
@@ -36,6 +39,26 @@ class ConfigContext extends ApiContext
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * Gets the maximum number of related entities that can be retrieved
+     *
+     * @return int|null
+     */
+    public function getMaxRelatedResults()
+    {
+        return $this->get(self::MAX_RELATED_RESULTS);
+    }
+
+    /**
+     * Sets the maximum number of related entities that can be retrieved
+     *
+     * @param int $limit
+     */
+    public function setMaxRelatedResults($limit)
+    {
+        $this->set(self::MAX_RELATED_RESULTS, $limit);
     }
 
     /**
