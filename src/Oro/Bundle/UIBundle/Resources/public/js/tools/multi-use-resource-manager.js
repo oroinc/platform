@@ -9,10 +9,10 @@ define(function(require) {
      * ```javascript
      * var backdropManager = new MultiUseResourceManager({
      *     listen: {
-     *         'construct': function() {
+     *         'constructResource': function() {
      *             $(document.body).addClass('backdrop');
      *         },
-     *         'dispose': function() {
+     *         'disposeResource': function() {
      *             $(document.body).removeClass('backdrop');
      *         }
      *     }
@@ -111,12 +111,12 @@ define(function(require) {
         checkState: function() {
             if (this.holders.length > 0 && !this.isCreated) {
                 this.isCreated = true;
-                this.trigger('construct');
+                this.trigger('constructResource');
                 return;
             }
             if (this.holders.length <= 0 && this.isCreated) {
                 this.isCreated = false;
-                this.trigger('dispose');
+                this.trigger('disposeResource');
             }
         },
 
@@ -125,7 +125,8 @@ define(function(require) {
          */
         dispose: function() {
             if (this.isCreated) {
-                this.trigger('dispose');
+                this.trigger('disposeResource');
+                this.isCreated = false;
             }
             MultiUseResourceManager.__super__.dispose.call(this);
         }
