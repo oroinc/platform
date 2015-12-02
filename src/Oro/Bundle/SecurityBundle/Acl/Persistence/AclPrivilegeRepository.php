@@ -750,7 +750,7 @@ class AclPrivilegeRepository
      */
     protected function getFirstNotEmptyAce($sid, $rootAcl, array $accessParamList)
     {
-        $resultAces = null;
+        $resultAces = [];
 
         foreach ($accessParamList as $accessParams) {
             list ($level, $field) = $accessParams;
