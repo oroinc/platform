@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
@@ -25,14 +25,8 @@ class CheckRequestType implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $requestType = $context->getRequestType();
-        if ($requestType !== RequestType::REST_PLAIN) {
-            // check JSON API headers only for REST requests
-            return;
-        }
-
         if ($this->isJsonApiRequest($context->getRequestHeaders())) {
-            $context->setRequestType(RequestType::REST_JSON_API);
+            $context->setRequestType(RequestType::JSON_API);
         }
     }
 

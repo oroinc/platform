@@ -41,9 +41,9 @@ class DumpMetadataCommand extends ContainerAwareCommand
             ->addOption(
                 'request-type',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'API request type',
-                RequestType::REST_JSON_API
+                [RequestType::REST, RequestType::JSON_API]
             );
     }
 
@@ -66,13 +66,13 @@ class DumpMetadataCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string $entityClass
-     * @param string $version
-     * @param string $requestType
+     * @param string   $entityClass
+     * @param string   $version
+     * @param string[] $requestType
      *
      * @return array
      */
-    protected function getMetadata($entityClass, $version, $requestType)
+    protected function getMetadata($entityClass, $version, array $requestType)
     {
         /** @var MetadataProvider $configProvider */
         $metadataProvider = $this->getContainer()->get('oro_api.metadata_provider');

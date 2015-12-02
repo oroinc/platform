@@ -6,30 +6,43 @@ use Oro\Component\ChainProcessor\Context as BaseContext;
 
 abstract class ApiContext extends BaseContext
 {
-    /** the type of a request, for example "rest", "soap", "odata", etc. */
+    /** a list of types the current request belongs, for example "rest", "soap", "odata", etc. */
     const REQUEST_TYPE = 'requestType';
 
     /** API version */
     const VERSION = 'version';
 
     /**
-     * Gets the type of a request, for example "rest", "soap", "odata", etc.
+     * Gets a list of types the current request belongs, for example "rest", "soap", "odata", etc.
+     * A request can belong to several types, e.g. "rest" and "json_api".
      *
-     * @return string|null
+     * @return string[]
      */
     public function getRequestType()
     {
-        return $this->get(self::REQUEST_TYPE);
+        $requestTypes = $this->get(self::REQUEST_TYPE);
+
+        return null !== $requestTypes
+            ? $requestTypes
+            : [];
     }
 
     /**
-     * Sets the type of a request, for example "rest", "soap", "odata", etc.
+     * Sets the type of the current request, for example "rest", "soap", "odata", etc.
+     * A request can belong to several types, e.g. "rest" and "json_api".
+     * This method adds the given type(s) to a list of already set types.
      *
-     * @param string $requestType
+     * @param string|string[] $requestType
      */
     public function setRequestType($requestType)
     {
-        $this->set(self::REQUEST_TYPE, $requestType);
+        $types = $this->getRequestType();
+        foreach ((array)$requestType as $type) {
+            if (!in_array($type, $types, true)) {
+                $types[] = $type;
+            }
+        }
+        $this->set(self::REQUEST_TYPE, $types);
     }
 
     /**

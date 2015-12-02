@@ -8,13 +8,13 @@ namespace Oro\Bundle\ApiBundle\Request;
 final class RequestType
 {
     /**
-     * REST API that can be used to work with plain PHP objects
+     * REST API request
      */
-    const REST_PLAIN = 'rest_plain';
+    const REST = 'rest';
 
     /**
-     * REST API conforms JSON API specification
+     * A request that conforms JSON API specification
      * @see http://jsonapi.org
      */
-    const REST_JSON_API = 'rest_json_api';
+    const JSON_API = 'json_api';
 }

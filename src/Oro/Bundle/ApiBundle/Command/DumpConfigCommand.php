@@ -43,14 +43,14 @@ class DumpConfigCommand extends ContainerAwareCommand
             ->addOption(
                 'request-type',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'API request type',
-                RequestType::REST_JSON_API
+                [RequestType::REST, RequestType::JSON_API]
             )
             ->addOption(
                 'section',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'The configuration section. Can be "entities" or "relations"',
                 'entities'
             )
@@ -100,12 +100,12 @@ class DumpConfigCommand extends ContainerAwareCommand
     /**
      * @param string   $entityClass
      * @param string   $version
-     * @param string   $requestType
-     * @param string[] $extras
+     * @param string[] $requestType
+     * @param array    $extras
      *
      * @return array
      */
-    protected function getConfig($entityClass, $version, $requestType, $extras)
+    protected function getConfig($entityClass, $version, array $requestType, array $extras)
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
@@ -124,12 +124,12 @@ class DumpConfigCommand extends ContainerAwareCommand
     /**
      * @param string   $entityClass
      * @param string   $version
-     * @param string   $requestType
-     * @param string[] $extras
+     * @param string[] $requestType
+     * @param array    $extras
      *
      * @return array
      */
-    protected function getRelationConfig($entityClass, $version, $requestType, $extras)
+    protected function getRelationConfig($entityClass, $version, array $requestType, array $extras)
     {
         /** @var RelationConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.relation_config_provider');

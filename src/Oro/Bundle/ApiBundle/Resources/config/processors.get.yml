@@ -15,8 +15,8 @@ services:
     # initialize
     #
 
-    oro_api.get.rest_json_api.check_request_type:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\CheckRequestType
+    oro_api.get.json_api.check_request_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
 
@@ -81,12 +81,12 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: 255 }
 
-    oro_api.get.normalize_entity_id:
+    oro_api.get.rest.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
             - @oro_api.rest.entity_id_transformer
         tags:
-            - { name: oro.api.processor, action: get, group: build_query, requestType: rest_json_api, priority: 250 }
+            - { name: oro.api.processor, action: get, group: build_query, requestType: rest, priority: 250 }
 
     oro_api.get.complete_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
@@ -155,19 +155,19 @@ services:
     # normalize_result
     #
 
-    oro_api.get.rest_json_api.build_json_api_document:
-        class: Oro\Bundle\ApiBundle\Processor\Get\RestJsonApi\BuildJsonApiDocument
+    oro_api.get.json_api.build_json_api_document:
+        class: Oro\Bundle\ApiBundle\Processor\Get\JsonApi\BuildJsonApiDocument
         arguments:
-            - @oro_api.rest_json_api.document_builder_factory
+            - @oro_api.json_api.document_builder_factory
         tags:
-            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest_json_api, priority: -10 }
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: json_api, priority: -10 }
 
-    oro_api.get.rest_json_api.validate_result_schema:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\ValidateResultSchema
+    oro_api.get.json_api.validate_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
         tags:
-            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest_json_api, priority: -200 }
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: json_api, priority: -200 }
 
-    oro_api.get.rest_json_api.set_response_content_type:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\SetResponseContentType
+    oro_api.get.json_api.set_response_content_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType
         tags:
-            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest_json_api, priority: -250 }
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: json_api, priority: -250 }

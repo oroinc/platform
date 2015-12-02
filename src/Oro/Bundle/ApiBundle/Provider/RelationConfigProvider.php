@@ -28,18 +28,18 @@ class RelationConfigProvider
      *
      * @param string                 $className   The FQCN of an entity
      * @param string                 $version     The version of a config
-     * @param string                 $requestType The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string[]               $requestType The type of API request, for example "rest", "soap", "odata", etc.
      * @param ConfigExtraInterface[] $extras      Additional configuration data.
      *
      * @return array|null
      */
-    public function getRelationConfig($className, $version, $requestType, array $extras = [])
+    public function getRelationConfig($className, $version, array $requestType, array $extras = [])
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $cacheKey = $requestType . $version . $className;
+        $cacheKey = implode('', $requestType) . $version . $className;
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];
         }

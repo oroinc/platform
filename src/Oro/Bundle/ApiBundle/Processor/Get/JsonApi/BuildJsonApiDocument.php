@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Get\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory;
 
 class BuildJsonApiDocument implements ProcessorInterface
@@ -25,16 +25,16 @@ class BuildJsonApiDocument implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var GetContext $context */
 
         $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
 
         if ($context->hasResult()) {
             $result = $context->getResult();
-            if (empty($result)) {
-                $documentBuilder->setDataCollection($result);
+            if (null === $result) {
+                $documentBuilder->setDataObject($result);
             } else {
-                $documentBuilder->setDataCollection($result, $context->getMetadata());
+                $documentBuilder->setDataObject($result, $context->getMetadata());
             }
         }
 

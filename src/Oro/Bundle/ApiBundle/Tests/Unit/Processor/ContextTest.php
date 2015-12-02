@@ -32,6 +32,37 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context = new Context($this->configProvider, $this->metadataProvider);
     }
 
+    public function testVersion()
+    {
+        $this->assertNull($this->context->getVersion());
+
+        $this->context->setVersion('test');
+        $this->assertEquals('test', $this->context->getVersion());
+        $this->assertEquals('test', $this->context->get(Context::VERSION));
+    }
+
+    public function testRequestType()
+    {
+        $this->assertEquals([], $this->context->getRequestType());
+
+        $this->context->setRequestType('test');
+        $this->assertEquals(['test'], $this->context->getRequestType());
+        $this->assertEquals(['test'], $this->context->get(Context::REQUEST_TYPE));
+
+        $this->context->setRequestType('another');
+        $this->assertEquals(['test', 'another'], $this->context->getRequestType());
+        $this->assertEquals(['test', 'another'], $this->context->get(Context::REQUEST_TYPE));
+
+        // test that already existing type is not added twice
+        $this->context->setRequestType('another');
+        $this->assertEquals(['test', 'another'], $this->context->getRequestType());
+        $this->assertEquals(['test', 'another'], $this->context->get(Context::REQUEST_TYPE));
+
+        $this->context->setRequestType(['test1', 'test2']);
+        $this->assertEquals(['test', 'another', 'test1', 'test2'], $this->context->getRequestType());
+        $this->assertEquals(['test', 'another', 'test1', 'test2'], $this->context->get(Context::REQUEST_TYPE));
+    }
+
     /**
      * keys of request headers should be are case insensitive
      */
@@ -154,15 +185,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($headers));
     }
 
-    public function testVersion()
-    {
-        $this->assertNull($this->context->getVersion());
-
-        $this->context->setVersion('test');
-        $this->assertEquals('test', $this->context->getVersion());
-        $this->assertEquals('test', $this->context->get(Context::VERSION));
-    }
-
     public function testClassName()
     {
         $this->assertNull($this->context->getClassName());
@@ -196,7 +218,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                $requestType,
+                [$requestType],
                 $configExtras
             )
             ->willReturn(
@@ -253,7 +275,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                $requestType,
+                [$requestType],
                 $configExtras
             )
             ->willReturn(
@@ -573,7 +595,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                $requestType,
+                [$requestType],
                 $configExtras
             )
             ->willReturn([ConfigUtil::DEFINITION => $config]);
@@ -582,7 +604,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                $requestType,
+                [$requestType],
                 $metadataExtras,
                 $config
             )

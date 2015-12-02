@@ -14,8 +14,8 @@ services:
     # initialize
     #
 
-    oro_api.get_list.rest_json_api.check_request_type:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\CheckRequestType
+    oro_api.get_list.json_api.check_request_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: 250 }
 
@@ -58,17 +58,17 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -10 }
 
-    oro_api.get_list.rest_json_api.set_default_paging:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\SetDefaultPaging
+    oro_api.get_list.json_api.set_default_paging:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultPaging
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest_json_api, priority: -10 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -10 }
 
-    oro_api.get_list.rest_json_api.set_default_sorting:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\SetDefaultSorting
+    oro_api.get_list.json_api.set_default_sorting:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultSorting
         arguments:
             - @oro_api.doctrine_helper
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest_json_api, priority: -10 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -10 }
 
     oro_api.get_list.register_filters:
         class: Oro\Bundle\ApiBundle\Processor\GetList\RegisterFilters
@@ -77,10 +77,10 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -100 }
 
-    oro_api.get_list.rest_json_api.normalize_filter_keys:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\NormalizeFilterKeys
+    oro_api.get_list.json_api.normalize_filter_keys:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\NormalizeFilterKeys
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest_json_api, priority: -110 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -110 }
 
     #
     # security_check
@@ -99,12 +99,12 @@ services:
     # build_query
     #
 
-    oro_api.get_list.normalize_filter_values:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\NormalizeFilterValues
+    oro_api.get_list.json_api.normalize_filter_values:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\NormalizeFilterValues
         arguments:
             - @oro_api.value_normalizer
         tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, requestType: rest_json_api, priority: 100 }
+            - { name: oro.api.processor, action: get_list, group: build_query, requestType: json_api, priority: 100 }
 
     oro_api.get_list.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\GetList\BuildCriteria
@@ -207,24 +207,24 @@ services:
     # normalize_result
     #
 
-    oro_api.get_list.rest_json_api.build_json_api_document:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\BuildJsonApiDocument
+    oro_api.get_list.json_api.build_json_api_document:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\BuildJsonApiDocument
         arguments:
-            - @oro_api.rest_json_api.document_builder_factory
+            - @oro_api.json_api.document_builder_factory
         tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest_json_api, priority: -10 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -10 }
 
-    oro_api.get_list.rest_json_api.validate_result_schema:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\ValidateResultSchema
+    oro_api.get_list.json_api.validate_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
         tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest_json_api, priority: -200 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -200 }
 
-    oro_api.get_list.rest_json_api.validate_result:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi\ValidateResult
+    oro_api.get_list.json_api.validate_result:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\ValidateResult
         tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest_json_api, priority: -210 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -210 }
 
-    oro_api.get_list.rest_json_api.set_response_content_type:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestJsonApi\SetResponseContentType
+    oro_api.get_list.json_api.set_response_content_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType
         tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest_json_api, priority: -250 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -250 }

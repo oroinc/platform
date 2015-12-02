@@ -18,7 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 
 class RestJsonApiRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP         = RequestType::REST_JSON_API;
+    const ROUTE_GROUP         = 'rest_json_api';
     const ENTITY_ATTRIBUTE    = 'entity';
     const ENTITY_PLACEHOLDER  = '{entity}';
     const ID_ATTRIBUTE        = 'id';
@@ -183,7 +183,7 @@ class RestJsonApiRouteOptionsResolver implements RouteOptionsResolverInterface
                 self::ID_ATTRIBUTE,
                 $this->valueNormalizer->getRequirement(
                     $metadata->getTypeOfField(reset($idFields)),
-                    RequestType::REST_JSON_API
+                    [RequestType::REST, RequestType::JSON_API]
                 )
             );
         } elseif ($idFieldCount > 1) {
@@ -193,7 +193,7 @@ class RestJsonApiRouteOptionsResolver implements RouteOptionsResolverInterface
                 $requirements[] = $field . '='
                     . $this->valueNormalizer->getRequirement(
                         $metadata->getTypeOfField($field),
-                        RequestType::REST_JSON_API
+                        [RequestType::REST, RequestType::JSON_API]
                     );
             }
             $route->setRequirement(
