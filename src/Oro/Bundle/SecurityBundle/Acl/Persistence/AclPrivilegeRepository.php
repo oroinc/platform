@@ -85,6 +85,24 @@ class AclPrivilegeRepository
     }
 
     /**
+     * @param string                $className
+     * @param AclExtensionInterface $extension
+     *
+     * @return EntitySecurityMetadata
+     */
+    protected function getClassMetadata($className, $extension)
+    {
+        $entityClasses = array_filter(
+            $extension->getClasses(),
+            function (EntitySecurityMetadata $entityMetadata) use ($className) {
+                return $entityMetadata->getClassName() == $className;
+            }
+        );
+
+        return reset($entityClasses);
+    }
+
+    /**
      * @param SID    $sid
      * @param string $className
      *
@@ -96,22 +114,18 @@ class AclPrivilegeRepository
         $extension = $this->manager->getExtensionSelector()->select(
             $extensionKey . ':' . $className
         );
+        $entityClass = $this->getClassMetadata($className, $extension);
 
-        $entityClass = array_filter(
-            $extension->getClasses(),
-            function (EntitySecurityMetadata $entityMetadata) use ($className) {
-                return $entityMetadata->getClassName() == $className;
-            }
-        );
-        /** @var EntitySecurityMetadata $entityClass */
-        $entityClass = reset($entityClass);
 
+        // get class level field ACL
         $objectIdentity = new OID($extensionKey, $className);
         $acls = $this->findAcls($sid, [$objectIdentity]);
 
         // find ACL for the root object identity
-        $rootOid = $objectIdentity;
-        $rootAcl = $this->findAclByOid($acls, $rootOid);
+        // root identify for field level ACL is corresponding class level entity ACL
+        $rootOid = new OID('entity', $className);
+        $rootAcl = $this->findAcls($sid, [$rootOid]);
+        $rootAcl = $this->findAclByOid($rootAcl, $rootOid);
 
         $privileges = new ArrayCollection();
 
@@ -141,6 +155,7 @@ class AclPrivilegeRepository
      * Gets all privileges associated with the given security identity.
      *
      * @param SID $sid
+     *
      * @return ArrayCollection|AclPrivilege[]
      */
     public function getPrivileges(SID $sid)
@@ -646,11 +661,10 @@ class AclPrivilegeRepository
             $this->addAclPermissions($sid, $field, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
         }
 
+        // add default permission for not found in db privileges
         foreach ($allowedPermissions as $permission) {
             if (!$privilege->hasPermission($permission)) {
-                $privilege->addPermission(
-                    new AclPermission($permission, $field ? AccessLevel::GLOBAL_LEVEL : AccessLevel::NONE_LEVEL)
-                );
+                $privilege->addPermission(new AclPermission($permission, AccessLevel::NONE_LEVEL));
             }
         }
     }
@@ -705,14 +719,50 @@ class AclPrivilegeRepository
         }
         // if so far not all requested privileges are found get them from the root ACL
         if ($privilege->getPermissionCount() < count($permissions)) {
+            // get root aces
+            $rootAces = $this->getFirstNotEmptyAce(
+                $sid,
+                $rootAcl,
+                [
+                    [AclManager::OBJECT_ACE, $field],
+                    [AclManager::CLASS_ACE, $field],
+                    [AclManager::OBJECT_ACE, null],
+                    [AclManager::CLASS_ACE, null],
+                ]
+            );
+
             $this->addAcesPermissions(
                 $privilege,
                 $permissions,
-                $this->getAces($sid, $rootAcl, AclManager::OBJECT_ACE, $field),
+                $rootAces,
                 $extension,
                 true
             );
         }
+    }
+
+    /**
+     * @param SID          $sid
+     * @param AclInterface $rootAcl
+     * @param array        $accessParamList [[AclManager::*_ACE, 'fieldName1'], ...]
+     *
+     * @return null|EntryInterface[]
+     */
+    protected function getFirstNotEmptyAce($sid, $rootAcl, array $accessParamList)
+    {
+        $resultAces = null;
+
+        foreach ($accessParamList as $accessParams) {
+            list ($level, $field) = $accessParams;
+            $rootAces = $this->getAces($sid, $rootAcl, $level, $field);
+
+            if (!empty($rootAces)) {
+                $resultAces = $rootAces;
+                break;
+            }
+        }
+
+        return $resultAces;
     }
 
     /**
