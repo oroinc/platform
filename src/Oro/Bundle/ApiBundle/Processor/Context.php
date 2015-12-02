@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
@@ -15,6 +14,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -45,9 +45,6 @@ class Context extends ApiContext
 
     /** the Criteria object is used to add additional restrictions to a query is used to get result data */
     const CRITERIA = 'criteria';
-
-    /** the maximum number of related entities that can be retrieved */
-    const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
 
     /**
      * this header can be used to request additional data like "total count"
@@ -705,26 +702,6 @@ class Context extends ApiContext
     public function setCriteria($criteria)
     {
         $this->set(self::CRITERIA, $criteria);
-    }
-
-    /**
-     * Gets the maximum number of related entities that can be retrieved
-     *
-     * @return int|null
-     */
-    public function getMaxRelatedEntities()
-    {
-        return $this->get(self::MAX_RELATED_ENTITIES);
-    }
-
-    /**
-     * Sets the maximum number of related entities that can be retrieved
-     *
-     * @param int $limit
-     */
-    public function setMaxRelatedEntities($limit)
-    {
-        $this->set(self::MAX_RELATED_ENTITIES, $limit);
     }
 
     /**

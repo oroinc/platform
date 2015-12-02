@@ -54,6 +54,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 20 }
 
+    oro_api.get.set_default_max_related_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultMaxRelatedEntities
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: -10 }
+
     #
     # security_check
     #
