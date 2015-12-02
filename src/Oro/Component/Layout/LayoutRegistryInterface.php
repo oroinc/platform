@@ -60,7 +60,7 @@ interface LayoutRegistryInterface
      * Builds the block.
      *
      * This method is called after the extended type has built the block
-     * and can be used to further modify the block.
+     * and can be used to further modify the block and prepare block options.
      *
      * @see BlockTypeInterface::buildForm()
      *
@@ -68,7 +68,7 @@ interface LayoutRegistryInterface
      * @param BlockBuilderInterface $builder The block builder
      * @param array                 $options The options
      */
-    public function buildBlock($name, BlockBuilderInterface $builder, array $options);
+    public function buildBlock($name, BlockBuilderInterface $builder, array &$options);
 
     /**
      * Builds the block view.

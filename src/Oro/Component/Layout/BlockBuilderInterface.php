@@ -38,4 +38,10 @@ interface BlockBuilderInterface
      * @return ContextInterface
      */
     public function getContext();
+
+    /**
+     * Returns the layout data
+     * @return DataAccessorInterface
+     */
+    public function getDataAccessor();
 }

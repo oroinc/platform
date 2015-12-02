@@ -9,7 +9,7 @@ abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options)
+    public function buildBlock(BlockBuilderInterface $builder, array &$options)
     {
     }
 

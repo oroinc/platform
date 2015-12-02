@@ -87,7 +87,8 @@ class BlockFactory implements BlockFactoryInterface
             $this->layoutManipulator,
             $this->rawLayout,
             $this->typeHelper,
-            $this->context
+            $this->context,
+            $this->dataAccessor
         );
         $this->block           = new Block(
             $this->rawLayout,
@@ -204,7 +205,6 @@ class BlockFactory implements BlockFactoryInterface
 
         // resolve options
         $resolvedOptions = $this->optionsResolver->resolveOptions($blockType, $options);
-        $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
 
         // point the block builder state to the current block
         $this->blockBuilder->initialize($id);
@@ -213,6 +213,7 @@ class BlockFactory implements BlockFactoryInterface
             $type->buildBlock($this->blockBuilder, $resolvedOptions);
             $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
         }
+        $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
     }
 
     /**
