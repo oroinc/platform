@@ -14,6 +14,13 @@ interface ProcessorBagInterface
     public function getProcessors(ContextInterface $context);
 
     /**
+     * Gets all registered actions.
+     *
+     * @return string[]
+     */
+    public function getActions();
+
+    /**
      * Gets all groups registered for the given action and have at least one processor.
      * The returned groups are sorted by its priority.
      *

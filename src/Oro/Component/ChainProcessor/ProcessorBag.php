@@ -114,6 +114,16 @@ class ProcessorBag implements ProcessorBagInterface
     /**
      * {@inheritdoc}
      */
+    public function getActions()
+    {
+        $this->ensureInitialized();
+
+        return array_keys($this->processors);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getActionGroups($action)
     {
         $this->ensureInitialized();
