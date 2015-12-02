@@ -37,7 +37,7 @@ datagrid:
 Option name              | Default value | Description
 :------------------------|:--------------|:-----------
 enable    | false        | Enables inline editing on the grid. By default is enabled for all cells that have frontend type that supports inline editing
-entity_name | | Entity class name to save action toute. By default try get from extended_entity_name
+entity_name | | Entity class name for saving data. By default it tries to get value from `extended_entity_name`
 behaviour | enable_all   | Specifies the way to enable the inline editing. Possible values: `enable_all` - (default). this will enable inline editing where possible. `enable_selected` - disable by default, enable only on configured cells
 plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | Specifies the plugin realization
 default_editors | orodatagrid/js/default-editors | Specifies default editors for front-end types
