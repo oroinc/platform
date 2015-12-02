@@ -573,7 +573,8 @@ define(function(require) {
         onSaveSuccess: function(response) {
             if (!this.cell.disposed && this.cell.$el) {
                 if (response) {
-                    var routeParametersRenameMap = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
+                    var routeParametersRenameMap
+                        = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
                     for (var i in routeParametersRenameMap) {
                         if (response[routeParametersRenameMap[i]]) {
                             this.cell.model.set(i, response[routeParametersRenameMap[i]]);
