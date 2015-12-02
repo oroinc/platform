@@ -33,7 +33,7 @@ class TagsFilter extends EntityFilter
         AclHelper $aclHelper
     ) {
         parent::__construct($factory, $util);
-        $this->doctrine = $doctrine;
+        $this->doctrine  = $doctrine;
         $this->aclHelper = $aclHelper;
     }
 
@@ -56,18 +56,20 @@ class TagsFilter extends EntityFilter
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
-            throw new \LogicException(sprintf(
-                '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
-                get_class($ds)
-            ));
+            throw new \LogicException(
+                sprintf(
+                    '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
+                    get_class($ds)
+                )
+            );
         }
 
         $className = $this->get('options')['field_options']['entity_class'];
-        $qb = $ds->getQueryBuilder();
-        $em = $qb->getEntityManager();
+        $qb        = $ds->getQueryBuilder();
+        $em        = $qb->getEntityManager();
 
         $tagsArray = $data['value']->toArray();
-        $tagsIds = array_map(
+        $tagsIds   = array_map(
             function ($tag) {
                 return $tag->getId();
             },
@@ -87,7 +89,7 @@ class TagsFilter extends EntityFilter
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getForm()
     {
@@ -98,9 +100,13 @@ class TagsFilter extends EntityFilter
                 ['entity_class' => $this->get('options')['field_options']['entity_class']]
             );
         }
+
         return $this->form;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getFormType()
     {
         return 'oro_type_tag_filter';
@@ -113,6 +119,7 @@ class TagsFilter extends EntityFilter
     {
         $formView  = $this->getForm()->createView();
         $fieldView = $formView->children['value'];
+
         return [
             'translatable' => true,
             'label'        => 'oro.tag.entity_plural_label',

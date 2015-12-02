@@ -101,6 +101,13 @@ services:
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
+    oro_tag.virtual_field_provider:
+        class: Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider
+        arguments:
+            - @oro_tag.helper.taggable_helper
+        tags:
+            - { name: oro_entity.virtual_field_provider, priority: 150 }
+
     oro_tag.filter.tags:
         class: %oro_tag.filter.tags.class%
         arguments:
