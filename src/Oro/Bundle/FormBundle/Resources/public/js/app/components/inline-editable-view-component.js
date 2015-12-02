@@ -55,7 +55,7 @@ define(function(require) {
                 el: this.wrapper.getContainer(),
                 autoRender: true,
                 model: this.model,
-                fieldName: 'value'
+                fieldName: this.fieldName
             }));
             if (this.classes.editor.processMetadata) {
                 waitors.push(this.classes.editor.processMetadata(this.metadata));
@@ -135,19 +135,19 @@ define(function(require) {
             wrapper.$el.addClass('loading');
             var ctx = {
                 wrapper: wrapper,
-                oldState: _.pick(wrapper.model.toJSON(), _.keys(modelUpdateData))
+                oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData))
             };
-            this.updateModel(wrapper.model, this.editorComponent, modelUpdateData);
-            if (this.metadata.editor.save_api_accessor.initialOptions.field_name) {
+            // this.updateModel(this.model, this.editorComponent, modelUpdateData);
+            if (this.saveApiAccessor.initialOptions.field_name) {
                 var keys = _.keys(serverUpdateData);
                 if (keys.length > 1) {
                     throw new Error('Only single field editors are supported with field_name option');
                 }
                 var newData = {};
-                newData[this.editor.save_api_accessor.initialOptions.field_name] = serverUpdateData[keys[0]];
+                newData[this.saveApiAccessor.initialOptions.field_name] = serverUpdateData[keys[0]];
                 serverUpdateData = newData;
             }
-            this.metadata.editor.save_api_accessor.send(wrapper.model.toJSON(), serverUpdateData, {}, {
+            this.saveApiAccessor.send(this.model.toJSON(), serverUpdateData, {}, {
                     processingMessage: __('oro.form.inlineEditing.saving_progress'),
                     preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
                 })
