@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -57,13 +58,32 @@ class FieldAclExtension extends EntityAclExtension
      */
     public function supports($type, $id)
     {
-        $supports = parent::supports($type, $id);
+        $isEntity = parent::supports($type, $id);
+        if (!$isEntity) {
+            return false;
+        }
 
-        // if entity extension supports AND
+        if ($id === $this->getExtensionKey()) {
+            return true;
+        }
+
         // either id starts with 'field' (e.g. field+fieldName)
         // or id is null (checking for new entity)
 
-        return $supports && (0 === strpos($id, 'field') || null === $id);
+        return (0 === strpos($id, 'field') || null === $id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
+    {
+        // no need to check any additional data here
+        // but if it will be useful - it's possible override this method and add custom logic
+        // based on $securityToken
+        // read interface method comment before
+
+        return true;
     }
 
     /**

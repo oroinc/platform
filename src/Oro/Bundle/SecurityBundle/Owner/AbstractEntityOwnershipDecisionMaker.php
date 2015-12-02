@@ -195,8 +195,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         if ($this->isLocalLevelEntity($domainObject)) {
             return in_array(
                 $tree->getBusinessUnitOrganizationId($this->getObjectId($domainObject)),
-                $allowedOrganizationIds,
-                true
+                $allowedOrganizationIds
             );
         }
 
