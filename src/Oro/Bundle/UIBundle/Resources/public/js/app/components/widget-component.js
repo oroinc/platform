@@ -53,7 +53,6 @@ define(function(require) {
                 if (this.options.createOnEvent) {
                     this._bindOpenEvent();
                 } else {
-                    this._deferredInit();
                     this.openWidget();
                 }
             }
@@ -87,9 +86,10 @@ define(function(require) {
          * Handles open widget action to
          *  - check if widget module is loaded before open widget
          *
-         * @protected
+         *  @return {Promise}
          */
         openWidget: function() {
+            this._deferredInit();
             var widgetModuleName;
             if (!this.widget) {
                 // defines module name and load the module, before open widget
@@ -101,6 +101,7 @@ define(function(require) {
             } else {
                 this._openWidget();
             }
+            return this.deferredInit.promise();
         },
 
         /**
@@ -147,7 +148,7 @@ define(function(require) {
             if (widget.deferredRender) {
                 widget.deferredRender.done(_.bind(this._resolveDeferredInit, this));
             } else {
-                this._resolveDeferredInit();
+                this._resolveDeferredInit(widget);
             }
         },
 
