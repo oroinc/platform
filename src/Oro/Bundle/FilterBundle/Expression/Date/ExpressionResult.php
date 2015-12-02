@@ -44,6 +44,7 @@ class ExpressionResult
 
                 switch ($value->getValue()) {
                     case DateModifierInterface::VAR_TODAY:
+                    case DateModifierInterface::VAR_THIS_DAY_W_Y:
                         $dateValue->startOfDay();
                         break;
                     case DateModifierInterface::VAR_SOW:
@@ -158,6 +159,7 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
+                case DateModifierInterface::VAR_THIS_DAY_W_Y:
                 case DateModifierInterface::VAR_SOW:
                 case DateModifierInterface::VAR_SOM:
                 case DateModifierInterface::VAR_SOQ:
@@ -208,6 +210,7 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
+                case DateModifierInterface::VAR_THIS_DAY_W_Y:
                 case DateModifierInterface::VAR_SOW:
                 case DateModifierInterface::VAR_SOM:
                 case DateModifierInterface::VAR_SOQ:

@@ -14,6 +14,7 @@ class DateModifierProvider implements DateModifierInterface
             self::VAR_SOQ          => 'soq',
             self::VAR_SOY          => 'soy',
             self::VAR_THIS_DAY     => 'this_day',
+            self::VAR_THIS_DAY_W_Y => 'this_day_w_y',
             self::VAR_THIS_WEEK    => 'this_week',
             self::VAR_THIS_MONTH   => 'this_month',
             self::VAR_FMQ          => 'this_fmq',
@@ -40,6 +41,7 @@ class DateModifierProvider implements DateModifierInterface
             self::PART_VALUE   => [
                 self::VAR_NOW,
                 self::VAR_TODAY,
+                self::VAR_THIS_DAY_W_Y,
                 self::VAR_SOW,
                 self::VAR_SOM,
                 self::VAR_SOQ,

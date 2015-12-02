@@ -33,6 +33,7 @@ interface DateModifierInterface
     const VAR_OCTOBER      = 26;
     const VAR_NOVEMBER     = 27;
     const VAR_DECEMBER     = 28;
+    const VAR_THIS_DAY_W_Y = 29;
 
     const PART_SOURCE  = 'source';
     const PART_VALUE   = 'value';
