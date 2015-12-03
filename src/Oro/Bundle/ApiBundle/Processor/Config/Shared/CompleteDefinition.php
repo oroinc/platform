@@ -86,8 +86,8 @@ class CompleteDefinition implements ProcessorInterface
      * @param array    $definition
      * @param string   $entityClass
      * @param string   $version
-     * @param string   $requestType
-     * @param string[] $extras
+     * @param string[] $requestType
+     * @param array    $extras
      *
      * @return array
      */
@@ -95,8 +95,8 @@ class CompleteDefinition implements ProcessorInterface
         array $definition,
         $entityClass,
         $version,
-        $requestType,
-        $extras
+        array $requestType,
+        array $extras
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
@@ -110,8 +110,8 @@ class CompleteDefinition implements ProcessorInterface
      * @param array         $definition
      * @param ClassMetadata $metadata
      * @param string        $version
-     * @param string        $requestType
-     * @param string[]      $extras
+     * @param string[]      $requestType
+     * @param array         $extras
      *
      * @return array
      */
@@ -119,8 +119,8 @@ class CompleteDefinition implements ProcessorInterface
         array $definition,
         ClassMetadata $metadata,
         $version,
-        $requestType,
-        $extras
+        array $requestType,
+        array $extras
     ) {
         $fieldNames = $metadata->getFieldNames();
         foreach ($fieldNames as $fieldName) {
@@ -150,8 +150,8 @@ class CompleteDefinition implements ProcessorInterface
      * @param array         $definition
      * @param ClassMetadata $metadata
      * @param string        $version
-     * @param string        $requestType
-     * @param string[]      $extras
+     * @param string[]      $requestType
+     * @param array         $extras
      *
      * @return array
      */
@@ -159,8 +159,8 @@ class CompleteDefinition implements ProcessorInterface
         array $definition,
         ClassMetadata $metadata,
         $version,
-        $requestType,
-        $extras
+        array $requestType,
+        array $extras
     ) {
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $fieldName => $mapping) {

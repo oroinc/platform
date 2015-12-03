@@ -64,7 +64,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     protected function reverseTransformSingleId($value, $dataType)
     {
         return $dataType !== DataType::STRING
-            ? $this->valueNormalizer->normalizeValue($value, $dataType, RequestType::REST_PLAIN)
+            ? $this->valueNormalizer->normalizeValue($value, $dataType, [RequestType::REST])
             : $value;
     }
 
@@ -109,7 +109,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
 
             $dataType         = $metadata->getTypeOfField($key);
             $normalized[$key] = $dataType !== DataType::STRING
-                ? $this->valueNormalizer->normalizeValue($val, $dataType, RequestType::REST_PLAIN)
+                ? $this->valueNormalizer->normalizeValue($val, $dataType, [RequestType::REST])
                 : $val;
 
             unset($fieldMap[$key]);

@@ -35,6 +35,6 @@ class NormalizeData implements ProcessorInterface
             return;
         }
 
-        $context->setResult($this->objectNormalizer->normalizeItem($data));
+        $context->setResult($this->objectNormalizer->normalizeObject($data));
     }
 }

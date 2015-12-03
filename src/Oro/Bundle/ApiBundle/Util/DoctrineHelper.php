@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 
 class DoctrineHelper extends BaseHelper
 {

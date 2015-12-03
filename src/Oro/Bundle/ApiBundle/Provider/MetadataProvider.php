@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Processor\MetadataProcessor;
 
@@ -25,21 +26,21 @@ class MetadataProvider
     /**
      * Gets metadata for the given version of an entity.
      *
-     * @param string     $className   The FQCN of an entity
-     * @param string     $version     The version of a config
-     * @param string     $requestType The type of API request, for example "rest", "soap", "odata", etc.
-     * @param string[]   $extras      Additional metadata information, for example "descriptions"
-     * @param array|null $config      The configuration of an entity
+     * @param string                   $className   The FQCN of an entity
+     * @param string                   $version     The version of a config
+     * @param string[]                 $requestType The type of API request, for example "rest", "soap", "odata", etc.
+     * @param MetadataExtraInterface[] $extras      Additional metadata information
+     * @param array|null               $config      The configuration of an entity
      *
      * @return EntityMetadata|null
      */
-    public function getMetadata($className, $version, $requestType, array $extras = [], $config = null)
+    public function getMetadata($className, $version, array $requestType, array $extras = [], $config = null)
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $cacheKey = $requestType . $version . $className;
+        $cacheKey = implode('', $requestType) . $version . $className;
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];
         }

@@ -42,8 +42,10 @@
             var parameters = $(this).closest('.content').find('fieldset.parameters'),
                 format = $('input.key[value="_format"]', parameters).closest('.tuple').find('input.value'),
                 version = $('input.key[value="version"]', parameters).closest('.tuple').find('input.value');
-            if (format.val() === '' && version.val() === '') {
+            if (format.val() === '') {
                 format.val('json');
+            }
+            if (version.val() === '') {
                 version.val('latest');
             }
 

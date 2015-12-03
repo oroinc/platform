@@ -34,6 +34,17 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testActions()
+    {
+        $this->processorBag->addProcessor('processor1', [], 'action1');
+        $this->processorBag->addProcessor('processor2', [], 'action2');
+
+        $this->assertSame(
+            ['action1', 'action2'],
+            $this->processorBag->getActions()
+        );
+    }
+
     public function testActionGroupsForUnknownAction()
     {
         $this->processorBag->addGroup('group1', 'action1');

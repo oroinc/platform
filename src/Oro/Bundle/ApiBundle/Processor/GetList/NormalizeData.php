@@ -37,7 +37,7 @@ class NormalizeData implements ProcessorInterface
 
         $normalizedData = [];
         foreach ($data as $key => $value) {
-            $normalizedData[$key] = $this->objectNormalizer->normalizeItem($value);
+            $normalizedData[$key] = $this->objectNormalizer->normalizeObject($value);
         }
         $context->setResult($normalizedData);
     }

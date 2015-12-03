@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\RestJsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
 

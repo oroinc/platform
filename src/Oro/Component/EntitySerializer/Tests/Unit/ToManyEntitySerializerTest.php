@@ -4,11 +4,14 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 class ToManyEntitySerializerTest extends EntitySerializerTestCase
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testManyToManyUnidirectional()
     {
         $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', [123, 456]);
 
         $conn = $this->getDriverConnectionMock($this->em);
 
@@ -17,16 +20,21 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             0,
             'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
             . ' FROM oro_test_serializer_user o0_'
-            . ' WHERE o0_.id = ?',
+            . ' WHERE o0_.id IN (?, ?)',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'category_name_2' => 'category_name',
+                    'id_0'            => 123,
+                    'name_1'          => 'user_name1',
+                    'category_name_2' => 'category_name1',
+                ],
+                [
+                    'id_0'            => 456,
+                    'name_1'          => 'user_name2',
+                    'category_name_2' => 'category_name2',
                 ]
             ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => 123, 2 => 456],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
 
         $this->setQueryExpectationAt(
@@ -39,25 +47,25 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
             . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
             . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)))'
-            . ' WHERE o0_.id IN (?)',
+            . ' WHERE o0_.id IN (?, ?)',
             [
                 [
-                    'id_0'     => 1,
+                    'id_0'     => 123,
                     'id_1'     => 10,
                     'name_2'   => 'group_name1',
                     'label_3'  => 'group_label1',
                     'public_4' => 0,
                 ],
                 [
-                    'id_0'     => 1,
+                    'id_0'     => 123,
                     'id_1'     => 20,
                     'name_2'   => 'group_name2',
                     'label_3'  => 'group_label2',
                     'public_4' => true,
                 ],
             ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => 123, 2 => 456],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
 
         $result = $this->serializer->serialize(
@@ -81,8 +89,8 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'     => 1,
-                    'name'   => 'user_name',
+                    'id'     => 123,
+                    'name'   => 'user_name1',
                     'groups' => [
                         [
                             'id'     => 10,
@@ -97,6 +105,152 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                             'public' => true,
                         ],
                     ],
+                ],
+                [
+                    'id'     => 456,
+                    'name'   => 'user_name2',
+                    'groups' => [],
+                ]
+            ],
+            $result
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testManyToManyUnidirectionalWithSubQueryLimit()
+    {
+        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', [123, 456]);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
+            . ' FROM oro_test_serializer_user o0_'
+            . ' WHERE o0_.id IN (?, ?)',
+            [
+                [
+                    'id_0'            => 123,
+                    'name_1'          => 'user_name1',
+                    'category_name_2' => 'category_name1',
+                ],
+                [
+                    'id_0'            => 456,
+                    'name_1'          => 'user_name2',
+                    'category_name_2' => 'category_name2',
+                ]
+            ],
+            [1 => 123, 2 => 456],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+        );
+
+        $this->setQueryExpectationAt(
+            $conn,
+            1,
+            'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
+            . ' FROM ('
+            . 'SELECT o0_.id AS id_0, o1_.id AS id_1'
+            . ' FROM oro_test_serializer_group o1_'
+            . ' INNER JOIN oro_test_serializer_user o0_ ON (EXISTS ('
+            . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
+            . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
+            . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)'
+            . '))'
+            . ' WHERE o0_.id = 123 LIMIT 10'
+            . ' UNION ALL'
+            . ' SELECT o0_.id AS id_0, o1_.id AS id_1'
+            . ' FROM oro_test_serializer_group o1_'
+            . ' INNER JOIN oro_test_serializer_user o0_ ON (EXISTS ('
+            . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
+            . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
+            . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)'
+            . '))'
+            . ' WHERE o0_.id = 456 LIMIT 10'
+            . ') entity',
+            [
+                [
+                    'entityId'        => 123,
+                    'relatedEntityId' => 10,
+                ],
+                [
+                    'entityId'        => 123,
+                    'relatedEntityId' => 20,
+                ],
+            ]
+        );
+
+        $this->setQueryExpectationAt(
+            $conn,
+            2,
+            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2, o0_.public AS public_3'
+            . ' FROM oro_test_serializer_group o0_'
+            . ' WHERE o0_.id IN (?, ?)',
+            [
+                [
+                    'id_0'     => 10,
+                    'name_1'   => 'group_name1',
+                    'label_2'  => 'group_label1',
+                    'public_3' => 0,
+                ],
+                [
+                    'id_0'     => 20,
+                    'name_1'   => 'group_name2',
+                    'label_2'  => 'group_label2',
+                    'public_3' => true,
+                ],
+            ],
+            [1 => 10, 2 => 20],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'     => null,
+                    'name'   => null,
+                    'groups' => [
+                        'max_results' => 10,
+                        'fields'      => [
+                            'isException' => [
+                                'exclude' => true
+                            ]
+                        ]
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'     => 123,
+                    'name'   => 'user_name1',
+                    'groups' => [
+                        [
+                            'id'     => 10,
+                            'name'   => 'group_name1',
+                            'label'  => 'group_label1',
+                            'public' => false,
+                        ],
+                        [
+                            'id'     => 20,
+                            'name'   => 'group_name2',
+                            'label'  => 'group_label2',
+                            'public' => true,
+                        ],
+                    ],
+                ],
+                [
+                    'id'     => 456,
+                    'name'   => 'user_name2',
+                    'groups' => [],
                 ]
             ],
             $result
@@ -141,7 +295,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
             . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
             . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)))'
-            . ' WHERE o0_.id IN (?)',
+            . ' WHERE o0_.id = ?',
             [
                 [
                     'id_0'     => 1,
@@ -235,7 +389,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
             . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
             . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)))'
-            . ' WHERE o0_.id IN (?)',
+            . ' WHERE o0_.id = ?',
             [
                 [
                     'id_0' => 1,
@@ -310,7 +464,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             . ' o1_.id AS id_1'
             . ' FROM oro_test_serializer_product o1_'
             . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
-            . ' WHERE o0_.id IN (?)'
+            . ' WHERE o0_.id = ?'
             . ' ORDER BY o1_.id DESC',
             [
                 [
@@ -384,7 +538,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             . ' o1_.id AS id_1'
             . ' FROM oro_test_serializer_product o1_'
             . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
-            . ' WHERE o0_.id IN (?)'
+            . ' WHERE o0_.id = ?'
             . ' ORDER BY o1_.id DESC',
             [
                 [
@@ -461,7 +615,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             . ' o1_.id AS id_1'
             . ' FROM oro_test_serializer_product o1_'
             . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
-            . ' WHERE o0_.id IN (?)',
+            . ' WHERE o0_.id = ?',
             [
                 [
                     'id_0' => 1,

@@ -7,11 +7,13 @@ use Symfony\Component\Routing\Route;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
+use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
@@ -103,7 +105,7 @@ class RestJsonApiDocHandler implements HandlerInterface
                     $route->getRequirement(RestJsonApiRouteOptionsResolver::ID_ATTRIBUTE)
                 );
             }
-            if ($config->hasConfigSection(ConfigUtil::FILTERS) && method_exists($config, 'getFilters')) {
+            if ($config->hasConfigExtra(FiltersConfigExtra::NAME) && method_exists($config, 'getFilters')) {
                 $this->addFilters($annotation, $config->getFilters());
             }
         }
@@ -138,9 +140,9 @@ class RestJsonApiDocHandler implements HandlerInterface
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
         $context = $processor->createContext();
-        $context->removeConfigSection(ConfigUtil::SORTERS);
-        $context->addConfigExtra(ConfigExtra::DESCRIPTIONS);
-        $context->setRequestType(RequestType::REST_JSON_API);
+        $context->removeConfigExtra(SortersConfigExtra::NAME);
+        $context->addConfigExtra(new DescriptionsConfigExtra());
+        $context->setRequestType([RequestType::REST, RequestType::JSON_API]);
         $context->setLastGroup('initialize');
         if ($entityClass) {
             $context->setClassName($entityClass);
@@ -249,7 +251,7 @@ class RestJsonApiDocHandler implements HandlerInterface
                     'description' => $filter->getDescription(),
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
-                        RequestType::REST_JSON_API,
+                        [RequestType::REST, RequestType::JSON_API],
                         $filter->isArrayAllowed() ? RestRequest::ARRAY_DELIMITER : null
                     )
                 ];

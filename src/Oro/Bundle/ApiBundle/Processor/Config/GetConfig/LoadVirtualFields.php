@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Label;
-use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
@@ -45,7 +45,9 @@ class LoadVirtualFields implements ProcessorInterface
                 $propertyPath = $this->getPropertyPath($query);
                 if (!empty($propertyPath)) {
                     $definition[ConfigUtil::FIELDS][$field][ConfigUtil::PROPERTY_PATH] = $propertyPath;
-                    if (!empty($query['select']['label']) && $context->hasExtra(ConfigExtra::DESCRIPTIONS)) {
+                    if (!empty($query['select']['label'])
+                        && $context->hasExtra(DescriptionsConfigExtra::NAME)
+                    ) {
                         $definition[ConfigUtil::FIELDS][$field][ConfigUtil::LABEL] = new Label(
                             $query['select']['label']
                         );

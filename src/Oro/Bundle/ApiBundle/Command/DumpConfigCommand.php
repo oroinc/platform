@@ -9,7 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\ApiBundle\Provider\ConfigExtra;
+use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -41,14 +43,14 @@ class DumpConfigCommand extends ContainerAwareCommand
             ->addOption(
                 'request-type',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'API request type',
-                RequestType::REST_JSON_API
+                [RequestType::REST, RequestType::JSON_API]
             )
             ->addOption(
                 'section',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'The configuration section. Can be "entities" or "relations"',
                 'entities'
             )
@@ -74,9 +76,9 @@ class DumpConfigCommand extends ContainerAwareCommand
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
 
-        $extras = [ConfigExtra::FILTERS, ConfigExtra::SORTERS];
+        $extras = [new FiltersConfigExtra(), new SortersConfigExtra()];
         if ($input->getOption('with-descriptions')) {
-            $extras[] = ConfigExtra::DESCRIPTIONS;
+            $extras[] = new DescriptionsConfigExtra();
         }
 
         switch ($input->getOption('section')) {
@@ -98,12 +100,12 @@ class DumpConfigCommand extends ContainerAwareCommand
     /**
      * @param string   $entityClass
      * @param string   $version
-     * @param string   $requestType
-     * @param string[] $extras
+     * @param string[] $requestType
+     * @param array    $extras
      *
      * @return array
      */
-    protected function getConfig($entityClass, $version, $requestType, $extras)
+    protected function getConfig($entityClass, $version, array $requestType, array $extras)
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
@@ -122,12 +124,12 @@ class DumpConfigCommand extends ContainerAwareCommand
     /**
      * @param string   $entityClass
      * @param string   $version
-     * @param string   $requestType
-     * @param string[] $extras
+     * @param string[] $requestType
+     * @param array    $extras
      *
      * @return array
      */
-    protected function getRelationConfig($entityClass, $version, $requestType, $extras)
+    protected function getRelationConfig($entityClass, $version, array $requestType, array $extras)
     {
         /** @var RelationConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.relation_config_provider');

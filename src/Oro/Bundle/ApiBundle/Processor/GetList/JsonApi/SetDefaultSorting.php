@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList\RestJsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\GetList\JsonApi;
 
 use Doctrine\Common\Collections\Criteria;
 

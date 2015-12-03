@@ -32,12 +32,12 @@ class ValueNormalizer
      *
      * @param mixed       $value          A value to be converted.
      * @param string      $dataType       The data-type.
-     * @param string      $requestType    The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string[]    $requestType    The type of API request, for example "rest", "soap", "odata", etc.
      * @param string|null $arrayDelimiter If specified a value can be an array.
      *
      * @return mixed
      */
-    public function normalizeValue($value, $dataType, $requestType, $arrayDelimiter = null)
+    public function normalizeValue($value, $dataType, array $requestType, $arrayDelimiter = null)
     {
         $context = $this->doNormalization($dataType, $requestType, $value, $arrayDelimiter);
 
@@ -48,14 +48,14 @@ class ValueNormalizer
      * Gets a regular expression that can be used to validate a value of the given data-type.
      *
      * @param string      $dataType       The data-type.
-     * @param string      $requestType    The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string[]    $requestType    The type of API request, for example "rest", "soap", "odata", etc.
      * @param string|null $arrayDelimiter If specified a value can be an array.
      *
      * @return string
      */
-    public function getRequirement($dataType, $requestType, $arrayDelimiter = null)
+    public function getRequirement($dataType, array $requestType, $arrayDelimiter = null)
     {
-        $requirementKey = $dataType . $requestType . (!empty($arrayDelimiter) ? $arrayDelimiter : '');
+        $requirementKey = $dataType . implode('', $requestType) . (!empty($arrayDelimiter) ? $arrayDelimiter : '');
         if (!array_key_exists($requirementKey, $this->requirements)) {
             $context = $this->doNormalization($dataType, $requestType, null, $arrayDelimiter);
 
@@ -67,14 +67,14 @@ class ValueNormalizer
 
     /**
      * @param string      $dataType
-     * @param string      $requestType
+     * @param string[]    $requestType
      * @param mixed|null  $value
      * @param string|null $arrayDelimiter
      *
      * @return NormalizeValueContext
      * @throws \Exception
      */
-    protected function doNormalization($dataType, $requestType, $value = null, $arrayDelimiter = null)
+    protected function doNormalization($dataType, array $requestType, $value = null, $arrayDelimiter = null)
     {
         /** @var NormalizeValueContext $context */
         $context = $this->processor->createContext();
