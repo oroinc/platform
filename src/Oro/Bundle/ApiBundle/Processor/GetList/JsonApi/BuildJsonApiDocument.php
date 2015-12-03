@@ -7,6 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory;
 
+/**
+ * Builds JSON API response based on the Context state.
+ */
 class BuildJsonApiDocument implements ProcessorInterface
 {
     /** @var JsonApiDocumentBuilderFactory */
@@ -30,8 +33,8 @@ class BuildJsonApiDocument implements ProcessorInterface
         $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
 
         if ($context->hasErrors()) {
-            $errors = $context->getErrors();
-            $documentBuilder->setErrorsCollection($errors);
+            $documentBuilder->setErrors($context->getErrors());
+            // remove errors from the Context to avoid processing them by other processors
             $context->resetErrors();
         } elseif ($context->hasResult()) {
             $result = $context->getResult();

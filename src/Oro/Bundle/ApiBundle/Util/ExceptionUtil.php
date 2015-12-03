@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 
 class ExceptionUtil
 {
@@ -29,26 +30,23 @@ class ExceptionUtil
     }
 
     /**
-     * Gets Http code for given exception.
+     * Gets the HTTP status code corresponding the given exception.
      *
      * @param \Exception $e
      *
      * @return int
      */
-    public static function getExceptionHttpCode(\Exception $e)
+    public static function getExceptionStatusCode(\Exception $e)
     {
-        $code = Response::HTTP_INTERNAL_SERVER_ERROR;
-
         $underlyingException = self::getProcessorUnderlyingException($e);
-        if ($underlyingException instanceof HttpExceptionInterface
-        ) {
-            $code = $underlyingException->getStatusCode();
+        if ($underlyingException instanceof HttpExceptionInterface) {
+            $statusCode = $underlyingException->getStatusCode();
+        } elseif ($underlyingException instanceof AccessDeniedException) {
+            $statusCode = $underlyingException->getCode();
+        } else {
+            $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        if ($underlyingException instanceof AccessDeniedException) {
-            $code = $underlyingException->getCode();
-        }
-
-        return $code;
+        return $statusCode;
     }
 }

@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\View\View;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -104,21 +103,15 @@ class RestApiController extends FOSRestController
 
         $view = $this->view($result);
         $view->getSerializationContext()->setSerializeNull(true);
-        $this->setResponseHeaders($view, $context);
-        $view->setStatusCode($context->getResponseStatusCode());
 
-        return $this->handleView($view);
-    }
-
-    /**
-     * @param View    $view
-     * @param Context $context
-     */
-    protected function setResponseHeaders(View $view, Context $context)
-    {
-        $headers = $context->getResponseHeaders()->toArray();
-        foreach ($headers as $key => $value) {
+        $statusCode = $context->getResponseStatusCode();
+        if (null !== $statusCode) {
+            $view->setStatusCode($statusCode);
+        }
+        foreach ($context->getResponseHeaders()->toArray() as $key => $value) {
             $view->setHeader($key, $value);
         }
+
+        return $this->handleView($view);
     }
 }

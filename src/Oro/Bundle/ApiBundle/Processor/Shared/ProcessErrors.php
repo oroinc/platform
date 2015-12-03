@@ -2,11 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
+
+/**
+ * Checks if there are any errors in the Context, and if so, raise an exception for the first error.
+ */
 class ProcessErrors implements ProcessorInterface
 {
     /**
@@ -14,17 +20,31 @@ class ProcessErrors implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
+        /** @var Context $context */
+
         if (!$context->hasErrors()) {
-            // if context has no errors - we have nothing to do
+            // no errors
             return;
         }
 
         $errors = $context->getErrors();
-        $error = array_pop($errors);
+        $error  = $errors[0];
+
         $exception = $error->getInnerException();
-        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
-        if ($underlyingException instanceof HttpExceptionInterface) {
-            $exception = $underlyingException;
+        if (null !== $exception) {
+            $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
+            if ($underlyingException instanceof HttpExceptionInterface) {
+                $exception = $underlyingException;
+            }
+        } else {
+            $message = $error->getDetail();
+            if (empty($message)) {
+                $message = $error->getTitle();
+            }
+            if (empty($message)) {
+                $message = 'Unknown error.';
+            }
+            $exception = new \RuntimeException($message);
         }
 
         throw $exception;

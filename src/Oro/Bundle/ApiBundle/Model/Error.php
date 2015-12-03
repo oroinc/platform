@@ -2,35 +2,50 @@
 
 namespace Oro\Bundle\ApiBundle\Model;
 
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
+
+/**
+ * Represents an error happened during the processing of an action.
+ */
 class Error
 {
-    /**
-     * A human-readable summary of the problem. May be translatable.
-     *
-     * @var string
-     */
+    /** @var int|null */
+    protected $statusCode;
+
+    /** @var string|Label|null */
     protected $title;
 
-    /**
-     * A human-readable explanation specific to this occurrence of the problem.
-     * @var string
-     */
+    /** @var string|Label|null */
     protected $detail;
 
-    /**
-     * The HTTP status code.
-     *
-     * @var integer
-     */
-    protected $status;
-
-    /** @var \Exception */
+    /** @var \Exception|null */
     protected $innerException;
 
     /**
-     * Gets title.
+     * Gets the HTTP status code applicable to this problem.
      *
-     * @return string
+     * @return int|null
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
+
+    /**
+     * Sets the HTTP status code applicable to this problem.
+     *
+     * @param int $statusCode
+     */
+    public function setStatusCode($statusCode)
+    {
+        $this->statusCode = $statusCode;
+    }
+
+    /**
+     * Gets a short, human-readable summary of the problem that should not change
+     * from occurrence to occurrence of the problem.
+     *
+     * @return string|Label|null
      */
     public function getTitle()
     {
@@ -38,9 +53,10 @@ class Error
     }
 
     /**
-     * Sets title.
+     * Sets a short, human-readable summary of the problem that should not change
+     * from occurrence to occurrence of the problem.
      *
-     * @param string $title
+     * @param string|Label $title
      */
     public function setTitle($title)
     {
@@ -48,9 +64,9 @@ class Error
     }
 
     /**
-     * Gets detail.
+     * Gets a human-readable explanation specific to this occurrence of the problem.
      *
-     * @return string
+     * @return string|Label|null
      */
     public function getDetail()
     {
@@ -58,9 +74,9 @@ class Error
     }
 
     /**
-     * Sets detail.
+     * Sets a human-readable explanation specific to this occurrence of the problem.
      *
-     * @param string $detail
+     * @param string|Label $detail
      */
     public function setDetail($detail)
     {
@@ -68,29 +84,9 @@ class Error
     }
 
     /**
-     * Gets status code.
+     * Gets an exception object that caused this occurrence of the problem.
      *
-     * @return int
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * Sets status code.
-     *
-     * @param int $status
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
-    }
-
-    /**
-     * Gets inner exception.
-     *
-     * @return \Exception
+     * @return \Exception|null
      */
     public function getInnerException()
     {
@@ -98,12 +94,19 @@ class Error
     }
 
     /**
-     * Sets inner exception.
+     * Sets an exception object that caused this occurrence of the problem.
      *
-     * @param \Exception $innerException
+     * @param \Exception $exception
      */
-    public function setInnerException($innerException)
+    public function setInnerException(\Exception $exception)
     {
-        $this->innerException = $innerException;
+        $this->innerException = $exception;
+
+        if (null === $this->statusCode) {
+            $this->statusCode = ExceptionUtil::getExceptionStatusCode($exception);
+        }
+        if (null === $this->detail) {
+            $this->detail = $exception->getMessage();
+        }
     }
 }

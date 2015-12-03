@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
@@ -14,12 +15,10 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Component\ChainProcessor\ParameterBag;
-use Oro\Component\ChainProcessor\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -48,8 +47,8 @@ class Context extends ApiContext
     /** the Criteria object is used to add additional restrictions to a query is used to get result data */
     const CRITERIA = 'criteria';
 
-    /** response status code */
-    const RESPONSE_STATUS_CODE = 'response_status_code';
+    /** the status code of an API response */
+    const RESPONSE_STATUS_CODE = 'responseStatusCode';
 
     /**
      * this header can be used to request additional data like "total count"
@@ -319,6 +318,26 @@ class Context extends ApiContext
     public function setResponseHeaders(ParameterBagInterface $parameterBag)
     {
         $this->responseHeaders = $parameterBag;
+    }
+
+    /**
+     * Gets the status code of an API response.
+     *
+     * @return int|null
+     */
+    public function getResponseStatusCode()
+    {
+        return $this->get(self::RESPONSE_STATUS_CODE);
+    }
+
+    /**
+     * Sets the status code of an API response.
+     *
+     * @param $statusCode
+     */
+    public function setResponseStatusCode($statusCode)
+    {
+        $this->set(self::RESPONSE_STATUS_CODE, $statusCode);
     }
 
     /**
@@ -713,35 +732,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Adds error.
-     *
-     * @param Error $error
-     */
-    public function addError(Error $error)
-    {
-        $this->errors[] = $error;
-    }
-
-    /**
-     * Remove all errors.
-     */
-    public function resetErrors()
-    {
-        $this->errors = [];
-    }
-
-    /**
-     * Gets errors.
-     *
-     * @return Error[]|null
-     */
-    public function getErrors()
-    {
-        return $this->errors;
-    }
-
-    /**
-     * Returns true if context has errors.
+     * Whether any error happened during the processing of an action.
      *
      * @return bool
      */
@@ -751,23 +742,36 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets response status code.
+     * Gets all errors happened during the processing of an action.
      *
-     * @param $statusCode
+     * @return Error[]
      */
-    public function setResponseStatusCode($statusCode)
+    public function getErrors()
     {
-        $this->set(self::RESPONSE_STATUS_CODE, $statusCode);
+        return null !== $this->errors
+            ? $this->errors
+            : [];
     }
 
     /**
-     * Gets response status code.
+     * Registers an error.
      *
-     * @return int
+     * @param Error $error
      */
-    public function getResponseStatusCode()
+    public function addError(Error $error)
     {
-        return $this->get(self::RESPONSE_STATUS_CODE) ? : Response::HTTP_OK;
+        if (null === $this->errors) {
+            $this->errors = [];
+        }
+        $this->errors[] = $error;
+    }
+
+    /**
+     * Removes all errors.
+     */
+    public function resetErrors()
+    {
+        $this->errors = null;
     }
 
     /**

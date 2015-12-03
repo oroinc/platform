@@ -122,9 +122,10 @@ class JsonApiDocumentBuilder
      *
      * @return self
      */
-    public function setErrorsCollection(array $errors)
+    public function setErrors(array $errors)
     {
         $this->assertNoData();
+
         $errorsData = [];
         foreach ($errors as $error) {
             $errorsData[] = $this->handleError($error);
@@ -364,8 +365,8 @@ class JsonApiDocumentBuilder
     protected function handleError(Error $error)
     {
         $result = [];
-        if ($error->getStatus()) {
-            $result['code'] = (string) $error->getStatus();
+        if ($error->getStatusCode()) {
+            $result['code'] = (string) $error->getStatusCode();
         }
         if ($error->getDetail()) {
             $result['detail'] = $error->getDetail();
