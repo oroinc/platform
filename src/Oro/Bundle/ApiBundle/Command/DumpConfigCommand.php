@@ -94,6 +94,14 @@ class DumpConfigCommand extends ContainerAwareCommand
                 );
         }
 
+        array_walk_recursive(
+            $config,
+            function (&$val) {
+                if ($val instanceof \Closure) {
+                    $val = '\Closure';
+                }
+            }
+        );
         $output->write(Yaml::dump($config, 100, 4, true, true));
     }
 
