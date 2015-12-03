@@ -228,7 +228,7 @@ define(function(require) {
          * @private
          */
         _getUniqueIdentifier: function() {
-            return tools.createUUID();
+            return tools.createRandomUUID();
         },
 
         /**

@@ -261,10 +261,10 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         },
 
         /**
-         * Generates Version 4 UUIDs (https://en.wikipedia.org/wiki/Universally_unique_identifier)
+         * Generates Version 4 random UUIDs (https://en.wikipedia.org/wiki/Universally_unique_identifier)
          * @return {string}
          */
-        createUUID: function() {
+        createRandomUUID: function() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 // jshint -W016
                 var r = Math.random() * 16 | 0;

@@ -104,9 +104,7 @@ define([
          */
         _resolveDeferredInit: function() {
             if (this.deferredInit) {
-                var args = _.toArray(arguments);
-                args.unshift(this);
-                this.deferredInit.resolve.apply(this.deferredInit, args);
+                this.deferredInit.resolve(this);
             }
         }
     });
