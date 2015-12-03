@@ -13,9 +13,6 @@ class CustomizeDataItemContext extends ApiContext
     /** FQCN of a customizing entity */
     const CLASS_NAME = 'class';
 
-    /** the configuration of a customizing entity */
-    const CONFIG = 'config';
-
     /**
      * Gets FQCN of a root entity.
      *
@@ -74,25 +71,5 @@ class CustomizeDataItemContext extends ApiContext
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
-    }
-
-    /**
-     * Gets the configuration of a customizing entity.
-     *
-     * @return array|null
-     */
-    public function getConfig()
-    {
-        return $this->get(self::CONFIG);
-    }
-
-    /**
-     * Sets the configuration of a customizing entity.
-     *
-     * @param array $config
-     */
-    public function setConfig($config)
-    {
-        $this->set(self::CONFIG, $config);
     }
 }
