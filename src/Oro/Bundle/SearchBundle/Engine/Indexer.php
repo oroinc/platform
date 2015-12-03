@@ -3,13 +3,8 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
 use Oro\Bundle\SearchBundle\Query\Expression\Parser as ExpressionParser;
@@ -17,12 +12,8 @@ use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
-use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
-
-use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -52,15 +43,6 @@ class Indexer
     /** @var SecurityProvider */
     protected $securityProvider;
 
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var EntityProvider */
-    protected $entityProvider;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /** @var AclHelper */
     protected $searchAclHelper;
 
@@ -69,9 +51,6 @@ class Indexer
      * @param EngineInterface     $engine
      * @param ObjectMapper        $mapper
      * @param SecurityProvider    $securityProvider
-     * @param ConfigManager       $configManager
-     * @param EntityProvider      $entityProvider
-     * @param TranslatorInterface $translator
      * @param AclHelper           $searchAclHelper
      * @param EventDispatcherInterface $dispatcher
      */
@@ -80,9 +59,6 @@ class Indexer
         EngineInterface          $engine,
         ObjectMapper             $mapper,
         SecurityProvider         $securityProvider,
-        ConfigManager            $configManager,
-        EntityProvider           $entityProvider,
-        TranslatorInterface      $translator,
         AclHelper                $searchAclHelper,
         EventDispatcherInterface $dispatcher
     ) {
@@ -90,9 +66,6 @@ class Indexer
         $this->engine           = $engine;
         $this->mapper           = $mapper;
         $this->securityProvider = $securityProvider;
-        $this->configManager    = $configManager;
-        $this->entityProvider   = $entityProvider;
-        $this->translator       = $translator;
         $this->searchAclHelper  = $searchAclHelper;
         $this->dispatcher       = $dispatcher;
     }
@@ -197,122 +170,6 @@ class Indexer
         $query = $this->getSimpleSearchQuery($searchString, $offset, $maxResults, $from, $page);
 
         return $this->query($query);
-    }
-
-    /**
-     * @param User   $user
-     * @param string $searchString
-     * @param int    $offset
-     * @param int    $maxResults
-     * @return array
-     */
-    public function autocompleteSearch(User $user, $searchString, $offset = 0, $maxResults = 0)
-    {
-        $classNameMap = [];
-        $entities     = $this->entityProvider->getEntities();
-        foreach ($entities as $description) {
-            $classNameMap[$description['name']] = true;
-        }
-
-        $tables  = [];
-        $configs = $this->configManager->getProvider('activity')->getConfigs();
-        foreach ($configs as $config) {
-            $className = $config->getId()->getClassName();
-            if (!isset($classNameMap[$className])) {
-                continue;
-            }
-            $activities = $config->get('activities');
-            if (!empty($activities) && in_array(Email::ENTITY_CLASS, $activities, true)) {
-                $tables[] = $this->em->getClassMetadata($className)->getTableName();
-            }
-        }
-
-        $results       = [];
-        $searchResults = $this->simpleSearch($searchString, $offset, $maxResults, $tables);
-        foreach ($searchResults->getElements() as $item) {
-            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
-            $className = $item->getEntityName();
-            if (ClassUtils::getClass($user) === $className && $user->getId() === $item->getRecordId()) {
-                continue;
-            }
-            $text = $item->getRecordTitle();
-            if ($label = $this->getClassLabel($className)) {
-                $text .= ' (' . $label . ')';
-            }
-            $results[] = [
-                'text' => $text,
-                'id'   => json_encode([
-                    'entityClass' => $className,
-                    'entityId'    => $item->getRecordId(),
-                ]),
-            ];
-        }
-
-        return $results;
-    }
-
-    /**
-     * @param User $user
-     * @param string $searchString
-     * @return array
-     */
-    public function autocompleteSearchById(User $user, $searchString)
-    {
-        $results = [];
-        if ($searchString) {
-            $targets = explode(';', $searchString);
-            foreach ($targets as $target) {
-                if (!$target) {
-                    continue;
-                }
-                $target = json_decode($target, true);
-                if (!isset($target['entityClass']) || !$target['entityClass']
-                    || !isset($target['entityId']) || !$target['entityId']
-                ) {
-                    continue;
-                }
-                if (ClassUtils::getClass($user) === $target['entityClass'] && $user->getId() === $target['entityId']) {
-                    continue;
-                }
-                $entity = $this->em->getRepository($target['entityClass'])->find($target['entityId']);
-                if ($fields = $this->mapper->getEntityMapParameter($target['entityClass'], 'title_fields')) {
-                    $text = [];
-                    foreach ($fields as $field) {
-                        $text[] = $this->mapper->getFieldValue($entity, $field);
-                    }
-                } else {
-                    $text = [(string) $entity];
-                }
-                $text = implode(' ', $text);
-                if ($label = $this->getClassLabel($target['entityClass'])) {
-                    $text .= ' (' . $label . ')';
-                }
-                $results[] = [
-                    'text' => $text,
-                    'id'   => json_encode([
-                        'entityClass' => $target['entityClass'],
-                        'entityId'    => $target['entityId'],
-                    ]),
-                ];
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * @param string $className
-     * @return null|string
-     */
-    protected function getClassLabel($className)
-    {
-        if (!$this->configManager->hasConfig($className)) {
-            return null;
-        }
-
-        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
-
-        return $this->translator->trans($label);
     }
 
     /**

@@ -1,6 +1,7 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% import 'OroActivityBundle::macros.html.twig' as AC %}
 
 {% oro_title_set({params : {
     "%entity.title%": entity.title|default('N/A'),
@@ -9,6 +10,8 @@
 
 {% block navButtons %}
     {% if editable %}
+        {# Button for add context on the activity list item view page #}
+        {{ AC.addContextButton(entity) }}
         {{ UI.editButton({
             'path' : path('oro_system_calendar_event_update', { id: entity.id }),
             'entity_label': 'oro.calendar.calendarevent.entity_label'|trans
@@ -24,6 +27,13 @@
         }) }}
     {% endif %}
 {% endblock navButtons %}
+
+{% block stats %}
+    {# Display contexts targets in the activity view page #}
+    <li class="context-data activity-context-activity-block">
+        {{ AC.activity_contexts(entity) }}
+    </li>
+{% endblock %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {

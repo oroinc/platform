@@ -36,7 +36,7 @@ class AddConditionAndActionCompilerPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($tagName) as $id => $attributes) {
             $definition = $container->getDefinition($id);
-            $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+            $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE)->setPublic(false);
 
             $className = $definition->getClass();
             $refClass = new \ReflectionClass($className);

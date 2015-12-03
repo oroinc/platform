@@ -26,9 +26,13 @@
     </div>
 {% endmacro %}
 
-{% macro tooltip(tooltip, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
+{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
     {% set tooltip_parameters = tooltip_parameters|default({}) %}
-    {% set tooltip = tooltip|trans(tooltip_parameters, "tooltips") %}
+    {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
+    {% set tooltip = tooltip_raw|trans(tooltip_parameters, "messages") %}
+    {% if (tooltip == tooltip_raw) %}
+        {% set tooltip = tooltip_raw|trans(tooltip_parameters, "tooltips") %}
+    {% endif %}
     {% if tooltip is not empty %}
         {% set details_anchor = details_anchor|default(null) %}
         {% set details_link = details_link|default(null) %}
@@ -119,7 +123,7 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -133,7 +137,7 @@
         {% set data = data|striptags('<a>')|raw|nl2br %}
     {% endif %}
 
-    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label html-property">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -898,7 +902,8 @@
             {% set class = '' %}
         {% endif %}
         {% if url is not empty %}
-            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title }}</a>
+            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
+                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ title }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
@@ -944,8 +949,8 @@
 
 {%- macro renderList(elements) -%}
     <ul class="extra-list">
-        {% for element in elements %}
+        {%- for element in elements %}
             <li class="extra-list-element">{{ element }}</li>
-        {% endfor %}
+        {% endfor -%}
     </ul>
 {% endmacro %}

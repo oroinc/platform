@@ -25,9 +25,6 @@ oro:
         to: To
         attachment:
             added: Attachment added
-        contexts:
-            added:   The context has been added
-            removed: The context has been removed
         send_email: Send email
         menu.shortcut_compose_email.label: Compose email
         action:
@@ -45,6 +42,7 @@ oro:
             mark_visible_read.label: Mark Visible as Read
             amount_of_emails: Amount of Emails to Display
             default_action: Default Action
+            default_action_hint: Default action for widget in a state of extended sidebar
             reply_all: Reply All
             reply: Reply
             forward: Forward
