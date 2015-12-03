@@ -196,6 +196,12 @@ define(function(require) {
             }).join(',');
         },
 
+        isChanged: function() {
+            return this.getValue() !== this.getModelValue().map(function(item) {
+                return item.id;
+            }).join(',');
+        },
+
         getServerUpdateData: function() {
             var data = {};
             var select2Data = this.$('.select2-container').select2('data');
