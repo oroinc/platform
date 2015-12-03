@@ -147,9 +147,11 @@ class ObjectNormalizer
                     } elseif ($count > 1) {
                         $value = $entityId;
                     } else {
-                        $value = sprintf(
-                            'ERROR: The entity "%s" does not have an identifier.',
-                            ClassUtils::getClass($value)
+                        throw new \RuntimeException(
+                            sprintf(
+                                'The entity "%s" does not have an identifier.',
+                                ClassUtils::getClass($value)
+                            )
                         );
                     }
                 }
@@ -159,7 +161,12 @@ class ObjectNormalizer
                 } elseif (method_exists($value, '__toString')) {
                     $value = (string)$value;
                 } else {
-                    $value = sprintf('ERROR: Instance of "%s" cannot be normalized.', get_class($value));
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Instance of "%s" cannot be normalized.',
+                            get_class($value)
+                        )
+                    );
                 }
             }
         }

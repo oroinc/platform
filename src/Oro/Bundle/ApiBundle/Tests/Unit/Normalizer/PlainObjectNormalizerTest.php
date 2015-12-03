@@ -5,57 +5,36 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
-use Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer;
-use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Entity;
-use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Object;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class ObjectNormalizerTest extends OrmRelatedTestCase
+class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ObjectNormalizer */
     protected $objectNormalizer;
 
     protected function setUp()
     {
-        parent::setUp();
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn(null);
 
         $this->objectNormalizer = new ObjectNormalizer(
-            $this->doctrineHelper,
+            new DoctrineHelper($doctrine),
             new EntityDataAccessor()
         );
 
         $this->objectNormalizer->addNormalizer(
             new DateTimeNormalizer()
         );
-        $this->objectNormalizer->addNormalizer(
-            new SearchItemNormalizer()
-        );
-    }
-
-    public function testNormalizeSearchItem()
-    {
-        $searchItem = new SearchResultItem(
-            $this->em,
-            'Test\Entity',
-            123,
-            'test_title'
-        );
-
-        $result = $this->objectNormalizer->normalizeObject($searchItem);
-
-        $this->assertEquals(
-            [
-                'id'     => 123,
-                'entity' => 'Test\Entity',
-                'title'  => 'test_title'
-            ],
-            $result
-        );
     }
 
     public function testNormalizeSimpleEntity()
     {
-        $entity = new Entity\Group();
+        $entity = new Object\Group();
         $entity->setId(123);
         $entity->setName('test_name');
 
@@ -72,7 +51,7 @@ class ObjectNormalizerTest extends OrmRelatedTestCase
 
     public function testNormalizeEntityWithNullToOneRelations()
     {
-        $product = new Entity\Product();
+        $product = new Object\Product();
         $product->setId(123);
         $product->setName('product_name');
 
@@ -102,7 +81,7 @@ class ObjectNormalizerTest extends OrmRelatedTestCase
                 'name'      => 'product_name',
                 'updatedAt' => new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')),
                 'category'  => 'category_name',
-                'owner'     => 456
+                'owner'     => 'user_name'
             ],
             $result
         );
@@ -110,7 +89,7 @@ class ObjectNormalizerTest extends OrmRelatedTestCase
 
     public function testNormalizeEntityWithNullToManyRelations()
     {
-        $user = new Entity\User();
+        $user = new Object\User();
         $user->setId(123);
         $user->setName('user_name');
 
@@ -139,40 +118,40 @@ class ObjectNormalizerTest extends OrmRelatedTestCase
                 'id'       => 456,
                 'name'     => 'user_name',
                 'category' => 'owner_category_name',
-                'groups'   => [11, 22],
-                'products' => [123]
+                'groups'   => ['owner_group1', 'owner_group2'],
+                'products' => ['product_name']
             ],
             $result
         );
     }
 
     /**
-     * @return Entity\Product
+     * @return Object\Product
      */
     protected function createProductEntity()
     {
-        $product = new Entity\Product();
+        $product = new Object\Product();
         $product->setId(123);
         $product->setName('product_name');
         $product->setUpdatedAt(new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')));
 
-        $category = new Entity\Category();
+        $category = new Object\Category();
         $category->setName('category_name');
         $category->setLabel('category_label');
         $product->setCategory($category);
 
-        $owner = new Entity\User();
+        $owner = new Object\User();
         $owner->setId(456);
         $owner->setName('user_name');
-        $ownerCategory = new Entity\Category();
+        $ownerCategory = new Object\Category();
         $ownerCategory->setName('owner_category_name');
         $category->setLabel('owner-category_label');
         $owner->setCategory($ownerCategory);
-        $ownerGroup1 = new Entity\Group();
+        $ownerGroup1 = new Object\Group();
         $ownerGroup1->setId(11);
         $ownerGroup1->setName('owner_group1');
         $owner->addGroup($ownerGroup1);
-        $ownerGroup2 = new Entity\Group();
+        $ownerGroup2 = new Object\Group();
         $ownerGroup2->setId(22);
         $ownerGroup2->setName('owner_group2');
         $owner->addGroup($ownerGroup2);

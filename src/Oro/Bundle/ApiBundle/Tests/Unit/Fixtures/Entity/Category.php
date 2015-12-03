@@ -54,4 +54,12 @@ class Category
     {
         $this->label = $label;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->name;
+    }
 }
