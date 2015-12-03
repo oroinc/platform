@@ -6,18 +6,19 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
+
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @RouteResource("calendarevents_guest")
  * @NamePrefix("oro_api_")
  */
-class CalendarEventGuestController extends RestController
+class CalendarEventGuestController extends RestGetController
 {
     /**
      * Get calendar event guests info.
@@ -60,13 +61,5 @@ class CalendarEventGuestController extends RestController
     public function getManager()
     {
         return $this->get('oro_calendar.calendar_event_guest.manager.api');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormHandler()
-    {
-        throw new \BadMethodCallException('Not implemented');
     }
 }

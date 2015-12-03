@@ -13,19 +13,15 @@ class CalendarEventGuestApiEntityManager extends ApiEntityManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var AssociationManager */
-    protected $associationManager;
-
     /**
+     * @param string             $class
      * @param ObjectManager      $om
      * @param EntityNameResolver $resolver
-     * @param AssociationManager $am
      */
-    public function __construct(ObjectManager $om, EntityNameResolver $resolver, AssociationManager $am)
+    public function __construct($class, ObjectManager $om, EntityNameResolver $resolver)
     {
-        parent::__construct('Oro\Bundle\CalendarBundle\Entity\CalendarEvent', $om);
+        parent::__construct($class, $om);
         $this->entityNameResolver = $resolver;
-        $this->associationManager = $am;
     }
 
     /**
