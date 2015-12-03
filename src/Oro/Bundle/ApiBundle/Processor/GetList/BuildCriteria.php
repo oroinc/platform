@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
+use Oro\Bundle\ApiBundle\Exceptioin\BadSorterValueHttpException;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
@@ -53,7 +54,7 @@ class BuildCriteria implements ProcessorInterface
                 : [];
             foreach ($orderBy as $field => $direction) {
                 if (!array_key_exists($field, $sortFields)) {
-                    throw new \RuntimeException(
+                    throw new BadSorterValueHttpException(
                         sprintf('Sorting by "%s" is not supported.', $field)
                     );
                 }

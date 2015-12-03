@@ -18,6 +18,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -702,6 +703,75 @@ class Context extends ApiContext
     public function setCriteria($criteria)
     {
         $this->set(self::CRITERIA, $criteria);
+    }
+
+    /**
+     * Adds error object to errors array
+     *
+     * @param Error $error
+     */
+    public function addError(Error $error)
+    {
+        $currentErrors = [];
+        if ($this->has('errors')) {
+            $currentErrors = $this->get('errors');
+        }
+        $currentErrors[] = $error;
+
+        $this->set('errors', $currentErrors);
+    }
+
+    /**
+     * Remove all Context errors
+     */
+    public function resetErrors()
+    {
+        $this->remove('errors');
+    }
+
+    /**
+     * Gets errors array
+     *
+     * @return Error[]|null
+     */
+    public function getErrors()
+    {
+        return $this->get('errors');
+    }
+
+    /**
+     * Returns true if context has errors
+     *
+     * @return bool
+     */
+    public function hasErrors()
+    {
+        return $this->has('errors') && count($this->get('errors')) > 0;
+    }
+
+    /**
+     * Sets response status code
+     *
+     * @param $statusCode
+     */
+    public function setStatusCode($statusCode)
+    {
+        $this->set('status_code', $statusCode);
+    }
+
+    /**
+     * Gets response status code
+     *
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        $code = Response::HTTP_OK;
+        if ($this->has('status_code')) {
+            $code = $this->get('status_code');
+        }
+
+        return $code;
     }
 
     /**

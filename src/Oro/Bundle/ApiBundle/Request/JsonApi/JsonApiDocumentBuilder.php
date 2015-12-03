@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Processor\Error;
 use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
@@ -67,6 +68,33 @@ class JsonApiDocumentBuilder
         if (null !== $object) {
             $this->result[self::DATA] = $this->handleObject($object, $metadata);
         }
+
+        return $this;
+    }
+
+    /**
+     * Sets errors array as the primary data
+     *
+     * @param array $errors
+     *
+     * @return $this
+     */
+    public function setErrorsCollection(array $errors)
+    {
+        $this->assertNoData();
+
+        $errorsData = [];
+
+        /** @var Error $error */
+        foreach ($errors as $error) {
+            $formattedError = ['detail' => $error->getDetail()];
+            if ($error->getStatus()) {
+                $formattedError['code'] = $error->getStatus();
+            }
+            $errorsData[] = $formattedError;
+        }
+
+        $this->result[self::ERRORS] = $errorsData;
 
         return $this;
     }

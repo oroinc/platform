@@ -105,6 +105,7 @@ class RestApiController extends FOSRestController
         $view = $this->view($result);
         $view->getSerializationContext()->setSerializeNull(true);
         $this->setResponseHeaders($view, $context);
+        $view->setStatusCode($context->getStatusCode());
 
         return $this->handleView($view);
     }

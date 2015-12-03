@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\ActionProcessor;
@@ -20,11 +21,28 @@ class RequestActionProcessor extends ActionProcessor
             parent::executeProcessors($context);
         } catch (ExecutionFailedException $e) {
             $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
-            if ($underlyingException instanceof HttpExceptionInterface) {
+
+            $status = 0;
+            if ($underlyingException instanceof HttpExceptionInterface
+            ) {
                 $e = $underlyingException;
+                $status = $underlyingException->getStatusCode();
             }
 
-            throw $e;
+            if ($underlyingException instanceof AccessDeniedException) {
+                $e = $underlyingException;
+                $status = $e->getCode();
+            }
+
+            $error = new Error();
+
+            $error->setStatus($status);
+            $error->setDetail($e->getMessage());
+            $error->setInnerException($e);
+            $context->addError($error);
+
+            $context->setFirstGroup('normalize_result');
+            parent::executeProcessors($context);
         }
     }
 }

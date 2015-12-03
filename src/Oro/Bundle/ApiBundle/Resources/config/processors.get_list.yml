@@ -207,12 +207,22 @@ services:
     # normalize_result
     #
 
+    oro_api.get_list.json_api.set_status_code:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ResponseStatusCode
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, priority: -5 }
+
     oro_api.get_list.json_api.build_json_api_document:
         class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\BuildJsonApiDocument
         arguments:
             - @oro_api.json_api.document_builder_factory
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -10 }
+
+    oro_api.get_list.json_api.process_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, priority: -100 }
 
     oro_api.get_list.json_api.validate_result_schema:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
