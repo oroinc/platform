@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
+/**
+ * This normalizer tells the ObjectNormalizer to skip a normalization of \DateTime.
+ */
 class DateTimeNormalizer implements ObjectNormalizerInterface
 {
     /**

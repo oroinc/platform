@@ -38,7 +38,7 @@ class OrmRelatedTestCase extends OrmTestCase
             ->getMock();
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $doctrine->expects($this->any())
             ->method('getAliasNamespace')
             ->will(

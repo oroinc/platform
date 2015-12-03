@@ -71,6 +71,13 @@ services:
         class: Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer
         public: false
 
+    oro_api.customize_data_item.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeDataItemProcessor
+        public: false
+        arguments:
+            - @oro_api.processor_bag
+            - customize_data_item
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
