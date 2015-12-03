@@ -576,7 +576,7 @@ define(function(require) {
                     var routeParametersRenameMap
                         = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
                     for (var i in routeParametersRenameMap) {
-                        if (response[routeParametersRenameMap[i]]) {
+                        if (typeof response[routeParametersRenameMap[i]] !== "undefined") {
                             this.cell.model.set(i, response[routeParametersRenameMap[i]]);
                         }
                     }
@@ -615,6 +615,13 @@ define(function(require) {
                     break;
                 case 403:
                     errors.push(__('You do not have permission to perform this action.'));
+                    break;
+                case 500:
+                    if (jqXHR.responseJSON.message) {
+                        errors.push(__(jqXHR.responseJSON.message));
+                    } else {
+                        errors.push(__('oro.ui.unexpected_error'));
+                    }
                     break;
                 default:
                     errors.push(__('oro.ui.unexpected_error'));
