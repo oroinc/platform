@@ -23,6 +23,7 @@ parameters:
     oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\DecoratorApiType
     oro_form.type.rich_text.class:                               Oro\Bundle\FormBundle\Form\Type\OroRichTextType
     oro_form.type.resizeable_rich_text.class:                    Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType
+    oro_form.type.data_changeset.class:                          Oro\Bundle\FormBundle\Form\Type\DataChangesetType
     oro_form.type.entity_changeset.class:                        Oro\Bundle\FormBundle\Form\Type\EntityChangesetType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
@@ -156,6 +157,13 @@ services:
         tags:
             - { name: form.type, alias: oro_resizeable_rich_text }
 
+    oro_form.type.data_changeset:
+        class: %oro_form.type.data_changeset.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: form.type, alias: oro_data_changeset }
+
     oro_form.type.entity_changeset:
         class: %oro_form.type.entity_changeset.class%
         arguments:
@@ -176,6 +184,9 @@ services:
 
     oro_help.form.tooltip_extension:
         class: %oro_form.extension.tooltip.class%
+        arguments:
+            - @oro_entity_config.provider.entity
+            - @translator.default
         tags:
             - { name: form.type_extension, alias: form }
 

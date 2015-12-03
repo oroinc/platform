@@ -1,0 +1,5 @@
+oro:
+    activity:
+        contexts:
+            added:   The context has been added
+            removed: The context has been removed

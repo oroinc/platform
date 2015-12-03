@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
 use Doctrine\ORM\NoResultException;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Security;
@@ -15,21 +16,20 @@ use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 class ContextListener
 {
     /** @var TokenStorage */
-    protected $tokenStorage;
+    private $tokenStorage = false;
 
     /** @var OrganizationManager */
-    protected $manager;
+    private $manager = false;
+
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param TokenStorage $tokenStorage
-     * @param OrganizationManager $manager
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        TokenStorage $tokenStorage,
-        OrganizationManager $manager
-    ) {
-        $this->tokenStorage = $tokenStorage;
-        $this->manager = $manager;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
     }
 
     /**
@@ -39,11 +39,11 @@ class ContextListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $token = $this->tokenStorage->getToken();
+        $token = $this->getTokenStorage()->getToken();
         if ($token instanceof OrganizationContextTokenInterface) {
             try {
                 $token->setOrganizationContext(
-                    $this->manager->getOrganizationById($token->getOrganizationContext()->getId())
+                    $this->getOrganizationManager()->getOrganizationById($token->getOrganizationContext()->getId())
                 );
 
                 if (!$token->getUser()->getOrganizations(true)->contains($token->getOrganizationContext())) {
@@ -51,12 +51,36 @@ class ContextListener
                     $exception->setOrganizationName($token->getOrganizationContext()->getName());
                     $exception->setToken($token);
                     $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
-                    $this->tokenStorage->setToken(null);
+                    $this->$this->getTokenStorage()->setToken(null);
                     throw $exception;
                 }
             } catch (NoResultException $e) {
                 $token->setAuthenticated(false);
             }
         }
+    }
+
+    /**
+     * @return TokenStorage
+     */
+    protected function getTokenStorage()
+    {
+        if ($this->tokenStorage === false) {
+            $this->tokenStorage = $this->container->get('security.token_storage');
+        }
+
+        return $this->tokenStorage;
+    }
+
+    /**
+     * @return OrganizationManager
+     */
+    protected function getOrganizationManager()
+    {
+        if ($this->manager === false) {
+            $this->manager = $this->container->get('oro_organization.organization_manager');
+        }
+
+        return $this->manager;
     }
 }

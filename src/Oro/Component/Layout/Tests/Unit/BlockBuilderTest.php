@@ -4,8 +4,10 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockBuilder;
 use Oro\Component\Layout\BlockTypeHelperInterface;
+use Oro\Component\Layout\DataAccessor;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\RawLayout;
 
 class BlockBuilderTest extends \PHPUnit_Framework_TestCase
@@ -25,17 +27,27 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var BlockBuilder */
     protected $blockBuilder;
 
+    /** @var DataAccessor */
+    protected $dataAccessor;
+
+    /** @var LayoutRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
+
     protected function setUp()
     {
         $this->rawLayout         = new RawLayout();
         $this->typeHelper        = $this->getMock('Oro\Component\Layout\BlockTypeHelperInterface');
         $this->context           = new LayoutContext();
         $this->layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $this->registry          = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->dataAccessor      = new DataAccessor($this->registry, $this->context);
+
         $this->blockBuilder      = new BlockBuilder(
             $this->layoutManipulator,
             $this->rawLayout,
             $this->typeHelper,
-            $this->context
+            $this->context,
+            $this->dataAccessor
         );
     }
 

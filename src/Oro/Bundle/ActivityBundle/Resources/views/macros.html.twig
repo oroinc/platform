@@ -1,0 +1,122 @@
+{#
+    Render activity contexts
+    Parameters:
+        entity - activity entity Oro\Bundle\ActivityBundle\Model\ActivityInterface
+#}
+{% macro activity_contexts(entity, target, checkTarget) %}
+    <script type="text/template" id="activity-context-activity-list">
+        <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
+                <span data-id="<%= entity.get('targetId') %>">
+                    <span class="<%= entity.get('icon') %>"></span>
+
+                    <% if (entity.get('link')) { %>
+                        <a href="<%= entity.get('link') %>">
+                            <span class="context-label"><%= entity.get('title') %></span>
+                        </a>
+                    <% } else { %>
+                        <span class="context-label"><%= entity.get('title') %></span>
+                    <% }  %>
+                    {% if  resource_granted('EDIT', entity) %}
+                        <i class="icon-remove"></i>
+                    {% endif %}
+                </span>
+        </div>
+    </script>
+
+    {% if checkTarget is empty %}
+        {% set checkTarget = false %}
+    {% endif %}
+
+    {% set targetClassNameEncoded = oro_class_name(target, true) %}
+    {% set activityClassAlias = oro_class_alias(entity, true) %}
+
+    {% set options = {
+        entityId: entity.id,
+        target: false,
+        checkTarget: checkTarget,
+        activityClassAlias: activityClassAlias
+    } %}
+
+    {% if checkTarget %}
+        {% set targetEntity = {
+            'target': {
+                'id' : target.id,
+                'className': targetClassNameEncoded
+            }
+        } %}
+        {% set options = options|merge(targetEntity) %}
+    {% endif %}
+
+    <div class="activity-context-activity"
+         data-page-component-module="oroactivity/js/app/components/activity-context-activity-component"
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate">
+        <div class="activity-context-activity-label">
+            {{ 'oro.activity.contexts.label'|trans }}
+        </div>
+        <div class="activity-context-activity-items">
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro activity_context_link() %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
+       data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
+        {{ UI.renderWidgetDataAttributes({
+            'type' : 'dialog',
+            'multiple' : true,
+            'refresh-widget-alias': 'activity-list-widget',
+            'options' : {
+                'alias': 'activity-context-dialog',
+                'dialogOptions' : {
+                    'title' : 'oro.activity.contexts.add_context_entity.label'|trans,
+                    'allowMaximize': true,
+                    'allowMinimize': true,
+                    'modal': true,
+                    'dblclick': 'maximize',
+                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                    'width': 1000,
+                    'height': 600
+                }
+            }
+        }) }}>
+        <i class="icon-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
+    </a>
+{% endmacro %}
+
+{# Button for add context on the activity list item view page #}
+{% macro addContextButton(entity, parameters) -%}
+    {% if resource_granted('EDIT', entity) %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {{ UI.clientButton({
+            'dataUrl': path(
+            'oro_activity_context', {
+                id:    entity.id,
+                activity: oro_class_name(entity, true)
+            }),
+            'aCss': 'no-hash',
+            'iCss': 'icon-link hide-text',
+            'dataId': entity.id,
+            'label' : 'oro.activity.contexts.add_context.label'|trans,
+            'widget' : {
+                'type' : 'dialog',
+                'multiple' : true,
+                'refresh-widget-alias': 'activity-list-widget',
+                'options' : {
+                    'alias': 'activity-context-dialog',
+                    'dialogOptions' : {
+                        'title' : 'oro.activity.contexts.add_context_entity.label'|trans,
+                        'allowMaximize': true,
+                        'allowMinimize': true,
+                        'modal': true,
+                        'dblclick': 'maximize',
+                        'maximizedHeightDecreaseBy': 'minimize-bar',
+                        'width': 1000,
+                        'height': 600
+                    }
+                }
+            }
+        }) }}
+    {% endif %}
+{% endmacro %}

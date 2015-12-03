@@ -346,7 +346,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         $folder        = $imapFolder->getFolder();
         $existingUids  = $this->getExistingUids($folder, $emails);
-        $isMultiFolder = $this->manager->hasCapability(Imap::CAPABILITY_MSG_MULTI_FOLDERS);
         $messageIds         = $this->getMessageIds($emails);
         $existingImapEmails = $this->getExistingImapEmails($folder->getOrigin(), $messageIds);
         $existingEmailUsers = $this->getExistingEmailUsers($folder, $messageIds);
@@ -368,43 +367,40 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 }
             );
 
-            $existingImapEmail = $this->findExistingImapEmail($relatedExistingImapEmails, $folder->getType());
-            if ($this->isMovableToOtherFolder($existingImapEmail, $isMultiFolder, $email)) {
-                $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
-            } else {
-                try {
-                    if (!isset($existingEmailUsers[$email->getMessageId()])) {
-                        $emailUser = $this->addEmailUser(
-                            $email,
-                            $folder,
-                            $email->hasFlag("\\Seen"),
-                            $this->currentUser,
-                            $this->currentOrganization
-                        );
-                    } else {
-                        $emailUser = $existingEmailUsers[$email->getMessageId()];
+            try {
+                if (!isset($existingEmailUsers[$email->getMessageId()])) {
+                    $emailUser = $this->addEmailUser(
+                        $email,
+                        $folder,
+                        $email->hasFlag("\\Seen"),
+                        $this->currentUser,
+                        $this->currentOrganization
+                    );
+                } else {
+                    $emailUser = $existingEmailUsers[$email->getMessageId()];
+                    if (!$emailUser->getFolders()->contains($folder)) {
                         $emailUser->addFolder($folder);
                     }
-                    $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
-                    $newImapEmails[] = $imapEmail;
-                    $this->em->persist($imapEmail);
-                    $this->logger->notice(
-                        sprintf(
-                            'The "%s" (UID: %d) email was persisted.',
-                            $email->getSubject(),
-                            $email->getId()->getUid()
-                        )
-                    );
-                } catch (\Exception $e) {
-                    $this->logger->warning(
-                        sprintf(
-                            'Failed to persist "%s" (UID: %d) email. Error: %s',
-                            $email->getSubject(),
-                            $email->getId()->getUid(),
-                            $e->getMessage()
-                        )
-                    );
                 }
+                $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
+                $newImapEmails[] = $imapEmail;
+                $this->em->persist($imapEmail);
+                $this->logger->notice(
+                    sprintf(
+                        'The "%s" (UID: %d) email was persisted.',
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+            } catch (\Exception $e) {
+                $this->logger->warning(
+                    sprintf(
+                        'Failed to persist "%s" (UID: %d) email. Error: %s',
+                        $email->getSubject(),
+                        $email->getId()->getUid(),
+                        $e->getMessage()
+                    )
+                );
             }
 
             $this->removeEmailFromOutdatedFolders($relatedExistingImapEmails);
@@ -477,45 +473,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
-     * Tries to find IMAP email in the given list of related IMAP emails
-     * This method returns ImapEmail object only if exactly one email is found
-     * and this email is located in the comparable folder {@see isComparableFolders()}
-     *
-     * @param ImapEmail[] $imapEmails
-     * @param string      $folderType
-     *
-     * @return ImapEmail|null
-     */
-    protected function findExistingImapEmail(array $imapEmails, $folderType)
-    {
-        if (empty($imapEmails)) {
-            return null;
-        }
-        if (count($imapEmails) === 1) {
-            /** @var ImapEmail $imapEmail */
-            $imapEmail = reset($imapEmails);
-            if (!$this->isComparableFolders($folderType, $imapEmail->getImapFolder()->getFolder()->getType())) {
-                return null;
-            }
-
-            return $imapEmail;
-        }
-
-        /** @var ImapEmail[] $filteredImapEmails */
-        $filteredImapEmails = array_filter(
-            $imapEmails,
-            function (ImapEmail $imapEmail) use ($folderType) {
-                return
-                    $this->isComparableFolders($folderType, $imapEmail->getImapFolder()->getFolder()->getType());
-            }
-        );
-
-        return count($filteredImapEmails) === 1
-            ? reset($filteredImapEmails)
-            : null;
-    }
-
-    /**
      * Removes email from all outdated folders
      *
      * @param ImapEmail[] $imapEmails The list of all related IMAP emails
@@ -532,34 +489,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         foreach ($outdatedImapEmails as $imapEmail) {
             $this->removeImapEmailReference($imapEmail);
         }
-    }
-
-    /**
-     * Moves an email to another folder
-     *
-     * @param ImapEmail       $imapEmail
-     * @param ImapEmailFolder $newImapFolder
-     * @param int             $newUid
-     */
-    protected function moveEmailToOtherFolder(ImapEmail $imapEmail, ImapEmailFolder $newImapFolder, $newUid)
-    {
-        $this->logger->notice(
-            sprintf(
-                'Move "%s" (UID: %d) email from "%s" to "%s". New UID: %d.',
-                $imapEmail->getEmail()->getSubject(),
-                $imapEmail->getUid(),
-                $imapEmail->getImapFolder()->getFolder()->getFullName(),
-                $newImapFolder->getFolder()->getFullName(),
-                $newUid
-            )
-        );
-
-        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
-        if ($emailUser !== null) {
-            $emailUser->addFolder($newImapFolder->getFolder());
-        }
-        $imapEmail->setImapFolder($newImapFolder);
-        $imapEmail->setUid($newUid);
     }
 
     /**

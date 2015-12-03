@@ -138,10 +138,7 @@ services:
     oro_locale.locale_listener:
         class: %oro_locale.locale_listener.class%
         arguments:
-            - @oro_locale.settings
-            - @stof_doctrine_extensions.listener.translatable
-            - %installed%
-            - @?router
+            - @service_container
         tags:
             - { name: kernel.event_subscriber }
 

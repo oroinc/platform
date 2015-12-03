@@ -25,6 +25,9 @@ parameters:
     # override default Doctrine event manager class
     doctrine.dbal.connection.event_manager.class:                  Oro\Bundle\EntityBundle\Event\OroEventManager
 
+    # override Doctrine MappingDriverChain
+    doctrine.orm.metadata.driver_chain.class: Oro\Bundle\EntityBundle\ORM\MappingDriverChain
+
     oro_entity.listener.orm.generated_value_strategy_listener.class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
 
     oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
@@ -216,6 +219,7 @@ services:
             - @oro_entity.entity_identifier_accessor
             - @oro_entity.routing_helper
             - @oro_entity.entity_name_resolver
+            - @oro_entity.entity_alias_resolver
         tags:
             - { name: twig.extension }
 

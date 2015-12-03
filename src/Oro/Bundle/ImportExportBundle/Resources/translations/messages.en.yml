@@ -12,7 +12,9 @@ oro:
             block_title:    "Import & Export"
             excluded.label: "Exclude Column"
             full.label:     "Export Fields"
+            full.tooltip:   "All fields of the related entity will be exported"
             header.label:   "Column Name"
+            header.tooltip: "If blank Label will be used"
             identity.label: "Use as Identity Field"
             order.label:    "Column Position"
 

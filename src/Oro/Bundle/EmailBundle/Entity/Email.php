@@ -817,4 +817,12 @@ class Email extends ExtendEmail
 
         return array_keys(AcceptHeader::fromString($this->acceptLanguageHeader)->all());
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getSubject();
+    }
 }

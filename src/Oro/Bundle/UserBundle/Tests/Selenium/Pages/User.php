@@ -427,4 +427,23 @@ class User extends AbstractPageEntity
 
         return $this;
     }
+
+    /**
+     * Method changes password using actions menu form user view page
+     * @param $newPassword
+     * @return $this
+     */
+    public function changePassword($newPassword)
+    {
+        $passwordField = "//*[@data-ftid='oro_set_password_form_password']";
+        $this->runActionInGroup('Change password');
+        $this->waitForAjax();
+        $this->test->byXPath($passwordField)->clear();
+        $this->test->byXPath($passwordField)->value($newPassword);
+        $this->test->byXPath("//div[@class='widget-actions-section']//button[@type='submit']")->click();
+        $this->waitForAjax();
+        $this->assertMessage('The password has been changed');
+
+        return $this;
+    }
 }

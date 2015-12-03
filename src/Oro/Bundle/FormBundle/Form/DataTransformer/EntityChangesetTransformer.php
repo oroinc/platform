@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EntityChangesetTransformer implements DataTransformerInterface
 {
     const ENTITY_KEY = 'entity';
-    const DATA_KEY = 'data';
 
     /**
      * @var DoctrineHelper
@@ -39,16 +38,7 @@ class EntityChangesetTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        $result = [];
-        if (null === $value || [] === $value) {
-            return $result;
-        }
-
-        foreach ($value as $id => $changeSetRow) {
-            $result[$id] = $changeSetRow[self::DATA_KEY];
-        }
-
-        return $result;
+        return $value;
     }
 
     /**
@@ -56,9 +46,8 @@ class EntityChangesetTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        $result = new ArrayCollection();
         if (!$value) {
-            return $result;
+            return new ArrayCollection();
         }
 
         if (!is_array($value) && !$value instanceof \Traversable) {
@@ -66,16 +55,13 @@ class EntityChangesetTransformer implements DataTransformerInterface
         }
 
         foreach ($value as $id => $changeSetRow) {
-            $result->set(
-                $id,
-                [
-                    self::ENTITY_KEY => $this->getEntityById($id),
-                    self::DATA_KEY => $changeSetRow
-                ]
+            $value[$id] = array_merge(
+                $changeSetRow,
+                [self::ENTITY_KEY => $this->getEntityById($id)]
             );
         }
 
-        return $result;
+        return $value;
     }
 
     /**

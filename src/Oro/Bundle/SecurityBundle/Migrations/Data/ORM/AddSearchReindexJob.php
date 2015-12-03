@@ -60,7 +60,7 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
         );
 
         // if we have search result for username and it's owner - search data already contains data with owners.
-        if ($searchResult) {
+        if ($searchResult->getRecordsCount()) {
             return;
         }
 
