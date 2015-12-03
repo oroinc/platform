@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Exceptioin\BadSorterValueHttpException;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Processor\Error;
-use Oro\Bundle\ApiBundle\Processor\Shared\ResponseStatusCode;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Processor\Shared\SetResponseStatusCode;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ResponseStatusCodeTest extends \PHPUnit_Framework_TestCase
+class SetResponseStatusCodeTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ResponseStatusCode */
+    /** @var SetResponseStatusCode */
     protected $processor;
 
     public function setUp()
     {
-        $this->processor = new ResponseStatusCode();
+        $this->processor = new SetResponseStatusCode();
     }
 
     /**
@@ -39,15 +39,15 @@ class ResponseStatusCodeTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->assertEquals(Response::HTTP_OK, $context->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $context->getResponseStatusCode());
         $this->processor->process($context);
-        $this->assertEquals($expectedCode, $context->getStatusCode());
+        $this->assertEquals($expectedCode, $context->getResponseStatusCode());
     }
 
     public function processData()
     {
-        $badSorerHttpError = new Error();
-        $badSorerHttpError->setInnerException(new BadSorterValueHttpException());
+        $notAcceptableHttpError = new Error();
+        $notAcceptableHttpError->setInnerException(new NotAcceptableHttpException());
 
         $conflictHttpError = new Error();
         $conflictHttpError->setInnerException(new ConflictHttpException());
@@ -64,11 +64,11 @@ class ResponseStatusCodeTest extends \PHPUnit_Framework_TestCase
                 Response::HTTP_OK
             ],
             'context with one HTTP error' => [
-                [$badSorerHttpError],
+                [$notAcceptableHttpError],
                 Response::HTTP_NOT_ACCEPTABLE
             ],
             'context with multiply HTTP errors from one group' => [
-                [$badSorerHttpError, $conflictHttpError],
+                [$notAcceptableHttpError, $conflictHttpError],
                 Response::HTTP_BAD_REQUEST
             ],
             'context with Symfony Security AccessDeniedException' => [
@@ -80,7 +80,7 @@ class ResponseStatusCodeTest extends \PHPUnit_Framework_TestCase
                 Response::HTTP_INTERNAL_SERVER_ERROR
             ],
             'context with multiply HTTP errors from different groups' => [
-                [$badSorerHttpError, $conflictHttpError, $nonHttpException],
+                [$notAcceptableHttpError, $conflictHttpError, $nonHttpException],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             ],
         ];

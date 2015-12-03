@@ -1,22 +1,35 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor;
+namespace Oro\Bundle\ApiBundle\Model;
 
 class Error
 {
-    /** @var string */
+    /**
+     * A human-readable summary of the problem. May be translatable.
+     *
+     * @var string
+     */
     protected $title;
 
-    /** @var string */
+    /**
+     * A human-readable explanation specific to this occurrence of the problem.
+     * @var string
+     */
     protected $detail;
 
-    /** @var string */
+    /**
+     * The HTTP status code.
+     *
+     * @var integer
+     */
     protected $status;
 
     /** @var \Exception */
     protected $innerException;
 
     /**
+     * Gets title.
+     *
      * @return string
      */
     public function getTitle()
@@ -25,6 +38,8 @@ class Error
     }
 
     /**
+     * Sets title.
+     *
      * @param string $title
      */
     public function setTitle($title)
@@ -33,6 +48,8 @@ class Error
     }
 
     /**
+     * Gets detail.
+     *
      * @return string
      */
     public function getDetail()
@@ -41,6 +58,8 @@ class Error
     }
 
     /**
+     * Sets detail.
+     *
      * @param string $detail
      */
     public function setDetail($detail)
@@ -49,7 +68,9 @@ class Error
     }
 
     /**
-     * @return string
+     * Gets status code.
+     *
+     * @return int
      */
     public function getStatus()
     {
@@ -57,7 +78,9 @@ class Error
     }
 
     /**
-     * @param string $status
+     * Sets status code.
+     *
+     * @param int $status
      */
     public function setStatus($status)
     {
@@ -65,6 +88,8 @@ class Error
     }
 
     /**
+     * Gets inner exception.
+     *
      * @return \Exception
      */
     public function getInnerException()
@@ -73,6 +98,8 @@ class Error
     }
 
     /**
+     * Sets inner exception.
+     *
      * @param \Exception $innerException
      */
     public function setInnerException($innerException)

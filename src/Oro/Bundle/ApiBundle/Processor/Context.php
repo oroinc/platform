@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ParameterBag;
-use Oro\Component\ChainProcessor\ParameterBagInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
@@ -18,6 +17,8 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -47,6 +48,9 @@ class Context extends ApiContext
     /** the Criteria object is used to add additional restrictions to a query is used to get result data */
     const CRITERIA = 'criteria';
 
+    /** response status code */
+    const RESPONSE_STATUS_CODE = 'response_status_code';
+
     /**
      * this header can be used to request additional data like "total count"
      * that will be returned in a response headers
@@ -58,6 +62,9 @@ class Context extends ApiContext
 
     /** @var FilterValueAccessorInterface */
     private $filterValues;
+
+    /** @var Error[] */
+    private $errors;
 
     /** @var ConfigProvider */
     protected $configProvider;
@@ -82,7 +89,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether a configuration of filters for an entity exists
+     * Checks whether a configuration of filters for an entity exists.
      *
      * @return bool
      */
@@ -92,7 +99,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a configuration of filters for an entity
+     * Gets a configuration of filters for an entity.
      *
      * @return array|null
      */
@@ -102,7 +109,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a configuration of filters for an entity
+     * Sets a configuration of filters for an entity.
      *
      * @param array|null $config
      */
@@ -112,7 +119,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether a configuration of sorters for an entity exists
+     * Checks whether a configuration of sorters for an entity exists.
      *
      * @return bool
      */
@@ -122,7 +129,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a configuration of sorters for an entity
+     * Gets a configuration of sorters for an entity.
      *
      * @return array|null
      */
@@ -132,7 +139,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a configuration of sorters for an entity
+     * Sets a configuration of sorters for an entity.
      *
      * @param array|null $config
      */
@@ -142,7 +149,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a list of filters is used to add additional restrictions to a query is used to get result data
+     * Gets a list of filters is used to add additional restrictions to a query is used to get result data.
      *
      * @return FilterCollection
      */
@@ -156,7 +163,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a collection of the FilterValue objects that contains all incoming filters
+     * Gets a collection of the FilterValue objects that contains all incoming filters.
      *
      * @return FilterValueAccessorInterface
      */
@@ -170,7 +177,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets an object that will be used to accessing incoming filters
+     * Sets an object that will be used to accessing incoming filters.
      *
      * @param FilterValueAccessorInterface $accessor
      */
@@ -180,7 +187,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a key of a main section of an entity configuration
+     * Gets a key of a main section of an entity configuration.
      *
      * @return string
      */
@@ -190,7 +197,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Loads an entity configuration
+     * Loads an entity configuration.
      */
     protected function loadConfig()
     {
@@ -226,7 +233,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Makes sure that all config sections are added to the context
+     * Makes sure that all config sections are added to the context.
      */
     protected function ensureAllConfigSectionsSet()
     {
@@ -242,7 +249,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Loads an entity metadata
+     * Loads an entity metadata.
      */
     protected function loadMetadata()
     {
@@ -267,7 +274,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets headers an API request
+     * Gets headers an API request.
      *
      * @return ParameterBagInterface
      */
@@ -281,7 +288,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets an object that will be used to accessing headers an API request
+     * Sets an object that will be used to accessing headers an API request.
      *
      * @param ParameterBagInterface $parameterBag
      */
@@ -291,7 +298,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets headers an API response
+     * Gets headers an API response.
      *
      * @return ParameterBagInterface
      */
@@ -305,7 +312,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets an object that will be used to accessing headers an API response
+     * Sets an object that will be used to accessing headers an API response.
      *
      * @param ParameterBagInterface $parameterBag
      */
@@ -315,7 +322,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets FQCN of an entity
+     * Gets FQCN of an entity.
      *
      * @return string
      */
@@ -325,7 +332,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets FQCN of an entity
+     * Sets FQCN of an entity.
      *
      * @param string $className
      */
@@ -335,7 +342,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether a configuration of an entity exists
+     * Checks whether a configuration of an entity exists.
      *
      * @return bool
      */
@@ -345,7 +352,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a configuration of an entity
+     * Gets a configuration of an entity.
      *
      * @return array|null
      */
@@ -360,7 +367,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a configuration of an entity
+     * Sets a configuration of an entity.
      *
      * @param array|null $config
      */
@@ -373,7 +380,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether a configuration of the given section exists
+     * Checks whether a configuration of the given section exists.
      *
      * @param string $configSection
      *
@@ -389,7 +396,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a configuration from the given section
+     * Gets a configuration from the given section.
      *
      * @param string $configSection
      *
@@ -414,7 +421,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a configuration for the given section
+     * Sets a configuration for the given section.
      *
      * @param string     $configSection
      * @param array|null $config
@@ -529,7 +536,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether metadata of an entity exists
+     * Checks whether metadata of an entity exists.
      *
      * @return bool
      */
@@ -539,7 +546,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets metadata of an entity
+     * Gets metadata of an entity.
      *
      * @return EntityMetadata|null
      */
@@ -553,7 +560,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets metadata of an entity
+     * Sets metadata of an entity.
      *
      * @param EntityMetadata|null $config
      */
@@ -656,7 +663,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether a query is used to get result data exists
+     * Checks whether a query is used to get result data exists.
      *
      * @return bool
      */
@@ -666,7 +673,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a query is used to get result data
+     * Gets a query is used to get result data.
      *
      * @return mixed
      */
@@ -676,7 +683,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a query is used to get result data
+     * Sets a query is used to get result data.
      *
      * @param mixed $query
      */
@@ -686,7 +693,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets the Criteria object is used to add additional restrictions to a query is used to get result data
+     * Gets the Criteria object is used to add additional restrictions to a query is used to get result data.
      *
      * @return Criteria
      */
@@ -696,7 +703,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets the Criteria object is used to add additional restrictions to a query is used to get result data
+     * Sets the Criteria object is used to add additional restrictions to a query is used to get result data.
      *
      * @param Criteria $criteria
      */
@@ -706,72 +713,61 @@ class Context extends ApiContext
     }
 
     /**
-     * Adds error object to errors array
+     * Adds error.
      *
      * @param Error $error
      */
     public function addError(Error $error)
     {
-        $currentErrors = [];
-        if ($this->has('errors')) {
-            $currentErrors = $this->get('errors');
-        }
-        $currentErrors[] = $error;
-
-        $this->set('errors', $currentErrors);
+        $this->errors[] = $error;
     }
 
     /**
-     * Remove all Context errors
+     * Remove all errors.
      */
     public function resetErrors()
     {
-        $this->remove('errors');
+        $this->errors = [];
     }
 
     /**
-     * Gets errors array
+     * Gets errors.
      *
      * @return Error[]|null
      */
     public function getErrors()
     {
-        return $this->get('errors');
+        return $this->errors;
     }
 
     /**
-     * Returns true if context has errors
+     * Returns true if context has errors.
      *
      * @return bool
      */
     public function hasErrors()
     {
-        return $this->has('errors') && count($this->get('errors')) > 0;
+        return !empty($this->errors);
     }
 
     /**
-     * Sets response status code
+     * Sets response status code.
      *
      * @param $statusCode
      */
-    public function setStatusCode($statusCode)
+    public function setResponseStatusCode($statusCode)
     {
-        $this->set('status_code', $statusCode);
+        $this->set(self::RESPONSE_STATUS_CODE, $statusCode);
     }
 
     /**
-     * Gets response status code
+     * Gets response status code.
      *
      * @return int
      */
-    public function getStatusCode()
+    public function getResponseStatusCode()
     {
-        $code = Response::HTTP_OK;
-        if ($this->has('status_code')) {
-            $code = $this->get('status_code');
-        }
-
-        return $code;
+        return $this->get(self::RESPONSE_STATUS_CODE) ? : Response::HTTP_OK;
     }
 
     /**

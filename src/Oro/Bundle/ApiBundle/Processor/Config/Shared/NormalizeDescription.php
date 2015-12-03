@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\Config\Label;
+use Oro\Bundle\ApiBundle\Model\Label;
 
 abstract class NormalizeDescription implements ProcessorInterface
 {

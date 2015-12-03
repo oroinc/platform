@@ -156,7 +156,7 @@ services:
     #
 
     oro_api.get.json_api.set_status_code:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ResponseStatusCode
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResponseStatusCode
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, priority: -5 }
 
