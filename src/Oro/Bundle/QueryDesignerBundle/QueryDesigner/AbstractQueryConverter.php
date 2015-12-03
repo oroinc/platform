@@ -441,6 +441,32 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * @param array $column
+     *
+     * @return array Where array has elements: string|FunctionInterface|null, string|null
+     */
+    protected function createColumnFuncion(array $column)
+    {
+        if (!empty($column['func'])) {
+            $function           = $this->functionProvider->getFunction(
+                $column['func']['name'],
+                $column['func']['group_name'],
+                $column['func']['group_type']
+            );
+            $functionExpr       = $function['expr'];
+            if (isset($function['return_type'])) {
+                $functionReturnType = $function['return_type'];
+            } else {
+                $functionReturnType = null;
+            }
+
+            return [$functionExpr, $functionReturnType];
+        }
+
+        return [null, null];
+    }
+
+    /**
      * Performs conversion of SELECT statement
      */
     protected function addSelectStatement()
@@ -448,21 +474,7 @@ abstract class AbstractQueryConverter
         foreach ($this->definition['columns'] as $column) {
             $columnName         = $column['name'];
             $fieldName          = $this->getFieldName($columnName);
-            $functionExpr       = null;
-            $functionReturnType = null;
-            if (!empty($column['func'])) {
-                $function           = $this->functionProvider->getFunction(
-                    $column['func']['name'],
-                    $column['func']['group_name'],
-                    $column['func']['group_type']
-                );
-                $functionExpr       = $function['expr'];
-                if (isset($function['return_type'])) {
-                    $functionReturnType = $function['return_type'];
-                } else {
-                    $functionReturnType = null;
-                }
-            }
+            list($functionExpr, $functionReturnType) = $this->createColumnFuncion($column);
             $isDistinct = !empty($column['distinct']);
             $tableAlias = $this->getTableAliasForColumn($columnName);
             if (isset($column['label'])) {
@@ -651,6 +663,12 @@ abstract class AbstractQueryConverter
         $fieldName      = $this->getFieldName($columnName);
         $columnAliasKey = $this->buildColumnAliasKey($columnName);
         $tableAlias     = $this->getTableAliasForColumn($columnName);
+        $column = ['name' => $fieldName];
+        if (isset($filter['func'])) {
+            $column['func'] = $filter['func'];
+        }
+        list($functionExpr) = $this->createColumnFuncion($column);
+
         $this->addWhereCondition(
             $this->getEntityClassName($columnName),
             $tableAlias,
