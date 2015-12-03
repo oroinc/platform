@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
@@ -27,18 +28,27 @@ class TagsExtension extends AbstractExtension
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
+    /** @var EntityRoutingHelper */
+    protected $entityRoutingHelper;
+
     /** @var TaggableHelper */
     protected $taggableHelper;
 
     /**
      * @param TagManager          $tagManager
      * @param EntityClassResolver $resolver
+     * @param EntityRoutingHelper $entityRoutingHelper
      * @param TaggableHelper      $helper
      */
-    public function __construct(TagManager $tagManager, EntityClassResolver $resolver, TaggableHelper $helper)
+    public function __construct(
+        TagManager $tagManager,
+        EntityClassResolver $resolver,
+        EntityRoutingHelper $entityRoutingHelper,
+        TaggableHelper $helper)
     {
         $this->tagManager          = $tagManager;
         $this->entityClassResolver = $resolver;
+        $this->entityRoutingHelper = $entityRoutingHelper;
         $this->taggableHelper      = $helper;
     }
 
@@ -59,19 +69,42 @@ class TagsExtension extends AbstractExtension
     {
         $columns = $config->offsetGetByPath('[columns]') ? : [];
         $formatter = new GridTaskPropertyFormatter();
+        header('entity: ' .$this->getEntityClassName($config));
         $config->offsetSetByPath(
             '[columns]',
             array_merge(
                 $columns,
                 [
                     self::COLUMN_NAME => [
-                        'label'         => 'oro.tag.tags_label',
-                        'type'          => 'callback',
-                        'frontend_type' => 'tags',
-                        'callable'      => array($formatter, 'getValue'),
-                        'editable'      => false,
-                        'translatable'  => true,
-                        'renderable'    => false
+                        'label'          => 'oro.tag.tags_label',
+                        'type'           => 'callback',
+                        'frontend_type'  => 'tags',
+                        'callable'       => array($formatter, 'getValue'),
+                        'editable'       => false,
+                        'translatable'   => true,
+                        'renderable'     => false,
+                        'inline_editing' => [
+                            'enable'         => true,
+                            'editor'         => [
+                                'view'           => 'orotag/js/app/views/editor/tags-editor-view'
+                            ],
+                            'save_api_accessor' => [
+                                'route' => 'oro_api_post_taggable',
+                                'http_method' => 'POST',
+                                'default_route_parameters' => [
+                                    'entity' => $this->entityRoutingHelper->getUrlSafeClassName(
+                                        $this->getEntityClassName($config))
+                                ],
+                                'route_parameters_rename_map' => [
+                                    'id' => 'entityId'
+                                ]
+                            ],
+                            'autocomplete_api_accessor' => [
+                                'class' => 'oroui/js/tools/search-api-accessor',
+                                'search_handler_name' => 'tags',
+                                'label_field_name' => 'name'
+                            ]
+                        ]
                     ]
                 ]
             )
