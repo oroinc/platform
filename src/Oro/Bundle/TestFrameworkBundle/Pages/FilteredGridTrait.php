@@ -78,4 +78,18 @@ trait FilteredGridTrait
 
         return $this;
     }
+
+    /**
+     * Method to refresh grid
+     * @return $this
+     */
+    public function refreshGrid()
+    {
+        $this->test->byXpath(
+            "//div[@class='actions-panel pull-right form-horizontal']//a[contains(., 'Refresh')]"
+        )->click();
+        $this->waitForAjax();
+
+        return $this;
+    }
 }
