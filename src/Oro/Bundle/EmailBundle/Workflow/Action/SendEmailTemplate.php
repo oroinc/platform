@@ -126,7 +126,7 @@ class SendEmailTemplate extends AbstractSendEmail
         }
         $templateData = $this->renderer->compileMessage($emailTemplate, ['entity' => $entity]);
 
-        $type = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
+        $type = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'html';
         list ($subjectRendered, $templateRendered) = $templateData;
 
         $emailModel->setSubject($subjectRendered);
