@@ -88,9 +88,9 @@ class ChannelRepository extends EntityRepository
         if (!empty($arguments)) {
             if (is_array($arguments)) {
                 $orX = $qb->expr()->orX();
-                foreach($arguments as $key => $argument) {
-                    $orX->add($qb->expr()->like('cast(j.args as text)', ':args_'.$key));
-                    $qb->setParameter('args_'.$key, '%' . $argument . '%');
+                foreach ($arguments as $key => $argument) {
+                    $orX->add($qb->expr()->like('cast(j.args as text)', ':args_' . $key));
+                    $qb->setParameter('args_' . $key, '%' . $argument . '%');
                 }
 
                 $qb->andWhere($orX);
