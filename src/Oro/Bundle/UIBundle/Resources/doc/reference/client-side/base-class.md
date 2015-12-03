@@ -11,3 +11,8 @@ Implements [Backbone events API](http://backbonejs.org/#Events), Chaplin's
 | options | <code>Object</code> | Options container |
 | options.listen | <code>Object</code> | Optional. Events to bind |
 
+<a name="module_BaseClass#disposed"></a>
+### baseClass.disposed : <code>boolean</code>
+Flag shows if the class is disposed or not
+
+**Kind**: instance property of <code>[BaseClass](#module_BaseClass)</code>  
