@@ -58,6 +58,7 @@ class TagsExtension extends AbstractExtension
     public function processConfigs(DatagridConfiguration $config)
     {
         $columns = $config->offsetGetByPath('[columns]') ? : [];
+        $formatter = new GridTaskPropertyFormatter();
         $config->offsetSetByPath(
             '[columns]',
             array_merge(
@@ -65,9 +66,9 @@ class TagsExtension extends AbstractExtension
                 [
                     self::COLUMN_NAME => [
                         'label'         => 'oro.tag.tags_label',
-                        'type'          => 'twig',
-                        'frontend_type' => 'html',
-                        'template'      => 'OroTagBundle:Datagrid:Property/tags.html.twig',
+                        'type'          => 'callback',
+                        'frontend_type' => 'tags',
+                        'callable'      => array($formatter, 'getValue'),
                         'editable'      => false,
                         'translatable'  => true,
                         'renderable'    => false

@@ -1,12 +1,5 @@
 {% if value %}
-    <ul class="inline tag-list">
-        {% for tag in value %}
-            <li data-id="{{ tag.id }}">
-                <a href="{{ path('oro_tag_search', {id: tag.id}) }}">
-                    <span class="label label-info">{{ tag.name }}</span>
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+    {{ value|json_encode|raw }}
+{%  else  %}
+    []
 {% endif %}
-
