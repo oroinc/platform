@@ -42,3 +42,5 @@ oro:
             owner.label:         Owner
             record_id.label:     Record
             tag.label:           Tag
+
+        tags_label: Tags

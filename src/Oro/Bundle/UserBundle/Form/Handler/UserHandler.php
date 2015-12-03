@@ -13,8 +13,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -25,7 +23,7 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
  *
  * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  */
-class UserHandler extends AbstractUserHandler implements TagHandlerInterface
+class UserHandler extends AbstractUserHandler
 {
     /** @var DelegatingEngine */
     protected $templating;
@@ -41,9 +39,6 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
 
     /** @var LoggerInterface */
     protected $logger;
-
-    /** @var TagManager */
-    protected $tagManager;
 
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
@@ -112,14 +107,6 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setTagManager(TagManager $tagManager)
-    {
-        $this->tagManager = $tagManager;
-    }
-
-    /**
      * @param BusinessUnitManager $businessUnitManager
      */
     public function setBusinessUnitManager(BusinessUnitManager $businessUnitManager)
@@ -133,7 +120,6 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     protected function onSuccess(User $user)
     {
         $this->manager->updateUser($user);
-        $this->tagManager->saveTagging($user);
 
         if ($this->form->has('inviteUser')
             && $this->form->has('plainPassword')
