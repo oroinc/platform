@@ -25,6 +25,13 @@ class CalendarEventGuestsProvider
         $this->entityNameResolver = $resolver;
     }
 
+    /**
+     * Returns properties of calendar event quests(child events and related users).
+     *
+     * @param CalendarEvent $event
+     *
+     * @return array [id, invitationStatus, email, userFullName]
+     */
     public function getGuestsInfo(CalendarEvent $event)
     {
         /** @var CalendarEventRepository $calendarEventRepository */
