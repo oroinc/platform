@@ -149,7 +149,6 @@ define(function(require) {
                         }
                     }
                 }
-                this.currentTermWeakSearchExpression = this.buildWeakSearchExpression(this.currentTerm);
                 data.results.sort(_.bind(this.tagSortCallback, this));
             } else {
                 data = $.extend({}, this.currentData);
@@ -174,27 +173,12 @@ define(function(require) {
             return this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
         },
 
-        buildWeakSearchExpression: function(term) {
-            var lowerCaseTerm = term.toLowerCase();
-            var regExpString = '';
-            for (var i = 0; i < lowerCaseTerm.length; i++) {
-                var letter = lowerCaseTerm[i];
-                regExpString += letter.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') + '.*';
-            }
-            return new RegExp(regExpString + '.*', 'i');
-        },
-
         getTermSimilarity: function(term) {
             var lowerCaseTerm = term.toLowerCase();
             var index = lowerCaseTerm.indexOf(this.currentTerm.toLowerCase());
             if (index === -1) {
-                var result = this.currentTermWeakSearchExpression.exec(term);
-                if (result === null) {
-                    return 1000;
-                }
-                return result.index + 500;
+                return 1000;
             }
-
             return index;
         },
 
