@@ -1,7 +1,8 @@
 define([
     'jquery',
+    'oroui/js/tools/scroll-helper',
     'bootstrap'
-], function($) {
+], function($, scrollHelper) {
     'use strict';
 
     /**
@@ -131,4 +132,58 @@ define([
     Popover.prototype.destroy = delegateAction(Popover.prototype.destroy, 'destroy');
     Tooltip.prototype.hide = delegateAction(Tooltip.prototype.hide, 'hide');
     Tooltip.prototype.destroy = delegateAction(Tooltip.prototype.destroy, 'destroy');
+
+    var originalApplyPlacement = Popover.prototype.applyPlacement;
+    Popover.prototype.applyPlacement = function(coords, posId) {
+        originalApplyPlacement.apply(this, arguments);
+
+        /*
+         * SCROLL support
+         */
+        var adjustmentLeft = scrollHelper.scrollIntoView(this.$tip[0]);
+
+        /*
+         * SHIFT support
+         */
+        if (posId === 'right' || posId === 'left') {
+            var outerHeight = this.$tip.outerHeight();
+            var visibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
+            var visibleHeight = visibleRect.bottom - visibleRect.top;
+            if (visibleHeight < outerHeight - /* fixes floating pixel calculation */ 1) {
+                // still doesn't match, decrease height and move into visible area
+                this.$tip.css({
+                    maxHeight: visibleHeight
+                });
+                this.$tip.css({
+                    height: this.$tip.outerHeight()
+                });
+                var centerChange = (outerHeight - visibleHeight) / 2;
+
+                this.$tip.css({
+                    top: parseFloat(this.$tip.css('top')) + adjustmentLeft.vertical
+                });
+                this.$arrow.css({
+                    top: 'calc(50% + ' + (centerChange - adjustmentLeft.vertical) + 'px)'
+                });
+            }
+        }
+    };
+    var originalShow = Popover.prototype.show;
+    Popover.prototype.show = function() {
+        // remove adjustments made by applyPlacement
+        if (this.$tip) {
+            this.$tip.css({
+                height: '',
+                maxHeight: '',
+                top: ''
+            });
+        }
+        if (this.$arrow) {
+            this.$arrow.css({
+                top: ''
+            });
+        }
+
+        originalShow.apply(this, arguments);
+    };
 });

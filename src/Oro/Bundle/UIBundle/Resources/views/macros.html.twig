@@ -123,7 +123,7 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -137,7 +137,7 @@
         {% set data = data|striptags('<a>')|raw|nl2br %}
     {% endif %}
 
-    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label html-property">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -902,7 +902,8 @@
             {% set class = '' %}
         {% endif %}
         {% if url is not empty %}
-            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title }}</a>
+            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
+                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ title }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
@@ -948,8 +949,8 @@
 
 {%- macro renderList(elements) -%}
     <ul class="extra-list">
-        {% for element in elements %}
+        {%- for element in elements %}
             <li class="extra-list-element">{{ element }}</li>
-        {% endfor %}
+        {% endfor -%}
     </ul>
 {% endmacro %}

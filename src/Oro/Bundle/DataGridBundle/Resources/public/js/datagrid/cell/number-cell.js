@@ -37,6 +37,35 @@ define([
          */
         createFormatter: function() {
             return new this.formatterPrototype({style: this.style});
+        },
+
+        /**
+         * @inheritDoc
+         */
+        render: function() {
+            var render = NumberCell.__super__.render.apply(this, arguments);
+
+            this.enterEditMode();
+
+            return render;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        enterEditMode: function() {
+            if (this.column.get('editable')) {
+                NumberCell.__super__.enterEditMode.apply(this, arguments);
+            }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        exitEditMode: function() {
+            if (!this.column.get('editable')) {
+                NumberCell.__super__.exitEditMode.apply(this, arguments);
+            }
         }
     });
 

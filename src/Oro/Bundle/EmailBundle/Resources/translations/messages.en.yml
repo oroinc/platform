@@ -205,6 +205,8 @@ oro:
             no_subject.label:     (no subject)
         to.label:                 To
         cc_bcc.label:             Cc/Bcc
+        cc.label:                 Cc
+        bcc.label:                Bcc
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
         template.label:           Apply template

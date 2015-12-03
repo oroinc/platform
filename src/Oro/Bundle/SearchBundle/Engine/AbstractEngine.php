@@ -176,7 +176,7 @@ abstract class AbstractEngine implements EngineInterface
     protected function reindexSingleEntity($entityName, $offset = null, $limit = null)
     {
         /** @var EntityManager $entityManager */
-            $entityManager = $this->registry->getManagerForClass($entityName);
+        $entityManager = $this->registry->getManagerForClass($entityName);
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
 
         $pk = $entityManager->getClassMetadata($entityName)->getIdentifier();

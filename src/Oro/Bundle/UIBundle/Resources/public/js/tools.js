@@ -256,8 +256,22 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         safeRegExp: function(str, flags) {
             var expression;
             str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-            expression = new RegExp(str, flags);
+            expression = new RegExp('(' + str + ')', flags);
             return expression;
+        },
+
+        /**
+         * Generates Version 4 random UUIDs (https://en.wikipedia.org/wiki/Universally_unique_identifier)
+         * @return {string}
+         */
+        createRandomUUID: function() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                // jshint -W016
+                var r = Math.random() * 16 | 0;
+                var v = c === 'x' ? r : (r & 0x3 | 0x8);
+                // jshint +W016
+                return v.toString(16);
+            });
         },
 
         /**

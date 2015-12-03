@@ -54,7 +54,7 @@ define(function(require) {
                     this._bindOpenEvent();
                 } else {
                     this._deferredInit();
-                    this.openWidget();
+                    this.openWidget().done(_.bind(this._resolveDeferredInit, this));
                 }
             }
         },
@@ -87,28 +87,31 @@ define(function(require) {
          * Handles open widget action to
          *  - check if widget module is loaded before open widget
          *
-         * @protected
+         *  @return {Promise}
          */
         openWidget: function() {
+            var deferredOpen = $.Deferred();
             var widgetModuleName;
             if (!this.widget) {
                 // defines module name and load the module, before open widget
                 widgetModuleName = mapWidgetModuleName(this.options.type);
                 tools.loadModules(widgetModuleName, function(Widget) {
                     this.widget = Widget;
-                    this._openWidget();
+                    this._openWidget(deferredOpen);
                 }, this);
             } else {
-                this._openWidget();
+                this._openWidget(deferredOpen);
             }
+            return deferredOpen.promise();
         },
 
         /**
          * Instantiates widget and opens (renders) it
          *
+         * @param {jQuery.Deferred} deferredOpen to handle widget opening process
          * @protected
          */
-        _openWidget: function() {
+        _openWidget: function(deferredOpen) {
             var widget;
             var Widget = this.widget;
             var options = $.extend(true, {}, this.options.options);
@@ -145,9 +148,11 @@ define(function(require) {
             }
 
             if (widget.deferredRender) {
-                widget.deferredRender.done(_.bind(this._resolveDeferredInit, this));
+                widget.deferredRender
+                    .done(_.bind(deferredOpen.resolve, deferredOpen))
+                    .fail(_.bind(deferredOpen.reject, deferredOpen));
             } else {
-                this._resolveDeferredInit();
+                deferredOpen.resolve(widget);
             }
         },
 

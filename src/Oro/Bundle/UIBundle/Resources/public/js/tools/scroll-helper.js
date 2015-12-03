@@ -1,11 +1,41 @@
 define(function(require) {
     'use strict';
+
     var $ = require('jquery');
     var _ = require('underscore');
-    var layout = require('oroui/js/layout');
     var tools = require('oroui/js/tools');
 
     return {
+        /**
+         * Height of header on mobile devices
+         */
+        MOBILE_HEADER_HEIGHT: 54,
+
+        /**
+         * Height of header on mobile devices
+         */
+        MOBILE_POPUP_HEADER_HEIGHT: 44,
+
+        /**
+         * Try to calculate the scrollbar width for your browser/os
+         * @return {Number}
+         */
+        scrollbarWidth: function() {
+            if (!this._scrollbarWidth) {
+                var $div = $(//borrowed from anti-scroll
+                    '<div style="width:50px;height:50px;overflow-y:scroll;' +
+                    'position:absolute;top:-200px;left:-200px;"><div style="height:100px;width:100%">' +
+                    '</div>'
+                );
+                $('body').append($div);
+                var w1 = $div.innerWidth();
+                var w2 = $('div', $div).innerWidth();
+                $div.remove();
+                this._scrollbarWidth =  w1 - w2;
+            }
+            return this._scrollbarWidth;
+        },
+
         /**
          * Returns visible rect of DOM element
          *
@@ -47,28 +77,31 @@ define(function(require) {
                 /**
                  * Equals header height. Cannot calculate dynamically due to issues on ipad
                  */
-                if (resultRect.top < layout.MOBILE_HEADER_HEIGHT && tools.isMobile()) {
+                if (resultRect.top < this.MOBILE_HEADER_HEIGHT && tools.isMobile()) {
                     if (current.id === 'top-page' && !$(document.body).hasClass('input-focused')) {
-                        resultRect.top = layout.MOBILE_HEADER_HEIGHT;
+                        resultRect.top = this.MOBILE_HEADER_HEIGHT;
                     } else if (current.className.split(/\s+/).indexOf('widget-content') !== -1) {
-                        resultRect.top = layout.MOBILE_POPUP_HEADER_HEIGHT;
+                        resultRect.top = this.MOBILE_POPUP_HEADER_HEIGHT;
                     }
                 }
 
                 midRect = this.getFinalVisibleRect(current, onAfterGetClientRect);
                 borders = $.fn.getBorders(current);
 
-                if (resultRect.top < midRect.top + borders.top) {
-                    resultRect.top = midRect.top + borders.top;
-                }
-                if (resultRect.bottom > midRect.bottom - borders.bottom) {
-                    resultRect.bottom = midRect.bottom - borders.bottom;
-                }
-                if (resultRect.left < midRect.left + borders.left) {
-                    resultRect.left = midRect.left + borders.left;
-                }
-                if (resultRect.right > midRect.right - borders.right) {
-                    resultRect.right = midRect.right - borders.right;
+                var style = window.getComputedStyle(current);
+                if (style.overflowX !== 'visible' || style.overflowY  !== 'visible') {
+                    if (resultRect.top < midRect.top + borders.top) {
+                        resultRect.top = midRect.top + borders.top;
+                    }
+                    if (resultRect.bottom > midRect.bottom - borders.bottom) {
+                        resultRect.bottom = midRect.bottom - borders.bottom;
+                    }
+                    if (resultRect.left < midRect.left + borders.left) {
+                        resultRect.left = midRect.left + borders.left;
+                    }
+                    if (resultRect.right > midRect.right - borders.right) {
+                        resultRect.right = midRect.right - borders.right;
+                    }
                 }
                 current = current.parentNode;
             }
@@ -87,10 +120,10 @@ define(function(require) {
             }
 
             if (current.scrollHeight > current.clientHeight) {
-                rect.bottom -= layout.scrollbarWidth();
+                rect.bottom -= this.scrollbarWidth();
             }
             if (current.scrollWidth > current.clientWidth) {
-                rect.right -= layout.scrollbarWidth();
+                rect.right -= this.scrollbarWidth();
             }
             return rect;
         },
@@ -122,7 +155,7 @@ define(function(require) {
 
         scrollIntoView: function(el, onAfterGetClientRect) {
             if (this.isCompletelyVisible(el, onAfterGetClientRect)) {
-                return;
+                return {vertical: 0, horizontal: 0};
             }
 
             var rect = this.getEditableClientRect(el);
@@ -130,7 +163,7 @@ define(function(require) {
                 onAfterGetClientRect(el, rect);
             }
             if (rect.top === rect.bottom || rect.left === rect.right) {
-                return false;
+                return {vertical: 0, horizontal: 0};
             }
             var visibleRect = this.getVisibleRect(el, null, false, onAfterGetClientRect);
             var scrolls = {
@@ -140,13 +173,14 @@ define(function(require) {
                     (rect.right !== visibleRect.right ? visibleRect.right - rect.right : 0)
             };
 
-            this.applyScrollToParents(el, scrolls);
+            return this.applyScrollToParents(el, scrolls);
         },
 
         applyScrollToParents: function(el, scrolls) {
             if (!scrolls.horizontal && !scrolls.vertical) {
-                return;
+                return scrolls;
             }
+
             // make a local copy to don't change initial object
             scrolls = _.extend({}, scrolls);
 
@@ -181,6 +215,8 @@ define(function(require) {
                     }
                 }
             });
+
+            return scrolls;
         }
     };
 });
