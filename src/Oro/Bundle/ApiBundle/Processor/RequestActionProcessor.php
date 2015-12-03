@@ -20,24 +20,25 @@ class RequestActionProcessor extends ActionProcessor
         try {
             parent::executeProcessors($context);
         } catch (ExecutionFailedException $e) {
-            $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
+            $exception = $e;
+            $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
 
             $status = 0;
             if ($underlyingException instanceof HttpExceptionInterface
             ) {
-                $e = $underlyingException;
+                $exception = $underlyingException;
                 $status = $underlyingException->getStatusCode();
             }
 
             if ($underlyingException instanceof AccessDeniedException) {
-                $e = $underlyingException;
-                $status = $e->getCode();
+                $exception = $underlyingException;
+                $status = $exception->getCode();
             }
 
             $error = new Error();
 
             $error->setStatus($status);
-            $error->setDetail($e->getMessage());
+            $error->setDetail($exception->getMessage());
             $error->setInnerException($e);
             $context->addError($error);
 

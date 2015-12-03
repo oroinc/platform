@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,14 +26,14 @@ class ResponseStatusCode implements ProcessorInterface
         $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         $groupedStatuses = [];
         foreach ($context->getErrors() as $error) {
-            $exception = $error->getInnerException();
-
             $code = Response::HTTP_INTERNAL_SERVER_ERROR;
-            if ($exception instanceof HttpExceptionInterface) {
-                $code = $exception->getStatusCode();
+            $exception = $error->getInnerException();
+            $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
+            if ($underlyingException instanceof HttpExceptionInterface) {
+                $code = $underlyingException->getStatusCode();
             }
-            if ($exception instanceof AccessDeniedException) {
-                $code = $exception->getCode();
+            if ($underlyingException instanceof AccessDeniedException) {
+                $code = $underlyingException->getCode();
             }
 
             $parentCode = (int) floor($code / 100) * 100;

@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class ProcessErrors implements ProcessorInterface
 {
@@ -20,6 +22,11 @@ class ProcessErrors implements ProcessorInterface
         $errors = $context->getErrors();
         $error = array_pop($errors);
         $exception = $error->getInnerException();
+        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
+        if ($underlyingException instanceof HttpExceptionInterface) {
+            $exception = $underlyingException;
+        }
+
         throw $exception;
     }
 }
