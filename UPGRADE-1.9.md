@@ -32,13 +32,13 @@ UPGRADE FROM 1.8 to 1.9
 
 ####DataGridBundle
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
-- JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options
+- JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
 
 ####EmailBundle
 - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
 - `oro_email.emailtemplate.variable_provider.entity` service was marked as private
 - `oro_email.emailtemplate.variable_provider.system` service was marked as private
-- `oro_email.emailtemplate.variable_provider.user` service was marked as private
+- `oro_email.emailtemplate.variable_provider.user` service was marked as private 
 
 ####EmbeddedFormBundle
 - Bundle now contains configuration of security firewall `embedded_form`
@@ -112,14 +112,14 @@ UPGRADE FROM 1.8 to 1.9
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
-- Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy)
+- Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy) 
 - `Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener` added to the class cache and constructor have container as performance improvement
 
 ####SidebarBundle
 - `Oro\Bundle\SidebarBundle\EventListener\RequestHandler` added to the class cache as performance improvement
 
 ####SoapBundle
-- Bundle now contains configuration of security firewall `wsse_secured`
+- Bundle now contains configuration of security firewall `wsse_secured` 
 - `Oro\Bundle\SoapBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
 
 ####TrackingBundle
@@ -144,8 +144,8 @@ UPGRADE FROM 1.8 to 1.9
 - Constructor of `Oro\Bundle\WorkflowBundle\Model\ProcessFactory` changed. New argument: `ConditionFactory $conditionFactory`
 - Added new process definition option `pre_conditions`
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
-- Services with tag `oro_workflow.condition` was marked as private
-- Services with tag `oro_workflow.action` was marked as private
+- Services with tag `oro_workflow.condition` was marked as private 
+- Services with tag `oro_workflow.action` was marked as private 
 - Route `oro_workflow_api_rest_process_activate` marked as deprecated. Use the route `oro_api_process_activate` instead.
 - Route `oro_workflow_api_rest_process_deactivate` marked as deprecated. Use the route `oro_api_process_deactivate` instead.
 - Route `oro_workflow_api_rest_workflowdefinition_get` marked as deprecated. Use the route `oro_api_workflow_definition_get` instead.
