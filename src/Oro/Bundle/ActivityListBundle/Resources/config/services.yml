@@ -28,6 +28,14 @@ parameters:
     # helper
     oro_activity_list.helper.acl_criteria.class: Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper
     oro_activity_list.helper.activity_inheritance_targets.class: Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper
+
+    # Steps
+    oro_activity_list.step.merge_activities.class: Oro\Bundle\ActivityListBundle\Model\Step\MergeActivitiesStep
+
+    # Strategies
+    oro_activity_list.strategy.delegate.class: Oro\Bundle\ActivityListBundle\Model\Strategy\DelegateStrategy
+    oro_activity_list.strategy.replace.class: Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy
+    oro_activity_list.strategy.unite.class: Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
@@ -180,3 +188,38 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @doctrine
+
+    oro_activity_list.step.merge_activities:
+        class: %oro_activity_list.step.merge_activities.class%
+        arguments:
+            - @oro_activity_list.strategy
+            - @event_dispatcher
+        tags:
+            - { name: oro_entity_merge.step }
+   
+    # Strategies
+    oro_activity_list.strategy.delegate:
+        class: %oro_activity_list.strategy.delegate.class%
+
+    oro_activity_list.strategy:
+        alias: oro_activity_list.strategy.delegate
+
+    oro_activity_list.strategy.replace:
+        class: %oro_activity_list.strategy.replace.class%
+        arguments:
+            - @oro_activity.manager
+            - @oro_entity.doctrine_helper
+            - @oro_activity_list.helper.acl_criteria
+            - @oro_activity_list.provider.chain
+        tags:
+            - { name: oro_activity_list.strategy }
+
+    oro_activity_list.strategy.unite:
+        class: %oro_activity_list.strategy.unite.class%
+        arguments:
+            - @oro_activity.manager
+            - @oro_entity.doctrine_helper
+            - @oro_activity_list.helper.acl_criteria
+            - @oro_activity_list.provider.chain
+        tags:
+            - { name: oro_activity_list.strategy }
