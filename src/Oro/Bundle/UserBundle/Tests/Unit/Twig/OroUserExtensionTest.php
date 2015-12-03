@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Twig;
 
-use Oro\Bundle\UserBundle\Twig\OroUserExtension;
 use Oro\Bundle\UserBundle\Model\Gender;
+use Oro\Bundle\UserBundle\Twig\OroUserExtension;
 
 class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
 {

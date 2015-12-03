@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Sorter\ORM\Flexible;
 
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
 
 use Oro\Bundle\GridBundle\Field\FieldDescription;
-use Oro\Bundle\GridBundle\Sorter\SorterInterface;
 use Oro\Bundle\GridBundle\Sorter\ORM\Flexible\FlexibleSorter;
+use Oro\Bundle\GridBundle\Sorter\SorterInterface;
 
 class FlexibleSorterTest extends \PHPUnit_Framework_TestCase
 {

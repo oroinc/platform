@@ -5,9 +5,9 @@ namespace Oro\Bundle\GridBundle\Datagrid\ORM;
 use Doctrine\ORM\Query;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\GridBundle\Datagrid\IterableResultInterface;
 use Oro\Bundle\GridBundle\Datagrid\ORM\ProxyQuery;
 use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
-use Oro\Bundle\GridBundle\Datagrid\IterableResultInterface;
 
 /**
  * Iterates query result with elements of ResultRecord type

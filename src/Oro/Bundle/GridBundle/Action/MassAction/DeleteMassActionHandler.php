@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\GridBundle\Action\MassAction;
 
-use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Parameter;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\GridBundle\Datagrid\IterableResultInterface;
 
 use Oro\Bundle\GridBundle\Datagrid\ORM\ConstantPagerIterableResult;
-use Oro\Bundle\GridBundle\Datagrid\IterableResultInterface;
 use Oro\Bundle\GridBundle\Datagrid\ResultRecordInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {

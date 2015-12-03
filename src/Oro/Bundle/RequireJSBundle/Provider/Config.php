@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\RequireJSBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Yaml\Yaml;
 use Doctrine\Common\Cache\CacheProvider;
-use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class Config
 {

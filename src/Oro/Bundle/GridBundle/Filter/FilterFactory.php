@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Filter;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\GridBundle\Filter\FilterInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class FilterFactory implements FilterFactoryInterface
 {

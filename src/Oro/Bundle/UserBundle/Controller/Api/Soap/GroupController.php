@@ -3,9 +3,9 @@
 namespace Oro\Bundle\UserBundle\Controller\Api\Soap;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
 use Oro\Bundle\UserBundle\Entity\Group;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class GroupController extends SoapController
 {

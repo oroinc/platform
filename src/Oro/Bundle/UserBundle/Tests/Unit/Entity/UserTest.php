@@ -5,13 +5,13 @@ namespace Oro\Bundle\UserBundle\Tests\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\UserBundle\Entity\Email;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
-use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\Group;
-use Oro\Bundle\UserBundle\Entity\Status;
-use Oro\Bundle\UserBundle\Entity\Email;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

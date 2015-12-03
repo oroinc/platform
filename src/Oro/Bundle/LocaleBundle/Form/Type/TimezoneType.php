@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
@@ -59,7 +59,7 @@ class TimezoneType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_locale_timezone';
     }

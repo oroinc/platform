@@ -4,8 +4,8 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Entity()

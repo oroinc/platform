@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Definition;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Definition;
 
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ServiceLinkPass implements CompilerPassInterface
 {

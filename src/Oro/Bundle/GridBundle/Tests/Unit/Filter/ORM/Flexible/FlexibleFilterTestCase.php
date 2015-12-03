@@ -4,14 +4,14 @@ namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM\Flexible;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
 
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
 use Oro\Bundle\GridBundle\Datagrid\ORM\ProxyQuery;
+
 use Oro\Bundle\GridBundle\Filter\ORM\Flexible\AbstractFlexibleFilter;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class FlexibleFilterTestCase extends \PHPUnit_Framework_TestCase
 {

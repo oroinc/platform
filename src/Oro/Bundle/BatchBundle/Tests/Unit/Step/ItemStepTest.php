@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step;
 
-use Oro\Bundle\BatchBundle\Step\ItemStep;
-use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Event\EventInterface;
 use Oro\Bundle\BatchBundle\Item\InvalidItemException;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Step\ItemStep;
 
 /**
  * Tests related to the ItemStep class

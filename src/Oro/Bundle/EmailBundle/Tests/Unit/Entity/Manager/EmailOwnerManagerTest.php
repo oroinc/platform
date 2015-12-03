@@ -4,8 +4,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 
 class EmailOwnerManagerTest extends \PHPUnit_Framework_TestCase

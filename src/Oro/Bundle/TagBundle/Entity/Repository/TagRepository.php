@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\Entity\Repository;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 
 use Oro\Bundle\TagBundle\Entity\Taggable;
 

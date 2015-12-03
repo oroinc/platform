@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Job;
 
-use Monolog\Logger;
 use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use Oro\Bundle\BatchBundle\Job\JobFactory;
 
 /**

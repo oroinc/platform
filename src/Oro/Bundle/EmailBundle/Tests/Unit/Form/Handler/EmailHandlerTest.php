@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
+use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Symfony\Component\HttpFoundation\Request;
-use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
 
 class EmailHandlerTest extends \PHPUnit_Framework_TestCase
 {

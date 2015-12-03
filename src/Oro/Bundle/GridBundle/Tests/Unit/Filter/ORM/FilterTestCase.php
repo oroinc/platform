@@ -3,10 +3,10 @@
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM;
 
 use Doctrine\ORM\Query\Expr;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\GridBundle\Filter\FilterInterface;
 
 use Oro\Bundle\GridBundle\Filter\ORM\AbstractFilter;
-use Oro\Bundle\GridBundle\Filter\FilterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class FilterTestCase extends \PHPUnit_Framework_TestCase
 {

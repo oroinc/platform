@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DateTimeRangeFilterType extends AbstractType
 {
@@ -32,7 +32,7 @@ class DateTimeRangeFilterType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

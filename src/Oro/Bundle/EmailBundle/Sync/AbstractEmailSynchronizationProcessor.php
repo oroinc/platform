@@ -3,11 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
-use Psr\Log\LoggerInterface;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractEmailSynchronizationProcessor
 {

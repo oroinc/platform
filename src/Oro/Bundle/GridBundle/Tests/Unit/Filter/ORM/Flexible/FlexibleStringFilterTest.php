@@ -3,8 +3,8 @@
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM\Flexible;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
-use Oro\Bundle\GridBundle\Filter\ORM\StringFilter;
 use Oro\Bundle\GridBundle\Filter\ORM\Flexible\FlexibleStringFilter;
+use Oro\Bundle\GridBundle\Filter\ORM\StringFilter;
 
 class FlexibleStringFilterTest extends FlexibleFilterTestCase
 {

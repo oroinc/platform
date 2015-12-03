@@ -3,14 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
-use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
+
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
+use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class WorkflowAssembler extends AbstractAssembler
 {

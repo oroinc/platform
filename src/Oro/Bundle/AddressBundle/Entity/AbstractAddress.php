@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\AddressBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-use Symfony\Component\Validator\ExecutionContext;
-
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
+use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
+
+use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
+use Symfony\Component\Validator\ExecutionContext;
 
 /**
  * Address

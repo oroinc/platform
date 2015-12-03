@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Entity\Manager;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Common\Util\ClassUtils;
 
 use JMS\JobQueueBundle\Entity\Job;
 

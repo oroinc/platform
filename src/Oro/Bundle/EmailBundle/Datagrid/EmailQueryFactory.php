@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class EmailQueryFactory
 {

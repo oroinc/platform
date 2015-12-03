@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Twig;
 
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class ViewAttributeExtension extends \Twig_Extension
 {

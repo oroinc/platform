@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\ArrayNode;
-
 use Oro\Bundle\GridBundle\DependencyInjection\Configuration;
+
+use Symfony\Component\Config\Definition\ArrayNode;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

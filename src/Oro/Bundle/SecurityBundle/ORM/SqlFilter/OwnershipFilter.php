@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\SqlFilter;
 
-use Oro\Bundle\SecurityBundle\ORM\SqlFilter\OwnershipFilterBuilder;
 use Doctrine\ORM\Mapping\ClassMetaData;
 use Doctrine\ORM\Query\Filter\SQLFilter;
+use Oro\Bundle\SecurityBundle\ORM\SqlFilter\OwnershipFilterBuilder;
 
 class OwnershipFilter extends SQLFilter
 {

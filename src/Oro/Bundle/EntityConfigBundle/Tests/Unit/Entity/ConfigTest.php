@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {

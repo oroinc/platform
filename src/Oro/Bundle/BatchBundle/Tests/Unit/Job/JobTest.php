@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Job;
 
-use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
-use Oro\Bundle\BatchBundle\Job\Job;
 use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\ExitStatus;
-use Oro\Bundle\BatchBundle\Tests\Unit\Step\InterruptedStep;
+use Oro\Bundle\BatchBundle\Job\Job;
+use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\IncompleteStep;
+use Oro\Bundle\BatchBundle\Tests\Unit\Step\InterruptedStep;
 
 /**
  * Tests related to the Job class

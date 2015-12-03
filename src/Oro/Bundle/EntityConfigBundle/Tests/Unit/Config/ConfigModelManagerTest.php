@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Tests\OrmTestCase;
-
 use Doctrine\ORM\EntityManager;
+
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Tests\OrmTestCase;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;

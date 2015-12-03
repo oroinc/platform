@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-
 use Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class WsseAuthListener extends Listener
 {

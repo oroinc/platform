@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Form\Type;
 
-use Symfony\Component\Form\Forms;
-use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\AbstractFlexibleManagerTest;
 use Oro\Bundle\FlexibleEntityBundle\Form\Type\FlexibleType;
+use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\AbstractFlexibleManagerTest;
+use Symfony\Component\Form\Forms;
 
 /**
  * Test related class

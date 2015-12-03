@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\GridBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
-
 use Oro\Bundle\GridBundle\DependencyInjection\OroGridExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Parameter;
+
+use Symfony\Component\DependencyInjection\Reference;
 
 class AddDependencyCallsCompilerPass extends AbstractDatagridManagerCompilerPass
 {

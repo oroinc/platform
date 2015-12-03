@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Property;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\GridBundle\Datagrid\ResultRecordInterface;
+
+use Symfony\Component\Translation\TranslatorInterface;
 
 class TranslateableProperty extends AbstractProperty
 {

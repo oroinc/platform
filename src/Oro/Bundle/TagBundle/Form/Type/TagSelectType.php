@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Bundle\TagBundle\Form\Type;
 
+use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
+use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 use Symfony\Component\Form\AbstractType;
+
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
-use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
 
 class TagSelectType extends AbstractType
 {
@@ -68,7 +68,7 @@ class TagSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_tag_select';
     }

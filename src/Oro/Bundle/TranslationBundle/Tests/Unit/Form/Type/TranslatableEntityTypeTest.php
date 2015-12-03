@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
-
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Stub\TestEntity;
+
+use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\OptionsResolver\Options;
 
 class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
 {

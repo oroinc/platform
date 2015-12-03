@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Type for option value attribute form (independent of persistence)
@@ -69,7 +69,7 @@ class AttributeOptionValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_flexibleentity_attribute_option_value';
     }

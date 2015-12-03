@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Symfony\Component\Security\Core\Role\Role as BaseRole;
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation\Type;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
 /**
  * Role Entity

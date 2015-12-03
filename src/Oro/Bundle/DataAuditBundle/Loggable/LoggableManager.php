@@ -1,24 +1,24 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\Loggable;
 
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Util\ClassUtils;
 
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\PersistentCollection;
+use Oro\Bundle\DataAuditBundle\Entity\Audit;
+
+use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
 use Oro\Bundle\DataAuditBundle\Metadata\PropertyMetadata;
-use Oro\Bundle\UserBundle\Entity\User;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-use Oro\Bundle\DataAuditBundle\Entity\Audit;
-use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
-
 use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexible;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexibleValue;
+
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

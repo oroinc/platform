@@ -4,10 +4,10 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Routing\Router;
-
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Symfony\Component\Routing\Router;
 
 class PrepareResultItemListener
 {

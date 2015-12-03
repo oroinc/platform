@@ -4,14 +4,14 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\UserBundle\Entity\User;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class EmailRenderer extends \Twig_Environment
 {

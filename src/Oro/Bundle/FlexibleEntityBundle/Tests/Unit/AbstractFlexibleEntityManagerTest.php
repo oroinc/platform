@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit;
 
-use Oro\Bundle\FlexibleEntityBundle\AttributeType\TextType;
-
-use Doctrine\Tests\OrmTestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
+
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Symfony\Component\DependencyInjection\Container;
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Doctrine\Tests\OrmTestCase;
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AttributeTypeFactory;
+use Oro\Bundle\FlexibleEntityBundle\AttributeType\TextType;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Test related class

@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Symfony\Component\Yaml\Yaml;
-
 use CG\Core\DefaultGeneratorStrategy;
+
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
 use CG\Generator\PhpProperty;
 use CG\Generator\Writer;
-
 use Doctrine\Common\Inflector\Inflector;
+
+use Symfony\Component\Yaml\Yaml;
 
 class Generator
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
 /**

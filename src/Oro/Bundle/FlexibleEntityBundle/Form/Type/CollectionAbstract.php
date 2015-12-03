@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Oro\Bundle\FlexibleEntityBundle\Form\EventListener\CollectionTypeSubscriber;
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Collection

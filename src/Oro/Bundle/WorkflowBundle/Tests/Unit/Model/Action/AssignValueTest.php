@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\AssignValue;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
+use Oro\Bundle\WorkflowBundle\Model\Action\AssignValue;
 
 class AssignValueTest extends \PHPUnit_Framework_TestCase
 {

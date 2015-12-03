@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Event triggered during job execution

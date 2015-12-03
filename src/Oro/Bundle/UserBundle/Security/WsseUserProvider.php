@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class WsseUserProvider extends Provider
 {

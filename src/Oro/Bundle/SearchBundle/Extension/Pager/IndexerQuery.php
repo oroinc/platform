@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Extension\Pager;
 
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 /**
  * @method Query setOrderBy() setOrderBy($fieldName, $direction = "ASC", $type = Query::TYPE_TEXT)

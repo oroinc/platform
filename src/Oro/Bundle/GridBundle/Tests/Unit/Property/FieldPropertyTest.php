@@ -5,8 +5,8 @@ namespace Oro\Bundle\GridBundle\Tests\Unit\Property;
 use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
 use Oro\Bundle\GridBundle\Datagrid\ResultRecordInterface;
 
-use Oro\Bundle\GridBundle\Property\FieldProperty;
 use Oro\Bundle\GridBundle\Field\FieldDescription;
+use Oro\Bundle\GridBundle\Property\FieldProperty;
 
 class FieldPropertyTest extends \PHPUnit_Framework_TestCase
 {

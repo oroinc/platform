@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+
+use Symfony\Component\EventDispatcher\Event;
 
 class PersistConfigEvent extends Event
 {

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\AbstractType;
-
 use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AddressApiType extends AbstractType
 {
@@ -41,7 +41,7 @@ class AddressApiType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'address';
     }

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Datagrid;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 interface QueryConverterInterface
 {

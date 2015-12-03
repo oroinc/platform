@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Entity\Repository;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\AddressBundle\Entity\Country;

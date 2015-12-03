@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Action\MassAction\Ajax;
 
-use Oro\Bundle\GridBundle\Action\MassAction\MassActionInterface;
 use Oro\Bundle\GridBundle\Action\MassAction\Ajax\AjaxMassAction;
+use Oro\Bundle\GridBundle\Action\MassAction\MassActionInterface;
 use Oro\Bundle\GridBundle\Tests\Unit\Action\MassAction\MassActionWithExceptionsTestCase;
 
 class AjaxMassActionTest extends MassActionWithExceptionsTestCase

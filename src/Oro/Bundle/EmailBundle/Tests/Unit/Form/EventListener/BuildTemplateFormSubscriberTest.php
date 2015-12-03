@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+
+use Symfony\Component\Form\FormEvents;
 
 class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
 {

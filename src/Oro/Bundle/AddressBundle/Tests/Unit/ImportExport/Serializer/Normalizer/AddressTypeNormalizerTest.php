@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
 
-use Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\AddressTypeNormalizer;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
+use Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\AddressTypeNormalizer;
 
 class AddressTypeNormalizerTest extends \PHPUnit_Framework_TestCase
 {

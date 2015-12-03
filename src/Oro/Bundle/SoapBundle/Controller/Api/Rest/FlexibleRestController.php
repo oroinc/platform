@@ -5,11 +5,11 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Proxy\Proxy;
 
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
 use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\ScopableInterface;
 use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TranslatableInterface;
 use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 abstract class FlexibleRestController extends RestController
 {

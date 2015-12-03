@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Item\Support;
 
-use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 
 /**
  * Simple reader that provides data from an array

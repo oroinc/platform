@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Adds custom template to use in rendering of Workflow's Step view attributes.

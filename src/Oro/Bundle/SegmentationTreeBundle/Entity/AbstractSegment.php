@@ -1,8 +1,8 @@
 <?php
 namespace Oro\Bundle\SegmentationTreeBundle\Entity;
 
-use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Abract segment mapped super class implementing node and tree

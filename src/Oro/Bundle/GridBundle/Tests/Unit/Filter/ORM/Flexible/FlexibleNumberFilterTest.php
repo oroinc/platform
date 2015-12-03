@@ -3,8 +3,8 @@
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM\Flexible;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
-use Oro\Bundle\GridBundle\Filter\ORM\NumberFilter;
 use Oro\Bundle\GridBundle\Filter\ORM\Flexible\FlexibleNumberFilter;
+use Oro\Bundle\GridBundle\Filter\ORM\NumberFilter;
 
 class FlexibleNumberFilterTest extends FlexibleFilterTestCase
 {

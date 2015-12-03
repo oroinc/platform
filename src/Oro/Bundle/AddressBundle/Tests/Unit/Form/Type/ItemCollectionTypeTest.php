@@ -1,8 +1,8 @@
 <?php
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
 use Oro\Bundle\AddressBundle\Form\Type\ItemCollectionType;
+use Symfony\Component\Form\FormView;
 
 class ItemCollectionTypeTest extends \PHPUnit_Framework_TestCase
 {

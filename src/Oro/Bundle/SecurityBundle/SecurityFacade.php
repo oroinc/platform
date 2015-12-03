@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle;
 
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class SecurityFacade
 {

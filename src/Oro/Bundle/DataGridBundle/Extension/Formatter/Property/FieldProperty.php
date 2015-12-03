@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldProperty extends AbstractProperty
 {

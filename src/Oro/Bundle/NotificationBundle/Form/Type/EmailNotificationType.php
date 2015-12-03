@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailNotificationType extends AbstractType
 {
@@ -131,7 +131,7 @@ class EmailNotificationType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailnotification';
     }

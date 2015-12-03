@@ -2,12 +2,12 @@
 namespace Oro\Bundle\AsseticBundle\Routing;
 
 use Assetic\Asset\AssetInterface;
+use Oro\Bundle\AsseticBundle\Factory\OroAssetManager;
 use Symfony\Bundle\AsseticBundle\Config\AsseticResource;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
-use Oro\Bundle\AsseticBundle\Factory\OroAssetManager;
+use Symfony\Component\Routing\RouteCollection;
 
 class AsseticLoader extends Loader
 {

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Command\Logger;
 
+use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Output\OutputInterface;
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 
 class OutputLoggerTest extends \PHPUnit_Framework_TestCase
 {

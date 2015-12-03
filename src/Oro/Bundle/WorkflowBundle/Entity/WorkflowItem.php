@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use JMS\Serializer\Annotation as Serializer;
+use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 
-use JMS\Serializer\Annotation as Serializer;
-
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**
  * Workflow item

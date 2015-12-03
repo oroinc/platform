@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Form\EventListener;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Oro\Bundle\UserBundle\Acl\Manager as AclManager;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\FormEvent;
+
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class ChangePasswordSubscriber extends UserSubscriber
 {

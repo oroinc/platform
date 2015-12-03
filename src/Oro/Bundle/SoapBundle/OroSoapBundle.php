@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SoapBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\LoadPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\LoadPass;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroSoapBundle extends Bundle
 {

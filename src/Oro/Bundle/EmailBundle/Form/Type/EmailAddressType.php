@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressTransformer;
 
 class EmailAddressType extends AbstractType
 {
@@ -35,7 +35,7 @@ class EmailAddressType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_email_email_address';
     }

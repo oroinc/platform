@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM;
 
-use Oro\Bundle\GridBundle\Filter\ORM\EntityFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
+use Oro\Bundle\GridBundle\Filter\ORM\EntityFilter;
 
 class EntityFilterTest extends FilterTestCase
 {

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Transformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Form\Exception\TransformationFailedException;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 
 use Symfony\Component\Form\DataTransformerInterface;
-
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class BusinessUnitTransformer implements DataTransformerInterface
 {

@@ -4,10 +4,10 @@ namespace Oro\Bundle\NotificationBundle\Provider;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineListener
 {

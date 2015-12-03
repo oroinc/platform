@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateTimeRangeType extends AbstractType
 {
@@ -27,7 +27,7 @@ class DateTimeRangeType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

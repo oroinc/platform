@@ -5,10 +5,10 @@ namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Manager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Tests\OrmTestCase;
 
-use Symfony\Component\DependencyInjection\Container;
-
 use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+
 use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Test related class

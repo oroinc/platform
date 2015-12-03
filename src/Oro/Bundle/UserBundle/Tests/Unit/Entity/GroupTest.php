@@ -4,10 +4,10 @@ namespace Oro\Bundle\UserBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\UserBundle\Entity\Group;
-use Oro\Bundle\UserBundle\Entity\Role;
-
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\UserBundle\Entity\Group;
+
+use Oro\Bundle\UserBundle\Entity\Role;
 
 class GroupTest extends \PHPUnit_Framework_TestCase
 {

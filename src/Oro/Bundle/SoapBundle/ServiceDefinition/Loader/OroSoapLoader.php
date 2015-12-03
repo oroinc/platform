@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SoapBundle\ServiceDefinition\Loader;
 
-use Symfony\Component\Config\FileLocator;
+use BeSimple\SoapBundle\ServiceDefinition\Loader\AnnotationClassLoader;
 
 use BeSimple\SoapBundle\ServiceDefinition\Loader\AnnotationFileLoader;
-use BeSimple\SoapBundle\ServiceDefinition\Loader\AnnotationClassLoader;
+use Symfony\Component\Config\FileLocator;
 
 class OroSoapLoader extends AnnotationFileLoader
 {

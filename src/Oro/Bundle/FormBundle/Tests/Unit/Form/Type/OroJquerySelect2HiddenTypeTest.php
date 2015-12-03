@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
-use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 
+use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
-use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
+
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
 {

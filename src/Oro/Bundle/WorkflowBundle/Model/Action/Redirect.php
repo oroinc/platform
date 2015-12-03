@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Routing\RouterInterface;
 
 class Redirect extends AbstractAction
 {

@@ -1,14 +1,14 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
 {

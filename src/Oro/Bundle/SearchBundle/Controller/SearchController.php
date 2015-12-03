@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\SearchBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class SearchController extends Controller
 {
@@ -43,11 +43,11 @@ class SearchController extends Controller
      * @Template("OroSearchBundle:Search:searchBar.html.twig")
      * @AclAncestor("oro_search")
      */
-    public function searchBarAction()
+    public function searchBarAction(Request $request)
     {
         return array(
             'entities'     => $this->get('oro_search.index')->getAllowedEntitiesListAliases(),
-            'searchString' => $this->getRequest()->get('searchString'),
+            'searchString' => $request->get('searchString'),
             'fromString'   => $this->getRequest()->get('fromString'),
         );
     }

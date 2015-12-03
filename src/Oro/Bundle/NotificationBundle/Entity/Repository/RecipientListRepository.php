@@ -4,9 +4,9 @@ namespace Oro\Bundle\NotificationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\TagBundle\Entity\ContainAuthorInterface;
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 
 class RecipientListRepository extends EntityRepository
 {

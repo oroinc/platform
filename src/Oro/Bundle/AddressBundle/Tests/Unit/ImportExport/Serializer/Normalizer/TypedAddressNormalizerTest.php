@@ -3,11 +3,11 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\AddressNormalizer;
 use Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\TypedAddressNormalizer;
 use Oro\Bundle\AddressBundle\Tests\Unit\ImportExport\Serializer\Normalizer\Stub\StubTypedAddress;
-use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 
 class TypedAddressNormalizerTest extends \PHPUnit_Framework_TestCase
 {

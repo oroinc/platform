@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\WorkflowBundle\Twig\ClassNameExtension;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Twig\Stub\Entity;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Twig\Stub\__CG__\EntityProxy;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Twig\Stub\Entity;
+use Oro\Bundle\WorkflowBundle\Twig\ClassNameExtension;
 
 class ClassNameExtensionTest extends \PHPUnit_Framework_TestCase
 {

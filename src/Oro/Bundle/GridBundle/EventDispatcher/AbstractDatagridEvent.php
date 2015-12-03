@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\EventDispatcher;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\GridBundle\Datagrid\DatagridInterface;
+
+use Symfony\Component\EventDispatcher\Event;
 
 abstract class AbstractDatagridEvent extends Event implements DatagridEventInterface
 {

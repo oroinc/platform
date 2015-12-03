@@ -5,10 +5,10 @@ namespace Oro\Bundle\FilterBundle\Extension\Orm;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Extension\Configuration;
+use Symfony\Component\Form\Form;
+
+use Symfony\Component\Form\FormFactoryInterface;
 
 abstract class AbstractFilter implements FilterInterface
 {

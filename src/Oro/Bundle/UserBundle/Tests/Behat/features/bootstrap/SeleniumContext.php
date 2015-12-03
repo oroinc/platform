@@ -1,12 +1,12 @@
 <?php
 // @codingStandardsIgnoreStart
-use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Event\ScenarioEvent;
-use Oro\Bundle\TestFrameworkBundle\Test\BehatSeleniumContext;
+use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\User;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Users;
+use Oro\Bundle\TestFrameworkBundle\Test\BehatSeleniumContext;
 
 class SeleniumContext extends BehatSeleniumContext
 {

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\BatchBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Psr\Log\LoggerInterface;
-use Oro\Bundle\BatchBundle\Event\JobExecutionEvent;
-use Oro\Bundle\BatchBundle\Event\EventInterface;
-use Oro\Bundle\BatchBundle\Event\StepExecutionEvent;
-use Oro\Bundle\BatchBundle\Event\InvalidItemEvent;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Event\EventInterface;
+use Oro\Bundle\BatchBundle\Event\InvalidItemEvent;
+use Oro\Bundle\BatchBundle\Event\JobExecutionEvent;
+use Oro\Bundle\BatchBundle\Event\StepExecutionEvent;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Subscriber to log job execution result

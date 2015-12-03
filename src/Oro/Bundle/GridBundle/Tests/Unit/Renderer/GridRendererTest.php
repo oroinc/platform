@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Renderer;
 
+use Oro\Bundle\GridBundle\Datagrid\DatagridView;
+use Oro\Bundle\GridBundle\Renderer\GridRenderer;
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
 use Symfony\Component\HttpFoundation\Response;
-use Oro\Bundle\GridBundle\Renderer\GridRenderer;
-use Oro\Bundle\GridBundle\Datagrid\DatagridView;
 
 class GridRendererTest extends \PHPUnit_Framework_TestCase
 {

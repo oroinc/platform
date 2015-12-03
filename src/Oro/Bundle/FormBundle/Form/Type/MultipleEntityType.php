@@ -2,15 +2,15 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MultipleEntityType extends AbstractType
 {
@@ -120,7 +120,7 @@ class MultipleEntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_multiple_entity';
     }

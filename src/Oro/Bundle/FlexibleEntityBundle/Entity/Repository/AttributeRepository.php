@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityRepository;
 
 /**
  * Attribute repository

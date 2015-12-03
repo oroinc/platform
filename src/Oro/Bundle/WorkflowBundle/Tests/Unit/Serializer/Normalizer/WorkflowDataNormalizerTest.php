@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
-use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
 
 class WorkflowDataNormalizerTest extends \PHPUnit_Framework_TestCase
 {

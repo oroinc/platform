@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Command;
 
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class OroLocalizationDumpCommand extends ContainerAwareCommand
 {

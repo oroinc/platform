@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
-use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
+use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 
 class UserEmailGridListener
 {

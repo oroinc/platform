@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Bundle\SegmentationTreeBundle\Manager;
 
-use Oro\Bundle\SegmentationTreeBundle\Entity\Repository\SegmentRepository;
-
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ObjectManager;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\SegmentationTreeBundle\Entity\AbstractSegment;
+
+use Oro\Bundle\SegmentationTreeBundle\Entity\Repository\SegmentRepository;
 
 /**
  * Service class to manage segments node and tree

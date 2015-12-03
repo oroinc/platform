@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Property;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-
 use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
+
 use Oro\Bundle\GridBundle\Datagrid\ResultRecordInterface;
 use Oro\Bundle\GridBundle\Property\UrlProperty;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class UrlPropertyTest extends \PHPUnit_Framework_TestCase
 {

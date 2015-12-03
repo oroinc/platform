@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\Common\Persistence\ObjectManager;
 
 class UserManager implements UserProviderInterface
 {

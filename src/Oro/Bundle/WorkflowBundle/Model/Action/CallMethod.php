@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CallMethod extends AbstractAction
 {

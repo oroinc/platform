@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Soap;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * TODO: Discuss ACL impl.

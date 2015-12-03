@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\BatchBundle\Notification;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Notify Job execution result by mail

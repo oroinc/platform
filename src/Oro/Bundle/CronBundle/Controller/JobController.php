@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\CronBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
+use JMS\JobQueueBundle\Entity\Job;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use JMS\JobQueueBundle\Entity\Job;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Route("/job")
@@ -107,7 +107,7 @@ class JobController extends Controller
      * @Route("/stop-daemon", name="oro_cron_job_stop_daemon")
      * @AclAncestor("oro_jobs")
      */
-    public function stopDaemonAction()
+    public function stopDaemonAction(Request $request)
     {
         $daemon     = $this->get('oro_cron.job_daemon');
         $translator = $this->get('translator');
@@ -124,7 +124,7 @@ class JobController extends Controller
             $ret['message'] = $e->getMessage();
         }
 
-        if ($this->getRequest()->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest()) {
             return new Response(json_encode($ret));
         } else {
             $this->get('session')->getFlashBag()->add($ret['error'] ? 'error' : 'success', $ret['message']);

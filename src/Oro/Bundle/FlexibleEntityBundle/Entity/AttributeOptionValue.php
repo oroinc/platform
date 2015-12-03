@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Entity;
 
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityAttributeOptionValue;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityAttributeOptionValue;
 
 /**
  * Attribute option values

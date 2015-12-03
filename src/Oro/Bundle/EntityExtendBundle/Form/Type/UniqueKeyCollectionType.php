@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 
 class UniqueKeyCollectionType extends AbstractType
 {
@@ -43,7 +43,7 @@ class UniqueKeyCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_entity_extend_unique_key_collection_type';
     }

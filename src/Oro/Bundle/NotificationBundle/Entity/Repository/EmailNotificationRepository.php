@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityRepository;
 
 /**
  * EmailNotificationRepository

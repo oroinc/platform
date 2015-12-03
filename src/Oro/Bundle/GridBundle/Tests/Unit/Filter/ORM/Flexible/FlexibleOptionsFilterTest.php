@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM\Flexible;
 
-use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
-
-use Oro\Bundle\FlexibleEntityBundle\Entity\AttributeOption;
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityAttributeOptionValue;
-
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+
+use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
+use Oro\Bundle\FlexibleEntityBundle\Entity\AttributeOption;
+
+use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityAttributeOptionValue;
 
 use Oro\Bundle\GridBundle\Filter\ORM\ChoiceFilter;
 use Oro\Bundle\GridBundle\Filter\ORM\Flexible\FlexibleOptionsFilter;

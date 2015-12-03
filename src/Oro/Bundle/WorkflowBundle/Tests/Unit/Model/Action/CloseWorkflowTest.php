@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\CloseWorkflow;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\Action\CloseWorkflow;
 
 class CloseWorkflowTest extends \PHPUnit_Framework_TestCase
 {

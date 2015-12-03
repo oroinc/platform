@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\Type;
+use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 
 /**
  * Email Folder

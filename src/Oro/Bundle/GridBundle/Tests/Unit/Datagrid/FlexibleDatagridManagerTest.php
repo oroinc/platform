@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Datagrid;
 
-use Oro\Bundle\GridBundle\Datagrid\FlexibleDatagridManager;
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
+use Oro\Bundle\GridBundle\Datagrid\FlexibleDatagridManager;
 
 class FlexibleDatagridManagerTest extends \PHPUnit_Framework_TestCase
 {

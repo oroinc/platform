@@ -5,8 +5,8 @@ namespace Oro\Bundle\FormBundle\Form\Extension;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class ConstraintAsOptionExtension extends AbstractTypeExtension
 {

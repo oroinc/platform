@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Symfony\Component\OptionsResolver\Options;
 
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class EntityFilterType extends AbstractChoiceType
 {

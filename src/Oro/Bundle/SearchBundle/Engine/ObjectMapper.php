@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ObjectMapper extends AbstractMapper
 {

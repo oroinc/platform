@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\SearchBundle\Datagrid\IndexerQuery;
-use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 
 class IndexerQueryTest extends \PHPUnit_Framework_TestCase

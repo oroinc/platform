@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\GridBundle\Action\MassAction;
 
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\GridBundle\Action\MassAction\MassActionMediator;
+use Oro\Bundle\GridBundle\Action\MassAction\MassActionResponseInterface;
+use Oro\Bundle\GridBundle\Datagrid\DatagridInterface;
+
+use Oro\Bundle\GridBundle\Datagrid\DatagridManagerRegistry;
+use Oro\Bundle\GridBundle\Datagrid\IterableResultInterface;
+use Oro\Bundle\GridBundle\Datagrid\ORM\IterableResult;
+use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
+use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\GridBundle\Datagrid\ORM\IterableResult;
-use Oro\Bundle\GridBundle\Datagrid\DatagridManagerRegistry;
-use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
-use Oro\Bundle\GridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
-use Oro\Bundle\GridBundle\Datagrid\IterableResultInterface;
-use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
-use Oro\Bundle\GridBundle\Action\MassAction\MassActionMediator;
-use Oro\Bundle\GridBundle\Action\MassAction\MassActionResponseInterface;
 
 class MassActionDispatcher
 {

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Iterates results of Query using buffer, allows to iterate large query

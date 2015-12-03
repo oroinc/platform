@@ -5,13 +5,13 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Notification;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Notification\EmailNotificationAdapter;
-use Oro\Bundle\CronBundle\Command\Logger\Exception\RaiseExceptionLoggerException;
-use Oro\Bundle\UserBundle\Entity\User;
-use Psr\Log\LoggerInterface;
 use Oro\Bundle\CalendarBundle\Notification\RemindersSender;
 use Oro\Bundle\CalendarBundle\Notification\RemindTimeCalculator;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\CronBundle\Command\Logger\Exception\RaiseExceptionLoggerException;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
 
 class RemindersSenderTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\EventListener;
 
-use Symfony\Component\Form\Form;
-use Oro\Bundle\FlexibleEntityBundle\Form\Type\AttributeOptionType;
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
+use Oro\Bundle\FlexibleEntityBundle\Form\Type\AttributeOptionType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Aims to customized attribute form type

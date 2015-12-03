@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\Parser;
 
-use Oro\Bundle\AsseticBundle\Parser\AsseticTokenParser;
-
 use \Twig_Token;
+
 use \Twig_TokenStream;
 use Assetic\Asset\AssetCollection;
+use Oro\Bundle\AsseticBundle\Parser\AsseticTokenParser;
 
 class AsseticTokenParserTest extends \PHPUnit_Framework_TestCase
 {

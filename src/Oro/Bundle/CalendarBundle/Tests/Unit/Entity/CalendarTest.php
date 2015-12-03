@@ -5,8 +5,8 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class CalendarTest extends \PHPUnit_Framework_TestCase

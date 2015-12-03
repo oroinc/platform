@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Command;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Translation\MessageCatalogue;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Symfony\Component\Yaml\Yaml;
 
 class AclTranslationUpdateCommand extends ContainerAwareCommand
 {

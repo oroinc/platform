@@ -3,8 +3,8 @@
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Performance\Fixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Common\Persistence\ObjectManager;
 
 class LoadAclData extends AbstractFixture implements OrderedFixtureInterface
 {

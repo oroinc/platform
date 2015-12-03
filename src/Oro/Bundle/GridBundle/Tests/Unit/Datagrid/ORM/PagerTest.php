@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Datagrid\ORM;
 
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\GridBundle\Datagrid\ORM\Pager;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 
 class PagerTest extends \PHPUnit_Framework_TestCase
 {

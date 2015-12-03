@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddFlexibleManagerCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Symfony\Component\DependencyInjection\Reference;
 
 class AddFlexibleManagerCompilerPassTest extends AbstractCompilerPassTest
 {

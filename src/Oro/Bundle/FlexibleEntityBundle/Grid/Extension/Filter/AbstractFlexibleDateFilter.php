@@ -4,10 +4,10 @@ namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Extension\Orm\AbstractDateFilter;
+
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 abstract class AbstractFlexibleDateFilter extends AbstractDateFilter
 {

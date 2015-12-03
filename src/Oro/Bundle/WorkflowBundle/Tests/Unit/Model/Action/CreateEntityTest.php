@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CreateEntityTest extends \PHPUnit_Framework_TestCase
 {

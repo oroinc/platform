@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\InstallerBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Doctrine\DBAL\DriverManager;
+use Symfony\Component\Validator\Constraint;
+
+use Symfony\Component\Validator\ConstraintValidator;
 
 class DatabaseConnectionValidator extends ConstraintValidator
 {

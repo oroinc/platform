@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Exception\RuntimeException;
 
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {

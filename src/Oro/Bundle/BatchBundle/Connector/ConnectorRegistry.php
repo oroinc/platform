@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\BatchBundle\Connector;
 
-use Oro\Bundle\BatchBundle\Job\JobInterface;
 use Oro\Bundle\BatchBundle\Entity\JobInstance;
-use Oro\Bundle\BatchBundle\Job\JobFactory;
-use Oro\Bundle\BatchBundle\Step\StepFactory;
-use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Item\ItemProcessorInterface;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\BatchBundle\Job\Job;
+use Oro\Bundle\BatchBundle\Job\JobFactory;
+use Oro\Bundle\BatchBundle\Job\JobInterface;
+use Oro\Bundle\BatchBundle\Step\StepFactory;
 
 /**
  * Aims to register all connectors

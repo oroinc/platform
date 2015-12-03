@@ -1,15 +1,15 @@
 <?php
 namespace Oro\Bundle\SegmentationTreeBundle\Tests\Unit\Model;
 
-use Doctrine\Tests\OrmTestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Tests\OrmTestCase;
 
-use Symfony\Component\DependencyInjection\Container;
+use Oro\Bundle\SegmentationTreeBundle\Entity\AbstractSegment;
 
 use Oro\Bundle\SegmentationTreeBundle\Manager\SegmentManager;
-use Oro\Bundle\SegmentationTreeBundle\Entity\AbstractSegment;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Tests on SegmentManager

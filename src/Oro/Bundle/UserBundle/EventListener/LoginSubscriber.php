@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-
 use Oro\Bundle\UserBundle\Entity\User;
+
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class LoginSubscriber
 {

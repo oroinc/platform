@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DistributionBundle;
 
-use Symfony\Component\HttpKernel\Kernel;
+use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\HttpKernel\Kernel;
 
-use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
+use Symfony\Component\Yaml\Yaml;
 
 abstract class OroKernel extends Kernel
 {

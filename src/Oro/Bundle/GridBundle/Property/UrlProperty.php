@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Property;
 
-use Symfony\Component\Routing\Router;
 use Oro\Bundle\GridBundle\Datagrid\ResultRecordInterface;
+use Symfony\Component\Routing\Router;
 
 class UrlProperty extends AbstractProperty
 {

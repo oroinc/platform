@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step;
 
-use Oro\Bundle\BatchBundle\Step\AbstractStep;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Step\AbstractStep;
 
 /**
  * Step used for test and always declared a stopped execution

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
-use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer

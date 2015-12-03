@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\EventListener;
 
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 
 /**
  * Aims to add  default value data from attribute if defined

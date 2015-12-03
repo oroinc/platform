@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Pages;
 
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
-use PHPUnit_Framework_Assert;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Users;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Roles;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Groups;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Accounts;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Contacts;
+use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Groups;
+use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Navigation;
+use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Roles;
+use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Users;
+use PHPUnit_Framework_Assert;
 
 /**
  * @method Users openUsers()

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Result;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Doctrine\Common\Persistence\ObjectManager;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\Type;
 
 class Item
 {

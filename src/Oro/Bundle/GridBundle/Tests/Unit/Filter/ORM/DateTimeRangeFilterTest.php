@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM;
 
-use Oro\Bundle\GridBundle\Filter\ORM\DateTimeRangeFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
+use Oro\Bundle\GridBundle\Filter\ORM\DateTimeRangeFilter;
 
 class DateTimeRangeFilterTest extends AbstractDateFilterTest
 {

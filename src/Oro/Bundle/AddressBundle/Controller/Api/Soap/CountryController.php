@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Soap;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
-use Doctrine\Common\Persistence\ObjectManager;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
-use Oro\Bundle\AddressBundle\Entity\Address;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
  * TODO: Discuss ACL impl.

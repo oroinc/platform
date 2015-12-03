@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\BatchBundle\EventListener\NotificationSubscriber;
 use Oro\Bundle\BatchBundle\Event\EventInterface;
+use Oro\Bundle\BatchBundle\EventListener\NotificationSubscriber;
 
 /**
  * Test related class

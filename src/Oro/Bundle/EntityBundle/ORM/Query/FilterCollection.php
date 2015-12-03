@@ -4,8 +4,8 @@ namespace Oro\Bundle\EntityBundle\ORM\Query;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\FilterCollection as BaseFilterCollection;
 use Doctrine\ORM\Query\Filter\SQLFilter;
+use Doctrine\ORM\Query\FilterCollection as BaseFilterCollection;
 
 /**
  * Collection class for all the query filters.

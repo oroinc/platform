@@ -4,16 +4,16 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
-use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
-use Oro\Bundle\ImapBundle\Manager\DTO\Email;
-use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
-use Zend\Mail\Headers;
-use Zend\Mail\Header\HeaderInterface;
-use Zend\Mail\Header\AbstractAddressList;
-use Zend\Mail\Address\AddressInterface;
-use Zend\Mail\Storage\Exception as MailException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
+use Oro\Bundle\ImapBundle\Manager\DTO\Email;
+use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
+use Zend\Mail\Address\AddressInterface;
+use Zend\Mail\Header\AbstractAddressList;
+use Zend\Mail\Header\HeaderInterface;
+use Zend\Mail\Headers;
+use Zend\Mail\Storage\Exception as MailException;
 
 class ImapEmailManager
 {

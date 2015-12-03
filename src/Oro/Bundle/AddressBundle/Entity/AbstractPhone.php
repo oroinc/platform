@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\AddressBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\MappedSuperclass

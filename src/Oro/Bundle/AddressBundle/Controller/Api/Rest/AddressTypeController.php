@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\Rest\Util\Codes;
-use FOS\RestBundle\Controller\FOSRestController;
+
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
+
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("addresstype")

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Collection;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexibleValue;
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractFlexibleValue;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
 
-use Oro\Bundle\FlexibleEntityBundle\Entity\Collection;
+use Symfony\Component\Form\FormEvents;
 
 /**
  * Collection type subscriber

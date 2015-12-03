@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type\Configuration;
 
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -34,7 +34,7 @@ class WebsocketType extends AbstractType
             );
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_installer_configuration_websocket';
     }

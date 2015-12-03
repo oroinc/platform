@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 {

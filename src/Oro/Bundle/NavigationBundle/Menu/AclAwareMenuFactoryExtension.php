@@ -6,8 +6,8 @@ use Doctrine\Common\Cache\CacheProvider;
 use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
 
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {

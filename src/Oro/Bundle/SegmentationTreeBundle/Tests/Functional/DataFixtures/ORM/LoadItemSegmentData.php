@@ -1,15 +1,15 @@
 <?php
 namespace Oro\Bundle\SegmentationTreeBundle\Tests\Functional\DataFixtures\ORM;
 
-use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\Item;
-use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\ItemSegment;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\Item;
+
+use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\ItemSegment;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Load tests items and items segment

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 
 use Oro\Bundle\UserBundle\Entity\User;

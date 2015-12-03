@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Symfony\Component\Filesystem\Filesystem;
-
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ExtendConfigDumper
 {

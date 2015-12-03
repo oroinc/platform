@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class EmailApiEntityManager extends ApiEntityManager
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\EmailBundle\EventListener\EntitySubscriber;
 use Doctrine\ORM\Events;
+use Oro\Bundle\EmailBundle\EventListener\EntitySubscriber;
 
 class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
+use Sylius\Bundle\FlowBundle\Process\Step\ControllerStep;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 
-use Sylius\Bundle\FlowBundle\Process\Step\ControllerStep;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 abstract class AbstractStep extends ControllerStep
 {

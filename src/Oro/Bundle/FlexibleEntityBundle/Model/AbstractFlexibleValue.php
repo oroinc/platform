@@ -4,8 +4,8 @@ namespace Oro\Bundle\FlexibleEntityBundle\Model;
 
 use Oro\Bundle\FlexibleEntityBundle\Exception\FlexibleConfigurationException;
 
-use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TranslatableInterface;
 use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\ScopableInterface;
+use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TranslatableInterface;
 
 /**
  * Abstract entity value, independent of storage

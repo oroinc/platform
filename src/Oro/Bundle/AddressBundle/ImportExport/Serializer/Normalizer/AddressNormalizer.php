@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
+
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class AddressNormalizer implements NormalizerInterface, DenormalizerInterface
 {

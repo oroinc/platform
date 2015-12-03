@@ -30,7 +30,7 @@ class EmailTemplateTranslationType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_email_emailtemplate_translatation';
     }

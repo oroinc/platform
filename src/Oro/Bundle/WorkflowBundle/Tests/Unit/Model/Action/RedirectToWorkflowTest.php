@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\WorkflowBundle\Model\Action\RedirectToWorkflow;
+
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RedirectToWorkflowTest extends \PHPUnit_Framework_TestCase
 {

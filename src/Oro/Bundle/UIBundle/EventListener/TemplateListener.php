@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\EventListener;
 
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class TemplateListener

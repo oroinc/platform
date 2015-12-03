@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\WorkflowBundle\Exception\ActionException;
 
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
-use Oro\Bundle\WorkflowBundle\Exception\ActionException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RequestEntity extends AbstractAction
 {

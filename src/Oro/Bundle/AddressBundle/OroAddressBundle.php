@@ -3,8 +3,8 @@
 namespace Oro\Bundle\AddressBundle;
 
 use Oro\Bundle\AddressBundle\DependencyInjection\Compiler\AddressProviderPass;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroAddressBundle extends Bundle
 {

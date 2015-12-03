@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\EventListener;
 
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleInterface;
-
 use Oro\Bundle\FlexibleEntityBundle\Event\FilterFlexibleEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 use Oro\Bundle\FlexibleEntityBundle\FlexibleEntityEvents;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Aims to add all values / required values when create or load a new flexible :

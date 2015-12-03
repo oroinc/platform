@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+
+use Symfony\Component\EventDispatcher\Event;
 
 class PrepareResultItemEvent extends Event
 {

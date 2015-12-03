@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
  * This class allows to get the owner of an entity

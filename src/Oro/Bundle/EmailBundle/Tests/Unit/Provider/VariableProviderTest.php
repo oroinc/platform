@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
+
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class VariableProviderTest extends \PHPUnit_Framework_TestCase
 {

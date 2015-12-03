@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 
 class EmailAddressManager

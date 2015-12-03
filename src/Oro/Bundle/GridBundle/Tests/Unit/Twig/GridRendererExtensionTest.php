@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\GridBundle\Twig\GridRendererExtension;
-use Oro\Bundle\GridBundle\Renderer\GridRenderer;
 use Oro\Bundle\GridBundle\Datagrid\DatagridView;
+use Oro\Bundle\GridBundle\Renderer\GridRenderer;
+use Oro\Bundle\GridBundle\Twig\GridRendererExtension;
 
 class GridRendererExtensionTest extends \PHPUnit_Framework_TestCase
 {

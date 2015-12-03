@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\JsFormValidationBundle\Tests\Unit\Generator;
 
+use Oro\Bundle\JsFormValidationBundle\Generator\GettersLibraries;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Validator\Mapping\GetterMetadata;
 
-use Oro\Bundle\JsFormValidationBundle\Generator\GettersLibraries;
+use Symfony\Component\Validator\Mapping\GetterMetadata;
 
 class GettersLibrariesTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Menu;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class UserMenuBuilder implements BuilderInterface
 {

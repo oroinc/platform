@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use JMS\Serializer\Serializer;
 use JMS\Serializer\Exception\RuntimeException;
+use JMS\Serializer\Serializer;
 
 class Md5Extension extends \Twig_Extension
 {

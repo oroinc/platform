@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Bundle\TagBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagAutocompleteType extends AbstractType
 {
@@ -28,7 +28,7 @@ class TagAutocompleteType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_tag_autocomplete';
     }

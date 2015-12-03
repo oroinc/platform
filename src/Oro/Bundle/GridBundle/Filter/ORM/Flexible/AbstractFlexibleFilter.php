@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\GridBundle\Filter\ORM\Flexible;
 
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
 
+use Oro\Bundle\GridBundle\Datagrid\ORM\ProxyQuery;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\GridBundle\Filter\FilterInterface;
 use Oro\Bundle\GridBundle\Filter\ORM\AbstractFilter;
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
-use Oro\Bundle\GridBundle\Datagrid\ORM\ProxyQuery;
 
 abstract class AbstractFlexibleFilter implements FilterInterface
 {

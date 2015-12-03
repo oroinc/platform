@@ -4,11 +4,11 @@ namespace Oro\Bundle\OrganizationBundle\Event;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class RecordOwnerDataListener
 {

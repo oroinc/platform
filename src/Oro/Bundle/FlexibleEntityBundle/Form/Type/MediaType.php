@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Form type linked to Media entity
@@ -50,7 +50,7 @@ class MediaType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_media';
     }

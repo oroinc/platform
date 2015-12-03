@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 
 class FormType extends AbstractType
 {
@@ -29,7 +29,7 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_config_form_type';
     }

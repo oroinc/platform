@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 abstract class WebTestCase extends BaseWebTestCase
 {

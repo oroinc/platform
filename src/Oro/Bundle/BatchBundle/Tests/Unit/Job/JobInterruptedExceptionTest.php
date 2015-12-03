@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Job;
 
-use Oro\Bundle\BatchBundle\Job\JobInterruptedException;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Job\JobInterruptedException;
 
 /**
  * Tests related to the JobInterruptedException

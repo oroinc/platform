@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
 use Oro\Bundle\AddressBundle\Entity\AddressType;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class AddressTypeNormalizer implements NormalizerInterface, DenormalizerInterface
 {

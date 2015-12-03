@@ -4,8 +4,8 @@ namespace Oro\Bundle\GridBundle\Tests\Unit\Datagrid\Views;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\GridBundle\Datagrid\Views\View;
 use Oro\Bundle\GridBundle\Datagrid\Views\AbstractViewsList;
+use Oro\Bundle\GridBundle\Datagrid\Views\View;
 
 class AbstractViewsListTest extends \PHPUnit_Framework_TestCase
 {

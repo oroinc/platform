@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass;
+
+use Symfony\Component\DependencyInjection\Reference;
 
 class NotificationHandlerPassTest extends \PHPUnit_Framework_TestCase
 {

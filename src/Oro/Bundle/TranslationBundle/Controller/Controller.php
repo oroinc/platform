@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Bundle\TranslationBundle\Controller;
 
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+//use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-//use Symfony\Component\Translation\TranslatorInterface;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Templating\TemplateReferenceInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 class Controller
 {

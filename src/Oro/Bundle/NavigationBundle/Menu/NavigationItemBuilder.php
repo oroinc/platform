@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
-
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
+
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
+use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class NavigationItemBuilder implements BuilderInterface
 {

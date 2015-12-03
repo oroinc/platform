@@ -2,42 +2,42 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
-use Doctrine\ORM\Mapping as ORM;
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use DateTime;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
-use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\Exclude;
-
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use JMS\Serializer\Annotation\Type;
 
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapConfigurationOwnerInterface;
 
+use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\Tag;
 
-use Oro\Bundle\UserBundle\Model\ExtendUser;
-use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\UserBundle\Entity\Email;
-use Oro\Bundle\UserBundle\Entity\EntityUploadedImageInterface;
 
-use DateTime;
+use Oro\Bundle\UserBundle\Entity\EntityUploadedImageInterface;
+use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Model\ExtendUser;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

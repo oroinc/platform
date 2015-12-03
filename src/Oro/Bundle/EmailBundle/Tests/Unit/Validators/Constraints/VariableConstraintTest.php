@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\EmailBundle\Validator\Constraints\VariablesConstraint;
+
+use Symfony\Component\Validator\Constraint;
 
 class VariableConstraintTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Monolog\Logger;
+use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 
 class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 
 class LoadDemoDataCommand extends ContainerAwareCommand
 {

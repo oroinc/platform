@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class ConfigurationPass implements CompilerPassInterface
 {

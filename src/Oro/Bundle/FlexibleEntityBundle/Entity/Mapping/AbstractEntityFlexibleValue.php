@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Entity\Mapping;
 
-use Symfony\Component\HttpFoundation\File\File;
-use Oro\Bundle\FlexibleEntityBundle\Model\AbstractFlexible;
-use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
-use Oro\Bundle\FlexibleEntityBundle\Model\AbstractFlexibleValue;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
+use Oro\Bundle\FlexibleEntityBundle\Model\AbstractFlexible;
+use Oro\Bundle\FlexibleEntityBundle\Model\AbstractFlexibleValue;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Base Doctrine ORM entity attribute value

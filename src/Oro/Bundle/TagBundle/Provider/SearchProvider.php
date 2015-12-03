@@ -4,12 +4,12 @@ namespace Oro\Bundle\TagBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Bundle\TagBundle\Entity\Tagging;
-use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
+use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Query\Result;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Bundle\TagBundle\Entity\Tagging;
 
 class SearchProvider extends ResultStatisticsProvider
 {

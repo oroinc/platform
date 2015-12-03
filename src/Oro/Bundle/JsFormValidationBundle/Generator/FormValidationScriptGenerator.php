@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\JsFormValidationBundle\Generator;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Validator\MetadataFactoryInterface;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Validator\Constraint;
+use APY\JsFormValidationBundle\Generator\FieldsConstraints;
+use APY\JsFormValidationBundle\Generator\FormValidationScriptGenerator as BaseFormValidationScriptGenerator;
+use APY\JsFormValidationBundle\Generator\PostProcessEvent;
+use APY\JsFormValidationBundle\Generator\PreProcessEvent;
+use APY\JsFormValidationBundle\JsfvEvents;
 use Assetic\Asset\AssetCollection;
 use Assetic\Filter\Yui\JsCompressorFilter;
 
-use APY\JsFormValidationBundle\Generator\PostProcessEvent;
-use APY\JsFormValidationBundle\JsfvEvents;
-use APY\JsFormValidationBundle\Generator\PreProcessEvent;
-use APY\JsFormValidationBundle\Generator\FieldsConstraints;
-use APY\JsFormValidationBundle\Generator\FormValidationScriptGenerator as BaseFormValidationScriptGenerator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\MetadataFactoryInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

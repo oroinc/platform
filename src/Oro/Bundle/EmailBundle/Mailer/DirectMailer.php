@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
+use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
-use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool

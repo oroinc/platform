@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
+use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\SerializerAwareInterface;
 
-use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class TypedAddressNormalizer implements DenormalizerInterface, NormalizerInterface, SerializerAwareInterface
 {

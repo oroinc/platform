@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SoapBundle\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Form\FormInterface;
+
+use Symfony\Component\HttpFoundation\Request;
 
 class ApiFormHandler
 {

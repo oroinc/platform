@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
+use Oro\Bundle\FlexibleEntityBundle\EventListener\TranslatableListener;
 use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\AbstractFlexibleManagerTest;
 use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Entity\Demo\Flexible;
-use Oro\Bundle\FlexibleEntityBundle\EventListener\TranslatableListener;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 
 /**
  * Test related class

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeSubscriber;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
 {

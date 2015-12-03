@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntitySelectType extends AbstractType
 {
@@ -74,7 +74,7 @@ class EntitySelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

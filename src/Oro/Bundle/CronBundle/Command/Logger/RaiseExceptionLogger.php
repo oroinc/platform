@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\CronBundle\Command\Logger;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\AbstractLogger;
-use Psr\Log\LogLevel;
 use Oro\Bundle\CronBundle\Command\Logger\Exception\RaiseExceptionLoggerException;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * This class uses $baseLogger to write log messages, but in additional it raises RaiseExceptionLoggerException

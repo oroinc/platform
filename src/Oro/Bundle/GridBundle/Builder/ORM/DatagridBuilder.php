@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\GridBundle\Builder\ORM;
 
+use Oro\Bundle\GridBundle\Builder\AbstractDatagridBuilder;
+use Oro\Bundle\GridBundle\Datagrid\ORM\Pager;
 use Oro\Bundle\GridBundle\Datagrid\PagerInterface;
 use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
-use Oro\Bundle\GridBundle\Datagrid\ORM\Pager;
-use Oro\Bundle\GridBundle\Builder\AbstractDatagridBuilder;
 
 class DatagridBuilder extends AbstractDatagridBuilder
 {

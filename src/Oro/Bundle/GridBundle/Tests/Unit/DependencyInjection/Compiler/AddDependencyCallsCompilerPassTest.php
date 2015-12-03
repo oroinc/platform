@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
-
 use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddDependencyCallsCompilerPass;
 use Oro\Bundle\GridBundle\DependencyInjection\OroGridExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AddDependencyCallsCompilerPassTest extends AbstractCompilerPassTest
 {

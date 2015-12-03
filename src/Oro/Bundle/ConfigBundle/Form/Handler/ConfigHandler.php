@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\Form\FormInterface;
+
+use Symfony\Component\HttpFoundation\Request;
 
 class ConfigHandler
 {

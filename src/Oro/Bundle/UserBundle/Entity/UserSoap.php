@@ -3,8 +3,8 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use JMS\Serializer\Annotation\Exclude;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * @ORM\MappedSuperclass()

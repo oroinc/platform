@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
-use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
-use Symfony\Component\HttpFoundation\Response;
-
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\UnitOfWork;
 
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
+
+use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
 {

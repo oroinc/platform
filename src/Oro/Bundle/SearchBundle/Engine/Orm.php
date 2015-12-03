@@ -4,16 +4,16 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use JMS\JobQueueBundle\Entity\Job;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Entity\Item;
 
 use Oro\Bundle\SearchBundle\Query\Query;
+
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
-use Oro\Bundle\SearchBundle\Entity\Item;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Orm extends AbstractEngine
 {

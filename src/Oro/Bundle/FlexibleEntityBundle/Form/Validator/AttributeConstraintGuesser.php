@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Validator;
 
-use Symfony\Component\Validator\Constraints;
+use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
 
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
-use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
+use Symfony\Component\Validator\Constraints;
 
 /**
  * Attribute constraint guesser

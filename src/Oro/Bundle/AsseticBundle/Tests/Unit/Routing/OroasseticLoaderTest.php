@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\Routing;
 
-use Symfony\Bundle\AsseticBundle\Factory\Resource\CoalescingDirectoryResource;
-use Symfony\Bundle\AsseticBundle\Factory\Resource\DirectoryResource;
 use Assetic\Asset\AssetCollection;
 use Assetic\Asset\FileAsset;
-use Oro\Bundle\AsseticBundle\Routing\AsseticLoader;
 use Oro\Bundle\AsseticBundle\Factory\OroAssetManager;
+use Oro\Bundle\AsseticBundle\Routing\AsseticLoader;
+use Symfony\Bundle\AsseticBundle\Factory\Resource\CoalescingDirectoryResource;
+use Symfony\Bundle\AsseticBundle\Factory\Resource\DirectoryResource;
 
 class AsseticLoaderTest extends \PHPUnit_Framework_TestCase
 {

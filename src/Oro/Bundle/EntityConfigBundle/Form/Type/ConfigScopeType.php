@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -150,7 +150,7 @@ class ConfigScopeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_entity_config_scope_type';
     }

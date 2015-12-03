@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
 
 /**

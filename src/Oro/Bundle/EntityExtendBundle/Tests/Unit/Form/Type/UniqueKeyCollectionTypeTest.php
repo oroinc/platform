@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class UniqueKeyCollectionTypeTest extends TypeTestCase
 {

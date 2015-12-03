@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
+
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class EntityTypeTest extends TypeTestCase
 {

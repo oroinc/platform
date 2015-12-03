@@ -4,8 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\MessageSelector;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {

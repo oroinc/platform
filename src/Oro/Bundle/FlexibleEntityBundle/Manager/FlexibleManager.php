@@ -5,23 +5,23 @@ namespace Oro\Bundle\FlexibleEntityBundle\Manager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
 
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AttributeTypeFactory;
-use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
-use Oro\Bundle\FlexibleEntityBundle\FlexibleEntityEvents;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
 use Oro\Bundle\FlexibleEntityBundle\Event\FilterAttributeEvent;
 use Oro\Bundle\FlexibleEntityBundle\Event\FilterFlexibleEvent;
 use Oro\Bundle\FlexibleEntityBundle\Event\FilterFlexibleValueEvent;
 use Oro\Bundle\FlexibleEntityBundle\Exception\FlexibleConfigurationException;
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleInterface;
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
-use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TranslatableInterface;
-use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\ScopableInterface;
+use Oro\Bundle\FlexibleEntityBundle\FlexibleEntityEvents;
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttributeOption;
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttributeOptionValue;
-use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
+use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\ScopableInterface;
+use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TranslatableInterface;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleInterface;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Flexible object manager, allow to use flexible entity in storage agnostic way

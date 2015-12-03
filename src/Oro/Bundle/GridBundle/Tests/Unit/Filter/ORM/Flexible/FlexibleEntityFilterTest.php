@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM\Flexible;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-use Oro\Bundle\GridBundle\Filter\ORM\Flexible\FlexibleEntityFilter;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
 use Oro\Bundle\GridBundle\Filter\ORM\EntityFilter;
+use Oro\Bundle\GridBundle\Filter\ORM\Flexible\FlexibleEntityFilter;
 
 /**
  * Test related class

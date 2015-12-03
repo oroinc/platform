@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Doctrine\Common\Collections\ArrayCollection;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\Type;
 
 use Oro\Bundle\SearchBundle\Query\Query;
 

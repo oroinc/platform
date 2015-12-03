@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ImapBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
-use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
-use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class ImapEmailBodyLoader implements EmailBodyLoaderInterface

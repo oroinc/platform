@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -53,7 +53,7 @@ class OwnershipType extends AbstractType
         return ChoiceType::class;
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

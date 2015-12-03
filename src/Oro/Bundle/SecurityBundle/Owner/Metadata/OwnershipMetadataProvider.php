@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**

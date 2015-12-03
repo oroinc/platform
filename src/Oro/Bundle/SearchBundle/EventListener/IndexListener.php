@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
-use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\SearchBundle\Engine\AbstractEngine;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class IndexListener
 {

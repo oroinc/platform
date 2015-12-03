@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Symfony\Component\DependencyInjection\Reference;
 
 class AddNormalizerCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

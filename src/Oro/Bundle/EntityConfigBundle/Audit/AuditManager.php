@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Audit;
 
-use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Security\Core\User\UserInterface;
-
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigLog;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigLog;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff;
+
+use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Audit config data

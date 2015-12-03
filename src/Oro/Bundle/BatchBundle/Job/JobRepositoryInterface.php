@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Job;
 
-use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
 
 /**
  * Common interface for Job repositories which should handle how job are stored, updated

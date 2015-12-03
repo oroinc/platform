@@ -5,12 +5,12 @@ namespace Oro\Bundle\TagBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TagBundle\Entity\ContainAuthorInterface;
 use Oro\Bundle\TagBundle\Entity\ContainUpdaterInterface;
+
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OwnerListener implements ContainerAwareInterface
 {

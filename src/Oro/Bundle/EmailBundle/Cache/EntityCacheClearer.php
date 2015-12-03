@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
-
 use Symfony\Component\Filesystem\Filesystem;
+
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 class EntityCacheClearer implements CacheClearerInterface
 {

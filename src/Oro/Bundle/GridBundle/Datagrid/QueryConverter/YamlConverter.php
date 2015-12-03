@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\GridBundle\Datagrid\QueryConverter;
 
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Config\Definition\Processor;
-
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\GridBundle\Datagrid\QueryConverterInterface;
 use Oro\Bundle\GridBundle\DependencyInjection\ReportConfiguration;
+
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Yaml\Yaml;
 
 class YamlConverter implements QueryConverterInterface
 {

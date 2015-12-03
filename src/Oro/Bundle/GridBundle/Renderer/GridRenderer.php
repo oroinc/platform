@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Renderer;
 
+use Oro\Bundle\GridBundle\Datagrid\DatagridView;
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
 use Symfony\Component\HttpFoundation\Response;
-use Oro\Bundle\GridBundle\Datagrid\DatagridView;
 
 class GridRenderer
 {

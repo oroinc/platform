@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
 class StepAssembler extends AbstractAssembler
 {

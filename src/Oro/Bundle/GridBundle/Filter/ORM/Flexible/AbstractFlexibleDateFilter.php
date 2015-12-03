@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Filter\ORM\Flexible;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\GridBundle\Filter\ORM\AbstractDateFilter;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 
 abstract class AbstractFlexibleDateFilter extends AbstractFlexibleFilter
 {

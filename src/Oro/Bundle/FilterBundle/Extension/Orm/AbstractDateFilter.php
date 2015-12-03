@@ -4,10 +4,10 @@ namespace Oro\Bundle\FilterBundle\Extension\Orm;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\Form\FormFactoryInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 
 use Oro\Bundle\LocaleBundle\Twig\DateFormatExtension;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 abstract class AbstractDateFilter extends AbstractFilter
 {

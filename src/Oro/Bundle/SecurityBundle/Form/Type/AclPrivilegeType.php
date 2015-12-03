@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Type;
 
+use Oro\Bundle\SecurityBundle\Form\Type\AclPermissionType;
+use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 
-use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType;
-use Oro\Bundle\SecurityBundle\Form\Type\AclPermissionType;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclPrivilegeType extends AbstractType
 {
@@ -65,7 +65,7 @@ class AclPrivilegeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_acl_privilege';
     }

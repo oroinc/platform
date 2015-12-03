@@ -6,10 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionFactory;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory;
-use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
 use Oro\Bundle\WorkflowBundle\Model\Action\Configurable as ConfigurableAction;
+use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionFactory;
+use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
 
 class TransitionAssembler extends AbstractAssembler
 {

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FormBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass;
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormCompilerPass;
+
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroFormBundle extends Bundle
 {

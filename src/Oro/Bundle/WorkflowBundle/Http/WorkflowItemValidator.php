@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Http;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WorkflowItemValidator
 {

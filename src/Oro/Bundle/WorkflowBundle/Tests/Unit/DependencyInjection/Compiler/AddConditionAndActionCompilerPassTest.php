@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddConditionAndActionCompilerPass;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AddConditionAndActionCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

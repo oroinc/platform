@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SearchBundle\Controller\Api;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 class SoapController extends ContainerAware
 {

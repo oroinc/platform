@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
-use Oro\Bundle\LocaleBundle\Tests\Unit\IcuAwareTestCase;
 use Oro\Bundle\LocaleBundle\Model\Calendar;
+use Oro\Bundle\LocaleBundle\Tests\Unit\IcuAwareTestCase;
 
 class CalendarTest extends IcuAwareTestCase
 {

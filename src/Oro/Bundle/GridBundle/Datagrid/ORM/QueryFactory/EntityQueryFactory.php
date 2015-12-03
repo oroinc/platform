@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\GridBundle\Datagrid\ORM\QueryFactory;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\GridBundle\Datagrid\ORM\EntityProxyQuery;
+
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class EntityQueryFactory extends AbstractQueryFactory
 {

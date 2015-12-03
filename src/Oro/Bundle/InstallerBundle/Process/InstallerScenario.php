@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\InstallerBundle\Process;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
-
 use Sylius\Bundle\FlowBundle\Process\Builder\ProcessBuilderInterface;
+
 use Sylius\Bundle\FlowBundle\Process\Scenario\ProcessScenarioInterface;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 class InstallerScenario extends ContainerAware implements ProcessScenarioInterface
 {

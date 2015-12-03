@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Datagrid;
 
-use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\GridBundle\Datagrid\RequestParameters;
+use Symfony\Component\HttpFoundation\Request;
 
 class RequestParametersTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
+use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType;
+use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
 use Symfony\Component\Form\AbstractType;
 
-use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
-use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclRoleType extends AbstractType
 {
@@ -96,7 +96,7 @@ class AclRoleType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_user_role_form';
     }

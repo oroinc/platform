@@ -4,9 +4,9 @@
 namespace Oro\Bundle\EmailBundle\Builder;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
 
 /**
  * A helper class allows you to easy build EmailBody entity

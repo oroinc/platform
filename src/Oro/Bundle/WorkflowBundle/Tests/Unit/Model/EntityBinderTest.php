@@ -3,8 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity;
-use Oro\Bundle\WorkflowBundle\Model\EntityBinder;
 use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
+use Oro\Bundle\WorkflowBundle\Model\EntityBinder;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 

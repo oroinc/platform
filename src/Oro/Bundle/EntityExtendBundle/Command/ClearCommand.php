@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ClearCommand extends ContainerAwareCommand
 {

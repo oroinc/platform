@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Route;
 
-use Symfony\Component\Routing\RouterInterface;
-use Oro\Bundle\GridBundle\Route\DefaultRouteGenerator;
 use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
 use Oro\Bundle\GridBundle\Field\FieldDescription;
+use Oro\Bundle\GridBundle\Route\DefaultRouteGenerator;
+use Symfony\Component\Routing\RouterInterface;
 
 class DefaultRouteGeneratorTest extends \PHPUnit_Framework_TestCase
 {

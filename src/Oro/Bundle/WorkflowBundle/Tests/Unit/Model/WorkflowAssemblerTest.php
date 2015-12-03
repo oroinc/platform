@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 {

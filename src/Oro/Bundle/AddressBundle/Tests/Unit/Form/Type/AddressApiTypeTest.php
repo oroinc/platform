@@ -3,10 +3,10 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\Type\AddressApiType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormBuilder;
 use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class AddressApiTypeTest extends \PHPUnit_Framework_TestCase
 {

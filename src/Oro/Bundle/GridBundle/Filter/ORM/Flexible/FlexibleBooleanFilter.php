@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Filter\ORM\Flexible;
 
-use Oro\Bundle\GridBundle\Filter\ORM\NumberFilter;
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
+use Oro\Bundle\GridBundle\Filter\ORM\NumberFilter;
 
 class FlexibleBooleanFilter extends AbstractFlexibleFilter
 {

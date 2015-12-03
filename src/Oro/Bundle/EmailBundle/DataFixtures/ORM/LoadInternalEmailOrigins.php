@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\DataFixtures\ORM;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 
 class LoadInternalEmailOrigins extends AbstractFixture
 {

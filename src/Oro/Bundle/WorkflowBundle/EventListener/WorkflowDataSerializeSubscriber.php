@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 
 use Doctrine\ORM\UnitOfWork;

@@ -3,14 +3,14 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiCrudInterface;
+use Doctrine\Common\Util\ClassUtils;
+use FOS\Rest\Util\Codes;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
+
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiCrudInterface;
+
 use Symfony\Component\HttpFoundation\Response;
-
-use Doctrine\Common\Util\ClassUtils;
-
-use FOS\Rest\Util\Codes;
 
 abstract class RestController extends RestGetController implements
      FormAwareInterface,

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Datagrid\ORM;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
 class EntityProxyQuery extends ProxyQuery
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Datagrid;
 
-use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
 use Oro\Bundle\GridBundle\Datagrid\DatagridManagerRegistry;
+use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
 
 class DatagridManagerRegistryTest extends \PHPUnit_Framework_TestCase
 {

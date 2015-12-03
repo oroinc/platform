@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\GridBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\GridBundle\Action\MassAction\MassActionDispatcher;
 use Oro\Bundle\GridBundle\Action\MassAction\MassActionParametersParser;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class MassActionController extends Controller
 {

@@ -5,26 +5,26 @@ namespace Oro\Bundle\EntityBundle\Controller;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\PersistentCollection;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 use FOS\Rest\Util\Codes;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\Datagrid\CustomEntityDatagrid;
-
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Entities controller.

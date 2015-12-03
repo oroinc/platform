@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Doctrine\ORM\Mapping as ORM;
 
 use Gedmo\Loggable\Entity\MappedSuperclass\AbstractLogEntry;
-
-use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\SerializedName;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use JMS\Serializer\Annotation\Type;
 
 use Oro\Bundle\UserBundle\Entity\User;
 

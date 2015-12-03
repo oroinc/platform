@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Sorter\ORM;
 
-use Oro\Bundle\GridBundle\Sorter\SorterInterface;
-use Oro\Bundle\GridBundle\Sorter\ORM\Sorter;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Oro\Bundle\GridBundle\Sorter\ORM\Sorter;
+use Oro\Bundle\GridBundle\Sorter\SorterInterface;
 
 class SorterTest extends \PHPUnit_Framework_TestCase
 {

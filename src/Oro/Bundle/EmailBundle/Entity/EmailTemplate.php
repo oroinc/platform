@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
 
-use Symfony\Component\Validator\Constraints as Assert;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * EmailTemplate

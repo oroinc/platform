@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer;
 
-use Symfony\Component\Serializer\Serializer;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Symfony\Component\Serializer\Serializer;
 
 class WorkflowDataSerializer extends Serializer implements WorkflowAwareSerializer
 {

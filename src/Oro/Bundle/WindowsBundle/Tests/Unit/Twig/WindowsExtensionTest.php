@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Twig;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
-use Twig_Environment;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\WindowsBundle\Twig\WindowsExtension;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+use Twig_Environment;
 
 class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
 {

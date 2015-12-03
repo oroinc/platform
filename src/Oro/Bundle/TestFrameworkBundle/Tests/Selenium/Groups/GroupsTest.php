@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
 
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 
 class GroupsTest extends Selenium2TestCase
 {

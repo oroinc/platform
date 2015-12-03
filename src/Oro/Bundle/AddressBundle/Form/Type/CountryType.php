@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\ORM\EntityRepository;
 
 class CountryType extends AbstractType
 {
@@ -30,7 +30,7 @@ class CountryType extends AbstractType
         return 'genemu_jqueryselect2_translatable_entity';
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_country';
     }

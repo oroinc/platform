@@ -3,8 +3,8 @@
 namespace Oro\Bundle\BatchBundle\Job;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
 
 /**
  * Class peristing JobExecution and StepExecution states

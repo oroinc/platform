@@ -4,10 +4,10 @@ namespace Oro\Bundle\JsFormValidationBundle\Tests\Unit\Generator;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Validator\MetadataFactoryInterface;
-
 use Oro\Bundle\JsFormValidationBundle\Generator\FormValidationScriptGenerator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Symfony\Component\Validator\MetadataFactoryInterface;
 
 class FormValidationScriptGeneratorTest extends \PHPUnit_Framework_TestCase
 {

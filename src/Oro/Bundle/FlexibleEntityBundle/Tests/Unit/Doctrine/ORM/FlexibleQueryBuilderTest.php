@@ -1,14 +1,14 @@
 <?php
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Doctrine\ORM;
 
-use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\AbstractOrmTest;
-use Doctrine\Tests\OrmTestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Oro\Bundle\FlexibleEntityBundle\Doctrine\ORM\FlexibleQueryBuilder;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Tests\OrmTestCase;
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
+use Oro\Bundle\FlexibleEntityBundle\Doctrine\ORM\FlexibleQueryBuilder;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
+use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\AbstractOrmTest;
 
 /**
  * Test related class

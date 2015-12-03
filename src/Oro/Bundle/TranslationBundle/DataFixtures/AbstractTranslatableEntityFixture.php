@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\TranslationBundle\DataFixtures;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Finder\Finder;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractTranslatableEntityFixture extends AbstractFixture implements ContainerAwareInterface
 {

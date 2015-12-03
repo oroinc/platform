@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Command;
 
+use Sensio\Bundle\GeneratorBundle\Command\Helper\DialogHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 
-use Sensio\Bundle\GeneratorBundle\Command\Helper\DialogHelper;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class AddFulltextIndexesCommand extends ContainerAwareCommand
 {

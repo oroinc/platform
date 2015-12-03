@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Soap;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
-use Doctrine\Common\Persistence\ObjectManager;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 class AuditController extends ContainerAware
 {

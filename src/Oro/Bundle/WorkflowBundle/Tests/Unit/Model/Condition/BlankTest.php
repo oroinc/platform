@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Condition;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Oro\Bundle\WorkflowBundle\Model\Condition;
 
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
-use Oro\Bundle\WorkflowBundle\Model\Condition;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class BlankTest extends \PHPUnit_Framework_TestCase
 {

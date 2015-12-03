@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\OptionsResolver\Options;
-
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\OptionsResolver\Options;
 
 class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {

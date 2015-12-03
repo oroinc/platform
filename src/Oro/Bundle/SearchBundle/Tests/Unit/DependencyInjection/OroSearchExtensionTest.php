@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
+
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {

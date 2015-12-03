@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Form\FormFactoryInterface;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\FilterBundle\Extension\Orm\EntityFilter;
+
+use Symfony\Component\Form\FormFactoryInterface;
 
 class FlexibleEntityFilter extends EntityFilter
 {

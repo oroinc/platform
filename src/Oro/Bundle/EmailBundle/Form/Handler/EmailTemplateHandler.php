@@ -4,12 +4,12 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Symfony\Component\Translation\Translator;
 
 class EmailTemplateHandler
 {

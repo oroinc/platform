@@ -2,25 +2,25 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\Translator;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+use Oro\Bundle\EmailBundle\Form\Model\Email;
 
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+use Symfony\Component\Translation\Translator;
 
 class EmailHandler
 {

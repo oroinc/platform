@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
-use Zend\Mail\Headers;
 use \Zend\Mail\Storage\Part;
+use Zend\Mail\Headers;
 
 class Body
 {

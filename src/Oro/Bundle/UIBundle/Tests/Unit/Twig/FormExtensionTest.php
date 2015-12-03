@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Oro\Bundle\UIBundle\Twig\FormExtension;
 use Oro\Bundle\UIBundle\Event\Events;
+use Oro\Bundle\UIBundle\Twig\FormExtension;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormExtensionTest extends \PHPUnit_Framework_TestCase
 {

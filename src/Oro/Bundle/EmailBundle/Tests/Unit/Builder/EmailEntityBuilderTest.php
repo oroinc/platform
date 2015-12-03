@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 
 class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
 {

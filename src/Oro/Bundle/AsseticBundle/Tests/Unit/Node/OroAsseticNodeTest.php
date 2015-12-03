@@ -1,8 +1,8 @@
 <?php
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\Node;
 
-use Assetic\Asset\FileAsset;
 use Assetic\Asset\AssetCollection;
+use Assetic\Asset\FileAsset;
 
 use Oro\Bundle\AsseticBundle\Node\OroAsseticNode;
 

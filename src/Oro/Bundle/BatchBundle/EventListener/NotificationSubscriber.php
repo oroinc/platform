@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\BatchBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Oro\Bundle\BatchBundle\Event\EventInterface;
-use Oro\Bundle\BatchBundle\Notification\Notifier;
 use Oro\Bundle\BatchBundle\Event\JobExecutionEvent;
+use Oro\Bundle\BatchBundle\Notification\Notifier;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Job execution notifier

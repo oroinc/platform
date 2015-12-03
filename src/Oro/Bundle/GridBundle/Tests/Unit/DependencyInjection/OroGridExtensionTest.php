@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\GridBundle\DependencyInjection\OroGridExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroGridExtensionTest extends \PHPUnit_Framework_TestCase
 {

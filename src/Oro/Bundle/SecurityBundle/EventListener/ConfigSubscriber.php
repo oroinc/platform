@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {

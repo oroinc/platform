@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\GridBundle\Action\ActionInterface;
 use Oro\Bundle\GridBundle\Action\RedirectAction;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ActionFactory implements ActionFactoryInterface
 {

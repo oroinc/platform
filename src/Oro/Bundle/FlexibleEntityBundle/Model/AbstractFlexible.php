@@ -3,8 +3,8 @@
 namespace Oro\Bundle\FlexibleEntityBundle\Model;
 
 use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\ScopableInterface;
-use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TranslatableInterface;
 use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TimestampableInterface;
+use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TranslatableInterface;
 
 /**
  * Abstract entity, independent of storage

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Entity;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class NavigationHistoryItemTest extends \PHPUnit_Framework_TestCase
 {

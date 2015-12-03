@@ -3,18 +3,18 @@
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
 use FOS\Rest\Util\Codes;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Symfony\Component\HttpFoundation\Response;
+use Oro\Bundle\EmailBundle\Entity\Email;
 
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
-use Oro\Bundle\EmailBundle\Entity\Email;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("email")

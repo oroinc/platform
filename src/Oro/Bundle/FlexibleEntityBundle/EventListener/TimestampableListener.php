@@ -5,8 +5,8 @@ namespace Oro\Bundle\FlexibleEntityBundle\EventListener;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TimestampableInterface;
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractFlexible;
+use Oro\Bundle\FlexibleEntityBundle\Model\Behavior\TimestampableInterface;
 
 /**
  * Aims to add timestambable behavior

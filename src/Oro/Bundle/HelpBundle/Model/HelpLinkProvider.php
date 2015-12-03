@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\HelpBundle\Model;
 
+use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\HelpBundle\Annotation\Help;
+use Symfony\Component\HttpFoundation\Request;
 
 class HelpLinkProvider
 {

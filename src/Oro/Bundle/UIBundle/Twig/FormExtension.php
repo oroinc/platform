@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Twig_Environment;
-use Symfony\Component\Form\FormView;
+use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
+use Oro\Bundle\UIBundle\Event\Events;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-use Oro\Bundle\UIBundle\Event\Events;
-use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
+use Symfony\Component\Form\FormView;
+use Twig_Environment;
 
 class FormExtension extends \Twig_Extension
 {

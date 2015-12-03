@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
 
-use Oro\Bundle\UserBundle\ImportExport\Serializer\Normalizer\UserNormalizer;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\ImportExport\Serializer\Normalizer\UserNormalizer;
 
 class UserNormalizerTest extends \PHPUnit_Framework_TestCase
 {

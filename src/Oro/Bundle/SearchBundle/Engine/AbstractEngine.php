@@ -4,12 +4,12 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
-use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Connector abstract class

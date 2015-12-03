@@ -4,9 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\NewEntityEvent;
-use Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 
 class ConfigureSubscriberTest extends \PHPUnit_Framework_TestCase

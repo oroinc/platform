@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
-use Symfony\Component\Console\Input\InputInterface;
+use Oro\Bundle\EntityExtendBundle\Databases\MySQLDatabase;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\EntityExtendBundle\Databases\MySQLDatabase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class BackupCommand extends ContainerAwareCommand

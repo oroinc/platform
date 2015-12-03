@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM;
 
-use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
+use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
 use Oro\Bundle\GridBundle\Filter\ORM\NumberFilter;
 
 class NumberFilterTest extends FilterTestCase

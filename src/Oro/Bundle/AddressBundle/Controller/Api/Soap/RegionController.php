@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Soap;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
-use Doctrine\Common\Persistence\ObjectManager;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Entity\Country;
+
 use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
  * TODO: Discuss ACL impl.

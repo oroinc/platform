@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\BatchBundle\Job;
 
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Oro\Bundle\BatchBundle\Step\StepInterface;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\BatchBundle\Event\EventInterface;
 use Oro\Bundle\BatchBundle\Event\JobExecutionEvent;
+use Oro\Bundle\BatchBundle\Step\StepInterface;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Implementation of the {@link Job} interface.

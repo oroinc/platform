@@ -2,30 +2,30 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\PersistentCollection;
-
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserApi;
-use Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler;
-
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
+use Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserApi;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends Controller
 {

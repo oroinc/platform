@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\AbstractOrmTest;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\FlexibleEntityBundle\Manager\SimpleManager;
+use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\AbstractOrmTest;
 
 /**
  * Test related class

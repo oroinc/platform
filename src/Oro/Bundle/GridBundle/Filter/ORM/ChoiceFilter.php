@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\GridBundle\Filter\ORM;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Query\QueryBuilder;
 
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 
 class ChoiceFilter extends AbstractFilter
 {

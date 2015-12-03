@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class UserHandler extends AbstractUserHandler implements TagHandlerInterface
 {

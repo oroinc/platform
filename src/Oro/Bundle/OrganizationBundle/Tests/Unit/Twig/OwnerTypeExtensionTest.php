@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundlee\Tests\Unit\Twig;
 
-use Oro\Bundle\OrganizationBundle\Twig\OwnerTypeExtension;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Twig\OwnerTypeExtension;
 
 class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
 {

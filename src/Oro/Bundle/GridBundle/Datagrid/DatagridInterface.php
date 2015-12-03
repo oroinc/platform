@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\GridBundle\Datagrid;
 
-use Symfony\Component\Form\Form;
-
-use Oro\Bundle\GridBundle\Property\PropertyInterface;
-use Oro\Bundle\GridBundle\Sorter\SorterInterface;
-use Oro\Bundle\GridBundle\Route\RouteGeneratorInterface;
 use Oro\Bundle\GridBundle\Action\ActionInterface;
+
 use Oro\Bundle\GridBundle\Action\MassAction\MassActionInterface;
-use Oro\Bundle\GridBundle\Datagrid\Views\AbstractViewsList;
 use Oro\Bundle\GridBundle\Datagrid\PagerInterface;
 use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
-use Oro\Bundle\GridBundle\Filter\FilterInterface;
 use Oro\Bundle\GridBundle\Datagrid\ResultRecordInterface;
+use Oro\Bundle\GridBundle\Datagrid\Views\AbstractViewsList;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Oro\Bundle\GridBundle\Filter\FilterInterface;
+use Oro\Bundle\GridBundle\Property\PropertyInterface;
+use Oro\Bundle\GridBundle\Route\RouteGeneratorInterface;
+use Oro\Bundle\GridBundle\Sorter\SorterInterface;
+use Symfony\Component\Form\Form;
 
 interface DatagridInterface
 {

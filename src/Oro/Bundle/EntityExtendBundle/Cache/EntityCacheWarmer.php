@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
 class EntityCacheWarmer extends CacheWarmer
 {

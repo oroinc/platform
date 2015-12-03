@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
-use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
+use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class EntityWriterTest extends \PHPUnit_Framework_TestCase
 {

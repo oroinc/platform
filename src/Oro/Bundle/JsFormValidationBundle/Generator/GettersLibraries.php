@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\JsFormValidationBundle\Generator;
 
-use Symfony\Component\Validator\Mapping\GetterMetadata;
 use APY\JsFormValidationBundle\Generator\GettersLibraries as BaseGettersLibraries;
+use Symfony\Component\Validator\Mapping\GetterMetadata;
 
 class GettersLibraries extends BaseGettersLibraries
 {

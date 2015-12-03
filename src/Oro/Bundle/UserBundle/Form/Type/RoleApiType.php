@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class RoleApiType extends AclRoleType
 {

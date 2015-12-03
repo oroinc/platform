@@ -1,8 +1,8 @@
 <?php
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Yaml;
 
 class ToolsAPI
 {

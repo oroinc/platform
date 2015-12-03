@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ConfigurationTypeTest extends FormIntegrationTestCase
 {

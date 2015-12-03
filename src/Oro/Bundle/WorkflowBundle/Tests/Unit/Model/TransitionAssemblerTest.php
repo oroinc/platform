@@ -3,10 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Model\Action\Configurable as ConfigurableAction;
+use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
-use Oro\Bundle\WorkflowBundle\Model\Action\Configurable as ConfigurableAction;
 
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\BatchBundle\Step;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Event\EventInterface;
+use Oro\Bundle\BatchBundle\Event\InvalidItemEvent;
+use Oro\Bundle\BatchBundle\Event\StepExecutionEvent;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\ExitStatus;
-use Oro\Bundle\BatchBundle\Job\JobRepositoryInterface;
 use Oro\Bundle\BatchBundle\Job\JobInterruptedException;
-use Oro\Bundle\BatchBundle\Entity\StepExecution;
-use Oro\Bundle\BatchBundle\Event\StepExecutionEvent;
-use Oro\Bundle\BatchBundle\Event\InvalidItemEvent;
-use Oro\Bundle\BatchBundle\Event\EventInterface;
+use Oro\Bundle\BatchBundle\Job\JobRepositoryInterface;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A Step implementation that provides common behavior to subclasses, including registering and calling

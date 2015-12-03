@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Processor;
 
-use Symfony\Component\Serializer\SerializerInterface;
-
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Converter\QueryBuilderAwareInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface;
+use Oro\Bundle\ImportExportBundle\Converter\QueryBuilderAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ExportProcessor implements ProcessorInterface, ContextAwareInterface
 {

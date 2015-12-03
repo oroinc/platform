@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Twig;
 
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\Forms;
-
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\FormBundle\Form\Twig\DataBlocks;
+
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\Forms;
 
 class DataBlocksTest extends \PHPUnit_Framework_TestCase
 {

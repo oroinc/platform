@@ -4,8 +4,8 @@ namespace Oro\Bundle\GridBundle\Datagrid\ORM\QueryFactory;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\GridBundle\Datagrid\ORM\ProxyQuery;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 
 class QueryFactory extends AbstractQueryFactory
 {

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\HelpBundle\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+
+use Symfony\Component\HttpKernel\HttpKernel;
 
 class HelpLinkRequestListener
 {

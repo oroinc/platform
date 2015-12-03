@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Route;
 
-use Symfony\Component\Routing\RouterInterface;
-use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
 use \Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
+use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class DefaultRouteGenerator implements RouteGeneratorInterface
 {

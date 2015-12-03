@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\WindowsBundle\Twig;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
-use Twig_Environment;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
+
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+use Twig_Environment;
 
 class WindowsExtension extends \Twig_Extension
 {

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Knp\Menu\ItemInterface;
-use Knp\Menu\Twig\Helper;
 use Knp\Menu\Provider\MenuProviderInterface;
+use Knp\Menu\Twig\Helper;
 
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\EventListener;
 
-use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
-
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Common\EventSubscriber;
 
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\AttributeRepository;
+
+use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
 
 /**
  * This listener is used to listen to insert or delete

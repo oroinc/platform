@@ -2,27 +2,27 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+
+use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class WidgetController extends Controller
 {
@@ -98,14 +98,14 @@ class WidgetController extends Controller
      * @param string $workflowName
      * @return array
      */
-    public function startTransitionFormAction($transitionName, $workflowName)
+    public function startTransitionFormAction(Request $request, $transitionName, $workflowName)
     {
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $workflow = $workflowManager->getWorkflow($workflowName);
 
         $initData = array();
-        $entityClass = $this->getRequest()->get('entityClass');
+        $entityClass = $request->get('entityClass');
         $entityId = $this->getRequest()->get('entityId');
         if ($entityClass && $entityId) {
             $entity = $this->getEntityReference($entityClass, $entityId);

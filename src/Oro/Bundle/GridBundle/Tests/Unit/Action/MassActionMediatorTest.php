@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Action;
 
-use Oro\Bundle\GridBundle\Action\MassAction\MassActionMediator;
 use Oro\Bundle\GridBundle\Action\MassAction\MassActionInterface;
+use Oro\Bundle\GridBundle\Action\MassAction\MassActionMediator;
 use Oro\Bundle\GridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\GridBundle\Datagrid\IterableResultInterface;
 

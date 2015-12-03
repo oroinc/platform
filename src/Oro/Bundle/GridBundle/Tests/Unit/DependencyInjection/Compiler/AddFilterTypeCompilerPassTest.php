@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddFilterTypeCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AddFilterTypeCompilerPassTest extends AbstractCompilerPassTest
 {

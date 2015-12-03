@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Entity\Demo\FlexibleValue;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
 
 use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Entity\Demo\Flexible;
-use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
+use Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Entity\Demo\FlexibleValue;
 
 /**
  * Test related demo class, aims to cover abstract one

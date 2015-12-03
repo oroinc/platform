@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigurationProvider;
+
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\CorrectConfiguration\CorrectConfigurationBundle;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\DuplicateConfiguration\DuplicateConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\EmptyConfiguration\EmptyConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectConfiguration\IncorrectConfigurationBundle;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\DuplicateConfiguration\DuplicateConfigurationBundle;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Symfony\Component\Yaml\Yaml;
 
 class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {

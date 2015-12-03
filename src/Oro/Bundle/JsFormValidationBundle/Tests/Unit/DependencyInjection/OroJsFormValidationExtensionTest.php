@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\JsFormValidationBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\JsFormValidationBundle\DependencyInjection\OroJsFormValidationExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroJsFormValidationExtensionTest extends \PHPUnit_Framework_TestCase
 {

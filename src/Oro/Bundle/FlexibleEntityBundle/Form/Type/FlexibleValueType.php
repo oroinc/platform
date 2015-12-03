@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
 
 /**
  * Base flexible value form type
@@ -63,7 +63,7 @@ class FlexibleValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_flexibleentity_value';
     }

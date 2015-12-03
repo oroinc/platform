@@ -4,10 +4,10 @@ namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Extension\Orm\BooleanFilter;
+
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class FlexibleBooleanFilter extends BooleanFilter
 {

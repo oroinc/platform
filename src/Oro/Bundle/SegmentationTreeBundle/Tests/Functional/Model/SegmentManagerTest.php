@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Model;
 
-use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\DataFixtures\ORM\LoadItemSegmentData;
+use Doctrine\Common\Annotations\AnnotationReader;
 
-use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\Item;
-use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\ItemSegment;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+
+use Doctrine\ORM\Tools\SchemaTool;
 use Oro\Bundle\SegmentationTreeBundle\Manager\SegmentManager;
 
+use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\DataFixtures\ORM\LoadItemSegmentData;
+use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\Item;
+use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\ItemSegment;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
-
-use Doctrine\Common\EventManager;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * Test related class

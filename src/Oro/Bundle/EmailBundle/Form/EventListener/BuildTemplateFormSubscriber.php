@@ -3,13 +3,13 @@ namespace Oro\Bundle\EmailBundle\Form\EventListener;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
+
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class BuildTemplateFormSubscriber implements EventSubscriberInterface
 {

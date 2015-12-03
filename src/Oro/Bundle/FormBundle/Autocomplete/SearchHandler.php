@@ -4,8 +4,8 @@ namespace Oro\Bundle\FormBundle\Autocomplete;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;

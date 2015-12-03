@@ -3,8 +3,8 @@
 namespace Oro\Bundle\FlexibleEntityBundle\AttributeType;
 
 use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 
 /**
  * Abstract option attribute type

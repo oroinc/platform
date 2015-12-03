@@ -3,9 +3,9 @@
 namespace Oro\Bundle\FlexibleEntityBundle\AttributeType;
 
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
+use Oro\Bundle\FlexibleEntityBundle\Form\Validator\ConstraintGuesserInterface;
 use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 use Oro\Bundle\MeasureBundle\Manager\MeasureManager;
-use Oro\Bundle\FlexibleEntityBundle\Form\Validator\ConstraintGuesserInterface;
 
 /**
  * Metric attribute type

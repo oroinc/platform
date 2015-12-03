@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Event;
 
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
 
 class EntityConfigEventTest extends \PHPUnit_Framework_TestCase

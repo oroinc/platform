@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\GridBundle\Sorter\ORM\Flexible;
 
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
 
-use Oro\Bundle\GridBundle\Sorter\ORM\Sorter;
-use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
 use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
+use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Oro\Bundle\GridBundle\Sorter\ORM\Sorter;
 
 class FlexibleSorter extends Sorter
 {

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Job;
 
-use Oro\Bundle\BatchBundle\Job\Job;
-use Oro\Bundle\BatchBundle\Job\JobInterruptedException;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\ExitStatus;
+use Oro\Bundle\BatchBundle\Job\Job;
+use Oro\Bundle\BatchBundle\Job\JobInterruptedException;
 
 /**
  * Tests related to the AbstractStep class

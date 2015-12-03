@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Entity\Config;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+
 use Symfony\Component\Form\FormFactory;
+
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ConfigBundle\Entity\Config;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class RelationType extends AbstractType
 {
@@ -141,7 +141,7 @@ class RelationType extends AbstractType
         );
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_entity_relation_type';
     }

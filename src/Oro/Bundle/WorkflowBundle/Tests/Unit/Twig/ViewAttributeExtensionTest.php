@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\WorkflowBundle\Twig\ViewAttributeExtension;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Twig\ViewAttributeExtension;
 
 class ViewAttributeExtensionTest extends \PHPUnit_Framework_TestCase
 {

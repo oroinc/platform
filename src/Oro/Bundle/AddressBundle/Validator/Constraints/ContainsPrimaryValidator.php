@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\AddressBundle\Validator\Constraints;
 
+use Oro\Bundle\AddressBundle\Entity\PrimaryItem;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-use Oro\Bundle\AddressBundle\Entity\PrimaryItem;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class ContainsPrimaryValidator extends ConstraintValidator
 {

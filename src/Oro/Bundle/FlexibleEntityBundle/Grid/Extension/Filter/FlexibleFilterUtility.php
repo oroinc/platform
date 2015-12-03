@@ -5,9 +5,9 @@ namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\FilterBundle\Extension\Configuration;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
 use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
 use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
-use Oro\Bundle\FlexibleEntityBundle\Entity\Repository\FlexibleEntityRepository;
 
 class FlexibleFilterUtility
 {

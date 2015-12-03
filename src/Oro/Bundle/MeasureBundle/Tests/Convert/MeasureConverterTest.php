@@ -1,24 +1,6 @@
 <?php
 namespace Oro\Bundle\MeasureBundle\Tests\Convert;
 
-use Oro\Bundle\MeasureBundle\Family\WeightFamilyInterface;
-
-use Oro\Bundle\MeasureBundle\Family\VolumeFamilyInterface;
-
-use Oro\Bundle\MeasureBundle\Family\TemperatureFamilyInterface;
-
-use Oro\Bundle\MeasureBundle\Family\SpeedFamilyInterface;
-
-use Oro\Bundle\MeasureBundle\Family\PowerFamilyInterface;
-
-use Oro\Bundle\MeasureBundle\Family\FrequencyFamilyInterface;
-
-use Oro\Bundle\MeasureBundle\Family\BinaryFamilyInterface;
-
-use Oro\Bundle\MeasureBundle\Family\AreaFamilyInterface;
-
-use Oro\Bundle\MeasureBundle\Family\LengthFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Convert\MeasureConverter;
 
 use Oro\Bundle\MeasureBundle\Exception\UnknownFamilyMeasureException;
@@ -26,6 +8,24 @@ use Oro\Bundle\MeasureBundle\Exception\UnknownFamilyMeasureException;
 use Oro\Bundle\MeasureBundle\Exception\UnknownMeasureException;
 
 use Oro\Bundle\MeasureBundle\Exception\UnknownOperatorException;
+
+use Oro\Bundle\MeasureBundle\Family\AreaFamilyInterface;
+
+use Oro\Bundle\MeasureBundle\Family\BinaryFamilyInterface;
+
+use Oro\Bundle\MeasureBundle\Family\FrequencyFamilyInterface;
+
+use Oro\Bundle\MeasureBundle\Family\LengthFamilyInterface;
+
+use Oro\Bundle\MeasureBundle\Family\PowerFamilyInterface;
+
+use Oro\Bundle\MeasureBundle\Family\SpeedFamilyInterface;
+
+use Oro\Bundle\MeasureBundle\Family\TemperatureFamilyInterface;
+
+use Oro\Bundle\MeasureBundle\Family\VolumeFamilyInterface;
+
+use Oro\Bundle\MeasureBundle\Family\WeightFamilyInterface;
 
 use Symfony\Component\Yaml\Yaml;
 

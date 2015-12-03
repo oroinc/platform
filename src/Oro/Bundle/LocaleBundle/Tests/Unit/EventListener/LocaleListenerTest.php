@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\EventListener;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
 use Oro\Bundle\LocaleBundle\EventListener\LocaleListener;
+use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 {

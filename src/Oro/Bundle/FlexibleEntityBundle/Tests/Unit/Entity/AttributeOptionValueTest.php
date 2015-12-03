@@ -1,11 +1,11 @@
 <?php
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\FlexibleEntityBundle\Entity\AttributeOptionValue;
-
 use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
 
 use Oro\Bundle\FlexibleEntityBundle\Entity\AttributeOption;
+
+use Oro\Bundle\FlexibleEntityBundle\Entity\AttributeOptionValue;
 
 /**
  * Test related class

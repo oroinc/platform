@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Datagrid\QueryConverter;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\GridBundle\Datagrid\QueryConverter\YamlConverter;
 

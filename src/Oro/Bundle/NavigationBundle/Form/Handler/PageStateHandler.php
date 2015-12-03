@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\NavigationBundle\Entity\PageState;
+use Symfony\Component\Form\FormInterface;
+
+use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class PageStateHandler
 {

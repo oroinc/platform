@@ -6,8 +6,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\AbstractPager;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
 class Pager extends AbstractPager implements PagerInterface
 {

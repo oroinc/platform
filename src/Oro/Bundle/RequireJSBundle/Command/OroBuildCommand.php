@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\RequireJSBundle\Command;
 
+use Oro\Bundle\RequireJSBundle\Provider\Config as RequireJSConfigProvider;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
-use Oro\Bundle\RequireJSBundle\Provider\Config as RequireJSConfigProvider;
 
 class OroBuildCommand extends ContainerAwareCommand
 {

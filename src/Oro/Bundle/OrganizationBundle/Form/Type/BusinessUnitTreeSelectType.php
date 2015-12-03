@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTransformer;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
+
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class BusinessUnitTreeSelectType extends AbstractType
 {
@@ -34,7 +34,7 @@ class BusinessUnitTreeSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_business_unit_tree_select';
     }

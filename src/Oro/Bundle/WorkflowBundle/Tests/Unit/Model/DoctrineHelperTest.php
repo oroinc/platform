@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Doctrine\Common\Persistence\Proxy;
 
 use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\__CG__\ItemStubProxy;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
 
 class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 {

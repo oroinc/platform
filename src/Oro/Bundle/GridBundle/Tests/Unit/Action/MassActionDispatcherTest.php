@@ -4,10 +4,10 @@ namespace Oro\Bundle\GridBundle\Tests\Unit\Action;
 
 use Doctrine\ORM\Query\Expr;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\GridBundle\Datagrid\ORM\ProxyQuery;
+
 use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
 {

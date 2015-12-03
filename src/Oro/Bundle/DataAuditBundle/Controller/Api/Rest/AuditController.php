@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Rest;
 
-use Symfony\Component\Validator\Constraints\True;
-
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\Rest\Util\Codes;
 
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\Validator\Constraints\True;
 
 /**
  * @NamePrefix("oro_api_")

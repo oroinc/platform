@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Bundle\SegmentationTreeBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Type for segment form
@@ -27,7 +27,7 @@ abstract class AbstractSegmentType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_segmentation_tree';
     }

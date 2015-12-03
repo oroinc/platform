@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ImapBundle\Manager\DTO;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
-use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 
 class Email
 {

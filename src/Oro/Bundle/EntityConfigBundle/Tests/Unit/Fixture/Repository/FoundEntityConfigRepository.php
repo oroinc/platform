@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigManagerTest;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 

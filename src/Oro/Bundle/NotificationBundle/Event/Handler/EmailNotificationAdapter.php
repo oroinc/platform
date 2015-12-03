@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NotificationBundle\Event\Handler;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
 
 /**
  * Adapts handler data to EmailNotificationInterface required for email notifications processor

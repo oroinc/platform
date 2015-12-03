@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Processor;
 
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {

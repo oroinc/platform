@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
-use Oro\Bundle\TestFrameworkBundle\Test\SoapClient;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\TerminableInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOConnection;
+use Oro\Bundle\TestFrameworkBundle\Test\SoapClient;
+use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\TerminableInterface;
 
 class Client extends BaseClient
 {

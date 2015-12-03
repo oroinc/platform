@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\Form\FormBuilderInterface;
+
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class EmailNotificationApiType extends EmailNotificationType
 {

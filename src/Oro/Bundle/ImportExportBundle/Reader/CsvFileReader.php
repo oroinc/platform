@@ -5,8 +5,8 @@ namespace Oro\Bundle\ImportExportBundle\Reader;
 use Oro\Bundle\BatchBundle\Item\InvalidItemException;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 
 class CsvFileReader extends AbstractReader

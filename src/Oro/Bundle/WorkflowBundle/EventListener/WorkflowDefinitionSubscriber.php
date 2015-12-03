@@ -3,12 +3,12 @@
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
-use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
  * Connects WorkflowItem with WorkflowDefinition

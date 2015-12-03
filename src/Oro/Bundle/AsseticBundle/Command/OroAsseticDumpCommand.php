@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\AsseticBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpFoundation\Request;
-
-use Doctrine\Common\Cache\CacheProvider;
-
 use Assetic\Asset\AssetInterface;
 use Assetic\Util\VarUtils;
-
+use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\AsseticBundle\Factory\OroAssetManager;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
+
+use Symfony\Component\Console\Input\InputInterface;
+
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use Symfony\Component\HttpFoundation\Request;
 
 class OroAsseticDumpCommand extends ContainerAwareCommand
 {

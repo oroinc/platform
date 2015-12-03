@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Performance;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PerformanceTest extends WebTestCase
 {

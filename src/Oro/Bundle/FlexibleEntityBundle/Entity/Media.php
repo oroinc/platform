@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Entity;
 
-use Symfony\Component\HttpFoundation\File\File;
-
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Media entity

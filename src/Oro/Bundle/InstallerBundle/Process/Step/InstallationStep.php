@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
-use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
+use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
 class InstallationStep extends AbstractStep
 {

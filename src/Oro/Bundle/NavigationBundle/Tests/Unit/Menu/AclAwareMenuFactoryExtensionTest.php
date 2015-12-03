@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Knp\Menu\MenuFactory;
 use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Doctrine\Common\Cache\CacheProvider;
+use Symfony\Component\Routing\RouterInterface;
 
 class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 {

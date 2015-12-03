@@ -3,9 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler;
+use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
 use Oro\Bundle\WorkflowBundle\Model\Action\TreeExecutor;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory;
 use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionFactory;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action\Stub\ArrayAction;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action\Stub\ArrayCondition;

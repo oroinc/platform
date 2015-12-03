@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Oro\Bundle\UserBundle\Entity\User;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

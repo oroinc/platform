@@ -4,15 +4,15 @@ namespace Oro\Bundle\GridBundle\Datagrid;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\GridBundle\Datagrid\Views\AbstractViewsList;
 use Oro\Bundle\GridBundle\Builder\DatagridBuilderInterface;
 use Oro\Bundle\GridBundle\Builder\ListBuilderInterface;
 use Oro\Bundle\GridBundle\Datagrid\QueryFactoryInterface;
+
+use Oro\Bundle\GridBundle\Datagrid\Views\AbstractViewsList;
 use Oro\Bundle\GridBundle\Route\RouteGeneratorInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ValidatorInterface;
 
 interface DatagridManagerInterface
 {

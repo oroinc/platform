@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\CalendarBundle\Notification;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CronBundle\Command\Logger\Exception\RaiseExceptionLoggerException;
+use Oro\Bundle\CronBundle\Command\Logger\RaiseExceptionLogger;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
-use Oro\Bundle\CronBundle\Command\Logger\RaiseExceptionLogger;
-use Oro\Bundle\CronBundle\Command\Logger\Exception\RaiseExceptionLoggerException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class RemindersSender
 {

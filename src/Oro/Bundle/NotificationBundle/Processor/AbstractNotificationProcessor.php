@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\NotificationBundle\Processor;
 
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManager;
 use JMS\JobQueueBundle\Entity\Job;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractNotificationProcessor
 {

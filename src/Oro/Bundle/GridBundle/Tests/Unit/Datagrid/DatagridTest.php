@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Datagrid;
 
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
 use Oro\Bundle\GridBundle\Datagrid\Datagrid;
-use Oro\Bundle\GridBundle\Filter\FilterInterface;
-use Oro\Bundle\GridBundle\Sorter\SorterInterface;
+
+use Oro\Bundle\GridBundle\Datagrid\PagerInterface;
 use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
 use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
+use Oro\Bundle\GridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\GridBundle\Datagrid\ResultRecord;
+use Oro\Bundle\GridBundle\EventDispatcher\ResultDatagridEvent;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionCollection;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Oro\Bundle\GridBundle\Filter\FilterInterface;
 use Oro\Bundle\GridBundle\Property\PropertyInterface;
-use Oro\Bundle\GridBundle\Datagrid\RequestParameters;
-use Oro\Bundle\GridBundle\Datagrid\PagerInterface;
-use Oro\Bundle\GridBundle\EventDispatcher\ResultDatagridEvent;
+use Oro\Bundle\GridBundle\Sorter\SorterInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

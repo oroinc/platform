@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\GridBundle\Datagrid;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Form;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Bundle\GridBundle\Action\ActionInterface;
+use Oro\Bundle\GridBundle\Action\MassAction\MassActionInterface;
+use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
 
-use Oro\Bundle\GridBundle\Filter\FilterInterface;
+use Oro\Bundle\GridBundle\Datagrid\Views\AbstractViewsList;
+use Oro\Bundle\GridBundle\EventDispatcher\ResultDatagridEvent;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionCollection;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Oro\Bundle\GridBundle\Filter\FilterInterface;
 use Oro\Bundle\GridBundle\Property\PropertyCollection;
 use Oro\Bundle\GridBundle\Property\PropertyInterface;
-use Oro\Bundle\GridBundle\Sorter\SorterInterface;
 use Oro\Bundle\GridBundle\Route\RouteGeneratorInterface;
-use Oro\Bundle\GridBundle\Action\ActionInterface;
-use Oro\Bundle\GridBundle\EventDispatcher\ResultDatagridEvent;
-use Oro\Bundle\GridBundle\Action\MassAction\MassActionInterface;
-use Oro\Bundle\GridBundle\Datagrid\Views\AbstractViewsList;
-use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
+use Oro\Bundle\GridBundle\Sorter\SorterInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

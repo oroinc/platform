@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ConditionFactory
 {

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Sorter\ORM;
 
-use Oro\Bundle\GridBundle\Sorter\SorterInterface;
 use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Oro\Bundle\GridBundle\Sorter\SorterInterface;
 
 class Sorter implements SorterInterface
 {

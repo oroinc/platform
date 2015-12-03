@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\AsseticBundle\Factory;
 
-use Symfony\Bundle\AsseticBundle\Factory\Resource\FileResource;
-
-use Assetic\Factory\Resource\IteratorResourceInterface;
 use Assetic\Asset\AssetInterface;
-use Assetic\Factory\LazyAssetManager;
 
+use Assetic\Factory\LazyAssetManager;
+use Assetic\Factory\Resource\IteratorResourceInterface;
 use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\AsseticBundle\Node\OroAsseticNode;
+
+use Symfony\Bundle\AsseticBundle\Factory\Resource\FileResource;
 
 class OroAssetManager
 {

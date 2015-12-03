@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\GridBundle\Filter\ORM\ChoiceFilter;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class ChoiceFilterTest extends FilterTestCase
 {

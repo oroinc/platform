@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Oro\Bundle\AddressBundle\Form\EventListener\ItemCollectionTypeSubscriber;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\AddressBundle\Form\EventListener\ItemCollectionTypeSubscriber;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ItemCollectionType extends AbstractType
 {
@@ -66,7 +66,7 @@ class ItemCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_item_collection';
     }

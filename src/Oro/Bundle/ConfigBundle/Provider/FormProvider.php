@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
-use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
+use Symfony\Component\Form\FormBuilderInterface;
 
 abstract class FormProvider implements ProviderInterface
 {

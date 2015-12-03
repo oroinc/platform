@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\EntityConfigBundle\Event\Events;
+
 use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EntityConfigSubscriber implements EventSubscriberInterface
 {

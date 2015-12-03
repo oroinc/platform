@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class EmailAddressTypeTest extends TypeTestCase
 {

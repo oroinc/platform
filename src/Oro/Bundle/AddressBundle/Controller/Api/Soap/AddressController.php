@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Soap;
 
-use Symfony\Component\Form\FormInterface;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * TODO: Discuss ACL impl.

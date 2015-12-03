@@ -3,8 +3,8 @@
 namespace Oro\Bundle\UIBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use Twig_Environment;
 use Symfony\Component\Form\FormView;
+use Twig_Environment;
 
 class BeforeFormRenderEvent extends Event
 {

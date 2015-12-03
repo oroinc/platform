@@ -2,10 +2,10 @@
 
 namespace ConfigBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
+use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
-use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class FormFieldTypeTest extends TypeTestCase
 {

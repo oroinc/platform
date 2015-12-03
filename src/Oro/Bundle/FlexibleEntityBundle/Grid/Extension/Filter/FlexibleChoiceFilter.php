@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\Form\FormFactoryInterface;
+use Oro\Bundle\FilterBundle\Extension\Orm\ChoiceFilter;
 
 use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
-use Oro\Bundle\FilterBundle\Extension\Orm\ChoiceFilter;
 use Oro\Bundle\FlexibleEntityBundle\Entity\AttributeOption;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class FlexibleChoiceFilter extends ChoiceFilter
 {

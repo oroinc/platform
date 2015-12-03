@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\EventListener;
 
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleInterface;
-use Oro\Bundle\FlexibleEntityBundle\Exception\HasRequiredValueException;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
-use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\FlexibleEntityBundle\Exception\HasRequiredValueException;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

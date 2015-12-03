@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle;
 
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\EntityConfigPass;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceLinkPass;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceMethodPass;
+
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceMethodPass;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceLinkPass;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\EntityConfigPass;
 
 class OroEntityConfigBundle extends Bundle
 {

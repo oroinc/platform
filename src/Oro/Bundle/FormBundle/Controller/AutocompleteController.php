@@ -2,23 +2,23 @@
 
 namespace Oro\Bundle\FormBundle\Controller;
 
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Autocomplete\Security;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
-use Oro\Bundle\FormBundle\Autocomplete\Security;
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
-use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
-
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\FileLocator;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @Route("/autocomplete")

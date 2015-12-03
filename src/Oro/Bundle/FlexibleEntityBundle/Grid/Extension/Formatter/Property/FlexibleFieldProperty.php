@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Formatter\Property;
 
-use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\FieldProperty;
+use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
 
 class FlexibleFieldProperty extends FieldProperty
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Twig;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class OwnerTypeExtension extends \Twig_Extension
 {

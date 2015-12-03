@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\TagBundle\Twig;
 
-use Symfony\Component\Routing\Router;
-
 use Oro\Bundle\TagBundle\Entity\Taggable;
+
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Symfony\Component\Routing\Router;
 
 class TagExtension extends \Twig_Extension
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;

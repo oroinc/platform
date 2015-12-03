@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\EventDispatcher;
 
-use Oro\Bundle\GridBundle\EventDispatcher\AbstractDatagridEvent;
 use Oro\Bundle\GridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\GridBundle\EventDispatcher\AbstractDatagridEvent;
 
 class AbstractDatagridEventTest extends \PHPUnit_Framework_TestCase
 {

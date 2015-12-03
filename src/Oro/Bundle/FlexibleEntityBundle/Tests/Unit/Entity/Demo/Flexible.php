@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Entity\Demo;
 
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexible;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexible;
 
 /**
  * A concret flexible class

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Command\Logger;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class OutputLogger extends AbstractLogger
 {

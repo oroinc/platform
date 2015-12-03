@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 
 class LoadAclRoles extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {

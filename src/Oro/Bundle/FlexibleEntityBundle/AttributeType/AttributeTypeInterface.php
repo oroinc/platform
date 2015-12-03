@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\AttributeType;
 
-use Symfony\Component\Form\FormFactoryInterface;
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * The attribute type interface

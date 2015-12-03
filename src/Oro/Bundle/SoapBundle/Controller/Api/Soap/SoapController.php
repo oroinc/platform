@@ -3,9 +3,9 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
 use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapApiCrudInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
+use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapApiCrudInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 

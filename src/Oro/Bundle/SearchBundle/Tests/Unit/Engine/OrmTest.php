@@ -3,13 +3,13 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\Orm;
-use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Entity\Item;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Attribute;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 class OrmTest extends \PHPUnit_Framework_TestCase
 {

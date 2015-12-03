@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Entity\Demo;
 
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexibleValue;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexibleValue;
 
 /**
  * A concret flexible attribue value class

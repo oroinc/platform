@@ -2,23 +2,23 @@
 
 namespace Oro\Bundle\GridBundle\Builder;
 
-use Oro\Bundle\GridBundle\Filter\FilterInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
-use Oro\Bundle\GridBundle\Field\FieldDescriptionCollection;
-use Oro\Bundle\GridBundle\Property\PropertyInterface;
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
-use Oro\Bundle\GridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
-use Oro\Bundle\GridBundle\Route\RouteGeneratorInterface;
-use Oro\Bundle\GridBundle\Filter\FilterFactoryInterface;
-use Oro\Bundle\GridBundle\Sorter\SorterFactoryInterface;
 use Oro\Bundle\GridBundle\Action\ActionFactoryInterface;
-use Oro\Bundle\GridBundle\Datagrid\PagerInterface;
 use Oro\Bundle\GridBundle\Action\MassAction\MassActionInterface;
+use Oro\Bundle\GridBundle\Datagrid\DatagridInterface;
+
+use Oro\Bundle\GridBundle\Datagrid\PagerInterface;
+use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
+use Oro\Bundle\GridBundle\Field\FieldDescriptionCollection;
+use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Oro\Bundle\GridBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\GridBundle\Filter\FilterInterface;
+use Oro\Bundle\GridBundle\Property\PropertyInterface;
+use Oro\Bundle\GridBundle\Route\RouteGeneratorInterface;
+use Oro\Bundle\GridBundle\Sorter\SorterFactoryInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 
 abstract class AbstractDatagridBuilder implements DatagridBuilderInterface
 {

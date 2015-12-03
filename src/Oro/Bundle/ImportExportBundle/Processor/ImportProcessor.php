@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ImportExportBundle\Processor;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
+
+use Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor;
+use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor;
-use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
-use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 
 class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, SerializerAwareInterface
 {

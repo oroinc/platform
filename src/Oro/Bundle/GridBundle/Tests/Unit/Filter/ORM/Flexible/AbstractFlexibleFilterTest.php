@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Filter\ORM\Flexible;
 
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
-use Oro\Bundle\GridBundle\Filter\ORM\Flexible\AbstractFlexibleFilter;
 use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManagerRegistry;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\GridBundle\Filter\FilterInterface;
+use Oro\Bundle\GridBundle\Filter\ORM\Flexible\AbstractFlexibleFilter;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

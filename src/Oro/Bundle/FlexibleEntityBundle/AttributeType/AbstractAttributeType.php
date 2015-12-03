@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\AttributeType;
 
-use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AttributeTypeInterface;
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
-use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
 use Oro\Bundle\FlexibleEntityBundle\Form\Validator\ConstraintGuesserInterface;
+use Oro\Bundle\FlexibleEntityBundle\Model\AbstractAttribute;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Validator\Constraints;
 
 /**
  * Abstract attribute type

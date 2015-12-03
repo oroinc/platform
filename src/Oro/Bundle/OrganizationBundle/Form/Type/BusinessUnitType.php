@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Doctrine\ORM\EntityRepository;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BusinessUnitType extends AbstractType
 {
@@ -95,7 +95,7 @@ class BusinessUnitType extends AbstractType
         );
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::FORM_NAME;
     }

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Symfony\Component\EventDispatcher\Event;
 
 class NewEntityConfigModelEvent extends Event
 {

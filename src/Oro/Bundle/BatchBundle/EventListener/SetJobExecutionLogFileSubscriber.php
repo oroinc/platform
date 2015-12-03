@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\BatchBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Oro\Bundle\BatchBundle\Event\EventInterface;
-use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
 use Oro\Bundle\BatchBundle\Event\JobExecutionEvent;
+use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Set the job execution log file into the job execution instance

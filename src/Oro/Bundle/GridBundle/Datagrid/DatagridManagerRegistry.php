@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\GridBundle\Datagrid;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\GridBundle\Datagrid\DatagridManagerInterface;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DatagridManagerRegistry
 {

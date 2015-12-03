@@ -4,8 +4,8 @@ namespace Oro\Bundle\GridBundle\Filter\ORM;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 
-use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 
 abstract class AbstractDateFilter extends AbstractFilter
 {

@@ -4,9 +4,9 @@ namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Extension\Orm\NumberFilter;
+
+use Symfony\Component\Form\FormFactoryInterface;
 
 class FlexibleNumberFilter extends NumberFilter
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Route;
 
-use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
 use Oro\Bundle\GridBundle\Datagrid\ParametersInterface;
+use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
 
 interface RouteGeneratorInterface
 {

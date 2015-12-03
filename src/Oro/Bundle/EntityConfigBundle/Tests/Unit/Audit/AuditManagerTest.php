@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\DependencyInjection\Container;
-
+use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\DependencyInjection\Container;
 
 class AuditManagerTest extends \PHPUnit_Framework_TestCase
 {

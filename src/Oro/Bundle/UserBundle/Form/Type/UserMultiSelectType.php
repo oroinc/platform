@@ -3,12 +3,12 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class UserMultiSelectType extends UserSelectType
 {

@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Events;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 
 class EntitySubscriber implements EventSubscriber

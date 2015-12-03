@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class CronCommand extends ContainerAwareCommand
 {

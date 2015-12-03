@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\GridBundle\Filter\ORM;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
 
+use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
-use Oro\Bundle\GridBundle\Filter\FilterInterface;
+
 use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
+use Oro\Bundle\GridBundle\Filter\FilterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractFilter extends AbstractDescriptiveFilter implements FilterInterface
 {

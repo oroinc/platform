@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity;
 
-use Oro\Bundle\SegmentationTreeBundle\Entity\AbstractSegment;
-use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\Item;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
 use Gedmo\Mapping\Annotation as Gedmo;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\SegmentationTreeBundle\Entity\AbstractSegment;
+use Oro\Bundle\SegmentationTreeBundle\Tests\Functional\Entity\Item;
 
 /**
  * A concrete Segment class allowing to organize

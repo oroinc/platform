@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Command\Logger;
 
-use Psr\Log\LogLevel;
-use Oro\Bundle\CronBundle\Command\Logger\RaiseExceptionLogger;
 use Oro\Bundle\CronBundle\Command\Logger\Exception\RaiseExceptionLoggerException;
+use Oro\Bundle\CronBundle\Command\Logger\RaiseExceptionLogger;
+use Psr\Log\LogLevel;
 
 class RaiseExceptionLoggerTest extends \PHPUnit_Framework_TestCase
 {

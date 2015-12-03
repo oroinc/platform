@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Extension;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-
 use Oro\Bundle\FilterBundle\Extension\Orm\FilterInterface;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {

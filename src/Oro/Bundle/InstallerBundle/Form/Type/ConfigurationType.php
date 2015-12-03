@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Oro\Bundle\InstallerBundle\Validator\Constraints as Assert;
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigurationType extends AbstractType
 {
@@ -45,7 +45,7 @@ class ConfigurationType extends AbstractType
             );
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_installer_configuration';
     }

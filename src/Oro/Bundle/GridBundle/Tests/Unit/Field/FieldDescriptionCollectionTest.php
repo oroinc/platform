@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Field;
 
-use Oro\Bundle\GridBundle\Field\FieldDescriptionCollection;
 use Oro\Bundle\GridBundle\Field\FieldDescription;
+use Oro\Bundle\GridBundle\Field\FieldDescriptionCollection;
 
 class FieldDescriptionCollectionTest extends \PHPUnit_Framework_TestCase
 {

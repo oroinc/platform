@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class CalendarEventHandler
 {

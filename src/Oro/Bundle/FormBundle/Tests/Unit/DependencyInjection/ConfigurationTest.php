@@ -1,11 +1,11 @@
 <?php
 namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\Processor;
-
 use Oro\Bundle\FormBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
+use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

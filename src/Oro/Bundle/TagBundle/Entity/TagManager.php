@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\TagBundle\Entity;
 
-use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr;
 
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+
+use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 
 class TagManager
 {

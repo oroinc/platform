@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
+
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TargetType extends AbstractType
 {
@@ -127,7 +127,7 @@ class TargetType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_entity_target_type';
     }

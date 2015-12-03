@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ConfigBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
+use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Symfony\Component\HttpFoundation\Request;
 
 class ConfigurationController extends Controller
 {

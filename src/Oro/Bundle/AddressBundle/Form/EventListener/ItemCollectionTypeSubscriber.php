@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\AddressBundle\Entity\EmptyItem;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
+
+use Symfony\Component\Form\FormEvents;
+
+use Symfony\Component\Form\FormInterface;
 
 class ItemCollectionTypeSubscriber implements EventSubscriberInterface
 {

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
 
-use Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\AddressNormalizer;
-use Oro\Bundle\AddressBundle\Entity\Region;
-use Oro\Bundle\AddressBundle\Entity\Country;
-use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\AddressBundle\Entity\Address;
+use Oro\Bundle\AddressBundle\Entity\Country;
+use Oro\Bundle\AddressBundle\Entity\Region;
+use Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\AddressNormalizer;
 
 class AddressNormalizerTest extends \PHPUnit_Framework_TestCase
 {

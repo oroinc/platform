@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Yaml\Parser;
-
 use Oro\Bundle\DataAuditBundle\DependencyInjection\OroDataAuditExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Symfony\Component\Yaml\Parser;
 
 class OroDataAuditExtensionTest extends \PHPUnit_Framework_TestCase
 {

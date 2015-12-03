@@ -2,9 +2,9 @@
 
 namespace ConfigBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox;
+
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ConfigCheckboxTest extends FormIntegrationTestCase
 {

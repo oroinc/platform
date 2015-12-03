@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit;
 
-use Doctrine\ORM\EntityManager;
-
-use Doctrine\Tests\OrmTestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
+
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Symfony\Component\DependencyInjection\Container;
+use Doctrine\Tests\OrmTestCase;
 use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Abstract test class which mock the entity manager

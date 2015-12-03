@@ -5,9 +5,9 @@ use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
 
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Attribute;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 {

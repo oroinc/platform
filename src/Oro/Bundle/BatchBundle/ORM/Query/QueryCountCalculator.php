@@ -3,8 +3,8 @@
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
 
 /**

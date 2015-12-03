@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\BatchBundle\Entity;
 
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\BatchBundle\Item\ExecutionContext;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\ExitStatus;
-use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Batch domain object representation the execution of a step. Unlike

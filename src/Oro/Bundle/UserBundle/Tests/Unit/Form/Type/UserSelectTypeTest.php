@@ -2,9 +2,9 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
 use Oro\Bundle\FormBundle\EntityAutocomplete\Transformer\EntityTransformerInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
+
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class UserSelectTypeTest extends \PHPUnit_Framework_TestCase
 {

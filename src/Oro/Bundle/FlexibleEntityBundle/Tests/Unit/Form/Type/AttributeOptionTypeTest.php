@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Form\Type;
 
-use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase;
 use Oro\Bundle\FlexibleEntityBundle\Form\Type\AttributeOptionType;
+use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase;
 
 /**
  * Test related class

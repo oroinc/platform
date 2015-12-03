@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\CalendarBundle\Command\Cron;
 
+use Oro\Bundle\CalendarBundle\Notification\RemindersSender;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
-use Oro\Bundle\CalendarBundle\Notification\RemindersSender;
 
 class SendRemindersCommand extends ContainerAwareCommand implements CronCommandInterface
 {

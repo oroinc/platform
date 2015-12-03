@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 
 class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {

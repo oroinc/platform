@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-use JMS\Serializer\Annotation\Type;
+use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Exclude;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use JMS\Serializer\Annotation\Type;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * BusinessUnit

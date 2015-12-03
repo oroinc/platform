@@ -1,8 +1,8 @@
 <?php
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexible;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexible;
 
 /**
  * @ORM\Table(name="test_search_item")

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FilterBundle\Extension\Orm;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\FilterBundle\Extension\Configuration;
+
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class ChoiceFilter extends AbstractFilter
 {

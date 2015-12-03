@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Entity\Mapping;
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Inflector\Inflector;
+use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractFlexible;
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 use Oro\Bundle\FlexibleEntityBundle\Model\AbstractFlexibleValue;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 
 /**
  * Base Doctrine ORM entity

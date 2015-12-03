@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\AbstractType;
 
 class AddressCollectionType extends AbstractType
 {
@@ -37,7 +37,7 @@ class AddressCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_address_collection';
     }

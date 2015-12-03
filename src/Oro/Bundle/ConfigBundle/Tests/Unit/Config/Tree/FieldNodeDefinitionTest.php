@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree;
 
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
+use Symfony\Component\Validator\Constraints\Length;
+
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class FieldNodeDefinitionTest extends \PHPUnit_Framework_TestCase
 {

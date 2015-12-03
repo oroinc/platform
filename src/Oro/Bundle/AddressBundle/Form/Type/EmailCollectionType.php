@@ -17,7 +17,7 @@ class EmailCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_email_collection';
     }

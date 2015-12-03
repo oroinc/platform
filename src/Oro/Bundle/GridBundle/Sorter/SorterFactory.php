@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Sorter;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SorterFactory implements SorterFactoryInterface
 {

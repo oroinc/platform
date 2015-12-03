@@ -4,8 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {

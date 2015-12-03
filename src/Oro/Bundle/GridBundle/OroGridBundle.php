@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\GridBundle;
 
+use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddDependencyCallsCompilerPass;
+use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddFilterTypeCompilerPass;
+
+use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddFlexibleManagerCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddDependencyCallsCompilerPass;
-use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddFlexibleManagerCompilerPass;
-use Oro\Bundle\GridBundle\DependencyInjection\Compiler\AddFilterTypeCompilerPass;
 
 class OroGridBundle extends Bundle
 {

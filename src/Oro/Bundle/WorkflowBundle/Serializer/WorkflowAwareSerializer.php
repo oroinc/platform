@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer;
 
-use Symfony\Component\Serializer\SerializerInterface;
-
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+
+use Symfony\Component\Serializer\SerializerInterface;
 
 interface WorkflowAwareSerializer extends SerializerInterface
 {

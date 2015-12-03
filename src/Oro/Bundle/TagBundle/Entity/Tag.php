@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\TagBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
-use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Tag

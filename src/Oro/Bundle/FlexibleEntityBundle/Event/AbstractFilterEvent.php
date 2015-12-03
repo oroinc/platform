@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FlexibleEntityBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Filter event allows to know the create flexible attribute

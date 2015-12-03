@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\InstallerBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Oro\Bundle\InstallerBundle\DependencyInjection\Compiler\InstallerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\InstallerBundle\DependencyInjection\Compiler\InstallerPass;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroInstallerBundle extends Bundle
 {

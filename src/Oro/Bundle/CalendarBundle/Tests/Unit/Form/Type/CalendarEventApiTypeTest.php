@@ -5,11 +5,11 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType;
 
 class CalendarEventApiTypeTest extends TypeTestCase
 {

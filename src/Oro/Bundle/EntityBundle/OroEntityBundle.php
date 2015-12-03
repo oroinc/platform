@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroEntityBundle extends Bundle
 {

@@ -6,8 +6,8 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
+use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 
 class TestEmailSynchronizer extends AbstractEmailSynchronizer
 {

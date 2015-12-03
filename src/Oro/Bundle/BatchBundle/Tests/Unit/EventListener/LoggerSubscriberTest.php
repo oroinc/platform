@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\BatchBundle\EventListener\LoggerSubscriber;
 use Oro\Bundle\BatchBundle\Event\EventInterface;
+use Oro\Bundle\BatchBundle\EventListener\LoggerSubscriber;
 
 /**
  * Test related class

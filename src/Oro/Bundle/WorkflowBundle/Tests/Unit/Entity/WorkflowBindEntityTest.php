@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 class WorkflowBindEntityTest extends \PHPUnit_Framework_TestCase
 {

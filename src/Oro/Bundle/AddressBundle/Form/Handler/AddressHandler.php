@@ -4,10 +4,10 @@ namespace Oro\Bundle\AddressBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Symfony\Component\Form\FormInterface;
+
+use Symfony\Component\HttpFoundation\Request;
 
 class AddressHandler
 {

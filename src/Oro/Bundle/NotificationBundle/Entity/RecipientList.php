@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\NotificationBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
-use Symfony\Component\Validator\ExecutionContext;
+use Oro\Bundle\UserBundle\Entity\Group;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\Group;
+use Symfony\Component\Validator\ExecutionContext;
 
 /**
  * EmailNotification

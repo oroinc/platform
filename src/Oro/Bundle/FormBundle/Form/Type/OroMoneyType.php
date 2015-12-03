@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormInterface;
+
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class OroMoneyType extends AbstractType
 {
@@ -38,7 +38,7 @@ class OroMoneyType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

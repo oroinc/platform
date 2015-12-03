@@ -3,8 +3,8 @@
 namespace Oro\Bundle\FlexibleEntityBundle\Tests\Unit\Form\Validator;
 
 use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
-use Symfony\Component\Validator\Constraints;
 use Oro\Bundle\FlexibleEntityBundle\Form\Validator\AttributeConstraintGuesser;
+use Symfony\Component\Validator\Constraints;
 
 /**
  * Test related class

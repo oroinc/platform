@@ -1,8 +1,8 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql;
 
-use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
+use Doctrine\ORM\Query\Lexer;
 
 /**
  * "TsRank" "(" {StateFieldPathExpression ","}* InParameter ")"

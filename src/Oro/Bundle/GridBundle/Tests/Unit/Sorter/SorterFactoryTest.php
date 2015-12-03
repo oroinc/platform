@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GridBundle\Tests\Unit\Sorter;
 
-use Oro\Bundle\GridBundle\Sorter\SorterFactory;
 use Oro\Bundle\GridBundle\Field\FieldDescription;
+use Oro\Bundle\GridBundle\Sorter\SorterFactory;
 
 class SorterFactoryTest extends \PHPUnit_Framework_TestCase
 {

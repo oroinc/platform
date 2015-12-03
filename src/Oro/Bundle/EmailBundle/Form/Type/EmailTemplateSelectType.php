@@ -52,7 +52,7 @@ class EmailTemplateSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_email_template_list';
     }

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Handler;
 
-use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Context;
+use JMS\Serializer\JsonSerializationVisitor;
 
 use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
