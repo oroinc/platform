@@ -323,7 +323,7 @@ class TagManager
         $owner = $this->getUser();
 
         // Tag[]  - assigned to the entity.
-        $oldTags = $this->fetchTags($entity, $owner, false, $organization);
+        $oldTags = $this->fetchTags($entity, null, false, $organization);
 
         // Modified entity Tags, could contains new tags, or does not contains tags that need to remove.
         $newTags = $this->getTags($entity);
@@ -343,7 +343,7 @@ class TagManager
             );
         }
 
-        $tagsToAdd    = $newOwnerTags->filter(
+        $tagsToAdd    = $newAllTags->filter(
             function ($tag) use ($oldTags) {
                 return !$oldTags->exists($this->getComparePredicate($tag));
             }
@@ -374,9 +374,10 @@ class TagManager
 
         if (!$tagsToAdd->isEmpty()) {
             $this->persistTags($entity, $tagsToAdd);
-            if ($flush) {
-                $this->em->flush();
-            }
+        }
+
+        if ($flush) {
+            $this->em->flush();
         }
     }
 
