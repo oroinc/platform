@@ -33,7 +33,7 @@ UPGRADE FROM 1.8 to 1.9
 ####DataGridBundle
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
 - JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
-
+ 
 ####EmailBundle
 - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
 - `oro_email.emailtemplate.variable_provider.entity` service was marked as private
