@@ -55,6 +55,7 @@ define(function(require) {
     var TagsEditorView;
     var AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
     var _ = require('underscore');
+    var $ = require('jquery');
 
     TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
         className: 'tags-select-editor',
@@ -74,6 +75,12 @@ define(function(require) {
 
         getSelect2Options: function() {
             var _this = this;
+            _this.currentData = null;
+            _this.firstPageData = {
+                results: [],
+                more: false,
+                isDummy: true
+            };
             return {
                 placeholder: this.placeholder || ' ',
                 allowClear: true,
@@ -92,10 +99,17 @@ define(function(require) {
                 },
                 query: function(options) {
                     _this.currentTerm = options.term;
-                    _this.currentData = null;
+                    _this.currentPage = options.page;
                     _this.currentCallback = options.callback;
+                    if (options.page === 1) {
+                        // immediately show first item
+                        _this.showResults();
+                    }
                     options.callback = function(data) {
                         _this.currentData = data;
+                        if (data.page === 1) {
+                            _this.firstPageData = data;
+                        }
                         _this.showResults();
                     };
                     if (_this.currentRequest && _this.currentRequest.term !== '' &&
@@ -118,7 +132,74 @@ define(function(require) {
         },
 
         showResults: function() {
-            this.currentCallback(this.currentData);
+            var data;
+            if (this.currentPage === 1) {
+                data = $.extend({}, this.firstPageData);
+                data.results = this.filterTermFromResults(this.currentTerm, data.results);
+                if (this.currentPage === 1) {
+                    if (this.isValidTerm(this.currentTerm)) {
+                        data.results.unshift({
+                            id: this.currentTerm,
+                            label: this.currentTerm
+                        });
+                    } else {
+                        if (this.firstPageData.isDummy) {
+                            // do not update list until choices will be loaded
+                            return;
+                        }
+                    }
+                }
+                this.currentTermWeakSearchExpression = this.buildWeakSearchExpression(this.currentTerm);
+                data.results.sort(_.bind(this.tagSortCallback, this));
+            } else {
+                data = $.extend({}, this.currentData);
+                data.results = this.filterTermFromResults(this.currentTerm, data.results);
+            }
+            this.currentCallback(data);
+        },
+
+        filterTermFromResults: function(term, results) {
+            results = _.clone(results);
+            for (var i = 0; i < results.length; i++) {
+                var result = results[i];
+                if (result.label === term) {
+                    results.splice(i, 1);
+                    break;
+                }
+            }
+            return results;
+        },
+
+        tagSortCallback: function(a, b) {
+            return this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
+        },
+
+        buildWeakSearchExpression: function(term) {
+            var lowerCaseTerm = term.toLowerCase();
+            var regExpString = '';
+            for (var i = 0; i < lowerCaseTerm.length; i++) {
+                var letter = lowerCaseTerm[i];
+                regExpString += letter.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') + '.*';
+            }
+            return new RegExp(regExpString + '.*', 'i');
+        },
+
+        getTermSimilarity: function(term) {
+            var lowerCaseTerm = term.toLowerCase();
+            var index = lowerCaseTerm.indexOf(this.currentTerm.toLowerCase());
+            if (index === -1) {
+                var result = this.currentTermWeakSearchExpression.exec(term);
+                if (result === null) {
+                    return 1000;
+                }
+                return result.index + 500;
+            }
+
+            return index;
+        },
+
+        isValidTerm: function(term) {
+            return _.isString(term) && term.length > 0;
         },
 
         getModelValue: function() {

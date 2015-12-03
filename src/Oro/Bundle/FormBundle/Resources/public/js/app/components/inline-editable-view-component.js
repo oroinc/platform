@@ -114,11 +114,12 @@ define(function(require) {
         },
 
         saveCurrentCellAndExit: function() {
-            this.saveCurrentCell();
-            this.exitEditMode();
+            if (this.saveCurrentCell(false)) {
+                this.exitEditMode(true);
+            }
         },
 
-        saveCurrentCell: function() {
+        saveCurrentCell: function(exit) {
             if (!this.editorView) {
                 throw Error('Edit mode disabled');
             }
@@ -156,6 +157,9 @@ define(function(require) {
                 .always(function() {
                     wrapper.$el.removeClass('loading');
                 });
+            if (exit !== false) {
+                this.exitEditMode();
+            }
             return true;
         },
 

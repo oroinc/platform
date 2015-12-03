@@ -15,12 +15,26 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
 }
-
-.inline-editable-wrapper:hover {
-  background: #f4efd4;
-  position: relative;
-  outline: 2px #f4efd4 solid;
-  .inline-editable-wrapper__start-editing-button {
-    display: block !important;
+.inline-editable-wrapper {
+  &.loading {
+    background: #f5f5f5;
+    :before {
+      background: url('../../../oroui/img/loader-16.gif') no-repeat center center rgba(245,245,245,0.7);
+      display: block !important;
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 1px;
+      width: 29px;
+      height: 29px;
+    }
+  }
+  &:hover {
+    background: #f4efd4;
+    position: relative;
+    outline: 2px #f4efd4 solid;
+    .inline-editable-wrapper__start-editing-button {
+      display: block !important;
+    }
   }
 }

@@ -84,6 +84,8 @@ define(function(require) {
                     }
                     options.callback({
                         results: _this.availableChoices,
+                        page: autoCompleteUrlParameters.page,
+                        term: autoCompleteUrlParameters.term,
                         more: response.more
                     });
                 }
@@ -93,6 +95,9 @@ define(function(require) {
                     if (!_this.disposed) {
                         options.callback({
                             results: [],
+                            page: autoCompleteUrlParameters.page,
+                            term: autoCompleteUrlParameters.term,
+                            error: true,
                             more: false
                         });
                     }

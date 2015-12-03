@@ -9,13 +9,21 @@ define(function(require) {
      */
     var InlineEditorWrapperView = BaseView.extend({
         template: require('tpl!oroform/templates/inline-editable-wrapper-view.html'),
+
         events: {
             'dblclick': 'onInlineEditingStart',
             'click [data-role="start-editing"]': 'onInlineEditingStart'
         },
+
+        setElement: function($el) {
+            $el.addClass('inline-editable-wrapper');
+            return InlineEditorWrapperView.__super__.setElement.apply(this, arguments);
+        },
+
         onInlineEditingStart: function() {
             this.trigger('start-editing');
         },
+
         getContainer: function() {
             return this.$('[data-role="container"]');
         }
