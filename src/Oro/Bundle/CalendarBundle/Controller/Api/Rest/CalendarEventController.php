@@ -208,35 +208,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
     }
 
     /**
-     * Get calendar event guests info.
-     *
-     * @param int $id Calendar event id
-     *
-     * @ApiDoc(
-     *      description="Get calendar event guests info",
-     *      resource=true
-     * )
-     * @AclAncestor("oro_calendar_event_view")
-     *
-     * @return Response
-     */
-    public function getGuestsInfoAction($id)
-    {
-        /** @var CalendarEvent|null $entity */
-        $entity = $this->getManager()->find($id);
-
-        $result = null;
-        $code   = Codes::HTTP_NOT_FOUND;
-        if ($entity) {
-            $result = $this->get('oro_calendar.provider.calendar_event_guests')
-                ->getGuestsInfo($entity);
-            $code   = Codes::HTTP_OK;
-        }
-
-        return $this->buildResponse($result ? : '', self::ACTION_READ, ['result' => $result], $code);
-    }
-
-    /**
      * Update calendar event.
      *
      * @param int $id Calendar event id

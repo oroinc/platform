@@ -132,23 +132,6 @@ class RestCalendarEventTest extends WebTestCase
      *
      * @param int $id
      */
-    public function testGetGuestsInfo($id)
-    {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_api_get_calendarevent_guests_info', ['id' => $id])
-        );
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-    }
-
-    /**
-     * @depends testPut
-     *
-     * @param int $id
-     */
     public function testCget($id)
     {
         $request = array(
