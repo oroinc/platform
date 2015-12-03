@@ -46,17 +46,17 @@ class ObjectNormalizer
     }
 
     /**
-     * @param mixed $item
+     * @param mixed $object
      *
      * @return mixed
      */
-    public function normalizeItem($item)
+    public function normalizeObject($object)
     {
-        if (null !== $item) {
-            $item = $this->normalizeValue($item, is_array($item) ? 0 : 1);
+        if (null !== $object) {
+            $object = $this->normalizeValue($object, is_array($object) ? 0 : 1);
         }
 
-        return $item;
+        return $object;
     }
 
     /**
