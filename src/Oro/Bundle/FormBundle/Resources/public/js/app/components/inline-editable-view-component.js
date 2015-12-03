@@ -138,7 +138,7 @@ define(function(require) {
                 wrapper: wrapper,
                 oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData))
             };
-            // this.updateModel(this.model, this.editorComponent, modelUpdateData);
+            this.updateModel(this.model, this.editorView, modelUpdateData);
             if (this.saveApiAccessor.initialOptions.field_name) {
                 var keys = _.keys(serverUpdateData);
                 if (keys.length > 1) {
@@ -161,6 +161,19 @@ define(function(require) {
                 this.exitEditMode();
             }
             return true;
+        },
+
+        updateModel: function(model, editorView, updateData) {
+            // assume "undefined" as delete value request
+            for (var key in updateData) {
+                if (updateData.hasOwnProperty(key)) {
+                    if (updateData[key] === editorView.UNSET_FIELD_VALUE) {
+                        model.unset(key);
+                        delete updateData[key];
+                    }
+                }
+            }
+            model.set(updateData);
         },
 
         /**
