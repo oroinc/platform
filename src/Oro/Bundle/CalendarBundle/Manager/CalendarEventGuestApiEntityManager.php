@@ -5,7 +5,6 @@ namespace Oro\Bundle\CalendarBundle\Manager;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class CalendarEventGuestApiEntityManager extends ApiEntityManager
