@@ -135,6 +135,62 @@ class ProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($iterator->valid());
     }
 
+    public function testApplicableCheckerGetterAndSetter()
+    {
+        $applicableChecker = new ChainApplicableChecker();
+
+        $iterator = new ProcessorIterator(
+            [],
+            new Context(),
+            $applicableChecker,
+            $this->getProcessorFactory()
+        );
+
+        $this->assertSame($applicableChecker, $iterator->getApplicableChecker());
+
+        $newApplicableChecker = new ChainApplicableChecker();
+        $iterator->setApplicableChecker($newApplicableChecker);
+        $this->assertSame($newApplicableChecker, $iterator->getApplicableChecker());
+    }
+
+    public function testServiceProperties()
+    {
+        $context = new Context();
+        $context->setAction('action1');
+
+        $processors = [
+            'action1' => [
+                [
+                    'processor'  => 'processor1',
+                    'attributes' => ['group' => 'group1', 'attr1' => 'val1']
+                ],
+                [
+                    'processor'  => 'processor2',
+                    'attributes' => ['group' => 'group2', 'attr1' => 'val1']
+                ]
+            ]
+        ];
+
+        $iterator = new ProcessorIterator(
+            $processors,
+            $context,
+            new ChainApplicableChecker(),
+            $this->getProcessorFactory()
+        );
+
+        $iterator->rewind();
+        $this->assertEquals('processor1', $iterator->getProcessorId());
+        $this->assertEquals('action1', $iterator->getAction());
+        $this->assertEquals('group1', $iterator->getGroup());
+        $this->assertEquals(['group' => 'group1', 'attr1' => 'val1'], $iterator->getProcessorAttributes());
+
+        $iterator->next();
+        $this->assertEquals('processor2', $iterator->getProcessorId());
+        $this->assertEquals('action1', $iterator->getAction());
+        $this->assertEquals('group2', $iterator->getGroup());
+        $this->assertEquals(['group' => 'group2', 'attr1' => 'val1'], $iterator->getProcessorAttributes());
+    }
+
     /**
      * @return ProcessorFactoryInterface
      */

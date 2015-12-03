@@ -56,6 +56,26 @@ class ProcessorIterator implements \Iterator
     }
 
     /**
+     * Gets the applicable checker.
+     *
+     * @return ApplicableCheckerInterface
+     */
+    public function getApplicableChecker()
+    {
+        return $this->applicableChecker;
+    }
+
+    /**
+     * Replaces existing applicable checker.
+     *
+     * @param ApplicableCheckerInterface $applicableChecker
+     */
+    public function setApplicableChecker(ApplicableCheckerInterface $applicableChecker)
+    {
+        $this->applicableChecker = $applicableChecker;
+    }
+
+    /**
      * Gets a action the iterator works with.
      *
      * @return string
@@ -95,6 +115,20 @@ class ProcessorIterator implements \Iterator
         }
 
         return $this->processors[$this->action][$this->index]['processor'];
+    }
+
+    /**
+     * Gets all attributes of a processor the iterator points to.
+     *
+     * @return array [key => value, ...]
+     */
+    public function getProcessorAttributes()
+    {
+        if (!$this->valid()) {
+            return null;
+        }
+
+        return $this->processors[$this->action][$this->index]['attributes'];
     }
 
     /**
