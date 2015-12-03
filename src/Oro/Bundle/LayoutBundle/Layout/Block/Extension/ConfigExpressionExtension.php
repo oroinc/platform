@@ -41,11 +41,11 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
      */
     public function buildBlock(BlockBuilderInterface $builder, array &$options)
     {
-        $context  = $builder->getContext();
-        $data  = $builder->getDataAccessor();
+        $context = $builder->getContext();
         $evaluate = $context->getOr('expressions_evaluate');
         $encoding = $context->getOr('expressions_encoding');
         if ($evaluate || $encoding !== null) {
+            $data = $builder->getDataAccessor();
             $this->processExpressions($options, $context, $data, $evaluate, $encoding);
         }
     }
