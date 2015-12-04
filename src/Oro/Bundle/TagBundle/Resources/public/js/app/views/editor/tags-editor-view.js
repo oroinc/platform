@@ -114,7 +114,7 @@ define(function(require) {
                     // we use this message not for its original mission
                     return _this.isLoading ?
                         __('oro.tag.inline_editing.loading') :
-                        (this.canCreate ?
+                        (_this.isCurrentTagSelected() ?
                             __('oro.tag.inline_editing.existing_tag') :
                             __('oro.tag.inline_editing.no_matches')
                         );
@@ -156,6 +156,17 @@ define(function(require) {
                     }
                 }
             };
+        },
+
+        isCurrentTagSelected: function() {
+            var select2Data = this.$('.select2-container').select2('data');
+            for (var i = 0; i < select2Data.length; i++) {
+                var tag = select2Data[i];
+                if (tag.label === this.currentTerm) {
+                    return true;
+                }
+            }
+            return false;
         },
 
         showResults: function() {
