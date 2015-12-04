@@ -75,7 +75,6 @@ class TagsExtension extends AbstractExtension
     {
         $columns = $config->offsetGetByPath('[columns]') ? : [];
         $formatter = new GridTaskPropertyFormatter();
-        header('Permission-Xxx: ' . ($this->securityFacade->isGranted('oro_tag_assign_unassign') ? 'true' : 'false'));
 
         $config->offsetSetByPath(
             '[columns]',
