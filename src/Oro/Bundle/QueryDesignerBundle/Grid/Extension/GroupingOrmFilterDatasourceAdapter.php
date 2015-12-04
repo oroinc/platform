@@ -50,7 +50,13 @@ class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
     public function addRestriction($restriction, $condition, $isComputed = false)
     {
         if ($isComputed) {
-            throw new \LogicException('The HAVING restrictions is not supported yet.');
+            if ($condition === FilterUtility::CONDITION_OR) {
+                $this->qb->orHaving($restriction);
+            } else {
+                $this->qb->andHaving($restriction);
+            }
+
+            return;
         }
 
         if ($this->currentExpr === null) {
