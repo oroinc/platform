@@ -20,6 +20,15 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
         $compiler = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
             ->disableOriginalConstructor()
             ->getMock();
+        $expressionResult = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $expressionResult->expects($this->any())
+            ->method('getVariableType')
+            ->will($this->returnValue(DateModifierInterface::VAR_THIS_DAY_W_Y));
+        $compiler->expects($this->any())
+            ->method('compile')
+            ->will($this->returnValue($expressionResult));
         $localeSettings->expects($this->any())
             ->method('getTimezone')
             ->will($this->returnValue('Asia/Tbilisi'));
@@ -213,6 +222,28 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                     'type'       => DateRangeFilterType::TYPE_EQUAL,
                     'part'       => DateModifierInterface::PART_MONTH,
                     'field'      => "MONTH(CONVERT_TZ(field, '+00:00', '+04:00'))",
+                ]
+            ],
+            'valid data given, equal then given part month with current day without year var'     => [
+                [
+                    'value' => [
+                        'start' => new \DateTime('2010-01-02'),
+                        'end' => 3,
+                        'start_original' => '{{'.DateModifierInterface::VAR_THIS_DAY_W_Y.'}}',
+                        'end_original' => 6
+                    ],
+                    'type'  => DateRangeFilterType::TYPE_EQUAL,
+                    'part'  => DateModifierInterface::PART_VALUE,
+                ],
+                'field',
+                [
+                    'date_start' => '0102',
+                    'date_end'   => 3,
+                    'date_start_original' => '{{'.DateModifierInterface::VAR_THIS_DAY_W_Y.'}}',
+                    'date_end_original' => 6,
+                    'type'       => DateRangeFilterType::TYPE_EQUAL,
+                    'part'       => DateModifierInterface::PART_VALUE,
+                    'field'      => "MONTH(CONVERT_TZ(field, '+00:00', '+04:00')) * 100 + DAY(CONVERT_TZ(field, '+00:00', '+04:00'))",
                 ]
             ],
         ];
