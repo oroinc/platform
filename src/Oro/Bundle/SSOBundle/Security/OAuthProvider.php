@@ -7,11 +7,11 @@ use HWI\Bundle\OAuthBundle\Security\Core\Exception\OAuthAwareExceptionInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\UserBundle\Entity\User;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
@@ -48,16 +48,13 @@ class OAuthProvider extends HWIOAuthProvider
     }
 
     /**
-     * Attempts to authenticate a TokenInterface object.
+     * {@inheritDoc}
      *
-     * @param OAuthToken $token The TokenInterface instance to authenticate
-     *
-     * @return TokenInterface An authenticated TokenInterface instance, never null
-     *
-     * @throws AuthenticationException if the authentication fails
+     * @throws OAuthAwareExceptionInterface
      */
     public function authenticate(TokenInterface $token)
     {
+        /* @var OAuthToken $token */
         $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName($token->getResourceOwnerName());
 
         try {
@@ -89,7 +86,7 @@ class OAuthProvider extends HWIOAuthProvider
      * @param User $user
      * @param TokenInterface $token
      *
-     * @return type
+     * @return Organization
      *
      * @throws BadCredentialsException
      */
@@ -106,5 +103,16 @@ class OAuthProvider extends HWIOAuthProvider
         }
 
         return $organization;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports(TokenInterface $token)
+    {
+        return
+            $token instanceof OAuthToken
+            && $this->resourceOwnerMap->hasResourceOwnerByName($token->getResourceOwnerName())
+            ;
     }
 }
