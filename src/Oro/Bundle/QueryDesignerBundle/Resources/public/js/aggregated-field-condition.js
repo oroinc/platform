@@ -20,6 +20,11 @@ define([
             this.$fieldChoice.fieldChoice(this.options.fieldChoice);
 
             this._updateFieldChoice();
+            this.options.columnsCollection.on('remove', function(model) {
+                if (model.get('name') === this._getColumnName()) {
+                    this.element.closest('.condition').find('.close').click();
+                }
+            }, this);
             if (data && data.columnName) {
                 this.selectField(data.columnName);
                 this._renderFilter(data.columnName);
@@ -77,7 +82,7 @@ define([
 
         _onUpdate: function() {
             var value;
-            var columnName = this.element.find('input.select').select2('val');
+            var columnName = this._getColumnName();
             var columnFunc = this._getColumnFunc(columnName);
 
             if (this.filter && !this.filter.isEmptyValue() && !_.isEmpty(columnFunc)) {
@@ -92,6 +97,10 @@ define([
 
             this.element.data('value', value);
             this.element.trigger('changed');
+        },
+
+        _getColumnName: function() {
+            return this.element.find('input.select').select2('val');
         },
 
         _getColumnFunc: function(columnName) {
