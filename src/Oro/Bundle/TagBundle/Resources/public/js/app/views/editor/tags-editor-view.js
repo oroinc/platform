@@ -55,6 +55,7 @@ define(function(require) {
     var TagsEditorView;
     var AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var $ = require('jquery');
 
     TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
@@ -103,7 +104,17 @@ define(function(require) {
                     return item.label;
                 },
                 formatResult: function(item) {
-                    return item.label;
+                    return item.label + (item.isNew ?
+                            (' <span class="select2__result-entry-info">(' +
+                            __('oro.tag.inline_editing.new_tag') + ')</span>') :
+                            '');
+                },
+                formatNoMatches: function() {
+                    // no matches appears in following two cases only
+                    // we use this message not for its original mission
+                    return _this.isLoading ?
+                        __('oro.tag.inline_editing.loading') :
+                        __('oro.tag.inline_editing.existing_tag');
                 },
                 initSelection: function(element, callback) {
                     callback(_this.getInitialResultItem());
@@ -112,6 +123,7 @@ define(function(require) {
                     _this.currentTerm = options.term;
                     _this.currentPage = options.page;
                     _this.currentCallback = options.callback;
+                    _this.isLoading = true;
                     if (options.page === 1) {
                         // immediately show first item
                         _this.showResults();
@@ -121,6 +133,7 @@ define(function(require) {
                         if (data.page === 1) {
                             _this.firstPageData = data;
                         }
+                        _this.isLoading = false;
                         _this.showResults();
                     };
                     if (_this.currentRequest && _this.currentRequest.term !== '' &&
@@ -149,11 +162,14 @@ define(function(require) {
                 data.results = this.filterTermFromResults(this.currentTerm, data.results);
                 if (this.currentPage === 1) {
                     if (this.isValidTerm(this.currentTerm)) {
-                        data.results.unshift(this.applyPermissionsToTag({
-                            id: this.currentTerm,
-                            label: this.currentTerm,
-                            owner: true
-                        }));
+                        if (this.firstPageData.term === this.currentTerm) {
+                            data.results.unshift({
+                                id: this.currentTerm,
+                                label: this.currentTerm,
+                                isNew: true,
+                                owner: true
+                            });
+                        }
                     } else {
                         if (this.firstPageData.isDummy) {
                             // do not update list until choices will be loaded
