@@ -1,8 +1,7 @@
-<a name="module_RelatedIdRelationEditorView"></a>
-## RelatedIdRelationEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
+<a name="module_RelatedIdSelectEditorView"></a>
+## RelatedIdSelectEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
 Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
-The editor will use `autocomplete_api_accessor` and `value_field_name`. The server will be updated with the value
-only.
+The editor will use provided `choices` map and `value_field_name`. The server will be updated with value only.
 
 ### Column configuration sample:
 
@@ -26,20 +25,17 @@ datagrid:
       {column-name-label}:
         inline_editing:
           editor:
-            view: orodatagrid/js/app/views/editor/related-id-select-editor-view
+            view: oroform/js/app/views/editor/related-id-select-editor-view
             view_options:
               placeholder: '<placeholder>'
               css_class_name: '<class-name>'
               value_field_name: {column-name-value}
+              # choices: @choiceProvider->getAll
+              choices: # required
+                key-1: First
+                key-2: Second
           validation_rules:
             NotBlank: ~
-        autocomplete_api_accessor:
-          # class: oroentity/js/tools/entity-select-search-api-accessor
-          # entity_select is default search api
-          # following options are specific only for entity-select-search-api-accessor
-          # please place here an options corresponding to specified class
-          entity_name: {corresponding-entity}
-          field_name: {corresponding-entity-field-name}
     properties:
       # this line is required to add {column-name-value} to data sent to client
       {column-name-value}: ~
@@ -49,13 +45,12 @@ datagrid:
 
 Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
+inline_editing.editor.view_options.choices          | Key-value set of available choices
 inline_editing.editor.view_options.value_field_name | Related value field name.
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
 inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
-inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
-inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
+
 
 ### Constructor parameters
 
@@ -65,11 +60,10 @@ inline_editing.editor.autocomplete_api_accessor.class | One of the [list of sear
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
-| options.input_delay | <code>Object</code> | Delay before user finished input and request sent to server |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder for an empty element |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
+| options.choices | <code>Object</code> | Key-value set of available choices |
 | options.value_field_name | <code>Object</code> | Related value field name |
-| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../search-apis.md) |
 

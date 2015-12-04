@@ -97,16 +97,16 @@ editor.view_options | {} | Specifies options to pass into the cell editor view
 
 Frontend type | Editor view
 :-------------|:-----------------------------------------------------------------
-string        | [text-editor-view](../../frontend/editor/text-editor-view.md)
-phone         | [text-editor-view](../../frontend/editor/text-editor-view.md)
-datetime      | [datetime-editor-view](../../frontend/editor/datetime-editor-view.md)
-date          | [date-editor-view](../../frontend/editor/date-editor-view.md)
-currency      | [number-editor-view](../../frontend/editor/number-editor-view.md)
-number        | [number-editor-view](../../frontend/editor/number-editor-view.md)
-integer       | [number-editor-view](../../frontend/editor/number-editor-view.md)
-decimal       | [number-editor-view](../../frontend/editor/number-editor-view.md)
-percent       | [percent-editor-view](../../frontend/editor/percent-editor-view.md)
-select        | [select-editor-view](../../frontend/editor/select-editor-view.md)
+string        | [text-editor-view](../../../../../FormBundle/Resources/doc/editor/text-editor-view.md)
+phone         | [text-editor-view](../../../../../FormBundle/Resources/doc/editor/text-editor-view.md)
+datetime      | [datetime-editor-view](../../../../../FormBundle/Resources/doc/editor/datetime-editor-view.md)
+date          | [date-editor-view](../../../../../FormBundle/Resources/doc/editor/date-editor-view.md)
+currency      | [number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+number        | [number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+integer       | [number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+decimal       | [number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+percent       | [percent-editor-view](../../../../../FormBundle/Resources/doc/editor/percent-editor-view.md)
+select        | [select-editor-view](../../../../../FormBundle/Resources/doc/editor/select-editor-view.md)
 
 Taken from [default-editors.md](../default-editors.md)
 
@@ -114,14 +114,14 @@ Taken from [default-editors.md](../default-editors.md)
 
 Editor                                                                      | Description
 :---------------------------------------------------------------------------|:-----------------------------------------------------
-[text-editor-view](../../frontend/editor/text-editor-view.md)                  | Editing text/phone cells
-[number-editor-view](../../frontend/editor/number-editor-view.md)              | Editing number/integer/decimal/currency cells
-[percent-editor-view](../../frontend/editor/percent-editor-view.md)            | Editing percent  cells
-[date-editor-view](../../frontend/editor/date-editor-view.md)                  | Editing date cells
-[datetime-editor-view](../../frontend/editor/datetime-editor-view.md)          | Editing datetime cells
-[select-editor-view](../../frontend/editor/select-editor-view.md)              | Editing select cells (predefined choices)
-[related-id-select-editor-view](../../frontend/editor/related-id-select-editor-view.md)   | Editing cells which already contain label (and no value) using predefined choices
-[related-id-relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md) | Editing cells which already contain label (and no value) using search api
+[text-editor-view](../../../../../FormBundle/Resources/doc/editor/text-editor-view.md)                  | Editing text/phone cells
+[number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)              | Editing number/integer/decimal/currency cells
+[percent-editor-view](../../../../../FormBundle/Resources/doc/editor/percent-editor-view.md)            | Editing percent  cells
+[date-editor-view](../../../../../FormBundle/Resources/doc/editor/date-editor-view.md)                  | Editing date cells
+[datetime-editor-view](../../../../../FormBundle/Resources/doc/editor/datetime-editor-view.md)          | Editing datetime cells
+[select-editor-view](../../../../../FormBundle/Resources/doc/editor/select-editor-view.md)              | Editing select cells (predefined choices)
+[related-id-select-editor-view](../../../../../FormBundle/Resources/doc/editor/related-id-select-editor-view.md)   | Editing cells which already contain label (and no value) using predefined choices
+[related-id-relation-editor-view](../../../../../FormBundle/Resources/doc/editor/related-id-relation-editor-view.md) | Editing cells which already contain label (and no value) using search api
 
 ## Supported search API's for `related-id-relation-editor-view`
 

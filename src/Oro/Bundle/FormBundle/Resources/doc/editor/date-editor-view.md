@@ -1,6 +1,6 @@
-<a name="module_DatetimeEditorView"></a>
-## DatetimeEditorView ⇐ <code>[DateEditorView](./date-editor-view.md)</code>
-Datetime cell content editor
+<a name="module_DateEditorView"></a>
+## DateEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
+Date cell content editor
 
 ### Column configuration samples:
 ``` yml
@@ -12,26 +12,23 @@ datagrid:
     columns:
       # Sample 1. Mapped by frontend type
       {column-name-1}:
-        frontend_type: datetime
+        frontend_type: date
       # Sample 2. Full configuration
       {column-name-2}:
         inline_editing:
           editor:
-            view: orodatagrid/js/app/views/editor/date-editor-view
+            view: oroform/js/app/views/editor/date-editor-view
             view_options:
               placeholder: '<placeholder>'
               css_class_name: '<class-name>'
               datePickerOptions:
-                # See http://goo.gl/pddxZU
                 altFormat: 'yy-mm-dd'
                 changeMonth: true
                 changeYear: true
                 yearRange: '-80:+1'
                 showButtonPanel: true
-              timePickerOptions:
-                # See https://github.com/jonthornton/jquery-timepicker#options
           validation_rules:
-            NotBlank: ~
+            NotBlank: true
 ```
 
 ### Options in yml:
@@ -42,13 +39,11 @@ inline_editing.editor.view_options.placeholder      | Optional. Placeholder for 
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
 inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
-inline_editing.editor.view_options.timeInputAttrs   | Optional. Attributes for the time HTML input element
-inline_editing.editor.view_options.timePickerOptions| Optional. See [documentation here](https://goo.gl/MP6Unb)
 inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 
 ### Constructor parameters
 
-**Extends:** <code>[DateEditorView](./date-editor-view.md)</code>  
+**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -60,6 +55,9 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 | options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
 | options.datePickerOptions | <code>Object</code> | See [documentation here](http://goo.gl/pddxZU) |
-| options.timeInputAttrs | <code>Object</code> | Attributes for time HTML input element |
-| options.timePickerOptions | <code>Object</code> | See [documentation here](https://goo.gl/MP6Unb) |
 
+<a name="module_DateEditorView#getViewOptions"></a>
+### dateEditorView.getViewOptions() ⇒ <code>Object</code>
+Prepares and returns editor sub-view options
+
+**Kind**: instance method of <code>[DateEditorView](#module_DateEditorView)</code>  

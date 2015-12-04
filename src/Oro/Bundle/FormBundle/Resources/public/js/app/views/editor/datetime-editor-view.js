@@ -20,7 +20,7 @@ define(function(require) {
      *       {column-name-2}:
      *         inline_editing:
      *           editor:
-     *             view: orodatagrid/js/app/views/editor/date-editor-view
+     *             view: oroform/js/app/views/editor/date-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
      *               css_class_name: '<class-name>'
