@@ -80,8 +80,8 @@ class SyncProcessor extends AbstractSyncProcessor
      * By default, if $connector is empty, will process all connectors of given integration
      *
      * @param Integration $integration Integration object
-     * @param array       $parameters Connector additional parameters
-     * @param callable    $callback
+     * @param array       $parameters  Connector additional parameters
+     * @param callable    $callback    Callback to filter connectors
      *
      * @return boolean
      */
@@ -218,7 +218,7 @@ class SyncProcessor extends AbstractSyncProcessor
      * Process integration connector
      *
      * @param Integration        $integration Integration object
-     * @param ConnectorInterface $connector   Connector name
+     * @param ConnectorInterface $connector   Connector object
      * @param array              $parameters  Connector additional parameters
      *
      * @return Status
