@@ -61,6 +61,11 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->context, $this->blockBuilder->getContext());
     }
 
+    public function testGetDataAccessor()
+    {
+        $this->assertSame($this->dataAccessor, $this->blockBuilder->getDataAccessor());
+    }
+
     public function testGetLayoutManipulator()
     {
         $this->assertSame($this->layoutManipulator, $this->blockBuilder->getLayoutManipulator());

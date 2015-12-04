@@ -168,7 +168,7 @@ class FormTypeTest extends BlockTypeTestCase
 
         $view         = new BlockView();
         $block        = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface');
         $context      = new LayoutContext();
         $formView     = new FormView();
 
