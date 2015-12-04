@@ -86,7 +86,11 @@ class TagsExtension extends AbstractExtension
                         'inline_editing' => [
                             'enable'         => true,
                             'editor'         => [
-                                'view'           => 'orotag/js/app/views/editor/tags-editor-view'
+                                'view'           => 'orotag/js/app/views/editor/tags-editor-view',
+                                'view_options' => [
+                                    'canCreate' => true,
+                                    'canEditGlobal' => true
+                                ]
                             ],
                             'save_api_accessor' => [
                                 'route' => 'oro_api_post_taggable',
