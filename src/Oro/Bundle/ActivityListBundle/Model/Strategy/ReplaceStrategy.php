@@ -98,7 +98,7 @@ class ReplaceStrategy implements StrategyInterface
      */
     public function supports(FieldData $fieldData)
     {
-        return $fieldData->getMode() == MergeModes::REPLACE;
+        return $fieldData->getMode() === MergeModes::REPLACE;
     }
 
     /**

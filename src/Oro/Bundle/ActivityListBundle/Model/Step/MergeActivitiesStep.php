@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Step;
 
-use Oro\Bundle\ActivityListBundle\MergeEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\ActivityListBundle\Event\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\Model\Step\DependentMergeStepInterface;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class MergeActivitiesStep
@@ -52,6 +53,6 @@ class MergeActivitiesStep implements DependentMergeStepInterface
      */
     public function getDependentSteps()
     {
-        return array('Oro\\Bundle\\EntityMergeBundle\\Model\\Step\\MergeFieldsStep');
+        return ['Oro\\Bundle\\EntityMergeBundle\\Model\\Step\\MergeFieldsStep'];
     }
 }

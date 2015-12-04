@@ -81,7 +81,7 @@ class UniteStrategy implements StrategyInterface
      */
     public function supports(FieldData $fieldData)
     {
-        return $fieldData->getMode() == MergeModes::UNITE;
+        return $fieldData->getMode() === MergeModes::UNITE;
     }
 
     /**

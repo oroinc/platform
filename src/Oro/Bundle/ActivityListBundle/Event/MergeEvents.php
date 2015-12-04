@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle;
+namespace Oro\Bundle\ActivityListBundle\Event;
 
 /**
  * Class MergeEvents

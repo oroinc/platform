@@ -248,4 +248,3 @@ services:
           - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata, priority: -10 }
           - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData, priority: -10 }
           - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity, priority: -10 }
-          
