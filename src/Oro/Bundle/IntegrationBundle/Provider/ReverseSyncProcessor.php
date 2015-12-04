@@ -34,8 +34,8 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
                 throw new LogicException('This connector does not support reverse sync.');
             }
 
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
+        } catch (\Exception $exception) {
+            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
 
             return false;
         }
@@ -103,18 +103,5 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
         }
 
         return $isSuccess;
-    }
-
-    /**
-     * Clone object here because it will be modified and changes should not be shared between
-     *
-     * @param Integration $integration
-     * @param string      $connector
-     *
-     * @return TwoWaySyncConnectorInterface
-     */
-    protected function getRealConnector(Integration $integration, $connector)
-    {
-        return clone $this->registry->getConnectorType($integration->getType(), $connector);
     }
 }
