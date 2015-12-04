@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-
-use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use Oro\Bundle\ApiBundle\Model\Error;
 
 class RequestActionProcessor extends ActionProcessor
 {
@@ -16,15 +14,20 @@ class RequestActionProcessor extends ActionProcessor
      */
     protected function executeProcessors(ContextInterface $context)
     {
+        /** @var Context $context */
+
         try {
             parent::executeProcessors($context);
         } catch (ExecutionFailedException $e) {
-            $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
-            if ($underlyingException instanceof HttpExceptionInterface) {
-                $e = $underlyingException;
-            }
+            // add an error to the context
+            $error = new Error();
+            $error->setInnerException($e);
+            $context->addError($error);
 
-            throw $e;
+            // go to the 'normalize_result' group that is intended
+            // to prepare valid response of the current request type
+            $context->setFirstGroup('normalize_result');
+            parent::executeProcessors($context);
         }
     }
 }

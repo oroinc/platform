@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
@@ -96,6 +97,40 @@ class JsonApiDocumentBuilder
                 )
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Sets error.
+     *
+     * @param Error $error
+     *
+     * @return self
+     */
+    public function setErrorObject(Error $error)
+    {
+        $this->result[self::ERRORS] = [$this->handleError($error)];
+
+        return $this;
+    }
+
+    /**
+     * Sets errors collection.
+     *
+     * @param Error[] $errors
+     *
+     * @return self
+     */
+    public function setErrors(array $errors)
+    {
+        $this->assertNoData();
+
+        $errorsData = [];
+        foreach ($errors as $error) {
+            $errorsData[] = $this->handleError($error);
+        }
+        $this->result[self::ERRORS] = $errorsData;
 
         return $this;
     }
@@ -320,5 +355,26 @@ class JsonApiDocumentBuilder
         if (array_key_exists(self::DATA, $this->result)) {
             throw new \RuntimeException('A primary data already exist.');
         }
+    }
+
+    /**
+     * @param Error $error
+     *
+     * @return array
+     */
+    protected function handleError(Error $error)
+    {
+        $result = [];
+        if ($error->getStatusCode()) {
+            $result['code'] = (string) $error->getStatusCode();
+        }
+        if ($error->getDetail()) {
+            $result['detail'] = $error->getDetail();
+        }
+        if ($error->getTitle()) {
+            $result['title'] = $error->getTitle();
+        }
+
+        return $result;
     }
 }

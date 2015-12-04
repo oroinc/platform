@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class BuildCriteria implements ProcessorInterface
 {
@@ -53,7 +54,7 @@ class BuildCriteria implements ProcessorInterface
                 : [];
             foreach ($orderBy as $field => $direction) {
                 if (!array_key_exists($field, $sortFields)) {
-                    throw new \RuntimeException(
+                    throw new NotAcceptableHttpException(
                         sprintf('Sorting by "%s" is not supported.', $field)
                     );
                 }

@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -185,6 +186,15 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($headers));
     }
 
+    public function testResponseStatusCode()
+    {
+        $this->assertNull($this->context->getResponseStatusCode());
+
+        $this->context->setResponseStatusCode(500);
+        $this->assertEquals(500, $this->context->getResponseStatusCode());
+        $this->assertEquals(500, $this->context->get(Context::RESPONSE_STATUS_CODE));
+    }
+
     public function testClassName()
     {
         $this->assertNull($this->context->getClassName());
@@ -224,7 +234,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 [
                     ConfigUtil::DEFINITION => $config,
-                    'section1'             => $section1Config
+                    'section1' => $section1Config
                 ]
             );
 
@@ -281,7 +291,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 [
                     ConfigUtil::DEFINITION => $config,
-                    'section1'             => $section1Config
+                    'section1' => $section1Config
                 ]
             );
 
@@ -416,7 +426,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $config = [
             ConfigUtil::DEFINITION => $mainConfig,
-            $configSection         => $sectionConfig
+            $configSection => $sectionConfig
         ];
 
         $this->context->setClassName('Test\Class');
@@ -735,5 +745,19 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setCriteria($criteria);
         $this->assertSame($criteria, $this->context->getCriteria());
         $this->assertSame($criteria, $this->context->get(Context::CRITERIA));
+    }
+
+    public function testErrors()
+    {
+        $this->assertFalse($this->context->hasErrors());
+        $this->assertSame([], $this->context->getErrors());
+
+        $this->context->addError(new Error());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertCount(1, $this->context->getErrors());
+
+        $this->context->resetErrors();
+        $this->assertFalse($this->context->hasErrors());
+        $this->assertSame([], $this->context->getErrors());
     }
 }

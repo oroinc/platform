@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Config;
+namespace Oro\Bundle\ApiBundle\Model;
 
 use Symfony\Component\Translation\TranslatorInterface;
 

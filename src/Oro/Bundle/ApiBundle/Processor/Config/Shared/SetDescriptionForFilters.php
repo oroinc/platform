@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Processor\Config\Label;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
