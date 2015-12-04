@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TagsExtension extends AbstractExtension
 {
@@ -34,6 +35,9 @@ class TagsExtension extends AbstractExtension
     /** @var TaggableHelper */
     protected $taggableHelper;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param TagManager          $tagManager
      * @param EntityClassResolver $resolver
@@ -44,12 +48,14 @@ class TagsExtension extends AbstractExtension
         TagManager $tagManager,
         EntityClassResolver $resolver,
         EntityRoutingHelper $entityRoutingHelper,
-        TaggableHelper $helper)
+        TaggableHelper $helper,
+        SecurityFacade $securityFacade)
     {
         $this->tagManager          = $tagManager;
         $this->entityClassResolver = $resolver;
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->taggableHelper      = $helper;
+        $this->securityFacade      = $securityFacade;
     }
 
     /**
@@ -69,7 +75,8 @@ class TagsExtension extends AbstractExtension
     {
         $columns = $config->offsetGetByPath('[columns]') ? : [];
         $formatter = new GridTaskPropertyFormatter();
-        header('entity: ' .$this->getEntityClassName($config));
+        header('Permission-Xxx: ' . ($this->securityFacade->isGranted('oro_tag_assign_unassign') ? 'true' : 'false'));
+
         $config->offsetSetByPath(
             '[columns]',
             array_merge(
@@ -84,12 +91,12 @@ class TagsExtension extends AbstractExtension
                         'translatable'   => true,
                         'renderable'     => false,
                         'inline_editing' => [
-                            'enable'         => true,
+                            'enable'         => $this->securityFacade->isGranted('oro_tag_assign_unassign'),
                             'editor'         => [
                                 'view'           => 'orotag/js/app/views/editor/tags-editor-view',
                                 'view_options' => [
-                                    'canCreate' => true,
-                                    'canEditGlobal' => true
+                                    'canCreate' => $this->securityFacade->isGranted('oro_tag_create'),
+                                    'canEditGlobal' => $this->securityFacade->isGranted('oro_tag_unassign_global')
                                 ]
                             ],
                             'save_api_accessor' => [

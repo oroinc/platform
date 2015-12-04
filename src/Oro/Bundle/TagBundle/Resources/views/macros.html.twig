@@ -9,7 +9,7 @@
             fieldName: 'tags',
             metadata: {
                 inline_editing: {
-                    enable: true,
+                    enable: resource_granted('oro_tag_assign_unassign'),
                     save_api_accessor: {
                         route: 'oro_api_post_taggable',
                         http_method: 'POST',
@@ -25,8 +25,8 @@
                     },
                     editor: {
                         view_options: {
-                            canCreate: false,
-                            canEditGlobal: true
+                            canCreate: resource_granted('oro_tag_create'),
+                            canEditGlobal: resource_granted('oro_tag_unassign_global')
                         }
                     }
                 }
