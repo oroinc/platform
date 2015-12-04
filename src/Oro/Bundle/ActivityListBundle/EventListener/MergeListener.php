@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\EventListener;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -19,16 +20,22 @@ class MergeListener
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var ConfigProvider */
+    protected $configProvider;
+
     /**
      * @param ActivityManager $activityManager
      * @param TranslatorInterface $translator
+     * @param ConfigProvider $configProvider
      */
     public function __construct(
         ActivityManager $activityManager,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        ConfigProvider $configProvider
     ) {
         $this->activityManager = $activityManager;
         $this->translator = $translator;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -48,7 +55,7 @@ class MergeListener
                 'is_collection' => true,
                 'label'         =>
                     $this->translator->trans('oro.activitylist.entity_plural_label') . ' ('
-                    . $this->getAliasByActivityClass($type)
+                    . $this->translator->trans($this->getAliasByActivityClass($type))
                     . ')',
                 'merge_modes'   => [MergeModes::REPLACE, MergeModes::UNITE]
             ];
@@ -113,6 +120,8 @@ class MergeListener
      */
     protected function getAliasByActivityClass($className)
     {
-        return strtolower(str_replace('\\', '_', $className));
+        $config = $this->configProvider->getConfig($className);
+
+        return $config->get('plural_label');
     }
 }
