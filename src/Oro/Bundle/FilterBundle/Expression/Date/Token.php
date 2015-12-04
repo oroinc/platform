@@ -10,6 +10,7 @@ class Token
     const TYPE_PUNCTUATION = 'TYPE_PUNCTUATION';
     const TYPE_TIME        = 'TYPE_TIME';
     const TYPE_DATE        = 'TYPE_DATE';
+    const TYPE_DAYMONTH    = 'TYPE_DAYMONTH';
 
     /** @var int */
     private $type;
