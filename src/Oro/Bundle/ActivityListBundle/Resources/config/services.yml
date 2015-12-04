@@ -190,6 +190,7 @@ services:
         class: %oro_activity_list.accessor.activity.class%
         arguments:
           - @doctrine
+          - @translator
         tags:
             - { name: oro_entity_merge.accessor }
 

@@ -50,6 +50,7 @@ class MergeListener
             $fieldMetadataOptions = [
                 'display'       => true,
                 'activity'      => true,
+                'is_virtual'    => true,
                 'type'          => $type,
                 'field_name'    => $this->getFieldNameByActivityClassName($type),
                 'is_collection' => true,
