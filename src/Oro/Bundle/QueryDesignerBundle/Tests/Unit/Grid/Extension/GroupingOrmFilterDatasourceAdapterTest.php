@@ -45,6 +45,25 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
+    public function testOneComputedRestriction()
+    {
+        $qb = new QueryBuilder($this->getTestEntityManager());
+        $qb->select(['u.status, COUNT(u.id)'])
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->groupBy('u.status');
+        $ds = new GroupingOrmFilterDatasourceAdapter($qb);
+
+        $ds->addRestriction($qb->expr()->eq('COUNT(u.id)', '1'), FilterUtility::CONDITION_AND, true);
+        $ds->applyRestrictions();
+
+        $this->assertEquals(
+            'SELECT u.status, COUNT(u.id) FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'GROUP BY u.status '
+            . 'HAVING COUNT(u.id) = 1',
+            $qb->getDQL()
+        );
+    }
+
     public function testSeveralRestrictions()
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
@@ -62,6 +81,27 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
             'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
             . 'WHERE u.id = 0 AND '
             . '((u.name = 1 OR u.name = 2) AND u.name = 3)',
+            $qb->getDQL()
+        );
+    }
+
+    public function testSeveralComputedRestrictions()
+    {
+        $qb = new QueryBuilder($this->getTestEntityManager());
+        $qb->select(['u.status, COUNT(u.id)'])
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->groupBy('u.status');
+        $ds = new GroupingOrmFilterDatasourceAdapter($qb);
+
+        $ds->addRestriction($qb->expr()->eq('COUNT(u.id)', '1'), FilterUtility::CONDITION_AND, true);
+        $ds->addRestriction($qb->expr()->eq('MIN(u.id)', '2'), FilterUtility::CONDITION_OR, true);
+        $ds->addRestriction($qb->expr()->eq('MAX(u.id)', '3'), FilterUtility::CONDITION_AND, true);
+        $ds->applyRestrictions();
+
+        $this->assertEquals(
+            'SELECT u.status, COUNT(u.id) FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'GROUP BY u.status '
+            . 'HAVING (COUNT(u.id) = 1 OR MIN(u.id) = 2) AND MAX(u.id) = 3',
             $qb->getDQL()
         );
     }

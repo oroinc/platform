@@ -676,7 +676,8 @@ abstract class AbstractQueryConverter
             $this->buildColumnExpression($columnName, $tableAlias, $fieldName),
             $this->getColumnAlias($columnAliasKey),
             $filter['criterion']['filter'],
-            $filter['criterion']['data']
+            $filter['criterion']['data'],
+            $functionExpr
         );
     }
 
