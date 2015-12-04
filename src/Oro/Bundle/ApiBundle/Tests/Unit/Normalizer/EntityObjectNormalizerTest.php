@@ -166,7 +166,7 @@ class EntityObjectNormalizerTest extends OrmRelatedTestCase
         $owner->setName('user_name');
         $ownerCategory = new Entity\Category();
         $ownerCategory->setName('owner_category_name');
-        $category->setLabel('owner-category_label');
+        $ownerCategory->setLabel('owner_category_label');
         $owner->setCategory($ownerCategory);
         $ownerGroup1 = new Entity\Group();
         $ownerGroup1->setId(11);
