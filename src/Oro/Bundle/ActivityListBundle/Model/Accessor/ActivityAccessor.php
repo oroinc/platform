@@ -2,33 +2,32 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Accessor;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor;
 
 class ActivityAccessor extends DefaultAccessor
 {
-    /** @var ActivityListManager */
-    protected $activityListManager;
-
     /** @var Registry */
     protected $registry;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
-     * @param ActivityListManager $activityListManager
      * @param Registry $registry
+     * @param TranslatorInterface $translator
      */
-    public function __construct(
-        ActivityListManager $activityListManager,
-        Registry $registry
-    ) {
-        $this->activityListManager = $activityListManager;
+    public function __construct(Registry $registry, TranslatorInterface $translator)
+    {
         $this->registry = $registry;
+        $this->translator = $translator;
     }
 
     /**
@@ -51,13 +50,13 @@ class ActivityAccessor extends DefaultAccessor
         return parent::getValue($entity, $metadata);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setValue($entity, FieldMetadata $metadata, $value)
-    {
-        parent::setValue($entity, $metadata, $value);
-    }
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function setValue($entity, FieldMetadata $metadata, $value)
+//    {
+//        parent::setValue($entity, $metadata, $value);
+//    }
 
     /**
      * @param object $entity
@@ -76,6 +75,6 @@ class ActivityAccessor extends DefaultAccessor
             [$type]
         );
 
-        return 'Items - ' . $count;
+        return $this->translator->trans('oro.activitylist.merge.items.label') . ' - ' . $count;
     }
 }

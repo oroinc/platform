@@ -189,7 +189,6 @@ services:
     oro_activity_list.accessor.activity:
         class: %oro_activity_list.accessor.activity.class%
         arguments:
-          - @oro_activity_list.manager
           - @doctrine
         tags:
             - { name: oro_entity_merge.accessor }

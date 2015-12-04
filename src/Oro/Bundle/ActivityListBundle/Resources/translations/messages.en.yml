@@ -51,3 +51,4 @@ oro:
             criteria:
                 activity: Activity
         activity_owners.label: Activity Owners
+        merge.items.label: Items
