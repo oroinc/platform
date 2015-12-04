@@ -258,8 +258,6 @@ class ChannelRepository extends EntityRepository
 
             $this->getEntityManager()->persist($status);
             $integration->addStatus($status);
-
-            $this->getEntityManager()->flush();
         }
     }
 }
