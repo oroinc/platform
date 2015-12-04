@@ -1,7 +1,8 @@
 placeholders:
     segment_criteria_list:
         items:
-            aggregated_field_condition: ~
+            aggregated_field_condition:
+                order: 10
 
 items:
     aggregated_field_condition:
