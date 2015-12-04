@@ -57,7 +57,7 @@ class MergeListener
                     $this->translator->trans('oro.activitylist.entity_plural_label') . ' ('
                     . $this->translator->trans($this->getAliasByActivityClass($type))
                     . ')',
-                'merge_modes'   => [MergeModes::REPLACE, MergeModes::UNITE]
+                'merge_modes'   => [MergeModes::UNITE, MergeModes::REPLACE]
             ];
 
             $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
