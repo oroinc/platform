@@ -34,6 +34,10 @@ class MergeFieldsStep implements DependentMergeStepInterface
     public function run(EntityData $data)
     {
         foreach ($data->getFields() as $field) {
+            $fieldMetadata = $field->getMetadata();
+            if ($fieldMetadata->has('is_virtual') && $fieldMetadata->get('is_virtual') === true) {
+                continue;
+            }
             $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE_FIELD, new FieldDataEvent($field));
             $this->strategy->merge($field);
             $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE_FIELD, new FieldDataEvent($field));
