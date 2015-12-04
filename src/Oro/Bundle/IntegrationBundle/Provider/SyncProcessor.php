@@ -97,12 +97,14 @@ class SyncProcessor extends AbstractSyncProcessor
                 if (!$this->isConnectorAllowed($connector, $integration, $processedConnectorStatuses)) {
                     continue;
                 }
-                $status = $this->processIntegrationConnector(
-                    $integration,
-                    $connector,
-                    $parameters
-                );
-                $isSuccess = $isSuccess && $status->getCode() == Status::STATUS_COMPLETED;
+                $status = $this->processIntegrationConnector($integration, $connector, $parameters);
+
+                /**
+                 * Moved from ChannelRepository::addStatus method contract
+                 */
+                $this->doctrineRegistry->getManager()->flush();
+
+                $isSuccess = $isSuccess && $this->isIntegrationConnectorProcessSuccess($status);
                 $processedConnectorStatuses[$connector->getType()] = $status;
             } catch (\Exception $exception) {
                 $isSuccess = false;

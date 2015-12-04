@@ -8,6 +8,7 @@ use Psr\Log\LoggerAwareInterface;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -120,5 +121,15 @@ abstract class AbstractSyncProcessor implements LoggerAwareInterface
     protected function getRealConnector(Integration $integration, $connector)
     {
         return clone $this->registry->getConnectorType($integration->getType(), $connector);
+    }
+
+    /**
+     * @param Status $status
+     *
+     * @return bool
+     */
+    protected function isIntegrationConnectorProcessSuccess(Status $status)
+    {
+        return $status->getCode() == Status::STATUS_COMPLETED;
     }
 }
