@@ -98,7 +98,7 @@ class DateFilterUtility
      */
     protected function applyDatePart($data)
     {
-        $field = $this->applyCurrentDayWithoutYearField($data['field'], $data);
+        $field = $this->modifyFieldToDayWithMonth($data['field'], $data);
 
         switch ($data['part']) {
             case DateModifierInterface::PART_MONTH:
@@ -132,35 +132,50 @@ class DateFilterUtility
 
     /**
      * variable 'this day without year' search all today records without year
+     * text 'January 16' search all January 16 records without year
      *
      * @param string $sqlField
      * @param array $data
      * @return string
      */
-    protected function applyCurrentDayWithoutYearField($sqlField, &$data)
+    protected function modifyFieldToDayWithMonth($sqlField, &$data)
     {
-        $isVariableExists = false;
+        $isModifyAllowed = false;
         $fields = ['date_start', 'date_end'];
         foreach ($fields as $field) {
             $originalKey = $field.'_original';
-            if ($data[$originalKey]) {
-                $expression = $this->expressionCompiler->compile($data[$originalKey], true);
-                if ($expression instanceof ExpressionResult &&
-                    $expression->getVariableType() == DateModifierInterface::VAR_THIS_DAY_W_Y &&
-                    $data[$field] instanceof \DateTime
-                ) {
+            if ($data[$originalKey] && $this->allowToModifyFieldToDayWithMonth($data, $originalKey, $field)) {
                     $data[$field] = $data[$field]->format('md');
-                    $isVariableExists = true;
-                }
+                    $isModifyAllowed = true;
             }
         }
 
-        if ($isVariableExists) {
+        if ($isModifyAllowed) {
             $sqlField = $this->modifyFieldToCorrectTimezone($sqlField);
             $sqlField = sprintf('MONTH(%s) * 100 + DAY(%s)', $sqlField, $sqlField);
         }
 
         return $sqlField;
+    }
+
+    /**
+     * @param array $data
+     * @param string $originalKey
+     * @param string $field
+     * @return bool
+     */
+    protected function allowToModifyFieldToDayWithMonth($data, $originalKey, $field)
+    {
+        $expression = $this->expressionCompiler->compile($data[$originalKey], true);
+        if ($expression instanceof ExpressionResult && $data[$field] instanceof \DateTime) {
+            if ($expression->getVariableType() == DateModifierInterface::VAR_THIS_DAY_W_Y) {
+                return true;
+            } elseif ($expression->getSourceType() == ExpressionResult::TYPE_DAYMONTH) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

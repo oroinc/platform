@@ -255,6 +255,12 @@ class DateFilterSubscriber implements EventSubscriberInterface
                         $data['part']=DateModifierInterface::PART_MONTH;
                         break;
                 }
+
+                switch ($result->getSourceType()) {
+                    case ExpressionResult::TYPE_DAYMONTH:
+                        $data['part']=DateModifierInterface::PART_VALUE;
+                        break;
+                }
             }
         }
     }
