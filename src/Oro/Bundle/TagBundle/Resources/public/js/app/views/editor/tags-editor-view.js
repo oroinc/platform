@@ -114,7 +114,10 @@ define(function(require) {
                     // we use this message not for its original mission
                     return _this.isLoading ?
                         __('oro.tag.inline_editing.loading') :
-                        __('oro.tag.inline_editing.existing_tag');
+                        (this.canCreate ?
+                            __('oro.tag.inline_editing.existing_tag') :
+                            __('oro.tag.inline_editing.no_matches')
+                        );
                 },
                 initSelection: function(element, callback) {
                     callback(_this.getInitialResultItem());
@@ -161,7 +164,7 @@ define(function(require) {
                 data = $.extend({}, this.firstPageData);
                 data.results = this.filterTermFromResults(this.currentTerm, data.results);
                 if (this.currentPage === 1) {
-                    if (this.isValidTerm(this.currentTerm)) {
+                    if (this.canCreate && this.isValidTerm(this.currentTerm)) {
                         if (this.firstPageData.term === this.currentTerm) {
                             data.results.unshift({
                                 id: this.currentTerm,
