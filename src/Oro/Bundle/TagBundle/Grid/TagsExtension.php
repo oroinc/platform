@@ -40,17 +40,18 @@ class TagsExtension extends AbstractExtension
 
     /**
      * @param TagManager          $tagManager
+     * @param TaggableHelper      $helper
      * @param EntityClassResolver $resolver
      * @param EntityRoutingHelper $entityRoutingHelper
-     * @param TaggableHelper      $helper
+     * @param SecurityFacade      $securityFacade
      */
     public function __construct(
         TagManager $tagManager,
+        TaggableHelper $helper,
         EntityClassResolver $resolver,
         EntityRoutingHelper $entityRoutingHelper,
-        TaggableHelper $helper,
-        SecurityFacade $securityFacade)
-    {
+        SecurityFacade $securityFacade
+    ) {
         $this->tagManager          = $tagManager;
         $this->entityClassResolver = $resolver;
         $this->entityRoutingHelper = $entityRoutingHelper;
@@ -73,8 +74,13 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $columns = $config->offsetGetByPath('[columns]') ? : [];
+        $columns   = $config->offsetGetByPath('[columns]') ?: [];
         $formatter = new GridTaskPropertyFormatter();
+
+        $permissions = [
+            'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY),
+            'oro_tag_unassign_global' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_REMOVE_ID_KEY)
+        ];
 
         $config->offsetSetByPath(
             '[columns]',
@@ -85,36 +91,34 @@ class TagsExtension extends AbstractExtension
                         'label'          => 'oro.tag.tags_label',
                         'type'           => 'callback',
                         'frontend_type'  => 'tags',
-                        'callable'       => array($formatter, 'getValue'),
+                        'callable'       => [$formatter, 'getValue'],
                         'editable'       => false,
                         'translatable'   => true,
                         'renderable'     => false,
                         'inline_editing' => [
-                            'enable'         => $this->securityFacade->isGranted('oro_tag_assign_unassign'),
-                            'editor'         => [
-                                'view'           => 'orotag/js/app/views/editor/tags-editor-view',
+                            'enable' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_ASSIGN_ID_KEY),
+                            'editor' => [
+                                'view'         => 'orotag/js/app/views/editor/tags-editor-view',
                                 'view_options' => [
-                                    'permissions' => [
-                                        'oro_tag_create' => $this->securityFacade->isGranted('oro_tag_create'),
-                                        'oro_tag_unassign_global' => $this->securityFacade->isGranted('oro_tag_unassign_global')
-                                    ]
+                                    'permissions' => $permissions
                                 ]
                             ],
-                            'save_api_accessor' => [
-                                'route' => 'oro_api_post_taggable',
-                                'http_method' => 'POST',
-                                'default_route_parameters' => [
+                            'save_api_accessor'         => [
+                                'route'                       => 'oro_api_post_taggable',
+                                'http_method'                 => 'POST',
+                                'default_route_parameters'    => [
                                     'entity' => $this->entityRoutingHelper->getUrlSafeClassName(
-                                        $this->getEntityClassName($config))
+                                        $this->getEntityClassName($config)
+                                    )
                                 ],
                                 'route_parameters_rename_map' => [
                                     'id' => 'entityId'
                                 ]
                             ],
                             'autocomplete_api_accessor' => [
-                                'class' => 'oroui/js/tools/search-api-accessor',
+                                'class'               => 'oroui/js/tools/search-api-accessor',
                                 'search_handler_name' => 'tags',
-                                'label_field_name' => 'name'
+                                'label_field_name'    => 'name'
                             ]
                         ]
                     ]
@@ -123,7 +127,6 @@ class TagsExtension extends AbstractExtension
         );
 
         $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
-        //@TODO Need recheck this condition
         if (empty($filters) || strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_report') === 0) {
             return;
         }
