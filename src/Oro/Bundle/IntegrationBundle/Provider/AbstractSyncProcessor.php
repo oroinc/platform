@@ -8,6 +8,7 @@ use Psr\Log\LoggerAwareInterface;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
@@ -106,5 +107,18 @@ abstract class AbstractSyncProcessor implements LoggerAwareInterface
         }
 
         return $counts;
+    }
+
+    /**
+     * Clone object here because it will be modified and changes should not be shared between
+     *
+     * @param Integration $integration
+     * @param string      $connector
+     *
+     * @return TwoWaySyncConnectorInterface
+     */
+    protected function getRealConnector(Integration $integration, $connector)
+    {
+        return clone $this->registry->getConnectorType($integration->getType(), $connector);
     }
 }

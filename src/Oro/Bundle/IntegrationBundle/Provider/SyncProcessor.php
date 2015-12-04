@@ -17,8 +17,6 @@ use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
 
 class SyncProcessor extends AbstractSyncProcessor
 {
-    const DEFAULT_CONNECTOR_ORDER = 100;
-
     /** @var ManagerRegistry */
     protected $doctrineRegistry;
 
@@ -56,6 +54,13 @@ class SyncProcessor extends AbstractSyncProcessor
     public function process(Integration $integration, $connector = null, array $parameters = [])
     {
         if (!$integration->isEnabled()) {
+            $this->logger->error(
+                sprintf(
+                    'Integration "%s" with type "%s" is not enabled. Cannot process synchronization.',
+                    $integration->getName(),
+                    $integration->getType()
+                )
+            );
             return false;
         }
 
@@ -75,41 +80,33 @@ class SyncProcessor extends AbstractSyncProcessor
      * By default, if $connector is empty, will process all connectors of given integration
      *
      * @param Integration $integration Integration object
-     * @param array       $parameters  Connector additional parameters
-     * @param \Closure    $callback    Callback to filter connectors
+     * @param array       $parameters Connector additional parameters
+     * @param callable    $callback
      *
      * @return boolean
      */
-    protected function processConnectors(Integration $integration, array $parameters = [], \Closure $callback = null)
+    protected function processConnectors(Integration $integration, array $parameters = [], callable $callback = null)
     {
+        $connectors = $this->getConnectorsToProcess($integration, $callback);
+
         $isSuccess = true;
 
-        $connectors = $this->getTypesOfConnectorsToSync($integration, $callback);
-        $realConnectors = $this->getOrderedConnectors($integration, $connectors);
-
         $processedConnectorStatuses = [];
-        foreach ($realConnectors as $connector) {
+        foreach ($connectors as $connector) {
             try {
-                if ($connector instanceof AllowedConnectorInterface
-                    && !$connector->isAllowed($integration, $processedConnectorStatuses)) {
-                    $this->logger->debug(sprintf('Connector %s skipped', $connector->getType()));
-
+                if (!$this->isConnectorAllowed($connector, $integration, $processedConnectorStatuses)) {
                     continue;
                 }
-
-                $result = $this->processIntegrationConnector(
+                $status = $this->processIntegrationConnector(
                     $integration,
                     $connector,
-                    $parameters,
-                    $status
+                    $parameters
                 );
+                $isSuccess = $isSuccess && $status->getCode() == Status::STATUS_COMPLETED;
                 $processedConnectorStatuses[$connector->getType()] = $status;
-
-                $isSuccess = $isSuccess && $result;
-            } catch (\Exception $e) {
+            } catch (\Exception $exception) {
                 $isSuccess = false;
-
-                $this->logger->critical($e->getMessage());
+                $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
             }
         }
 
@@ -118,11 +115,41 @@ class SyncProcessor extends AbstractSyncProcessor
 
     /**
      * @param Integration $integration
-     * @param \Closure $callback
+     * @param callable|null $callback
+     * @return ConnectorInterface[]
+     */
+    protected function getConnectorsToProcess(Integration $integration, callable $callback = null)
+    {
+        $connectors = $this->loadConnectorsToProcess($integration, $callback);
+        $orderedConnectors = $this->getSortedConnectors($connectors);
+
+        return $orderedConnectors;
+    }
+
+    /**
+     * @param Integration $integration
+     * @param callable $callback
+     * @return ConnectorInterface[]
+     */
+    protected function loadConnectorsToProcess($integration, callable $callback = null)
+    {
+        $connectorTypes = $this->getTypesOfConnectorsToProcess($integration, $callback);
+
+        /** @var ConnectorInterface[] $realConnectors */
+        $connectors = array_map(function ($connectorType) use ($integration) {
+            return $this->getRealConnector($integration, $connectorType);
+        }, $connectorTypes);
+
+        return $connectors;
+    }
+
+    /**
+     * @param Integration $integration
+     * @param callable $callback
      *
      * @return string[]
      */
-    protected function getTypesOfConnectorsToSync(Integration $integration, \Closure $callback = null)
+    protected function getTypesOfConnectorsToProcess(Integration $integration, callable $callback = null)
     {
         $connectors = $integration->getConnectors();
 
@@ -134,20 +161,72 @@ class SyncProcessor extends AbstractSyncProcessor
     }
 
     /**
+     * @param ConnectorInterface[] $connectors
+     * @return ConnectorInterface[]
+     */
+    protected function getSortedConnectors(array $connectors)
+    {
+        usort($connectors, function ($firstConnector, $secondConnector) {
+            $firstConnectorOrder = $secondConnectorOrder = OrderedConnectorInterface::DEFAULT_ORDER;
+            if ($firstConnector instanceof OrderedConnectorInterface) {
+                $firstConnectorOrder = $firstConnector->getOrder();
+            }
+            if ($secondConnector instanceof OrderedConnectorInterface) {
+                $secondConnectorOrder = $firstConnector->getOrder();
+            }
+
+            if ($firstConnectorOrder == $secondConnectorOrder) {
+                return 0;
+            }
+
+            return ($firstConnectorOrder < $secondConnectorOrder) ? -1 : 1;
+        });
+
+        return $connectors;
+    }
+
+    /**
+     * Checks whether connector is allowed to process. Logs information if connector is not allowed.
+     *
+     * @param ConnectorInterface $connector
+     * @param Integration $integration
+     * @param Status[] $processedConnectorStatuses
+     * @return bool
+     */
+    protected function isConnectorAllowed(
+        ConnectorInterface $connector,
+        Integration $integration,
+        array $processedConnectorStatuses
+    ) {
+        if ($connector instanceof AllowedConnectorInterface
+            && !$connector->isAllowed($integration, $processedConnectorStatuses)
+        ) {
+            $this->logger->info(
+                sprintf(
+                    'Connector with type "%s" is not allowed and it\'s processing is skipped.',
+                    $connector->getType()
+                )
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Process integration connector
      *
      * @param Integration        $integration Integration object
      * @param ConnectorInterface $connector   Connector name
      * @param array              $parameters  Connector additional parameters
-     * @param Status|null        $status
      *
-     * @return bool
+     * @return Status
      */
     protected function processIntegrationConnector(
         Integration $integration,
         ConnectorInterface $connector,
-        array $parameters = [],
-        Status &$status = null
+        array $parameters = []
     ) {
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector->getType()));
@@ -157,20 +236,12 @@ class SyncProcessor extends AbstractSyncProcessor
                 ProcessorRegistry::TYPE_IMPORT,
                 $connector->getImportEntityFQCN()
             );
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             // log and continue
-            $this->logger->error($e->getMessage());
-            $status = new Status();
-            $status
+            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+            return $this->createConnectorStatus($connector, $integration)
                 ->setCode(Status::STATUS_FAILED)
-                ->setMessage($e->getMessage())
-                ->setConnector($connector->getType());
-
-            $this->doctrineRegistry
-                ->getRepository('OroIntegrationBundle:Channel')
-                ->addStatus($integration, $status);
-
-            return false;
+                ->setMessage($exception->getMessage());
         }
 
         $configuration = [
@@ -186,7 +257,7 @@ class SyncProcessor extends AbstractSyncProcessor
                 ),
         ];
 
-        return $this->processImport($connector, $jobName, $configuration, $integration, $status);
+        return $this->processImport($connector, $jobName, $configuration, $integration);
     }
 
     /**
@@ -194,17 +265,11 @@ class SyncProcessor extends AbstractSyncProcessor
      * @param string             $jobName
      * @param array              $configuration
      * @param Integration        $integration
-     * @param Status|null        $status
      *
-     * @return boolean
+     * @return Status
      */
-    protected function processImport(
-        ConnectorInterface $connector,
-        $jobName,
-        $configuration,
-        Integration $integration,
-        Status &$status = null
-    ) {
+    protected function processImport(ConnectorInterface $connector, $jobName, $configuration, Integration $integration)
+    {
         $event = new SyncEvent($jobName, $configuration);
         $this->eventDispatcher->dispatch(SyncEvent::SYNC_BEFORE, $event);
         $configuration = $event->getConfiguration();
@@ -224,8 +289,7 @@ class SyncProcessor extends AbstractSyncProcessor
         $exceptions = $jobResult->getFailureExceptions();
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
-        $status = new Status();
-        $status->setConnector($connector->getType());
+        $status = $this->createConnectorStatus($connector, $integration);
         $status->setData(is_array($connectorData) ? $connectorData : []);
 
         $message = $this->formatResultMessage($context);
@@ -249,58 +313,27 @@ class SyncProcessor extends AbstractSyncProcessor
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         }
 
-        $this->doctrineRegistry
-            ->getRepository('OroIntegrationBundle:Channel')
-            ->addStatus($integration, $status);
-
         if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
             $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
         }
 
-        return $isSuccess;
+        return $status;
     }
 
     /**
+     * @param ConnectorInterface $connector
      * @param Integration $integration
-     * @param string[]    $connectorTypes
-     *
-     * @return ConnectorInterface[]
+     * @return Status
      */
-    protected function getOrderedConnectors(Integration $integration, array $connectorTypes)
+    protected function createConnectorStatus(ConnectorInterface $connector, Integration $integration)
     {
-        /** @var ConnectorInterface[] $realConnectors */
-        $realConnectors = array_map(function ($connector) use ($integration) {
-            // Clone object here because it will be modified and changes should not be shared between
-            $realConnector = $this->registry->getConnectorType($integration->getType(), $connector);
-            if (!$realConnector) {
-                throw new \RuntimeException(
-                    sprintf(
-                        "Could not find connector with type %s for integration %s",
-                        $connector,
-                        $integration->getType()
-                    )
-                );
-            }
+        $status = new Status();
+        $status->setConnector($connector->getType());
 
-            return clone $realConnector;
-        }, $connectorTypes);
+        $this->doctrineRegistry
+            ->getRepository('OroIntegrationBundle:Channel')
+            ->addStatus($integration, $status);
 
-        usort($realConnectors, function ($firstConnector, $secondConnector) {
-            $firstConnectorOrder = $secondConnectorOrder = static::DEFAULT_CONNECTOR_ORDER;
-            if ($firstConnector instanceof OrderedConnectorInterface) {
-                $firstConnectorOrder = $firstConnector->getOrder();
-            }
-            if ($secondConnector instanceof OrderedConnectorInterface) {
-                $secondConnectorOrder = $firstConnector->getOrder();
-            }
-
-            if ($firstConnectorOrder == $secondConnectorOrder) {
-                return 0;
-            }
-
-            return ($firstConnectorOrder < $secondConnectorOrder) ? -1 : 1;
-        });
-
-        return $realConnectors;
+        return $status;
     }
 }
