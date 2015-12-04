@@ -113,7 +113,10 @@ class SystemCalendarProvider extends AbstractCalendarProvider
         //    $end,
         //    []
         //);
-        $extraFields = array_intersect($extraFields, $this->getSupportedFields('Oro\Bundle\CalendarBundle\Entity\CalendarEvent'));
+        $extraFields = array_intersect(
+            $extraFields,
+            $this->getSupportedFields('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
+        );
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
         $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(

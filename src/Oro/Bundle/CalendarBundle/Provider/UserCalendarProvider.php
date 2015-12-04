@@ -83,7 +83,10 @@ class UserCalendarProvider extends AbstractCalendarProvider
     ) {
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $extraFields = array_intersect($extraFields, $this->getSupportedFields('Oro\Bundle\CalendarBundle\Entity\CalendarEvent'));
+        $extraFields = array_intersect(
+            $extraFields,
+            $this->getSupportedFields('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
+        );
         $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
 
         $visibleIds = [];

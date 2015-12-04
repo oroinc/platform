@@ -6,7 +6,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 abstract class AbstractCalendarProvider implements CalendarProviderInterface
 {
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -15,16 +14,6 @@ abstract class AbstractCalendarProvider implements CalendarProviderInterface
     {
         $this->doctrineHelper = $doctrineHelper;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds);
-
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraField);
 
     /**
      * @param string $className
