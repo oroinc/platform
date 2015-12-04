@@ -100,14 +100,14 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
                 $tableAlias,
                 $fieldName,
                 $functionExpr
-                    ? $this->prepareFunctionExpression(
-                        $functionExpr,
-                        $tableAlias,
-                        $fieldName,
-                        $columnExpr,
-                        $columnAlias
-                    )
-                    : $columnExpr
+                ? $this->prepareFunctionExpression(
+                    $functionExpr,
+                    $tableAlias,
+                    $fieldName,
+                    $columnExpr,
+                    $columnAlias
+                )
+                : $columnExpr
             ),
             'filter'     => $filterName,
             'filterData' => $filterData

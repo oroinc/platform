@@ -2,7 +2,9 @@ define([
     'jquery',
     'underscore',
     'oroquerydesigner/js/field-condition'
-], function ($, _) {
+], function($, _) {
+    'use strict';
+
     $.widget('oroauditquerydesigner.aggregatedFieldCondition', $.oroquerydesigner.fieldCondition, {
         options: {
             columnsCollection: null
@@ -57,7 +59,7 @@ define([
         _getAggregatedSelectData: function() {
             return _.map(
                 this._getAggregatedColumns(),
-                function (model) {
+                function(model) {
                     return {
                         id: model.get('name'),
                         text: model.get('label')
