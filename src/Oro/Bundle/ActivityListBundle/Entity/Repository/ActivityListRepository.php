@@ -106,19 +106,28 @@ class ActivityListRepository extends EntityRepository
      *
      * @param string $className Target entity class name
      * @param int $entityId     Target entity id
+     * @param array $types      Activity types
      *
      * @return int              Number of activity list records
      */
-    public function getRecordsCountForTargetClassAndId($className, $entityId)
+    public function getRecordsCountForTargetClassAndId($className, $entityId, $types = [])
     {
         // we need try/catch here to avoid crash on non exist entity relation
         try {
-            $result = $this->createQueryBuilder('list')
+            $qb = $this->createQueryBuilder('list')
                 ->select('COUNT(list.id)')
                 ->join('list.' . $this->getAssociationName($className), 'r')
                 ->where('r.id = :entityId')
-                ->setParameter('entityId', $entityId)
-                ->getQuery()
+                ->setParameter('entityId', $entityId);
+            if (count($types) > 0) {
+                $orX = $qb->expr()->orX();
+                foreach ($types as $type) {
+                    $orX->add('list.relatedActivityClass = :relatedActivityClass');
+                    $qb->setParameter('relatedActivityClass', $type);
+                }
+                $qb->andWhere($orX);
+            }
+            $result = $qb->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
             $result = 0;

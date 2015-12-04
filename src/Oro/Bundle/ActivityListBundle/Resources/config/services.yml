@@ -28,6 +28,10 @@ parameters:
     # helper
     oro_activity_list.helper.acl_criteria.class: Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper
     oro_activity_list.helper.activity_inheritance_targets.class: Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper
+
+    # merge
+    oro_activity_list.listener.merge_listener.class: Oro\Bundle\ActivityListBundle\EventListener\MergeListener
+    oro_activity_list.accessor.activity.class: Oro\Bundle\ActivityListBundle\Model\Accessor\ActivityAccessor
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
@@ -180,3 +184,23 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @doctrine
+
+    # Merge accessor
+    oro_activity_list.accessor.activity:
+        class: %oro_activity_list.accessor.activity.class%
+        arguments:
+          - @oro_activity_list.manager
+          - @doctrine
+        tags:
+            - { name: oro_entity_merge.accessor }
+
+    # Merge listener
+    oro_activity_list.listener.merge_listener:
+        class: %oro_activity_list.listener.merge_listener.class%
+        arguments:
+          - @oro_activity.manager
+          - @translator
+        tags:
+          - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata, priority: -10 }
+          - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData, priority: -10 }
+          - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity, priority: -10 }

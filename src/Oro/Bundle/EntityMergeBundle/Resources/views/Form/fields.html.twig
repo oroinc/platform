@@ -4,7 +4,9 @@
         <thead>
         <tr class="default-field">
             <td class="merge-first-column" rowspan="2">
-                {{form_label(form.masterEntity)}}
+                <div class="control-label wrap">
+                    {{form_label(form.masterEntity)}}
+                </div>
             </td>
             {% for child in form.masterEntity %}
                 <td class="entity-merge-column">
@@ -58,7 +60,9 @@
                 <div class="entity-merge-strategy-wrapper">
 
                     <span class="entity-merge-inline entity-merge-strategy-label">
-                        {{ form_label(form.children.mode) }}
+                        <div class="control-label wrap">
+                            {{ form_label(form.children.mode) }}
+                        </div>
                     </span>
 
                     <div class="entity-merge-inline">
@@ -80,7 +84,9 @@
 
 {% block oro_entity_merge_choice_value_widget %}
     <div class="entity-merge-fields-blocks-wrapper">
-        <div class="entity-merge-inline">{{ form_widget(form, {'attr': form.vars.attr|merge({'class': 'entity-merge-field-choice'})}) }}</div>
+        <div class="entity-merge-inline">
+            {{ form_widget(form, {'attr': form.vars.attr|merge({'class': 'entity-merge-field-choice'})}) }}
+        </div>
         <label data-entity-key="{{ form.vars.name }}" data-entity-field-name="{{ form.vars.full_name }}"
                class="entity-merge-inline-label merge-entity-representative"
                for="{{ id }}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
