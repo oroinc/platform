@@ -228,7 +228,7 @@ services:
         tags:
             - { name: oro_activity_list.strategy }
 
-	# Merge accessor
+    # Merge accessor
     oro_activity_list.accessor.activity:
         class: %oro_activity_list.accessor.activity.class%
         arguments:
