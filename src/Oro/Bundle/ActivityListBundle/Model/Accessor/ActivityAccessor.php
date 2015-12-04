@@ -50,14 +50,6 @@ class ActivityAccessor extends DefaultAccessor
         return parent::getValue($entity, $metadata);
     }
 
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function setValue($entity, FieldMetadata $metadata, $value)
-//    {
-//        parent::setValue($entity, $metadata, $value);
-//    }
-
     /**
      * @param object $entity
      * @param string $type
