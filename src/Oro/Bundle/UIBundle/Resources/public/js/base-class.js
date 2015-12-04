@@ -19,6 +19,7 @@ define(function(require) {
      * @exports BaseClass
      */
     function BaseClass(options) {
+        options = options || {};
         this.cid = _.uniqueId('class');
         this.initialize(options);
         if (options.listen) {
@@ -31,7 +32,8 @@ define(function(require) {
         constructor: BaseClass,
 
         /**
-         * Flag shows if the component is disposed or not
+         * Flag shows if the class is disposed or not
+         * @type {boolean}
          */
         disposed: false,
 
