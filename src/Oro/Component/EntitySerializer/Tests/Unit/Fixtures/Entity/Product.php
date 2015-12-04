@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="oro_test_serializer_product")
+ * @ORM\Table(name="product_table")
  */
 class Product
 {

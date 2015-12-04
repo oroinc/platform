@@ -12,10 +12,10 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
-            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
+            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'           => 1,
@@ -53,9 +53,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.label AS label_1, o0_.public AS public_2'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.label AS label_1, g0_.public AS public_2'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'     => 1,
@@ -100,9 +100,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.label AS label_1, o0_.public AS public_2'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.label AS label_1, g0_.public AS public_2'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'     => 1,
@@ -141,10 +141,10 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
-            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
+            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'           => 1,
@@ -196,10 +196,10 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
-            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
+            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'           => 1,
@@ -241,10 +241,10 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
-            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
+            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'           => 1,
@@ -290,9 +290,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.name AS name_1'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'   => 1,
@@ -333,9 +333,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0' => 1,
@@ -379,9 +379,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0' => 1,
@@ -427,12 +427,12 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1,'
-            . ' o1_.name AS name_2,'
-            . ' o0_.category_name AS category_name_3'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' LEFT JOIN oro_test_serializer_category o1_ ON o0_.category_name = o1_.name'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1,'
+            . ' c1_.name AS name_2,'
+            . ' u0_.category_name AS category_name_3'
+            . ' FROM user_table u0_'
+            . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'            => 1,
@@ -448,10 +448,10 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT o0_.id AS id_0, o1_.name AS name_1'
-            . ' FROM oro_test_serializer_product o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0, p1_.name AS name_1'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'   => 1,
@@ -533,12 +533,12 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1,'
-            . ' o1_.name AS name_2,'
-            . ' o0_.category_name AS category_name_3'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' LEFT JOIN oro_test_serializer_category o1_ ON o0_.category_name = o1_.name'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1,'
+            . ' c1_.name AS name_2,'
+            . ' u0_.category_name AS category_name_3'
+            . ' FROM user_table u0_'
+            . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'            => 1,
@@ -597,10 +597,10 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
-            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
+            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'           => 1,
@@ -646,9 +646,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.label AS label_1'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.label AS label_1'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'    => 1,
@@ -703,9 +703,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.label AS label_1'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.label AS label_1'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'    => 1,
@@ -748,9 +748,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.label AS label_1'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.label AS label_1'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'    => 1,
@@ -798,9 +798,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.label AS label_1'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT g0_.id AS id_0, g0_.label AS label_1'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
             [
                 [
                     'id_0'    => 1,

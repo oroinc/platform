@@ -18,9 +18,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' WHERE o0_.id IN (?, ?)',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            . ' FROM user_table u0_'
+            . ' WHERE u0_.id IN (?, ?)',
             [
                 [
                     'id_0'            => 123,
@@ -40,14 +40,14 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT o0_.id AS id_0,'
-            . ' o1_.id AS id_1, o1_.name AS name_2, o1_.label AS label_3, o1_.public AS public_4'
-            . ' FROM oro_test_serializer_group o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (EXISTS ('
-            . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
-            . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
-            . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)))'
-            . ' WHERE o0_.id IN (?, ?)',
+            'SELECT u0_.id AS id_0,'
+            . ' g1_.id AS id_1, g1_.name AS name_2, g1_.label AS label_3, g1_.public AS public_4'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)))'
+            . ' WHERE u0_.id IN (?, ?)',
             [
                 [
                     'id_0'     => 123,
@@ -130,9 +130,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' WHERE o0_.id IN (?, ?)',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            . ' FROM user_table u0_'
+            . ' WHERE u0_.id IN (?, ?)',
             [
                 [
                     'id_0'            => 123,
@@ -154,23 +154,23 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             1,
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
             . ' FROM ('
-            . 'SELECT o0_.id AS id_0, o1_.id AS id_1'
-            . ' FROM oro_test_serializer_group o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (EXISTS ('
-            . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
-            . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
-            . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)'
+            . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
             . '))'
-            . ' WHERE o0_.id = 123 LIMIT 10'
+            . ' WHERE u0_.id = 123 LIMIT 10'
             . ' UNION ALL'
-            . ' SELECT o0_.id AS id_0, o1_.id AS id_1'
-            . ' FROM oro_test_serializer_group o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (EXISTS ('
-            . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
-            . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
-            . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)'
+            . ' SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
             . '))'
-            . ' WHERE o0_.id = 456 LIMIT 10'
+            . ' WHERE u0_.id = 456 LIMIT 10'
             . ') entity',
             [
                 [
@@ -187,9 +187,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             2,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2, o0_.public AS public_3'
-            . ' FROM oro_test_serializer_group o0_'
-            . ' WHERE o0_.id IN (?, ?)',
+            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2, g0_.public AS public_3'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id IN (?, ?)',
             [
                 [
                     'id_0'     => 10,
@@ -271,9 +271,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            . ' FROM user_table u0_'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'            => 1,
@@ -288,14 +288,14 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT o0_.id AS id_0,'
-            . ' o1_.id AS id_1, o1_.name AS name_2, o1_.label AS label_3, o1_.public AS public_4'
-            . ' FROM oro_test_serializer_group o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (EXISTS ('
-            . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
-            . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
-            . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)))'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0,'
+            . ' g1_.id AS id_1, g1_.name AS name_2, g1_.label AS label_3, g1_.public AS public_4'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)))'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'     => 1,
@@ -366,9 +366,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            . ' FROM user_table u0_'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'            => 1,
@@ -382,14 +382,14 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT o0_.id AS id_0,'
-            . ' o1_.id AS id_1'
-            . ' FROM oro_test_serializer_group o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (EXISTS ('
-            . 'SELECT 1 FROM oro_test_serializer_user_to_group o2_'
-            . ' INNER JOIN oro_test_serializer_group o3_ ON o2_.user_group_id = o3_.id'
-            . ' WHERE o2_.user_id = o0_.id AND o3_.id IN (o1_.id)))'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0,'
+            . ' g1_.id AS id_1'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)))'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0' => 1,
@@ -444,9 +444,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            . ' FROM user_table u0_'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'            => 1,
@@ -460,12 +460,12 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT o0_.id AS id_0,'
-            . ' o1_.id AS id_1'
-            . ' FROM oro_test_serializer_product o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
-            . ' WHERE o0_.id = ?'
-            . ' ORDER BY o1_.id DESC',
+            'SELECT u0_.id AS id_0,'
+            . ' p1_.id AS id_1'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' WHERE u0_.id = ?'
+            . ' ORDER BY p1_.id DESC',
             [
                 [
                     'id_0' => 1,
@@ -518,9 +518,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            . ' FROM user_table u0_'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'            => 1,
@@ -534,12 +534,12 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT o0_.id AS id_0,'
-            . ' o1_.id AS id_1'
-            . ' FROM oro_test_serializer_product o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
-            . ' WHERE o0_.id = ?'
-            . ' ORDER BY o1_.id DESC',
+            'SELECT u0_.id AS id_0,'
+            . ' p1_.id AS id_1'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' WHERE u0_.id = ?'
+            . ' ORDER BY p1_.id DESC',
             [
                 [
                     'id_0' => 1,
@@ -595,9 +595,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.category_name AS category_name_2'
-            . ' FROM oro_test_serializer_user o0_'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            . ' FROM user_table u0_'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0'            => 1,
@@ -611,11 +611,11 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT o0_.id AS id_0,'
-            . ' o1_.id AS id_1'
-            . ' FROM oro_test_serializer_product o1_'
-            . ' INNER JOIN oro_test_serializer_user o0_ ON (o1_.owner_id = o0_.id)'
-            . ' WHERE o0_.id = ?',
+            'SELECT u0_.id AS id_0,'
+            . ' p1_.id AS id_1'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' WHERE u0_.id = ?',
             [
                 [
                     'id_0' => 1,
@@ -632,12 +632,12 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             2,
-            'SELECT o0_.id AS id_0, o0_.name AS name_1,'
-            . ' o1_.name AS name_2,'
-            . ' o0_.category_name AS category_name_3, o0_.owner_id AS owner_id_4'
-            . ' FROM oro_test_serializer_product o0_'
-            . ' LEFT JOIN oro_test_serializer_category o1_ ON o0_.category_name = o1_.name'
-            . ' WHERE o0_.id IN (?, ?)',
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' c1_.name AS name_2,'
+            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN category_table c1_ ON p0_.category_name = c1_.name'
+            . ' WHERE p0_.id IN (?, ?)',
             [
                 [
                     'id_0'            => 10,
