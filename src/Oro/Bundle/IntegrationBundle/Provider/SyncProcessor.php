@@ -241,9 +241,11 @@ class SyncProcessor extends AbstractSyncProcessor
         } catch (\Exception $exception) {
             // log and continue
             $this->logger->error($exception->getMessage(), ['exception' => $exception]);
-            return $this->createConnectorStatus($connector, $integration)
+            $status = $this->createConnectorStatus($connector)
                 ->setCode(Status::STATUS_FAILED)
                 ->setMessage($exception->getMessage());
+            $this->addConnectorStatusAndFlush($integration, $status);
+            return $status;
         }
 
         $configuration = [
@@ -291,7 +293,7 @@ class SyncProcessor extends AbstractSyncProcessor
         $exceptions = $jobResult->getFailureExceptions();
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
-        $status = $this->createConnectorStatus($connector, $integration);
+        $status = $this->createConnectorStatus($connector);
         $status->setData(is_array($connectorData) ? $connectorData : []);
 
         $message = $this->formatResultMessage($context);
@@ -315,6 +317,8 @@ class SyncProcessor extends AbstractSyncProcessor
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         }
 
+        $this->addConnectorStatusAndFlush($integration, $status);
+
         if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
             $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
         }
@@ -323,19 +327,29 @@ class SyncProcessor extends AbstractSyncProcessor
     }
 
     /**
+     * Creates status of connector of integration.
+     *
      * @param ConnectorInterface $connector
-     * @param Integration $integration
      * @return Status
      */
-    protected function createConnectorStatus(ConnectorInterface $connector, Integration $integration)
+    protected function createConnectorStatus(ConnectorInterface $connector)
     {
         $status = new Status();
         $status->setConnector($connector->getType());
 
+        return $status;
+    }
+
+    /**
+     * Adds status of connector to integration and flush changes.
+     *
+     * @param Integration $integration
+     * @param Status $status
+     */
+    protected function addConnectorStatusAndFlush(Integration $integration, Status $status)
+    {
         $this->doctrineRegistry
             ->getRepository('OroIntegrationBundle:Channel')
-            ->addStatus($integration, $status);
-
-        return $status;
+            ->addStatusAndFlush($integration, $status);
     }
 }

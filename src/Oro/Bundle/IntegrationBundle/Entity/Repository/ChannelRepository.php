@@ -246,18 +246,32 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * Adds status to integration, manual persist of newly created statuses
+     * Adds status to integration, manual persist of newly created statuses and do flush.
      *
+     * @deprecated 1.9.0:1.11.0 Use $this->addStatusAndFlush() instead
      * @param Integration $integration
      * @param Status  $status
      */
     public function addStatus(Integration $integration, Status $status)
+    {
+        $this->addStatusAndFlush($integration, $status);
+    }
+
+    /**
+     * Adds status to integration, manual persist of newly created statuses and do flush.
+     *
+     * @param Integration $integration
+     * @param Status  $status
+     */
+    public function addStatusAndFlush(Integration $integration, Status $status)
     {
         if ($this->getEntityManager()->isOpen()) {
             $integration = $this->getOrLoadById($integration->getId());
 
             $this->getEntityManager()->persist($status);
             $integration->addStatus($status);
+
+            $this->getEntityManager()->flush();
         }
     }
 }
