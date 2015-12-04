@@ -25,6 +25,7 @@ define(function(require) {
 
         METADATA_DEFAULTS: {
             inline_editing: {
+                enable: false,
                 save_api_accessor: {
                     'class': 'oroui/js/tools/api-accessor'
                 }
@@ -36,44 +37,55 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var waitors = [];
             options.metadata = $.extend(true, {}, this.METADATA_DEFAULTS, options.metadata);
+            this.inlineEditingOptions = options.metadata.inline_editing;
+            var waitors = [];
             this.fieldName = options.fieldName || 'value';
             // frontend type mapped to viewer/editor/reader
             var classes = frontendTypeMap[options.frontend_type];
             this.classes = classes;
-            this.viewer = options.viewer || {};
-            this.editor = options.editor || {};
             this.metadata = options.metadata;
             this.model = new BaseModel();
             this.model.set(this.fieldName, options.value);
-            this.wrapper = new InlineEditorWrapperView({
-                el: options._sourceElement,
-                autoRender: true
-            });
-            this.view = new classes.viewer(_.extend({
-                el: this.wrapper.getContainer(),
-                autoRender: true,
-                model: this.model,
-                fieldName: this.fieldName
-            }));
-            if (this.classes.editor.processMetadata) {
-                waitors.push(this.classes.editor.processMetadata(this.metadata));
+            if (this.inlineEditingOptions.enable) {
+                this.wrapper = new InlineEditorWrapperView({
+                    el: options._sourceElement,
+                    autoRender: true
+                });
+                this.view = new classes.viewer(_.extend({
+                    el: this.wrapper.getContainer(),
+                    autoRender: true,
+                    model: this.model,
+                    fieldName: this.fieldName
+                }));
+                if (this.classes.editor.processMetadata) {
+                    waitors.push(this.classes.editor.processMetadata(this.metadata));
+                }
+                this.wrapper.on('start-editing', this.enterEditMode, this);
+                waitors.push(tools.loadModuleAndReplace(this.inlineEditingOptions.save_api_accessor, 'class').then(
+                    _.bind(function() {
+                        var ConcreteApiAccessor = this.inlineEditingOptions.save_api_accessor['class'];
+                        this.saveApiAccessor = new ConcreteApiAccessor(
+                            _.omit(this.inlineEditingOptions.save_api_accessor, 'class'));
+                    }, this)
+                ));
+            } else {
+                this.view = new classes.viewer(_.extend({
+                    el: options._sourceElement,
+                    autoRender: true,
+                    model: this.model,
+                    fieldName: this.fieldName
+                }));
             }
-            this.wrapper.on('start-editing', this.enterEditMode, this);
-            waitors.push(tools.loadModuleAndReplace(options.metadata.inline_editing.save_api_accessor, 'class').then(
-                _.bind(function() {
-                    var ConcreteApiAccessor = options.metadata.inline_editing.save_api_accessor['class'];
-                    this.saveApiAccessor = new ConcreteApiAccessor(
-                        _.omit(options.metadata.inline_editing.save_api_accessor, 'class'));
-                }, this)
-            ));
             this.deferredInit = $.when.apply($, waitors);
         },
 
         enterEditMode: function() {
             var View = this.classes.editor;
-            var viewInstance = new View(_.extend({}, this.editor.viewOptions, {
+            var viewConfiguration = this.inlineEditingOptions.editor ?
+                this.inlineEditingOptions.editor.view_options :
+                {};
+            var viewInstance = new View(_.extend({}, viewConfiguration, {
                 autoRender: true,
                 model: this.model,
                 fieldName: this.fieldName,
