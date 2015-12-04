@@ -129,7 +129,7 @@ class ActivityListManager
      * @param integer $entityId
      * @param array   $filter
      *
-     * @return ActivityList[]
+     * @return int
      */
     public function getListCount($entityClass, $entityId, $filter)
     {
@@ -148,7 +148,7 @@ class ActivityListManager
 
         $result = $statement->fetchColumn();
 
-        return $result;
+        return (int)$result;
     }
 
     /**
