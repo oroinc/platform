@@ -25,6 +25,11 @@ define([
                     this.element.closest('.condition').find('.close').click();
                 }
             }, this);
+            this.options.columnsCollection.on('change:func', function(model) {
+                if (model.get('name') === this._getColumnName() && _.isEmpty(model.get('func'))) {
+                    this.element.closest('.condition').find('.close').click();
+                }
+            }, this);
             if (data && data.columnName) {
                 this.selectField(data.columnName);
                 this._renderFilter(data.columnName);
