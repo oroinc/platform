@@ -224,4 +224,12 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $result = $this->provider->getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
         $this->assertEquals($events, $result);
     }
+
+    public function testGetExtraFieldEntityClass()
+    {
+        $this->assertEquals(
+            'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+            $this->provider->getExtraFieldEntityClass()
+        );
+    }
 }

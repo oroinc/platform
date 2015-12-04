@@ -120,4 +120,12 @@ class UserCalendarProvider implements CalendarProviderInterface
 
         return $name;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getExtraFieldEntityClass()
+    {
+        return 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    }
 }

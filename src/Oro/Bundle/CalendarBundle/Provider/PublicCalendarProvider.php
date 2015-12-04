@@ -121,4 +121,12 @@ class PublicCalendarProvider implements CalendarProviderInterface
 
         return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getExtraFieldEntityClass()
+    {
+        return 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    }
 }

@@ -96,7 +96,7 @@ class CalendarManager
      * @param \DateTime $start          A date/time specifies the begin of a time interval
      * @param \DateTime $end            A date/time specifies the end of a time interval
      * @param bool      $subordinate    Determines whether events from connected calendars should be included or not
-     * @param array     $extraFields
+     * @param array     $extraFields    [entityClass => [extraField1, extraField2 ...], ...]
      *
      * @return array
      */
@@ -119,6 +119,12 @@ class CalendarManager
 
         foreach ($this->providers as $alias => $provider) {
             $connections = [];
+            $providerExtraFields = [];
+            if (isset($extraFields[$provider->getExtraFieldEntityClass()]) &&
+                is_array($extraFields[$provider->getExtraFieldEntityClass()])
+            ) {
+                $providerExtraFields = $extraFields[$provider->getExtraFieldEntityClass()];
+            }
             foreach ($allConnections as $c) {
                 if ($c['calendarAlias'] === $alias) {
                     $connections[$c['calendar']] = $c['visible'];
@@ -131,7 +137,7 @@ class CalendarManager
                 $start,
                 $end,
                 $connections,
-                $extraFields
+                $providerExtraFields
             );
             if (!empty($events)) {
                 foreach ($events as &$event) {

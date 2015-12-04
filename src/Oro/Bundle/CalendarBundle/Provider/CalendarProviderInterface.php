@@ -54,4 +54,11 @@ interface CalendarProviderInterface
      *                  reminders - the list of attached reminders. defaults to empty
      */
     public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraField);
+
+    /**
+     * Returns the class name of an entity for which the additional fields can be selected.
+     *
+     * @return string
+     */
+    public function getExtraFieldEntityClass();
 }

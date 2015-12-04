@@ -145,4 +145,12 @@ class SystemCalendarProvider implements CalendarProviderInterface
             $qb->getQuery()
         );
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getExtraFieldEntityClass()
+    {
+        return 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    }
 }
