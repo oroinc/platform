@@ -7,11 +7,8 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
-class UserCalendarProvider implements CalendarProviderInterface
+class UserCalendarProvider extends AbstractCalendarProvider
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
@@ -28,7 +25,7 @@ class UserCalendarProvider implements CalendarProviderInterface
         EntityNameResolver $entityNameResolver,
         AbstractCalendarEventNormalizer $calendarEventNormalizer
     ) {
-        $this->doctrineHelper          = $doctrineHelper;
+        parent::__construct($doctrineHelper);
         $this->entityNameResolver      = $entityNameResolver;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
     }
@@ -86,6 +83,7 @@ class UserCalendarProvider implements CalendarProviderInterface
     ) {
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $extraFields = array_intersect($extraFields, $this->getSupportedFields('Oro\Bundle\CalendarBundle\Entity\CalendarEvent'));
         $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
 
         $visibleIds = [];
@@ -119,13 +117,5 @@ class UserCalendarProvider implements CalendarProviderInterface
         }
 
         return $name;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getExtraFieldEntityClass()
-    {
-        return 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
     }
 }

@@ -104,11 +104,10 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function cgetAction()
     {
-        $calendarId  = (int)$this->getRequest()->get('calendar');
-        $subordinate = (true == $this->getRequest()->get('subordinate'));
-        $class = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
-        $extendFields = $this->getExtendFieldNames($class);
-        $qb = null;
+        $calendarId   = (int)$this->getRequest()->get('calendar');
+        $subordinate  = (true == $this->getRequest()->get('subordinate'));
+        $extendFields = $this->getExtendFieldNames('Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+        $qb           = null;
         if ($this->getRequest()->get('start') && $this->getRequest()->get('end')) {
             $result = $this->get('oro_calendar.calendar_manager')->getCalendarEvents(
                 $this->get('oro_security.security_facade')->getOrganization()->getId(),
@@ -117,7 +116,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
                 new \DateTime($this->getRequest()->get('start')),
                 new \DateTime($this->getRequest()->get('end')),
                 $subordinate,
-                [$class => $extendFields]
+                $extendFields
             );
         } elseif ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
             $dateParamFilter  = new HttpDateTimeParameterFilter();
@@ -390,11 +389,11 @@ class CalendarEventController extends RestController implements ClassResourceInt
     {
         $configProvider = $this->get('oro_entity_config.provider.extend');
         $configs        = $configProvider->filter(
-             function (ConfigInterface $extendConfig) {
+            function (ConfigInterface $extendConfig) {
                 return
                     $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM) &&
                     ExtendHelper::isFieldAccessible($extendConfig) &&
-                    !$extendConfig->has('target_entity')&&
+                    !$extendConfig->has('target_entity') &&
                     !$extendConfig->is('is_serialized');
             },
             $class
