@@ -7,14 +7,6 @@
             fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]'
         }
     } %}
-    {% set aggregatedFieldConditionOptions = {
-        fieldChoice: {
-            select2: {
-                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
-            },
-            fieldsLoaderSelector: '#' ~ params.entity_choice_id ~ 'oro_api_querydesigner_aggregated_fields',
-        }
-    } %}
     {% set segmentConditionOptions = {
         segmentChoice: {
             select2: {
@@ -33,7 +25,7 @@
         criteriaListSelector: '#' ~ params.criteria_list_id,
         entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
         onFieldsUpdate: {
-            toggleCriteria: ['condition-item', 'condition-segment', 'conditions-group', 'aggregated-condition-item']
+            toggleCriteria: ['condition-item', 'condition-segment', 'conditions-group']
         }
     } %}
     {% set conditionBuilderOptions = update_segment_condition_builder_options(conditionBuilderOptions) %}
@@ -48,12 +40,6 @@
                         data-widget="fieldCondition"
                         data-options="{{ fieldConditionOptions|json_encode }}">
                         {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
-                    </li>
-                    <li class="option" data-criteria="aggregated-condition-item"
-                        data-module="oroquerydesigner/js/aggregated-field-condition"
-                        data-widget="aggregatedFieldCondition"
-                        data-options="{{ aggregatedFieldConditionOptions|json_encode }}">
-                        {{ 'oro.query_designer.condition_builder.criteria.aggregated_field_condition'|trans }}
                     </li>
                     <li class="option" data-criteria="condition-segment"
                         data-module="orosegment/js/segment-condition"
@@ -162,22 +148,11 @@
             itemContainer: '#' ~ type ~ '-column-list .item-container',
             itemTemplate:  '#' ~ type ~ '-column-row'
         },
-        aggregatedFieldsLoader: {
-            entityChoice:      '[data-ftid=' ~ type ~ '_form_entity]',
-            loadingMaskParent: '#' ~ form.vars.id,
-            router:            'oro_api_querydesigner_aggregated_fields',
-            routingParams:     entityFieldsRouteParams,
-            fieldsData:        fieldsData,
-            confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
-        },
         columnFieldChoiceOptions:     {},
         select2FieldChoiceTemplate:   '#column-chain-template',
         select2SegmentChoiceTemplate: '#segment-template',
         entities:                     entities,
-        metadata:                     metadata,
-        extensions: [
-            'orosegment/js/app/components/aggregated-field-condition-extension',
-        ],
+        metadata:                     metadata
     } %}
 
     {% if type == 'oro_report' %}
@@ -195,7 +170,7 @@
         {% set widgetOptions = widgetOptions|merge({'columnFieldChoiceOptions': {exclude: ['relation_type']} }) %}
     {% endif %}
 
-    {% set widgetOptions = update_segment_widget_options(widgetOptions) %}
+    {% set widgetOptions = update_segment_widget_options(widgetOptions, type) %}
 
     <div data-page-component-module="orosegment/js/app/components/segment-component"
          data-page-component-options="{{ widgetOptions|json_encode }}"></div>
