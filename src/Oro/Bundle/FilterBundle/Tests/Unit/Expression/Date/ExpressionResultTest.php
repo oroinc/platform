@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 
 class ExpressionResultTest extends \PHPUnit_Framework_TestCase
 {
@@ -381,6 +382,32 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
                 date_create('first day of january '.date('Y'))->modify(' +3  days')
             ],
         ];
+    }
+
+    public function testMonthsVariables()
+    {
+        $token = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Token')
+            ->disableOriginalConstructor()
+            ->setMethods(array('is', 'getValue', '__toString'))
+            ->getMock();
+        $token
+            ->expects($this->any())
+            ->method('is')
+            ->will($this->returnValue(Token::TYPE_VARIABLE));
+        $token
+            ->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue(DateModifierProvider::VAR_MARCH));
+        $token
+            ->expects($this->any())
+            ->method('__toString')
+            ->will($this->returnValue('march'));
+
+        $expression = new ExpressionResult($token);
+        $result = $expression->getValue();
+
+        $this->assertNotNull($result);
+        $this->assertEquals('march', strtolower($result->format('F')));
     }
 
     /**
