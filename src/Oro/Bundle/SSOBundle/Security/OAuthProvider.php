@@ -112,7 +112,6 @@ class OAuthProvider extends HWIOAuthProvider
     {
         return
             $token instanceof OAuthToken
-            && $this->resourceOwnerMap->hasResourceOwnerByName($token->getResourceOwnerName())
-            ;
+            && $this->resourceOwnerMap->hasResourceOwnerByName($token->getResourceOwnerName());
     }
 }
