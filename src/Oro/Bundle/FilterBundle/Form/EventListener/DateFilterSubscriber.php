@@ -64,6 +64,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
         $children = array_keys($form->get('value')->all());
         if (isset($data['part']) && isset($data['type'])) {
             $this->modifyDateForEqualType($data);
+            $this->modifyPartByVariable($data);
         }
         // compile expressions
         $this->mapValues(
@@ -215,6 +216,43 @@ class DateFilterSubscriber implements EventSubscriberInterface
                             $data['value']['start'] = $data['value']['end'];
                             $data['value']['end'] = $clonedDate->endOfDay()->format('Y-m-d H:i');
                         }
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Doesn't matter which part user was selected. This variables should contain own certain part.
+     * To support this approach see that now grid doesn't contain 'part' select box and backend must
+     * change 'part' dynamically
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @param array $data
+     */
+    protected function modifyPartByVariable(&$data)
+    {
+        foreach ($data['value'] as $field) {
+            if ($field) {
+                $result = $this->expressionCompiler->compile($field, true);
+                switch ($result->getVariableType()) {
+                    case DateModifierInterface::VAR_THIS_DAY_W_Y:
+                        $data['part']=DateModifierInterface::PART_VALUE;
+                        break;
+                    case DateModifierInterface::VAR_THIS_MONTH:
+                    case DateModifierInterface::VAR_JANUARY:
+                    case DateModifierInterface::VAR_FEBRUARY:
+                    case DateModifierInterface::VAR_MARCH:
+                    case DateModifierInterface::VAR_APRIL:
+                    case DateModifierInterface::VAR_MAY:
+                    case DateModifierInterface::VAR_JUNE:
+                    case DateModifierInterface::VAR_JULY:
+                    case DateModifierInterface::VAR_AUGUST:
+                    case DateModifierInterface::VAR_SEPTEMBER:
+                    case DateModifierInterface::VAR_OCTOBER:
+                    case DateModifierInterface::VAR_NOVEMBER:
+                    case DateModifierInterface::VAR_DECEMBER:
+                        $data['part']=DateModifierInterface::PART_MONTH;
                         break;
                 }
             }
