@@ -61,13 +61,27 @@ define(function(require) {
         className: 'tags-select-editor',
         DEFAULT_PER_PAGE: 20,
 
+        initialize: function(options) {
+            TagsEditorView.__super__.initialize.apply(this, arguments);
+            this.canCreate = options.canCreate;
+            this.canEditGlobal = options.canEditGlobal;
+        },
+
         getInitialResultItem: function() {
+            var _this = this;
             return this.getModelValue().map(function(item) {
-                return {
+                return _this.applyPermissionsToTag({
                     id: item.id,
-                    label: item.name
-                };
+                    label: item.name,
+                    owner: item.owner
+                });
             });
+        },
+
+        applyPermissionsToTag: function(tag) {
+            var isOwner = tag.owner === void 0 ? true : tag.owner;
+            tag.locked = this.canEditGlobal ? false : !isOwner;
+            return tag;
         },
 
         getSelect2Options: function() {
@@ -135,10 +149,11 @@ define(function(require) {
                 data.results = this.filterTermFromResults(this.currentTerm, data.results);
                 if (this.currentPage === 1) {
                     if (this.isValidTerm(this.currentTerm)) {
-                        data.results.unshift({
+                        data.results.unshift(this.applyPermissionsToTag({
                             id: this.currentTerm,
-                            label: this.currentTerm
-                        });
+                            label: this.currentTerm,
+                            owner: true
+                        }));
                     } else {
                         if (this.firstPageData.isDummy) {
                             // do not update list until choices will be loaded
@@ -216,7 +231,8 @@ define(function(require) {
             data[this.fieldName] = select2Data.map(function(item) {
                 return {
                     id: item.id,
-                    name: item.label
+                    name: item.label,
+                    owner: item.owner === void 0 ? true : item.owner
                 };
             });
             return data;
