@@ -138,16 +138,22 @@
       width: calc(~"100% - 61px")
     }
   }
-  &.tags-select-editor {
+  &.tags-column-editor {
     width: auto!important; // ignore cell width
+    .select2-choices {
+      max-width: 20vw;
+    }
+    .select2-container {
+      width: auto !important;
+    }
+  }
+  &.tags-select-editor {
     min-width: 100px; // ignore min-width
     .select2-container {
       height: auto;
-      width: auto !important;
     }
     .select2-choices {
       max-height: 40vh;
-      max-width: 20vw;
       min-width: 130px;
       overflow: auto;
       .select2-search-choice {
