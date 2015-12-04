@@ -64,8 +64,7 @@ define(function(require) {
 
         initialize: function(options) {
             TagsEditorView.__super__.initialize.apply(this, arguments);
-            this.canCreate = options.canCreate;
-            this.canEditGlobal = options.canEditGlobal;
+            this.permissions = options.permissions || {};
         },
 
         getInitialResultItem: function() {
@@ -81,7 +80,7 @@ define(function(require) {
 
         applyPermissionsToTag: function(tag) {
             var isOwner = tag.owner === void 0 ? true : tag.owner;
-            tag.locked = this.canEditGlobal ? false : !isOwner;
+            tag.locked = this.permissions.oro_tag_unassign_global ? false : !isOwner;
             return tag;
         },
 
@@ -175,7 +174,7 @@ define(function(require) {
                 data = $.extend({}, this.firstPageData);
                 data.results = this.filterTermFromResults(this.currentTerm, data.results);
                 if (this.currentPage === 1) {
-                    if (this.canCreate && this.isValidTerm(this.currentTerm)) {
+                    if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
                         if (this.firstPageData.term === this.currentTerm) {
                             data.results.unshift({
                                 id: this.currentTerm,

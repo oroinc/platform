@@ -94,8 +94,10 @@ class TagsExtension extends AbstractExtension
                             'editor'         => [
                                 'view'           => 'orotag/js/app/views/editor/tags-editor-view',
                                 'view_options' => [
-                                    'canCreate' => $this->securityFacade->isGranted('oro_tag_create'),
-                                    'canEditGlobal' => $this->securityFacade->isGranted('oro_tag_unassign_global')
+                                    'permissions' => [
+                                        'oro_tag_create' => $this->securityFacade->isGranted('oro_tag_create'),
+                                        'oro_tag_unassign_global' => $this->securityFacade->isGranted('oro_tag_unassign_global')
+                                    ]
                                 ]
                             ],
                             'save_api_accessor' => [
