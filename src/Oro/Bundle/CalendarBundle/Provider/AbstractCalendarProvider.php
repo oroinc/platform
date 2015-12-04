@@ -26,4 +26,20 @@ abstract class AbstractCalendarProvider implements CalendarProviderInterface
 
         return $classMetadata->fieldNames;
     }
+
+    /**
+     * @param        $extraFields
+     *
+     * @param string $class
+     *
+     * @return array
+     */
+    protected function filterSupportedFields($extraFields, $class)
+    {
+        $extraFields = !empty($extraFields)
+            ? array_intersect($extraFields, $this->getSupportedFields($class))
+            : [];
+
+        return $extraFields;
+    }
 }

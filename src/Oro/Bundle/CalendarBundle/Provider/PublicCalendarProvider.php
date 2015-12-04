@@ -57,7 +57,7 @@ class PublicCalendarProvider extends AbstractCalendarProvider
 
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
-        $qb = $repo->getPublicCalendarsQueryBuilder();
+        $qb   = $repo->getPublicCalendarsQueryBuilder();
         /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
 
@@ -97,12 +97,9 @@ class PublicCalendarProvider extends AbstractCalendarProvider
         }
 
         /** @var CalendarEventRepository $repo */
-        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $extraFields = array_intersect(
-            $extraFields,
-            $this->getSupportedFields('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
-        );
-        $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder(
+        $repo         = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $extraFields  = $this->filterSupportedFields($extraFields, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+        $qb           = $repo->getPublicEventListByTimeIntervalQueryBuilder(
             $start,
             $end,
             [],

@@ -36,9 +36,9 @@ class UserCalendarProvider extends AbstractCalendarProvider
     public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
         if (empty($calendarIds)) {
-            return array();
+            return [];
         }
-        
+
         $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar')
             ->createQueryBuilder('o')
             ->select('o, owner')
@@ -82,12 +82,9 @@ class UserCalendarProvider extends AbstractCalendarProvider
         $extraFields = []
     ) {
         /** @var CalendarEventRepository $repo */
-        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $extraFields = array_intersect(
-            $extraFields,
-            $this->getSupportedFields('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
-        );
-        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
+        $repo        = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $extraFields = $this->filterSupportedFields($extraFields, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+        $qb          = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
 
         $visibleIds = [];
         foreach ($connections as $id => $visible) {

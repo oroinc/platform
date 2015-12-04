@@ -171,7 +171,11 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $code   = Codes::HTTP_NOT_FOUND;
         if ($entity) {
             $result = $this->get('oro_calendar.calendar_event_normalizer.user')
-                ->getCalendarEvent($entity);
+                ->getCalendarEvent(
+                    $entity,
+                    null,
+                    $this->getExtendFieldNames('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
+                );
             $code   = Codes::HTTP_OK;
         }
 
