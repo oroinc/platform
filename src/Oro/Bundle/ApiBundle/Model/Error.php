@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Model;
 
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Represents an error happened during the processing of an action.
@@ -107,6 +108,21 @@ class Error
         }
         if (null === $this->detail) {
             $this->detail = $exception->getMessage();
+        }
+    }
+
+    /**
+     * Translates all attributes that are represented by the Label object.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function trans(TranslatorInterface $translator)
+    {
+        if ($this->title instanceof Label) {
+            $this->title = $this->title->trans($translator);
+        }
+        if ($this->detail instanceof Label) {
+            $this->detail = $this->detail->trans($translator);
         }
     }
 }

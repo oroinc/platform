@@ -160,6 +160,13 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, priority: -10 }
 
+    oro_api.get.normalize_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
+        arguments:
+            - @translator
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, priority: -10 }
+
     oro_api.get.json_api.build_json_api_document:
         class: Oro\Bundle\ApiBundle\Processor\Get\JsonApi\BuildJsonApiDocument
         arguments:
@@ -167,10 +174,10 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: json_api, priority: -20 }
 
-    oro_api.get.rest.process_errors:
+    oro_api.get.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
         tags:
-            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, priority: -100 }
+            - { name: oro.api.processor, action: get, group: normalize_result, priority: -100 }
 
     oro_api.get.json_api.validate_result_schema:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
