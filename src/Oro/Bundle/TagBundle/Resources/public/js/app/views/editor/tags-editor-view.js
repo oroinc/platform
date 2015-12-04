@@ -92,6 +92,7 @@ define(function(require) {
                 more: false,
                 isDummy: true
             };
+            this.isSelect2Initialized = true;
             return {
                 placeholder: this.placeholder || ' ',
                 allowClear: true,
@@ -238,15 +239,25 @@ define(function(require) {
         },
 
         isChanged: function() {
-            return this.getValue() !== this.getModelValue().map(function(item) {
-                return item.id;
-            }).join(',');
+            if (!this.isSelect2Initialized) {
+                return false;
+            }
+            var stringValue = _.toArray(this.getValue().sort().map(function(item) {
+                return item.label;
+            })).join('☕');
+            var stringModelValue = _.toArray(this.getModelValue().sort().map(function(item) {
+                return item.name;
+            })).join('☕');
+            return stringValue !== stringModelValue;
+        },
+
+        getValue: function() {
+            return this.$('.select2-container').select2('data');
         },
 
         getServerUpdateData: function() {
             var data = {};
-            var select2Data = this.$('.select2-container').select2('data');
-            data[this.fieldName] = select2Data.map(function(item) {
+            data[this.fieldName] = this.getValue().map(function(item) {
                 return {
                     name: item.label
                 };
@@ -256,8 +267,7 @@ define(function(require) {
 
         getModelUpdateData: function() {
             var data = {};
-            var select2Data = this.$('.select2-container').select2('data');
-            data[this.fieldName] = select2Data.map(function(item) {
+            data[this.fieldName] = this.getValue().map(function(item) {
                 return {
                     id: item.id,
                     name: item.label,
