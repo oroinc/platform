@@ -176,3 +176,8 @@ services:
             - @oro_tag.tag.manager
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlush }
+
+    oro_tag.formatter.tags_formatter:
+        class: Oro\Bundle\TagBundle\Formatter\TagsTypeFormatter
+        tags:
+            - { name: oro_importexport.formatter.formatter, data_type: tags, format_type: excel }
