@@ -55,8 +55,9 @@ class ReplaceStrategy implements StrategyInterface
         $entityData    = $fieldData->getEntityData();
         $masterEntity  = $entityData->getMasterEntity();
         $sourceEntity  = $fieldData->getSourceEntity();
+        $fieldMetadata = $fieldData->getMetadata();
 
-        $activityClass = 'OroCRM\Bundle\CallBundle\Entity\Call';
+        $activityClass = $fieldMetadata->get('type');
 
         $activityListItems = $this->getActivityListByEntity($masterEntity, $activityClass);
         foreach ($activityListItems as $activityListItem) {
@@ -73,6 +74,11 @@ class ReplaceStrategy implements StrategyInterface
         }
     }
 
+    /**
+     * @param $entity
+     * @param $activityClass
+     * @return mixed
+     */
     protected function getActivityListByEntity($entity, $activityClass)
     {
         $entityClass = get_class($entity);

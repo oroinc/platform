@@ -37,8 +37,9 @@ class MergeActivitiesStep implements DependentMergeStepInterface
      */
     public function run(EntityData $data)
     {
-        foreach ($data->getFields() as $name => $field) {
-            if ($name == 'tags') {
+        foreach ($data->getFields() as $field) {
+            $fieldMetadata = $field->getMetadata();
+            if ($fieldMetadata->has('activity') && $fieldMetadata->get('activity') === true) {
                 $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE_ACTIVITY, new FieldDataEvent($field));
                 $this->strategy->merge($field);
                 $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE_ACTIVITY, new FieldDataEvent($field));

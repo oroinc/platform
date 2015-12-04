@@ -55,9 +55,10 @@ class UniteStrategy implements StrategyInterface
         $entityData    = $fieldData->getEntityData();
         $masterEntity  = $entityData->getMasterEntity();
         $sourceEntity  = $fieldData->getSourceEntity();
+        $fieldMetadata = $fieldData->getMetadata();
 
         $entityClass = get_class($sourceEntity);
-        $activityClass = 'OroCRM\Bundle\CallBundle\Entity\Call';
+        $activityClass = $fieldMetadata->get('type');
         $queryBuilder = $this->doctrineHelper
             ->getEntityRepository(ActivityList::ENTITY_NAME)
             ->getBaseActivityListQueryBuilder($entityClass, $sourceEntity->getId())
