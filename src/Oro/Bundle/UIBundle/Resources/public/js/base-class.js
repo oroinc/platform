@@ -20,6 +20,9 @@ define(function(require) {
      */
     function BaseClass(options) {
         this.cid = _.uniqueId('class');
+        if (!options) {
+            options = {};
+        }
         this.initialize(options);
         if (options.listen) {
             this.on(options.listen);

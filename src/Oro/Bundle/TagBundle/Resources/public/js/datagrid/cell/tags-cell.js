@@ -30,7 +30,7 @@ define([
         /**
          * @property {string}
          */
-        className: 'tags-cell',
+        className: 'tags-cell tags-container',
 
         /**
          * @inheritDoc
@@ -46,7 +46,7 @@ define([
 
             if (_.isArray(value) && value.length) {
                 html = value.map(function(v) {
-                    return '<span class="tags-item">' + v.text + '</span> ';
+                    return '<span class="tags-container__tag-entry">' + v.name + '</span> ';
                 });
             } else {
                 html = 'N/A';

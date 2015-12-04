@@ -5,3 +5,4 @@ config:
         'orotag/js/update-view': 'bundles/orotag/js/update-view.js'
         'orotag/js/view': 'bundles/orotag/js/view.js'
         'oro/select2-multi-autocomplete-component': 'bundles/orotag/js/components/select2-multi-autocomplete-component.js'
+        'oro/datagrid/cell/tags-cell': 'bundles/orotag/js/datagrid/cell/tags-cell.js'

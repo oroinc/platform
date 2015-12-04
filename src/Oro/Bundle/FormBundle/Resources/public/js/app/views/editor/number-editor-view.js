@@ -41,8 +41,8 @@ define(function(require) {
      * @class
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
-     * @param {Backgrid.Cell} options.cell - Current datagrid cell
-     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.fieldName - Field name to edit in model
+     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder for an empty element
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      *
@@ -84,7 +84,7 @@ define(function(require) {
         },
 
         getModelValue: function() {
-            var raw = this.model.get(this.column.get('name'));
+            var raw = this.model.get(this.fieldName);
             return parseFloat(raw);
         },
 
@@ -97,13 +97,13 @@ define(function(require) {
 
         getServerUpdateData: function() {
             var data = {};
-            data[this.column.get('name')] = isNaN(this.getValue()) ? null : this.getValue();
+            data[this.fieldName] = isNaN(this.getValue()) ? null : this.getValue();
             return data;
         },
 
         getModelUpdateData: function() {
             var data = {};
-            data[this.column.get('name')] = isNaN(this.getValue()) ? this.UNSET_FIELD_VALUE : this.getValue();
+            data[this.fieldName] = isNaN(this.getValue()) ? this.UNSET_FIELD_VALUE : this.getValue();
             return data;
         }
     });

@@ -2,11 +2,29 @@
     {% set tagCloudElId = 'tags-' ~ random() %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div class="tags-view-form-container" {{ UI.renderPageComponentAttributes({
-        'module': 'oroui/js/app/components/view-component',
-        'options': {
-            'view': 'orotag/js/app/views/viewer/tags-view',
-            'items': oro_tag_get_list(entity),
-            autoRender: true
+        'module': 'oroform/js/app/components/inline-editable-view-component',
+        options: {
+            'frontend_type': 'tags',
+            value: oro_tag_get_list(entity),
+            fieldName: 'tags',
+            metadata: {
+                inline_editing: {
+                    enable: true,
+                    save_api_accessor: {
+                        route: 'oro_api_post_taggable',
+                        http_method: 'POST',
+                        default_route_parameters: {
+                            entity: oro_class_name(entity, true),
+                            entityId: entity.id
+                        }
+                    },
+                    autocomplete_api_accessor: {
+                        class: 'oroui/js/tools/search-api-accessor',
+                        search_handler_name: 'tags',
+                        label_field_name: 'name'
+                    }
+                }
+            }
         }
     }) }}></div>
 {% endmacro %}
