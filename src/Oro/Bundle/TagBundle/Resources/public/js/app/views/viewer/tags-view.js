@@ -24,7 +24,7 @@ define(function(require) {
             };
         },
         tagSortCallback: function(a, b) {
-            return (b.owner ? 1 : 0) - (a.owner ? 1 : 0);
+            return (a.owner ? 1 : 0) - (b.owner ? 1 : 0);
         }
     });
 
