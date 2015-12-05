@@ -35,8 +35,8 @@ datagrid:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   0: Inactive
-                   1: Active
+                   - Inactive
+                   - Active
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
@@ -658,107 +658,6 @@ datagrid:
                     data_name: u.enabled
             default:
                 username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
-
-        filters:
-            columns:
-                firstName:
-                    type: string
-                    data_name: u.firstName
-                lastName:
-                    type: string
-                    data_name: u.lastName
-                email:
-                    type: string
-                    data_name: u.email
-                username:
-                    type: string
-                    data_name: u.username
-                enabled:
-                    type: choice
-                    data_name: u.enabled
-                    options:
-                        field_options:
-                            choices:
-                                'false': Inactive
-                                'true':  Active
-
-    share-with-users-datagrid:
-        extended_entity_name: %oro_user.entity.class%
-        options:
-            entityHint: user
-            entity_pagination: true
-            toolbarOptions:
-                pageSize:
-                    default_per_page: 10
-            routerEnabled: false
-
-        source:
-            acl_resource: oro_user_user_view
-            type: orm
-            query:
-                select:
-                    - u.id
-                    - u.firstName
-                    - u.lastName
-                    - u.email
-                    - u.username
-                    - u.enabled
-                    - bu.name as businessUnit
-                    - organizationOwner.name as organization
-                from:
-                    - { table: %oro_user.entity.class%, alias: u }
-                join:
-                    left:
-                        - { join: u.owner, alias: bu }
-                        - { join: u.organization, alias: organizationOwner }
-
-                where:
-                    and:
-                        - u.id != @oro_security.security_facade->getLoggedUserId
-        columns:
-            firstName:
-                label:         oro.user.first_name.label
-            lastName:
-                label:         oro.user.last_name.label
-            email:
-                label:         oro.user.email.label
-            username:
-                label:         oro.user.username.label
-            enabled:
-                label:         oro.user.enabled.label
-                frontend_type: select
-                choices:
-                   - Inactive
-                   - Active
-            businessUnit:
-                label:         oro.user.business_unit.label
-            organization:
-                label:         oro.user.organization.label
-        properties:
-            id: ~
-            entity:
-                type: twig
-                frontend_type: html
-                template: OroUserBundle:Share:Property/entity.html.twig
-                data_name: u
-        sorters:
-            columns:
-                firstName:
-                    data_name: u.firstName
-                lastName:
-                    data_name: u.lastName
-                email:
-                    data_name: u.email
-                username:
-                    data_name: u.username
-                enabled:
-                    data_name: u.enabled
-                businessUnit:
-                    data_name: bu.name
-                organization:
-                    data_name: organizationOwner.name
-            default:
-                enabled: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         filters:
             columns:

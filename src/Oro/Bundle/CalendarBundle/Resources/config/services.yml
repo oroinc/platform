@@ -62,6 +62,14 @@ services:
             - %oro_calendar.calendar_event.entity.class%
             - @doctrine.orm.entity_manager
 
+    oro_calendar.calendar_event_guest.manager.api:
+        class: Oro\Bundle\CalendarBundle\Manager\CalendarEventGuestApiEntityManager
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_calendar.calendar_event.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_entity.entity_name_resolver
+
     oro_calendar.calendar_property.manager.api:
         class: %oro_calendar.calendar_property.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
@@ -245,3 +253,4 @@ services:
         class: %oro_calendar.system_calendar_event.datagrid_helper.class%
         arguments:
             - @oro_security.security_facade
+
