@@ -60,8 +60,6 @@ class UserCalendarProvider implements CalendarProviderInterface
             // prohibit to remove the current calendar from the list of connected calendars
             if ($calendar->getId() === $calendarId) {
                 $resultItem['removable'] = false;
-            }
-            if ($calendarId === $calendar->getId()) {
                 $resultItem['canAddEvent']    = true;
                 $resultItem['canEditEvent']   = true;
                 $resultItem['canDeleteEvent'] = true;
