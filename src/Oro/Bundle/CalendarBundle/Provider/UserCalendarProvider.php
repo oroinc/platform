@@ -92,7 +92,7 @@ class UserCalendarProvider implements CalendarProviderInterface
                 $visibleIds[] = $id;
             }
         }
-        if (!empty($visibleIds)) {
+        if ($visibleIds) {
             $qb
                 ->andWhere('c.id IN (:visibleIds)')
                 ->setParameter('visibleIds', $visibleIds);
@@ -111,11 +111,6 @@ class UserCalendarProvider implements CalendarProviderInterface
      */
     protected function buildCalendarName(Calendar $calendar)
     {
-        $name = $calendar->getName();
-        if (!$name) {
-            $name = $this->entityNameResolver->getName($calendar->getOwner());
-        }
-
-        return $name;
+        return $calendar->getName() ?: $this->entityNameResolver->getName($calendar->getOwner());
     }
 }
