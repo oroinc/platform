@@ -22,7 +22,6 @@ datagrid:
 
         inline_editing:
             enable: true
-            entity_name: %oro_user.entity.class%
         columns:
             firstName:
                 label:         oro.user.first_name.label

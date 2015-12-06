@@ -26,7 +26,8 @@ class FieldProperty extends AbstractProperty
      */
     protected function initialize()
     {
-        if ($this->getOr(self::FRONTEND_TYPE_KEY) === self::TYPE_SELECT) {
+        $type = $this->getOr(self::FRONTEND_TYPE_KEY);
+        if ($type === self::TYPE_SELECT || $type === self::TYPE_MULTI_SELECT) {
             $translator = $this->translator;
 
             $choices    = $this->getOr('choices', []);
@@ -48,6 +49,9 @@ class FieldProperty extends AbstractProperty
     {
         try {
             $value = $record->getValue($this->getOr(self::DATA_NAME_KEY) ?: $this->get(self::NAME_KEY));
+            if ($this->getOr(self::FRONTEND_TYPE_KEY) === self::TYPE_MULTI_SELECT) {
+                $value = explode(',', $value);
+            }
         } catch (\LogicException $e) {
             // default value
             $value = null;
