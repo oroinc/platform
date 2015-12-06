@@ -48,16 +48,11 @@ class PublicCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
-        $result = [];
-
         if (!$this->calendarConfig->isPublicCalendarEnabled()) {
-            foreach ($calendarIds as $id) {
-                $result[$id] = null;
-            }
-
-            return $result;
+            return array_fill_keys($calendarIds, null);
         }
 
+        $result = [];
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
         $qb = $repo->getPublicCalendarsQueryBuilder();
