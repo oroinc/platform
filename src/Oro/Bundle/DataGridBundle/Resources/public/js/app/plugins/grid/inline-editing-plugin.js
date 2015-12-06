@@ -576,7 +576,7 @@ define(function(require) {
                     var routeParametersRenameMap
                         = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
                     for (var i in routeParametersRenameMap) {
-                        if (typeof response[routeParametersRenameMap[i]] !== "undefined") {
+                        if (typeof response[routeParametersRenameMap[i]] !== 'undefined') {
                             this.cell.model.set(i, response[routeParametersRenameMap[i]]);
                         }
                     }
