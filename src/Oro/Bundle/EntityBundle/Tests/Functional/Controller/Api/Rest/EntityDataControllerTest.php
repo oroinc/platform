@@ -77,8 +77,7 @@ class EntityDataControllerTest extends WebTestCase
      */
     public function setDataProvider()
     {
-        $dt = new \DateTime('2000-05-05 01:05:05');
-        $zone = $dt->getTimezone();
+        $zone = new \DateTimeZone('UTC');
 
         return [
             'id blocked' => [
@@ -119,14 +118,14 @@ class EntityDataControllerTest extends WebTestCase
             'date' => [
                 'Oro\Bundle\UserBundle\Entity\User',
                 'birthday',
-                '2000-05-05',
+                '2000-05-05T00:00:00+0000',
                 new \DateTime('2000-05-05', $zone),
                 Codes::HTTP_NO_CONTENT
             ],
             'datetime' => [
                 'Oro\Bundle\UserBundle\Entity\User',
                 'lastLogin',
-                '2000-05-05 01:05:05',
+                '2000-05-05T01:05:05+0000',
                 new \DateTime('2000-05-05 01:05:05', $zone),
                 Codes::HTTP_NO_CONTENT
             ],
