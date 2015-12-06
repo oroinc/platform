@@ -243,11 +243,7 @@ class Group
     public function setRoles($roles)
     {
         if ($roles instanceof Collection) {
-            $this->roles->clear();
-
-            foreach ($roles as $role) {
-                $this->addRole($role);
-            }
+            $this->roles = new ArrayCollection($roles->toArray());
         } elseif (is_array($roles)) {
             $this->roles = new ArrayCollection($roles);
         } else {
