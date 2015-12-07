@@ -1,5 +1,5 @@
 <a name="module_TagsEditorView"></a>
-## TagsEditorView ⇐ <code>[AbstractRelationEditorView](./abstract-relation-editor-view.md)</code>
+## TagsEditorView ⇐ <code>[AbstractRelationEditorView]</code>
 Tags-select content editor. Please note that it requires column data format
 corresponding to tags-cell.
 
@@ -36,7 +36,7 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 
 ### Constructor parameters
 
-**Extends:** <code>[AbstractRelationEditorView](./abstract-relation-editor-view.md)</code>  
+**Extends:** <code>[AbstractRelationEditorView]</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |

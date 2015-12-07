@@ -4,7 +4,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     /**
-     * Tags view, able to handle plain array of `tags`.
+     * Tags view, able to handle tags array in model.
      *
      * Usage sample:
      * ```javascript
@@ -16,7 +16,7 @@ define(function(require) {
      *             // ...
      *         ]
      *     }),
-     *     fieldName: 'tags' // should match model tags field name,
+     *     fieldName: 'tags', // should match tags field name in model
      *     autoRender: true
      * });
      * ```
