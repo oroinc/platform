@@ -2,12 +2,24 @@
 
 namespace Oro\Bundle\TagBundle\Provider;
 
+use Doctrine\ORM\Query\Expr\Join;
+
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
 class TagVirtualFieldProvider implements VirtualFieldProviderInterface
 {
-    const TAG_FIELD_NAME = 'name';
+    const TAG_FIELD = 'tag_field';
+
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
+    /** @param TaggableHelper $helper */
+    public function __construct(TaggableHelper $helper)
+    {
+        $this->taggableHelper = $helper;
+    }
 
     /**
      * {@inheritdoc}
@@ -15,8 +27,8 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
     public function isVirtualField($className, $fieldName)
     {
         return
-            $className === 'Oro\Bundle\TagBundle\Entity\Tag' &&
-            $fieldName === self::TAG_FIELD_NAME;
+            $this->taggableHelper->isTaggable($className) &&
+            $fieldName === self::TAG_FIELD;
     }
 
     /**
@@ -26,10 +38,29 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
     {
         return [
             'select' => [
-                'expr'                => 'entity.name',
-                'label'               => 'oro.tag.entity_label',
+                'expr'                => 'virtualTag.name',
+                'label'               => 'oro.tag.entity_plural_label',
                 'return_type'         => GroupingScope::GROUP_DICTIONARY,
-                'related_entity_name' => $className,
+                'related_entity_name' => 'Oro\Bundle\TagBundle\Entity\Tag',
+            ],
+            'join'   => [
+                'left' => [
+                    [
+                        'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
+                        'alias'         => 'virtualTagging',
+                        'conditionType' => Join::WITH,
+                        'condition'     => sprintf(
+                            "(virtualTagging.entityName = '%s' and virtualTagging.recordId = entity.id)",
+                            $className
+                        )
+                    ],
+                    [
+                        'join'          => 'Oro\Bundle\TagBundle\Entity\Tag',
+                        'alias'         => 'virtualTag',
+                        'conditionType' => Join::WITH,
+                        'condition'     => "virtualTagging.tag = virtualTag"
+                    ]
+                ]
             ]
         ];
     }
@@ -39,8 +70,8 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function getVirtualFields($className)
     {
-        if ($className === 'Oro\Bundle\TagBundle\Entity\Tag') {
-            return [self::TAG_FIELD_NAME];
+        if ($this->taggableHelper->isTaggable($className)) {
+            return [self::TAG_FIELD];
         }
 
         return [];

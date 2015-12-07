@@ -189,3 +189,8 @@ services:
         class: Oro\Bundle\TagBundle\Formatter\TagsTypeFormatter
         tags:
             - { name: oro_importexport.formatter.formatter, data_type: tags, format_type: excel }
+
+    oro_tag.grid.column_options_guesser:
+        class: Oro\Bundle\TagBundle\Grid\TagsColumnOptionsGuesser
+        tags:
+            - { name: oro_datagrid.column_options_guesser }
