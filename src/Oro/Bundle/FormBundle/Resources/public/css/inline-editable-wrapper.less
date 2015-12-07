@@ -16,17 +16,17 @@
   }
 }
 .inline-editable-wrapper {
-  &.save-success {
+  &.save-success .inline-editable-container{
     background: #F4FEE2;
   }
-  &.save-success {
+  &.save-success .inline-editable-container{
     background: #F4FEE2;
   }
-  &.save-fail {
+  &.save-fail .inline-editable-container{
     background: #FFEEEE;
   }
 
-  &.loading {
+  &.loading .inline-editable-container {
     background: #f5f5f5;
     :before {
       background: url('../../../../bundles/oroui/img/loader-16.gif') no-repeat center center rgba(245,245,245,0.7);
@@ -42,12 +42,16 @@
       display: none !important;
     }
   }
-  &:hover {
-    background: #f4efd4;
+  .inline-editable-container {
     position: relative;
-    outline: 2px #f4efd4 solid;
-    .inline-editable-wrapper__start-editing-button {
-      display: block !important;
+    display: inline-block;
+    padding-right: 30px;
+    &:hover {
+      background: #f4efd4;
+      outline: 2px #f4efd4 solid;
+      .inline-editable-wrapper__start-editing-button {
+        display: block !important;
+      }
     }
   }
 }
