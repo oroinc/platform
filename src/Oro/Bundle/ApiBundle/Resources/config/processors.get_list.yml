@@ -46,6 +46,16 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: 50 }
 
+    oro_api.get_list.normalize_include_parameter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludeParameter
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: 50 }
+
+    oro_api.get_list.normalize_fields_parameter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFieldsParameter
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: 50 }
+
     oro_api.get_list.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -58,29 +68,44 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -10 }
 
+    oro_api.get_list.register_filters:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\RegisterFilters
+        arguments:
+            - @oro.api.filter_factory
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: -50 }
+
+    oro_api.get_list.json_api.normalize_filter_keys:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\NormalizeFilterKeys
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -50 }
+
     oro_api.get_list.json_api.set_default_paging:
         class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultPaging
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -10 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -100 }
 
     oro_api.get_list.json_api.set_default_sorting:
         class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultSorting
         arguments:
             - @oro_api.doctrine_helper
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -10 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -100 }
 
-    oro_api.get_list.register_filters:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\RegisterFilters
+    oro_api.get_list.json_api.set_include_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetIncludeFilter
         arguments:
-            - @oro.api.filter_factory
+            - @oro_api.doctrine_helper
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, priority: -100 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -100 }
 
-    oro_api.get_list.json_api.normalize_filter_keys:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\NormalizeFilterKeys
+    oro_api.get_list.json_api.set_fields_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetFieldsFilter
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_api.json_api.entity_class_transformer
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -110 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -100 }
 
     #
     # security_check

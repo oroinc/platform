@@ -20,6 +20,7 @@ class GetListContext extends Context
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
         parent::__construct($configProvider, $metadataProvider);
+
         $this->setConfigExtras([new FiltersConfigExtra(), new SortersConfigExtra()]);
     }
 

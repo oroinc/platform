@@ -65,7 +65,6 @@ class ConfigUtil extends BaseConfigUtil
     {
         return
             isset($config[self::FIELDS])
-            || self::isExclude($config)
             || (
                 isset($config[self::EXCLUSION_POLICY])
                 && $config[self::EXCLUSION_POLICY] !== self::EXCLUSION_POLICY_ALL

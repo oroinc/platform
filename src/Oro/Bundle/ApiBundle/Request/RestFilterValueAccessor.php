@@ -48,6 +48,20 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
+     * Get all filters.
+     *
+     * @return null|FilterValue[]
+     */
+    public function getAll()
+    {
+        $this->ensureRequestParsed();
+
+        return !empty($this->parameters)
+            ? $this->parameters
+            : null;
+    }
+
+    /**
      * Makes sure the Request parsed
      */
     protected function ensureRequestParsed()

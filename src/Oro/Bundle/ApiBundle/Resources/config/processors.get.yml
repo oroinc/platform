@@ -10,7 +10,6 @@ services:
         tags:
             - { name: oro.api.action_processor }
 
-
     #
     # initialize
     #
@@ -47,6 +46,16 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 50 }
 
+    oro_api.get.normalize_include_parameter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludeParameter
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: 50 }
+
+    oro_api.get.normalize_fields_parameter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFieldsParameter
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: 50 }
+
     oro_api.get.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -58,6 +67,21 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultMaxRelatedEntities
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -10 }
+
+    oro_api.get.json_api.set_include_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetIncludeFilter
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -10 }
+
+    oro_api.get.json_api.set_fields_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetFieldsFilter
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_api.json_api.entity_class_transformer
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -10 }
 
     #
     # security_check
