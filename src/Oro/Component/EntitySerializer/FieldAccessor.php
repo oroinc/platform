@@ -98,13 +98,9 @@ class FieldAccessor
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $fields         = array_filter(
             $this->getFields($entityClass, $config),
-            function ($field) use ($entityMetadata, $config, $withAssociations) {
-                // skip metadata properties like '__class__' or '__discriminator__'
-                if ($this->isMetadataProperty($field)) {
-                    return false;
-                }
+            function ($field) use ($entityMetadata, $withAssociations) {
                 // skip virtual properties
-                if (isset($config[ConfigUtil::FIELDS][$field][ConfigUtil::PROPERTY_PATH])) {
+                if (!$entityMetadata->isField($field) && !$entityMetadata->isAssociation($field)) {
                     return false;
                 }
 

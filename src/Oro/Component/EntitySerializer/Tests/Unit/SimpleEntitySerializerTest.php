@@ -133,6 +133,51 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
+    public function testSimpleEntityWithComputedField()
+    {
+        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT g0_.id AS id_0, g0_.name AS name_1'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id = ?',
+            [
+                [
+                    'id_0'   => 1,
+                    'name_1' => 'test_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'           => null,
+                    'name'         => null,
+                    'computedName' => null,
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'           => 1,
+                    'name'         => 'test_name',
+                    'computedName' => 'test_name (COMPUTED)',
+                ]
+            ],
+            $result
+        );
+    }
+
     public function testSimpleEntityWithExclusionAndPartialLoadDisabled()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
