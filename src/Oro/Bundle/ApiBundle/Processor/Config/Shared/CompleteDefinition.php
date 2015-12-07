@@ -164,13 +164,7 @@ class CompleteDefinition implements ProcessorInterface
     ) {
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $fieldName => $mapping) {
-            if (array_key_exists($fieldName, $definition)
-                && (
-                    !is_array($definition[$fieldName])
-                    || ConfigUtil::isRelationInitialized($definition[$fieldName])
-                )
-            ) {
-                // already defined and initialized
+            if (!$this->isAssociationCompletionRequired($fieldName, $definition)) {
                 continue;
             }
 
@@ -190,5 +184,33 @@ class CompleteDefinition implements ProcessorInterface
         }
 
         return $definition;
+    }
+
+    /**
+     * @param $fieldName
+     * @param $definition
+     *
+     * @return bool|string
+     */
+    protected function isAssociationCompletionRequired($fieldName, $definition)
+    {
+        if (!array_key_exists($fieldName, $definition)) {
+            return true;
+        }
+
+        if (!is_array($definition[$fieldName])) {
+            return false;
+        }
+
+        if (isset($definition[$fieldName][ConfigUtil::DEFINITION])) {
+            if (null === $definition[$fieldName][ConfigUtil::DEFINITION]) {
+                return true;
+            }
+            if (is_array($definition[$fieldName][ConfigUtil::DEFINITION])) {
+                return false === ConfigUtil::isRelationInitialized($definition[$fieldName][ConfigUtil::DEFINITION]);
+            }
+        }
+
+        return false === ConfigUtil::isRelationInitialized($definition[$fieldName]);
     }
 }

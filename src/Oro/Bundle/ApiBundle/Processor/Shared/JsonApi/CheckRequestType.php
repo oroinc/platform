@@ -59,8 +59,11 @@ class CheckRequestType implements ProcessorInterface
             }
             // Servers MUST respond with a 406 Not Acceptable status code if a request's Accept header contains only
             // the JSON API media type and all instances of that media type are modified with media type parameters.
-            $acceptHeader = array_map('trim', explode(',', $requestHeaders->get('Accept')));
-            if (!array_intersect(['*/*', 'application/*', self::JSON_API_CONTENT_TYPE], $acceptHeader)) {
+            $regexString = sprintf(
+                '/(\*\/\*)|(application\/\*)|(%s)/',
+                preg_quote(self::JSON_API_CONTENT_TYPE, '/')
+            );
+            if (!preg_match($regexString, $requestHeaders->get('Accept'))) {
                 throw new NotAcceptableHttpException(
                     'Not supported "Accept" header or it contains the JSON API content type ' .
                     'and all instances of that are modified with media type parameters.'

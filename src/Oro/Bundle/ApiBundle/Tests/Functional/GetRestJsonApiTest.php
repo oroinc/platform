@@ -6,12 +6,17 @@ class GetRestJsonApiTest extends ApiTestCase
 {
     protected function setUp()
     {
-        parent::setUp();
-
         $this->initClient(
             [],
-            array_merge($this->generateWsseAuthHeader(), ['HTTP_CONTENT_TYPE' => 'application/vnd.api+json'])
+            $this->generateWsseAuthHeader(
+                self::USER_NAME,
+                self::USER_PASSWORD,
+                null,
+                'application/vnd.api+json'
+            )
         );
+
+        parent::setUp();
     }
 
     /**
@@ -29,7 +34,10 @@ class GetRestJsonApiTest extends ApiTestCase
         // test get list request
         $this->client->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1])
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1]),
+            [],
+            [],
+            $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD, null, 'application/vnd.api+json')
         );
         $response = $this->client->getResponse();
         $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
@@ -40,7 +48,10 @@ class GetRestJsonApiTest extends ApiTestCase
 
         $this->client->request(
             'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
+            $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id]),
+            [],
+            [],
+            $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD, null, 'application/vnd.api+json')
         );
         $this->assertApiResponseStatusCodeEquals(
             $this->client->getResponse(),
@@ -48,5 +59,20 @@ class GetRestJsonApiTest extends ApiTestCase
             $entityAlias,
             'get'
         );
+    }
+
+    /**
+     * @param string $entityClass
+     * @param array  $content
+     *
+     * @return array
+     */
+    protected function getGetRequestConfig($entityClass, $content)
+    {
+        if (array_key_exists('data', $content) && count($content['data']) === 1) {
+            return [$content['data'][0]['id'], true];
+        }
+
+        return [1, false];
     }
 }

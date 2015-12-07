@@ -10,7 +10,7 @@ services:
     # get_metadata
     #
 
-    oro_api.get_config.load_from_config_bag:
+    oro_api.get_metadata.load_from_config_bag:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadFromConfigBag
         arguments:
             - @oro_api.config_bag

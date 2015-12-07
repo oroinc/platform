@@ -32,19 +32,24 @@ class BuildJsonApiDocument implements ProcessorInterface
 
         $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
 
-        if ($context->hasErrors()) {
-            $documentBuilder->setErrors($context->getErrors());
-            // remove errors from the Context to avoid processing them by other processors
-            $context->resetErrors();
-        } elseif ($context->hasResult()) {
-            $result = $context->getResult();
-            if (empty($result)) {
-                $documentBuilder->setDataCollection($result);
-            } else {
-                $documentBuilder->setDataCollection($result, $context->getMetadata());
+        try {
+            if ($context->hasErrors()) {
+                $documentBuilder->setErrors($context->getErrors());
+                // remove errors from the Context to avoid processing them by other processors
+                $context->resetErrors();
+            } elseif ($context->hasResult()) {
+                $result = $context->getResult();
+                if (empty($result)) {
+                    $documentBuilder->setDataCollection($result);
+                } else {
+                    $documentBuilder->setDataCollection($result, $context->getMetadata());
+                }
             }
-        }
 
-        $context->setResult($documentBuilder->getDocument());
+            $context->setResult($documentBuilder->getDocument());
+        } catch (\Exception $e) {
+            $context->setResponseStatusCode(500);
+            throw $e;
+        }
     }
 }

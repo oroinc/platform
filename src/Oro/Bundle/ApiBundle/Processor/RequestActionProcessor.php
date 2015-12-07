@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Component\ChainProcessor\ActionProcessor;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -27,7 +28,19 @@ class RequestActionProcessor extends ActionProcessor
             // go to the 'normalize_result' group that is intended
             // to prepare valid response of the current request type
             $context->setFirstGroup('normalize_result');
-            parent::executeProcessors($context);
+            $this->executeNormalizeResultProcessors($context);
+        }
+    }
+
+    /**
+     * @param ContextInterface $context
+     */
+    protected function executeNormalizeResultProcessors(ContextInterface $context)
+    {
+        $processors = $this->processorBag->getProcessors($context);
+        /** @var ProcessorInterface $processor */
+        foreach ($processors as $processor) {
+            $processor->process($context);
         }
     }
 }
