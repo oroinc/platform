@@ -138,4 +138,18 @@
       width: calc(~"100% - 61px")
     }
   }
+  &.multi-select-editor, &.multi-relation-editor{
+    width: auto !important; // ignore cell width
+    min-width: 0; // ignore min-width
+    .select2-container {
+      height: auto;
+      width: auto !important;
+    }
+    .select2-choices {
+      max-height: 40vh;
+      max-width: 50vw;
+      min-width: 130px;
+      overflow: auto;
+    }
+  }
 }

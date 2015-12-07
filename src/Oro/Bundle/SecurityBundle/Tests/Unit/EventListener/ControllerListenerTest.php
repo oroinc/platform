@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\SecurityBundle\EventListener\ControllerListener;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\HttpFoundation\Request;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+
+use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\EventListener\ControllerListener;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject;
 
 class ControllerListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,10 +56,7 @@ class ControllerListenerTest extends \PHPUnit_Framework_TestCase
                 $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
                     ->disableOriginalConstructor()
                     ->getMock(),
-                $logger,
-                $this->getMockBuilder('Oro\Bundle\SecurityBundle\Provider\ShareProvider')
-                    ->disableOriginalConstructor()
-                    ->getMock()
+                $logger
             ),
             $logger
         );
