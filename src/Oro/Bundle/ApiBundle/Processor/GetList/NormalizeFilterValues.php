@@ -1,14 +1,16 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
+/**
+ * Converts values of all requested filters according to the type of a filter.
+ */
 class NormalizeFilterValues implements ProcessorInterface
 {
     /** @var ValueNormalizer */

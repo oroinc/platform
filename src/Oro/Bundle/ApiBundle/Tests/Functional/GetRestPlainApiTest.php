@@ -25,7 +25,7 @@ class GetRestPlainApiTest extends ApiTestCase
         // test get list request
         $this->client->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1])
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'limit' => 1])
         );
         $response = $this->client->getResponse();
         $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');

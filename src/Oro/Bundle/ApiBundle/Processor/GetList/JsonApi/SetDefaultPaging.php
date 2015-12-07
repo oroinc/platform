@@ -3,19 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetList\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
-use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
-use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultPaging as RestSetDefaultPaging;
+use Oro\Bundle\ApiBundle\Processor\GetList\SetDefaultPaging as BaseSetDefaultPaging;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class SetDefaultPaging implements ProcessorInterface
+/**
+ * Sets default paging for JSON API requests: page[number] = 1, page[size] = 10.
+ */
+class SetDefaultPaging extends BaseSetDefaultPaging
 {
-    const DEFAULT_PAGE      = 1;
-    const DEFAULT_PAGE_SIZE = 10;
-
-    const PAGE_FILTER_KEY      = 'page[number]';
-    const PAGE_SIZE_FILTER_KEY = 'page[size]';
+    const PAGE_NUMBER_FILTER_KEY = 'page[number]';
+    const PAGE_SIZE_FILTER_KEY   = 'page[size]';
 
     /**
      * {@inheritdoc}
@@ -29,33 +28,37 @@ class SetDefaultPaging implements ProcessorInterface
             return;
         }
 
-        $filters = $context->getFilters();
-        if (!$filters->has(self::PAGE_SIZE_FILTER_KEY)) {
-            $filters->add(
-                self::PAGE_SIZE_FILTER_KEY,
-                new PageSizeFilter(
-                    DataType::INTEGER,
-                    'The number of items per page.',
-                    self::DEFAULT_PAGE_SIZE
-                )
-            );
-        }
-        // "page number" filter must be added after "page size" filter because it depends on this filter
-        // @see Oro\Bundle\ApiBundle\Filter\PageNumberFilter::apply
-        if (!$filters->has(self::PAGE_FILTER_KEY)) {
-            $filters->add(
-                self::PAGE_FILTER_KEY,
-                new PageNumberFilter(
-                    DataType::UNSIGNED_INTEGER,
-                    'The page number, starting from 1.',
-                    self::DEFAULT_PAGE
-                )
-            );
+        if (!in_array(RequestType::REST, $context->getRequestType(), true)) {
+            parent::process($context);
         } else {
-            // make sure that "page number" filter is added after "page size" filter
-            $pageFilter = $filters->get(self::PAGE_FILTER_KEY);
-            $filters->remove(self::PAGE_FILTER_KEY);
-            $filters->add(self::PAGE_FILTER_KEY, $pageFilter);
+            // reuse REST API paging filters
+            $filters = $context->getFilters();
+            if ($filters->has(RestSetDefaultPaging::PAGE_SIZE_FILTER_KEY)) {
+                $filter = $filters->get(RestSetDefaultPaging::PAGE_SIZE_FILTER_KEY);
+                $filters->remove(RestSetDefaultPaging::PAGE_SIZE_FILTER_KEY);
+                $filters->add($this->getPageSizeFilterKey(), $filter);
+            }
+            if ($filters->has(RestSetDefaultPaging::PAGE_NUMBER_FILTER_KEY)) {
+                $filter = $filters->get(RestSetDefaultPaging::PAGE_NUMBER_FILTER_KEY);
+                $filters->remove(RestSetDefaultPaging::PAGE_NUMBER_FILTER_KEY);
+                $filters->add($this->getPageNumberFilterKey(), $filter);
+            }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPageNumberFilterKey()
+    {
+        return self::PAGE_NUMBER_FILTER_KEY;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPageSizeFilterKey()
+    {
+        return self::PAGE_SIZE_FILTER_KEY;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\GetList\Rest;
 
 use Doctrine\Common\Collections\Criteria;
 
@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Sets default sorting for REST API requests: sort = identifier field ASC.
+ */
 class SetDefaultSorting implements ProcessorInterface
 {
     const SORT_FILTER_KEY = 'sort';
