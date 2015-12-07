@@ -17,7 +17,7 @@ define(function(require) {
         OVERLAY_TOOL_DEFAULTS: {
             position: {
                 my: 'left top',
-                at: 'left-1 top-4',
+                at: 'left-10 top-6',
                 collision: 'flipfit'
             },
             backdrop: true
@@ -31,6 +31,8 @@ define(function(require) {
                 }
             }
         },
+
+        WIDTH_INCREMENT: 15,
 
         /**
          * @constructor
@@ -189,11 +191,11 @@ define(function(require) {
         },
 
         /**
-         * Resizes editor to cell width
+         * Resizes editor to base view width
          */
-        resizeTo: function(view, cell) {
+        resizeTo: function(view, baseView) {
             view.$el.css({
-                width: cell.$el.outerWidth()
+                width: baseView.$el.outerWidth() + this.WIDTH_INCREMENT
             });
         }
     }, {
