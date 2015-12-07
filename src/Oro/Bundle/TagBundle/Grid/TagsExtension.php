@@ -4,6 +4,7 @@ namespace Oro\Bundle\TagBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -26,14 +27,14 @@ class TagsExtension extends AbstractExtension
     /** @var TagManager */
     protected $tagManager;
 
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
-
-    /** @var TaggableHelper */
-    protected $taggableHelper;
 
     /** @var SecurityFacade */
     protected $securityFacade;
@@ -53,9 +54,9 @@ class TagsExtension extends AbstractExtension
         SecurityFacade $securityFacade
     ) {
         $this->tagManager          = $tagManager;
+        $this->taggableHelper      = $helper;
         $this->entityClassResolver = $resolver;
         $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->taggableHelper      = $helper;
         $this->securityFacade      = $securityFacade;
     }
 
@@ -74,8 +75,9 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $columns   = $config->offsetGetByPath('[columns]') ?: [];
-        $formatter = new GridTaskPropertyFormatter();
+        $columns          = $config->offsetGetByPath('[columns]') ?: [];
+        $className        = $this->getEntityClassName($config);
+        $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
 
         $permissions = [
             'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY),
@@ -91,7 +93,9 @@ class TagsExtension extends AbstractExtension
                         'label'          => 'oro.tag.tags_label',
                         'type'           => 'callback',
                         'frontend_type'  => 'tags',
-                        'callable'       => [$formatter, 'getValue'],
+                        'callable'       => function (ResultRecordInterface $record) {
+                            return $record->getValue('tags');
+                        },
                         'editable'       => false,
                         'translatable'   => true,
                         'renderable'     => false,
@@ -107,9 +111,7 @@ class TagsExtension extends AbstractExtension
                                 'route'                       => 'oro_api_post_taggable',
                                 'http_method'                 => 'POST',
                                 'default_route_parameters'    => [
-                                    'entity' => $this->entityRoutingHelper->getUrlSafeClassName(
-                                        $this->getEntityClassName($config)
-                                    )
+                                    'entity' => $urlSafeClassName
                                 ],
                                 'route_parameters_rename_map' => [
                                     'id' => 'entityId'
