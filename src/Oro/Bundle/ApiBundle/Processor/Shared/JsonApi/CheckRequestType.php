@@ -72,7 +72,7 @@ class CheckRequestType implements ProcessorInterface
             }
             if (!$isCorrectHeader) {
                 throw new NotAcceptableHttpException(
-                    'Not supported "Accept" header or it contains the JSON API content type ' .
+                    'Not supported "Accept" header. It contains the JSON API content type ' .
                     'and all instances of that are modified with media type parameters.'
                 );
             }
