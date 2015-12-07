@@ -541,8 +541,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function generateWsseAuthHeader(
         $userName = self::USER_NAME,
         $userPassword = self::USER_PASSWORD,
-        $nonce = null,
-        $contentType = 'application/json'
+        $nonce = null
     ) {
         if (null === $nonce) {
             $nonce = uniqid();
@@ -551,7 +550,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $created  = date('c');
         $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
         $wsseHeader = [
-            'CONTENT_TYPE' => $contentType,
+            'CONTENT_TYPE' => 'application/json',
             'HTTP_Authorization' => 'WSSE profile="UsernameToken"',
             'HTTP_X-WSSE' => sprintf(
                 'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',

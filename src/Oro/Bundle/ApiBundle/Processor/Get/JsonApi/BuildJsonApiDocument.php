@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Get\JsonApi;
 
+use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
@@ -48,8 +51,12 @@ class BuildJsonApiDocument implements ProcessorInterface
 
             $context->setResult($documentBuilder->getDocument());
         } catch (\Exception $e) {
-            $context->setResponseStatusCode(500);
-            throw $e;
+            $context->setResponseStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            $error = new Error();
+            $error->setInnerException($e);
+            $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
+            $documentBuilder->setErrorObject($error);
+            $context->setResult($documentBuilder->getDocument());
         }
     }
 }

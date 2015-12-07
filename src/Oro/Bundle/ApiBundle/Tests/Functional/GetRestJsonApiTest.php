@@ -8,11 +8,9 @@ class GetRestJsonApiTest extends ApiTestCase
     {
         $this->initClient(
             [],
-            $this->generateWsseAuthHeader(
-                self::USER_NAME,
-                self::USER_PASSWORD,
-                null,
-                'application/vnd.api+json'
+            array_replace(
+                $this->generateWsseAuthHeader(),
+                ['CONTENT_TYPE' => 'application/vnd.api+json']
             )
         );
 
@@ -37,7 +35,10 @@ class GetRestJsonApiTest extends ApiTestCase
             $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1]),
             [],
             [],
-            $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD, null, 'application/vnd.api+json')
+            array_replace(
+                $this->generateWsseAuthHeader(),
+                ['CONTENT_TYPE' => 'application/vnd.api+json']
+            )
         );
         $response = $this->client->getResponse();
         $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
@@ -51,7 +52,10 @@ class GetRestJsonApiTest extends ApiTestCase
             $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id]),
             [],
             [],
-            $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD, null, 'application/vnd.api+json')
+            array_replace(
+                $this->generateWsseAuthHeader(),
+                ['CONTENT_TYPE' => 'application/vnd.api+json']
+            )
         );
         $this->assertApiResponseStatusCodeEquals(
             $this->client->getResponse(),
