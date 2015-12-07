@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -40,6 +41,7 @@ class TagManager
     /** @var Router */
     protected $router;
 
+    /** @var array */
     protected $storage = [];
 
     /**
@@ -218,7 +220,7 @@ class TagManager
             return [];
         }
 
-        $usedOrganization = $organization ? : $this->getOrganization();
+        $usedOrganization = $organization ?: $this->getOrganization();
 
         $names = array_unique(array_map('trim', $names));
         $tags  = $this->em->getRepository($this->tagClass)->findBy(
@@ -320,63 +322,78 @@ class TagManager
      */
     public function saveTagging($entity, $flush = true, Organization $organization = null)
     {
-        $owner = $this->getUser();
-
         // Tag[]  - assigned to the entity.
-        $oldTags = $this->fetchTags($entity, $owner, false, $organization);
+        $oldAllTags = $this->fetchTags($entity, null, false, $organization);
 
         // Modified entity Tags, could contains new tags, or does not contains tags that need to remove.
         $newTags = $this->getTags($entity);
 
         // Taggable submitted form entity contains array of [autocomplete = [], all => Tag[], owner => Tag[]] tags.
         if (isset($newTags['all'], $newTags['owner'])) {
-            $newAllTags   = new ArrayCollection($newTags['all']);
-            $newOwnerTags = new ArrayCollection($newTags['owner']);
+            $newAllTags = new ArrayCollection($newTags['all']);
         } else {
-            $newAllTags   = $newTags;
-            $newOwnerTags = $newTags->filter(
-                function (Tag $tag) use ($owner) {
-                    return
-                        $tag->getOwner() === $owner ||
-                        $tag->getId() === null;
-                }
-            );
+            $newAllTags = $newTags;
         }
 
-        $tagsToAdd    = $newOwnerTags->filter(
-            function ($tag) use ($oldTags) {
-                return !$oldTags->exists($this->getComparePredicate($tag));
+        // Get all tags that should be added
+        $tagsToAdd = $newAllTags->filter(
+            function ($tag) use ($oldAllTags) {
+                return !$oldAllTags->exists($this->getComparePredicate($tag));
             }
         );
-        $tagsToDelete = $oldTags->filter(
-            function ($tag) use ($newOwnerTags) {
-                return !$newOwnerTags->exists($this->getComparePredicate($tag));
-            }
-        );
-
-        if (!$tagsToDelete->isEmpty() && $this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
-            $this->deleteTagging($entity, $tagsToDelete, $owner);
-        }
-
-        // process if current user allowed to remove other's tag links
-        if ($owner && $this->securityFacade->isGranted(self::ACL_RESOURCE_REMOVE_ID_KEY)) {
-            // get 'not mine' taggings
-            $oldTags      = $this->fetchTags($entity, $owner, true, $organization);
-            $tagsToDelete = $oldTags->filter(
-                function ($tag) use ($newAllTags) {
-                    return !$newAllTags->exists($this->getComparePredicate($tag));
-                }
-            );
-            if (!$tagsToDelete->isEmpty()) {
-                $this->deleteTagging($entity, $tagsToDelete);
-            }
-        }
-
         if (!$tagsToAdd->isEmpty()) {
             $this->persistTags($entity, $tagsToAdd);
-            if ($flush) {
-                $this->em->flush();
+        }
+
+        // Get all tags that should be deleted
+        $tagsToDelete = $oldAllTags->filter(
+            function (Tag $tag) use ($newAllTags) {
+                return !$newAllTags->exists($this->getComparePredicate($tag));
             }
+        );
+        if (!$tagsToDelete->isEmpty()) {
+            $this->persistDeleteTags($entity, $tagsToDelete);
+        }
+
+        if ($flush) {
+            $this->em->flush();
+        }
+    }
+
+    /**
+     * @param object     $entity
+     * @param Collection $tags
+     */
+    protected function persistDeleteTags($entity, Collection $tags)
+    {
+        $owner = $this->getUser();
+
+        // Current assigned tags(taggings) for this owner
+        $assignedOwnerTags = $this->fetchTags($entity, $owner, false);
+
+        $ownerTags = $tags->filter(
+            function (Tag $tag) use ($assignedOwnerTags) {
+                return $assignedOwnerTags->exists($this->getComparePredicate($tag));
+            }
+        );
+        if (!$ownerTags->isEmpty()) {
+            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
+                throw new AccessDeniedException("User does not have access to assign/unassign tags.");
+            }
+            $this->deleteTagging($entity, $ownerTags, $owner);
+        }
+
+        $anotherTags = $tags->filter(
+            function (Tag $tag) use ($assignedOwnerTags) {
+                return !$assignedOwnerTags->exists($this->getComparePredicate($tag));
+            }
+        );
+        // Delete 'not mine' taggings
+        if (!$anotherTags->isEmpty()) {
+            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_REMOVE_ID_KEY)) {
+                throw new AccessDeniedException("User does not have access to remove another's tags.");
+            }
+            $this->deleteTagging($entity, $anotherTags);
         }
     }
 
@@ -441,14 +458,13 @@ class TagManager
      */
     protected function persistTags($entity, $tags)
     {
+        if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
+            throw new AccessDeniedException("User does not have access to assign/unassign tags.");
+        }
+
         foreach ($tags as $tag) {
-            if ($this->getUser() &&
-                (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY) ||
-                    (!$this->securityFacade->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId())
-                )
-            ) {
-                // skip tags that have not ID because user not granted to create tags
-                continue;
+            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId()) {
+                throw new AccessDeniedException("User does not have access to create tags.");
             }
 
             $tagging = $this->createTagging($tag, $entity);
@@ -496,7 +512,7 @@ class TagManager
     protected function fetchTags($entity, $owner, $all = false, Organization $organization = null)
     {
         $repository       = $this->getTagsRepository();
-        $usedOrganization = $organization ? : $this->getOrganization();
+        $usedOrganization = $organization ?: $this->getOrganization();
 
         $elements = $repository->getTags(
             ClassUtils::getClass($entity),

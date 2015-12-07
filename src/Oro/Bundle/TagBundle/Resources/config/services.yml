@@ -122,9 +122,10 @@ services:
         class: Oro\Bundle\TagBundle\Grid\TagsExtension
         arguments:
             - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
             - @oro_entity.orm.entity_class_resolver
             - @oro_entity.routing_helper
-            - @oro_tag.helper.taggable_helper
+            - @oro_security.security_facade
         tags:
             - { name: oro_datagrid.extension }
 
@@ -183,3 +184,8 @@ services:
             - @oro_tag.tag.manager
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlush }
+
+    oro_tag.formatter.tags_formatter:
+        class: Oro\Bundle\TagBundle\Formatter\TagsTypeFormatter
+        tags:
+            - { name: oro_importexport.formatter.formatter, data_type: tags, format_type: excel }

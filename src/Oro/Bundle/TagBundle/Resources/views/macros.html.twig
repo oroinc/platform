@@ -9,7 +9,7 @@
             fieldName: 'tags',
             metadata: {
                 inline_editing: {
-                    enable: true,
+                    enable: resource_granted('oro_tag_assign_unassign'),
                     save_api_accessor: {
                         route: 'oro_api_post_taggable',
                         http_method: 'POST',
@@ -22,6 +22,14 @@
                         class: 'oroui/js/tools/search-api-accessor',
                         search_handler_name: 'tags',
                         label_field_name: 'name'
+                    },
+                    editor: {
+                        view_options: {
+                            permissions: {
+                                oro_tag_create: resource_granted('oro_tag_create'),
+                                oro_tag_unassign_global: resource_granted('oro_tag_unassign_global')
+                            }
+                        }
                     }
                 }
             }

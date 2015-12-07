@@ -4,12 +4,14 @@ namespace Oro\Bundle\TagBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TagsExtension extends AbstractExtension
 {
@@ -25,31 +27,37 @@ class TagsExtension extends AbstractExtension
     /** @var TagManager */
     protected $tagManager;
 
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /** @var TaggableHelper */
-    protected $taggableHelper;
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /**
      * @param TagManager          $tagManager
+     * @param TaggableHelper      $helper
      * @param EntityClassResolver $resolver
      * @param EntityRoutingHelper $entityRoutingHelper
-     * @param TaggableHelper      $helper
+     * @param SecurityFacade      $securityFacade
      */
     public function __construct(
         TagManager $tagManager,
+        TaggableHelper $helper,
         EntityClassResolver $resolver,
         EntityRoutingHelper $entityRoutingHelper,
-        TaggableHelper $helper)
-    {
+        SecurityFacade $securityFacade
+    ) {
         $this->tagManager          = $tagManager;
+        $this->taggableHelper      = $helper;
         $this->entityClassResolver = $resolver;
         $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->taggableHelper      = $helper;
+        $this->securityFacade      = $securityFacade;
     }
 
     /**
@@ -67,9 +75,15 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $columns = $config->offsetGetByPath('[columns]') ? : [];
-        $formatter = new GridTaskPropertyFormatter();
-        header('entity: ' .$this->getEntityClassName($config));
+        $columns          = $config->offsetGetByPath('[columns]') ?: [];
+        $className        = $this->getEntityClassName($config);
+        $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
+
+        $permissions = [
+            'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY),
+            'oro_tag_unassign_global' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_REMOVE_ID_KEY)
+        ];
+
         $config->offsetSetByPath(
             '[columns]',
             array_merge(
@@ -79,30 +93,34 @@ class TagsExtension extends AbstractExtension
                         'label'          => 'oro.tag.tags_label',
                         'type'           => 'callback',
                         'frontend_type'  => 'tags',
-                        'callable'       => array($formatter, 'getValue'),
+                        'callable'       => function (ResultRecordInterface $record) {
+                            return $record->getValue('tags');
+                        },
                         'editable'       => false,
                         'translatable'   => true,
                         'renderable'     => false,
                         'inline_editing' => [
-                            'enable'         => true,
-                            'editor'         => [
-                                'view'           => 'orotag/js/app/views/editor/tags-editor-view'
+                            'enable' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_ASSIGN_ID_KEY),
+                            'editor' => [
+                                'view'         => 'orotag/js/app/views/editor/tags-editor-view',
+                                'view_options' => [
+                                    'permissions' => $permissions
+                                ]
                             ],
-                            'save_api_accessor' => [
-                                'route' => 'oro_api_post_taggable',
-                                'http_method' => 'POST',
-                                'default_route_parameters' => [
-                                    'entity' => $this->entityRoutingHelper->getUrlSafeClassName(
-                                        $this->getEntityClassName($config))
+                            'save_api_accessor'         => [
+                                'route'                       => 'oro_api_post_taggable',
+                                'http_method'                 => 'POST',
+                                'default_route_parameters'    => [
+                                    'entity' => $urlSafeClassName
                                 ],
                                 'route_parameters_rename_map' => [
                                     'id' => 'entityId'
                                 ]
                             ],
                             'autocomplete_api_accessor' => [
-                                'class' => 'oroui/js/tools/search-api-accessor',
+                                'class'               => 'oroui/js/tools/search-api-accessor',
                                 'search_handler_name' => 'tags',
-                                'label_field_name' => 'name'
+                                'label_field_name'    => 'name'
                             ]
                         ]
                     ]
@@ -111,7 +129,6 @@ class TagsExtension extends AbstractExtension
         );
 
         $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
-        //@TODO Need recheck this condition
         if (empty($filters) || strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_report') === 0) {
             return;
         }
