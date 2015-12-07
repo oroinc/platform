@@ -43,6 +43,7 @@ class DataNormalizer
         foreach ($config[ConfigUtil::FIELDS] as $field => $fieldConfig) {
             if (null !== $fieldConfig) {
                 if (isset($fieldConfig[ConfigUtil::PROPERTY_PATH])
+                    && !ConfigUtil::isExclude($fieldConfig)
                     && (!array_key_exists($field, $row) || null !== $row[$field])
                 ) {
                     $this->applyPropertyPath($row, $field, $fieldConfig[ConfigUtil::PROPERTY_PATH]);
