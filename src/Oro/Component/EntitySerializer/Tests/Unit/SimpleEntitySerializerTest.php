@@ -4,6 +4,174 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 class SimpleEntitySerializerTest extends EntitySerializerTestCase
 {
+    public function testReuseExistingJoin()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->leftJoin('e.owner', 'user')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' u1_.id AS id_2,'
+            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
+            . ' u1_.category_name AS category_name_5'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'id_2'            => 10,
+                    'category_name_3' => 'category_name',
+                    'owner_id_4'      => 10,
+                    'category_name_5' => 'owner_category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'    => null,
+                    'name'  => null,
+                    'owner' => [
+                        'fields' => 'id',
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'    => 1,
+                    'name'  => 'product_name',
+                    'owner' => 10
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testReuseExistingInnerJoin()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->innerJoin('e.owner', 'user')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' u1_.id AS id_2,'
+            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
+            . ' u1_.category_name AS category_name_5'
+            . ' FROM product_table p0_'
+            . ' INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'id_2'            => 10,
+                    'category_name_3' => 'category_name',
+                    'owner_id_4'      => 10,
+                    'category_name_5' => 'owner_category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'    => null,
+                    'name'  => null,
+                    'owner' => [
+                        'fields' => 'id',
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'    => 1,
+                    'name'  => 'product_name',
+                    'owner' => 10
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testReuseExistingJoinJoinWithCondition()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->leftJoin('e.owner', 'user', 'WITH', 'e.owner = user.id AND user.name LIKE \'a%\'')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' u1_.id AS id_2,'
+            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
+            . ' u1_.category_name AS category_name_5'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id AND (p0_.owner_id = u1_.id AND u1_.name LIKE \'a%\')'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'id_2'            => 10,
+                    'category_name_3' => 'category_name',
+                    'owner_id_4'      => 10,
+                    'category_name_5' => 'owner_category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'    => null,
+                    'name'  => null,
+                    'owner' => [
+                        'fields' => 'id',
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'    => 1,
+                    'name'  => 'product_name',
+                    'owner' => 10
+                ]
+            ],
+            $result
+        );
+    }
+
     public function testSimpleEntityWithoutConfig()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
