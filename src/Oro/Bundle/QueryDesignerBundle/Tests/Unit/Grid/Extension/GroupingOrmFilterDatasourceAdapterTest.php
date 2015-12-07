@@ -449,7 +449,8 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
             . 'GROUP BY u.status '
             . 'HAVING COUNT(u.id) = 0 AND '
             . '(COUNT(u.id) = 1 AND '
-            . '((COUNT(u.id) = 2 AND (COUNT(u.id) = 3 OR COUNT(u.id) = 4)) OR COUNT(u.id) = 5 OR (COUNT(u.id) = 6 AND COUNT(u.id) = 7)) AND '
+            . '((COUNT(u.id) = 2 AND (COUNT(u.id) = 3 OR COUNT(u.id) = 4)) '
+            . 'OR COUNT(u.id) = 5 OR (COUNT(u.id) = 6 AND COUNT(u.id) = 7)) AND '
             . 'COUNT(u.id) = 8)',
             $qb->getDQL()
         );
