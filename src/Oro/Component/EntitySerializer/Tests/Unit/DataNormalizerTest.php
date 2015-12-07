@@ -150,8 +150,8 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedData' => [
                     [
-                        'id'          => 123,
-                        'contact'     => null
+                        'id'      => 123,
+                        'contact' => null
                     ]
                 ]
             ],
@@ -445,6 +445,44 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     [
                         'id'          => 123,
                         'accountName' => 'account_name'
+                    ]
+                ]
+            ],
+            'deep_property_path_with_excluded_relation'       => [
+                'config'       => [
+                    'fields' => [
+                        'id'      => null,
+                        'contact' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'id'      => null,
+                                'name'    => null,
+                                'account' => [
+                                    'exclusion_policy' => 'all',
+                                    'fields'           => 'id',
+                                    'property_path'    => 'id',
+                                    'exclude'          => true
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'      => 123,
+                        'contact' => [
+                            'id'   => 456,
+                            'name' => 'contact_name'
+                        ]
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'      => 123,
+                        'contact' => [
+                            'id'   => 456,
+                            'name' => 'contact_name'
+                        ]
                     ]
                 ]
             ],
