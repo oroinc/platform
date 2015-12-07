@@ -192,4 +192,23 @@ class ArrayUtil
             return $order[$a] - $order[$b];
         };
     }
+
+    /**
+     * Return true if callback on any element returns truthy value, false otherwise
+     *
+     * @param callable $callback
+     * @param array $array
+     *
+     * @return boolean
+     */
+    public static function some(callable $callback, array $array)
+    {
+        foreach ($array as $item) {
+            if (call_user_func($callback, $item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
