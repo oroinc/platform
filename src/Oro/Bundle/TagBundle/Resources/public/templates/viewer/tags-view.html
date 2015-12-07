@@ -1,6 +1,6 @@
 <div class="tags-container">
     <% if (!model[fieldName].length) { %>
-        N/A|trans
+        N/A
     <% } %>
     <% _.each(model[fieldName].sort(tagSortCallback) , function(item) { %>
     <a href="<%= item.url %>"
