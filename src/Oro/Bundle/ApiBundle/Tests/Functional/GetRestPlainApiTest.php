@@ -6,9 +6,8 @@ class GetRestPlainApiTest extends ApiTestCase
 {
     protected function setUp()
     {
-        parent::setUp();
-
         $this->initClient([], $this->generateWsseAuthHeader());
+        parent::setUp();
     }
 
     /**

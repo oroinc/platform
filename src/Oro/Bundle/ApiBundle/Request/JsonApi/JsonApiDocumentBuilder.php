@@ -110,6 +110,8 @@ class JsonApiDocumentBuilder
      */
     public function setErrorObject(Error $error)
     {
+        $this->assertNoData();
+
         $this->result[self::ERRORS] = [$this->handleError($error)];
 
         return $this;

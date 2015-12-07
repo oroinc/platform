@@ -90,7 +90,10 @@ class FixFieldNaming implements ProcessorInterface
             $fieldConfig = [];
         }
         if (empty($fieldConfig[ConfigUtil::DEFINITION][ConfigUtil::PROPERTY_PATH])) {
-            $fieldConfig[ConfigUtil::DEFINITION][ConfigUtil::PROPERTY_PATH] = $fieldName;
+            $fieldConfig[ConfigUtil::DEFINITION][ConfigUtil::PROPERTY_PATH] =
+                array_key_exists(ConfigUtil::PROPERTY_PATH, $fieldConfig)
+                    ? $fieldConfig[ConfigUtil::PROPERTY_PATH]
+                    : $fieldName;
         }
         unset($fields[$fieldName]);
         $fields[$newFieldName] = $fieldConfig;

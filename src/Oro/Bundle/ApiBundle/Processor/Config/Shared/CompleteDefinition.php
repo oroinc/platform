@@ -166,11 +166,10 @@ class CompleteDefinition implements ProcessorInterface
         foreach ($associations as $fieldName => $mapping) {
             if (array_key_exists($fieldName, $definition)
                 && (
-                    !is_array($definition[$fieldName])
-                    || ConfigUtil::isRelationInitialized($definition[$fieldName])
+                   !is_array($definition[$fieldName])
+                   || ConfigUtil::isRelationInitialized($definition[$fieldName])
                 )
             ) {
-                // already defined and initialized
                 continue;
             }
 

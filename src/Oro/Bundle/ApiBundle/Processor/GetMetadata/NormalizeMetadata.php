@@ -53,7 +53,7 @@ class NormalizeMetadata implements ProcessorInterface
             } elseif (isset($fieldConfig[ConfigUtil::PROPERTY_PATH])) {
                 $path = ConfigUtil::explodePropertyPath($fieldConfig[ConfigUtil::PROPERTY_PATH]);
                 if (count($path) === 1) {
-                    $entityMetadata->renameProperty($entityMetadata, reset($path), $fieldName);
+                    $entityMetadata->renameProperty(reset($path), $fieldName);
                 }
             }
         }

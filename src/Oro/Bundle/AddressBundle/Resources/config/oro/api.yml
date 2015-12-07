@@ -2,13 +2,11 @@ oro_api:
     relations:
         Oro\Bundle\AddressBundle\Entity\AbstractAddress:
             definition:
-                exclusion_policy: none
                 fields:
                     owner:
                         exclude: true
         Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress:
             definition:
-                exclusion_policy: none
                 fields:
                     types:
                         order_by:

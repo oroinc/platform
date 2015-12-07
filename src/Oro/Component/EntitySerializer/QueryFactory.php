@@ -104,7 +104,8 @@ class QueryFactory
             foreach ($entityIds as $id) {
                 $subQuery = $this->getRelatedItemsIdsQuery($associationMapping, [$id], $config);
                 $subQuery->setMaxResults($limit);
-                $subQueries[] = QueryUtils::getExecutableSql($subQuery);
+                // We should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
+                $subQueries[] = '(' . QueryUtils::getExecutableSql($subQuery) . ')';
                 if (null === $selectStmt) {
                     $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
                     $selectStmt = sprintf(
