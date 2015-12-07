@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Filter\SortFilter;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
+/**
+ * Applies all requested filters to the Criteria object.
+ */
 class BuildCriteria implements ProcessorInterface
 {
     /**
@@ -26,39 +26,10 @@ class BuildCriteria implements ProcessorInterface
         $filterValues = $context->getFilterValues();
         $filters      = $context->getFilters();
         foreach ($filters as $filterKey => $filter) {
-            $filterValue = null;
-            if ($filterValues->has($filterKey)) {
-                $filterValue = $filterValues->get($filterKey);
-            }
-
-            if ($filter instanceof SortFilter && $context->hasConfigOfSorters()) {
-                $this->validateSortValue(
-                    null !== $filterValue ? $filterValue->getValue() : null,
-                    $context->hasConfigOfSorters() ? $context->getConfigOfSorters() : null
-                );
-            }
-
+            $filterValue = $filterValues->has($filterKey)
+                ? $filterValues->get($filterKey)
+                : null;
             $filter->apply($criteria, $filterValue);
-        }
-    }
-
-    /**
-     * @param array|null $orderBy
-     * @param array|null $sorters
-     */
-    protected function validateSortValue($orderBy, $sorters)
-    {
-        if (!empty($orderBy)) {
-            $sortFields = !empty($sorters) && !empty($sorters[ConfigUtil::FIELDS])
-                ? $sorters[ConfigUtil::FIELDS]
-                : [];
-            foreach ($orderBy as $field => $direction) {
-                if (!array_key_exists($field, $sortFields)) {
-                    throw new NotAcceptableHttpException(
-                        sprintf('Sorting by "%s" is not supported.', $field)
-                    );
-                }
-            }
         }
     }
 }
