@@ -8,15 +8,10 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnitInterface;
-use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
-
 class BaseAclManager implements AclSidInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @param string|RoleInterface|UserInterface|TokenInterface|BusinessUnitInterface $identity
      */
     public function getSid($identity)
     {
@@ -28,14 +23,12 @@ class BaseAclManager implements AclSidInterface
             return UserSecurityIdentity::fromAccount($identity);
         } elseif ($identity instanceof TokenInterface) {
             return UserSecurityIdentity::fromToken($identity);
-        } elseif ($identity instanceof BusinessUnitInterface) {
-            return BusinessUnitSecurityIdentity::fromBusinessUnit($identity);
         }
 
         throw new \InvalidArgumentException(
             sprintf(
-                '$identity must be a string or implement one of RoleInterface, UserInterface, TokenInterface,'
-                . ' BusinessUnitInterface (%s given)',
+                '$identity must be a string or implement one of RoleInterface, UserInterface, TokenInterface'
+                . ' (%s given)',
                 is_object($identity) ? get_class($identity) : gettype($identity)
             )
         );

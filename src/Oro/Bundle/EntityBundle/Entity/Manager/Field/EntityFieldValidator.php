@@ -16,17 +16,17 @@ class EntityFieldValidator
     /** @var Registry */
     protected $registry;
 
-    public function __construct(
-        Registry $registry
-    ) {
+    /**
+     * @param Registry $registry
+     */
+    public function __construct(Registry $registry)
+    {
         $this->registry = $registry;
     }
 
     /**
      * @param $entity
      * @param $content
-     *
-     * @return bool
      *
      * @throws EntityHasFieldException
      * @throws FieldUpdateAccessException
@@ -37,15 +37,11 @@ class EntityFieldValidator
         foreach ($keys as $fieldName) {
             $this->validateFieldName($entity, $fieldName);
         }
-
-        return true;
     }
 
     /**
      * @param $entity
      * @param $fieldName
-     *
-     * @return bool
      *
      * @throws FieldUpdateAccessException
      * @throws EntityHasFieldException
@@ -59,8 +55,6 @@ class EntityFieldValidator
         if (!$this->hasAccessEditFiled($fieldName)) {
             throw new FieldUpdateAccessException('oro.entity.controller.message.access_denied', Codes::HTTP_FORBIDDEN);
         }
-
-        return true;
     }
 
     /**
@@ -78,15 +72,18 @@ class EntityFieldValidator
         return true;
     }
 
+    /**
+     * @param $entity
+     * @param $fieldName
+     *
+     * @return bool
+     */
     protected function hasField($entity, $fieldName)
     {
         /** @var ClassMetadata $metaData */
         $metaData = $this->getMetaData($entity);
-        if ($metaData->hasField($fieldName) || $metaData->hasAssociation($fieldName)) {
-            return true;
-        }
 
-        return false;
+        return $metaData->hasField($fieldName) || $metaData->hasAssociation($fieldName);
     }
 
     /**
