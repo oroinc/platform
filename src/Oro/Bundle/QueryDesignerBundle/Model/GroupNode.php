@@ -3,6 +3,7 @@
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
 use LogicException;
+
 use Oro\Component\PhpUtils\ArrayUtil;
 
 class GroupNode
