@@ -69,13 +69,13 @@ class TagManager
      * @param @param string $entityClassName The FQCN of the entity
      * @param array $ids
      *
-     * @return array [id, name, entityId]
+     * @return array [id, name, entityId, owner]
      */
     public function getTagsByEntityIds($entityClassName, array $ids)
     {
         $repository = $this->getTagsRepository();
 
-        return $repository->getTagsByEntityIds($entityClassName, $ids);
+        return $repository->getTagsByEntityIds($entityClassName, $ids, $this->getUser());
     }
 
     /**

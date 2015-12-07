@@ -1,5 +1,9 @@
 <div class="tags-container">
+    <% if (!model[fieldName].length) { %>
+        N/A|trans
+    <% } %>
     <% _.each(model[fieldName].sort(tagSortCallback) , function(item) { %>
-        <a href="<%= item.url %>" class="tags-container__tag-entry<%= item.owner ? ' tags-container__tag-entry_is-my' : ''%>"><%= item.name %></a>
+    <a href="<%= item.url %>"
+       class="tags-container__tag-entry<%= item.owner ? ' tags-container__tag-entry_is-my' : ''%>"><%= item.name %></a>
     <% }) %>
 </div>

@@ -48,8 +48,6 @@ define([
                 html = value.map(function(v) {
                     return '<span class="tags-container__tag-entry">' + v.name + '</span> ';
                 });
-            } else {
-                html = 'N/A';
             }
 
             this.$el.html(html);
