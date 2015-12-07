@@ -67,6 +67,6 @@ class ActivityAccessor extends DefaultAccessor
             [$type]
         );
 
-        return $this->translator->trans('oro.activitylist.merge.items.label') . ' - ' . $count;
+        return $count . ' ' . $this->translator->trans('oro.activitylist.merge.items.label');
     }
 }

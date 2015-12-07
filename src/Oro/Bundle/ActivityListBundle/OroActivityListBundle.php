@@ -18,6 +18,5 @@ class OroActivityListBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new ActivityListProvidersPass());
-        $container->addCompilerPass(new AddStrategyCompilerPass());
     }
 }
