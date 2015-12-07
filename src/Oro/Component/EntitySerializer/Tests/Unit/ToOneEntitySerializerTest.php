@@ -289,8 +289,12 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             $qb,
             [
                 'fields' => [
-                    'owner' => [
-                        'fields' => [
+                    'groups' => ['exclude' => true],
+                    'owner'  => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'       => null,
+                            'name'     => null,
                             'category' => ['fields' => 'label']
                         ]
                     ]
@@ -308,6 +312,205 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                         'id'       => 10,
                         'name'     => 'user_name',
                         'category' => 'user_category_label'
+                    ],
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testManyToOneBidirectionalWithManyToManyIds()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' u1_.id AS id_2, u1_.name AS name_3,'
+            . ' p0_.category_name AS category_name_4, p0_.owner_id AS owner_id_5,'
+            . ' u1_.category_name AS category_name_6'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'id_2'            => 10,
+                    'name_3'          => 'user_name',
+                    'category_name_4' => 'category_name',
+                    'owner_id_5'      => 10,
+                    'category_name_6' => 'user_category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->setQueryExpectationAt(
+            $conn,
+            1,
+            'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1'
+            . ' FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
+            . '))'
+            . ' WHERE u0_.id = ?',
+            [
+                [
+                    'id_0' => 10,
+                    'id_1' => 100,
+                ],
+                [
+                    'id_0' => 10,
+                    'id_1' => 101,
+                ],
+            ],
+            [1 => 10],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'    => null,
+                    'name'  => null,
+                    'owner' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'     => null,
+                            'name'   => null,
+                            'groups' => [
+                                'fields' => 'id',
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'    => 1,
+                    'name'  => 'product_name',
+                    'owner' => [
+                        'id'     => 10,
+                        'name'   => 'user_name',
+                        'groups' => [100, 101],
+                    ],
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testManyToOneBidirectionalWithManyToMany()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' u1_.id AS id_2, u1_.name AS name_3,'
+            . ' p0_.category_name AS category_name_4, p0_.owner_id AS owner_id_5,'
+            . ' u1_.category_name AS category_name_6'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'id_2'            => 10,
+                    'name_3'          => 'user_name',
+                    'category_name_4' => 'category_name',
+                    'owner_id_5'      => 10,
+                    'category_name_6' => 'user_category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->setQueryExpectationAt(
+            $conn,
+            1,
+            'SELECT u0_.id AS id_0, g1_.id AS id_1, g1_.name AS name_2'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1'
+            . ' FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
+            . '))'
+            . ' WHERE u0_.id = ?',
+            [
+                [
+                    'id_0'   => 10,
+                    'id_1'   => 100,
+                    'name_2' => 'owner_group_name1',
+                ],
+                [
+                    'id_0'   => 10,
+                    'id_1'   => 101,
+                    'name_2' => 'owner_group_name2',
+                ],
+            ],
+            [1 => 10],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'    => null,
+                    'name'  => null,
+                    'owner' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'     => null,
+                            'name'   => null,
+                            'groups' => [
+                                'exclusion_policy' => 'all',
+                                'fields'           => [
+                                    'id'   => null,
+                                    'name' => null,
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'    => 1,
+                    'name'  => 'product_name',
+                    'owner' => [
+                        'id'     => 10,
+                        'name'   => 'user_name',
+                        'groups' => [
+                            ['id' => 100, 'name' => 'owner_group_name1'],
+                            ['id' => 101, 'name' => 'owner_group_name2'],
+                        ],
                     ],
                 ]
             ],

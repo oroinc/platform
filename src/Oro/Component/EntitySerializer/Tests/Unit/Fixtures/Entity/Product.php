@@ -2,6 +2,8 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -35,11 +37,21 @@ class Product
     protected $owner;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Group")
+     * @ORM\JoinTable(name="rel_product_to_group_table",
+     *      joinColumns={@ORM\JoinColumn(name="product_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="product_group_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     */
+    protected $groups;
+
+    /**
      * @param int|null $id
      */
     public function __construct($id = null)
     {
-        $this->id = $id;
+        $this->id     = $id;
+        $this->groups = new ArrayCollection();
     }
 
     /**
@@ -106,6 +118,42 @@ class Product
     public function setOwner($owner)
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Group[]|Collection
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param Group $group
+     *
+     * @return self
+     */
+    public function addGroup(Group $group)
+    {
+        if (!$this->groups->contains($group)) {
+            $this->groups->add($group);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Group $group
+     *
+     * @return self
+     */
+    public function removeGroup(Group $group)
+    {
+        if ($this->groups->contains($group)) {
+            $this->groups->removeElement($group);
+        }
 
         return $this;
     }

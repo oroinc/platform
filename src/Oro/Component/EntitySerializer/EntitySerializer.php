@@ -216,8 +216,9 @@ class EntitySerializer
         }
 
         $result = [];
+
+        $idFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
         if ($useIdAsKey) {
-            $idFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
             foreach ($entities as $entity) {
                 $id          = $this->dataAccessor->getValue($entity, $idFieldName);
                 $result[$id] = $this->serializeItem($entity, $entityClass, $config);
@@ -228,14 +229,7 @@ class EntitySerializer
             }
         }
 
-        $relatedData = $this->loadRelatedData(
-            $entityClass,
-            $this->getEntityIds($entities, $entityClass),
-            $config
-        );
-        if (!empty($relatedData)) {
-            $this->applyRelatedData($result, $entityClass, $relatedData);
-        }
+        $this->loadRelatedData($result, $entityClass, $this->getEntityIds($entities, $idFieldName), $config);
 
         if (isset($config[ConfigUtil::POST_SERIALIZE])) {
             $callback = $config[ConfigUtil::POST_SERIALIZE];
@@ -270,11 +264,16 @@ class EntitySerializer
                 if ($entityMetadata->isAssociation($field)) {
                     if ($value !== null) {
                         if (!empty($targetConfig[ConfigUtil::FIELDS])) {
-                            $value = $this->serializeItem(
+                            $targetEntityClass = $entityMetadata->getAssociationTargetClass($field);
+                            $targetEntityId    = $this->dataAccessor->getValue(
                                 $value,
-                                $entityMetadata->getAssociationTargetClass($field),
-                                $targetConfig
+                                $this->doctrineHelper->getEntityIdFieldName($targetEntityClass)
                             );
+
+                            $value = $this->serializeItem($value, $targetEntityClass, $targetConfig);
+                            $items = [$value];
+                            $this->loadRelatedData($items, $targetEntityClass, [$targetEntityId], $targetConfig);
+                            $value = reset($items);
                             if (isset($targetConfig[ConfigUtil::POST_SERIALIZE])) {
                                 $value = $this->postSerialize($value, $targetConfig[ConfigUtil::POST_SERIALIZE]);
                             }
@@ -354,51 +353,12 @@ class EntitySerializer
     }
 
     /**
-     * @param array $entityIds
-     * @param array $mapping
-     * @param array $config
-     *
-     * @return array
-     */
-    protected function getRelatedItemsBindings($entityIds, $mapping, $config)
-    {
-        $rows = $this->queryFactory->getRelatedItemsIds($mapping, $entityIds, $config);
-
-        $result = [];
-        foreach ($rows as $row) {
-            $result[$row['entityId']][] = $row['relatedEntityId'];
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array $bindings
-     *
-     * @return array
-     */
-    protected function getRelatedItemsIds($bindings)
-    {
-        $result = [];
-        foreach ($bindings as $ids) {
-            foreach ($ids as $id) {
-                if (!isset($result[$id])) {
-                    $result[$id] = $id;
-                }
-            }
-        }
-
-        return array_values($result);
-    }
-
-    /**
+     * @param array  $result
      * @param string $entityClass
      * @param array  $entityIds
      * @param array  $config
-     *
-     * @return array
      */
-    protected function loadRelatedData($entityClass, $entityIds, $config)
+    protected function loadRelatedData(array &$result, $entityClass, $entityIds, $config)
     {
         $relatedData    = [];
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
@@ -415,8 +375,37 @@ class EntitySerializer
                 ? $this->loadRelatedItemsForSimpleEntity($entityIds, $mapping, $targetConfig)
                 : $this->loadRelatedItems($entityIds, $mapping, $targetConfig);
         }
+        if (!empty($relatedData)) {
+            $this->applyRelatedData($result, $entityClass, $relatedData);
+        }
+    }
 
-        return $relatedData;
+    /**
+     * @param array  $result
+     * @param string $entityClass
+     * @param array  $relatedData [field => [entityId => [field => value, ...], ...], ...]
+     *
+     * @throws \RuntimeException
+     */
+    protected function applyRelatedData(array &$result, $entityClass, $relatedData)
+    {
+        $entityIdFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
+        foreach ($result as &$resultItem) {
+            if (!array_key_exists($entityIdFieldName, $resultItem)) {
+                throw new \RuntimeException(
+                    sprintf('The result item does not contain the entity identifier. Entity: %s.', $entityClass)
+                );
+            }
+            $entityId = $resultItem[$entityIdFieldName];
+            foreach ($relatedData as $field => $relatedItems) {
+                $resultItem[$field] = [];
+                if (!empty($relatedItems[$entityId])) {
+                    foreach ($relatedItems[$entityId] as $relatedItem) {
+                        $resultItem[$field][] = $relatedItem;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -437,7 +426,7 @@ class EntitySerializer
      * @param array $mapping
      * @param array $config
      *
-     * @return array
+     * @return array [entityId => [field => value, ...], ...]
      */
     protected function loadRelatedItems($entityIds, $mapping, $config)
     {
@@ -470,7 +459,45 @@ class EntitySerializer
      * @param array $mapping
      * @param array $config
      *
-     * @return array
+     * @return array [entityId => relatedEntityId, ...]
+     */
+    protected function getRelatedItemsBindings($entityIds, $mapping, $config)
+    {
+        $rows = $this->queryFactory->getRelatedItemsIds($mapping, $entityIds, $config);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['entityId']][] = $row['relatedEntityId'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $bindings [entityId => relatedEntityId, ...]
+     *
+     * @return array of unique ids of all related entities from $bindings array
+     */
+    protected function getRelatedItemsIds($bindings)
+    {
+        $result = [];
+        foreach ($bindings as $ids) {
+            foreach ($ids as $id) {
+                if (!isset($result[$id])) {
+                    $result[$id] = $id;
+                }
+            }
+        }
+
+        return array_values($result);
+    }
+
+    /**
+     * @param array $entityIds
+     * @param array $mapping
+     * @param array $config
+     *
+     * @return array [entityId => [field => value, ...], ...]
      */
     protected function loadRelatedItemsForSimpleEntity($entityIds, $mapping, $config)
     {
@@ -505,34 +532,6 @@ class EntitySerializer
     }
 
     /**
-     * @param array  $result
-     * @param string $entityClass
-     * @param array  $relatedData
-     *
-     * @throws \RuntimeException
-     */
-    protected function applyRelatedData(array &$result, $entityClass, $relatedData)
-    {
-        $entityIdFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
-        foreach ($result as &$resultItem) {
-            if (!array_key_exists($entityIdFieldName, $resultItem)) {
-                throw new \RuntimeException(
-                    sprintf('The result item does not contain the entity identifier. Entity: %s.', $entityClass)
-                );
-            }
-            $entityId = $resultItem[$entityIdFieldName];
-            foreach ($relatedData as $field => $relatedItems) {
-                $resultItem[$field] = [];
-                if (!empty($relatedItems[$entityId])) {
-                    foreach ($relatedItems[$entityId] as $relatedItem) {
-                        $resultItem[$field][] = $relatedItem;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * @param string $entityClass
      * @param array  $config
      *
@@ -552,15 +551,14 @@ class EntitySerializer
     }
 
     /**
-     * @param object[] $entities
-     * @param string   $entityClass
+     * @param object[] $entities    A list of entities
+     * @param string   $idFieldName The name of entity identifier field
      *
-     * @return array
+     * @return array of unique ids of all entities from $entities array
      */
-    protected function getEntityIds($entities, $entityClass)
+    protected function getEntityIds($entities, $idFieldName)
     {
-        $ids         = [];
-        $idFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
+        $ids = [];
         foreach ($entities as $entity) {
             $id = $this->dataAccessor->getValue($entity, $idFieldName);
             if (!isset($ids[$id])) {
