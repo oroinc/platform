@@ -17,6 +17,11 @@ class PrivilegeCollectionType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['privileges_config'] = $options['options']['privileges_config'];
+
+        if (in_array('SHARE', $view->vars['privileges_config']['permissions'])) {
+            array_pop($view->vars['privileges_config']['permissions']);
+        }
+
         $view->vars['page_component_module'] = $options['page_component_module'];
         $view->vars['page_component_options'] = $options['page_component_options'];
     }

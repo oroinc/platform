@@ -19,7 +19,6 @@ datagrid:
           editor:
             view: orodatagrid/js/app/views/editor/date-editor-view
             view_options:
-              placeholder: '<placeholder>'
               css_class_name: '<class-name>'
               datePickerOptions:
                 # See http://goo.gl/pddxZU
@@ -38,7 +37,6 @@ datagrid:
 
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
 inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
@@ -56,7 +54,6 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | options.model | <code>Object</code> | Current row model |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for an empty element |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 | options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
 | options.datePickerOptions | <code>Object</code> | See [documentation here](http://goo.gl/pddxZU) |
