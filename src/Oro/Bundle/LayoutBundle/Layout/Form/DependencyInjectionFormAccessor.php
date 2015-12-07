@@ -67,6 +67,8 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor implements Co
      */
     public function setFormData($formData)
     {
-        $this->getForm()->setData($formData);
+        if (!$this->getForm()->isSubmitted()) {
+            $this->getForm()->setData($formData);
+        }
     }
 }
