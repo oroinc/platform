@@ -3,9 +3,10 @@
 namespace Oro\Bundle\QueryDesignerBundle\Grid\Extension;
 
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
+
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\QueryDesignerBundle\Model\ExpressionBuilder;
+use Oro\Bundle\QueryDesignerBundle\Model\Restriction;
 
 /**
  * Represents ORM data source adapter which allows to combine restrictions in groups,
@@ -13,25 +14,8 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
  */
 class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
 {
-    /**
-     * @var Expr\Composite[]
-     */
-    protected $exprStack;
-
-    /**
-     * @var string[]
-     */
-    protected $conditionStack;
-
-    /**
-     * @var Expr\Composite
-     */
-    protected $currentExpr = null;
-
-    /**
-     * @var string
-     */
-    protected $currentCondition = null;
+    /** @var ExpressionBuilder */
+    protected $expressionBuilder;
 
     /**
      * Constructor
@@ -41,7 +25,7 @@ class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
     public function __construct(QueryBuilder $qb)
     {
         parent::__construct($qb);
-        $this->resetState();
+        $this->expressionBuilder = new ExpressionBuilder();
     }
 
     /**
@@ -49,54 +33,17 @@ class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
      */
     public function addRestriction($restriction, $condition, $isComputed = false)
     {
-        if ($isComputed) {
-            if ($condition === FilterUtility::CONDITION_OR) {
-                $this->qb->orHaving($restriction);
-            } else {
-                $this->qb->andHaving($restriction);
-            }
-
-            return;
-        }
-
-        if ($this->currentExpr === null) {
-            // this is the first item in a group
-            $this->currentExpr = $restriction;
-        } else {
-            // other items
-            if ($condition === FilterUtility::CONDITION_OR) {
-                if ($this->currentExpr instanceof Expr\Orx) {
-                    $this->currentExpr->add($restriction);
-                } else {
-                    $this->currentExpr = $this->qb->expr()->orX($this->currentExpr, $restriction);
-                }
-            } else {
-                if ($this->currentExpr instanceof Expr\Andx) {
-                    $this->currentExpr->add($restriction);
-                } else {
-                    $this->currentExpr = $this->qb->expr()->andX($this->currentExpr, $restriction);
-                }
-            }
-        }
+        $this->expressionBuilder->addRestriction(new Restriction($restriction, $condition, $isComputed));
     }
 
     public function beginRestrictionGroup($condition)
     {
-        array_push($this->exprStack, $this->currentExpr);
-        array_push($this->conditionStack, $this->currentCondition);
-
-        $this->currentExpr      = null;
-        $this->currentCondition = $condition;
+        $this->expressionBuilder->beginGroup($condition);
     }
 
     public function endRestrictionGroup()
     {
-        $tmpExpr                = $this->currentExpr;
-        $tmpCondition           = $this->currentCondition;
-        $this->currentExpr      = array_pop($this->exprStack);
-        $this->currentCondition = array_pop($this->conditionStack);
-
-        $this->addRestriction($tmpExpr, $tmpCondition);
+        $this->expressionBuilder->endGroup();
     }
 
     /**
@@ -104,26 +51,6 @@ class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
      */
     public function applyRestrictions()
     {
-        if ($this->currentExpr === null && empty($this->exprStack)) {
-            return;
-        }
-
-        if ($this->currentExpr === null) {
-            $this->currentExpr = array_pop($this->exprStack);
-        }
-
-        $this->qb->andWhere($this->currentExpr);
-        $this->resetState();
-    }
-
-    /**
-     * Resets all 'state' variables of this adapter
-     */
-    protected function resetState()
-    {
-        $this->exprStack        = [];
-        $this->conditionStack   = [];
-        $this->currentExpr      = null;
-        $this->currentCondition = null;
+        $this->expressionBuilder->applyRestrictions($this->qb);
     }
 }
