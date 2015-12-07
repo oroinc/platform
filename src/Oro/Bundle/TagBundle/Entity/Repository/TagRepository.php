@@ -18,14 +18,20 @@ class TagRepository extends EntityRepository
     /**
      * @param string $entityClassName
      * @param array  $entityIds
+     * @param User   $owner
      * @param string $direction
      *
-     * @return array [id, name, entityId]
+     * @return array [id, name, entityId, owner]
      */
-    public function getTagsByEntityIds($entityClassName, array $entityIds, $direction = Criteria::ASC)
+    public function getTagsByEntityIds($entityClassName, array $entityIds, User $owner, $direction = Criteria::ASC)
     {
         $qb = $this->createQueryBuilder('t')
-            ->select('t.id', 't.name', 't2.recordId AS entityId')
+            ->select(
+                't.id',
+                't.name',
+                't2.recordId AS entityId',
+                '(CASE WHEN t2.owner = :owner THEN true ELSE false END) AS owner'
+            )
             ->innerJoin(
                 't.tagging',
                 't2',
@@ -34,7 +40,8 @@ class TagRepository extends EntityRepository
             )
             ->orderBy('t.name', $direction)
             ->setParameter('entityIds', $entityIds)
-            ->setParameter('entityClassName', $entityClassName);
+            ->setParameter('entityClassName', $entityClassName)
+            ->setParameter('owner', $owner);
 
         return $qb->getQuery()->getResult();
     }
