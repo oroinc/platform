@@ -125,6 +125,7 @@ services:
             - @oro_tag.helper.taggable_helper
             - @oro_entity.orm.entity_class_resolver
             - @oro_entity.routing_helper
+            - @oro_security.security_facade
         tags:
             - { name: oro_datagrid.extension }
 

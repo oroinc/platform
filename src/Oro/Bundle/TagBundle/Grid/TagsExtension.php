@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TagsExtension extends AbstractExtension
 {
@@ -35,22 +36,28 @@ class TagsExtension extends AbstractExtension
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param TagManager          $tagManager
      * @param TaggableHelper      $helper
      * @param EntityClassResolver $resolver
      * @param EntityRoutingHelper $entityRoutingHelper
+     * @param SecurityFacade      $securityFacade
      */
     public function __construct(
         TagManager $tagManager,
         TaggableHelper $helper,
         EntityClassResolver $resolver,
-        EntityRoutingHelper $entityRoutingHelper
+        EntityRoutingHelper $entityRoutingHelper,
+        SecurityFacade $securityFacade
     ) {
         $this->tagManager          = $tagManager;
         $this->taggableHelper      = $helper;
         $this->entityClassResolver = $resolver;
         $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->securityFacade      = $securityFacade;
     }
 
     /**
@@ -72,6 +79,11 @@ class TagsExtension extends AbstractExtension
         $className        = $this->getEntityClassName($config);
         $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
 
+        $permissions = [
+            'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY),
+            'oro_tag_unassign_global' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_REMOVE_ID_KEY)
+        ];
+
         $config->offsetSetByPath(
             '[columns]',
             array_merge(
@@ -88,9 +100,12 @@ class TagsExtension extends AbstractExtension
                         'translatable'   => true,
                         'renderable'     => false,
                         'inline_editing' => [
-                            'enable'                    => true,
-                            'editor'                    => [
-                                'view' => 'orotag/js/app/views/editor/tags-editor-view'
+                            'enable' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_ASSIGN_ID_KEY),
+                            'editor' => [
+                                'view'         => 'orotag/js/app/views/editor/tags-editor-view',
+                                'view_options' => [
+                                    'permissions' => $permissions
+                                ]
                             ],
                             'save_api_accessor'         => [
                                 'route'                       => 'oro_api_post_taggable',
@@ -114,7 +129,6 @@ class TagsExtension extends AbstractExtension
         );
 
         $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
-        //@TODO Need recheck this condition
         if (empty($filters) || strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_report') === 0) {
             return;
         }
