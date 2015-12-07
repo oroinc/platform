@@ -1,8 +1,9 @@
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
     'oroquerydesigner/js/field-condition'
-], function($, _) {
+], function($, _, __) {
     'use strict';
 
     $.widget('oroauditquerydesigner.aggregatedFieldCondition', $.oroquerydesigner.fieldCondition, {
@@ -13,6 +14,7 @@ define([
         _create: function() {
             var data = this.element.data('value');
 
+            this.element.append('<h5>').text(__('oro.querydesigner.aggregated_field_condition.label'));
             this.$fieldChoice = $('<input>').addClass(this.options.fieldChoiceClass);
             this.$filterContainer = $('<span>').addClass(this.options.filterContainerClass);
             this.element.append(this.$fieldChoice, this.$filterContainer);
