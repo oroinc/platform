@@ -19,6 +19,7 @@ define(function(require) {
      * @exports BaseClass
      */
     function BaseClass(options) {
+        options = options || {};
         this.cid = _.uniqueId('class');
         if (!options) {
             options = {};

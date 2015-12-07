@@ -27,7 +27,8 @@ Please see [text-editor-view](../../../../FormBundle/Resources/doc/editor/text-e
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.datetime"></a>
 ### defaultEditors.datetime : <code>function</code>
-Please see [datetime-editor-view](../../../../FormBundle/Resources/doc/editor/datetime-editor-view.md) for details
+Please see [datetime-editor-view](../../../../FormBundle/Resources/doc/editor/datetime-editor-view.md)
+for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.date"></a>
@@ -37,31 +38,37 @@ Please see [date-editor-view](../../../../FormBundle/Resources/doc/editor/date-e
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.currency"></a>
 ### defaultEditors.currency : <code>function</code>
-Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md) for details
+Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.number"></a>
 ### defaultEditors.number : <code>function</code>
-Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md) for details
+Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.integer"></a>
 ### defaultEditors.integer : <code>function</code>
-Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md) for details
+Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.decimal"></a>
 ### defaultEditors.decimal : <code>function</code>
-Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md) for details
+Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.percent"></a>
 ### defaultEditors.percent : <code>function</code>
-Please see [percent-editor-view](../../../../FormBundle/Resources/doc/editor/percent-editor-view.md) for details
+Please see [percent-editor-view](../../../../FormBundle/Resources/doc/editor/percent-editor-view.md)
+for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.select"></a>
 ### defaultEditors.select : <code>function</code>
-Please see [select-editor-view](../../../../FormBundle/Resources/doc/editor/select-editor-view.md) for details
+Please see [select-editor-view](../../../../FormBundle/Resources/doc/editor/select-editor-view.md)
+for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  

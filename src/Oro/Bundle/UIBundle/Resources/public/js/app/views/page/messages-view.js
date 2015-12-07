@@ -8,7 +8,25 @@ define([
     var PageMainMenuView;
 
     PageMainMenuView = PageRegionView.extend({
+        /**
+         * @type {Array}
+         */
         pageItems: ['flashMessages'],
+
+        /**
+         * Current route
+         *
+         * @type {object}
+         */
+        route: null,
+
+        /**
+         * @inheritDoc
+         */
+        onPageUpdate: function(pageData, actionArgs, jqXHR, promises) {
+            PageMainMenuView.__super__.onPageUpdate.apply(this, arguments);
+            this.route = actionArgs.route;
+        },
 
         /**
          * Prevents rendering a view without page data
@@ -20,7 +38,10 @@ define([
                 return this;
             }
 
-            this.$el.empty();
+            if (this.route && this.route.previous) {
+                // clear container if it is not the first load of page
+                this.$el.empty();
+            }
 
             // does not show messages from cache
             if (this.actionArgs.options.fromCache !== true) {

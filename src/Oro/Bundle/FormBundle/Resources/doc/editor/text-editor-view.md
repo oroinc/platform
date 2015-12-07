@@ -39,7 +39,8 @@ datagrid:
 
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
+inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 
@@ -51,14 +52,16 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
-| options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
-| options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for an empty element |
+| options.fieldName | <code>string</code> | Field name to edit in model |
+| options.metadata | <code>string</code> | Editor metadata |
+| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
+| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 
 
 * [TextEditorView](#module_TextEditorView) ⇐ <code>BaseView</code>
   * [.ARROW_LEFT_KEY_CODE](#module_TextEditorView#ARROW_LEFT_KEY_CODE)
+  * [.getPlaceholder()](#module_TextEditorView#getPlaceholder) ⇒ <code>string</code>
   * [.focus(atEnd)](#module_TextEditorView#focus)
   * [.getValidationRules()](#module_TextEditorView#getValidationRules) ⇒ <code>Object</code>
   * [.getFormattedValue()](#module_TextEditorView#getFormattedValue) ⇒ <code>string</code>
@@ -80,6 +83,11 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 Arrow codes
 
 **Kind**: instance property of <code>[TextEditorView](#module_TextEditorView)</code>  
+<a name="module_TextEditorView#getPlaceholder"></a>
+### textEditorView.getPlaceholder() ⇒ <code>string</code>
+Returns placeholder
+
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#focus"></a>
 ### textEditorView.focus(atEnd)
 Places focus on the editor

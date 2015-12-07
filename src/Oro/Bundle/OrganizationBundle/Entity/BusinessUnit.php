@@ -41,8 +41,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"="",
- *              "share_grid"="share-with-business-units-datagrid"
+ *              "group_name"=""
  *          }
  *      }
  * )
