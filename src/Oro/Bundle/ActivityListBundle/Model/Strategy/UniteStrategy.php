@@ -4,8 +4,6 @@ namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
@@ -23,28 +21,14 @@ class UniteStrategy implements StrategyInterface
     /** @var DoctrineHelper  */
     protected $doctrineHelper;
 
-    /** @var ActivityListAclCriteriaHelper */
-    protected $activityListAclHelper;
-
-    /** @var ActivityListChainProvider */
-    protected $activityListProvider;
-
     /**
-     * @param ActivityManager               $activityManager
-     * @param DoctrineHelper                $doctrineHelper
-     * @param ActivityListAclCriteriaHelper $activityListAclCriteriaHelper
-     * @param ActivityListChainProvider     $activityListChainProvider
+     * @param ActivityManager $activityManager
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(
-        ActivityManager $activityManager,
-        DoctrineHelper $doctrineHelper,
-        ActivityListAclCriteriaHelper $activityListAclCriteriaHelper,
-        ActivityListChainProvider $activityListChainProvider
-    ) {
+    public function __construct(ActivityManager $activityManager, DoctrineHelper $doctrineHelper)
+    {
         $this->activityManager = $activityManager;
         $this->doctrineHelper = $doctrineHelper;
-        $this->activityListAclHelper = $activityListAclCriteriaHelper;
-        $this->activityListProvider = $activityListChainProvider;
     }
 
     /**
@@ -67,7 +51,6 @@ class UniteStrategy implements StrategyInterface
                     ->andWhere('activity.relatedActivityClass = :activityClass')
                     ->setParameter('activityClass', $activityClass);
 
-                $this->activityListAclHelper->applyAclCriteria($queryBuilder, $this->activityListProvider->getProviders());
                 /** @var ActivityList[] $activities */
                 $activities = $queryBuilder->getQuery()->getResult();
 

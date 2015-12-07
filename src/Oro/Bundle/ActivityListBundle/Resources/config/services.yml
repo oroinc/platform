@@ -213,8 +213,6 @@ services:
         arguments:
             - @oro_activity.manager
             - @oro_entity.doctrine_helper
-            - @oro_activity_list.helper.acl_criteria
-            - @oro_activity_list.provider.chain
         tags:
             - { name: oro_activity_list.strategy }
 
@@ -223,8 +221,6 @@ services:
         arguments:
             - @oro_activity.manager
             - @oro_entity.doctrine_helper
-            - @oro_activity_list.helper.acl_criteria
-            - @oro_activity_list.provider.chain
         tags:
             - { name: oro_activity_list.strategy }
 
