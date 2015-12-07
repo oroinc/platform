@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 
 /**
@@ -11,17 +11,15 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
  */
 class TextGuesser implements GuesserInterface
 {
-    /**
-     * @var OroEntityManager
-     */
-    protected $entityManager;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /**
-     * @param OroEntityManager $oroEntityManager
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(OroEntityManager $oroEntityManager)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->entityManager = $oroEntityManager;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -29,11 +27,12 @@ class TextGuesser implements GuesserInterface
      */
     public function guessColumnOptions($columnName, $entityName, $column)
     {
-        $metadata = $this->entityManager->getClassMetadata($entityName);
+        $entityManager = $this->doctrineHelper->getEntityManager($entityName);
+        $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
         if ($metadata->hasField($columnName) && !$metadata->hasAssociation($columnName)) {
-            $result[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
+            $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
         }
 
         return $result;
