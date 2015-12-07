@@ -54,25 +54,29 @@ class UniteStrategy implements StrategyInterface
     {
         $entityData    = $fieldData->getEntityData();
         $masterEntity  = $entityData->getMasterEntity();
-        $sourceEntity  = $fieldData->getSourceEntity();
         $fieldMetadata = $fieldData->getMetadata();
 
-        $entityClass = get_class($sourceEntity);
-        $activityClass = $fieldMetadata->get('type');
-        $queryBuilder = $this->doctrineHelper
-            ->getEntityRepository(ActivityList::ENTITY_NAME)
-            ->getBaseActivityListQueryBuilder($entityClass, $sourceEntity->getId())
-            ->andWhere('activity.relatedActivityClass = :activityClass')
-            ->setParameter('activityClass', $activityClass);
+        $entities = $fieldData->getEntityData()->getEntities();
+        foreach ($entities as $sourceEntity) {
+            if ($sourceEntity->getId() !== $masterEntity->getId()) {
+                $entityClass = get_class($sourceEntity);
+                $activityClass = $fieldMetadata->get('type');
+                $queryBuilder = $this->doctrineHelper
+                    ->getEntityRepository(ActivityList::ENTITY_NAME)
+                    ->getBaseActivityListQueryBuilder($entityClass, $sourceEntity->getId())
+                    ->andWhere('activity.relatedActivityClass = :activityClass')
+                    ->setParameter('activityClass', $activityClass);
 
-        $this->activityListAclHelper->applyAclCriteria($queryBuilder, $this->activityListProvider->getProviders());
-        /** @var ActivityList[] $activities */
-        $activities = $queryBuilder->getQuery()->getResult();
+                $this->activityListAclHelper->applyAclCriteria($queryBuilder, $this->activityListProvider->getProviders());
+                /** @var ActivityList[] $activities */
+                $activities = $queryBuilder->getQuery()->getResult();
 
-        foreach ($activities as $activityListItem) {
-            $activity = $this->doctrineHelper->getEntityRepository($activityListItem->getRelatedActivityClass())
-                ->find($activityListItem->getRelatedActivityId());
-            $this->activityManager->replaceActivityTarget($activity, $sourceEntity, $masterEntity);
+                foreach ($activities as $activityListItem) {
+                    $activity = $this->doctrineHelper->getEntityRepository($activityListItem->getRelatedActivityClass())
+                        ->find($activityListItem->getRelatedActivityId());
+                    $this->activityManager->replaceActivityTarget($activity, $sourceEntity, $masterEntity);
+                }
+            }
         }
     }
 
