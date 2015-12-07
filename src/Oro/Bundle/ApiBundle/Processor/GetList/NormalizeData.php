@@ -24,6 +24,8 @@ class NormalizeData implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
+        /** @var GetListContext $context */
+
         if (!$context->hasResult()) {
             // no result
             return;
@@ -35,9 +37,11 @@ class NormalizeData implements ProcessorInterface
             return;
         }
 
+        $config = $context->getConfig();
+
         $normalizedData = [];
         foreach ($data as $key => $value) {
-            $normalizedData[$key] = $this->objectNormalizer->normalizeObject($value);
+            $normalizedData[$key] = $this->objectNormalizer->normalizeObject($value, $config);
         }
         $context->setResult($normalizedData);
     }

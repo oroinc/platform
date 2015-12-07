@@ -32,13 +32,13 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNormalizeSimpleEntity()
+    public function testNormalizeSimpleObject()
     {
-        $entity = new Object\Group();
-        $entity->setId(123);
-        $entity->setName('test_name');
+        $object = new Object\Group();
+        $object->setId(123);
+        $object->setName('test_name');
 
-        $result = $this->objectNormalizer->normalizeObject($entity);
+        $result = $this->objectNormalizer->normalizeObject($object);
 
         $this->assertEquals(
             [
@@ -49,7 +49,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNormalizeEntityWithNullToOneRelations()
+    public function testNormalizeObjectWithNullToOneRelations()
     {
         $product = new Object\Product();
         $product->setId(123);
@@ -69,10 +69,10 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNormalizeEntityWithToOneRelations()
+    public function testNormalizeObjectWithToOneRelations()
     {
         $result = $this->objectNormalizer->normalizeObject(
-            $this->createProductEntity()
+            $this->createProductObject()
         );
 
         $this->assertEquals(
@@ -87,7 +87,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNormalizeEntityWithNullToManyRelations()
+    public function testNormalizeObjectWithNullToManyRelations()
     {
         $user = new Object\User();
         $user->setId(123);
@@ -107,10 +107,10 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNormalizeEntityWithToManyRelations()
+    public function testNormalizeObjectWithToManyRelations()
     {
         $result = $this->objectNormalizer->normalizeObject(
-            $this->createProductEntity()->getOwner()
+            $this->createProductObject()->getOwner()
         );
 
         $this->assertEquals(
@@ -128,7 +128,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return Object\Product
      */
-    protected function createProductEntity()
+    protected function createProductObject()
     {
         $product = new Object\Product();
         $product->setId(123);
@@ -145,7 +145,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $owner->setName('user_name');
         $ownerCategory = new Object\Category();
         $ownerCategory->setName('owner_category_name');
-        $category->setLabel('owner-category_label');
+        $ownerCategory->setLabel('owner_category_label');
         $owner->setCategory($ownerCategory);
         $ownerGroup1 = new Object\Group();
         $ownerGroup1->setId(11);
