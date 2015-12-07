@@ -4,18 +4,16 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
-use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class MergeListener
 {
-    /** @var ActivityManager */
-    protected $activityManager;
+    const TRANSLATE_KEY = 'plural_label';
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -23,19 +21,22 @@ class MergeListener
     /** @var ConfigProvider */
     protected $configProvider;
 
+    /** @var ActivityListChainProvider */
+    protected $activityListChainProvider;
+
     /**
-     * @param ActivityManager $activityManager
      * @param TranslatorInterface $translator
      * @param ConfigProvider $configProvider
+     * @param ActivityListChainProvider $activityListChainProvider
      */
     public function __construct(
-        ActivityManager $activityManager,
         TranslatorInterface $translator,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        ActivityListChainProvider $activityListChainProvider
     ) {
-        $this->activityManager = $activityManager;
         $this->translator = $translator;
         $this->configProvider = $configProvider;
+        $this->activityListChainProvider = $activityListChainProvider;
     }
 
     /**
@@ -54,41 +55,13 @@ class MergeListener
                 'type'          => $type,
                 'field_name'    => $this->getFieldNameByActivityClassName($type),
                 'is_collection' => true,
-                'label'         =>
-                    $this->translator->trans('oro.activitylist.entity_plural_label') . ' ('
-                    . $this->translator->trans($this->getAliasByActivityClass($type))
-                    . ')',
+                'label'         => $this->translator->trans($this->getAliasByActivityClass($type)),
                 'merge_modes'   => [MergeModes::UNITE, MergeModes::REPLACE]
             ];
 
             $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
             $entityMetadata->addFieldMetadata($fieldMetadata);
         }
-    }
-
-    /**
-     * Load activities
-     *
-     * @param EntityDataEvent $event
-     */
-    public function onCreateEntityData(EntityDataEvent $event)
-    {
-        $entityData     = $event->getEntityData();
-        $entityMetadata = $entityData->getMetadata();
-        $types = $this->getAvailableActivityTypes($entityMetadata);
-        $entities = $entityData->getEntities();
-    }
-
-    /**
-     * Save activities
-     *
-     * @param EntityDataEvent $event
-     */
-    public function afterMergeEntity(EntityDataEvent $event)
-    {
-        $entityData     = $event->getEntityData();
-        $entityMetadata = $entityData->getMetadata();
-        $types = $this->getAvailableActivityTypes($entityMetadata);
     }
 
     /**
@@ -99,9 +72,14 @@ class MergeListener
     protected function getAvailableActivityTypes(EntityMetadata $entityMetadata)
     {
         $className = $entityMetadata->getClassName();
-        $types = $this->activityManager->getActivities($className);
+        $types = [];
+        foreach ($this->activityListChainProvider->getSupportedActivities() as $type) {
+            if ($this->activityListChainProvider->isApplicableTarget($className, $type)) {
+                $types[] = $type;
+            }
+        }
 
-        return array_keys($types);
+        return $types;
     }
 
     /**
@@ -123,6 +101,6 @@ class MergeListener
     {
         $config = $this->configProvider->getConfig($className);
 
-        return $config->get('plural_label');
+        return $config->get(self::TRANSLATE_KEY);
     }
 }

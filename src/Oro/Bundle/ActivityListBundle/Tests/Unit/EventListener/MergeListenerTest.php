@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\ActivityListBundle\EventListener\MergeListener;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 
 class MergeListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,8 +22,8 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityMetadata|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityMetadata;
 
-    /** @var ActivityManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $activityManager;
+//    /** @var ActivityManager|\PHPUnit_Framework_MockObject_MockObject */
+//    protected $activityManager;
 
     /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
@@ -30,12 +31,19 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
+    /** @var ActivityListChainProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $activityListChainProvider;
+
     protected function setUp()
     {
-        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
+//        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
+//            ->disableOriginalConstructor()
+//            ->getMock();
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->activityListChainProvider = $this
+            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -44,7 +52,12 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->willReturn('Items');
 
-        $this->listener = new MergeListener($this->activityManager, $this->translator, $this->configProvider);
+        $this->listener = new MergeListener(
+//            $this->activityManager,
+            $this->translator,
+            $this->configProvider,
+            $this->activityListChainProvider
+        );
 
         $this->entityMetadata = $this
             ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
@@ -64,9 +77,14 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('addFieldMetadata');
 
-        $this->activityManager
+//        $this->activityManager
+//            ->expects($this->once())
+//            ->method('getActivities')
+//            ->willReturn([]);
+
+        $this->activityListChainProvider
             ->expects($this->once())
-            ->method('getActivities')
+            ->method('getSupportedActivities')
             ->willReturn([]);
 
         $event = new EntityMetadataEvent($this->entityMetadata);
@@ -88,9 +106,8 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn('label');
 
-        $k = array_keys($keys);
         $i = 0;
-        foreach ($k as $key) {
+        foreach ($keys as $key) {
             $i++;
             $fieldMetadataOptions = [
                 'display' => true,
@@ -99,7 +116,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
                 'type' => $key,
                 'field_name' => $key,
                 'is_collection' => true,
-                'label' => 'Items (Items)',
+                'label' => 'Items',
                 'merge_modes' => [MergeModes::UNITE, MergeModes::REPLACE]
             ];
             $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
@@ -110,10 +127,15 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo($fieldMetadata));
         }
 
-        $this->activityManager
+        $this->activityListChainProvider
             ->expects($this->once())
-            ->method('getActivities')
+            ->method('getSupportedActivities')
             ->willReturn($keys);
+
+        $this->activityListChainProvider
+            ->expects($this->exactly($calls))
+            ->method('isApplicableTarget')
+            ->willReturn(true);
 
         $event = new EntityMetadataEvent($this->entityMetadata);
 
@@ -124,20 +146,20 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'one' => [
-                'keys' => ['key1' => 'value'],
+                'keys' => ['key1'],
                 'calls' => 1
             ],
             'two' => [
-                'keys' => ['key1' => 'value', 'key2' => 'value'],
+                'keys' => ['key1', 'key2'],
                 'calls' => 2
             ],
             'five' => [
                 'keys' => [
-                    'key1' => 'value',
-                    'key2' => 'value',
-                    'key3' => 'value',
-                    'key4' => 'value',
-                    'key5' => 'value'
+                    'key1',
+                    'key2',
+                    'key3',
+                    'key4',
+                    'key5'
                 ],
                 'calls' => 5
             ],
