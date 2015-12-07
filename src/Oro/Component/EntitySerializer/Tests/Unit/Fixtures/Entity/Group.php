@@ -135,4 +135,12 @@ class Group
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getComputedName()
+    {
+        return sprintf('%s (COMPUTED)', $this->name);
+    }
 }
