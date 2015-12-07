@@ -19,8 +19,12 @@ define(function(require) {
         getTemplateData: function() {
             return {
                 model: this.model.toJSON(),
-                fieldName: this.fieldName
+                fieldName: this.fieldName,
+                tagSortCallback: this.tagSortCallback
             };
+        },
+        tagSortCallback: function(a, b) {
+            return (a.owner ? 1 : 0) - (b.owner ? 1 : 0);
         }
     });
 
