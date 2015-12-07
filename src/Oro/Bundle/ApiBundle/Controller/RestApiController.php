@@ -25,7 +25,7 @@ class RestApiController extends FOSRestController
      *
      * @param Request $request
      *
-     * @ApiDoc(description="Get entities", resource=true)
+     * @ApiDoc(description="Get entities", resource=true, views={"rest_plain", "rest_json_api"})
      *
      * @return Response
      */
@@ -46,7 +46,7 @@ class RestApiController extends FOSRestController
      *
      * @param Request $request
      *
-     * @ApiDoc(description="Get entity", resource=true)
+     * @ApiDoc(description="Get entity", resource=true, views={"rest_plain", "rest_json_api"})
      *
      * @return Response
      */

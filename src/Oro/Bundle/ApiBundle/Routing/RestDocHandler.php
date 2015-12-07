@@ -23,7 +23,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
-class RestJsonApiDocHandler implements HandlerInterface
+class RestDocHandler implements HandlerInterface
 {
     const ID_DESCRIPTION     = 'The identifier of an entity';
     const FORMAT_DESCRIPTION = 'The response format';
@@ -45,6 +45,9 @@ class RestJsonApiDocHandler implements HandlerInterface
         ],
     ];
 
+    /** @var RestDocViewDetector */
+    protected $docViewDetector;
+
     /** @var ActionProcessorBag */
     protected $processorBag;
 
@@ -61,6 +64,7 @@ class RestJsonApiDocHandler implements HandlerInterface
     protected $valueNormalizer;
 
     /**
+     * @param RestDocViewDetector              $docViewDetector
      * @param ActionProcessorBag               $processorBag
      * @param EntityClassNameProviderInterface $entityClassNameProvider
      * @param EntityAliasResolver              $entityAliasResolver
@@ -68,12 +72,14 @@ class RestJsonApiDocHandler implements HandlerInterface
      * @param ValueNormalizer                  $valueNormalizer
      */
     public function __construct(
+        RestDocViewDetector $docViewDetector,
         ActionProcessorBag $processorBag,
         EntityClassNameProviderInterface $entityClassNameProvider,
         EntityAliasResolver $entityAliasResolver,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
+        $this->docViewDetector         = $docViewDetector;
         $this->processorBag            = $processorBag;
         $this->entityClassNameProvider = $entityClassNameProvider;
         $this->entityAliasResolver     = $entityAliasResolver;
@@ -86,7 +92,7 @@ class RestJsonApiDocHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if ($route->getOption('group') !== RestJsonApiRouteOptionsResolver::ROUTE_GROUP) {
+        if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP) {
             return;
         }
         $action = $route->getDefault('_action');
@@ -98,18 +104,18 @@ class RestJsonApiDocHandler implements HandlerInterface
         if ($entityClass) {
             $config = $this->getConfig($action, $entityClass);
             $this->setDescription($annotation, $action, (array)$config->getConfig(), $entityClass);
-            if ($this->hasAttribute($route, RestJsonApiRouteOptionsResolver::ID_PLACEHOLDER)) {
+            if ($this->hasAttribute($route, RestRouteOptionsResolver::ID_PLACEHOLDER)) {
                 $this->addIdRequirement(
                     $annotation,
                     $entityClass,
-                    $route->getRequirement(RestJsonApiRouteOptionsResolver::ID_ATTRIBUTE)
+                    $route->getRequirement(RestRouteOptionsResolver::ID_ATTRIBUTE)
                 );
             }
             if ($config->hasConfigExtra(FiltersConfigExtra::NAME) && method_exists($config, 'getFilters')) {
                 $this->addFilters($annotation, $config->getFilters());
             }
         }
-        $formatRequirement = $route->getRequirement(RestJsonApiRouteOptionsResolver::FORMAT_ATTRIBUTE);
+        $formatRequirement = $route->getRequirement(RestRouteOptionsResolver::FORMAT_ATTRIBUTE);
         if ($formatRequirement) {
             $this->addFormatRequirement($annotation, $formatRequirement);
         }
@@ -122,7 +128,7 @@ class RestJsonApiDocHandler implements HandlerInterface
      */
     protected function getEntityClass(Route $route)
     {
-        $pluralAlias = $route->getDefault(RestJsonApiRouteOptionsResolver::ENTITY_ATTRIBUTE);
+        $pluralAlias = $route->getDefault(RestRouteOptionsResolver::ENTITY_ATTRIBUTE);
 
         return $pluralAlias
             ? $this->entityAliasResolver->getClassByPluralAlias($pluralAlias)
@@ -142,11 +148,15 @@ class RestJsonApiDocHandler implements HandlerInterface
         $context = $processor->createContext();
         $context->removeConfigExtra(SortersConfigExtra::NAME);
         $context->addConfigExtra(new DescriptionsConfigExtra());
-        $context->setRequestType([RequestType::REST, RequestType::JSON_API]);
+        $context->setRequestType(RequestType::REST);
+        if ('rest_json_api' === $this->docViewDetector->getView()) {
+            $context->setRequestType(RequestType::JSON_API);
+        }
         $context->setLastGroup('initialize');
         if ($entityClass) {
             $context->setClassName($entityClass);
         }
+
         $processor->process($context);
 
         return $context;
@@ -207,7 +217,7 @@ class RestJsonApiDocHandler implements HandlerInterface
     protected function addFormatRequirement(ApiDoc $annotation, $requirement)
     {
         $annotation->addRequirement(
-            RestJsonApiRouteOptionsResolver::FORMAT_ATTRIBUTE,
+            RestRouteOptionsResolver::FORMAT_ATTRIBUTE,
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType(DataType::STRING),
                 'requirement' => $requirement,
@@ -230,7 +240,7 @@ class RestJsonApiDocHandler implements HandlerInterface
             : DataType::STRING;
 
         $annotation->addRequirement(
-            RestJsonApiRouteOptionsResolver::ID_ATTRIBUTE,
+            RestRouteOptionsResolver::ID_ATTRIBUTE,
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
                 'requirement' => $requirement,

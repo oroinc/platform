@@ -1,8 +1,8 @@
 parameters:
-    # a list of supported formats of REST API requests based on JSON API delimited by |
-    oro_api.rest_json_api.formats: json
-    # default format of REST API requests based on JSON API
-    oro_api.rest_json_api.default_format: json
+    # a list of supported formats of REST API requests delimited by |
+    oro_api.rest.formats: json
+    # default format of REST API requests
+    oro_api.rest.default_format: json
 
 services:
     oro_api.action_processor_bag:
@@ -177,8 +177,8 @@ services:
             - @oro_api.json_api.entity_class_transformer
             - @oro_api.rest.entity_id_transformer
 
-    oro_api.rest_json_api.routing_options_resolver:
-        class: Oro\Bundle\ApiBundle\Routing\RestJsonApiRouteOptionsResolver
+    oro_api.rest.routing_options_resolver:
+        class: Oro\Bundle\ApiBundle\Routing\RestRouteOptionsResolver
         public: false
         arguments:
             - @oro_entity_config.entity_manager_bag
@@ -186,15 +186,16 @@ services:
             - @oro_entity.entity_alias_resolver
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
-            - %oro_api.rest_json_api.formats%
-            - %oro_api.rest_json_api.default_format%
+            - %oro_api.rest.formats%
+            - %oro_api.rest.default_format%
         tags:
             - { name: routing.options_resolver, priority: -255 }
 
-    oro_api.rest_json_api.doc_handler:
-        class: Oro\Bundle\ApiBundle\Routing\RestJsonApiDocHandler
+    oro_api.rest.doc_handler:
+        class: Oro\Bundle\ApiBundle\Routing\RestDocHandler
         public: false
         arguments:
+            - @oro_api.rest.doc_view_detector
             - @oro_api.action_processor_bag
             - @oro_entity.entity_class_name_provider
             - @oro_entity.entity_alias_resolver
@@ -202,6 +203,12 @@ services:
             - @oro_api.value_normalizer
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    oro_api.rest.doc_view_detector:
+        class: Oro\Bundle\ApiBundle\Routing\RestDocViewDetector
+        public: false
+        arguments:
+            - @request_stack
 
     oro.api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory
