@@ -323,8 +323,12 @@ class EntitySerializer
                 continue;
             }
 
-            $alias = 'a' . ++$aliasCounter;
-            $qb->leftJoin(sprintf('%s.%s', $rootAlias, $field), $alias);
+            $join  = sprintf('%s.%s', $rootAlias, $field);
+            $alias = $this->getExistingJoinAlias($qb, $rootAlias, $join);
+            if (!$alias) {
+                $alias = 'a' . ++$aliasCounter;
+                $qb->leftJoin($join, $alias);
+            }
             $this->updateSelectQueryPart(
                 $qb,
                 $alias,
@@ -333,6 +337,28 @@ class EntitySerializer
                 true
             );
         }
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string       $rootAlias
+     * @param string       $join
+     *
+     * @return string|null
+     */
+    protected function getExistingJoinAlias(QueryBuilder $qb, $rootAlias, $join)
+    {
+        $joins = $qb->getDQLPart('join');
+        if (!empty($joins[$rootAlias])) {
+            /** @var Query\Expr\Join $item */
+            foreach ($joins[$rootAlias] as $item) {
+                if ($item->getJoin() === $join) {
+                    return $item->getAlias();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

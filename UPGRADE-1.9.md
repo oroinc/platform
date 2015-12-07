@@ -98,6 +98,7 @@ after:
     'isPrimary' => ['property_path' => 'primary']
 ```
 - The signature of `post_serialize` callback is changed. Old signature: `function (array &$item) : void`. New signature: `function (array $item) : array`.
+- The `EntitySerializer` changed to accept existing joins. See https://github.com/orocrm/platform/issues/283.
 
 ####ImportExportBundle
 - `Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer`: the first argument of constructor `Doctrine\ORM\EntityManager $entityManager` replaced by `Oro\Bundle\EntityBundle\ORM\DoctrineHelper $doctrineHelper`
