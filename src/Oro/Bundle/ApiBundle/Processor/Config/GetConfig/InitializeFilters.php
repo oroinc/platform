@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Config\BuildConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class BuildSorters implements ProcessorInterface
+class InitializeFilters implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
@@ -16,11 +16,11 @@ class BuildSorters implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        if ($context->hasSorters()) {
-            // a sorters' definition is already built
+        if ($context->hasFilters()) {
+            // a filters' definition is already built
             return;
         }
 
-        $context->setSorters(ConfigUtil::getInitialConfig());
+        $context->setFilters(ConfigUtil::getInitialConfig());
     }
 }
