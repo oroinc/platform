@@ -9,7 +9,6 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\ActivityListBundle\EventListener\MergeListener;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
@@ -22,9 +21,6 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityMetadata|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityMetadata;
 
-//    /** @var ActivityManager|\PHPUnit_Framework_MockObject_MockObject */
-//    protected $activityManager;
-
     /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
@@ -36,9 +32,6 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-//        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
-//            ->disableOriginalConstructor()
-//            ->getMock();
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -53,7 +46,6 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn('Items');
 
         $this->listener = new MergeListener(
-//            $this->activityManager,
             $this->translator,
             $this->configProvider,
             $this->activityListChainProvider
@@ -76,11 +68,6 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
         $this->entityMetadata
             ->expects($this->never())
             ->method('addFieldMetadata');
-
-//        $this->activityManager
-//            ->expects($this->once())
-//            ->method('getActivities')
-//            ->willReturn([]);
 
         $this->activityListChainProvider
             ->expects($this->once())
