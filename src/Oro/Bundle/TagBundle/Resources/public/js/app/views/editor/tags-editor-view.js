@@ -18,7 +18,7 @@ define(function(require) {
      *       {column-name-1}:
      *         inline_editing:
      *           editor:
-     *             view: orodatagrid/js/app/views/editor/tags-editor-view
+     *             view: oroform/js/app/views/editor/tags-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
      *               css_class_name: '<class-name>'

@@ -115,7 +115,7 @@ datagrid:
                 inline_editing:
                     enable: true
                     editor:
-                        view: orodatagrid/js/app/views/editor/select-editor-view
+                        view: oroform/js/app/views/editor/select-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
                 choices: # can be used service as data provider @service->getDataMethod
@@ -136,7 +136,7 @@ datagrid:
                 inline_editing:
                     enable: true
                     editor:
-                        view: orodatagrid/js/app/views/editor/multi-select-editor-view
+                        view: oroform/js/app/views/editor/multi-select-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
                 choices: # can be used service as data provider @service->getDataMethod
@@ -156,7 +156,7 @@ datagrid:
                 inline_editing:
                     enable: true
                     editor:
-                        view: orodatagrid/js/app/views/editor/related-id-relation-editor-view
+                        view: oroform/js/app/views/editor/related-id-relation-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
 ```
@@ -174,7 +174,7 @@ datagrid:
                 inline_editing:
                     enable: true
                     editor:
-                        view: orodatagrid/js/app/views/editor/multi-relation-editor-view
+                        view: oroform/js/app/views/editor/multi-relation-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
 ```
