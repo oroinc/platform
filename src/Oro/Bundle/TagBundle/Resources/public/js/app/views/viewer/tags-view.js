@@ -1,13 +1,31 @@
+/** @lends TagsView */
 define(function(require) {
     'use strict';
     var BaseView = require('oroui/js/app/views/base/view');
 
     /**
-     * Tags view, able to handle either `collection` of tags or plain array of `items`.
+     * Tags view, able to handle plain array of `tags`.
+     *
+     * Usage sample:
+     * ```javascript
+     * var tagsView = new TagsView({
+     *     model: new Backbone.Model({
+     *         tags: [
+     *             {id: 1, name: 'tag1'},
+     *             {id: 2, name: 'tag2'},
+     *             // ...
+     *         ]
+     *     }),
+     *     fieldName: 'tags' // should match model tags field name,
+     *     autoRender: true
+     * });
+     * ```
      *
      * @class
+     * @augments BaseView
+     * @exports TagsView
      */
-    var TagsView = BaseView.extend({
+    var TagsView = BaseView.extend(/** @exports TagsView.prototype */{
         template: require('tpl!orotag/templates/viewer/tags-view.html'),
         listen: {
             'change model': 'render'
