@@ -6,7 +6,6 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager;
-use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 
 class AbstractAclManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,15 +57,6 @@ class AbstractAclManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new UserSecurityIdentity('Test', get_class($user)),
             $this->abstract->getSid($src)
-        );
-
-        $businessUnit = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\BusinessUnitInterface');
-        $businessUnit->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue(1));
-        $this->assertEquals(
-            new BusinessUnitSecurityIdentity(1, get_class($businessUnit)),
-            $this->abstract->getSid($businessUnit)
         );
 
         $this->setExpectedException('\InvalidArgumentException');
