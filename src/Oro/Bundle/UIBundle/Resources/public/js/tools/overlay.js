@@ -39,6 +39,7 @@ define(function(require) {
                     old = _new || ($overlayContent.css('top') + '.' + $overlayContent.css('left'));
                     $overlayContent.position(options.position);
                     _new = $overlayContent.css('top') + '.' + $overlayContent.css('left');
+                    $overlayContent.trigger('updatePosition');
                     iterations--;
                 } while (old !== _new && iterations > 0);
             }
