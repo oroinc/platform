@@ -239,6 +239,6 @@ services:
         arguments:
           - @translator
           - @oro_entity_config.provider.entity
-          - @oro_activity_list.provider.chain
+          - @oro_activity.manager
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata, priority: -10 }
