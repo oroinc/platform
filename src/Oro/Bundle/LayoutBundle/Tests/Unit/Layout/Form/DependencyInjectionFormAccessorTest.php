@@ -173,7 +173,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
 
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->once())->method('setData')->with($data);
-        $form->expects($this->at(2))->method('getData')->willReturn($data);
+        $form->expects($this->once())->method('getData')->willReturn($data);
 
         $this->container->expects($this->once())
             ->method('get')
@@ -182,7 +182,6 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
 
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
 
-        $this->assertNull($formAccessor->getForm()->getData());
         $formAccessor->setFormData($data);
         $this->assertEquals($data, $formAccessor->getForm()->getData());
     }
