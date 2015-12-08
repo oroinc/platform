@@ -56,6 +56,7 @@ class RestApiController extends FOSRestController
         /** @var GetContext $context */
         $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
+        $context->setFilterValues(new RestFilterValueAccessor($request));
 
         $processor->process($context);
 
