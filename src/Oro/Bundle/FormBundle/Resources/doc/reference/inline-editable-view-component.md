@@ -52,7 +52,7 @@ Sample:
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
-| options._sourceElement | <code>Object</code> | Element where to connect this view (passed automatically when                                          page component is [connected through DOM attributes](../../../../../../UIBundle/Resources/doc/reference/page-component.md)) |
+| options._sourceElement | <code>Object</code> | Element where to connect this view (passed automatically when                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md)) |
 | options.frontend_type | <code>string</code> | frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js) |
 | options.value | <code>\*</code> | value to edit |
 | options.fieldName | <code>string</code> | field name to use when sending value to server |
