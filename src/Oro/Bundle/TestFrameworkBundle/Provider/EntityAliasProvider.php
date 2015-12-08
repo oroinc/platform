@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 
 /**
  * This alias provider excludes aliases generation for test entities to avoid duplications of aliases.
- * TestActivity entity does not covered by this class because it should have aliases
+ * TestActivity and TestActivityTarget entities does not covered by this class because they should have aliases
  * to build correct association API routes.
  */
 class EntityAliasProvider implements EntityAliasProviderInterface
@@ -15,7 +15,6 @@ class EntityAliasProvider implements EntityAliasProviderInterface
         'Oro\Bundle\TestFrameworkBundle\Entity\Item',
         'Oro\Bundle\TestFrameworkBundle\Entity\ItemValue',
         'Oro\Bundle\TestFrameworkBundle\Entity\Product',
-        'Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget',
         'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
     ];
 
