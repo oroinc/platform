@@ -15,7 +15,7 @@ class NormalizeValueContext extends ApiContext
     /** determines if a value can be an array */
     const ARRAY_ALLOWED = 'arrayAllowed';
 
-    /** a delimiter that should be used to split a string to separate items */
+    /** a delimiter that should be used to split a string to separate elements */
     const ARRAY_DELIMITER = 'arrayDelimiter';
 
     /**
@@ -97,7 +97,7 @@ class NormalizeValueContext extends ApiContext
     }
 
     /**
-     * Gets a delimiter that should be used to split a string to separate items.
+     * Gets a delimiter that should be used to split a string to separate elements.
      *
      * @return string|null
      */
@@ -107,7 +107,7 @@ class NormalizeValueContext extends ApiContext
     }
 
     /**
-     * Sets a delimiter that should be used to split a string to separate items.
+     * Sets a delimiter that should be used to split a string to separate elements.
      *
      * @param string|null $delimiter
      */

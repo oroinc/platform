@@ -16,7 +16,6 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -262,7 +261,7 @@ class RestDocHandler implements HandlerInterface
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
                         [RequestType::REST, RequestType::JSON_API],
-                        $filter->isArrayAllowed() ? RestRequest::ARRAY_DELIMITER : null
+                        $filter->isArrayAllowed()
                     )
                 ];
                 $default = $filter->getDefaultValueString();

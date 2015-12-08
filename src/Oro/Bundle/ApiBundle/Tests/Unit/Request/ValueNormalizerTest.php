@@ -32,6 +32,14 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $processorMap = [
             [
+                $this->addProcessor($processorBag, 'set_array_delimiter'),
+                new Processor\SetArrayDelimiter()
+            ],
+            [
+                $this->addProcessor($processorBag, 'string', DataType::STRING),
+                new Processor\NormalizeString()
+            ],
+            [
                 $this->addProcessor($processorBag, 'integer', DataType::INTEGER),
                 new Processor\NormalizeInteger()
             ],
@@ -89,7 +97,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetArrayRequirement($expectedValue, $dataType, $requestType)
     {
-        $result = $this->valueNormalizer->getRequirement($dataType, $requestType, RestRequest::ARRAY_DELIMITER);
+        $result = $this->valueNormalizer->getRequirement($dataType, $requestType, true);
         $this->assertSame($expectedValue, $result);
     }
 
@@ -136,15 +144,15 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function getArrayRequirement($requirement)
     {
-        return sprintf('%1$s(%2$s%1$s)*', $requirement, RestRequest::ARRAY_DELIMITER);
+        return sprintf('%1$s(,%1$s)*', $requirement);
     }
 
     /**
      * @dataProvider normalizeValueProvider
      */
-    public function testNormalizeValue($expectedValue, $value, $dataType, $requestType)
+    public function testNormalizeValue($expectedValue, $value, $dataType, $requestType, $isArrayAllowed = false)
     {
-        $result = $this->valueNormalizer->normalizeValue($value, $dataType, $requestType, RestRequest::ARRAY_DELIMITER);
+        $result = $this->valueNormalizer->normalizeValue($value, $dataType, $requestType, $isArrayAllowed);
         if (is_object($expectedValue)) {
             $this->assertInstanceOf(get_class($expectedValue), $result);
             $this->assertEquals(get_class($expectedValue), get_class($result));
@@ -159,40 +167,77 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function normalizeValueProvider()
     {
         return [
-            ['test', 'test', 'unknownType', [RequestType::REST]],
-            [null, null, DataType::STRING, [RequestType::REST]],
-            [null, null, DataType::INTEGER, [RequestType::REST]],
-            [null, null, DataType::UNSIGNED_INTEGER, [RequestType::REST]],
-            [null, null, DataType::BOOLEAN, [RequestType::REST]],
-            [null, null, DataType::DATETIME, [RequestType::REST]],
-            [null, null, DataType::ORDER_BY, [RequestType::REST]],
-            ['test', 'test', DataType::STRING, [RequestType::REST]],
-            [123, 123, DataType::INTEGER, [RequestType::REST]],
-            [[123, 456], [123, 456], DataType::INTEGER, [RequestType::REST]],
-            [0, '0', DataType::INTEGER, [RequestType::REST]],
-            [123, '123', DataType::INTEGER, [RequestType::REST]],
-            [-123, '-123', DataType::INTEGER, [RequestType::REST]],
-            [[123, -456], '123,-456', DataType::INTEGER, [RequestType::REST]],
-            [123, 123, DataType::UNSIGNED_INTEGER, [RequestType::REST]],
-            [[123, 456], [123, 456], DataType::UNSIGNED_INTEGER, [RequestType::REST]],
-            [0, '0', DataType::UNSIGNED_INTEGER, [RequestType::REST]],
-            [123, '123', DataType::UNSIGNED_INTEGER, [RequestType::REST]],
-            [[123, 456], '123,456', DataType::UNSIGNED_INTEGER, [RequestType::REST]],
-            [false, '0', DataType::BOOLEAN, [RequestType::REST]],
-            [false, false, DataType::BOOLEAN, [RequestType::REST]],
-            [false, 'false', DataType::BOOLEAN, [RequestType::REST]],
-            [false, 'no', DataType::BOOLEAN, [RequestType::REST]],
-            [true, true, DataType::BOOLEAN, [RequestType::REST]],
-            [true, '1', DataType::BOOLEAN, [RequestType::REST]],
-            [true, 'true', DataType::BOOLEAN, [RequestType::REST]],
-            [true, 'yes', DataType::BOOLEAN, [RequestType::REST]],
-            [[true, false], [true, false], DataType::BOOLEAN, [RequestType::REST]],
-            [[true, false], '1,0', DataType::BOOLEAN, [RequestType::REST]],
+            ['test', 'test', 'unknownType', [RequestType::REST], true],
+            ['test', 'test', 'unknownType', [RequestType::REST], false],
+            [null, null, DataType::STRING, [RequestType::REST], true],
+            [null, null, DataType::STRING, [RequestType::REST], false],
+            [null, null, DataType::INTEGER, [RequestType::REST], true],
+            [null, null, DataType::INTEGER, [RequestType::REST], false],
+            [null, null, DataType::UNSIGNED_INTEGER, [RequestType::REST], true],
+            [null, null, DataType::UNSIGNED_INTEGER, [RequestType::REST], false],
+            [null, null, DataType::BOOLEAN, [RequestType::REST], true],
+            [null, null, DataType::BOOLEAN, [RequestType::REST], false],
+            [null, null, DataType::DATETIME, [RequestType::REST], true],
+            [null, null, DataType::DATETIME, [RequestType::REST], false],
+            [null, null, DataType::ORDER_BY, [RequestType::REST], true],
+            ['test', 'test', DataType::STRING, [RequestType::REST], true],
+            ['test', 'test', DataType::STRING, [RequestType::REST], false],
+            [['test1', 'test2'], ['test1', 'test2'], DataType::STRING, [RequestType::REST], true],
+            [['test1', 'test2'], ['test1', 'test2'], DataType::STRING, [RequestType::REST], false],
+            [['test1', 'test2'], 'test1,test2', DataType::STRING, [RequestType::REST], true],
+            ['test1,test2', 'test1,test2', DataType::STRING, [RequestType::REST], false],
+            [123, 123, DataType::INTEGER, [RequestType::REST], true],
+            [123, 123, DataType::INTEGER, [RequestType::REST], false],
+            [[123, 456], [123, 456], DataType::INTEGER, [RequestType::REST], true],
+            [[123, 456], [123, 456], DataType::INTEGER, [RequestType::REST], false],
+            [0, '0', DataType::INTEGER, [RequestType::REST], true],
+            [0, '0', DataType::INTEGER, [RequestType::REST], false],
+            [123, '123', DataType::INTEGER, [RequestType::REST], true],
+            [123, '123', DataType::INTEGER, [RequestType::REST], false],
+            [-123, '-123', DataType::INTEGER, [RequestType::REST], true],
+            [-123, '-123', DataType::INTEGER, [RequestType::REST], false],
+            [[123, -456], '123,-456', DataType::INTEGER, [RequestType::REST], true],
+            [123, 123, DataType::UNSIGNED_INTEGER, [RequestType::REST], true],
+            [123, 123, DataType::UNSIGNED_INTEGER, [RequestType::REST], false],
+            [[123, 456], [123, 456], DataType::UNSIGNED_INTEGER, [RequestType::REST], true],
+            [[123, 456], [123, 456], DataType::UNSIGNED_INTEGER, [RequestType::REST], false],
+            [0, '0', DataType::UNSIGNED_INTEGER, [RequestType::REST], true],
+            [0, '0', DataType::UNSIGNED_INTEGER, [RequestType::REST], false],
+            [123, '123', DataType::UNSIGNED_INTEGER, [RequestType::REST], true],
+            [123, '123', DataType::UNSIGNED_INTEGER, [RequestType::REST], false],
+            [[123, 456], '123,456', DataType::UNSIGNED_INTEGER, [RequestType::REST], true],
+            [false, '0', DataType::BOOLEAN, [RequestType::REST], true],
+            [false, '0', DataType::BOOLEAN, [RequestType::REST], false],
+            [false, false, DataType::BOOLEAN, [RequestType::REST], true],
+            [false, false, DataType::BOOLEAN, [RequestType::REST], false],
+            [false, 'false', DataType::BOOLEAN, [RequestType::REST], true],
+            [false, 'false', DataType::BOOLEAN, [RequestType::REST], false],
+            [false, 'no', DataType::BOOLEAN, [RequestType::REST], true],
+            [false, 'no', DataType::BOOLEAN, [RequestType::REST], false],
+            [true, true, DataType::BOOLEAN, [RequestType::REST], true],
+            [true, true, DataType::BOOLEAN, [RequestType::REST], false],
+            [true, '1', DataType::BOOLEAN, [RequestType::REST], true],
+            [true, '1', DataType::BOOLEAN, [RequestType::REST], false],
+            [true, 'true', DataType::BOOLEAN, [RequestType::REST], true],
+            [true, 'true', DataType::BOOLEAN, [RequestType::REST], false],
+            [true, 'yes', DataType::BOOLEAN, [RequestType::REST], true],
+            [true, 'yes', DataType::BOOLEAN, [RequestType::REST], false],
+            [[true, false], [true, false], DataType::BOOLEAN, [RequestType::REST], true],
+            [[true, false], [true, false], DataType::BOOLEAN, [RequestType::REST], false],
+            [[true, false], '1,0', DataType::BOOLEAN, [RequestType::REST], true],
             [
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 DataType::DATETIME,
-                [RequestType::REST]
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                DataType::DATETIME,
+                [RequestType::REST],
+                false
             ],
             [
                 [
@@ -204,25 +249,63 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                     new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 ],
                 DataType::DATETIME,
-                [RequestType::REST]
+                [RequestType::REST],
+                true
+            ],
+            [
+                [
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                ],
+                [
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                ],
+                DataType::DATETIME,
+                [RequestType::REST],
+                false
             ],
             [
                 new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
                 '2010-01-28',
                 DataType::DATETIME,
-                [RequestType::REST]
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                '2010-01-28',
+                DataType::DATETIME,
+                [RequestType::REST],
+                false
             ],
             [
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 '2010-01-28T15:00:00+00:00',
                 DataType::DATETIME,
-                [RequestType::REST]
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                '2010-01-28T15:00:00+00:00',
+                DataType::DATETIME,
+                [RequestType::REST],
+                false
             ],
             [
                 new \DateTime('2010-01-28T15:00:00+0200', new \DateTimeZone('UTC')),
                 '2010-01-28T15:00:00+02:00',
                 DataType::DATETIME,
-                [RequestType::REST]
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('2010-01-28T15:00:00+0200', new \DateTimeZone('UTC')),
+                '2010-01-28T15:00:00+02:00',
+                DataType::DATETIME,
+                [RequestType::REST],
+                false
             ],
             [
                 [
@@ -231,16 +314,18 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
                 '2010-01-28T15:00:00+00:00,2010-01-28T15:00:00+02:00',
                 DataType::DATETIME,
-                [RequestType::REST]
+                [RequestType::REST],
+                true
             ],
-            [['fld1' => Criteria::ASC], ['fld1' => Criteria::ASC], DataType::ORDER_BY, [RequestType::REST]],
-            [['fld1' => Criteria::ASC], 'fld1', DataType::ORDER_BY, [RequestType::REST]],
-            [['fld1' => Criteria::DESC], '-fld1', DataType::ORDER_BY, [RequestType::REST]],
+            [['fld1' => Criteria::ASC], ['fld1' => Criteria::ASC], DataType::ORDER_BY, [RequestType::REST], true],
+            [['fld1' => Criteria::ASC], 'fld1', DataType::ORDER_BY, [RequestType::REST], true],
+            [['fld1' => Criteria::DESC], '-fld1', DataType::ORDER_BY, [RequestType::REST], true],
             [
                 ['fld1' => Criteria::ASC, 'fld2' => Criteria::DESC],
                 'fld1,-fld2',
                 DataType::ORDER_BY,
-                [RequestType::REST]
+                [RequestType::REST],
+                true
             ],
         ];
     }
@@ -251,7 +336,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeInvalidValue($expectedExceptionMessage, $value, $dataType, $requestType)
     {
         $this->setExpectedException('\UnexpectedValueException', $expectedExceptionMessage);
-        $this->valueNormalizer->normalizeValue($value, $dataType, $requestType, RestRequest::ARRAY_DELIMITER);
+        $this->valueNormalizer->normalizeValue($value, $dataType, $requestType, true);
     }
 
     public function normalizeInvalidValueProvider()
@@ -335,14 +420,17 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param ProcessorBag         $processorBag
      * @param string               $processorId
-     * @param string               $dataType
+     * @param string|null          $dataType
      * @param string|string[]|null $requestType
      *
      * @return string
      */
-    protected function addProcessor(ProcessorBag $processorBag, $processorId, $dataType, $requestType = null)
+    protected function addProcessor(ProcessorBag $processorBag, $processorId, $dataType = null, $requestType = null)
     {
-        $attributes = ['dataType' => $dataType];
+        $attributes = [];
+        if (null !== $dataType) {
+            $attributes['dataType'] = $dataType;
+        }
         if (null !== $requestType) {
             $attributes['requestType'] = $requestType;
         }

@@ -10,6 +10,16 @@ services:
     # common processors
     #
 
+    oro_api.normalize_value.set_array_delimiter:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\SetArrayDelimiter
+        tags:
+            - { name: oro.api.processor, action: normalize_value, priority: 200 }
+
+    oro_api.normalize_value.string:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeString
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: string, priority: -10 }
+
     oro_api.normalize_value.integer:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger
         tags:

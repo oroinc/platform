@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 /**
@@ -47,7 +46,7 @@ class NormalizeFilterValues implements ProcessorInterface
                         $filterValue->getValue(),
                         $filter->getDataType(),
                         $context->getRequestType(),
-                        $filter->isArrayAllowed($filterValue->getOperator()) ? RestRequest::ARRAY_DELIMITER : null
+                        $filter->isArrayAllowed($filterValue->getOperator())
                     );
                     $filterValue->setValue($value);
                 }

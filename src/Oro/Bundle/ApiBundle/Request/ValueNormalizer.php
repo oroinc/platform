@@ -30,16 +30,16 @@ class ValueNormalizer
     /**
      * Converts a value to the given data-type.
      *
-     * @param mixed       $value          A value to be converted.
-     * @param string      $dataType       The data-type.
-     * @param string[]    $requestType    The type of API request, for example "rest", "soap", "odata", etc.
-     * @param string|null $arrayDelimiter If specified a value can be an array.
+     * @param mixed    $value          A value to be converted.
+     * @param string   $dataType       The data-type.
+     * @param string[] $requestType    The type of API request, for example "rest", "soap", "odata", etc.
+     * @param bool     $isArrayAllowed Whether a value can be an array.
      *
      * @return mixed
      */
-    public function normalizeValue($value, $dataType, array $requestType, $arrayDelimiter = null)
+    public function normalizeValue($value, $dataType, array $requestType, $isArrayAllowed = false)
     {
-        $context = $this->doNormalization($dataType, $requestType, $value, $arrayDelimiter);
+        $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
 
         return $context->getResult();
     }
@@ -47,17 +47,17 @@ class ValueNormalizer
     /**
      * Gets a regular expression that can be used to validate a value of the given data-type.
      *
-     * @param string      $dataType       The data-type.
-     * @param string[]    $requestType    The type of API request, for example "rest", "soap", "odata", etc.
-     * @param string|null $arrayDelimiter If specified a value can be an array.
+     * @param string   $dataType       The data-type.
+     * @param string[] $requestType    The type of API request, for example "rest", "soap", "odata", etc.
+     * @param bool     $isArrayAllowed Whether a value can be an array.
      *
      * @return string
      */
-    public function getRequirement($dataType, array $requestType, $arrayDelimiter = null)
+    public function getRequirement($dataType, array $requestType, $isArrayAllowed = false)
     {
-        $requirementKey = $dataType . implode('', $requestType) . (!empty($arrayDelimiter) ? $arrayDelimiter : '');
+        $requirementKey = $dataType . implode('', $requestType) . ($isArrayAllowed ? '|arr' : '');
         if (!array_key_exists($requirementKey, $this->requirements)) {
-            $context = $this->doNormalization($dataType, $requestType, null, $arrayDelimiter);
+            $context = $this->doNormalization($dataType, $requestType, null, $isArrayAllowed);
 
             $this->requirements[$requirementKey] = $context->getRequirement() ?: self::DEFAULT_REQUIREMENT;
         }
@@ -66,27 +66,22 @@ class ValueNormalizer
     }
 
     /**
-     * @param string      $dataType
-     * @param string[]    $requestType
-     * @param mixed|null  $value
-     * @param string|null $arrayDelimiter
+     * @param string     $dataType
+     * @param string[]   $requestType
+     * @param mixed|null $value
+     * @param bool       $isArrayAllowed
      *
      * @return NormalizeValueContext
      * @throws \Exception
      */
-    protected function doNormalization($dataType, array $requestType, $value = null, $arrayDelimiter = null)
+    protected function doNormalization($dataType, array $requestType, $value = null, $isArrayAllowed = false)
     {
         /** @var NormalizeValueContext $context */
         $context = $this->processor->createContext();
         $context->setRequestType($requestType);
         $context->setDataType($dataType);
         $context->setResult($value);
-        $context->removeRequirement();
-
-        if (!empty($arrayDelimiter)) {
-            $context->setArrayAllowed(true);
-            $context->setArrayDelimiter($arrayDelimiter);
-        }
+        $context->setArrayAllowed($isArrayAllowed);
         try {
             $this->processor->process($context);
         } catch (\Exception $e) {

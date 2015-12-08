@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\NormalizeValue;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityPluralAlias;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 
 class NormalizeEntityPluralAliasTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,7 +42,7 @@ class NormalizeEntityPluralAliasTest extends \PHPUnit_Framework_TestCase
     {
         $context = new NormalizeValueContext();
         $context->setArrayAllowed(true);
-        $context->setArrayDelimiter(RestRequest::ARRAY_DELIMITER);
+        $context->setArrayDelimiter(',');
         $context->setResult('alias1,alias2');
 
         $this->entityAliasResolver->expects($this->exactly(2))
@@ -98,6 +97,6 @@ class NormalizeEntityPluralAliasTest extends \PHPUnit_Framework_TestCase
 
     protected function getArrayRequirement($requirement)
     {
-        return sprintf('%1$s(%2$s%1$s)*', $requirement, RestRequest::ARRAY_DELIMITER);
+        return sprintf('%1$s(,%1$s)*', $requirement);
     }
 }

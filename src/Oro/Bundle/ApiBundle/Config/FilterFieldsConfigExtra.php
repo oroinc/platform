@@ -13,14 +13,14 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     const NAME = 'filter_fields';
 
     /** @var array */
-    protected $excludeFields;
+    protected $fields;
 
     /**
-     * @param array $excludeFields
+     * @param array $fields
      */
-    public function __construct($excludeFields = [])
+    public function __construct($fields = [])
     {
-        $this->excludeFields = $excludeFields;
+        $this->fields = $fields;
     }
 
     /**
@@ -36,6 +36,6 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
      */
     public function configureContext(ConfigContext $context)
     {
-        $context->set(self::NAME, $this->excludeFields);
+        $context->set(self::NAME, $this->fields);
     }
 }

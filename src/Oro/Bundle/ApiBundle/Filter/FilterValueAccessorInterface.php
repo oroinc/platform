@@ -24,4 +24,13 @@ interface FilterValueAccessorInterface
      * @return FilterValue|null The FilterValue or NULL if it was not found
      */
     public function get($key);
+
+    /**
+     * Gets all filters or all filters from the given group.
+     *
+     * @param string|null $group The name of a filter's group
+     *
+     * @return FilterValue[] [filter key => FilterValue, ...]
+     */
+    public function getAll($group = null);
 }

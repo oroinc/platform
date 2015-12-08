@@ -3,10 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
- * Represents an value/operator pair that is used to filter requested by API data.
+ * Represents input option that is used to filter data requested by API.
  */
 class FilterValue
 {
+    /** @var string */
+    protected $path;
+
     /** @var mixed */
     protected $value;
 
@@ -14,13 +17,35 @@ class FilterValue
     protected $operator;
 
     /**
+     * @param string $path
      * @param mixed  $value
      * @param string $operator
      */
-    public function __construct($value, $operator)
+    public function __construct($path, $value, $operator)
     {
+        $this->path     = $path;
         $this->value    = $value;
         $this->operator = $operator;
+    }
+
+    /**
+     * Gets a path the filter is applied.
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * Sets a path the filter is applied.
+     *
+     * @param string $path
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
@@ -14,6 +15,9 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
 
     /** @var FilterValue[] */
     protected $parameters;
+
+    /** @var array */
+    protected $groups;
 
     /**
      * @param Request $request
@@ -48,17 +52,19 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * Get all filters.
-     *
-     * @return null|FilterValue[]
+     * {@inheritdoc}
      */
-    public function getAll()
+    public function getAll($group = null)
     {
         $this->ensureRequestParsed();
 
-        return !empty($this->parameters)
-            ? $this->parameters
-            : null;
+        if (empty($group)) {
+            return $this->parameters;
+        }
+
+        return isset($this->groups[$group])
+            ? $this->groups[$group]
+            : [];
     }
 
     /**
@@ -67,38 +73,43 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     protected function ensureRequestParsed()
     {
         if (null === $this->parameters) {
-            $this->parameters = $this->parseRequest();
+            $this->parseRequest();
         }
     }
 
     /**
      * Extracts filters from the Request
-     *
-     * @return array
      */
     protected function parseRequest()
     {
-        $parameters = [];
+        $this->parameters = [];
+        $this->groups     = [];
 
         $matchResult = preg_match_all(
-            '/(?P<name>([\w\d-\.]+(%5B[\w\d-\.]+%5D)*))'
+            '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>(%5B[\w\d-\.]+%5D)*)))'
             . '(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))'
             . '(?P<value>[^&]+)/',
             $this->request->getQueryString(),
             $matches,
             PREG_SET_ORDER
         );
-        if (false === $matchResult) {
-            return $parameters;
-        }
+        if (false !== $matchResult) {
+            foreach ($matches as $match) {
+                $key   = strtolower(rawurldecode($match['key']));
+                $group = strtolower(rawurldecode($match['group']));
+                $path  = strtolower(rawurldecode($match['path']));
+                $path  = !empty($path)
+                    ? strtr($path, ['][' => ConfigUtil::PATH_DELIMITER, '[' => '', ']' => ''])
+                    : $key;
+                $value = new FilterValue(
+                    $path,
+                    rawurldecode($match['value']),
+                    rawurldecode(strtolower($match['operator']))
+                );
 
-        foreach ($matches as $match) {
-            $parameters[strtolower(rawurldecode($match['name']))] = new FilterValue(
-                rawurldecode($match['value']),
-                rawurldecode(strtolower($match['operator']))
-            );
+                $this->parameters[$key]     = $value;
+                $this->groups[$group][$key] = $value;
+            }
         }
-
-        return $parameters;
     }
 }
