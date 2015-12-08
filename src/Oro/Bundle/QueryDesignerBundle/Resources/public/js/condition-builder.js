@@ -364,7 +364,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
             var $condition;
             // new condition
             if (ui.sender && ui.sender.is(this.$criteriaList)) {
-                if (ui.placeholder.hasClass('hide')) {
+                if (ui.placeholder && ui.placeholder.hasClass('hide')) {
                     return;
                 }
 
