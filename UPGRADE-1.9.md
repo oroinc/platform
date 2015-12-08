@@ -78,14 +78,8 @@ UPGRADE FROM 1.8 to 1.9
 - Services with tag `oro_entity_extend.entity_config_dumper_extension` was marked as private
 - Services with tag `oro_entity_extend.entity_generator_extension` was marked as private
 
-####FilterBundle
-- Services with tag `oro_filter.extension.orm_filter.filter` was marked as private
-
-####FormBundle
-- Add new form type: `oro_autocomplete`. See [text_autocomplete_form_type.md](./src/Oro/Bundle/FormBundle/Resources/doc/reference/text_autocomplete_form_type.md) for more detailed info.
-
 ####EntitySerializer component
-- `Oro\Component\EntitySerializer\EntitySerializer` class has a lot of changes. Check your inherited classes, if any.
+- `Oro\Component\EntitySerializer\EntitySerializer` class has a lot of changes. This can bring a `backward compatibility break` if you have inherited classes.
 - `excluded_fields` attribute is marked as deprecated. Use `exclude` attribute for a field.
 - `orderBy` attribute is marked as deprecated. Use `order_by` attribute instead.
 - `result_name` attribute is marked as deprecated. Use `property_path` attribute instead.
@@ -98,7 +92,35 @@ after:
     'isPrimary' => ['property_path' => 'primary']
 ```
 - The signature of `post_serialize` callback is changed. Old signature: `function (array &$item) : void`. New signature: `function (array $item) : array`.
+- Now `post_serialize` callback is called before data normalization. This can bring a `backward compatibility break` if you use `post_serialize` callback together with `result_name` attribute. Use original field names instead of renamed ones in `post_serialize` callbacks.
+before:
+```
+    'fields' => [
+        'firstName' => null,
+        'lastName' => ['result_name' => 'surName']
+    ],
+    `post_serialize` => function (array &$item) {
+        $item['fullName'] = $item['firstName'] . ' ' . $item['surName'];
+    }
+```
+after:
+```
+    'fields' => [
+        'firstName' => null,
+        'lastName' => ['result_name' => 'surName']
+    ],
+    `post_serialize` => function (array $item) {
+        $item['fullName'] = $item['firstName'] . ' ' . $item['lastName'];
+        return $item;
+    }
+```
 - The `EntitySerializer` changed to accept existing joins. See https://github.com/orocrm/platform/issues/283.
+
+####FilterBundle
+- Services with tag `oro_filter.extension.orm_filter.filter` was marked as private
+
+####FormBundle
+- Add new form type: `oro_autocomplete`. See [text_autocomplete_form_type.md](./src/Oro/Bundle/FormBundle/Resources/doc/reference/text_autocomplete_form_type.md) for more detailed info.
 
 ####ImportExportBundle
 - `Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer`: the first argument of constructor `Doctrine\ORM\EntityManager $entityManager` replaced by `Oro\Bundle\EntityBundle\ORM\DoctrineHelper $doctrineHelper`
