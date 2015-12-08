@@ -173,4 +173,18 @@ class ActivityListRepository extends EntityRepository
             ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
         );
     }
+
+    /**
+     * @param $entityClass
+     * @param $entityId
+     * @param $activityClass
+     * @return QueryBuilder
+     */
+    public function getActivityListQueryBuilderByActivityClass($entityClass, $entityId, $activityClass)
+    {
+        return $this->getBaseActivityListQueryBuilder($entityClass, $entityId)
+            ->select('activity.relatedActivityId')
+            ->andWhere('activity.relatedActivityClass = :activityClass')
+            ->setParameter('activityClass', $activityClass);
+    }
 }

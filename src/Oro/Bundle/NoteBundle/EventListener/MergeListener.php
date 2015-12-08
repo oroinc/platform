@@ -5,12 +5,12 @@ namespace Oro\Bundle\NoteBundle\EventListener;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Model\MergeModes;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class MergeListener
 {
@@ -56,7 +56,7 @@ class MergeListener
                 'field_name'    => $this->getNoteFieldName(),
                 'is_collection' => true,
                 'label'         => $this->translator->trans($this->getNoteAlias()),
-                'merge_modes'   => [MergeModes::UNITE, MergeModes::REPLACE]
+                'merge_modes'   => [MergeModes::NOTES_UNITE, MergeModes::NOTES_REPLACE]
             ];
 
             $fieldMetadata = new FieldMetadata($fieldMetadataOptions);

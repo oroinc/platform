@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
@@ -43,20 +45,20 @@ class UniteStrategy implements StrategyInterface
         $entities = $fieldData->getEntityData()->getEntities();
         foreach ($entities as $sourceEntity) {
             if ($sourceEntity->getId() !== $masterEntity->getId()) {
-                $entityClass = get_class($sourceEntity);
+                $entityClass = ClassUtils::getRealClass($masterEntity);
                 $activityClass = $fieldMetadata->get('type');
                 $queryBuilder = $this->doctrineHelper
                     ->getEntityRepository(ActivityList::ENTITY_NAME)
-                    ->getBaseActivityListQueryBuilder($entityClass, $sourceEntity->getId())
-                    ->andWhere('activity.relatedActivityClass = :activityClass')
-                    ->setParameter('activityClass', $activityClass);
+                    ->getActivityListQueryBuilderByActivityClass($entityClass, $sourceEntity->getId(), $activityClass);
 
-                /** @var ActivityList[] $activities */
-                $activities = $queryBuilder->getQuery()->getResult();
+                $activityListItems = $queryBuilder->getQuery()->getResult();
+                $activityIds = array_column($activityListItems, 'relatedActivityId');
 
-                foreach ($activities as $activityListItem) {
-                    $activity = $this->doctrineHelper->getEntityRepository($activityListItem->getRelatedActivityClass())
-                        ->find($activityListItem->getRelatedActivityId());
+                $activities = $this->doctrineHelper
+                    ->getEntityRepository($activityClass)
+                    ->findBy(['id' => $activityIds]);
+
+                foreach ($activities as $activity) {
                     $this->activityManager->replaceActivityTarget($activity, $sourceEntity, $masterEntity);
                 }
             }

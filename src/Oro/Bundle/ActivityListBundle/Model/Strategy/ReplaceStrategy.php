@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
@@ -43,17 +45,13 @@ class ReplaceStrategy implements StrategyInterface
 
         $activityClass = $fieldMetadata->get('type');
 
-        $activityListItems = $this->getActivityListByEntity($masterEntity, $activityClass);
-        foreach ($activityListItems as $activityListItem) {
-            $activity = $this->doctrineHelper->getEntityRepository($activityListItem->getRelatedActivityClass())
-                ->find($activityListItem->getRelatedActivityId());
+        $activities = $this->getActivitiesByEntity($masterEntity, $activityClass);
+        foreach ($activities as $activity) {
             $this->activityManager->removeActivityTarget($activity, $masterEntity);
         }
 
-        $activityListItems = $this->getActivityListByEntity($sourceEntity, $activityClass);
-        foreach ($activityListItems as $activityListItem) {
-            $activity = $this->doctrineHelper->getEntityRepository($activityListItem->getRelatedActivityClass())
-                ->find($activityListItem->getRelatedActivityId());
+        $activities = $this->getActivitiesByEntity($sourceEntity, $activityClass);
+        foreach ($activities as $activity) {
             $this->activityManager->replaceActivityTarget($activity, $sourceEntity, $masterEntity);
         }
     }
@@ -63,16 +61,17 @@ class ReplaceStrategy implements StrategyInterface
      * @param $activityClass
      * @return mixed
      */
-    protected function getActivityListByEntity($entity, $activityClass)
+    protected function getActivitiesByEntity($entity, $activityClass)
     {
-        $entityClass = get_class($entity);
+        $entityClass = ClassUtils::getRealClass($entity);
         $queryBuilder = $this->doctrineHelper
             ->getEntityRepository(ActivityList::ENTITY_NAME)
-            ->getBaseActivityListQueryBuilder($entityClass, $entity->getId())
-            ->andWhere('activity.relatedActivityClass = :activityClass')
-            ->setParameter('activityClass', $activityClass);
+            ->getActivityListQueryBuilderByActivityClass($entityClass, $entity->getId(), $activityClass);
 
-        return $queryBuilder->getQuery()->getResult();
+        $activityListItems = $queryBuilder->getQuery()->getResult();
+        $activityIds = array_column($activityListItems, 'relatedActivityId');
+
+        return $this->doctrineHelper->getEntityRepository($activityClass)->findBy(['id' => $activityIds]);
     }
 
     /**
