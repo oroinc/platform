@@ -4,12 +4,12 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class MergeListener
 {
@@ -51,13 +51,12 @@ class MergeListener
             $fieldMetadataOptions = [
                 'display'       => true,
                 'activity'      => true,
-                'is_virtual'    => true,
                 'type'          => $type,
                 'field_name'    => $this->getFieldNameByActivityClassName($type),
 //                'template'      => 'test',
                 'is_collection' => true,
                 'label'         => $this->translator->trans($this->getAliasByActivityClass($type)),
-                'merge_modes'   => [MergeModes::UNITE, MergeModes::REPLACE]
+                'merge_modes'   => [MergeModes::ACTIVITY_UNITE, MergeModes::ACTIVITY_REPLACE]
             ];
 
             $fieldMetadata = new FieldMetadata($fieldMetadataOptions);

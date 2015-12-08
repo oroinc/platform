@@ -4,10 +4,10 @@ namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 /**
  * Class UniteStrategy
@@ -68,7 +68,7 @@ class UniteStrategy implements StrategyInterface
      */
     public function supports(FieldData $fieldData)
     {
-        return $fieldData->getMode() === MergeModes::UNITE;
+        return $fieldData->getMode() === MergeModes::ACTIVITY_UNITE;
     }
 
     /**
@@ -76,6 +76,6 @@ class UniteStrategy implements StrategyInterface
      */
     public function getName()
     {
-        return 'unite';
+        return 'activity_unite';
     }
 }

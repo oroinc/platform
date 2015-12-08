@@ -4,9 +4,9 @@ namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 
 /**
@@ -80,7 +80,7 @@ class ReplaceStrategy implements StrategyInterface
      */
     public function supports(FieldData $fieldData)
     {
-        return $fieldData->getMode() === MergeModes::REPLACE;
+        return $fieldData->getMode() === MergeModes::ACTIVITY_REPLACE;
     }
 
     /**
@@ -88,6 +88,6 @@ class ReplaceStrategy implements StrategyInterface
      */
     public function getName()
     {
-        return 'replace';
+        return 'activity_replace';
     }
 }
