@@ -186,10 +186,6 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager->expects($this->once())
-            ->method('isHiddenModel')
-            ->with($entityClass)
-            ->willReturn(true);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->willReturnMap(
@@ -216,15 +212,15 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
         return [
             'hidden'                   => [
                 'entityClass'   => 'Test\Entity',
-                'expectedAlias' => false
+                'expectedAlias' => null
             ],
             'hidden_with_custom_alias' => [
                 'entityClass'   => 'Test\EntityWithCustomAlias',
-                'expectedAlias' => false
+                'expectedAlias' => null
             ],
             'hidden_excluded'          => [
                 'entityClass'   => 'Test\ExcludedEntity',
-                'expectedAlias' => false
+                'expectedAlias' => null
             ]
         ];
     }
@@ -248,10 +244,6 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager->expects($this->once())
-            ->method('isHiddenModel')
-            ->with($entityClass)
-            ->willReturn(false);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->willReturnMap(

@@ -59,6 +59,10 @@ class CompleteDefinition implements ProcessorInterface
             return;
         }
 
+        if (ConfigUtil::getArrayValue($definition, ConfigUtil::DEFINITION)) {
+            $definition = ConfigUtil::getArrayValue($definition, ConfigUtil::DEFINITION);
+        }
+
         $fields = ConfigUtil::getArrayValue($definition, ConfigUtil::FIELDS);
 
         $entityClass = $context->getClassName();
