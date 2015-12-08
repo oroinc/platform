@@ -6,7 +6,8 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 
 /**
  * This alias provider excludes aliases generation for test entities to avoid duplications of aliases.
- * TestActivity entity does not covered by this class because it should have aliases.
+ * TestActivity entity does not covered by this class because it should have aliases
+ * to build correct association API routes.
  */
 class EntityAliasProvider implements EntityAliasProviderInterface
 {
