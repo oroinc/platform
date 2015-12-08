@@ -52,9 +52,9 @@ class MergeListener
                 'display'       => true,
                 'activity'      => true,
                 'type'          => Note::ENTITY_NAME,
-                'field_name'    => $this->getFieldNameByActivityClassName(),
+                'field_name'    => $this->getNoteFieldName(),
                 'is_collection' => true,
-                'label'         => $this->translator->trans($this->getAliasByActivityClass()),
+                'label'         => $this->translator->trans($this->getNoteAlias()),
                 'merge_modes'   => [MergeModes::UNITE, MergeModes::REPLACE]
             ];
 
@@ -80,7 +80,7 @@ class MergeListener
     /**
      * @return string
      */
-    protected function getFieldNameByActivityClassName()
+    protected function getNoteFieldName()
     {
         return strtolower(str_replace('\\', '_', Note::ENTITY_NAME));
     }
@@ -88,7 +88,7 @@ class MergeListener
     /**
      * @return string
      */
-    protected function getAliasByActivityClass()
+    protected function getNoteAlias()
     {
         $config = $this->configProvider->getConfig(Note::ENTITY_NAME);
 
