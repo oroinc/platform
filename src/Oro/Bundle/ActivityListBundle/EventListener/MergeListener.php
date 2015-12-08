@@ -53,7 +53,7 @@ class MergeListener
                 'activity'      => true,
                 'type'          => $type,
                 'field_name'    => $this->getFieldNameByActivityClassName($type),
-//                'template'      => 'test',
+                'template'      => 'OroActivityListBundle:Merge:value.html.twig',
                 'is_collection' => true,
                 'label'         => $this->translator->trans($this->getAliasByActivityClass($type)),
                 'merge_modes'   => [MergeModes::ACTIVITY_UNITE, MergeModes::ACTIVITY_REPLACE]
