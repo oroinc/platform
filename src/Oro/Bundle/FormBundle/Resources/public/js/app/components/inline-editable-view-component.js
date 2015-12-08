@@ -2,26 +2,15 @@
 define(function(require) {
     'use strict';
 
-    var InlineEditableViewComponent;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var BaseModel = require('oroui/js/app/models/base/model');
-    var InlineEditorWrapperView = require('../views/inline-editable-wrapper-view');
-    var frontendTypeMap = require('../../tools/frontend-type-map');
-    var overlayTool = require('oroui/js/tools/overlay');
-    var tools = require('oroui/js/tools');
-
     /**
      * Allows to connect inline editors on view pages.
-     * Currently used only for tags-editor.
+     * Currently used only for tags-editor. See [index of supported editors](../editor)
      * @TODO update after connecting other editors
      *
      * Sample:
      *
-     * ```xml
+     * ```twig
+     * {% import 'OroUIBundle::macros.html.twig' as UI %}
      * <div class="tags-view-form-container" {{ UI.renderPageComponentAttributes({
      *    module: 'oroform/js/app/components/inline-editable-view-component',
      *    options: {
@@ -71,6 +60,18 @@ define(function(require) {
      * @augments [BaseComponent](./text-editor-view.md)
      * @exports InlineEditableViewComponent
      */
+    var InlineEditableViewComponent;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var $ = require('jquery');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var BaseModel = require('oroui/js/app/models/base/model');
+    var InlineEditorWrapperView = require('../views/inline-editable-wrapper-view');
+    var frontendTypeMap = require('../../tools/frontend-type-map');
+    var overlayTool = require('oroui/js/tools/overlay');
+    var tools = require('oroui/js/tools');
+
     InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
         OVERLAY_TOOL_DEFAULTS: {
             position: {
