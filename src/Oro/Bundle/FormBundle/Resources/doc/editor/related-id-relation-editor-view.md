@@ -56,7 +56,7 @@ inline_editing.editor.view_options.css_class_name   | Optional. Additional css c
 inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
 inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
-inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
+inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../reference/search-apis.md)
 
 ### Constructor parameters
 
