@@ -5,7 +5,7 @@ nelmio_api_doc:
 security:
     firewalls:
         api_wsse_secured:
-            pattern: ^/api/(?!(doc)).*
+            pattern: ^/api/(?!doc($|/.*))
             wsse:
                 lifetime: 3600
                 realm:    "Secured API"
