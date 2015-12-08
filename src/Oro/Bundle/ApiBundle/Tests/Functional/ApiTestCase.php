@@ -5,25 +5,29 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ApiBundle\Request\JsonApi\EntityClassTransformer;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ApiTestCase extends WebTestCase
 {
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var EntityClassTransformer */
+    protected $entityClassTransformer;
+
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         /** @var ContainerInterface $container */
-        $container                 = $this->getContainer();
-        $this->entityAliasResolver = $container->get('oro_entity.entity_alias_resolver');
-        $this->doctrineHelper      = $container->get('oro_api.doctrine_helper');
+        $container                    = $this->getContainer();
+
+        $this->entityClassTransformer = $container->get('oro_api.json_api.entity_class_transformer');
+        $this->doctrineHelper         = $container->get('oro_api.doctrine_helper');
     }
 
     /**

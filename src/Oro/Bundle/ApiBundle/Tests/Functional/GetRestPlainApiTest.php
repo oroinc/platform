@@ -4,22 +4,30 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 class GetRestPlainApiTest extends ApiTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->initClient([], $this->generateWsseAuthHeader());
+
         parent::setUp();
     }
 
     /**
+     * @param string $entityClass
+     *
      * @dataProvider getEntities
      */
     public function testGetListRestRequests($entityClass)
     {
-        $entityAlias = $this->entityAliasResolver->getPluralAlias($entityClass);
+        $entityAlias = $this->entityClassTransformer->transform($entityClass);
 
-        //@todo: should be deleted after voter was fixed
+        /**
+         * @TODO: Fix AbandonedCartBundle/Acl/Voter/AbandonedCartVoter (CRM-4733)
+         */
         if ($entityAlias === 'abandonedcartcampaigns') {
-            $this->markTestSkipped('Should be deleted after abandonedcartcampaigns voter was fixed');
+            $this->markTestSkipped('Should be deleted after fix of AbandonedCartVoter.');
         }
 
         // test get list request
