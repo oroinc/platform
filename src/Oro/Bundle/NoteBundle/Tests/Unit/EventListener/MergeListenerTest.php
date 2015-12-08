@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\NoteBundle\Model\MergeModes;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\NoteBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -96,8 +96,9 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             'type' => $entity,
             'field_name' => $alias,
             'is_collection' => true,
+            'template' => 'OroActivityListBundle:Merge:value.html.twig',
             'label' => 'Items',
-            'merge_modes' => [MergeModes::UNITE, MergeModes::REPLACE]
+            'merge_modes' => [MergeModes::NOTES_UNITE, MergeModes::NOTES_REPLACE]
         ];
         $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
 
