@@ -50,7 +50,8 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
 inline_editing.editor.view_options.value_field_name | Related value field name.
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
+inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
 inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
@@ -68,7 +69,8 @@ inline_editing.editor.autocomplete_api_accessor.class | One of the [list of sear
 | options.input_delay | <code>Object</code> | Delay before user finished input and request sent to server |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for an empty element |
+| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
+| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 | options.value_field_name | <code>Object</code> | Related value field name |
 | options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../search-apis.md) |
