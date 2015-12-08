@@ -4,8 +4,6 @@
 
 {% if convertedValue|length %}
     {{ convertedValue }}
-    {#{{ 'oro.activitylist.merge.items.label'|trans }}#}
-    {#{{ 'oro.activitylist.merge.items.label'|trans }}#}
     {{ 'oro.activitylist.merge.items.label'|transchoice(convertedValue) }}
 {% else %}
     {{ empty_cell }}
