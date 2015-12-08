@@ -35,17 +35,13 @@ class ExpressionBuilder
     public function beginGroup($condition)
     {
         $groupNode = new GroupNode($condition);
-        if (!$this->currentGroupNode && $this->groupNode) {
-            $this->groupNode = $groupNode->addNode($this->groupNode);
-            $this->currentGroupNode = $this->groupNode;
-        }
-
         if ($this->currentGroupNode) {
             $this->currentGroupNode->addNode($groupNode);
             $this->currentGroupNode = $groupNode;
+        } elseif ($this->groupNode) {
+            $this->currentGroupNode = $this->groupNode = $groupNode->addNode($this->groupNode);
         } else {
-            $this->groupNode = $groupNode;
-            $this->currentGroupNode = $this->groupNode;
+            $this->currentGroupNode = $this->groupNode = $groupNode;
         }
     }
 
