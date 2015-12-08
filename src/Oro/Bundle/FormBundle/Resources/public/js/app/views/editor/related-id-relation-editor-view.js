@@ -59,7 +59,7 @@ define(function(require) {
      * inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
      * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
      * inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
-     * inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
+     * inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../reference/search-apis.md)
      *
      * ### Constructor parameters
      *
@@ -74,7 +74,7 @@ define(function(require) {
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.value_field_name - Related value field name
      * @param {Object} options.autocomplete_api_accessor - Autocomplete API specification.
-     *                                      Please see [list of search API's](../search-apis.md)
+     *                                      Please see [list of search API's](../reference/search-apis.md)
      *
      * @augments [AbstractRelationEditorView](./abstract-relation-editor-view.md)
      * @exports RelatedIdRelationEditorView
