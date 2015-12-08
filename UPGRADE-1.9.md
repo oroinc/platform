@@ -83,6 +83,7 @@ UPGRADE FROM 1.8 to 1.9
 - `excluded_fields` attribute is marked as deprecated. Use `exclude` attribute for a field.
 - `orderBy` attribute is marked as deprecated. Use `order_by` attribute instead.
 - `result_name` attribute is marked as deprecated. Use `property_path` attribute instead.
+
 before:
 ```
     'primary' => ['result_name' => 'isPrimary']
@@ -93,6 +94,7 @@ after:
 ```
 - The signature of `post_serialize` callback is changed. Old signature: `function (array &$item) : void`. New signature: `function (array $item) : array`.
 - Now `post_serialize` callback is called before data normalization. This can bring a `backward compatibility break` if you use `post_serialize` callback together with `result_name` attribute. Use original field names instead of renamed ones in `post_serialize` callbacks.
+
 before:
 ```
     'fields' => [
