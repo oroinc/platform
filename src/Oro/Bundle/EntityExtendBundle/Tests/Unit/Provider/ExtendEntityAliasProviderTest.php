@@ -168,64 +168,6 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider hiddenEntityDataProvider
-     */
-    public function testGetEntityAliasForHiddenEntity($entityClass, $expectedAlias)
-    {
-        $enumConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $enumConfig         = new Config(new EntityConfigId('enum', $entityClass));
-
-        $groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $groupingConfig         = new Config(new EntityConfigId('grouping', $entityClass));
-
-        $this->configManager->expects($this->once())
-            ->method('hasConfig')
-            ->with($entityClass)
-            ->willReturn(true);
-        $this->configManager->expects($this->exactly(2))
-            ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['enum', $enumConfigProvider],
-                    ['grouping', $groupingConfigProvider]
-                ]
-            );
-        $enumConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($entityClass)
-            ->willReturn($enumConfig);
-        $groupingConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($entityClass)
-            ->willReturn($groupingConfig);
-
-        $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
-    }
-
-    public function hiddenEntityDataProvider()
-    {
-        return [
-            'hidden'                   => [
-                'entityClass'   => 'Test\Entity',
-                'expectedAlias' => null
-            ],
-            'hidden_with_custom_alias' => [
-                'entityClass'   => 'Test\EntityWithCustomAlias',
-                'expectedAlias' => null
-            ],
-            'hidden_excluded'          => [
-                'entityClass'   => 'Test\ExcludedEntity',
-                'expectedAlias' => null
-            ]
-        ];
-    }
-
-    /**
      * @dataProvider customEntityDataProvider
      */
     public function testGetEntityAliasForCustomEntity($entityClass, $expectedAlias)
