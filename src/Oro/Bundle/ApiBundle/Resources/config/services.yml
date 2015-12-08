@@ -108,6 +108,15 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
         public: false
 
+    oro_api.entity_exclusion_provider.config:
+        class: Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
+        public: false
+        arguments:
+            - @oro_entity.entity_hierarchy_provider
+            - [] # exclusion rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+        tags:
+            - { name: oro_entity.exclusion_provider.api, priority: 60 }
+
     oro_api.virtual_field_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
 

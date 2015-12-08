@@ -43,8 +43,18 @@ class OroApiExtension extends Extension
         foreach ($resources as $resource) {
             $apiConfig = $this->mergeApiConfiguration($resource, $apiConfig);
         }
+
+        $exclusions = [];
+        if (array_key_exists('exclusions', $apiConfig)) {
+            $exclusions = $apiConfig['exclusions'];
+            unset($apiConfig['exclusions']);
+        }
+
         $configBagDef = $container->getDefinition('oro_api.config_bag');
         $configBagDef->replaceArgument(0, $apiConfig);
+
+        $exclusionProviderDef = $container->getDefinition('oro_api.entity_exclusion_provider.config');
+        $exclusionProviderDef->replaceArgument(1, $exclusions);
     }
 
     /**
