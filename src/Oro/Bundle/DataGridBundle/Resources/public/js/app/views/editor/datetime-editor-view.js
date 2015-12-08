@@ -100,7 +100,7 @@ define(function(require) {
             'keydown .timepicker-input': 'onTimeEditorKeydown'
         },
 
-        format: datetimeFormatter.backendFormats.datetime,
+        format: datetimeFormatter.getBackendDateTimeFormat(),
 
         render: function() {
             var _this = this;

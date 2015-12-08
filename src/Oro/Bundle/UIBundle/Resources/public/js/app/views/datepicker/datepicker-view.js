@@ -32,7 +32,7 @@ define(function(require) {
         /**
          * Format of date/datetime that original input accepts
          */
-        backendFormat: datetimeFormatter.backendFormats.date,
+        backendFormat: datetimeFormatter.getBackendDateFormat(),
 
         /**
          * Flag to prevent frontend field update once origin field is changed
