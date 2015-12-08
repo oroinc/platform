@@ -1,7 +1,7 @@
 <a name="module_TagsEditorView"></a>
-## TagsEditorView ⇐ <code>[AbstractRelationEditorView]</code>
+## TagsEditorView ⇐ <code>[AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)</code>
 Tags-select content editor. Please note that it requires column data format
-corresponding to tags-cell.
+corresponding to [tags-view](../viewer/tags-view.md).
 
 ### Column configuration samples:
 ``` yml
@@ -11,15 +11,29 @@ datagrid:
       enable: true
     # <grid configuration> goes here
     columns:
-      # Sample 1. Full configuration
+      # Sample 1. Sample configuration
       {column-name-1}:
+        frontend_type: tags
         inline_editing:
           editor:
             view: oroform/js/app/views/editor/tags-editor-view
             view_options:
-              placeholder: '<placeholder>'
-              css_class_name: '<class-name>'
-              maximumSelectionLength: 3
+                permissions:
+                    oro_tag_create: true
+                    oro_tag_unassign_global: true
+          save_api_accessor:
+              # usual save api configuration
+              route: 'oro_api_post_taggable'
+              http_method: 'POST'
+              default_route_parameters:
+                  entity: <entity-url-safe-class-name>
+              route_parameters_rename_map:
+                  id: entityId
+          autocomplete_api_accessor:
+              # usual configuration for tags view
+              class: 'oroui/js/tools/search-api-accessor'
+              search_handler_name: 'tags'
+              label_field_name: 'name'
           validation_rules:
             NotBlank: true
 ```
@@ -28,15 +42,14 @@ datagrid:
 
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
-inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
-inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-inline_editing.editor.view_options.maximumSelectionLength | Optional. Maximum selection length
 inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
+inline_editing.editor.permissions      | Permissions
+inline_editing.editor.permissions.oro_tag_create | Allows user to create new tag
+inline_editing.editor.permissions.oro_tag_unassign_global | Allows user to edit tags assigned by all users
 
 ### Constructor parameters
 
-**Extends:** <code>[AbstractRelationEditorView]</code>  
+**Extends:** <code>[AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -44,8 +57,6 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | options.model | <code>Object</code> | Current row model |
 | options.fieldName | <code>string</code> | Field name to edit in model |
 | options.metadata | <code>string</code> | Editor metadata |
-| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
-| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
-| options.maximumSelectionLength | <code>string</code> | Maximum selection length |
+| options.permissions | <code>string</code> | Permissions object |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 
