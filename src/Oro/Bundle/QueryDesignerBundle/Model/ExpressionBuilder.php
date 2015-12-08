@@ -62,11 +62,12 @@ class ExpressionBuilder
             return;
         }
 
-        $expr = $this->resolveGroupNode($this->groupNode);
-        if ($this->groupNode->isComputed()) {
-            $qb->andHaving($expr);
-        } else {
-            $qb->andWhere($expr);
+        list($uncomputedExpr, $computedExpr) = $this->resolveGroupNode($this->groupNode);
+        if ($computedExpr) {
+            $qb->andHaving($computedExpr);
+        }
+        if ($uncomputedExpr) {
+            $qb->andWhere($uncomputedExpr);
         }
     }
 
@@ -77,17 +78,31 @@ class ExpressionBuilder
      */
     protected function resolveGroupNode(GroupNode $gNode)
     {
-        $restrictions = [];
+        $uncomputedRestrictions = [];
+        $computedRestrictions = [];
+
         foreach ($gNode->getChildren() as $node) {
             if ($node instanceof Restriction) {
-                $restrictions[] = $node;
+                if ($node->isComputed()) {
+                    $computedRestrictions[] = $node;
+                } else {
+                    $uncomputedRestrictions[] = $node;
+                }
             } else {
-                $expr = $this->resolveGroupNode($node);
-                $restrictions[] = new Restriction($expr, $node->getCondition(), $node->isComputed());
+                list($uncomputedExpr, $computedExpr) = $this->resolveGroupNode($node);
+                if ($uncomputedExpr) {
+                    $uncomputedRestrictions[] = new Restriction($uncomputedExpr, $node->getCondition(), $node->isComputed());
+                }
+                if ($computedExpr) {
+                    $computedRestrictions[] = new Restriction($computedExpr, $node->getCondition(), $node->isComputed());
+                }
             }
         }
 
-        return $this->createExprFromRestrictions($restrictions);
+        return [
+            $this->createExprFromRestrictions($uncomputedRestrictions),
+            $this->createExprFromRestrictions($computedRestrictions),
+        ];
     }
 
     /**

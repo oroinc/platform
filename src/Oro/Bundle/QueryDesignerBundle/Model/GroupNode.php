@@ -90,7 +90,7 @@ class GroupNode
         );
 
         if ($computed && $unComputed) {
-            throw new LogicException('Mixing ofcomputed nodes with uncomputed is not implemented');
+            throw new LogicException('Mixing of computed nodes with uncomputed is not implemented');
         }
 
         return $computed;

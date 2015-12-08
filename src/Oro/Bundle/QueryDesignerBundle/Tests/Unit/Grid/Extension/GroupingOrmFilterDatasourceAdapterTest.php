@@ -455,4 +455,27 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
             $qb->getDQL()
         );
     }
+
+    public function testComputedWithUnComputedRestrictionsTogether()
+    {
+        $qb = new QueryBuilder($this->getTestEntityManager());
+        $qb->select(['u.status, COUNT(u.id)'])
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->groupBy('u.status');
+        $ds = new GroupingOrmFilterDatasourceAdapter($qb);
+
+        $ds->addRestriction($qb->expr()->eq('u.id', '1'), FilterUtility::CONDITION_AND);
+        $ds->addRestriction($qb->expr()->eq('u.id', '2'), FilterUtility::CONDITION_AND);
+        $ds->addRestriction($qb->expr()->eq('COUNT(u.id)', '3'), FilterUtility::CONDITION_AND, true);
+        $ds->addRestriction($qb->expr()->eq('COUNT(u.id)', '4'), FilterUtility::CONDITION_OR, true);
+        $ds->applyRestrictions();
+
+        $this->assertEquals(
+            'SELECT u.status, COUNT(u.id) FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 1 AND u.id = 2 '
+            . 'GROUP BY u.status '
+            . 'HAVING COUNT(u.id) = 3 OR COUNT(u.id) = 4',
+            $qb->getDQL()
+        );
+    }
 }
