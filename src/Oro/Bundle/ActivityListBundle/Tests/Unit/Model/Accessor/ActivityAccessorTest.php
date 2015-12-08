@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Model\Accessor;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 
@@ -19,21 +17,13 @@ class ActivityAccessorTest extends \PHPUnit_Framework_TestCase
     /** @var Registry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
-
     protected function setUp()
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->willReturn('Items');
-
-        $this->accessor = new ActivityAccessor($this->registry, $this->translator);
+        $this->accessor = new ActivityAccessor($this->registry); //, $this->translator);
     }
 
     public function testGetName()
@@ -77,7 +67,7 @@ class ActivityAccessorTest extends \PHPUnit_Framework_TestCase
                 'entity' => $this->createEntity('foo'),
                 'metadata' => $this->getFieldMetadata('id', ['activity' => true, 'type' => 'test']),
                 'count' => 123,
-                'expected' => 'Items - 123',
+                'expected' => '123',
             ],
         ];
     }

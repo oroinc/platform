@@ -51,6 +51,7 @@ class MergeListener
             $fieldMetadataOptions = [
                 'display'       => true,
                 'activity'      => true,
+                'template'      => 'OroActivityListBundle:Merge:value.html.twig',
                 'type'          => Note::ENTITY_NAME,
                 'field_name'    => $this->getNoteFieldName(),
                 'is_collection' => true,

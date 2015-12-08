@@ -51,7 +51,7 @@ oro:
             criteria:
                 activity: Activity
         activity_owners.label: Activity Owners
-        merge.items.label: Item(s)
+        merge.items.label: 'Item|Items'
 
     entity_merge:
         merge_modes:
