@@ -1,9 +1,9 @@
 <a name="module_InlineEditableViewComponent"></a>
-## InlineEditableViewComponent ⇐ <code>[BaseComponent](./text-editor-view.md)</code>
+## InlineEditableViewComponent ⇐ <code>BaseComponent</code>
 Allows to connect inline editors on view pages.
 Currently used only for tags-editor. See [index of supported editors](../editor)
 
-**Extends:** <code>[BaseComponent](./text-editor-view.md)</code>  
+**Extends:** <code>BaseComponent</code>  
 **Todo**
 
 - [ ] update after connecting other editors
@@ -53,15 +53,14 @@ Sample:
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
 | options._sourceElement | <code>Object</code> | Element to connect this view |
-| options.frontend_type | <code>string</code> | frontend type (usually it correspond grid frontend types) |
+| options.frontend_type | <code>string</code> | frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js) |
 | options.value | <code>\*</code> | value to edit |
 | options.fieldName | <code>string</code> | field name to use when sending value to server |
-| options.metadata | <code>Object</code> | Editor metadata |
 | options.metadata | <code>Object</code> | Editor metadata |
 | options.metadata.inline_editing | <code>Object</code> | inline-editing configuration |
 
 
-* [InlineEditableViewComponent](#module_InlineEditableViewComponent) ⇐ <code>[BaseComponent](./text-editor-view.md)</code>
+* [InlineEditableViewComponent](#module_InlineEditableViewComponent) ⇐ <code>BaseComponent</code>
   * [.initialize](#module_InlineEditableViewComponent#initialize)
     * [new initialize(options)](#new_module_InlineEditableViewComponent#initialize_new)
   * [.resizeTo()](#module_InlineEditableViewComponent#resizeTo)

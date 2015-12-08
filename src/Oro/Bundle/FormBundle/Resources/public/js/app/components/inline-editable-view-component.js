@@ -50,14 +50,13 @@ define(function(require) {
      * @class
      * @param {Object} options - Options container
      * @param {Object} options._sourceElement - Element to connect this view
-     * @param {string} options.frontend_type - frontend type (usually it correspond grid frontend types)
+     * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
      * @param {*} options.value - value to edit
      * @param {string} options.fieldName - field name to use when sending value to server
      * @param {Object} options.metadata - Editor metadata
-     * @param {Object} options.metadata - Editor metadata
      * @param {Object} options.metadata.inline_editing - inline-editing configuration
      *
-     * @augments [BaseComponent](./text-editor-view.md)
+     * @augments BaseComponent
      * @exports InlineEditableViewComponent
      */
     var InlineEditableViewComponent;
