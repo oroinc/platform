@@ -25,5 +25,5 @@ inline_editing.editor.autocomplete_api_accessor.class | One of the [list of sear
 | options.metadata | <code>string</code> | Editor metadata |
 | options.placeholder | <code>string</code> | Placeholder for an empty element |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
-| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../search-apis.md) |
+| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../reference/search-apis.md) |
 

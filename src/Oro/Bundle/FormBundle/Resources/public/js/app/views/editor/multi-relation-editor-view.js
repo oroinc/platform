@@ -58,7 +58,7 @@ define(function(require) {
      * @param {string} options.maximumSelectionLength - Maximum selection length
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.autocomplete_api_accessor - Autocomplete API specification.
-     *                                      Please see [list of search API's](../search-apis.md)
+     *                                      Please see [list of search API's](../reference/search-apis.md)
      *
      * @augments [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)
      * @exports MultiRelationEditorView
