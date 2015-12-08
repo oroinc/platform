@@ -111,6 +111,9 @@
                 <% }); %>
             </select>
         </span>
+        <% if (typeof(popoverContent) !== "undefined" && typeof(popoverTitle) !== "undefined") { %>
+            <i class="icon-info-sign" data-content="<%= popoverContent %>" data-placement="right" data-toggle="popover" data-original-title="<%= popoverTitle %>"></i>
+        <% } %>
     </div>
 </script>
 

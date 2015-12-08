@@ -11,6 +11,8 @@ define(function(require) {
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var localeSettings = require('orolocale/js/locale-settings');
+    var layout = require('oroui/js/layout');
+
     require('orofilter/js/datevariables-widget');
 
     /**
@@ -238,7 +240,9 @@ define(function(require) {
                     name: this.name,
                     choices: this.choices,
                     selectedChoice: value.type,
-                    selectedChoiceLabel: selectedChoiceLabel
+                    selectedChoiceLabel: selectedChoiceLabel,
+                    popoverTitle: __('test'),
+                    popoverContent: __('test')
                 })
             );
 
@@ -256,6 +260,7 @@ define(function(require) {
 
             this._renderSubViews();
             this.changeFilterType(value.type);
+            layout.initPopover(this.$el);
 
             this._criteriaRenderd = true;
         },
