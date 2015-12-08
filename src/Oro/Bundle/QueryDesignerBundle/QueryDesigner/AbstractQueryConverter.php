@@ -445,15 +445,15 @@ abstract class AbstractQueryConverter
      *
      * @return array Where array has elements: string|FunctionInterface|null, string|null
      */
-    protected function createColumnFuncion(array $column)
+    protected function createColumnFunction(array $column)
     {
         if (!empty($column['func'])) {
-            $function           = $this->functionProvider->getFunction(
+            $function = $this->functionProvider->getFunction(
                 $column['func']['name'],
                 $column['func']['group_name'],
                 $column['func']['group_type']
             );
-            $functionExpr       = $function['expr'];
+            $functionExpr = $function['expr'];
             if (isset($function['return_type'])) {
                 $functionReturnType = $function['return_type'];
             } else {
@@ -474,7 +474,7 @@ abstract class AbstractQueryConverter
         foreach ($this->definition['columns'] as $column) {
             $columnName         = $column['name'];
             $fieldName          = $this->getFieldName($columnName);
-            list($functionExpr, $functionReturnType) = $this->createColumnFuncion($column);
+            list($functionExpr, $functionReturnType) = $this->createColumnFunction($column);
             $isDistinct = !empty($column['distinct']);
             $tableAlias = $this->getTableAliasForColumn($columnName);
             if (isset($column['label'])) {
@@ -667,7 +667,7 @@ abstract class AbstractQueryConverter
         if (isset($filter['func'])) {
             $column['func'] = $filter['func'];
         }
-        list($functionExpr) = $this->createColumnFuncion($column);
+        list($functionExpr) = $this->createColumnFunction($column);
 
         $this->addWhereCondition(
             $this->getEntityClassName($columnName),

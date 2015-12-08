@@ -89,7 +89,7 @@ class ExpressionBuilder
     /**
      * @param GroupNode $gNode
      *
-     * @return mixed Expr
+     * @return mixed Expr[] Where first item  is uncomputed expr and 2nd one is computed
      */
     protected function resolveGroupNode(GroupNode $gNode)
     {

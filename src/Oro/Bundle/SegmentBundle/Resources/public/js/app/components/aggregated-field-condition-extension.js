@@ -6,19 +6,6 @@ define([
 
     return {
         load: function(segment) {
-            segment.defaults = $.extend(true, segment.defaults, {
-                defaults: {
-                    aggregatedFieldsLoader: {
-                        loadingMaskParent: '',
-                        router: null,
-                        routingParams: {},
-                        fieldsData: [],
-                        confirmMessage: '',
-                        loadEvent: 'aggregatedFieldsLoaded'
-                    }
-                }
-            });
-
             segment.configureFilters = _.wrap(segment.configureFilters, function(original) {
                 var $criteria = $(this.options.filters.criteriaList);
 
@@ -36,22 +23,6 @@ define([
                 }
 
                 original.apply(this, _.rest(arguments));
-            });
-
-            segment.initFieldsLoader = _.wrap(segment.initFieldsLoader, function(original) {
-                this.$aggregatedFieldsLoader = original.call(this, this.options.aggregatedFieldsLoader);
-
-                return original.apply(this, _.rest(arguments));
-            });
-
-            segment.initEntityChangeEvents = _.wrap(segment.initEntityChangeEvents, function(original) {
-                this.trigger(
-                    this.options.aggregatedFieldsLoader.loadEvent,
-                    this.$aggregatedFieldsLoader.val(),
-                    this.$aggregatedFieldsLoader.fieldsLoader('getFieldsData')
-                );
-
-                return original.apply(this, _.rest(arguments));
             });
         }
     };

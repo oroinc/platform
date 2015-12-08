@@ -29,20 +29,9 @@ class SegmentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $widgetOptions = $event->getWidgetOptions();
-        $fieldsLoader = $widgetOptions['fieldsLoader'];
-
         $event->setWidgetOptions(array_merge_recursive(
-            $widgetOptions,
+            $event->getWidgetOptions(),
             [
-                'aggregatedFieldsLoader' => [
-                    'entityChoice'      => $fieldsLoader['entityChoice'],
-                    'loadingMaskParent' => $fieldsLoader['loadingMaskParent'],
-                    'router'            => 'oro_api_querydesigner_aggregated_fields',
-                    'routingParams'     => [],
-                    'fieldsData'        => $fieldsLoader['fieldsData'],
-                    'confirmMessage'    => $fieldsLoader['confirmMessage'],
-                ],
                 'extensions' => [
                     'orosegment/js/app/components/aggregated-field-condition-extension',
                 ],

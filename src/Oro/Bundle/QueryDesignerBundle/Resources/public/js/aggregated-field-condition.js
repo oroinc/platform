@@ -57,15 +57,8 @@ define([
         },
 
         _updateFieldChoice: function() {
-            var self = this;
             var fieldChoice = this.$fieldChoice.fieldChoice().data('oroentity-fieldChoice');
-            var originalSelect2Data = fieldChoice._select2Data;
-
-            fieldChoice._select2Data = function(path) {
-                originalSelect2Data.apply(this, arguments);
-
-                return self._getAggregatedSelectData();
-            };
+            fieldChoice._select2Data = _.bind(this._getAggregatedSelectData, this);
         },
 
         _getAggregatedSelectData: function() {
