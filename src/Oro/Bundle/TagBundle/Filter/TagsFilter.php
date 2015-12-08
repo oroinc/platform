@@ -121,6 +121,7 @@ class TagsFilter extends EntityFilter
         $fieldView = $formView->children['value'];
 
         return [
+            'enabled'      => true,
             'translatable' => true,
             'label'        => 'oro.tag.entity_plural_label',
             'choices'      => $fieldView->vars['choices'],

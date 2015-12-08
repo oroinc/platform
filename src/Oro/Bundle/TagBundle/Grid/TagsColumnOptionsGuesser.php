@@ -10,13 +10,11 @@ class TagsColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {
     public function guessFilter($class, $property, $type)
     {
-        if ($property === TagVirtualFieldProvider::TAG_FIELD ) {
+        if ($property === TagVirtualFieldProvider::TAG_FIELD) {
             return new ColumnGuess(
                 [
                     'type'      => 'tag',
-                    'label'     => 'oro.tag.entity_plural_label',
                     'data_name' => 'tag.id',
-                    'enabled'   => true,
                     'options'   => [
                         'field_options' => [
                             'entity_class' => $class,

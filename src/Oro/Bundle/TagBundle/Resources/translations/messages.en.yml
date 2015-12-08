@@ -44,3 +44,5 @@ oro:
             tag.label:           Tag
 
         tags_label: Tags
+
+        enabled: Enable tags

@@ -1,8 +1,10 @@
 define([
     'backgrid',
     'underscore',
-    'orotranslation/js/translator'
-], function(Backgrid, _, __) {
+    'orotranslation/js/translator',
+    'orotag/js/app/views/viewer/tags-view',
+    'routing'
+], function(Backgrid, _, __, TagsView, routing) {
     'use strict';
 
     var TagsCell;
@@ -32,25 +34,28 @@ define([
          */
         className: 'tags-cell tags-container',
 
+        template: TagsView.prototype.template,
+
+        tagSortCallback: TagsView.prototype.tagSortCallback,
+
         /**
          * @inheritDoc
          */
-        render: function() {
-            var value = this.model.get(this.column.get('name'));
-            var html = '';
-
-            if (value === null || value === void 0) {
-                // assume empty
-                value = [];
-            }
-
-            if (_.isArray(value) && value.length) {
-                html = value.map(function(v) {
-                    return '<span class="tags-container__tag-entry">' + v.name + '</span> ';
+        render: function () {
+            // preparing urls
+            var data = this.model.toJSON();
+            var tags = data[this.column.get('name')];
+            for (var i = 0; i < tags.length; i++) {
+                tags[i].url = routing.generate('oro_tag_search', {
+                    id: tags[i].id
                 });
             }
 
-            this.$el.html(html);
+            this.$el.html(this.template({
+                model: data,
+                fieldName: this.column.get('name'),
+                tagSortCallback: this.tagSortCallback
+            }));
 
             return this;
         }
