@@ -10,6 +10,10 @@ php:
 env:
   - SYMFONY_VERSION=2.7.*
 
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
 before_script:
   - phpenv config-rm xdebug.ini
   - composer self-update
