@@ -414,9 +414,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
                 .prependTo($condition)
                 .dropdownSelect({
                     buttonClass: 'btn btn-mini',
-                    options: $condition.is('[condition-type=aggregated-condition-item]')
-                        ? [operation]
-                        : this.options.operations,
+                    options: $condition.is('[condition-type=aggregated-condition-item]') ?
+                        [operation] : this.options.operations,
                     selected: operation
                 });
         },
