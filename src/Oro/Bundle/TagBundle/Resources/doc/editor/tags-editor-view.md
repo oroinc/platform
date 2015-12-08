@@ -16,7 +16,7 @@ datagrid:
         frontend_type: tags
         inline_editing:
           editor:
-            view: oroform/js/app/views/editor/tags-editor-view
+            # view: orotag/js/app/views/editor/tags-editor-view
             view_options:
                 permissions:
                     oro_tag_create: true
