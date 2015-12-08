@@ -22,7 +22,7 @@ oro:
         entity_label:        Tag
         entity_plural_label: Tags
         id.label:            Id
-        name.label:          Tag
+        name.label:          Name
         owner.label:         Owner
         tagging.label:       Tagging
         updated_by.label:    Updated By
@@ -44,3 +44,5 @@ oro:
             tag.label:           Tag
 
         tags_label: Tags
+
+        enabled: Enable tags

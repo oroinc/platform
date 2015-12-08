@@ -98,7 +98,7 @@ class TagsExtension extends AbstractExtension
                         },
                         'editable'       => false,
                         'translatable'   => true,
-                        'renderable'     => false,
+                        'renderable'     => true,
                         'inline_editing' => [
                             'enable' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_ASSIGN_ID_KEY),
                             'editor' => [
@@ -135,9 +135,7 @@ class TagsExtension extends AbstractExtension
 
         $filters[self::FILTER_COLUMN_NAME] = [
             'type'      => 'tag',
-            'label'     => 'oro.tag.entity_plural_label',
             'data_name' => 'tag.id',
-            'enabled'   => false,
             'options'   => [
                 'field_options' => [
                     'entity_class' => $this->getEntityClassName($config),
