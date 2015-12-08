@@ -51,7 +51,7 @@ class GroupNodeValidator extends ConstraintValidator
         }
 
         $computedTypes = ArrayUtil::dropWhile(
-            function($type) {
+            function ($type) {
                 return $type === GroupNode::TYPE_UNCOMPUTED;
             },
             $types
