@@ -34,7 +34,7 @@ define(function(require) {
         /**
          * Format of date/datetime that original input accepts
          */
-        backendFormat: datetimeFormatter.backendFormats.datetime,
+        backendFormat: datetimeFormatter.getBackendDateTimeFormat(),
 
         /**
          * @type {string}
