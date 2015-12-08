@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Accessor;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
@@ -17,17 +15,12 @@ class ActivityAccessor extends DefaultAccessor
     /** @var Registry */
     protected $registry;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
      * @param Registry $registry
-     * @param TranslatorInterface $translator
      */
-    public function __construct(Registry $registry, TranslatorInterface $translator)
+    public function __construct(Registry $registry)
     {
         $this->registry = $registry;
-        $this->translator = $translator;
     }
 
     /**
@@ -67,6 +60,6 @@ class ActivityAccessor extends DefaultAccessor
             [$type]
         );
 
-        return $count . ' ' . $this->translator->trans('oro.activitylist.merge.items.label');
+        return $count;
     }
 }
