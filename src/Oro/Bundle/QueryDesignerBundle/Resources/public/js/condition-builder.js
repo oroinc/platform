@@ -82,6 +82,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
             opts.criteriaList = $.extend({}, opts.sortable, opts.criteriaList);
             opts.criteriaList.start = $.proxy(this._onCriteriaGrab, this);
             opts.criteriaList.stop = $.proxy(this._onCriteriaDrop, this);
+            opts.criteriaList.change = $.proxy(this._onCriteriaChange, this);
 
             opts.conditionsGroup.start = $.proxy(this._onConditionsGroupGrab, this);
             opts.conditionsGroup.stop = $.proxy(this._onConditionsGroupDrop, this);
@@ -133,6 +134,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
         _initControl: function() {
             var $content = this._createConditionContent(this.$rootCondition, this.$rootCondition.data('value'));
             this._initConditionsGroup($content);
+            this._updateRootAggregatedCondition(
+                this.$rootCondition.find('>[data-criteria]').has('[data-criteria=aggregated-condition-item]')
+            );
             this._updateOperators();
             this.$rootCondition.data('initialized', true);
         },
@@ -229,10 +233,44 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
             this.$rootCondition.find('.hide-operator').removeClass('hide-operator');
         },
 
-        syncDropAreaOver: function() {
+        _onCriteriaChange: function(e, ui) {
+            if (this._isPlaceholderInValidPosition(e, ui)) {
+                this.element.find('.sortable-placeholder').removeClass('hide');
+            } else {
+                this.element.find('.sortable-placeholder').addClass('hide');
+            }
+        },
+
+        syncDropAreaOver: function(e, ui) {
             this.$rootCondition
                 .parent()
                 .toggleClass('drop-area-over', this.$rootCondition.find('.sortable-placeholder').length !== 0);
+        },
+
+        _isPlaceholderInValidPosition: function(e, ui) {
+            if (ui.item.data('criteria') === 'aggregated-condition-item') {
+                if (
+                    ui.placeholder.closest('[condition-type=aggregated-condition-item]').length ||
+                    (ui.placeholder.is(':last-child') &&
+                        !this.element.find('[condition-type=aggregated-condition-item]').length)
+                ) {
+                    return true;
+                }
+
+                return false;
+            } else if (ui.item.data('criteria') !== 'conditions-group' &&
+                ui.placeholder.closest('[condition-type=aggregated-condition-item]').length
+            ) {
+                return false;
+            }
+
+            return !ui.placeholder.prev('[condition-type=aggregated-condition-item]').length;
+        },
+
+        _updateRootAggregatedCondition: function($condition) {
+            $condition
+                .attr('condition-type', 'aggregated-condition-item')
+                .find('>.operator [data-value=OR]').parent('li').remove();
         },
 
         _getCriteriaOrigin: function(criteria) {
@@ -329,8 +367,23 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
             var $condition;
             // new condition
             if (ui.sender && ui.sender.is(this.$criteriaList)) {
-                $condition = this._createCondition(ui.item.data('criteria'));
-                $condition.insertBefore(ui.item);
+                if (ui.placeholder.hasClass('hide')) {
+                    return;
+                }
+
+                var criteria = ui.item.data('criteria');
+                if (criteria === 'aggregated-condition-item' &&
+                    !this.element.find('[condition-type=aggregated-condition-item]').length
+                ) {
+                    var $conditionsGroup = this._createCondition('conditions-group');
+                    this._updateRootAggregatedCondition($conditionsGroup);
+                    $conditionsGroup.insertBefore(ui.item);
+                    $condition = this._createCondition(ui.item.data('criteria'));
+                    $conditionsGroup.find('.conditions-group').append($condition);
+                } else {
+                    $condition = this._createCondition(criteria);
+                    $condition.insertBefore(ui.item);
+                }
             } else {
                 $condition = ui.item;
             }
@@ -353,7 +406,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
             // add operators to proper conditions
             $conditions.filter(':not(:first-child)').not(':has(>.operator)')
                 .each(function() {
-                    self._initConditionOperation(this);
+                    self._initConditionOperation($(this));
                 }).trigger('changed');
         },
 
@@ -365,7 +418,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
                 .prependTo($condition)
                 .dropdownSelect({
                     buttonClass: 'btn btn-mini',
-                    options: this.options.operations,
+                    options: $condition.is('[condition-type=aggregated-condition-item]')
+                        ? [operation]
+                        : this.options.operations,
                     selected: operation
                 });
         },
