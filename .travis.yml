@@ -11,6 +11,7 @@ env:
   - SYMFONY_VERSION=2.7.*
 
 before_script:
+  - phpenv config-rm xdebug.ini
   - composer self-update
   - phpenv config-add travis.php.ini
   - travis_wait composer require symfony/symfony:${SYMFONY_VERSION} --prefer-source --update-no-dev
