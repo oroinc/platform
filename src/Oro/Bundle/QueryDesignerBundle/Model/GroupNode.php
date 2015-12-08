@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
-use LogicException;
-
 use Oro\Component\PhpUtils\ArrayUtil;
 
 class GroupNode
 {
+    const TYPE_COMPUTED = 'computed';
+    const TYPE_UNCOMPUTED = 'uncomputed';
+    const TYPE_MIXED = 'mixed';
+
     /** @var string*/
     protected $condition;
 
@@ -27,6 +29,8 @@ class GroupNode
 
     /**
      * @param GroupNode|Restriction $node
+     *
+     * @return $this
      */
     public function addNode($node)
     {
@@ -34,14 +38,20 @@ class GroupNode
         if ($node instanceof GroupNode) {
             $node->setParent($this);
         }
+
+        return $this;
     }
 
     /**
      * @param GroupNode $node
+     *
+     * @return $this
      */
     public function setParent(GroupNode $node)
     {
         $this->parentNode = $node;
+
+        return $this;
     }
 
     /**
@@ -69,14 +79,31 @@ class GroupNode
     }
 
     /**
-     * @return bool
-     *
-     * @throws LogicException If computed restrictions are mixed with uncomputed
+     * @return string
      */
-    public function isComputed()
+    public function getType()
     {
+        $mixed = ArrayUtil::some(
+            function ($node) {
+                if ($node instanceof GroupNode) {
+                    return $node->getType() === GroupNode::TYPE_MIXED;
+                }
+
+                return false;
+            },
+            $this->nodes
+        );
+
+        if ($mixed) {
+            return GroupNode::TYPE_MIXED;
+        }
+
         $computed = ArrayUtil::some(
             function ($node) {
+                if ($node instanceof GroupNode) {
+                    return $node->getType() === GroupNode::TYPE_COMPUTED;
+                }
+
                 return $node->isComputed();
             },
             $this->nodes
@@ -84,15 +111,19 @@ class GroupNode
 
         $unComputed = ArrayUtil::some(
             function ($node) {
+                if ($node instanceof GroupNode) {
+                    return $node->getType() === GroupNode::TYPE_UNCOMPUTED;
+                }
+
                 return !$node->isComputed();
             },
             $this->nodes
         );
 
         if ($computed && $unComputed) {
-            throw new LogicException('Mixing of computed nodes with uncomputed is not implemented');
+            return static::TYPE_MIXED;
         }
 
-        return $computed;
+        return $computed ? static::TYPE_COMPUTED : static::TYPE_UNCOMPUTED;
     }
 }

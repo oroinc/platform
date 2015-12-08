@@ -5,7 +5,6 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\Extension;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
-
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 
@@ -468,6 +467,32 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->addRestriction($qb->expr()->eq('u.id', '2'), FilterUtility::CONDITION_AND);
         $ds->addRestriction($qb->expr()->eq('COUNT(u.id)', '3'), FilterUtility::CONDITION_AND, true);
         $ds->addRestriction($qb->expr()->eq('COUNT(u.id)', '4'), FilterUtility::CONDITION_OR, true);
+        $ds->applyRestrictions();
+
+        $this->assertEquals(
+            'SELECT u.status, COUNT(u.id) FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 1 AND u.id = 2 '
+            . 'GROUP BY u.status '
+            . 'HAVING COUNT(u.id) = 3 OR COUNT(u.id) = 4',
+            $qb->getDQL()
+        );
+    }
+
+    /**
+     * @expectedException LogicException
+     * @expectedExceptionMessage Computed conditions cannot be mixed with uncomputed.
+     */
+    public function testComputedWithUnComputedRestrictionsTogetherShouldReturnExceptionWhenRestrictionsAreMixed()
+    {
+        $qb = new QueryBuilder($this->getTestEntityManager());
+        $qb->select(['u.status, COUNT(u.id)'])
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->groupBy('u.status');
+        $ds = new GroupingOrmFilterDatasourceAdapter($qb);
+
+        $ds->addRestriction($qb->expr()->eq('u.id', '1'), FilterUtility::CONDITION_AND);
+        $ds->addRestriction($qb->expr()->eq('COUNT(u.id)', '2'), FilterUtility::CONDITION_AND, true);
+        $ds->addRestriction($qb->expr()->eq('COUNT(u.id)', '3'), FilterUtility::CONDITION_OR);
         $ds->applyRestrictions();
 
         $this->assertEquals(

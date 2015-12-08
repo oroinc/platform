@@ -2,18 +2,32 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
+use LogicException;
+
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\ValidatorInterface;
+
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupNodeConstraint;
 
 class ExpressionBuilder
 {
+    /** @var ValidatorInterface */
+    protected $validator;
+
     /** @var GroupNode */
     protected $groupNode;
 
     /** @var GroupNode */
     protected $currentGroupNode;
+
+    public function __construct()
+    {
+        $this->validator = Validation::createValidator();
+    }
 
     /**
      * @param string $condition
@@ -62,6 +76,11 @@ class ExpressionBuilder
             return;
         }
 
+        $violationList = $this->validator->validate($this->groupNode, new GroupNodeConstraint());
+        foreach ($violationList as $violation) {
+            throw new LogicException($violation->getMessage());
+        }
+
         list($uncomputedExpr, $computedExpr) = $this->resolveGroupNode($this->groupNode);
         if ($computedExpr) {
             $qb->andHaving($computedExpr);
@@ -91,10 +110,10 @@ class ExpressionBuilder
             } else {
                 list($uncomputedExpr, $computedExpr) = $this->resolveGroupNode($node);
                 if ($uncomputedExpr) {
-                    $uncomputedRestrictions[] = new Restriction($uncomputedExpr, $node->getCondition(), $node->isComputed());
+                    $uncomputedRestrictions[] = new Restriction($uncomputedExpr, $node->getCondition(), false);
                 }
                 if ($computedExpr) {
-                    $computedRestrictions[] = new Restriction($computedExpr, $node->getCondition(), $node->isComputed());
+                    $computedRestrictions[] = new Restriction($computedExpr, $node->getCondition(), true);
                 }
             }
         }

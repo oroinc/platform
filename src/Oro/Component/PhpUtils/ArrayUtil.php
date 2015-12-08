@@ -211,4 +211,22 @@ class ArrayUtil
 
         return false;
     }
+
+    /**
+     * Return copy of the array starting with item for which callback returns falsity value
+     *
+     * @param callable $callback
+     *
+     * @param array $array
+     */
+    public static function dropWhile(callable $callback, array $array)
+    {
+        foreach ($array as $key => $value) {
+            if (!call_user_func($callback, $value)) {
+                return array_slice($array, $key);
+            }
+        }
+
+        return [];
+    }
 }
