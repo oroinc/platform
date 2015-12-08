@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
 
 /**
  * Class ReplaceStrategy

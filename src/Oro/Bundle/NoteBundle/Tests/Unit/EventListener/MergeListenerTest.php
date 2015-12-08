@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\NoteBundle\Model\MergeModes;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\NoteBundle\Tests\Unit\Stub\EntityStub;
