@@ -9,7 +9,19 @@
             wsseAllowed = userName && apiKey,
             serverTime = {{ 'now'|date('c', 'UTC')|json_encode|raw }},
             clientTime = new Date(),
-            serverTimeOffset = Date.parse(serverTime) - clientTime;
+            serverTimeOffset = Date.parse(serverTime) - clientTime,
+            apiDocLink = $('#header a').first(),
+            apiDocHref = apiDocLink.attr('href'),
+            apiType = window.location.pathname.substr(apiDocHref.length + 1);
+        apiDocLink.after(
+            '<div id="api_type" style="float: left; font-size: 1.2em; padding: 13px 16px;">type: ' +
+            '<a href="' + apiDocHref + '">current</a>' +
+            '&nbsp;|&nbsp;' +
+            '<a href="' + apiDocHref + '/rest_plain">new</a>' +
+            '&nbsp;|&nbsp;' +
+            '<a href="' + apiDocHref + '/rest_json_api">JSON.API</a>' +
+            '</div>'
+        );
         $('#sandbox_configuration').prepend(
             'authentication: ' +
             '<select id="authentication_type">' +
@@ -58,7 +70,7 @@
                 headers = $(this).closest('.content').find('fieldset.headers'),
                 emptyHeader = null,
                 routePath = $(this).parents('li.operation').find('div.heading span.path').text(),
-                isAllowedRoute = routePath.indexOf('/api/rest/') === -1,
+                isAllowedRoute = apiType === 'rest_json_api' && routePath.indexOf('/api/rest/') === -1,
                 isHeaderRequired = function () {
                     var needsHeader = true;
                     $('.tuple', headers).each(function (index, header) {

@@ -63,9 +63,6 @@ class SetDescriptionForFields implements ProcessorInterface
                 if (!isset($fieldConfig[ConfigUtil::LABEL])) {
                     $fieldConfig[ConfigUtil::LABEL] = new Label($config->get('label'));
                 }
-                if (!isset($fieldConfig[ConfigUtil::DESCRIPTION])) {
-                    $fieldConfig[ConfigUtil::DESCRIPTION] = new Label($config->get('description'));
-                }
                 $definition[ConfigUtil::FIELDS][$fieldName] = $fieldConfig;
             }
         }
