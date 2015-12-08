@@ -134,9 +134,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
         _initControl: function() {
             var $content = this._createConditionContent(this.$rootCondition, this.$rootCondition.data('value'));
             this._initConditionsGroup($content);
-            this._updateRootAggregatedCondition(
-                this.$rootCondition.find('>[data-criteria]').has('[data-criteria=aggregated-condition-item]')
-            );
             this._updateOperators();
             this.$rootCondition.data('initialized', true);
         },
@@ -376,7 +373,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
                     !this.element.find('[condition-type=aggregated-condition-item]').length
                 ) {
                     var $conditionsGroup = this._createCondition('conditions-group');
-                    this._updateRootAggregatedCondition($conditionsGroup);
                     $conditionsGroup.insertBefore(ui.item);
                     $condition = this._createCondition(ui.item.data('criteria'));
                     $conditionsGroup.find('.conditions-group').append($condition);
@@ -442,6 +438,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
 
         _onChanged: function() {
             this._setSourceValue(this.$rootCondition.data('value'));
+            this._updateRootAggregatedCondition(
+                this.$rootCondition.find('>[data-criteria]').has('[data-criteria=aggregated-condition-item]')
+            );
         },
 
         _setSourceValue: function(value) {
