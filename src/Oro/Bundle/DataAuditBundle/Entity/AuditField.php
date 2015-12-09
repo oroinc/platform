@@ -17,7 +17,11 @@ class AuditField extends ExtendAuditField
     /**
      * @var Audit
      *
-     * @ORM\ManyToOne(targetEntity="AbstractAudit", inversedBy="fields", cascade={"persist"})
+     * @ORM\ManyToOne(
+     *      targetEntity="Oro\Bundle\DataAuditBundle\Entity\AbstractAudit",
+     *      inversedBy="fields",
+     *      cascade={"persist"}
+     * )
      * @ORM\JoinColumn(name="audit_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $audit;
