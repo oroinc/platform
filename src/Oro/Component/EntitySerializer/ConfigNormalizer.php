@@ -41,12 +41,14 @@ class ConfigNormalizer
                             if (isset($fieldConfig[ConfigUtil::FIELDS])) {
                                 $config[ConfigUtil::FIELDS][$field] = $this->applyPropertyPathConfig(
                                     $fieldConfig,
-                                    $fieldConfig[ConfigUtil::PROPERTY_PATH]
+                                    $fieldConfig[ConfigUtil::PROPERTY_PATH],
+                                    $fieldConfig
                                 );
                             } else {
                                 $config = $this->applyPropertyPathConfig(
                                     $config,
-                                    $fieldConfig[ConfigUtil::PROPERTY_PATH]
+                                    $fieldConfig[ConfigUtil::PROPERTY_PATH],
+                                    $fieldConfig
                                 );
                             }
                         }
@@ -105,26 +107,37 @@ class ConfigNormalizer
     /**
      * @param array  $config
      * @param string $propertyPath
+     * @param array  $fieldConfig
      *
      * @return array
      */
-    protected function applyPropertyPathConfig(array $config, $propertyPath)
+    protected function applyPropertyPathConfig(array $config, $propertyPath, array &$fieldConfig)
     {
         $properties = ConfigUtil::explodePropertyPath($propertyPath);
-        $this->applyPropertyConfig($config, $properties[0]);
+
+        $currentConfig   = &$config;
+        $currentProperty = $properties[0];
+
+        $this->applyPropertyConfig($currentConfig, $currentProperty);
 
         $count = count($properties);
         if ($count > 1) {
-            $i             = 1;
-            $currentConfig = &$config;
+            $i = 1;
             while ($i < $count) {
                 $currentConfig = &$currentConfig[ConfigUtil::FIELDS][$properties[$i - 1]];
                 if (null === $currentConfig) {
                     $currentConfig = [];
                 }
-                $this->applyPropertyConfig($currentConfig, $properties[$i]);
+                $currentProperty = $properties[$i];
+                $this->applyPropertyConfig($currentConfig, $currentProperty);
                 $i++;
             }
+        }
+
+        if (array_key_exists(ConfigUtil::DATA_TRANSFORMER, $fieldConfig)) {
+            $currentConfig[ConfigUtil::FIELDS][$currentProperty][ConfigUtil::DATA_TRANSFORMER] =
+                $fieldConfig[ConfigUtil::DATA_TRANSFORMER];
+            unset($fieldConfig[ConfigUtil::DATA_TRANSFORMER]);
         }
 
         return $config;
