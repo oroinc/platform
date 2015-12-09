@@ -192,7 +192,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($callback(1, $tagToCompare2));
     }
 
-    // @todo
     public function testGetPreparedArrayFromDb()
     {
         $resource = new Taggable(array('id' => 1));
