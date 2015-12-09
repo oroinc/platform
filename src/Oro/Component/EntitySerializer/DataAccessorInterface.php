@@ -10,7 +10,7 @@ interface DataAccessorInterface
      * @param string $className The FQCN
      * @param string $property  The name of the property
      *
-     * @return boolean
+     * @return bool
      */
     public function hasGetter($className, $property);
 
@@ -22,7 +22,7 @@ interface DataAccessorInterface
      * @param mixed  $value    Contains a value of the specified property;
      *                         if the operation failed a value of this variable is unpredictable
      *
-     * @return boolean true if a value is got; otherwise, false
+     * @return bool true if a value is got; otherwise, false
      */
     public function tryGetValue($object, $property, &$value);
 

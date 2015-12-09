@@ -19,7 +19,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Bundle\SoapBundle\Handler\Context;
