@@ -30,6 +30,13 @@ oro:
             tab:
                 calendar: Calendar
                 variables: Variables
+            info: >
+                In addition to exact dates, the filter supports entry of days and months.
+                Delete the year from the date in order to filter records that fall into
+                this date of any year (e.g. customers that have birthdays on November 15th);
+                delete the year and the day to filter records by entire months
+                (e.g. all orders placed between January and March). Both long and short month
+                names are supported.
         embedded:
             choice:
                 field_to_value: field value

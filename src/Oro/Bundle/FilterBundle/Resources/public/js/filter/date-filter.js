@@ -241,8 +241,7 @@ define(function(require) {
                     choices: this.choices,
                     selectedChoice: value.type,
                     selectedChoiceLabel: selectedChoiceLabel,
-                    popoverTitle: __('test'),
-                    popoverContent: __('test')
+                    popoverContent: __('oro.filter.date.info')
                 })
             );
 
