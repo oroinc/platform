@@ -9,6 +9,7 @@ define(function(require) {
     var ChoiceFilter = require('./choice-filter');
     var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
+    var DayValueHelper = require('orofilter/js/day-value-helper');
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var localeSettings = require('orolocale/js/locale-settings');
     var layout = require('oroui/js/layout');
@@ -115,6 +116,12 @@ define(function(require) {
 
         hasPartsElement: false,
 
+        /**
+         * List of acceptable day formats
+         * @type {Array.<string>}
+         */
+        dayFormats: null,
+
         events: {
             'change select': 'onChangeFilterType'
         },
@@ -123,9 +130,11 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function() {
+            this.dayFormats = [datetimeFormatter.getDayFormat()];
             // make own copy of options
             this.dateWidgetOptions = $.extend(true, {}, this.dateWidgetOptions, this.externalWidgetOptions);
             this.dateVariableHelper = new DateVariableHelper(this.dateWidgetOptions.dateVars);
+            this.dayValueHelper = new DayValueHelper(this.dayFormats.slice());
 
             //parts rendered only if theme exist
             this.hasPartsElement = (this.templateTheme !== '');
@@ -308,7 +317,8 @@ define(function(require) {
                 },
                 datePickerOptions: this.dateWidgetOptions,
                 dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector),
-                backendFormat: datetimeFormatter.getDateFormat()
+                backendFormat: datetimeFormatter.getDateFormat(),
+                dayFormats: this.dayFormats.slice()
             });
             return options;
         },
@@ -397,6 +407,8 @@ define(function(require) {
         _toDisplayValue: function(value) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
+            } else if (this.dayValueHelper.isDayValue(value)) {
+                value = this.dayValueHelper.formatDisplayValue(value);
             } else if (datetimeFormatter.isBackendDateValid(value)) {
                 value = datetimeFormatter.formatDate(value);
             }
@@ -412,6 +424,8 @@ define(function(require) {
         _toRawValue: function(value) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
+            } else if (this.dayValueHelper.isDayValue(value)) {
+                value = this.dayValueHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateValid(value)) {
                 value = datetimeFormatter.convertDateToBackendFormat(value);
             }
