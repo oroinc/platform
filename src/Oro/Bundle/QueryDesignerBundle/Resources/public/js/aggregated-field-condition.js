@@ -14,7 +14,6 @@ define([
         _create: function() {
             var data = this.element.data('value');
 
-            this.element.append('<h5>').text(__('oro.querydesigner.aggregated_field_condition.label'));
             this.$fieldChoice = $('<input>').addClass(this.options.fieldChoiceClass);
             this.$filterContainer = $('<span>').addClass(this.options.filterContainerClass);
             this.element.append(this.$fieldChoice, this.$filterContainer);
@@ -23,12 +22,12 @@ define([
 
             this._updateFieldChoice();
             this.options.columnsCollection.on('remove', function(model) {
-                if (model.get('name') === this._getColumnName()) {
+                if (model.get('label') === this._getColumnLabel()) {
                     this.element.closest('.condition').find('.close').click();
                 }
             }, this);
-            this.options.columnsCollection.on('change:func', function(model) {
-                if (model.get('name') === this._getColumnName() && _.isEmpty(model.get('func'))) {
+            this.options.columnsCollection.on('change:func change:label', function(model) {
+                if (model._previousAttributes.label === this._getColumnLabel()) {
                     this.element.closest('.condition').find('.close').click();
                 }
             }, this);
@@ -68,6 +67,17 @@ define([
             };
 
             var self = this;
+
+            fieldChoice.formatChoice = _.wrap(fieldChoice.formatChoice, function(original) {
+                var formatted = original.apply(this, _.rest(arguments));
+                var func = self._getCurrentFunc();
+                if (func && func.name) {
+                    formatted += ' (' + func.name + ')';
+                }
+
+                return formatted;
+            });
+
             fieldChoice.getApplicableConditions = _.wrap(
                 fieldChoice.getApplicableConditions,
                 function(original) {
