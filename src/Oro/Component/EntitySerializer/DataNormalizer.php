@@ -46,7 +46,11 @@ class DataNormalizer
                     && !ConfigUtil::isExclude($fieldConfig)
                     && (!array_key_exists($field, $row) || null !== $row[$field])
                 ) {
-                    $this->applyPropertyPath($row, $field, $fieldConfig[ConfigUtil::PROPERTY_PATH]);
+                    $propertyPath = $fieldConfig[ConfigUtil::PROPERTY_PATH];
+                    $renaming     = isset($fieldConfig[ConfigUtil::FIELDS])
+                        && is_array($fieldConfig[ConfigUtil::FIELDS])
+                        && array_key_exists($propertyPath, $fieldConfig[ConfigUtil::FIELDS]);
+                    $this->applyPropertyPath($row, $field, $propertyPath, $renaming);
                 }
                 if (!empty($fieldConfig[ConfigUtil::FIELDS]) && !empty($row[$field]) && is_array($row[$field])) {
                     if (array_key_exists(0, $row[$field])) {
@@ -63,8 +67,9 @@ class DataNormalizer
      * @param array  $row
      * @param string $field
      * @param string $propertyPath
+     * @param bool   $renaming
      */
-    protected function applyPropertyPath(array &$row, $field, $propertyPath)
+    protected function applyPropertyPath(array &$row, $field, $propertyPath, $renaming)
     {
         if (!array_key_exists($field, $row)) {
             $row[$field] = $this->extractValueByPropertyPath($row, $propertyPath);
@@ -76,7 +81,7 @@ class DataNormalizer
             } else {
                 $row[$field] = $this->extractValueByPropertyPath($row[$field], $propertyPath);
             }
-        } elseif (array_key_exists($propertyPath, $row)) {
+        } elseif (!$renaming && array_key_exists($propertyPath, $row)) {
             $row[$field] = $row[$propertyPath];
             unset($row[$propertyPath]);
         }
