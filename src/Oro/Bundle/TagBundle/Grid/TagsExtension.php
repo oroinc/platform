@@ -75,6 +75,14 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
+        // Skip adding column and filter on reports and segments.
+        // @todo: Should be refactored and added filter and column in CRM-4731
+        if (strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_report') === 0 ||
+            strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_segment') === 0
+        ) {
+            return;
+        }
+
         $columns          = $config->offsetGetByPath('[columns]') ?: [];
         $className        = $this->getEntityClassName($config);
         $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
@@ -129,7 +137,10 @@ class TagsExtension extends AbstractExtension
         );
 
         $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
-        if (empty($filters) || strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_report') === 0) {
+
+        // @todo: Should be refactored and added filter in CRM-4731
+        // For reports and segments we need to add filter also if $filters is empty.
+        if (empty($filters)) {
             return;
         }
 
