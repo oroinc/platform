@@ -131,8 +131,8 @@ define(function(require) {
          * @param {Array.<string>=} options.dayFormats List of acceptable day formats
          * @inheritDoc
          */
-        initialize: function(options) {
-            this.dayFormats = options && options.dayFormats || [datetimeFormatter.getDayFormat()];
+        initialize: function() {
+            this.dayFormats = [datetimeFormatter.getDayFormat()];
             // make own copy of options
             this.dateWidgetOptions = $.extend(true, {}, this.dateWidgetOptions, this.externalWidgetOptions);
             this.dateVariableHelper = new DateVariableHelper(this.dateWidgetOptions.dateVars);
