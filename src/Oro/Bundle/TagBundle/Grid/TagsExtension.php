@@ -98,7 +98,7 @@ class TagsExtension extends AbstractExtension
                         },
                         'editable'       => false,
                         'translatable'   => true,
-                        'renderable'     => true,
+                        'renderable'     => $this->taggableHelper->isEnableGridColumn($className),
                         'inline_editing' => [
                             'enable' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_ASSIGN_ID_KEY),
                             'editor' => [
@@ -135,13 +135,16 @@ class TagsExtension extends AbstractExtension
 
         $filters[self::FILTER_COLUMN_NAME] = [
             'type'      => 'tag',
+            'label'     => 'oro.tag.entity_plural_label',
             'data_name' => 'tag.id',
+            'enabled'   => $this->taggableHelper->isEnableGridFilter($className),
             'options'   => [
                 'field_options' => [
                     'entity_class' => $this->getEntityClassName($config),
                 ]
             ]
         ];
+
         $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
     }
 
@@ -173,9 +176,8 @@ class TagsExtension extends AbstractExtension
             array_map(
                 function (ResultRecord $item) use ($tags) {
                     $id = $item->getValue('id');
-                    if (isset($tags[$id])) {
-                        $item->addData(['tags' => $tags[$id]]);
-                    }
+                    $data = isset($tags[$id]) ? $tags[$id] : [];
+                    $item->addData(['tags' => $data]);
 
                     return $item;
                 },

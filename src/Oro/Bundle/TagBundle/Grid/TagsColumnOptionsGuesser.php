@@ -14,6 +14,7 @@ class TagsColumnOptionsGuesser extends AbstractColumnOptionsGuesser
             return new ColumnGuess(
                 [
                     'type'      => 'tag',
+                    'label'     => 'oro.tag.entity_plural_label',
                     'data_name' => 'tag.id',
                     'options'   => [
                         'field_options' => [

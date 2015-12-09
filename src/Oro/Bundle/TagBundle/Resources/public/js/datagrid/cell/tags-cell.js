@@ -53,6 +53,7 @@ define([
 
             this.$el.html(this.template({
                 model: data,
+                showDefault: false,
                 fieldName: this.column.get('name'),
                 tagSortCallback: this.tagSortCallback
             }));

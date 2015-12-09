@@ -120,13 +120,22 @@ class TagsFilter extends EntityFilter
         $formView  = $this->getForm()->createView();
         $fieldView = $formView->children['value'];
 
-        return [
-            'enabled'      => true,
+        $defaultMetadata = [
+            'name'         => $this->getName(),
             'translatable' => true,
-            'label'        => 'oro.tag.entity_plural_label',
+            'enabled'      => true,
             'choices'      => $fieldView->vars['choices'],
-            'type'         => 'multichoice',
-            'name'         => $this->name
         ];
+
+        $metadata         = array_diff_key(
+            $this->get() ?: [],
+            array_flip($this->util->getExcludeParams())
+        );
+        $metadata         = $this->mapParams($metadata);
+        $metadata['type'] = 'multichoice';
+
+        $metadata = array_merge($defaultMetadata, $metadata);
+
+        return $metadata;
     }
 }

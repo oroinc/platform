@@ -35,6 +35,40 @@ class TaggableHelper
     }
 
     /**
+     * Checks if column with tags should appear by default on the grid for entity
+     *
+     * @param string|object $entity
+     *
+     * @return bool
+     */
+    public function isEnableGridColumn($entity)
+    {
+        return
+            self::isImplementsTaggable($entity) ||
+            (
+                $this->tagConfigProvider->hasConfig($entity) &&
+                $this->tagConfigProvider->getConfig($entity)->is('enableGridColumn')
+            );
+    }
+
+    /**
+     * Checks if tags filter should appear by default on the grid for entity
+     *
+     * @param string|object $entity
+     *
+     * @return bool
+     */
+    public function isEnableGridFilter($entity)
+    {
+        return
+            self::isImplementsTaggable($entity) ||
+            (
+                $this->tagConfigProvider->hasConfig($entity) &&
+                $this->tagConfigProvider->getConfig($entity)->is('enableGridFilter')
+            );
+    }
+
+    /**
      * Checks if entity class implements Taggable interface
      *
      * @param object|string $entity

@@ -20,3 +20,15 @@ oro_entity_config:
                 immutable: # boolean
                     options:
                         auditable:          false
+
+                # indicates whether column with tags should appear by default on the grid
+                # if FALSE it does not appear on the grid, and can be enabled from the grid settings
+                enableGridColumn:
+                    options:
+                        default_value:      true
+
+                # indicates whether tags filter should appear by default on the grid
+                # if FALSE it does not appear on the grid, and can be enabled from the filter manager
+                enableGridFilter:
+                    options:
+                        default_value:      true
