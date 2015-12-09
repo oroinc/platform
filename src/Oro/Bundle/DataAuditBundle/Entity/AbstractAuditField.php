@@ -10,13 +10,6 @@ use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 /**
  * @ORM\MappedSuperclass()
- * @ORM\Entity()
- * @ORM\Table(name="oro_audit_field", indexes={
- *      @ORM\Index(name="idx_oro_audit_field_type", columns={"type"})
- * })
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({"audit_field" = "AuditField"})
  */
 abstract class AbstractAuditField
 {

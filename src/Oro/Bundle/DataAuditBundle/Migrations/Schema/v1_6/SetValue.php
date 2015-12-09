@@ -30,13 +30,5 @@ class SetValue implements Migration, OrderedMigrationInterface
                 ['type' => Type::STRING]
             )
         );
-
-        $queries->addPreQuery(
-            new ParametrizedSqlMigrationQuery(
-                'UPDATE oro_audit_field SET type = :type',
-                ['type' => 'audit_field'],
-                ['type' => Type::STRING]
-            )
-        );
     }
 }

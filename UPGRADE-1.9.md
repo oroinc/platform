@@ -29,6 +29,34 @@ UPGRADE FROM 1.8 to 1.9
 
 ####DataAuditBundle
 - `Oro\Bundle\DataauditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
+- Grid merge uses distinct policy
+
+```
+grid-name:
+    source:
+        value: 1
+grid-name:
+    source:
+        value: 2
+```
+
+will result
+
+```
+grid-name:
+    source:
+        value: 2
+```
+
+instead of
+
+```
+grid-name:
+    source:
+        value:
+            - 1
+            - 2
+```
 
 ####DataGridBundle
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private

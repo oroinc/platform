@@ -23,8 +23,5 @@ class AddColumn implements Migration, OrderedMigrationInterface
     {
         $auditTable = $schema->getTable('oro_audit');
         $auditTable->addColumn('type', 'string', ['length' => 255, 'notnull' => false]);
-
-        $auditFieldTable = $schema->getTable('oro_audit_field');
-        $auditFieldTable->addColumn('type', 'string', ['length' => 255, 'notnull' => false]);
     }
 }
