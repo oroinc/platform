@@ -6,6 +6,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
+/**
+ * Makes sure that the request type exists in the Context.
+ */
 class ValidateRequestTypeExists implements ProcessorInterface
 {
     /**

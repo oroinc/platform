@@ -11,6 +11,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * Sets the request type to "json_api" if the corresponding 'Content-Type' header was received.
+ */
 class CheckRequestType implements ProcessorInterface
 {
     /**

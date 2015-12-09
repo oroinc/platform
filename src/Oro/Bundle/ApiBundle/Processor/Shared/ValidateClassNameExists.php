@@ -6,6 +6,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
+/**
+ * Makes sure that the class name of an entity exists in the Context.
+ */
 class ValidateClassNameExists implements ProcessorInterface
 {
     /**

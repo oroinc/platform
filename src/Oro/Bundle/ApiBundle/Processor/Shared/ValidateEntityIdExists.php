@@ -6,6 +6,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 
+/**
+ * Makes sure that the identifier of an entity exists in the Context.
+ */
 class ValidateEntityIdExists implements ProcessorInterface
 {
     /**

@@ -7,6 +7,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Makes sure that the valid result was added to the Context.
+ */
 class ValidateResult implements ProcessorInterface
 {
     /**
