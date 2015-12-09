@@ -6,6 +6,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var TabsView = require('oroui/js/app/views/tabs-view');
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
+    var DayValueHelper = require('orofilter/js/day-value-helper');
     var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     require('orofilter/js/datevariables-widget');
 
@@ -28,6 +29,7 @@ define(function(require) {
         initialize: function(options) {
             _.extend(this, _.pick(options, ['backendFormat']));
             this.dateVariableHelper = new DateVariableHelper(options.datePickerOptions.dateVars);
+            this.dayValueHelper = new DayValueHelper(options.dayFormats);
             VariableDatePickerView.__super__.initialize.apply(this, arguments);
         },
 
@@ -141,6 +143,8 @@ define(function(require) {
             var value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
+            } else if (this.dayValueHelper.isDayValue(value)) {
+                value = this.dayValueHelper.formatRawValue(value);
             } else {
                 value = VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
             }
@@ -156,6 +160,8 @@ define(function(require) {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
+            } else if (this.dayValueHelper.isDayValue(value)) {
+                value = this.dayValueHelper.formatDisplayValue(value);
             } else {
                 value = VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
             }
