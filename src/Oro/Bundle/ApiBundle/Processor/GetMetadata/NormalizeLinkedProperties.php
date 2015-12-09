@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Expands metadata of root entity adding fields which are aliases on child associations.
+ * Expands metadata of root entity adding fields which are aliases for child associations.
  * For example if there is a configuration of field like:
  * addressName:
  *      property_path: address.name

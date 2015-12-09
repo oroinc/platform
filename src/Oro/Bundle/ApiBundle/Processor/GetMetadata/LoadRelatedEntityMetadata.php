@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Adds metadata for fields of related entities.
+ */
 class LoadRelatedEntityMetadata implements ProcessorInterface
 {
     /** @var MetadataProvider */
