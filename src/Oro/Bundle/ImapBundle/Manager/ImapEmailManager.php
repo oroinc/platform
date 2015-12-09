@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use ArrayIterator;
-
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\AcceptHeaderItem;
 
@@ -243,7 +241,7 @@ class ImapEmailManager
         if ($header === false) {
             return '';
         } elseif (!$header instanceof \ArrayIterator) {
-            $header = new ArrayIterator([$header]);
+            $header = new \ArrayIterator([$header]);
         }
 
         $items = [];
