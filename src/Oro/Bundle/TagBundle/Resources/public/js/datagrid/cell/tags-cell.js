@@ -41,7 +41,7 @@ define([
         /**
          * @inheritDoc
          */
-        render: function () {
+        render: function() {
             // preparing urls
             var data = this.model.toJSON();
             var tags = data[this.column.get('name')];
