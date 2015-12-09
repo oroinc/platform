@@ -73,8 +73,8 @@ define([
                 function(original) {
                     var conditions = original.apply(this, _.rest(arguments));
                     var func = self._getCurrentFunc();
-                    if (func && func.name === 'Count') {
-                        conditions.type = 'integer';
+                    if (func && func.return_type) {
+                        conditions.type = func.return_type;
                     }
 
                     return conditions;
