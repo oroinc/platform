@@ -2,7 +2,7 @@ oro_rest_api_cget:
     path: /api/{entity}.{_format}
     methods: [GET]
     requirements:
-        entity: (?!soap)
+        entity: (?:(?!(soap|rest)$)[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:cget
         _action: get_list
@@ -13,7 +13,7 @@ oro_rest_api_get:
     path: /api/{entity}/{id}.{_format}
     methods: [GET]
     requirements:
-        entity: (?!soap)
+        entity: (?:(?!(soap|rest)$)[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:get
         _action: get
