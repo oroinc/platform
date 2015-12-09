@@ -38,29 +38,10 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
     {
         return [
             'select' => [
-                'expr'                => 'virtualTag.name',
+                'expr'                => 'entity.name',
                 'label'               => 'oro.tag.entity_plural_label',
-                'return_type'         => GroupingScope::GROUP_DICTIONARY,
+                'return_type'         => 'tag',
                 'related_entity_name' => 'Oro\Bundle\TagBundle\Entity\Tag',
-            ],
-            'join'   => [
-                'left' => [
-                    [
-                        'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
-                        'alias'         => 'virtualTagging',
-                        'conditionType' => Join::WITH,
-                        'condition'     => sprintf(
-                            "(virtualTagging.entityName = '%s' and virtualTagging.recordId = entity.id)",
-                            $className
-                        )
-                    ],
-                    [
-                        'join'          => 'Oro\Bundle\TagBundle\Entity\Tag',
-                        'alias'         => 'virtualTag',
-                        'conditionType' => Join::WITH,
-                        'condition'     => "virtualTagging.tag = virtualTag"
-                    ]
-                ]
             ]
         ];
     }

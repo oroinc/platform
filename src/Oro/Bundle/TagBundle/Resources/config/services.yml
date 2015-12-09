@@ -17,8 +17,6 @@ parameters:
 
     oro_tag.event_listener.merge_listener.class: Oro\Bundle\TagBundle\EventListener\MergeListener
 
-    oro_tag.filter.tags.class: Oro\Bundle\TagBundle\Filter\TagsFilter
-
 services:
     oro_tag.tag.manager:
         class: %oro_tag.tag.manager.class%
@@ -109,7 +107,7 @@ services:
             - { name: oro_entity.virtual_field_provider, priority: 150 }
 
     oro_tag.filter.tags:
-        class: %oro_tag.filter.tags.class%
+        class: Oro\Bundle\TagBundle\Filter\EntityTagsFilter
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
@@ -190,7 +188,12 @@ services:
         tags:
             - { name: oro_importexport.formatter.formatter, data_type: tags, format_type: excel }
 
-    oro_tag.grid.column_options_guesser:
-        class: Oro\Bundle\TagBundle\Grid\TagsColumnOptionsGuesser
+    oro_tag.filter.tags_report:
+        class: Oro\Bundle\TagBundle\Filter\TagsReportFilter
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+            - @doctrine
+            - @oro_security.acl_helper
         tags:
-            - { name: oro_datagrid.column_options_guesser }
+            - { name: oro_filter.extension.orm_filter.filter, type: tags-report }
