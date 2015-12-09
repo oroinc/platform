@@ -32,9 +32,12 @@ define([
                     this.element.closest('.condition').find('.close').click();
                 }
             }, this);
-            if (data && data.columnName) {
-                this.selectField(data.columnName);
-                this._renderFilter(data.columnName);
+            if (data && data.columnName && data.func) {
+                var column = this._getColumnByNameAndFunc(data.columnName, data.func);
+                if (column) {
+                    this.$fieldChoice.fieldChoice('setData', {id: column.get('name'), text: column.get('label')});
+                    this._renderFilter(column.get('name'));
+                }
             }
 
             this._on(this.$fieldChoice, {
@@ -59,6 +62,24 @@ define([
         _updateFieldChoice: function() {
             var fieldChoice = this.$fieldChoice.fieldChoice().data('oroentity-fieldChoice');
             fieldChoice._select2Data = _.bind(this._getAggregatedSelectData, this);
+
+            fieldChoice.setData = function(data) {
+                this.element.select2('data', data, true);
+            };
+
+            var self = this;
+            fieldChoice.getApplicableConditions = _.wrap(
+                fieldChoice.getApplicableConditions,
+                function(original) {
+                    var conditions = original.apply(this, _.rest(arguments));
+                    var func = self._getCurrentFunc();
+                    if (func && func.name === 'Count') {
+                        conditions.type = 'integer';
+                    }
+
+                    return conditions;
+                }
+            );
         },
 
         _getAggregatedSelectData: function() {
@@ -83,7 +104,7 @@ define([
         _onUpdate: function() {
             var value;
             var columnName = this._getColumnName();
-            var columnFunc = this._getColumnFunc(columnName);
+            var columnFunc = this._getCurrentFunc();
 
             if (this.filter && !this.filter.isEmptyValue() && !_.isEmpty(columnFunc)) {
                 value = {
@@ -103,13 +124,29 @@ define([
             return this.element.find('input.select').select2('val');
         },
 
-        _getColumnFunc: function(columnName) {
-            var column = this.options.columnsCollection.findWhere({name: columnName});
+        _getColumnLabel: function() {
+            var obj = this.element.find('input.select').select2('data');
+
+            return obj ? obj.text : undefined;
+        },
+
+        _getCurrentFunc: function() {
+            var column = this.options.columnsCollection.findWhere({label: this._getColumnLabel()});
             if (_.isEmpty(column)) {
                 return;
             }
 
             return column.get('func');
+        },
+
+        _getColumnByNameAndFunc: function(name, func) {
+            if (!func) {
+                return;
+            }
+
+            return _.find(this.options.columnsCollection.where({name: name}), function(column) {
+                return column.get('func') && column.get('func').name === func.name;
+            });
         },
 
         _getFilterCriterion: function() {
