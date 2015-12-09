@@ -88,6 +88,31 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            // @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
+            'result_name_with_data_transformer'           => [
+                'config'         => [
+                    'fields' => [
+                        'phones' => [
+                            'fields' => [
+                                'primary' => [
+                                    'result_name'      => 'isPrimary',
+                                    'data_transformer' => 'primary_field_transformer'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'phones' => [
+                            'fields' => [
+                                'isPrimary' => ['property_path' => 'primary'],
+                                'primary'   => ['data_transformer' => 'primary_field_transformer']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'single_property_path'                        => [
                 'config'         => [
                     'fields' => [
@@ -104,6 +129,52 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                             'fields' => [
                                 'isPrimary' => ['property_path' => 'primary'],
                                 'primary'   => null
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'property_path_with_data_transformer'         => [
+                'config'         => [
+                    'fields' => [
+                        'phones' => [
+                            'fields' => [
+                                'isPrimary' => [
+                                    'property_path'    => 'primary',
+                                    'data_transformer' => 'primary_field_transformer'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'phones' => [
+                            'fields' => [
+                                'isPrimary' => ['property_path' => 'primary'],
+                                'primary'   => ['data_transformer' => 'primary_field_transformer']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'deep_property_path_with_data_transformer'    => [
+                'config'         => [
+                    'fields' => [
+                        'phone_number' => [
+                            'property_path'    => 'phone.number',
+                            'data_transformer' => 'phone_number_field_transformer'
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'phone_number' => [
+                            'property_path' => 'phone.number'
+                        ],
+                        'phone'        => [
+                            'fields' => [
+                                'number' => ['data_transformer' => 'phone_number_field_transformer']
                             ]
                         ]
                     ]
