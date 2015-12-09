@@ -49,6 +49,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class AcmeTestBundle implements Migration
 {
+    /**
+     * {@inheritdoc}
+     */
     public function up(Schema $schema, QueryBag $queries)
     {
         $options = new OroOptions();
