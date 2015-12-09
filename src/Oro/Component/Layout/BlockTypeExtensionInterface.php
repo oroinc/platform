@@ -10,14 +10,14 @@ interface BlockTypeExtensionInterface
      * Builds the block.
      *
      * This method is called after the extended type has built the block
-     * and can be used to further modify the block.
+     * and can be used to further modify the block and prepare block options.
      *
      * @see BlockTypeInterface::buildForm()
      *
      * @param BlockBuilderInterface $builder
      * @param array                 $options
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options);
+    public function buildBlock(BlockBuilderInterface $builder, array &$options);
 
     /**
      * Builds the block view.

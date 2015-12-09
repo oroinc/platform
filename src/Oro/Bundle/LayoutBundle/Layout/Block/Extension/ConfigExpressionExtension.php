@@ -6,8 +6,7 @@ use Oro\Component\ConfigExpression\AssemblerInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
-use Oro\Component\Layout\BlockInterface;
-use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
@@ -40,13 +39,14 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function buildBlock(BlockBuilderInterface $builder, array &$options)
     {
-        $context  = $block->getContext();
+        $context = $builder->getContext();
         $evaluate = $context->getOr('expressions_evaluate');
         $encoding = $context->getOr('expressions_encoding');
         if ($evaluate || $encoding !== null) {
-            $this->processExpressions($view->vars, $context, $block->getData(), $evaluate, $encoding);
+            $data = $builder->getDataAccessor();
+            $this->processExpressions($options, $context, $data, $evaluate, $encoding);
         }
     }
 

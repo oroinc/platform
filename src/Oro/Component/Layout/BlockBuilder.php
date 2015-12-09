@@ -20,21 +20,29 @@ final class BlockBuilder implements BlockBuilderInterface
     private $id;
 
     /**
+     * @var DataAccessorInterface
+     */
+    private $dataAccessor;
+
+    /**
      * @param LayoutManipulatorInterface $layoutManipulator
      * @param RawLayout                $rawLayout
      * @param BlockTypeHelperInterface $typeHelper
      * @param ContextInterface         $context
+     * @param DataAccessorInterface    $dataAccessor
      */
     public function __construct(
         LayoutManipulatorInterface $layoutManipulator,
         RawLayout $rawLayout,
         BlockTypeHelperInterface $typeHelper,
-        ContextInterface $context
+        ContextInterface $context,
+        DataAccessorInterface $dataAccessor
     ) {
         $this->layoutManipulator = $layoutManipulator;
         $this->rawLayout         = $rawLayout;
         $this->typeHelper        = $typeHelper;
         $this->context           = $context;
+        $this->dataAccessor      = $dataAccessor;
     }
 
     /**
@@ -89,5 +97,13 @@ final class BlockBuilder implements BlockBuilderInterface
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataAccessor()
+    {
+        return $this->dataAccessor;
     }
 }
