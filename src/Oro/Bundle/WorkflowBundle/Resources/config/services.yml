@@ -105,3 +105,8 @@ services:
             - @oro_workflow.workflow_assembler
             - @oro_entity_config.provider.workflow
 
+    oro_workflow.exclusion_provider.workflow_item_step:
+        class: Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }

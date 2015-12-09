@@ -1,6 +1,65 @@
+/** @lends InlineEditableViewComponent */
 define(function(require) {
     'use strict';
 
+    /**
+     * Allows to connect inline editors on view pages.
+     * Currently used only for tags-editor. See [index of supported editors](../editor)
+     * @TODO update after connecting other editors
+     *
+     * Sample:
+     *
+     * ```twig
+     * {% import 'OroUIBundle::macros.html.twig' as UI %}
+     * <div class="tags-view-form-container" {{ UI.renderPageComponentAttributes({
+     *    module: 'oroform/js/app/components/inline-editable-view-component',
+     *    options: {
+     *        frontend_type: 'tags',
+     *        value: oro_tag_get_list(entity),
+     *        fieldName: 'tags',
+     *        metadata: {
+     *            inline_editing: {
+     *                enable: resource_granted('oro_tag_assign_unassign'),
+     *                save_api_accessor: {
+     *                    route: 'oro_api_post_taggable',
+     *                    http_method: 'POST',
+     *                    default_route_parameters: {
+     *                        entity: oro_class_name(entity, true),
+     *                        entityId: entity.id
+     *                    }
+     *                },
+     *                autocomplete_api_accessor: {
+     *                    class: 'oroui/js/tools/search-api-accessor',
+     *                    search_handler_name: 'tags',
+     *                    label_field_name: 'name'
+     *                },
+     *                editor: {
+     *                    view_options: {
+     *                        permissions: {
+     *                            oro_tag_create: resource_granted('oro_tag_create'),
+     *                            oro_tag_unassign_global: resource_granted('oro_tag_unassign_global')
+     *                        }
+     *                    }
+     *                }
+     *            }
+     *        }
+     *    }
+     * }) }}></div>
+     * ```
+     *
+     * @class
+     * @param {Object} options - Options container
+     * @param {Object} options._sourceElement - Element where to connect this view (passed automatically when
+     *                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md))
+     * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
+     * @param {*} options.value - value to edit
+     * @param {string} options.fieldName - field name to use when sending value to server
+     * @param {Object} options.metadata - Editor metadata
+     * @param {Object} options.metadata.inline_editing - inline-editing configuration
+     *
+     * @augments BaseComponent
+     * @exports InlineEditableViewComponent
+     */
     var InlineEditableViewComponent;
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -13,7 +72,7 @@ define(function(require) {
     var overlayTool = require('oroui/js/tools/overlay');
     var tools = require('oroui/js/tools');
 
-    InlineEditableViewComponent = BaseComponent.extend({
+    InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
         OVERLAY_TOOL_DEFAULTS: {
             position: {
                 my: 'left top',

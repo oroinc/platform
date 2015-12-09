@@ -23,6 +23,12 @@ services:
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
+    oro_comment.exclusion_provider:
+        class: Oro\Bundle\CommentBundle\Provider\CommentExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
+
     oro_comment.comment.api_manager:
         class: %oro_comment.comment.api_manager.class%
         arguments:
