@@ -72,7 +72,9 @@ class DataNormalizer
     protected function applyPropertyPath(array &$row, $field, $propertyPath, $renaming)
     {
         if (!array_key_exists($field, $row)) {
-            $row[$field] = $this->extractValueByPropertyPath($row, $propertyPath);
+            if (!$renaming) {
+                $row[$field] = $this->extractValueByPropertyPath($row, $propertyPath);
+            }
         } elseif (is_array($row[$field])) {
             if (array_key_exists(0, $row[$field])) {
                 foreach ($row[$field] as &$subRow) {

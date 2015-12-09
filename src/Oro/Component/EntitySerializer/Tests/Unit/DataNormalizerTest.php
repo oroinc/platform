@@ -509,6 +509,27 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'invalid config (a config for not existing relation)'     => [
+                'config'       => [
+                    'fields' => [
+                        'contact' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                            'property_path'    => 'id'
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id' => 123,
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id' => 123,
+                    ]
+                ]
+            ],
         ];
     }
 }
