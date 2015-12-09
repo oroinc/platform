@@ -193,15 +193,16 @@ services:
     oro_activity_list.strategy.replace:
         class: %oro_activity_list.strategy.replace.class%
         arguments:
-            - @oro_activity.manager
+            - @oro_activity_list.manager
             - @oro_entity.doctrine_helper
+            - @oro_activity.manager
         tags:
             - { name: oro_entity_merge.strategy }
 
     oro_activity_list.strategy.unite:
         class: %oro_activity_list.strategy.unite.class%
         arguments:
-            - @oro_activity.manager
+            - @oro_activity_list.manager
             - @oro_entity.doctrine_helper
         tags:
             - { name: oro_entity_merge.strategy }

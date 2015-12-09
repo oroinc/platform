@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -17,20 +17,27 @@ use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
  */
 class ReplaceStrategy implements StrategyInterface
 {
-    /** @var ActivityManager  */
-    protected $activityManager;
+    /** @var ActivityListManager  */
+    protected $activityListManager;
 
     /** @var DoctrineHelper  */
     protected $doctrineHelper;
 
+    /** @var ActivityManager  */
+    protected $activityManager;
+
     /**
-     * @param ActivityManager $activityManager
+     * @param ActivityListManager $activityListManager
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ActivityManager $activityManager, DoctrineHelper $doctrineHelper)
-    {
-        $this->activityManager = $activityManager;
+    public function __construct(
+        ActivityListManager $activityListManager,
+        DoctrineHelper $doctrineHelper,
+        ActivityManager $activityManager
+    ) {
+        $this->activityListManager = $activityListManager;
         $this->doctrineHelper = $doctrineHelper;
+        $this->activityManager = $activityManager;
     }
 
     /**
@@ -45,15 +52,35 @@ class ReplaceStrategy implements StrategyInterface
 
         $activityClass = $fieldMetadata->get('type');
 
-        $activities = $this->getActivitiesByEntity($masterEntity, $activityClass);
+        $activityListItems = $this->getActivitiesByEntity($masterEntity, $activityClass);
+        $activityIds = array_column($activityListItems, 'relatedActivityId');
+
+        $activities = $this->doctrineHelper->getEntityRepository($activityClass)->findBy(['id' => $activityIds]);
         foreach ($activities as $activity) {
             $this->activityManager->removeActivityTarget($activity, $masterEntity);
         }
 
-        $activities = $this->getActivitiesByEntity($sourceEntity, $activityClass);
-        foreach ($activities as $activity) {
-            $this->activityManager->replaceActivityTarget($activity, $sourceEntity, $masterEntity);
-        }
+        $activityListItems = $this->getActivitiesByEntity($sourceEntity, $activityClass);
+
+        $activityIds = array_column($activityListItems, 'id');
+        $entityClass = ClassUtils::getRealClass($masterEntity);
+        $this->activityListManager
+            ->replaceActivityTargetWithPlainQuery(
+                $activityIds,
+                $entityClass,
+                $sourceEntity->getId(),
+                $masterEntity->getId()
+            );
+
+        $activityIds = array_column($activityListItems, 'relatedActivityId');
+        $this->activityListManager
+            ->replaceActivityTargetWithPlainQuery(
+                $activityIds,
+                $entityClass,
+                $sourceEntity->getId(),
+                $masterEntity->getId(),
+                $activityClass
+            );
     }
 
     /**
@@ -68,10 +95,7 @@ class ReplaceStrategy implements StrategyInterface
             ->getEntityRepository(ActivityList::ENTITY_NAME)
             ->getActivityListQueryBuilderByActivityClass($entityClass, $entity->getId(), $activityClass);
 
-        $activityListItems = $queryBuilder->getQuery()->getResult();
-        $activityIds = array_column($activityListItems, 'relatedActivityId');
-
-        return $this->doctrineHelper->getEntityRepository($activityClass)->findBy(['id' => $activityIds]);
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
