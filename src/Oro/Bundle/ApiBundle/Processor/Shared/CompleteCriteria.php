@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Adds joins to the Criteria object for associations are used in WHERE clause but are not joined yet.
+ */
 class CompleteCriteria implements ProcessorInterface
 {
     const JOIN_ALIAS_TEMPLATE = 'alias%d';

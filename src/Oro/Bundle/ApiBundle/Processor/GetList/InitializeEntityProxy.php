@@ -7,6 +7,10 @@ use Doctrine\ORM\Proxy\Proxy;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Checks the result list contains elements that are instances of "Doctrine\ORM\Proxy\Proxy"
+ * and makes sure they are initialized.
+ */
 class InitializeEntityProxy implements ProcessorInterface
 {
     /**
