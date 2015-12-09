@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
+use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -98,7 +99,7 @@ class CronCommand extends ContainerAwareCommand
             /**
              * @todo Add "Oro timezone" setting as parameter to isDue method
              */
-            if ($cron->isDue()) {
+            if ($cron->isDue() && !$this->hasJobInQueue($name)) {
                 $job = new Job($name);
 
                 $em->persist($job);
@@ -113,5 +114,18 @@ class CronCommand extends ContainerAwareCommand
 
         $output->writeln('');
         $output->writeln('All commands finished');
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    protected function hasJobInQueue($name)
+    {
+        /** @var JobManager $jobManager */
+        $jobManager = $this->getContainer()->get('oro_cron.job_manager');
+
+        return $jobManager->hasJobInQueue($name, '[]');
     }
 }
