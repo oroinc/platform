@@ -66,6 +66,7 @@ class TagsExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
+            $this->securityFacade->getToken() !== null &&
             null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)
             && $this->taggableHelper->isTaggable($this->getEntityClassName($config));
     }
