@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Layout\Block\Type;
+namespace Oro\Bundle\DataGridBundle\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;

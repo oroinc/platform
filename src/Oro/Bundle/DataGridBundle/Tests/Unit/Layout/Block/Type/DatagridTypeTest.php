@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Block\Type;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-use Oro\Bundle\UIBundle\Layout\Block\Type\DatagridType;
+use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 
 class DatagridTypeTest extends BlockTypeTestCase

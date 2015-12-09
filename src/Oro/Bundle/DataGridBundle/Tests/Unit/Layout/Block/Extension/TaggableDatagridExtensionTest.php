@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Block\Extension;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Extension;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Component\Layout\BlockView;
 
-use Oro\Bundle\UIBundle\Layout\Block\Extension\TaggableDatagridExtension;
+use Oro\Bundle\DataGridBundle\Layout\Block\Extension\TaggableDatagridExtension;
 
 class TaggableDatagridExtensionTest extends \PHPUnit_Framework_TestCase
 {
