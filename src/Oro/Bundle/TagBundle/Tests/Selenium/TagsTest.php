@@ -59,7 +59,7 @@ class TagsTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Tags $login*/
         $login->openTags('Oro\Bundle\TagBundle')
-            ->filterBy('Tag', $tagName)
+            ->filterBy('Name', $tagName)
             ->delete([$tagName])
             ->assertMessage('Item deleted')
             ->assertTitle('All - Tags - System');
