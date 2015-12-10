@@ -80,24 +80,23 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
+        // @TODO Reports logic should be removed from this extension
         $isReports = $this->isReportGrid($config);
         $filters   = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
-
-        if (!$isReports && empty($filters)) {
-            return;
-        }
-
         $columns = $config->offsetGetByPath('[columns]', []);
         $sorters = $config->offsetGetByPath(self::GRID_SORTERS_PATH, []);
+
         $column  = [self::COLUMN_NAME => $this->getColumnDefinition($config, $isReports)];
         $filter  = $this->getColumnFilterDefinition($config, $isReports);
 
         if ($isReports) {
             $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
+            // if it is report/segment grid and it has tags column we
+            // replace it with properly configured one
+            // and add tag filter.
             if (isset($aliases['tag_field'])) {
                 $tagAlias           = $aliases['tag_field'];
                 $filters[$tagAlias] = $filter;
-                // Need remove old column, as no needed.
                 unset($columns[$tagAlias]);
                 unset($sorters[$tagAlias]);
                 $config->offsetSetByPath(
@@ -109,14 +108,11 @@ class TagsExtension extends AbstractExtension
                 );
             }
         } else {
-            $filters[self::FILTER_COLUMN_NAME] = $filter;
-            $config->offsetSetByPath(
-                '[columns]',
-                array_merge(
-                    $columns,
-                    $column
-                )
-            );
+            $config->offsetSetByPath('[columns]', array_merge($columns, $column));
+            // do not add tag filter if $filters are empty(case when they are disabled).
+            if (!empty($filters)) {
+                $filters[self::FILTER_COLUMN_NAME] = $filter;
+            }
         }
 
         $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
