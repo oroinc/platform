@@ -225,7 +225,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
 
         $this->handler->expects($this->once())->method('calculateCount')
-            ->with($this->isInstanceOf('Oro\Bundle\EntityBundle\ORM\SqlQuery'))
+            ->with($this->isInstanceOf('Oro\Component\DoctrineUtils\ORM\SqlQuery'))
             ->willReturn($testCount);
 
         $context = $this->createContext();
@@ -277,7 +277,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
 
         $this->handler->expects($this->once())->method('calculateCount')
-            ->with($this->isInstanceOf('Oro\Bundle\EntityBundle\ORM\SqlQuery'))
+            ->with($this->isInstanceOf('Oro\Component\DoctrineUtils\ORM\SqlQuery'))
             ->willReturn($testCount);
 
         $context = $this->createContext();

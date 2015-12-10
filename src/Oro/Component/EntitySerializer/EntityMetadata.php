@@ -102,7 +102,7 @@ class EntityMetadata
      *
      * @param string $fieldName
      *
-     * @return boolean
+     * @return bool
      */
     public function isField($fieldName)
     {
@@ -114,7 +114,7 @@ class EntityMetadata
      *
      * @param string $fieldName
      *
-     * @return boolean
+     * @return bool
      */
     public function isAssociation($fieldName)
     {
@@ -126,7 +126,7 @@ class EntityMetadata
      *
      * @param string $fieldName
      *
-     * @return boolean
+     * @return bool
      */
     public function isCollectionValuedAssociation($fieldName)
     {

@@ -5,9 +5,14 @@ namespace Oro\Bundle\SoapBundle\Serializer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
+use Oro\Component\EntitySerializer\ConfigNormalizer;
 use Oro\Component\EntitySerializer\DataAccessorInterface as BaseDataAccessorInterface;
+use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\DataTransformerInterface as BaseDataTransformerInterface;
+use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntitySerializer as BaseEntitySerializer;
+use Oro\Component\EntitySerializer\FieldAccessor;
+use Oro\Component\EntitySerializer\QueryFactory;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Serializer\ExtendEntityFieldFilter;
@@ -31,12 +36,20 @@ class EntitySerializer extends BaseEntitySerializer
         BaseDataTransformerInterface $dataTransformer,
         QueryHintResolverInterface $queryHintResolver
     ) {
+        $doctrineHelper = new DoctrineHelper($doctrine);
+        $fieldAccessor  = new FieldAccessor(
+            $doctrineHelper,
+            $dataAccessor,
+            new ExtendEntityFieldFilter($configManager)
+        );
         parent::__construct(
-            $doctrine,
-            new ExtendEntityFieldFilter($configManager),
+            $doctrineHelper,
             $dataAccessor,
             $dataTransformer,
-            $queryHintResolver
+            new QueryFactory($doctrineHelper, $queryHintResolver),
+            $fieldAccessor,
+            new ConfigNormalizer(),
+            new DataNormalizer()
         );
     }
 }
