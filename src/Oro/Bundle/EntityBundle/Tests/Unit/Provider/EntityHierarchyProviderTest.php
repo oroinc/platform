@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -170,8 +171,8 @@ class EntityHierarchyProviderTest extends OrmTestCase
     protected function getProvider($isReturnManager = true)
     {
         return new EntityHierarchyProvider(
-            $this->extendConfigProvider,
-            $this->getDoctrineMock($this->emMock, $isReturnManager)
+            new DoctrineHelper($this->getDoctrineMock($this->emMock, $isReturnManager)),
+            $this->extendConfigProvider
         );
     }
 }
