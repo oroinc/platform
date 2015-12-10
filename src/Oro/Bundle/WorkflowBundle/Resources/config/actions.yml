@@ -198,5 +198,6 @@ services:
         arguments:
             - @oro_workflow.context_accessor
             - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
         tags:
             - { name: oro_workflow.action, alias: copy_tagging }

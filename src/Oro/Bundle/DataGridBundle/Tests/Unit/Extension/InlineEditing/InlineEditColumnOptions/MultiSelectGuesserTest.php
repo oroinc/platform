@@ -146,7 +146,7 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
                     'inline_editing' => [
                         'enable' => 1,
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/multi-select-editor-view'
+                            'view' => 'oroform/js/app/views/editor/multi-select-editor-view'
                         ]
                     ],
                     'frontend_type' => 'multi-select',
@@ -167,7 +167,7 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
                     'inline_editing' => [
                         'enable' => 1,
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/multi-select-editor-view'
+                            'view' => 'oroform/js/app/views/editor/multi-select-editor-view'
                         ]
                     ],
                     'frontend_type' => 'multi-select',
@@ -184,7 +184,7 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
                     'inline_editing' => [
                         'enable' => 1,
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/multi-select-editor-view-2'
+                            'view' => 'oroform/js/app/views/editor/multi-select-editor-view-2'
                         ]
                     ],
                     'frontend_type' => 'multi-select',

@@ -106,5 +106,5 @@ datagrid:
         columns:
             entity:
                 label: Item
-                type: search-result
+                type: tag-search-result
                 frontend_type: html

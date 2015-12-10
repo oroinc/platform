@@ -115,7 +115,7 @@ datagrid:
                 inline_editing:
                     enable: true
                     editor:
-                        view: orodatagrid/js/app/views/editor/select-editor-view
+                        view: oroform/js/app/views/editor/select-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
                 choices: # can be used service as data provider @service->getDataMethod
@@ -136,7 +136,7 @@ datagrid:
                 inline_editing:
                     enable: true
                     editor:
-                        view: orodatagrid/js/app/views/editor/multi-select-editor-view
+                        view: oroform/js/app/views/editor/multi-select-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
                 choices: # can be used service as data provider @service->getDataMethod
@@ -156,7 +156,7 @@ datagrid:
                 inline_editing:
                     enable: true
                     editor:
-                        view: orodatagrid/js/app/views/editor/related-id-relation-editor-view
+                        view: oroform/js/app/views/editor/related-id-relation-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
 ```
@@ -174,7 +174,7 @@ datagrid:
                 inline_editing:
                     enable: true
                     editor:
-                        view: orodatagrid/js/app/views/editor/multi-relation-editor-view
+                        view: oroform/js/app/views/editor/multi-relation-editor-view
                     autocomplete_api_accessor:
                         class: oroui/js/tools/search-api-accessor
 ```
@@ -183,19 +183,19 @@ datagrid:
 
 Frontend type | Editor view
 :-------------|:-----------------------------------------------------------------
-string        | [text-editor-view](../../frontend/editor/text-editor-view.md)
-phone         | [text-editor-view](../../frontend/editor/text-editor-view.md)
-datetime      | [datetime-editor-view](../../frontend/editor/datetime-editor-view.md)
-date          | [date-editor-view](../../frontend/editor/date-editor-view.md)
-currency      | [number-editor-view](../../frontend/editor/number-editor-view.md)
-number        | [number-editor-view](../../frontend/editor/number-editor-view.md)
-integer       | [number-editor-view](../../frontend/editor/number-editor-view.md)
-decimal       | [number-editor-view](../../frontend/editor/number-editor-view.md)
-percent       | [percent-editor-view](../../frontend/editor/percent-editor-view.md)
-select        | [select-editor-view](../../frontend/editor/select-editor-view.md)
-multi-select  | [multi-select-editor-view](../../frontend/editor/multi-select-editor-view.md)
-relation      | [relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md)
-multi-relation | [multi-relation-editor-view](../../frontend/editor/multi-relation-editor-view.md)
+string        | [text-editor-view](../../../../../FormBundle/Resources/doc/editor/text-editor-view.md)
+phone         | [text-editor-view](../../../../../FormBundle/Resources/doc/editor/text-editor-view.md)
+datetime      | [datetime-editor-view](../../../../../FormBundle/Resources/doc/editor/datetime-editor-view.md)
+date          | [date-editor-view](../../../../../FormBundle/Resources/doc/editor/date-editor-view.md)
+currency      | [number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+number        | [number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+integer       | [number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+decimal       | [number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+percent       | [percent-editor-view](../../../../../FormBundle/Resources/doc/editor/percent-editor-view.md)
+select        | [select-editor-view](../../../../../FormBundle/Resources/doc/editor/select-editor-view.md)
+multi-select  | [multi-select-editor-view](../../../../../FormBundle/Resources/doc/editor/multi-select-editor-view.md)
+relation      | [relation-editor-view](../../../../../FormBundle/Resources/doc/editor/related-id-relation-editor-view.md)
+multi-relation | [multi-relation-editor-view](../../../../../FormBundle/Resources/doc/editor/multi-relation-editor-view.md)
 
 Taken from [default-editors.md](../default-editors.md)
 
@@ -203,16 +203,16 @@ Taken from [default-editors.md](../default-editors.md)
 
 Editor                                                                      | Description
 :---------------------------------------------------------------------------|:-----------------------------------------------------
-[text-editor-view](../../frontend/editor/text-editor-view.md)                  | Editing text/phone cells
-[number-editor-view](../../frontend/editor/number-editor-view.md)              | Editing number/integer/decimal/currency cells
-[percent-editor-view](../../frontend/editor/percent-editor-view.md)            | Editing percent  cells
-[date-editor-view](../../frontend/editor/date-editor-view.md)                  | Editing date cells
-[datetime-editor-view](../../frontend/editor/datetime-editor-view.md)          | Editing datetime cells
-[select-editor-view](../../frontend/editor/select-editor-view.md)              | Editing select cells (predefined choices)
-[related-id-select-editor-view](../../frontend/editor/related-id-select-editor-view.md)   | Editing cells which already contain label (and no value) using predefined choices
-[related-id-relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md) | Editing cells which already contain label (and no value) using search api
-[multi-relation-editor-view](../../frontend/editor/multi-relation-editor-view.md) | Editing cells with specific format, for many to one relations.
-[multi-select-editor-view](../../frontend/editor/multi-select-editor-view.md) | Editing cells with specific format, for multiselect field.
+[text-editor-view](../../../../../FormBundle/Resources/doc/editor/text-editor-view.md)                  | Editing text/phone cells
+[number-editor-view](../../../../../FormBundle/Resources/doc/editor/number-editor-view.md)              | Editing number/integer/decimal/currency cells
+[percent-editor-view](../../../../../FormBundle/Resources/doc/editor/percent-editor-view.md)            | Editing percent  cells
+[date-editor-view](../../../../../FormBundle/Resources/doc/editor/date-editor-view.md)                  | Editing date cells
+[datetime-editor-view](../../../../../FormBundle/Resources/doc/editor/datetime-editor-view.md)          | Editing datetime cells
+[select-editor-view](../../../../../FormBundle/Resources/doc/editor/select-editor-view.md)              | Editing select cells (predefined choices)
+[related-id-select-editor-view](../../../../../FormBundle/Resources/doc/editor/related-id-select-editor-view.md)   | Editing cells which already contain label (and no value) using predefined choices
+[related-id-relation-editor-view](../../../../../FormBundle/Resources/doc/editor/related-id-relation-editor-view.md) | Editing cells which already contain label (and no value) using search api
+[multi-relation-editor-view](../../../../../FormBundle/Resources/doc/editor/multi-relation-editor-view.md) | Editing cells with specific format, for many to one relations.
+[multi-select-editor-view](../../../../../FormBundle/Resources/doc/editor/multi-select-editor-view.md) | Editing cells with specific format, for multiselect field.
 
 ## Supported search API's for `related-id-relation-editor-view`
 
