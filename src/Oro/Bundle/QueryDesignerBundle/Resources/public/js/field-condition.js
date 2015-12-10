@@ -40,8 +40,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             });
 
             this._on(this.$filterContainer, {
-                change: function() {
-                    if (this.filter) {
+                change: function(e) {
+                    if (this.filter && !$(e.target).is('[data-fake-front-field]')) {
                         this.filter.applyValue();
                     }
                 }

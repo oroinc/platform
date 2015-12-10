@@ -110,6 +110,7 @@ define(function(require) {
             this.$frontDateField = $('<input />');
             options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
             this.$frontDateField.attr(options.dateInputAttrs);
+            this.$frontDateField.attr('data-fake-front-field', '');
             this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
             this.$el.after(this.$frontDateField);
             this.$el.attr('data-format', 'backend');

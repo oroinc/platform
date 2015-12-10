@@ -125,7 +125,7 @@ define(function(require) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
             } else if (this.dayValueHelper.isDayValue(value)) {
-                value = this.dayValueHelper.formatDisplayValue(value);
+                value = this.dayValueHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateTimeValid(value)) {
                 momentInstance = moment(value, datetimeFormatter.getDateTimeFormat(), true);
                 value = momentInstance.format(this.backendFormat);
