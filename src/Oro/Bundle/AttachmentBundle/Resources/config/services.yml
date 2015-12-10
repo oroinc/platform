@@ -140,6 +140,12 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_attachment.config
 
+    oro_attachment.exclusion_provider:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
+
     oro_attachment.config:
         class: %oro_attachment.config.class%
         arguments:
