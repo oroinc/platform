@@ -19,7 +19,9 @@ class TagsExtension extends AbstractExtension
 
     const GRID_EXTEND_ENTITY_PATH = '[extended_entity_name]';
     const GRID_FROM_PATH          = '[source][query][from]';
+    const GRID_COLUMN_ALIAS_PATH  = '[source][query_config][column_aliases]';
     const GRID_FILTERS_PATH       = '[filters][columns]';
+    const GRID_SORTERS_PATH       = '[sorters][columns]';
     const GRID_NAME_PATH          = 'name';
     const FILTER_COLUMN_NAME      = 'tagname';
     const PROPERTY_ID_PATH        = '[properties][id]';
@@ -66,9 +68,9 @@ class TagsExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $this->securityFacade->getToken() !== null &&
-            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)
-            && $this->taggableHelper->isTaggable($this->getEntityClassName($config));
+            null !== $this->securityFacade->getToken() &&
+            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
+            $this->taggableHelper->isTaggable($this->getEntityClassName($config));
     }
 
     /**
@@ -76,88 +78,42 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        // Skip adding column and filter on reports and segments.
-        // @todo: Should be refactored and added filter and column in CRM-4731
-        if (strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_report') === 0 ||
-            strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_segment') === 0
-        ) {
+        $gridName  = $config->offsetGetByPath(self::GRID_NAME_PATH);
+        $isReports = strpos($gridName, 'oro_report') === 0 || strpos($gridName, 'oro_segment') === 0;
+
+        $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
+
+        if (!$isReports && empty($filters)) {
             return;
         }
 
-        $columns          = $config->offsetGetByPath('[columns]') ?: [];
-        $className        = $this->getEntityClassName($config);
-        $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
+        $columns = $config->offsetGetByPath('[columns]', []);
+        $sorters = $config->offsetGetByPath(self::GRID_SORTERS_PATH, []);
+        $column  = [self::COLUMN_NAME => $this->getColumnDefinition($config, $isReports)];
+        $filter  = $this->getColumnFilterDefinition($config, $isReports);
 
-        $permissions = [
-            'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY),
-            'oro_tag_unassign_global' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_REMOVE_ID_KEY)
-        ];
+        if ($isReports) {
+            $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
+            if (isset($aliases['tag_field'])) {
+                $tagAlias           = $aliases['tag_field'];
+                $filters[$tagAlias] = $filter;
+                // Need remove old column, as no needed.
+                unset($columns[$tagAlias]);
+                unset($sorters[$tagAlias]);
+            }
+        } else {
+            $filters[self::FILTER_COLUMN_NAME] = $filter;
+        }
 
         $config->offsetSetByPath(
             '[columns]',
             array_merge(
                 $columns,
-                [
-                    self::COLUMN_NAME => [
-                        'label'          => 'oro.tag.tags_label',
-                        'type'           => 'callback',
-                        'frontend_type'  => 'tags',
-                        'callable'       => function (ResultRecordInterface $record) {
-                            return $record->getValue('tags');
-                        },
-                        'editable'       => false,
-                        'translatable'   => true,
-                        'renderable'     => $this->taggableHelper->isEnableGridColumn($className),
-                        'inline_editing' => [
-                            'enable' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_ASSIGN_ID_KEY),
-                            'editor' => [
-                                'view'         => 'orotag/js/app/views/editor/tags-editor-view',
-                                'view_options' => [
-                                    'permissions' => $permissions
-                                ]
-                            ],
-                            'save_api_accessor'         => [
-                                'route'                       => 'oro_api_post_taggable',
-                                'http_method'                 => 'POST',
-                                'default_route_parameters'    => [
-                                    'entity' => $urlSafeClassName
-                                ],
-                                'route_parameters_rename_map' => [
-                                    'id' => 'entityId'
-                                ]
-                            ],
-                            'autocomplete_api_accessor' => [
-                                'class'               => 'oroui/js/tools/search-api-accessor',
-                                'search_handler_name' => 'tags',
-                                'label_field_name'    => 'name'
-                            ]
-                        ]
-                    ]
-                ]
+                $column
             )
         );
-
-        $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
-
-        // @todo: Should be refactored and added filter in CRM-4731
-        // For reports and segments we need to add filter also if $filters is empty.
-        if (empty($filters)) {
-            return;
-        }
-
-        $filters[self::FILTER_COLUMN_NAME] = [
-            'type'      => 'tag',
-            'label'     => 'oro.tag.entity_plural_label',
-            'data_name' => 'tag.id',
-            'enabled'   => $this->taggableHelper->isEnableGridFilter($className),
-            'options'   => [
-                'field_options' => [
-                    'entity_class' => $this->getEntityClassName($config),
-                ]
-            ]
-        ];
-
         $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
+        $config->offsetSetByPath(self::GRID_SORTERS_PATH, $sorters);
     }
 
     /**
@@ -172,7 +128,7 @@ class TagsExtension extends AbstractExtension
             },
             $rows
         );
-        //@TODO Should we apply acl?
+
         $tags = array_reduce(
             $this->tagManager->getTagsByEntityIds($this->getEntityClassName($config), $ids),
             function ($entitiesTags, $item) {
@@ -187,7 +143,7 @@ class TagsExtension extends AbstractExtension
             'data',
             array_map(
                 function (ResultRecord $item) use ($tags) {
-                    $id = $item->getValue('id');
+                    $id   = $item->getValue('id');
                     $data = isset($tags[$id]) ? $tags[$id] : [];
                     $item->addData(['tags' => $data]);
 
@@ -196,6 +152,84 @@ class TagsExtension extends AbstractExtension
                 $rows
             )
         );
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param bool                  $isReports
+     *
+     * @return array
+     */
+    protected function getColumnDefinition(DatagridConfiguration $config, $isReports)
+    {
+        $className        = $this->getEntityClassName($config);
+        $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
+
+        $permissions = [
+            'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY),
+            'oro_tag_unassign_global' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_REMOVE_ID_KEY)
+        ];
+
+        return [
+            'label'          => 'oro.tag.tags_label',
+            'type'           => 'callback',
+            'frontend_type'  => 'tags',
+            'callable'       => function (ResultRecordInterface $record) {
+                return $record->getValue('tags');
+            },
+            'editable'       => false,
+            'translatable'   => true,
+            'renderable'     => $this->taggableHelper->isEnableGridColumn($className) || $isReports,
+            'inline_editing' => [
+                'enable' => $this->securityFacade->isGranted(
+                    TagManager::ACL_RESOURCE_ASSIGN_ID_KEY
+                ),
+                'editor'                    => [
+                    'view'         => 'orotag/js/app/views/editor/tags-editor-view',
+                    'view_options' => [
+                        'permissions' => $permissions
+                    ]
+                ],
+                'save_api_accessor'         => [
+                    'route'                       => 'oro_api_post_taggable',
+                    'http_method'                 => 'POST',
+                    'default_route_parameters'    => [
+                        'entity' => $urlSafeClassName
+                    ],
+                    'route_parameters_rename_map' => [
+                        'id' => 'entityId'
+                    ]
+                ],
+                'autocomplete_api_accessor' => [
+                    'class'               => 'oroui/js/tools/search-api-accessor',
+                    'search_handler_name' => 'tags',
+                    'label_field_name'    => 'name'
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param bool                  $isReports
+     *
+     * @return array
+     */
+    protected function getColumnFilterDefinition(DatagridConfiguration $config, $isReports)
+    {
+        $className = $this->getEntityClassName($config);
+
+        return [
+            'type'      => 'tag',
+            'data_name' => 'tag.id',
+            'label'     => 'oro.tag.entity_plural_label',
+            'enabled'   => $this->taggableHelper->isEnableGridFilter($className) || $isReports,
+            'options'   => [
+                'field_options' => [
+                    'entity_class' => $this->getEntityClassName($config),
+                ]
+            ]
+        ];
     }
 
     /**
@@ -209,7 +243,7 @@ class TagsExtension extends AbstractExtension
     /**
      * @param DatagridConfiguration $config
      *
-     * @return null|string
+     * @return string|null
      */
     protected function getEntityClassName(DatagridConfiguration $config)
     {

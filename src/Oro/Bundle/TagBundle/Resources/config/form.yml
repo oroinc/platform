@@ -148,4 +148,8 @@ services:
             - tags
             - 'oro_tag_standalone_collection_api'
 
-
+    oro_tag.form.type.filter.tags_report:
+        class: Oro\Bundle\TagBundle\Form\Type\Filter\TagsReportFilterType
+        arguments: ["@translator"]
+        tags:
+            - { name: form.type, alias: oro_type_tags_report_filter }
