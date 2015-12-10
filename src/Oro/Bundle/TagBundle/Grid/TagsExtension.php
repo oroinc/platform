@@ -70,7 +70,9 @@ class TagsExtension extends AbstractExtension
         return
             null !== $this->securityFacade->getToken() &&
             null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
-            $this->taggableHelper->isTaggable($this->getEntityClassName($config));
+            $this->taggableHelper->isTaggable($this->getEntityClassName($config)) &&
+            // Do not add column with tags in cases when user does not have access to view tags, except report/segments.
+            ($this->isReportGrid($config) || $this->securityFacade->isGranted('oro_tag_view'));
     }
 
     /**
@@ -78,9 +80,7 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $gridName  = $config->offsetGetByPath(self::GRID_NAME_PATH);
-        $isReports = strpos($gridName, 'oro_report') === 0 || strpos($gridName, 'oro_segment') === 0;
-
+        $isReports = $this->isReportGrid($config);
         $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
 
         if (!$isReports && empty($filters)) {
@@ -100,18 +100,25 @@ class TagsExtension extends AbstractExtension
                 // Need remove old column, as no needed.
                 unset($columns[$tagAlias]);
                 unset($sorters[$tagAlias]);
+                $config->offsetSetByPath(
+                    '[columns]',
+                    array_merge(
+                        $columns,
+                        $column
+                    )
+                );
             }
         } else {
             $filters[self::FILTER_COLUMN_NAME] = $filter;
+            $config->offsetSetByPath(
+                '[columns]',
+                array_merge(
+                    $columns,
+                    $column
+                )
+            );
         }
 
-        $config->offsetSetByPath(
-            '[columns]',
-            array_merge(
-                $columns,
-                $column
-            )
-        );
         $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
         $config->offsetSetByPath(self::GRID_SORTERS_PATH, $sorters);
     }
@@ -152,6 +159,22 @@ class TagsExtension extends AbstractExtension
                 $rows
             )
         );
+    }
+
+    /**
+     * Checks if configuration is for report or segment grid
+     *
+     * @param DatagridConfiguration $config
+     *
+     * @return bool
+     */
+    protected function isReportGrid(DatagridConfiguration $config)
+    {
+        $gridName = $config->offsetGetByPath(self::GRID_NAME_PATH);
+
+        return
+            strpos($gridName, 'oro_report') === 0 ||
+            strpos($gridName, 'oro_segment') === 0;
     }
 
     /**
