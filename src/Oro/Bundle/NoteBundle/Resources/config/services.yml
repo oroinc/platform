@@ -84,12 +84,6 @@ services:
         class: %oro_note.strategy.replace.class%
         arguments:
             - @oro_entity.doctrine_helper
-        tags:
-            - { name: oro_entity_merge.strategy }
-
-    oro_note.strategy.unite:
-        class: %oro_note.strategy.unite.class%
-        arguments:
-            - @oro_entity.doctrine_helper
+            - @oro_activity_list.manager
         tags:
             - { name: oro_entity_merge.strategy }

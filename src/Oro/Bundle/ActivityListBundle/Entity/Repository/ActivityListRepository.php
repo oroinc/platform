@@ -183,7 +183,7 @@ class ActivityListRepository extends EntityRepository
     public function getActivityListQueryBuilderByActivityClass($entityClass, $entityId, $activityClass)
     {
         return $this->getBaseActivityListQueryBuilder($entityClass, $entityId)
-            ->select('activity.relatedActivityId')
+            ->select('activity.relatedActivityId, activity.id')
             ->andWhere('activity.relatedActivityClass = :activityClass')
             ->setParameter('activityClass', $activityClass);
     }
