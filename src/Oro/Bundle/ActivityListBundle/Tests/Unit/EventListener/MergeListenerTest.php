@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
