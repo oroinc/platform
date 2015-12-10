@@ -58,7 +58,7 @@ class TwigTemplateProperty extends AbstractProperty
             ]
         );
 
-        return $this->getTemplate()->render($context);
+        return $this->getTemplate()->render($context, false);
     }
 
     /**

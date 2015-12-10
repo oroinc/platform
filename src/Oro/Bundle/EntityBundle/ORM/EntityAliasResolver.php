@@ -52,6 +52,18 @@ class EntityAliasResolver implements WarmableInterface
     }
 
     /**
+     * Checks whether the given entity class has an alias.
+     *
+     * @param string $entityClass The FQCN of an entity
+     *
+     * @return bool
+     */
+    public function hasAlias($entityClass)
+    {
+        return null !== $this->findEntityAlias($entityClass);
+    }
+
+    /**
      * Returns the alias for the given entity class.
      *
      * @param string $entityClass The FQCN of an entity
@@ -64,7 +76,7 @@ class EntityAliasResolver implements WarmableInterface
     public function getAlias($entityClass)
     {
         $entityAlias = $this->findEntityAlias($entityClass);
-        if (!$entityAlias) {
+        if (null === $entityAlias) {
             throw new EntityAliasNotFoundException(
                 sprintf('An alias for "%s" entity not found.', $entityClass)
             );
@@ -86,7 +98,7 @@ class EntityAliasResolver implements WarmableInterface
     public function getPluralAlias($entityClass)
     {
         $entityAlias = $this->findEntityAlias($entityClass);
-        if (!$entityAlias) {
+        if (null === $entityAlias) {
             throw new EntityAliasNotFoundException(
                 sprintf('A plural alias for "%s" entity not found.', $entityClass)
             );
@@ -217,8 +229,11 @@ class EntityAliasResolver implements WarmableInterface
                 break;
             }
         }
+        if (false === $entityAlias) {
+            $entityAlias = null;
+        }
 
-        if ($entityAlias) {
+        if (null !== $entityAlias) {
             if ($this->validateDuplicates($entityClass, $entityAlias)) {
                 $this->aliases[$entityClass] = $entityAlias;
 
