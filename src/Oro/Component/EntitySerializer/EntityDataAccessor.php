@@ -42,7 +42,7 @@ class EntityDataAccessor implements DataAccessorInterface
     public function tryGetValue($object, $property, &$value)
     {
         if (is_array($object)) {
-            if (isset($object[$property]) || array_key_exists($property, $object)) {
+            if (array_key_exists($property, $object)) {
                 $value = $object[$property];
 
                 return true;

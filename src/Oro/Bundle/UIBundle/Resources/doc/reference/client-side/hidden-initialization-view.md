@@ -1,7 +1,7 @@
 <a name="HiddenInitializationView"></a>
 ## HiddenInitializationView ⇐ <code>BaseView</code>
-**Extends:** <code>BaseView</code>  
 **Kind**: global class  
+**Extends:** <code>BaseView</code>  
 <a name="new_HiddenInitializationView_new"></a>
 ### new HiddenInitializationView()
 View allows hide part of DOM tree till all page components will be initialized

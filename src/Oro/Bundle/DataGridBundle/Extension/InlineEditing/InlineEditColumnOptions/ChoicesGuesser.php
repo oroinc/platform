@@ -17,7 +17,7 @@ class ChoicesGuesser implements GuesserInterface
 {
     /** Frontend type */
     const SELECT = 'select';
-    const DEFAULT_EDITOR_VIEW = 'orodatagrid/js/app/views/editor/select-editor-view';
+    const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/select-editor-view';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
