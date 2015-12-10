@@ -79,7 +79,6 @@ define([
          * onSubmit event listener
          */
         onSubmit: function(event) {
-            event.preventDefault();
             if (this.$label.hasClass('error')) {
                 return;
             }
@@ -103,19 +102,33 @@ define([
                 url = (url.match(/^([^#]+)/) || [])[1];
             }
 
-            var data = {};
-            data[this.options.formName + '[label]'] = this.$label.val();
-            data[this.options.formName + '[privileges]'] = JSON.stringify(this.privileges);
-            data[this.options.formName + '[appendUsers]'] = this.$appendUsers.val();
-            data[this.options.formName + '[removeUsers]'] = this.$removeUsers.val();
-            data[this.options.formName + '[_token]'] = this.$token.val();
+            var data = this.getData();
+            var dataAction = $(event.target).attr('data-action');
+            if (dataAction) {
+                data.input_action = dataAction;
+            }
+
             var options = {
                 url: url,
                 type: method || 'GET',
                 data: $.param(data)
             };
             mediator.execute('submitPage', options);
-            this.dispose();
+        },
+
+        /**
+         * @returns {Object}
+         */
+        getData: function() {
+            var data = {};
+
+            data[this.options.formName + '[label]'] = this.$label.val();
+            data[this.options.formName + '[privileges]'] = JSON.stringify(this.privileges);
+            data[this.options.formName + '[appendUsers]'] = this.$appendUsers.val();
+            data[this.options.formName + '[removeUsers]'] = this.$removeUsers.val();
+            data[this.options.formName + '[_token]'] = this.$token.val();
+
+            return data;
         },
 
         /**
