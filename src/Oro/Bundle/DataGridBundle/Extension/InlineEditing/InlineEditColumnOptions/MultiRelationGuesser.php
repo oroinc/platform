@@ -14,7 +14,7 @@ class MultiRelationGuesser extends RelationGuesser
     /** Frontend type */
     const MULTI_RELATION = 'multi-relation';
 
-    const DEFAULT_EDITOR_VIEW = 'orodatagrid/js/app/views/editor/multi-relation-editor-view';
+    const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/multi-relation-editor-view';
     const DEFAULT_API_ACCESSOR_CLASS = 'oroui/js/tools/search-api-accessor';
 
     /**

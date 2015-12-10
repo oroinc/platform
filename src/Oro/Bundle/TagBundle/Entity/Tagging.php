@@ -5,6 +5,7 @@ namespace Oro\Bundle\TagBundle\Entity;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Model\ExtendTagging;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -17,7 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *        @ORM\UniqueConstraint(name="tagging_idx", columns={"tag_id", "entity_name", "record_id", "user_owner_id"})
  *    },
  *    indexes={
- *        @ORM\Index(name="entity_name_idx", columns={"entity_name"})
+ *        @ORM\Index(name="entity_name_idx", columns={"entity_name", "record_id"})
  *    }
  * )
  * @ORM\Entity
@@ -84,12 +85,6 @@ class Tagging extends ExtendTagging
 
     /**
      * @var string
-     * @ORM\Column(name="alias", type="string", length=100)
-     */
-    protected $alias;
-
-    /**
-     * @var string
      * @ORM\Column(name="entity_name", type="string", length=100)
      */
     protected $entityName;
@@ -101,9 +96,10 @@ class Tagging extends ExtendTagging
     protected $recordId;
 
     /**
-     * Constructor
+     * @param Tag|null    $tag
+     * @param object|null $entity
      */
-    public function __construct(Tag $tag = null, Taggable $resource = null)
+    public function __construct(Tag $tag = null, $entity = null)
     {
         parent::__construct();
 
@@ -111,8 +107,12 @@ class Tagging extends ExtendTagging
             $this->setTag($tag);
         }
 
-        if ($resource != null) {
-            $this->setResource($resource);
+        if ($entity != null) {
+            if ($entity instanceof Taggable) {
+                $this->setResource($entity);
+            } else {
+                $this->setEntity($entity);
+            }
         }
 
         $this->setCreated(new \DateTime('now'));
@@ -156,7 +156,18 @@ class Tagging extends ExtendTagging
     public function setResource(Taggable $resource)
     {
         $this->entityName = ClassUtils::getClass($resource);
-        $this->recordId = $resource->getTaggableId();
+        $this->recordId   = TaggableHelper::getEntityId($resource);
+    }
+
+    /**
+     * Sets the entity class and id
+     *
+     * @param object $entity
+     */
+    public function setEntity($entity)
+    {
+        $this->entityName = ClassUtils::getClass($entity);
+        $this->recordId   = $entity->getId();
     }
 
     /**
@@ -167,29 +178,6 @@ class Tagging extends ExtendTagging
     public function getEntityName()
     {
         return $this->entityName;
-    }
-
-    /**
-     * Setter for alias
-     *
-     * @param string $alias
-     * @return $this
-     */
-    public function setAlias($alias)
-    {
-        $this->alias = $alias;
-
-        return $this;
-    }
-
-    /**
-     * Getter for alias
-     *
-     * @return string
-     */
-    public function getAlias()
-    {
-        return $this->alias;
     }
 
     /**
@@ -226,6 +214,7 @@ class Tagging extends ExtendTagging
      * Set created date
      *
      * @param \DateTime $date
+     *
      * @return $this
      */
     public function setCreated(\DateTime $date)

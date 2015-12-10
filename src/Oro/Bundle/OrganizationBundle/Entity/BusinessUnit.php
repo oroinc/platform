@@ -141,11 +141,6 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
     protected $updatedAt;
 
     /**
-     * @var ArrayCollection $tags
-     */
-    protected $tags;
-
-    /**
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="businessUnits")
      */
     protected $users;

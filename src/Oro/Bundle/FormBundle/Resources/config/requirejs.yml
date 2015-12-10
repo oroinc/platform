@@ -49,6 +49,17 @@ config:
         'oroform/js/validator/type': 'bundles/oroform/js/validator/type.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
 
+        'oroform/js/app/components/inline-editable-view-component': 'bundles/oroform/js/app/components/inline-editable-view-component.js'
+        'oroform/js/app/views/editor/text-editor-view': 'bundles/oroform/js/app/views/editor/text-editor-view.js'
+        'oroform/js/app/views/editor/date-editor-view': 'bundles/oroform/js/app/views/editor/date-editor-view.js'
+        'oroform/js/app/views/editor/datetime-editor-view': 'bundles/oroform/js/app/views/editor/datetime-editor-view.js'
+        'oroform/js/app/views/editor/number-editor-view': 'bundles/oroform/js/app/views/editor/number-editor-view.js'
+        'oroform/js/app/views/editor/percent-editor-view': 'bundles/oroform/js/app/views/editor/percent-editor-view.js'
+        'oroform/js/app/views/editor/related-id-relation-editor-view': 'bundles/oroform/js/app/views/editor/related-id-relation-editor-view.js'
+        'oroform/js/app/views/editor/related-id-select-editor-view': 'bundles/oroform/js/app/views/editor/related-id-select-editor-view.js'
+        'oroform/js/app/views/editor/select-editor-view': 'bundles/oroform/js/app/views/editor/select-editor-view.js'
+        'oroform/js/app/views/editor/abstract-relation-editor-view': 'bundles/oroform/js/app/views/editor/abstract-relation-editor-view.js'
+
         'oroform/js/formatter/field': 'bundles/oroform/js/formatter/field.js'
 
         'oroform/js/multiple-entity': 'bundles/oroform/js/multiple-entity.js'
