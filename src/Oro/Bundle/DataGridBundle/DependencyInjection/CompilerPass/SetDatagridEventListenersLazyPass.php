@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Marks event listener services for all data grids as "lazy"
- * to prevent loading of services used by them on each request in the dev mode.
+ * to prevent loading of services used by them on each request if Symfony Profiler is enabled.
  * The loading of all event listeners is triggered by Symfony's EventDataCollector.
  */
 class SetDatagridEventListenersLazyPass implements CompilerPassInterface
@@ -17,6 +17,11 @@ class SetDatagridEventListenersLazyPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->hasDefinition('profiler')) {
+            // the Symfony Profiler is disabled
+            return;
+        }
+
         $datagridEventListeners = [];
         $eventListeners         = $container->findTaggedServiceIds('kernel.event_listener');
         foreach ($eventListeners as $serviceId => $tags) {
