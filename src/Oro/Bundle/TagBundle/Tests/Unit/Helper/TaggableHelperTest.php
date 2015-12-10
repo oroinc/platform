@@ -75,6 +75,51 @@ class TaggableHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+
+    /**
+     * @dataProvider isTaggableDataProvider
+     *
+     * @param object     $object
+     * @param bool       $expected
+     * @param bool|false $needSetConfig
+     * @param bool|false $hasConfig
+     * @param bool|false $isEnableGridColumn
+     */
+    public function testIsEnableGridColumn(
+        $object,
+        $expected,
+        $needSetConfig = false,
+        $hasConfig = false,
+        $isEnableGridColumn = false
+    ) {
+        if ($needSetConfig) {
+            $this->setConfigProvider($object, $hasConfig, $isEnableGridColumn);
+        }
+        $this->assertEquals($expected, $this->helper->isEnableGridColumn($object));
+    }
+
+    /**
+     * @dataProvider isTaggableDataProvider
+     *
+     * @param object     $object
+     * @param bool       $expected
+     * @param bool|false $needSetConfig
+     * @param bool|false $hasConfig
+     * @param bool|false $isEnableGridFilter
+     */
+    public function testIsEnableGridFilter(
+        $object,
+        $expected,
+        $needSetConfig = false,
+        $hasConfig = false,
+        $isEnableGridFilter = false
+    ) {
+        if ($needSetConfig) {
+            $this->setConfigProvider($object, $hasConfig, $isEnableGridFilter);
+        }
+        $this->assertEquals($expected, $this->helper->isEnableGridColumn($object));
+    }
+
     /** @return array */
     public function isImplementsTaggableDataProvider()
     {

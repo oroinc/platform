@@ -37,6 +37,7 @@ define(function(require) {
         getTemplateData: function() {
             return {
                 model: this.model.toJSON(),
+                showDefault: true,
                 fieldName: this.fieldName,
                 tagSortCallback: this.tagSortCallback
             };

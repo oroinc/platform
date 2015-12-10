@@ -114,8 +114,6 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testAfterMergeEntity()
     {
-        $this->markTestSkipped('@todo: Should be fixed in CRM-4544');
-
         $this->entityData
             ->expects($this->any())
             ->method('getMasterEntity')
@@ -125,7 +123,17 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager
             ->expects($this->once())
+            ->method('getTags')
+            ->willReturn(new ArrayCollection());
+
+        $this->manager
+            ->expects($this->once())
             ->method('saveTagging');
+
+        $this->helper
+            ->expects($this->once())
+            ->method('isTaggable')
+            ->willReturn(true);
 
         $this->listener->afterMergeEntity($event);
     }

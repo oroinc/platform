@@ -18,7 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *        @ORM\UniqueConstraint(name="tagging_idx", columns={"tag_id", "entity_name", "record_id", "user_owner_id"})
  *    },
  *    indexes={
- *        @ORM\Index(name="entity_name_idx", columns={"entity_name"})
+ *        @ORM\Index(name="entity_name_idx", columns={"entity_name", "record_id"})
  *    }
  * )
  * @ORM\Entity

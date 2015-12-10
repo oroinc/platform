@@ -1,5 +1,5 @@
 <div class="tags-container">
-    <% if (!model[fieldName].length) { %>
+    <% if (!model[fieldName].length && showDefault) { %>
         N/A
     <% } %>
     <% _.each(model[fieldName].sort(tagSortCallback) , function(item) { %>
