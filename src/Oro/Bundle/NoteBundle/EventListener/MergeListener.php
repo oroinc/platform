@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\NoteBundle\EventListener;
 
-use Oro\Bundle\NoteBundle\Model\MergeModes;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\NoteBundle\Model\MergeModes;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
