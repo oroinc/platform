@@ -52,7 +52,7 @@ define(function(require) {
             var isValidDate = moment(date, this.getDateFormat(), true).isValid();
             var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
 
-            if (!target && !isVariable && !isDay && (!isValidDate || !isValidTime)) {
+            if (!this._preventFrontendUpdate && !target && !isVariable && !isDay && (!isValidDate || !isValidTime)) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }
