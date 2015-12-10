@@ -60,8 +60,7 @@ define(function(require) {
      * @param {string} options.permissions - Permissions object
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      *
-     * @augments [AbstractRelationEditorView]
-     *                                  (../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)
+     * @augments [AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)
      * @exports TagsEditorView
      */
     var TagsEditorView;

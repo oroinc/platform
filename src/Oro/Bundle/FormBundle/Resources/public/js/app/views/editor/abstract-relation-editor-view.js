@@ -13,8 +13,7 @@ define(function(require) {
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
      * inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
-     * inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs]
-     *                                                                      (../reference/search-apis.md)
+     * inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../reference/search-apis.md)
      *
      * ### Constructor parameters
      *

@@ -50,10 +50,8 @@ define(function(require) {
      * @class
      * @param {Object} options - Options container
      * @param {Object} options._sourceElement - Element where to connect this view (passed automatically when
-     *                                          page component is [connected through DOM attributes]
-     *                                          (../../../../UIBundle/Resources/doc/reference/page-component.md))
-     * @param {string} options.frontend_type - frontend type, please find [available keys here]
-     *                                          (../../public/js/tools/frontend-type-map.js)
+     *                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md))
+     * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
      * @param {*} options.value - value to edit
      * @param {string} options.fieldName - field name to use when sending value to server
      * @param {Object} options.metadata - Editor metadata

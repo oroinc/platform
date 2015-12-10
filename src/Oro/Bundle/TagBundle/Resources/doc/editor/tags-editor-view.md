@@ -1,5 +1,5 @@
 <a name="module_TagsEditorView"></a>
-## TagsEditorView ⇐ <code>[AbstractRelationEditorView]</code>
+## TagsEditorView ⇐ <code>[AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)</code>
 Tags-select content editor. Please note that it requires column data format
 corresponding to [tags-view](../viewer/tags-view.md).
 
@@ -49,7 +49,7 @@ inline_editing.editor.permissions.oro_tag_unassign_global | Allows user to edit 
 
 ### Constructor parameters
 
-**Extends:** <code>[AbstractRelationEditorView]</code>  
+**Extends:** <code>[AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
