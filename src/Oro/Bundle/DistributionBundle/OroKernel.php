@@ -271,7 +271,7 @@ abstract class OroKernel extends Kernel
         // we should not use parent::stripComments method to cleanup source code from the comments to avoid
         // memory leaks what generate token_get_all function.
         if (!$this->debug) {
-            $cache->write(php_strip_whitespace($cache), $container->getResources());
+            $cache->write(php_strip_whitespace($cache->getPath()), $container->getResources());
         }
     }
 
