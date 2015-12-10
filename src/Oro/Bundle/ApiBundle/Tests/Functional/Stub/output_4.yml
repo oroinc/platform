@@ -1,0 +1,9 @@
+data:
+  0:
+    type: users
+    id: "1"
+    attributes:
+        phone: ~
+        email: "admin@example.com"
+        firstName: "John"
+        enabled: true
