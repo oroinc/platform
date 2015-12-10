@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -66,6 +65,12 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityClass($entityOrClass, $expectedClass)
     {
+        $this->registry->expects($this->any())
+            ->method('getAliasNamespace')
+            ->will($this->returnValueMap([
+                ['OroEntityBundle', 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub']
+            ]));
+
         $this->assertEquals(
             $expectedClass,
             $this->doctrineHelper->getEntityClass($entityOrClass)
@@ -93,6 +98,10 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             'proxy entity class' => [
                 'entity'        => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy',
                 'expectedClass' => 'ItemStubProxy',
+            ],
+            'short entity class' => [
+                'entity'        => 'OroEntityBundle:ItemStub',
+                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
             ],
         ];
     }
@@ -240,12 +249,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param       $expected
-     * @param array $identifiers
-     * @param bool  $exception
      * @dataProvider getSingleEntityIdentifierDataProvider
      */
-    public function testGetSingleEntityIdentifier($expected, array $identifiers, $exception = true)
+    public function testGetSingleEntityIdentifier($expected, array $identifiers, $throwException = true)
     {
         $entity = new ItemStubProxy();
         $class  = 'ItemStubProxy';
@@ -265,7 +271,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expected,
-            $this->doctrineHelper->getSingleEntityIdentifier($entity, $exception)
+            $this->doctrineHelper->getSingleEntityIdentifier($entity, $throwException)
         );
     }
 
@@ -284,9 +290,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'actual'   => [],
             ],
             'multiple identifier, no exception' => [
-                'expected'  => null,
-                'actual'    => ['first_id' => 1, 'second_id' => 2],
-                'exception' => false,
+                'expected'       => null,
+                'actual'         => ['first_id' => 1, 'second_id' => 2],
+                'throwException' => false,
             ],
         ];
     }
@@ -379,13 +385,50 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetEntityIdentifierFieldNamesForClass()
+    {
+        $class       = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub';
+        $identifiers = ['id' => self::TEST_IDENTIFIER];
+
+        $this->classMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array_keys($identifiers)));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->will($this->returnValue($this->classMetadata));
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+
+        $this->assertEquals(
+            array_keys($identifiers),
+            $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($class)
+        );
+    }
+
+    public function testGetEntityIdentifierFieldNamesForClassNotManageableEntity()
+    {
+        $class = 'FooEntity';
+
+        $this->setExpectedException(
+            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
+            sprintf('Entity class "%s" is not manageable', $class)
+        );
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($class);
+    }
+
     /**
-     * @param       $expected
-     * @param array $identifiers
-     * @param bool  $exception
      * @dataProvider getSingleEntityIdentifierFieldNameDataProvider
      */
-    public function testGetSingleEntityIdentifierFieldName($expected, array $identifiers, $exception = true)
+    public function testGetSingleEntityIdentifierFieldName($expected, array $identifiers, $throwException = true)
     {
         $entity = new ItemStubProxy();
         $class  = 'ItemStubProxy';
@@ -404,7 +447,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expected,
-            $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity, $exception)
+            $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity, $throwException)
         );
     }
 
@@ -423,9 +466,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'actual'   => [],
             ],
             'multiple identifier, no exception' => [
-                'expected'  => null,
-                'actual'    => ['first_id' => 1, 'second_id' => 2],
-                'exception' => false,
+                'expected'       => null,
+                'actual'         => ['first_id' => 1, 'second_id' => 2],
+                'throwException' => false,
             ],
         ];
     }
@@ -457,12 +500,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param       $expected
-     * @param array $identifiers
-     * @param bool  $exception
      * @dataProvider getSingleEntityIdentifierFieldTypeDataProvider
      */
-    public function testGetSingleEntityIdentifierFieldType($expected, array $identifiers, $exception = true)
+    public function testGetSingleEntityIdentifierFieldType($expected, array $identifiers, $throwException = true)
     {
         $entity = new ItemStubProxy();
         $class  = 'ItemStubProxy';
@@ -490,7 +530,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expected,
-            $this->doctrineHelper->getSingleEntityIdentifierFieldType($entity, $exception)
+            $this->doctrineHelper->getSingleEntityIdentifierFieldType($entity, $throwException)
         );
     }
 
@@ -507,9 +547,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'exception' => false,
             ],
             'multiple identifier, no exception' => [
-                'expected'  => null,
-                'actual'    => ['first_id' => 'integer', 'second_id' => 'string'],
-                'exception' => false,
+                'expected'       => null,
+                'actual'         => ['first_id' => 'integer', 'second_id' => 'string'],
+                'throwException' => false,
             ],
         ];
     }
@@ -598,13 +638,38 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testIsManageableEntityClass()
+    {
+        $class = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+
+        $this->assertTrue(
+            $this->doctrineHelper->isManageableEntityClass($class)
+        );
+    }
+
+    public function testIsManageableEntityClassForNotManageableEntity()
+    {
+        $class = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->assertFalse(
+            $this->doctrineHelper->isManageableEntityClass($class)
+        );
+    }
+
     /**
-     * @param mixed $data
-     * @param string $class
-     *
-     * @dataProvider dataProvider
+     * @dataProvider getEntityMetadataDataProvider
      */
-    public function testGetEntityMetadata($data, $class)
+    public function testGetEntityMetadata($entityOrClass, $class)
     {
         $this->em->expects($this->once())
             ->method('getClassMetadata')
@@ -617,17 +682,28 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $this->classMetadata,
-            $this->doctrineHelper->getEntityMetadata($data)
+            $this->doctrineHelper->getEntityMetadata($entityOrClass)
         );
     }
 
     /**
+     * @return array
+     */
+    public function getEntityMetadataDataProvider()
+    {
+        return [
+            ['ItemStubProxy', 'ItemStubProxy'],
+            [new ItemStubProxy(), 'ItemStubProxy']
+        ];
+    }
+
+    /**
      * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "ItemStubProxy" is not manageable
+     * @expectedExceptionMessage Entity class "ItemStub" is not manageable
      */
     public function testGetEntityMetadataNotManageableEntity()
     {
-        $class = 'ItemStubProxy';
+        $class = 'ItemStub';
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -637,31 +713,103 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->getEntityMetadata($class);
     }
 
-    /**
-     * @param mixed $data
-     *
-     * @dataProvider dataProvider
-     */
-    public function testGetEntityManager($data)
+    public function testGetEntityMetadataNotManageableEntityWithoutThrowException()
     {
+        $class = 'ItemStub';
+
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
-            ->with($this->doctrineHelper->getEntityClass($data))
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->assertNull(
+            $this->doctrineHelper->getEntityMetadata($class, false)
+        );
+    }
+
+    public function testGetEntityMetadataForClass()
+    {
+        $class = 'ItemStub';
+
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->will($this->returnValue($this->classMetadata));
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
             ->will($this->returnValue($this->em));
 
         $this->assertSame(
-            $this->em,
-            $this->doctrineHelper->getEntityManager($data)
+            $this->classMetadata,
+            $this->doctrineHelper->getEntityMetadataForClass($class)
         );
     }
 
     /**
      * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "ItemStubProxy" is not manageable
+     * @expectedExceptionMessage Entity class "ItemStub" is not manageable
+     */
+    public function testGetEntityMetadataForClassNotManageableEntity()
+    {
+        $class = 'ItemStub';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->doctrineHelper->getEntityMetadataForClass($class);
+    }
+
+    public function testGetEntityMetadataForClassNotManageableEntityWithoutThrowException()
+    {
+        $class = 'ItemStub';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->assertNull(
+            $this->doctrineHelper->getEntityMetadataForClass($class, false)
+        );
+    }
+
+    /**
+     * @dataProvider getEntityManagerDataProvider
+     */
+    public function testGetEntityManager($entityOrClass)
+    {
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($this->doctrineHelper->getEntityClass($entityOrClass))
+            ->will($this->returnValue($this->em));
+
+        $this->assertSame(
+            $this->em,
+            $this->doctrineHelper->getEntityManager($entityOrClass)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function getEntityManagerDataProvider()
+    {
+        return [
+            ['ItemStubProxy'],
+            [new ItemStubProxy()]
+        ];
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
+     * @expectedExceptionMessage Entity class "ItemStub" is not manageable
      */
     public function testGetEntityManagerNotManageableEntity()
     {
-        $class = 'ItemStubProxy';
+        $class = 'ItemStub';
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -669,6 +817,65 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->doctrineHelper->getEntityManager($class);
+    }
+
+    public function testGetEntityManagerNotManageableEntityWithoutThrowException()
+    {
+        $class = 'ItemStub';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->assertNull(
+            $this->doctrineHelper->getEntityManager($class, false)
+        );
+    }
+
+    public function testGetEntityManagerForClass()
+    {
+        $class = 'ItemStub';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+
+        $this->assertSame(
+            $this->em,
+            $this->doctrineHelper->getEntityManagerForClass($class)
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
+     * @expectedExceptionMessage Entity class "ItemStub" is not manageable
+     */
+    public function testGetEntityManagerForClassNotManageableEntity()
+    {
+        $class = 'ItemStub';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->doctrineHelper->getEntityManagerForClass($class);
+    }
+
+    public function testGetEntityManagerForClassNotManageableEntityWithoutThrowException()
+    {
+        $class = 'ItemStub';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->assertNull(
+            $this->doctrineHelper->getEntityManagerForClass($class, false)
+        );
     }
 
     public function testGetEntityRepositoryByEntity()
@@ -729,6 +936,44 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->doctrineHelper->getEntityRepository($class);
+    }
+
+    public function testGetEntityRepositoryForClass()
+    {
+        $class = 'ItemStub';
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository');
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->with($class)
+            ->will($this->returnValue($repo));
+
+        $this->assertSame(
+            $repo,
+            $this->doctrineHelper->getEntityRepositoryForClass($class)
+        );
+    }
+
+    public function testGetEntityRepositoryForClassNotManageableEntity()
+    {
+        $class = 'ItemStub';
+
+        $this->setExpectedException(
+            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
+            sprintf('Entity class "%s" is not manageable', $class)
+        );
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->doctrineHelper->getEntityRepositoryForClass($class);
     }
 
     public function testGetEntityReference()
@@ -809,16 +1054,5 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper->getEntityManager('\stdClass');
         $this->doctrineHelper->getEntityManager('\stdClass');
-    }
-
-    /**
-     * @return array
-     */
-    public function dataProvider()
-    {
-        return [
-            ['ItemStubProxy', 'ItemStubProxy'],
-            [new ItemStubProxy(), 'ItemStubProxy']
-        ];
     }
 }

@@ -78,6 +78,14 @@ services:
         tags:
             - { name: routing.options_resolver }
 
+    oro_activity.exclusion_provider:
+        class: Oro\Bundle\ActivityBundle\Provider\ActivityExclusionProvider
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
+
     oro_activity.manager.activity.api:
         class: %oro_activity.manager.activity.api.class%
         parent: oro_soap.manager.entity_manager.abstract

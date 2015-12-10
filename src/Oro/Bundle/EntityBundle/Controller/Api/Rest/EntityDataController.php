@@ -45,7 +45,7 @@ class EntityDataController extends FOSRestController
         $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
         list($form, $data) = $this->getManager()->patch($className, $id, $data);
 
-        if ($form->getErrors()->count() > 0) {
+        if ($form->getErrors(true)->count() > 0) {
             $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
         } else {
             $view = $this->view($data, Codes::HTTP_NO_CONTENT);

@@ -262,6 +262,10 @@ define(function(require) {
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 
+            if (!CellEditorView) {
+                throw new Error('Editor view in not available for `' + cell.column.get('name') + '` column');
+            }
+
             var editorComponent = new CellEditorComponent(_.extend({}, editor.component_options, {
                 cell: cell,
                 view: CellEditorView,
@@ -566,8 +570,18 @@ define(function(require) {
             }
         }
     }, {
-        onSaveSuccess: function() {
+        onSaveSuccess: function(response) {
             if (!this.cell.disposed && this.cell.$el) {
+                if (response) {
+                    var routeParametersRenameMap
+                        = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
+                    for (var i in routeParametersRenameMap) {
+                        if (typeof response[routeParametersRenameMap[i]] !== 'undefined') {
+                            this.cell.model.set(i, response[routeParametersRenameMap[i]]);
+                        }
+                    }
+                }
+
                 var _this = this;
                 this.cell.$el.addClass('save-success');
                 _.delay(function() {
@@ -601,6 +615,13 @@ define(function(require) {
                     break;
                 case 403:
                     errors.push(__('You do not have permission to perform this action.'));
+                    break;
+                case 500:
+                    if (jqXHR.responseJSON.message) {
+                        errors.push(__(jqXHR.responseJSON.message));
+                    } else {
+                        errors.push(__('oro.ui.unexpected_error'));
+                    }
                     break;
                 default:
                     errors.push(__('oro.ui.unexpected_error'));

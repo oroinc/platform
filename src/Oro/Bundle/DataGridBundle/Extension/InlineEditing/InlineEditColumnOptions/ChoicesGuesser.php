@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOpti
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
@@ -15,23 +15,23 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
  */
 class ChoicesGuesser implements GuesserInterface
 {
-    /**
-     * @var OroEntityManager
-     */
-    protected $entityManager;
+    /** Frontend type */
+    const SELECT = 'select';
+    const DEFAULT_EDITOR_VIEW = 'orodatagrid/js/app/views/editor/select-editor-view';
 
-    /**
-     * @var AclHelper
-     */
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /** @var AclHelper */
     protected $aclHelper;
 
     /**
-     * @param OroEntityManager $oroEntityManager
-     * @param AclHelper        $aclHelper
+     * @param DoctrineHelper $doctrineHelper
+     * @param AclHelper $aclHelper
      */
-    public function __construct(OroEntityManager $oroEntityManager, AclHelper $aclHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, AclHelper $aclHelper)
     {
-        $this->entityManager = $oroEntityManager;
+        $this->doctrineHelper = $doctrineHelper;
         $this->aclHelper = $aclHelper;
     }
 
@@ -40,28 +40,25 @@ class ChoicesGuesser implements GuesserInterface
      */
     public function guessColumnOptions($columnName, $entityName, $column)
     {
-        $metadata = $this->entityManager->getClassMetadata($entityName);
+        $entityManager = $this->doctrineHelper->getEntityManager($entityName);
+        $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
-        $isConfigured = isset($column[Configuration::BASE_CONFIG_KEY]['editor']);
-        $isConfigured = $isConfigured || isset($column[Configuration::BASE_CONFIG_KEY]['autocomplete_api_accessor']);
-        if (!$isConfigured && $metadata->hasAssociation($columnName)) {
+        if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
+                $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
+                $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::SELECT;
+                $result[PropertyInterface::TYPE_KEY] = 'field';
+
                 $targetEntity = $metadata->getAssociationTargetClass($columnName);
-
-                $targetEntityMetadata = $this->entityManager->getClassMetadata($targetEntity);
-                if (isset($column[Configuration::BASE_CONFIG_KEY]['view_options']['value_field_name'])) {
-                    $labelField = $column[Configuration::BASE_CONFIG_KEY]['view_options']['value_field_name'];
-                } else {
-                    $labelField = $this->guessLabelField($targetEntityMetadata, $columnName);
-                }
-
-                $result[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
-
-                $result[PropertyInterface::FRONTEND_TYPE_KEY] = 'select';
+                $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
+                $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
-                $result['choices'] = $this->getChoices($targetEntity, $keyField, $labelField);
+                $result[Configuration::CHOICES_KEY] = $this->getChoices($targetEntity, $keyField, $labelField);
+
+                $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
+                $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             }
         }
 
@@ -114,7 +111,8 @@ class ChoicesGuesser implements GuesserInterface
      */
     protected function getChoices($entity, $keyField, $labelField)
     {
-        $queryBuilder = $this->entityManager
+        $entityManager = $this->doctrineHelper->getEntityManager($entity);
+        $queryBuilder = $entityManager
             ->getRepository($entity)
             ->createQueryBuilder('e');
         //select only id and label fields
@@ -127,5 +125,77 @@ class ChoicesGuesser implements GuesserInterface
         }
 
         return $choices;
+    }
+
+    /**
+     * @param $column
+     * @param $isConfiguredInlineEdit
+     * @param $result
+     *
+     * @return array
+     */
+    protected function guessEditorView($column, $isConfiguredInlineEdit, $result)
+    {
+        if (!$this->isConfiguredViewEditor($column, $isConfiguredInlineEdit)) {
+            $result[Configuration::BASE_CONFIG_KEY][Configuration::EDITOR_KEY][Configuration::VIEW_KEY]
+                = static::DEFAULT_EDITOR_VIEW;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $column
+     * @param $isConfiguredInlineEdit
+     *
+     * @return bool
+     */
+    protected function isConfiguredViewEditor($column, $isConfiguredInlineEdit)
+    {
+        $isConfigured = $isConfiguredInlineEdit
+            && array_key_exists(Configuration::EDITOR_KEY, $column[Configuration::BASE_CONFIG_KEY]);
+        $isConfigured = $isConfigured
+            && array_key_exists(
+                Configuration::VIEW_KEY,
+                $column[Configuration::BASE_CONFIG_KEY][Configuration::EDITOR_KEY]
+            );
+
+        return $isConfigured;
+    }
+
+    /**
+     * @param $column
+     *
+     * @return bool
+     */
+    protected function isConfiguredAccessor($column)
+    {
+        $isConfigured = isset($column[Configuration::BASE_CONFIG_KEY][Configuration::EDITOR_KEY]);
+        $isConfigured = $isConfigured
+            || isset($column[Configuration::BASE_CONFIG_KEY][Configuration::AUTOCOMPLETE_API_ACCESSOR_KEY]);
+
+        return $isConfigured;
+    }
+
+    /**
+     * @param $columnName
+     * @param $column
+     * @param $targetEntityMetadata
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    protected function getLabelField($columnName, $column, $targetEntityMetadata)
+    {
+        if (isset($column[Configuration::BASE_CONFIG_KEY]
+                [Configuration::VIEW_OPTIONS_KEY][Configuration::VALUE_FIELD_NAME_KEY])) {
+            $labelField = $column[Configuration::BASE_CONFIG_KEY]
+                [Configuration::VIEW_OPTIONS_KEY][Configuration::VALUE_FIELD_NAME_KEY];
+        } else {
+            $labelField = $this->guessLabelField($targetEntityMetadata, $columnName);
+        }
+
+        return $labelField;
     }
 }

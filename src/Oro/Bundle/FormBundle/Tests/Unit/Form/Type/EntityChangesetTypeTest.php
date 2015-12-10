@@ -4,10 +4,12 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Form\Type\DataChangesetType;
 use Oro\Bundle\FormBundle\Form\Type\EntityChangesetType;
 
 class EntityChangesetTypeTest extends FormIntegrationTestCase
@@ -32,6 +34,15 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
 
         parent::setUp();
     }
+    /**
+     * @return array
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension([DataChangesetType::NAME => new DataChangesetType()], [])
+        ];
+    }
 
     public function testGetName()
     {
@@ -40,19 +51,16 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('hidden', $this->type->getParent());
+        $this->assertEquals(DataChangesetType::NAME, $this->type->getParent());
     }
 
     public function testSetDefaultOptions()
     {
-        /** @var OptionsResolverInterface|\PHPUnit_Framework_MockObject_MockObject $resolver */
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setRequired')
             ->with(['class']);
-        $resolver->expects($this->once())
-            ->method('setDefaults')
-            ->with(['data_class' => null, 'mapped' => false]);
         $this->type->setDefaultOptions($resolver);
     }
 

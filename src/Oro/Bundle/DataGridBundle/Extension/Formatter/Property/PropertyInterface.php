@@ -20,6 +20,7 @@ interface PropertyInterface
     const TYPE_PERCENT      = 'percent';
     const TYPE_CURRENCY     = 'currency';
     const TYPE_SELECT       = 'select';
+    const TYPE_MULTI_SELECT = 'multi-select';
     const TYPE_STRING       = 'string';
     const TYPE_HTML         = 'html';
     const TYPE_BOOLEAN      = 'boolean';
