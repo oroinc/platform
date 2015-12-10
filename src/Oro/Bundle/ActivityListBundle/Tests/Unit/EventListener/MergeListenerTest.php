@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\EventListener;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
+use Oro\Bundle\ActivityListBundle\Model\MergeModes;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\ActivityListBundle\EventListener\MergeListener;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 
 class MergeListenerTest extends \PHPUnit_Framework_TestCase
