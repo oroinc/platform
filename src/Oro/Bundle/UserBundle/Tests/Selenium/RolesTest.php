@@ -104,33 +104,6 @@ class RolesTest extends Selenium2TestCase
         return $randomPrefix;
     }
 
-    public function testRolesAddSave()
-    {
-        $randomPrefix = WebTestCase::generateRandomString(5);
-
-        $login = $this->login();
-        /** @var Roles $login */
-        $roles = $login->openRoles('Oro\Bundle\UserBundle')
-            ->assertTitle('All - Roles - User Management - System')
-            ->add()
-            ->assertTitle('Create Role - Roles - User Management - System')
-            ->setLabel($this->newRole['LABEL'] . $randomPrefix);
-        $roles->getTest()->byXPath("//div[@class='pull-right']//a[@class='btn-success btn dropdown-toggle']")->click();
-        $roles->waitForAjax();
-        $roles->getTest()->byXPath("//div[@class='pull-right']//button[normalize-space(.) = 'Save']")->click();
-        $roles->waitPageToLoad();
-        $roles->waitForAjax();
-        $roles = $roles->assertMessage('Role saved')
-            ->close();
-
-        //verify new Role
-        $roles->refresh();
-
-        static::assertTrue($roles->entityExists(array('name' => $this->newRole['LABEL'] . $randomPrefix)));
-
-        return $randomPrefix;
-    }
-
     /**
      * @depends testRolesAddSaveAndClose
      * @param $randomPrefix
