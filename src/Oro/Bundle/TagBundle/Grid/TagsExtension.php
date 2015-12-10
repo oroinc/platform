@@ -81,7 +81,7 @@ class TagsExtension extends AbstractExtension
     public function processConfigs(DatagridConfiguration $config)
     {
         $isReports = $this->isReportGrid($config);
-        $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
+        $filters   = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
 
         if (!$isReports && empty($filters)) {
             return;
@@ -204,7 +204,7 @@ class TagsExtension extends AbstractExtension
             'translatable'   => true,
             'renderable'     => $this->taggableHelper->isEnableGridColumn($className) || $isReports,
             'inline_editing' => [
-                'enable' => $this->securityFacade->isGranted(
+                'enable'                    => $this->securityFacade->isGranted(
                     TagManager::ACL_RESOURCE_ASSIGN_ID_KEY
                 ),
                 'editor'                    => [
