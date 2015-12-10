@@ -116,7 +116,7 @@ class RefreshContextListener
         if (!$organization) {
             return;
         }
-
+        $em->getUnitOfWork()->markReadOnly($organization);
         $token->setOrganizationContext($organization);
     }
 
