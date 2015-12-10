@@ -81,7 +81,7 @@ class RolesTest extends Selenium2TestCase
         static::assertGreaterThanOrEqual(count($this->defaultRoles)-1, $checks);
     }
 
-    public function testRolesAdd()
+    public function testRolesAddSaveAndClose()
     {
         $randomPrefix = WebTestCase::generateRandomString(5);
 
@@ -105,7 +105,7 @@ class RolesTest extends Selenium2TestCase
     }
 
     /**
-     * @depends testRolesAdd
+     * @depends testRolesAddSaveAndClose
      * @param $randomPrefix
      */
     public function testRoleDelete($randomPrefix)
