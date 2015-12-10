@@ -28,7 +28,13 @@ UPGRADE FROM 1.8 to 1.9
 - Removed class `Oro\Bundle\ConfigBundle\Manager\UserConfigManager` and service `oro_config.user_config_manager`. Use `oro_config.user` service instead.
 
 ####DataAuditBundle
-- `Oro\Bundle\DataauditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
+- `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
+- `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` has `@InheritanceType("SINGLE_TABLE")`
+- `audit-grid` and `audit-history-grid` based on `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` now. Make join to get your entity on grid
+
+####DataGridBundle
+- Services with tag `oro_datagrid.extension.formatter.property` was marked as private
+- JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
 - Grid merge uses distinct policy
 
 ```
@@ -57,12 +63,7 @@ grid-name:
             - 1
             - 2
 ```
-- `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
 
-####DataGridBundle
-- Services with tag `oro_datagrid.extension.formatter.property` was marked as private
-- JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
- 
 ####DistributionBundle:
 - Fix `priority` attribute handling for `routing.options_resolver` tag to be conform Symfony standards. New behaviour: the higher the priority, the sooner the resolver gets executed.
 
