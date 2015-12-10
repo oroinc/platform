@@ -12,6 +12,7 @@ parameters:
     oro_workflow.action.create_related_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
     oro_workflow.action.request_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity
     oro_workflow.action.call_method.class: Oro\Bundle\WorkflowBundle\Model\Action\CallMethod
+    oro_workflow.action.call_service_method.class: Oro\Bundle\WorkflowBundle\Model\Action\CallServiceMethod
     oro_workflow.action.start_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow
     oro_workflow.action.redirect.class: Oro\Bundle\WorkflowBundle\Model\Action\Redirect
     oro_workflow.action.format_string.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatString
@@ -111,6 +112,14 @@ services:
             - @oro_workflow.context_accessor
         tags:
             - { name: oro_workflow.action, alias: call_method }
+
+    oro_workflow.action.call_service_method:
+        class: %oro_workflow.action.call_service_method.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @service_container
+        tags:
+            - { name: oro_workflow.action, alias: call_service_method }
 
     oro_workflow.action.start_workflow:
         class: %oro_workflow.action.start_workflow.class%
