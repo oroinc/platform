@@ -7,7 +7,7 @@ use Oro\Bundle\TagBundle\Form\Type\Filter\TagsReportFilterType;
 class TagsReportFilter extends AbstractTagsFilter
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getFormType()
     {

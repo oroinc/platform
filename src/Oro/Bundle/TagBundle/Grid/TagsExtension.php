@@ -68,8 +68,8 @@ class TagsExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)
-            && $this->taggableHelper->isTaggable($this->getEntityClassName($config));
+            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
+            $this->taggableHelper->isTaggable($this->getEntityClassName($config));
     }
 
     /**
@@ -77,8 +77,8 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $isReports = strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_report') === 0 ||
-            strpos($config->offsetGetByPath(self::GRID_NAME_PATH), 'oro_segment') === 0;
+        $gridName  = $config->offsetGetByPath(self::GRID_NAME_PATH);
+        $isReports = strpos($gridName, 'oro_report') === 0 || strpos($gridName, 'oro_segment') === 0;
 
         $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
 
@@ -99,25 +99,18 @@ class TagsExtension extends AbstractExtension
                 // Need remove old column, as no needed.
                 unset($columns[$tagAlias]);
                 unset($sorters[$tagAlias]);
-                $config->offsetSetByPath(
-                    '[columns]',
-                    array_merge(
-                        $columns,
-                        $column
-                    )
-                );
             }
         } else {
             $filters[self::FILTER_COLUMN_NAME] = $filter;
-            $config->offsetSetByPath(
-                '[columns]',
-                array_merge(
-                    $columns,
-                    $column
-                )
-            );
         }
 
+        $config->offsetSetByPath(
+            '[columns]',
+            array_merge(
+                $columns,
+                $column
+            )
+        );
         $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
         $config->offsetSetByPath(self::GRID_SORTERS_PATH, $sorters);
     }
@@ -134,7 +127,7 @@ class TagsExtension extends AbstractExtension
             },
             $rows
         );
-        //@TODO Should we apply acl?
+
         $tags = array_reduce(
             $this->tagManager->getTagsByEntityIds($this->getEntityClassName($config), $ids),
             function ($entitiesTags, $item) {

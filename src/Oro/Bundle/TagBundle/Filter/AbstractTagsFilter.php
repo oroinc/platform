@@ -54,21 +54,19 @@ abstract class AbstractTagsFilter extends AbstractFilter
     {
         $expr = false;
 
-        $qb = $ds->getQueryBuilder();
+        $qb            = $ds->getQueryBuilder();
         $entityIdAlias = $qb->getRootAliases()[0] . '.id';
 
         $taggingAlias = $ds->generateParameterName('tagging');
-        $tagAlias = $ds->generateParameterName('tag');
-
+        $tagAlias     = $ds->generateParameterName('tag');
 
         $subQueryDQL = $qb->getEntityManager()->getRepository('OroTagBundle:Tagging')
             ->createQueryBuilder($taggingAlias)
-            ->select($taggingAlias  . '.recordId')
+            ->select($taggingAlias . '.recordId')
             ->join($taggingAlias . '.tag', $tagAlias)
             ->where($taggingAlias . '.entityName = :tag_filter_entity_class_name')
             ->andWhere($qb->expr()->in($tagAlias . '.id', $data['value']))
             ->getDQL();
-
 
         switch ($data['type']) {
             case DictionaryFilterType::TYPE_IN:
