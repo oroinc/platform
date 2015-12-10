@@ -87,3 +87,9 @@ services:
             - @oro_activity_list.manager
         tags:
             - { name: oro_entity_merge.strategy }
+
+    oro_note.exclusion_provider:
+        class: Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
