@@ -89,7 +89,7 @@ define(function(require) {
         },
 
         getModelValue: function() {
-            var value = this.model.get(this.column.get('name'));
+            var value = this.model.get(this.fieldName);
             if (_.isString(value)) {
                 value = JSON.parse(value);
             }

@@ -64,10 +64,18 @@ config:
             deps:
                 - 'cryptojs/core'
             exports: 'CryptoJS'
+        'jquery.multiselect':
+            deps:
+                - 'jquery-ui'
+        'jquery.multiselect.filter':
+            deps:
+                - 'jquery.multiselect'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
             'jquery.select2': 'oroui/js/extend/select2'
+            'jquery.multiselect': 'oroui/js/extend/multiselect'
+            'jquery.multiselect.filter': 'oroui/js/extend/multiselect-filter'
             'chaplin': 'oroui/js/extend/chaplin'
             'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
@@ -79,6 +87,10 @@ config:
             'jquery': 'jquery'
         'oroui/js/extend/select2':
             'jquery.select2': 'jquery.select2'
+        'oroui/js/extend/multiselect':
+            'jquery.multiselect': 'jquery.multiselect'
+        'oroui/js/extend/multiselect-filter':
+            'jquery.multiselect.filter': 'jquery.multiselect.filter'
         'oroui/js/extend/jquery-ui':
             'jquery-ui': 'jquery-ui'
         'oroui/js/extend/chaplin':
@@ -115,6 +127,8 @@ config:
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
         'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'
+        'jquery.multiselect': 'bundles/oroui/lib/multiselect/jquery.multiselect.js'
+        'jquery.multiselect.filter': 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.js'
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/oroui/lib/jquery/jquery.cookie.js'
@@ -208,3 +222,8 @@ build:
         'cryptojs/hmac': 'empty:'
         'cryptojs/sha256': 'empty:'
         'cryptojs/pbkdf2': 'empty:'
+#       jQuery.UI after v.1.11.2 started to support AMD. And that broke a js-build with
+#       files which does not support AMD. jquery.multiselect and jquery.multiselect.filter
+#       use AMD without dependency, therefore it's excluded
+        'jquery.multiselect': 'empty:'
+        'jquery.multiselect.filter': 'empty:'
