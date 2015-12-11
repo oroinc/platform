@@ -31,6 +31,8 @@ class SyncCommand extends AbstractSyncCronCommand
 
     const STATUS_SUCCESS = 0;
     const STATUS_FAILED = 255;
+    const INTEGRATION_ID_OPTION = 'integration-id';
+    const CONNECTOR_PARAMETERS_ARGUMENT = 'connector-parameters';
 
     /**
      * @var SyncProcessorRegistry
@@ -53,7 +55,7 @@ class SyncCommand extends AbstractSyncCronCommand
         $this
             ->setName(static::COMMAND_NAME)
             ->addOption(
-                'integration-id',
+                self::INTEGRATION_ID_OPTION,
                 'i',
                 InputOption::VALUE_OPTIONAL,
                 'If option exists sync will be performed for given integration id'
@@ -78,7 +80,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 100
             )
             ->addArgument(
-                'connector-parameters',
+                self::CONNECTOR_PARAMETERS_ARGUMENT,
                 InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                 'Additional connector parameters array. Format - parameterKey=parameterValue',
                 []
@@ -98,7 +100,7 @@ class SyncCommand extends AbstractSyncCronCommand
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
         $connector = $input->getOption('connector');
-        $integrationId = $input->getOption('integration-id');
+        $integrationId = $input->getOption(self::INTEGRATION_ID_OPTION);
         $batchSize = $input->getOption('transport-batch-size');
         $connectorParameters = $this->getConnectorParameters($input);
         $entityManager = $this->getService('doctrine.orm.entity_manager');
@@ -161,7 +163,7 @@ class SyncCommand extends AbstractSyncCronCommand
     {
         $result = ['force' => $input->getOption('force')];
 
-        $connectorParameters = $input->getArgument('connector-parameters');
+        $connectorParameters = $input->getArgument(self::CONNECTOR_PARAMETERS_ARGUMENT);
         if (!empty($connectorParameters)) {
             foreach ($connectorParameters as $parameterString) {
                 $parameterConfigArray = explode('=', $parameterString);

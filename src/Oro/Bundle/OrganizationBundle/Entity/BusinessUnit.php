@@ -41,8 +41,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"="",
- *              "share_grid"="share-with-business-units-datagrid"
+ *              "group_name"=""
  *          }
  *      }
  * )
@@ -140,11 +139,6 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
      * )
      */
     protected $updatedAt;
-
-    /**
-     * @var ArrayCollection $tags
-     */
-    protected $tags;
 
     /**
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="businessUnits")

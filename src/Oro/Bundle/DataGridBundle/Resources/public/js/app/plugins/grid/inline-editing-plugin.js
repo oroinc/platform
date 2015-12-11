@@ -11,7 +11,7 @@ define(function(require) {
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var backdropManager = require('oroui/js/tools/backdrop-manager');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
-    require('orodatagrid/js/app/views/editor/text-editor-view');
+    require('oroform/js/app/views/editor/text-editor-view');
 
     InlineEditingPlugin = BasePlugin.extend({
         /**
@@ -29,7 +29,7 @@ define(function(require) {
         /**
          * This view is used by default for editing
          */
-        DEFAULT_VIEW: 'orodatagrid/js/app/views/editor/text-editor-view',
+        DEFAULT_VIEW: 'oroform/js/app/views/editor/text-editor-view',
 
         /**
          * This view is used by default for editing
@@ -137,7 +137,7 @@ define(function(require) {
 
         initPopover: function() {
             this.main.$el.popover({
-                content: __('oro.datagrid.inlineEditing.helpMessage'),
+                content: __('oro.form.inlineEditing.helpMessage'),
                 container: document.body,
                 selector: 'td.editable',
                 placement: 'bottom',
@@ -349,8 +349,8 @@ define(function(require) {
                 serverUpdateData = newData;
             }
             this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
-                    processingMessage: __('oro.datagrid.inlineEditing.saving_progress'),
-                    preventWindowUnload: __('oro.datagrid.inlineEditing.inline_edits')
+                    processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                    preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
                 })
                 .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
@@ -459,7 +459,7 @@ define(function(require) {
         },
 
         _onRequireJsError: function() {
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.loadingError'));
+            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.loadingError'));
         },
 
         /**
@@ -570,15 +570,25 @@ define(function(require) {
             }
         }
     }, {
-        onSaveSuccess: function() {
+        onSaveSuccess: function(response) {
             if (!this.cell.disposed && this.cell.$el) {
+                if (response) {
+                    var routeParametersRenameMap
+                        = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
+                    for (var i in routeParametersRenameMap) {
+                        if (typeof response[routeParametersRenameMap[i]] !== 'undefined') {
+                            this.cell.model.set(i, response[routeParametersRenameMap[i]]);
+                        }
+                    }
+                }
+
                 var _this = this;
                 this.cell.$el.addClass('save-success');
                 _.delay(function() {
                     _this.cell.$el.removeClass('save-success');
                 }, 2000);
             }
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.successMessage'));
+            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },
 
         onSaveError: function(jqXHR) {
@@ -605,6 +615,13 @@ define(function(require) {
                     break;
                 case 403:
                     errors.push(__('You do not have permission to perform this action.'));
+                    break;
+                case 500:
+                    if (jqXHR.responseJSON.message) {
+                        errors.push(__(jqXHR.responseJSON.message));
+                    } else {
+                        errors.push(__('oro.ui.unexpected_error'));
+                    }
                     break;
                 default:
                     errors.push(__('oro.ui.unexpected_error'));

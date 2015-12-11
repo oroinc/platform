@@ -53,6 +53,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_ui.twig.view_extension:
+        class: Oro\Bundle\UIBundle\Twig\ViewExtension
+        arguments:
+            - @event_dispatcher
+        tags:
+            - { name: twig.extension }
+
     oro_ui.twig.formatter_extension:
         class: %oro_ui.twig.formatter.class%
         tags:

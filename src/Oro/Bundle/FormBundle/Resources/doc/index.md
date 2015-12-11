@@ -8,3 +8,4 @@ OroFormBundle Documentation
 - [UI DataBlock Config](./reference/ui_datablock_config.md)
 - [Client side form validation](./reference/js_validation.md)
 - [Form Handler Events](./reference/form_handler_events.md)
+- [Inline Editable Views](./reference/inline-editable-view-component.md)

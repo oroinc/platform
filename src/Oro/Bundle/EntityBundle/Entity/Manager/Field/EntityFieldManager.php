@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -158,10 +159,20 @@ class EntityFieldManager
         // search simple field
         if ($metaData->hasField($fieldName)) {
             $fieldInfo = $metaData->getFieldMapping($fieldName);
-
-            $fieldType = $fieldInfo['type'];
-            if (in_array($fieldType, ['boolean'])) {
+            if (in_array($fieldInfo['type'], ['boolean'])) {
                 $fieldValue = (bool)$fieldValue;
+            }
+        }
+        if ($metaData->hasAssociation($fieldName)) {
+            $fieldInfo = $metaData->getAssociationMapping($fieldName);
+            if ($fieldInfo['type'] === ClassMetadataInfo::MANY_TO_MANY) {
+                // fix values from datagrid multi-relation element
+                if (is_array($fieldValue) && array_key_exists('data', $fieldValue) && is_array($fieldValue['data'])) {
+                    $values = $fieldValue['data'];
+                    $fieldValue = array_map(function ($item) {
+                        return $item['id'];
+                    }, $values);
+                }
             }
         }
 
