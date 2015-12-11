@@ -1,16 +1,17 @@
 define([
-    'jquery',
-    'routing',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    'oro/filter/choice-filter',
-    'oroui/js/messenger',
+    'require',
     'jquery.select2'
-], function($, routing, _, __, tools, ChoiceFilter, messenger) {
+], function(require) {
     'use strict';
 
     var DictionaryFilter;
+    var $ = require('jquery');
+    var routing = require('routing');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var ChoiceFilter = require('oro/filter/choice-filter');
+    var messenger = require('oroui/js/messenger');
 
     /**
      * Multiple select filter: filter values as multiple select options

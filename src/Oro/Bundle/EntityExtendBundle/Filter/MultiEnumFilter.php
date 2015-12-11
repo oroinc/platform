@@ -36,7 +36,6 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
         $type =  $data['type'];
         $parameterName = $ds->generateParameterName($this->getName());
 
-
         $this->applyFilterToClause(
             $ds,
             $this->buildComparisonExpr(
@@ -68,6 +67,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
             $params[FilterUtility::FORM_OPTIONS_KEY]['enum_code'] = $params['enum_code'];
             unset($params['enum_code']);
         }
+
         parent::init($name, $params);
     }
 

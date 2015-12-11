@@ -94,17 +94,22 @@ class DictionaryFilter extends BaseMultiChoiceFilter
                 )
             );
         }
-        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-        list($joinAlias) = explode('.', $fieldName);
-        $qb = $ds->getQueryBuilder();
-        $em = $qb->getEntityManager();
-        $class = $this->get('class');
-        $metadata = $em->getClassMetadata($class);
-        $fieldNames = $metadata->getIdentifierFieldNames();
-        if ($count = count($fieldNames) !== 1) {
-            throw new LogicException('Class needs to have exactly 1 identifier, but it has "%d"', $count);
+
+        try {
+            $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+            list($joinAlias) = explode('.', $fieldName);
+            $qb = $ds->getQueryBuilder();
+            $em = $qb->getEntityManager();
+            $class = $this->get('options')['class'];
+            $metadata = $em->getClassMetadata($class);
+            $fieldNames = $metadata->getIdentifierFieldNames();
+            if ($count = count($fieldNames) !== 1) {
+                throw new LogicException('Class needs to have exactly 1 identifier, but it has "%d"', $count);
+            }
+            $field = sprintf('%s.%s', $joinAlias, $fieldNames[0]);
+        } catch (\Exception $e) {
+            $field = $this->getName();
         }
-        $field = sprintf('%s.%s', $joinAlias, $fieldNames[0]);
 
         return $field;
     }

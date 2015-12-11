@@ -52,7 +52,6 @@ class EnumFilter extends BaseMultiChoiceFilter
         $type =  $data['type'];
         $parameterName = $ds->generateParameterName($this->getName());
 
-
         $this->applyFilterToClause(
             $ds,
             $this->buildComparisonExpr(
