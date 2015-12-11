@@ -64,3 +64,9 @@ services:
            - @oro_security.owner.entity_owner_accessor.link
         tags:
            - {name: oro_activity_list.provider, priority: 40}
+
+    oro_note.exclusion_provider:
+        class: Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }

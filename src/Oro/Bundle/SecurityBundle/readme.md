@@ -44,6 +44,8 @@ Also the following permissions are supported for entities:
  - **ASSIGN**: Controls whether a user is allowed to change an owner of a record. For example assign a record to another user.
  - **SHARE**: Controls whether the user can share a record with another user.
 
+ `*` **NOTE: SHARE functionality is implemented in Enterprise Edition**
+
 And these permissions are supported for fields:
  
  - **VIEW**: Controls whether a user is allowed to view a field.

@@ -1035,9 +1035,15 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                 }
 
                 if (isNaN(l)) {
+                    if (!isNaN(r)) {
+                        return 1;
+                    }
                     l = String(l).toLowerCase();
                 }
                 if (isNaN(r)) {
+                    if (!isNaN(l)) {
+                        return -1;
+                    }
                     r = String(r).toLowerCase();
                 }
 

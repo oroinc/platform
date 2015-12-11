@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\AbstractEntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDecisionMakerTest
 {
@@ -54,13 +55,6 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider->expects($this->any())
-            ->method('hasConfig')
-            ->willReturn(false);
-
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
@@ -91,11 +85,6 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
                             'oro_security.owner.entity_owner_accessor',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                             new EntityOwnerAccessor($this->metadataProvider),
-                        ],
-                        [
-                            'oro_entity_config.provider.security',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $configProvider
                         ],
                     ]
                 )

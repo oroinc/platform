@@ -28,7 +28,13 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsShuldReturnTrueForOAuthToken()
     {
+        $this->resourceOwnerMap->expects($this->once())
+            ->method('hasResourceOwnerByName')
+            ->with($this->equalTo('google'))
+            ->will($this->returnValue(true));
+
         $token = new OAuthToken('token');
+        $token->setResourceOwnerName('google');
         $this->assertTrue($this->oauthProvider->supports($token));
     }
     

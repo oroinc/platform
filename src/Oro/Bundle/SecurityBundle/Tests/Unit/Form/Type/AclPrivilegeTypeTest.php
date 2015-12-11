@@ -31,7 +31,7 @@ class AclPrivilegeTypeTest extends \PHPUnit_Framework_TestCase
         );
         $builder->expects($this->at(1))->method('add')->with(
             'permissions',
-            $this->isInstanceOf('Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType'),
+            'oro_acl_permission_collection',
             $this->contains($options)
         );
         $this->formType->buildForm($builder, $options);
