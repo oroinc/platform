@@ -67,12 +67,14 @@ class TagsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        $isReports = $this->isReportGrid($config);
+
         return
             null !== $this->securityFacade->getToken() &&
-            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
             $this->taggableHelper->isTaggable($this->getEntityClassName($config)) &&
+            ($isReports || null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)) &&
             // Do not add column with tags in cases when user does not have access to view tags, except report/segments.
-            ($this->isReportGrid($config) || $this->securityFacade->isGranted('oro_tag_view'));
+            ($isReports || $this->securityFacade->isGranted('oro_tag_view'));
     }
 
     /**
@@ -83,11 +85,11 @@ class TagsExtension extends AbstractExtension
         // @TODO Reports logic should be removed from this extension
         $isReports = $this->isReportGrid($config);
         $filters   = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
-        $columns = $config->offsetGetByPath('[columns]', []);
-        $sorters = $config->offsetGetByPath(self::GRID_SORTERS_PATH, []);
+        $columns   = $config->offsetGetByPath('[columns]', []);
+        $sorters   = $config->offsetGetByPath(self::GRID_SORTERS_PATH, []);
 
-        $column  = [self::COLUMN_NAME => $this->getColumnDefinition($config, $isReports)];
-        $filter  = $this->getColumnFilterDefinition($config, $isReports);
+        $column = [self::COLUMN_NAME => $this->getColumnDefinition($config, $isReports)];
+        $filter = $this->getColumnFilterDefinition($config, $isReports);
 
         if ($isReports) {
             $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
@@ -124,10 +126,13 @@ class TagsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
+        $aliases    = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
+        $identifier = isset($aliases['tag_field']) ? $aliases['tag_field'] : 'id';
+
         $rows = (array)$result->offsetGetOr('data', []);
         $ids  = array_map(
-            function (ResultRecord $item) {
-                return $item->getValue('id');
+            function (ResultRecord $item) use ($identifier) {
+                return $item->getValue($identifier);
             },
             $rows
         );
@@ -145,8 +150,8 @@ class TagsExtension extends AbstractExtension
         $result->offsetSet(
             'data',
             array_map(
-                function (ResultRecord $item) use ($tags) {
-                    $id   = $item->getValue('id');
+                function (ResultRecord $item) use ($tags, $identifier) {
+                    $id   = $item->getValue($identifier);
                     $data = isset($tags[$id]) ? $tags[$id] : [];
                     $item->addData(['tags' => $data]);
 

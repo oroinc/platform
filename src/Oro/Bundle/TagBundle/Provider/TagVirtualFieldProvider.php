@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Provider;
 
-use Doctrine\ORM\Query\Expr\Join;
-
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
 class TagVirtualFieldProvider implements VirtualFieldProviderInterface
@@ -38,7 +35,8 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
     {
         return [
             'select' => [
-                'expr'                => 'entity.name',
+                // Do not change this params it using for reports, for executing identifier for target entity.
+                'expr'                => 'entity.id',
                 'label'               => 'oro.tag.entity_plural_label',
                 'return_type'         => 'tag',
                 'related_entity_name' => 'Oro\Bundle\TagBundle\Entity\Tag',
