@@ -1,3 +1,19 @@
+{% if sidebarsGetURL is not defined %}
+    {% set sidebarsGetURL = path('oro_api_get_sidebars', {'position': 'SIDEBAR_' ~ placement|upper}) %}
+{% endif %}
+
+{% if sidebarPostURL is not defined %}
+    {% set sidebarPostURL = path('oro_api_post_sidebars') %}
+{% endif %}
+
+{% if widgetsGetURL is not defined %}
+    {% set widgetsGetURL = path('oro_api_get_sidebarwidgets', {'placement': placement}) %}
+{% endif %}
+
+{% if widgetPostURL is not defined %}
+    {% set widgetPostURL = path('oro_api_post_sidebarwidgets') %}
+{% endif %}
+
 {% if isDesktopVersion() and oro_config_value('oro_sidebar.sidebar_' ~ placement ~ '_active') == true %}
 <div id="sidebar-{{ placement }}" class="sidebar sidebar-{{ placement }}"></div>
 
@@ -9,7 +25,7 @@
 
         $(function () {
             {%- set sidebarData -%}
-                {{ render(path('oro_api_get_sidebars', {'position': 'SIDEBAR_' ~ placement|upper}))|raw }}
+                {{ render(sidebarsGetURL)|raw }}
             {%- endset -%}
             {% if sidebarData is not empty %}
             var sidebarData = {{ sidebarData }};
@@ -20,8 +36,8 @@
             var widgets = new WidgetContainerCollection();
             var availableWidgets = {{ oro_sidebar_get_available_widgets(placement)|json_encode|raw }};
 
-            sidebarModel.urlRoot = {{ path('oro_api_post_sidebars')|json_encode|raw }};
-            widgets.url = {{ path('oro_api_post_sidebarwidgets')|json_encode|raw }};
+            sidebarModel.urlRoot = {{ sidebarPostURL|json_encode|raw }};
+            widgets.url = {{ widgetPostURL|json_encode|raw }};
 
             new SidebarView({
                 model: sidebarModel,
@@ -31,7 +47,7 @@
                 $main: $('#main')
             });
 
-            widgets.reset({{ render(path('oro_api_get_sidebarwidgets', {'placement': placement})) }});
+            widgets.reset({{ render(widgetsGetURL) }});
 
             widgets.each(function (widget) {
                 var name = widget.get('widgetName');

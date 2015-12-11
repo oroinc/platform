@@ -1,13 +1,7 @@
-/*global require*/
 require([
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/tools'
-], function(BaseController, tools) {
+    'oroui/js/app/controllers/base/controller'
+], function(BaseController) {
     'use strict';
-
-    if (tools.isMobile()) {
-        return;
-    }
 
     /**
      * Init ShortcutsView
@@ -15,14 +9,14 @@ require([
     BaseController.loadBeforeAction([
         'jquery',
         'oroemail/js/app/components/email-notification-component'
-    ], function(jquery, EmailNotificationComponent) {
+    ], function($, EmailNotificationComponent) {
         BaseController.addToReuse('emailNotification', {
             compose: function() {
-                var $menu = jquery('.email-notification-menu');
+                var $menu = $('.email-notification-menu');
                 if ($menu.length !== 0) {
                     var options = $menu.data('page-component-options');
-                    options._sourceElement = '.email-notification-menu';
-                    this.cComponent = new EmailNotificationComponent(options);
+                    options._sourceElement = $menu;
+                    this.component = new EmailNotificationComponent(options);
                 }
             }
         });

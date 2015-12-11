@@ -5,14 +5,13 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestUsersTest extends WebTestCase
 {
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
     }
 
     /**
@@ -20,8 +19,8 @@ class RestUsersTest extends WebTestCase
      */
     public function testCreateUser()
     {
-        $request = array(
-            "user" => array(
+        $request = [
+            "user" => [
                 "username"      => 'user_' . mt_rand(),
                 "email"         => 'test_' . mt_rand() . '@test.com',
                 "phone"         => '123-123',
@@ -29,10 +28,10 @@ class RestUsersTest extends WebTestCase
                 "plainPassword" => '1231231q',
                 "firstName"     => "firstName",
                 "lastName"      => "lastName",
-                "roles"         => array("3"),
+                "roles"         => ["3"],
                 "owner"         => "1"
-            )
-        );
+            ]
+        ];
         $this->client->request(
             'POST',
             $this->getUrl('oro_api_post_user'),
@@ -40,6 +39,42 @@ class RestUsersTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 201);
+
+        return $request;
+    }
+
+    /**
+     * Test validation.
+     * Wrong request - "plainPassword" is NOT specified.
+     *
+     * @return array
+     */
+    public function testCreateUserFailed()
+    {
+        $request = [
+            'user' => [
+                'username'  => 'user_' . mt_rand(),
+                'firstName' => "firstName",
+                'lastName'  => "lastName",
+                'email'     => 'test_' . mt_rand() . '@test . com',
+                'enabled'   => '1'
+            ]
+        ];
+
+        $this->client->request('POST', $this->getUrl('oro_api_post_user'), $request);
+        $result = $this->client->getResponse();
+
+        /**
+         * "Validation Failed",
+         * "plainPassword": {
+         *   "errors": [
+         *     "This value should not be blank."
+         *   ]
+         * },
+         */
+        $this->assertJsonResponseStatusCodeEquals($result, 400);
+        $message = json_decode($result->getContent())->message;
+        $this->assertEquals('Validation Failed', $message);
 
         return $request;
     }
@@ -88,7 +123,7 @@ class RestUsersTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_users'),
-            array('limit' => 100)
+            ['limit' => 100]
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -100,7 +135,7 @@ class RestUsersTest extends WebTestCase
         unset($request['user']['plainPassword']);
         $this->client->request(
             'PUT',
-            $this->getUrl('oro_api_put_user', array('id' => $userId)),
+            $this->getUrl('oro_api_put_user', ['id' => $userId]),
             $request
         );
         $result = $this->client->getResponse();
@@ -109,7 +144,7 @@ class RestUsersTest extends WebTestCase
         //open user by id
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_user', array('id' => $userId))
+            $this->getUrl('oro_api_get_user', ['id' => $userId])
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -158,10 +193,10 @@ class RestUsersTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_api_get_user_filter',
-                array(
+                [
                     'username' => $request['user']['username'],
                     'email'    => $request['user']['email']
-                )
+                ]
             )
         );
 
@@ -192,14 +227,14 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->getUrl('oro_api_delete_user', array('id' => $userId))
+            $this->getUrl('oro_api_delete_user', ['id' => $userId])
         );
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_user', array('id' => $userId))
+            $this->getUrl('oro_api_get_user', ['id' => $userId])
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);
@@ -209,7 +244,7 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->getUrl('oro_api_delete_user', array('id' => 1))
+            $this->getUrl('oro_api_delete_user', ['id' => 1])
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 403);
@@ -219,7 +254,7 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_user_roles', array('id' => 1))
+            $this->getUrl('oro_api_get_user_roles', ['id' => 1])
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -231,7 +266,7 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_user_roles', array('id' => 0))
+            $this->getUrl('oro_api_get_user_roles', ['id' => 0])
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);
@@ -241,7 +276,7 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_user_groups', array('id' => 1))
+            $this->getUrl('oro_api_get_user_groups', ['id' => 1])
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -253,7 +288,7 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_user_groups', array('id' => 0))
+            $this->getUrl('oro_api_get_user_groups', ['id' => 0])
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);

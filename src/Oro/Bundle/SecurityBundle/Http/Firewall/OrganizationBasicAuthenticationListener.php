@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface as TokenFactory;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 
 class OrganizationBasicAuthenticationListener
 {
@@ -39,7 +39,7 @@ class OrganizationBasicAuthenticationListener
     protected $manager;
 
     /**
-     * @var TokenFactory
+     * @var UsernamePasswordOrganizationTokenFactoryInterface
      */
     protected $tokenFactory;
 
@@ -73,9 +73,9 @@ class OrganizationBasicAuthenticationListener
     }
 
     /**
-     * @param TokenFactory $tokenFactory
+     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
      */
-    public function setTokenFactory(TokenFactory $tokenFactory)
+    public function setTokenFactory(UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;
     }

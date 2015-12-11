@@ -8,8 +8,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  * @package Oro\Bundle\TestFrameworkBundle\Pages
  * {@inheritdoc}
  */
-abstract class AbstractPageEntity extends AbstractPageFilteredGrid
+abstract class AbstractPageEntity extends AbstractPage
 {
+    use FilteredGridTrait;
+
     /** @var string */
     protected $owner;
 
@@ -238,10 +240,15 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
     {
         $this->assertElementPresent(
             "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
-            "/following-sibling::div[contains(., '{$value}')]",
-            "Field '{$fieldName}' data are not equals '{$value}'"
+            "/following-sibling::div/div",
+            "Field '{$fieldName}' is not found"
         );
+        $actualValue = $this->test->byXPath(
+            "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
+            "/following-sibling::div/div"
+        )->text();
 
+        \PHPUnit_Framework_Assert::assertEquals($value, $actualValue, "Field '{$fieldName}' has incorrect value");
         return $this;
     }
 
@@ -253,6 +260,8 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
      */
     public function verifyActivity($activityType, $activityName)
     {
+        $this->test->moveto($this->test->byXPath("//*[@class='container-fluid accordion']"));
+        $this->filterByMultiselect('Activity Type', [$activityType]);
         $this->assertElementPresent(
             "//*[@class='container-fluid accordion']".
             "//*[@class='message-item message'][contains(., '{$activityName}')]".
@@ -274,7 +283,8 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
         $this->filterBy($filterName, $entityName);
         $this->assertElementPresent(
             "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
-            "//preceding-sibling::td/input"
+            "//preceding-sibling::td/input",
+            "{$entityName} is not found in embedded grid"
         );
         $this->test->byXPath(
             "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".

@@ -92,13 +92,23 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
-        if (strpos($val, '%') !== false) {
-            $val = $this->resolveParameter($val);
+        while (strpos($val, '%') !== false) {
+            $newVal = $this->resolveParameter($val);
+            if ($newVal == $val) {
+                break;
+            }
+            $val = $newVal;
         }
 
-        if (strpos($val, '::') !== false) {
-            $val = $this->resolveStatic($datagridName, $key, $val);
-        } elseif (strpos($val, '@') !== false) {
+        while (is_scalar($val) && strpos($val, '::') !== false) {
+            $newVal = $this->resolveStatic($datagridName, $key, $val);
+            if ($newVal == $val) {
+                break;
+            }
+            $val = $newVal;
+        }
+
+        if (is_scalar($val) && strpos($val, '@') !== false) {
             $val = $this->resolveService($datagridName, $key, $val);
         }
 
@@ -180,6 +190,10 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveService($datagridName, $key, $val)
     {
+        if (strpos($val, '\@') !== false) {
+            return str_replace('\@', '@', $val);
+        }
+
         $serviceRegex = '@(?P<service>[\w\.]+)';
         $methodRegex = '(?P<method>\w+)';
         $argumentsRegex = '(?P<arguments>\(.*?\))';

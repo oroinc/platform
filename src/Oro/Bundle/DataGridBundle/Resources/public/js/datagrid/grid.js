@@ -490,6 +490,10 @@ define(function(require) {
                 this.setAdditionalParameter(param, value);
             });
 
+            this.listenTo(mediator, 'datagrid:removeParam:' + this.name, function(param) {
+                this.removeAdditionalParameter(param);
+            });
+
             this.listenTo(mediator, 'datagrid:restoreState:' + this.name,
                 function(columnName, dataField, included, excluded) {
                     this.collection.each(function(model) {
@@ -529,6 +533,7 @@ define(function(require) {
 
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
+            this._deferredRender();
             this.initLayout().always(_.bind(function() {
                 this.rendered = true;
                 /**
@@ -542,6 +547,7 @@ define(function(require) {
                  * @event grid_render:complete
                  */
                 mediator.trigger('grid_render:complete', this.$el);
+                this._resolveDeferredRender();
             }, this));
 
             return this;

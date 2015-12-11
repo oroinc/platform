@@ -56,6 +56,7 @@ define(function(require) {
                         component.view.el.id === fieldId
                     ) {
                         component.view.tinymceInstance.execCommand('mceInsertContent', false, value);
+                        component.view.tinymceInstance.execCommand('mceFocus', false, value);
                     }
                 });
             }
@@ -66,6 +67,7 @@ define(function(require) {
                 this.forEachComponent(function(component) {
                     if (!_.isUndefined(component.view) &&
                         !_.isUndefined(component.view.tinymceConnected) &&
+                        !_.isNull(this.options.emailVariableView) &&
                         component.view.tinymceConnected === true
                     ) {
                         $(component.view.tinymceInstance.getBody()).on(

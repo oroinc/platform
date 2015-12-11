@@ -9,19 +9,19 @@ use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthentica
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactoryInterface as TokenFactory;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactoryInterface;
 
 class OrganizationRememberMeAuthenticationProvider extends RememberMeAuthenticationProvider
 {
     /**
-     * @var TokenFactory
+     * @var OrganizationRememberMeTokenFactoryInterface
      */
     protected $tokenFactory;
 
     /**
-     * @param TokenFactory $tokenFactory
+     * @param OrganizationRememberMeTokenFactoryInterface $tokenFactory
      */
-    public function setTokenFactory(TokenFactory $tokenFactory)
+    public function setTokenFactory(OrganizationRememberMeTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;
     }

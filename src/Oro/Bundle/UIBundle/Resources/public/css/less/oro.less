@@ -118,6 +118,21 @@ label, input, button, select, textarea { font-size:13px;}
       font-size: 13px;
       text-align:right;
     }
+    .control-label.wrap {
+      float:left;
+      padding-top:7px;
+      color: #777;
+      font-weight: normal;
+      font-size: 13px;
+      text-align:right;
+      .tooltip-icon {
+        margin-right: 5px;
+        cursor: pointer;
+      }
+      label {
+        display: inline;
+      }
+    }
     .controls {
       margin-left:170px;
       &.autocomplete-box{
@@ -131,6 +146,9 @@ label, input, button, select, textarea { font-size:13px;}
         &.html-content {
           overflow: auto;
         }
+      }
+      .control-label.wrap {
+        width: 130px;
       }
       label.control-label {
         width: auto;
@@ -273,6 +291,7 @@ i.color {
     .controls {
       margin-left: 240px;
     }
+    div.control-label,
     label.control-label {
       width: 230px;
       text-align: right;
@@ -830,12 +849,24 @@ footer {
   cursor: auto;
 }
 .ui-dialog-content {
-  margin: @verticalPadding/2 @horizontalPadding/2;
+  padding: @verticalPadding/2 @horizontalPadding/2 0 @verticalPadding/2;
+  margin: 0 auto;
   position: relative;
   min-width: 250px;
+  width: 100% !important;
+  height: calc(~"100% - 81px") !important;
   .ui-resizable-handle {
     cursor: move;
   }
+}
+.ui-dialog:not(.ui-dialog-buttons) .ui-dialog-content{
+  height: calc(~"100% - 32px") !important;
+  border-radius: 0 0 3px 3px;
+}
+.ui-dialog.ui-resizable:not(.ui-dialog-buttons) .ui-dialog-content{
+  height: calc(~"100% - 50px") !important;
+  border-radius: 0 0 3px 3px;
+  border-bottom: 1px solid #e5e5e5;
 }
 .ui-dialog .widget-actions-section .btn,
 .ui-dialog .widget-actions-section a.action {
@@ -1577,8 +1608,8 @@ footer {
   .ui-dialog-titlebar {
     margin:-1px -1px 0 -1px;
     border-bottom: 1px solid #000;
-    background-color: #47505a;
-    #gradient > .vertical(#47505a, #363e47);
+    background-color: @titleBackgroundStart;
+    #gradient > .vertical(@titleBackgroundStart, @titleBackgroundEnd);
     padding: 6px 15px;
   }
   .ui-dialog-title {
@@ -1716,6 +1747,7 @@ footer {
 }
 .ui-dialog.ui-widget-content {
   border: 1px solid #bbb;
+  background-color: #fafafa;
 }
 .user-info-state {
   clear: right;
@@ -1792,18 +1824,22 @@ footer {
   border-radius: 0;
   border: solid #ddd;
   border-width: 0 1px 1px;
-  padding: 10px;
+  padding: 5px 10px 10px;
   overflow: hidden;
 }
 .tags-overlay .well{
   -webkit-box-shadow: none;
   box-shadow: none;
+  padding-top: 4px;
 }
 .tags-overlay .tag-list,
 .tag-view  .tag-list {
   margin-bottom: 0;
   li {
-    padding-top: 3px;
+    padding: 5px 5px 0 0;
+  }
+  a:hover span.label {
+    background:#e4e4e4;
   }
   span.label {
     background:#eee;
@@ -1814,19 +1850,11 @@ footer {
     padding:4px 6px;
     border:none;
     color:@bodyColor;
-    &:hover {
-      background:#e4e4e4;
-    }
-    &.with-button {
-      position: relative;
-      padding-right: 20px;
-    }
     .select2-search-choice-close {
-      background:none;
-      width:0;
-      height:0;
-      top:5px;
-      right:15px;
+      position: relative;
+      display: inline-block;
+      right: -2px;
+      top: 0;
       &:before {
         width:20px;
         content: "\f00d";
@@ -2073,7 +2101,7 @@ body .mce-tinymce { width: 292px }
 textarea {
   height: 150px;
   resize: vertical;
-  text-align: justify;
+  text-align: left;
   vertical-align: top;
 }
 .scrollspy-title {
@@ -2608,6 +2636,25 @@ label.radio.error {
       font:14px/1em 'FontAwesome';
       color:#ddd;
       content: "\f00d";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
+  .addAfterRow {
+    &:after {
+      content: "\f067";
+    }
+    text-indent:-999;
+    font-size:0;
+    line-height:0;
+    margin: 0 0 0 0;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f067";
       text-indent:0;
     }
     &:hover:after {

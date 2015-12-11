@@ -17,10 +17,12 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block content %}
-    {% set pageReload    = attribute(form.vars.block_config, activeSubGroup).page_reload %}
     {% set saveButton    = UI.saveAndCloseButton('oro.config.actions.save_settings'|trans) %}
     {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
-
+    {% set options = {
+        pageReload: attribute(form.vars.block_config, activeSubGroup).page_reload,
+        el: '#' ~ form.vars.id,
+    } %}
     <form
         id="{{ form.vars.id }}"
         name="{{ form.vars.name }}"
@@ -28,56 +30,12 @@
         action="{{ formAction }}"
         method="post"
         data-collect="true"
+        data-page-component-module="oroconfig/js/form/config-form"
+        data-page-component-options="{{ options|json_encode }}"
     >
         {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
         {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup, routeName, routeParameters) }}
     </form>
     {{ oro_form_js_validation(form) }}
-
-    <script type="text/javascript">
-        /* jshint browser:true, devel:true */
-        /* global require */
-        require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/default', 'oroui/js/modal'],
-        function ($, __, mediator, messenger, FormDefault, Modal) {
-            'use strict';
-
-            $('#{{ form.vars.id }} :input[type=reset]').click(function (e) {
-                var $form = $(this).closest('form'),
-                    $checkboxes = $form.find('.parent-scope-checkbox input'),
-                    confirm = new Modal({
-                        title: __('Confirmation'),
-                        okText: __('OK'),
-                        cancelText: __('Cancel'),
-                        content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
-                        className: 'modal modal-primary',
-                        okButtonClass: 'btn-primary btn-large'
-                    });
-
-                confirm.on('ok', function () {
-                    $form.get(0).reset();
-                    $checkboxes.trigger('change');
-                });
-                confirm.open();
-                e.preventDefault();
-            });
-
-            {% if pageReload %}
-                $('#{{ form.vars.id }}').submit(function() {
-                    mediator.once('page:update', function() {
-                        messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
-                        // force reload without hash navigation
-                        window.location.reload();
-                    });
-
-                    mediator.once('page:afterChange', function() {
-                        // Show loading until page is fully reloaded
-                        mediator.execute('showLoading');
-                    });
-                });
-            {% endif %}
-
-            new FormDefault();
-        });
-    </script>
     {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
 {% endblock content %}

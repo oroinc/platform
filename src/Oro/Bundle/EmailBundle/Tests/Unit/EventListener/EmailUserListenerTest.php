@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
+
 use Oro\Bundle\EmailBundle\EventListener\EmailUserListener;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,11 +19,33 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $processor;
 
+    /**
+     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $em;
+
+    /**
+     * @var UnitOfWork|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $uow;
+
     public function setUp()
     {
         $this->processor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor')
                 ->disableOriginalConstructor()
                 ->getMock();
+
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->em->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($this->uow);
 
         $this->listener = new EmailUserListener($this->processor);
     }
@@ -41,35 +66,20 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
         $emailUserArray = [$emailUser1, $emailUser2, $emailUser1];
 
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
-            ->setMethods(
-                [
-                    'getEntityManager',
-                    'getUnitOfWork',
-                    'getScheduledEntityInsertions',
-                    'getScheduledEntityUpdates',
-                    'getEntityChangeSet'
-                ]
-            )
+            ->setMethods(['getEntityManager'])
             ->disableOriginalConstructor()
             ->getMock();
         $onFlushEventArgs
             ->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($onFlushEventArgs));
-        $onFlushEventArgs
-            ->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($onFlushEventArgs));
-        $onFlushEventArgs
-            ->expects($this->exactly(3))
+            ->will($this->returnValue($this->em));
+        $this->uow->expects($this->any())
             ->method('getEntityChangeSet')
             ->will($this->returnValue($changesetAnswer));
-        $onFlushEventArgs
-            ->expects($this->once())
+        $this->uow->expects($this->any())
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue($emailUserArray));
-        $onFlushEventArgs
-            ->expects($this->once())
+        $this->uow->expects($this->any())
             ->method('getScheduledEntityUpdates')
             ->will($this->returnValue($emailUserArray));
         $this->processor
@@ -84,6 +94,10 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
         $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $postFlushEventArgs->expects($this->any())
+            ->method('getEntityManager')
+            ->willReturn($this->em);
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);

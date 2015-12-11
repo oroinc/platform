@@ -26,6 +26,11 @@ define(function(require) {
          */
         opened: false,
 
+        /**
+         * @property {oroui.widget.AbstractWidget}
+         */
+        view: null,
+
         defaults: {
             options: {}
         },
@@ -122,19 +127,28 @@ define(function(require) {
                 this.opened = true;
                 this.listenTo(widget, 'widgetRemove', _.bind(function() {
                     this.opened = false;
+                    delete this.view;
                 }, this));
+
+                if (widget.isEmbedded()) {
+                    // save reference to widget (only for a single + embedded instance)
+                    // to get access over named component
+                    this.view = widget;
+                }
             }
 
             widget.render();
 
             if (widget.isEmbedded()) {
-                /**
-                 * if the widget is embedded, bind its life cycle with the component
-                 */
+                // if the widget is embedded, bind its life cycle with the component
                 widget.listenTo(this, 'dispose', widget.dispose);
             }
 
-            this._resolveDeferredInit();
+            if (widget.deferredRender) {
+                widget.deferredRender.done(_.bind(this._resolveDeferredInit, this));
+            } else {
+                this._resolveDeferredInit();
+            }
         },
 
         /**

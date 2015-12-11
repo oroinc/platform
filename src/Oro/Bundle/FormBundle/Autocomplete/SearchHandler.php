@@ -57,11 +57,6 @@ class SearchHandler implements SearchHandlerInterface
     protected $aclHelper;
 
     /**
-     * @var int
-     */
-    protected $latestFoundIdsCount = 0;
-
-    /**
      * @var PropertyAccessor
      */
     protected $propertyAccessor;
@@ -149,7 +144,7 @@ class SearchHandler implements SearchHandlerInterface
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }
 
-        $hasMore = $this->latestFoundIdsCount === $perPage;
+        $hasMore = count($items) === $perPage;
         if ($hasMore) {
             $items = array_slice($items, 0, $perPage - 1);
         }
@@ -183,9 +178,25 @@ class SearchHandler implements SearchHandlerInterface
         $entityIds = $this->searchIds($search, $firstResult, $maxResults);
 
         $resultEntities = [];
-
         if ($entityIds) {
-            $resultEntities = $this->getEntitiesByIds($entityIds);
+            $unsortedEntities = $this->getEntitiesByIds($entityIds);
+
+            /**
+             * We need to sort entities in the same order given by method searchIds.
+             *
+             * @todo Should be not necessary after implementation of BAP-5691.
+             */
+            $entityByIdHash = [];
+
+            foreach ($unsortedEntities as $entity) {
+                $entityByIdHash[$this->getPropertyValue($this->idFieldName, $entity)] = $entity;
+            }
+
+            foreach ($entityIds as $entityId) {
+                if (isset($entityByIdHash[$entityId])) {
+                    $resultEntities[] = $entityByIdHash[$entityId];
+                }
+            }
         }
 
         return $resultEntities;
@@ -200,9 +211,8 @@ class SearchHandler implements SearchHandlerInterface
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->entityRepository->createQueryBuilder('e');
         $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
-        $query = $this->aclHelper->apply($queryBuilder, 'VIEW');
 
-        return $query->getResult();
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
@@ -221,8 +231,6 @@ class SearchHandler implements SearchHandlerInterface
             $ids[] = $element->getRecordId();
         }
 
-        $this->latestFoundIdsCount = count($ids);
-
         return $ids;
     }
 
@@ -237,7 +245,6 @@ class SearchHandler implements SearchHandlerInterface
     {
         return $this->getEntitiesByIds(explode(',', $query));
     }
-
 
     /**
      * @param array $items
@@ -277,6 +284,10 @@ class SearchHandler implements SearchHandlerInterface
      */
     protected function getPropertyValue($propertyPath, $item)
     {
+        if (!(is_object($item) || is_array($item))) {
+            return null;
+        }
+
         if (is_array($item)) {
             $keys = array_map(
                 function ($key) {

@@ -8,9 +8,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
- * @dbReindex
  */
 class ControllersTest extends WebTestCase
 {

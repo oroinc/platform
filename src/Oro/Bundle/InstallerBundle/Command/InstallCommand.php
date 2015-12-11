@@ -452,8 +452,13 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
                 array(
-                    '--process-isolation' => true,
-                    '--fixtures-type'     => 'demo',
+                    '--process-isolation'  => true,
+                    '--fixtures-type'      => 'demo',
+                    '--disabled-listeners' =>
+                        [
+                            'oro_dataaudit.listener.entity_listener',
+                            'oro_dataaudit.listener.deprecated_audit_data_listener'
+                        ]
                 )
             );
         }
@@ -490,7 +495,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->runCommand(
                 'fos:js-routing:dump',
                 array(
-                    '--target'            => 'web/js/routes.js',
                     '--process-isolation' => true,
                 )
             )
@@ -527,7 +531,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         // clear the cache and set installed flag in DI container
         $cacheClearOptions = ['--process-isolation' => true];
         if ($commandExecutor->getDefaultOption('no-debug')) {
-            $cacheClearOptions['--no-debug'] = false;
+            $cacheClearOptions['--no-debug'] = true;
         }
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 

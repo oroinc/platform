@@ -43,6 +43,12 @@ define(function(require) {
         devToolbarHeight: undefined,
 
         /**
+         * List of elements with disabled scroll. Used to reset theirs state
+         * @private
+         */
+        _scrollDisabledElements: null,
+
+        /**
          * @returns {number} development toolbar height in dev mode, 0 in production mode
          */
         getDevToolbarHeight: function() {
@@ -76,7 +82,7 @@ define(function(require) {
 
             $container.find('[data-toggle="tooltip"]').tooltip();
 
-            this.initPopover($container.find('label'));
+            this.initPopover($container.find('.control-label'));
         },
 
         initPopover: function(container) {
@@ -144,15 +150,19 @@ define(function(require) {
         styleForm: function($container) {
             var $elements;
             if ($.isPlainObject($.uniform)) {
+                var notUniformFilter = function(i, el) {
+                    return $(el).parent('.selector, .uploader').length === 0;
+                };
+
                 // bind uniform plugin to select elements
-                $elements = $container.find('select:not(.no-uniform,.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)').filter(notUniformFilter);
                 $elements.uniform();
                 if ($elements.is('.error:not([multiple])')) {
                     $elements.removeClass('error').closest('.selector').addClass('error');
                 }
 
                 // bind uniform plugin to input:file elements
-                $elements = $container.find('input:file');
+                $elements = $container.find('input:file').filter(notUniformFilter);
                 $elements.uniform({
                     fileDefaultHtml: __('Please select a file...'),
                     fileButtonHtml: __('Choose File')
@@ -161,6 +171,8 @@ define(function(require) {
                     $elements.removeClass('error').closest('.uploader').addClass('error');
                 }
             }
+
+            $container.one('content:changed', _.bind(this.styleForm, this, $container));
         },
 
         /**
@@ -263,19 +275,25 @@ define(function(require) {
          * @returns {string}
          */
         disablePageScroll: function($mainEl) {
+            if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
+                this.enablePageScroll();
+            }
             var $scrollableParents = $mainEl.parents();
             $scrollableParents.scrollTop(0);
             $scrollableParents.addClass('disable-scroll');
+            this._scrollDisabledElements = $scrollableParents;
         },
 
         /**
-         * Enables ability to scroll of $mainEl's scrollable parents
+         * Enables ability to scroll where it was previously disabled
          *
-         * @param $mainEl
          * @returns {string}
          */
-        enablePageScroll: function($mainEl) {
-            $mainEl.parents().removeClass('disable-scroll');
+        enablePageScroll: function() {
+            if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
+                this._scrollDisabledElements.parents().removeClass('disable-scroll');
+                delete this._scrollDisabledElements;
+            }
         },
 
         /**

@@ -1,25 +1,60 @@
 @import "../../../oroui/css/less/mixins";
 
+@spacerHeight: 10px;
+
+.drop-area-marker {
+  position: absolute;
+  border: dashed 3px #ddd;
+  width: 100%;
+  background-color: rgba(255,255,255,0.65);
+  z-index: 1;
+  box-sizing: border-box;
+  margin-top: @spacerHeight;
+  > span {
+    text-transform: uppercase;
+    font-size: 112%;
+    font-weight: bold;
+    display: block;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #363946;
+  }
+}
+.drop-area-over .drop-area-marker {
+  display: none;
+}
 .conditions-group {
   list-style: none;
   margin: 0;
   padding: 0;
-  min-height: 30px;
-  &:before,
-  &:after {
-    content: '';
+  min-height: 199px;
+  box-sizing: border-box;
+  &:before, &:after {
+    content: "";
     display: block;
-    height: 6px;
+    height: @spacerHeight;
   }
   .sortable-placeholder {
-    background-color: #929faf;
-    width: 100%;
-    height: 1px;
+    background-color: transparent;
+    min-height: 50px;
+    border: dashed 3px #E1E1E1;
+    margin: 34px 0 0 0;
     position: relative;
-    border: 4px solid #fff;
-    border-right-color: #929faf;
-    border-left-width: 0;
-    .box-sizing(content-box);
+    &:nth-child(1) {
+      margin-top: 0;
+      margin-bottom: 34px;
+    }
+  }
+  &.drag-start-from-first {
+    > li.sortable-placeholder:nth-child(2) {
+        margin-top: 0;
+        margin-bottom: 34px;
+    }
+  }
+  .hide-operator > .operator{
+    display: none;
   }
   .condition {
     position: relative;
@@ -45,6 +80,9 @@
         }
       }
     }
+    .conditions-group {
+      min-height: 138px;
+    }
     .condition-item {
       border: 1px solid #e1e1e1;
       .border-radius(4px);
@@ -58,7 +96,7 @@
       padding-left: @verticalPadding * .8;
     }
     & > .close {
-      margin-right: 3px;
+      margin-right: 4px;
     }
     &[data-criteria=conditions-group] {
       & > .close {
@@ -68,7 +106,7 @@
         float: left;
         position: absolute;
         top: 50%;
-        margin: -7px 0 0 -5px;
+        margin: -7px 0 0 -4px;
         height: 14px;
         line-height: 14px;
         z-index: 1;
@@ -92,11 +130,12 @@
 }
 
 .filter-criteria {
-  padding: 0 @contentPadding * .5 @contentPadding * .5;
+  padding: 0 @contentPadding*0.5 @contentPadding*0.5-4;
   .hint {
     text-transform: uppercase;
-    margin: 10px 0 2px;
+    margin: 5px 0 3px 0;
     font-size: @fontSizeMini;
+    text-align: center;
   }
   .criteria-list {
     list-style: none;
@@ -111,7 +150,7 @@
     border: 1px solid #d3dbe3;
     .border-radius(3px);
     padding: 3px 8px;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
     .cursor(grab);
     &.disabled{
       cursor: auto;
@@ -134,13 +173,16 @@
   }
   .select2-container {
     width: auto;
+    max-width: none;
     vertical-align: initial;
-    display: inline;
+    display: block;
+    margin-bottom: 4px;
     .select2-choice {
       box-shadow: none;
       border: none;
       padding: 0;
       color: @linkColor;
+      height: auto;
       &:hover, &:focus {
         color: @linkColorHover;
       }
@@ -150,10 +192,16 @@
     }
     .select2-choice,
     .select2-chosen {
-      line-height: 28px;
+      line-height: 20px;
       display: inline;
+      white-space: normal;
       span {
         display: inline;
+        white-space: normal;
+      }
+      .entity-field-path > span:after {
+        content: ' ';
+        font-size: 0;
       }
     }
   }
@@ -197,20 +245,22 @@
   }
 }
 
-.condition-builder.left-panel-container{
-  background-color: #eff2f5;
+.condition-builder{
   border: 1px solid #c9c9c9;
-  margin-bottom: @bottomPadding;
-  min-width: 617px;/* @TODO temporary solution, will be fixed in CRM-2025 */
-  & > .panel-placeholder {
-    background-color: white;
-    margin-left: 23.4%;
+  min-width: 582px;/* @TODO temporary solution, will be fixed in CRM-2025 */
+  background-color: #eff2f5;
+  .left-area {
+    width: 150px;
+    float: left;
+  }
+  .right-area {
+    width: calc(~"100% - 150px");
+    float: left;
+    padding: 0 10px;
     border-left: 1px solid #c9c9c9;
-    & > * {
-      margin-left: -30.55%;
-      .condition-builder {
-        padding: 15px 15px 15px 0;
-      }
+    background-color: white;
+    > div {
+      position: relative;
     }
   }
 }

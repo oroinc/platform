@@ -8,11 +8,13 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SidebarBundle\Entity\AbstractWidget;
 use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
-use Oro\Bundle\SidebarBundle\Entity\Widget;
 
 /**
  * @RouteResource("sidebarwidgets")
@@ -32,13 +34,13 @@ class WidgetController extends FOSRestController
      */
     public function cgetAction($placement)
     {
-        /** @var WidgetRepository $widgetRepository */
-        $widgetRepository = $this->getDoctrine()->getRepository('OroSidebarBundle:Widget');
-        $items = $widgetRepository->getWidgets(
-            $this->getUser(),
-            $placement,
-            $this->container->get('security.context')->getToken()->getOrganizationContext()
-        );
+        $token = $this->container->get('security.token_storage')->getToken();
+        $organization = null;
+        $items = [];
+        if ($token instanceof OrganizationContextTokenInterface) {
+            $organization = $token->getOrganizationContext();
+            $items = $this->getRepository()->getWidgets($this->getUser(), $placement, $organization);
+        }
 
         if (!$items) {
             $items = [];
@@ -56,20 +58,25 @@ class WidgetController extends FOSRestController
      *  description="Add Sidebar Widget",
      *  resource=true
      * )
+     * @param Request $request
      * @return Response
      */
-    public function postAction()
+    public function postAction(Request $request)
     {
-        $entity = new Widget();
-        $entity->setWidgetName($this->getRequest()->get('widgetName'));
-        $entity->setPosition($this->getRequest()->get('position'));
-        $entity->setSettings($this->getRequest()->get('settings'));
-        $entity->setPlacement($this->getRequest()->get('placement'));
-        $entity->setState($this->getRequest()->get('state'));
+        $widgetClass = $this->getWidgetClass();
+        /** @var AbstractWidget $entity */
+        $entity = new $widgetClass();
+        $entity->setWidgetName($request->get('widgetName'));
+        $entity->setPosition($request->get('position'));
+        $entity->setSettings($request->get('settings'));
+        $entity->setPlacement($request->get('placement'));
+        $entity->setState($request->get('state'));
         $entity->setUser($this->getUser());
-        $entity->setOrganization(
-            $this->container->get('security.context')->getToken()->getOrganizationContext()
-        );
+
+        $token = $this->container->get('security.token_storage')->getToken();
+        if ($token instanceof OrganizationContextTokenInterface) {
+            $entity->setOrganization($token->getOrganizationContext());
+        }
 
         $manager = $this->getManager();
         $manager->persist($entity);
@@ -85,16 +92,17 @@ class WidgetController extends FOSRestController
      *
      * @param int $widgetId Widget instance id
      *
+     * @param Request $request
+     * @return Response
      * @ApiDoc(
      *  description="Update Sidebar Widget",
      *  resource=true
      * )
-     * @return Response
      */
-    public function putAction($widgetId)
+    public function putAction($widgetId, Request $request)
     {
         /** @var \Oro\Bundle\SidebarBundle\Entity\Widget $entity */
-        $entity = $this->getManager()->find('OroSidebarBundle:Widget', (int)$widgetId);
+        $entity = $this->getManager()->find($this->getWidgetClass(), (int)$widgetId);
         if (!$entity) {
             return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
         }
@@ -102,10 +110,10 @@ class WidgetController extends FOSRestController
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         }
 
-        $entity->setState($this->getRequest()->get('state', $entity->getState()));
-        $entity->setPosition($this->getRequest()->get('position', $entity->getPosition()));
-        $entity->setSettings($this->getRequest()->get('settings', $entity->getSettings()));
-        $entity->setPlacement($this->getRequest()->get('placement', $entity->getPlacement()));
+        $entity->setState($request->get('state', $entity->getState()));
+        $entity->setPosition($request->get('position', $entity->getPosition()));
+        $entity->setSettings($request->get('settings', $entity->getSettings()));
+        $entity->setPlacement($request->get('placement', $entity->getPlacement()));
 
         $em = $this->getManager();
         $em->persist($entity);
@@ -128,7 +136,7 @@ class WidgetController extends FOSRestController
     public function deleteAction($widgetId)
     {
         /** @var \Oro\Bundle\SidebarBundle\Entity\Widget $entity */
-        $entity = $this->getManager()->find('OroSidebarBundle:Widget', (int)$widgetId);
+        $entity = $this->getManager()->find($this->getWidgetClass(), (int)$widgetId);
         if (!$entity) {
             return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
         }
@@ -161,6 +169,22 @@ class WidgetController extends FOSRestController
      */
     protected function getManager()
     {
-        return $this->getDoctrine()->getManagerForClass('OroSidebarBundle:Widget');
+        return $this->getDoctrine()->getManagerForClass($this->getWidgetClass());
+    }
+
+    /**
+     * @return WidgetRepository
+     */
+    protected function getRepository()
+    {
+        return $this->getManager()->getRepository($this->getWidgetClass());
+    }
+
+    /**
+     * @return string
+     */
+    protected function getWidgetClass()
+    {
+        return $this->getParameter('oro_sidebar.entity.widget.class');
     }
 }

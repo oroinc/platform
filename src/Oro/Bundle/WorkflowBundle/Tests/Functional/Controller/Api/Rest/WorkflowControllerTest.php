@@ -12,7 +12,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class WorkflowControllerTest extends WebTestCase
 {
