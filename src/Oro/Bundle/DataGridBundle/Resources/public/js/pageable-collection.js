@@ -14,21 +14,25 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         pageSize: 'p',
         sorters: 's',
         filters: 'f',
+        columns: 'c',
         gridView: 'v',
         urlParams: 'g'
     };
 
-    // Quickly reset a collection by temporarily detaching the comparator of the
-    // given collection, reset and then attach the comparator back to the
-    // collection and sort.
-
-    // @param {Backbone.Collection} collection
-    // @param {...*} resetArgs
-    // @return {Backbone.Collection} collection The same collection instance after
-    // reset.
+    /**
+     * Quickly reset a collection by temporarily detaching the comparator of the
+     * given collection, reset and then attach the comparator back to the
+     * collection and sort.
+     *
+     * @param {Backbone.Collection} fullCollection
+     * @param {Object} models
+     * @param {Object} options
+     * @returns {Backbone.Collection}
+     */
     function resetQuickly () {
 
         var collection = arguments[0];
+        var options = arguments[2];
         var resetArgs = _.toArray(arguments).slice(1);
 
         var comparator = collection.comparator;
@@ -39,7 +43,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         }
         finally {
             collection.comparator = comparator;
-            if (comparator) {
+            if (comparator && !options.reset) {
                 collection.sort();
             }
         }
@@ -68,6 +72,13 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         model: Backbone.Model,
 
         /**
+         * Original set of options passed during initialization
+         *
+         * @property {Object}
+         */
+        options: {},
+
+        /**
          * Initial state of collection
          *
          * @property
@@ -77,7 +88,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             pageSize: 25,
             totals: null,
             filters: {},
-            sorters: {}
+            sorters: {},
+            columns: {}
         },
 
         /**
@@ -114,6 +126,13 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         urlParams: {},
 
         /**
+         * Whether need to show all records at one page
+         *
+         * @property {Boolean}
+         */
+        onePagePagination: false,
+
+        /**
          * Initialize basic parameters from source options
          *
          * @param models
@@ -121,6 +140,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          */
         initialize: function(models, options) {
             options = options || {};
+            this.options = options;
 
             // copy initialState from the prototype to own property
             this.initialState = tools.deepClone(this.initialState);
@@ -156,6 +176,21 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                 this.inputName = options.inputName;
             }
 
+            if (options.state) {
+                if (options.state.currentPage) {
+                    options.state.currentPage = parseInt(options.state.currentPage);
+                }
+                if (options.state.pageSize) {
+                    options.state.pageSize = parseInt(options.state.pageSize);
+                }
+            }
+
+            if (options.toolbarOptions && options.toolbarOptions.pagination) {
+                if (options.toolbarOptions.pagination.onePage) {
+                    this.onePagePagination = true;
+                }
+            }
+
             _.extend(this.queryParams, {
                 currentPage: this.inputName + '[_pager][_page]',
                 pageSize:    this.inputName + '[_pager][_per_page]',
@@ -167,8 +202,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
 
             PageableCollection.__super__.initialize.call(this, models, options);
 
-            if (models.options) {
-                this.state.totals = models.options.totals;
+            if (options.totals) {
+                this.state.totals = options.totals;
             }
         },
 
@@ -189,8 +224,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * Adds filter parameters to data
          *
          * @param {Object} data
-         * @param {Object} state
-         * @param {String} prefix
+         * @param {Object=} state
+         * @param {string=} prefix
          * @return {Object}
          */
         processFiltersParams: function(data, state, prefix) {
@@ -208,6 +243,30 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                     this.generateParameterStrings(state.filters, prefix)
                 );
             }
+            return data;
+        },
+
+        /**
+         * Adds columns parameters to data
+         *
+         * @param {Object} data
+         * @param {Object=} state
+         * @param {string=} prefix
+         * @return {Object}
+         */
+        processColumnsParams: function(data, state, prefix) {
+            if (!state) {
+                state = this.state;
+            }
+
+            if (!prefix) {
+                prefix = this.inputName + '[_columns]';
+            }
+
+            var columnsData = {};
+            columnsData[prefix] = this._packColumnsStateData(state.columns);
+            _.extend(data, columnsData);
+
             return data;
         },
 
@@ -266,22 +325,56 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @return {Object}
          */
         parse: function(resp, options) {
-            resp.options = resp.options || {};
-            this.state.totalRecords = resp.options.totalRecords || 0;
-            this.state.hideToolbar = resp.options.hideToolbar;
+            var responseModels = this._parseResponseModels(resp);
+            var responseOptions = this._parseResponseOptions(resp);
+            if (responseOptions) {
+                _.extend(options, responseOptions);
+            }
+            this.state.totalRecords = options.totalRecords || 0;
+            this.state.hideToolbar = options.hideToolbar;
             this.state = this._checkState(this.state);
-            return resp.data;
+
+            return responseModels;
         },
 
         /**
          * Reset collection object
          *
-         * @param models
+         * @param resp
          * @param options
          */
-        reset: function(models, options) {
-            this.trigger('beforeReset', this, models, options);
+        reset: function(resp, options) {
+            var responseModels = this._parseResponseModels(resp);
+            var responseOptions = this._parseResponseOptions(resp);
+            if (responseOptions) {
+                _.extend(options, responseOptions);
+            }
+            this.trigger('beforeReset', this, responseModels, options);
             BackbonePageableCollection.prototype.reset.apply(this, arguments);
+        },
+
+        /**
+         * @param {Object} resp
+         * @returns {Object}
+         * @protected
+         */
+        _parseResponseModels: function(resp) {
+            if (_.has(resp, 'data')) {
+                return resp.data;
+            }
+            return resp;
+        },
+
+        /**
+         * @param {Object} resp
+         * @returns {Object}
+         * @protected
+         */
+        _parseResponseOptions: function(resp) {
+            if (_.has(resp, 'options')) {
+                return resp.options;
+            }
+            return {};
         },
 
         /**
@@ -448,9 +541,15 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                 (mode === 'infinite' ? links : true)) {
 
                 state.totalRecords = totalRecords = this.finiteInt(totalRecords, 'totalRecords');
-                state.pageSize = pageSize = this.finiteInt(pageSize, 'pageSize');
-                state.currentPage = currentPage = this.finiteInt(currentPage, 'currentPage');
                 state.firstPage = firstPage = this.finiteInt(firstPage, 'firstPage');
+
+                if (this.onePagePagination) {
+                    state.pageSize = pageSize = state.totalRecords;
+                    state.currentPage = currentPage = state.firstPage;
+                } else {
+                    state.pageSize = pageSize = this.finiteInt(pageSize, 'pageSize');
+                    state.currentPage = currentPage = this.finiteInt(currentPage, 'currentPage');
+                }
 
                 if (pageSize < 0) {
                     throw new RangeError('"pageSize" must be >= 0');
@@ -537,6 +636,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             var state = this._checkState(this.state);
             data = this.processQueryParams(data, state);
             data = this.processFiltersParams(data, state);
+            data = this.processColumnsParams(data, state);
 
             return data;
         },
@@ -695,7 +795,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         getSortDirectionKey: function(directionValue) {
             var directionKey = null;
             _.each(this.queryParams.directions, function(value, key) {
-                if (value === directionValue) {
+                if (value === directionValue || key === directionValue) {
                     directionKey = key;
                 }
             });
@@ -772,16 +872,14 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
 
             return this;
         },
+
         /**
          * Clone collection
          *
          * @return {PageableCollection}
          */
         clone: function() {
-            var collectionOptions = {};
-            collectionOptions.url = this.url;
-            collectionOptions.inputName = this.inputName;
-            var newCollection = new PageableCollection(this.toJSON(), collectionOptions);
+            var newCollection = new PageableCollection(this.toJSON(), tools.deepClone(this.options));
             newCollection.state = tools.deepClone(this.state);
             newCollection.initialState = tools.deepClone(this.initialState);
             return newCollection;
@@ -806,6 +904,22 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         },
 
         /**
+         *
+         * @param {Integer} pageSize
+         * @param {Object} options
+         * @returns {Object}
+         */
+        setPageSize: function(pageSize, options) {
+            this.state.pageSize = pageSize;
+            if (this.mode === 'server') {
+                this.fetch({reset: true});
+                return this.getPage(this.state.currentPage, options);
+            } else {
+                return PageableCollection.__super__.setPageSize.call(this, pageSize, options);
+            }
+        },
+
+        /**
          * Encodes passed state taking in account url parameters of the collection
          *
          * @param {Object} state
@@ -815,6 +929,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         _encodeStateData: function(state) {
             var stateData = {urlParams: this.urlParams};
             stateData = _.extend(stateData, state);
+            this._packStateData(stateData);
             return PageableCollection.encodeStateData(stateData);
         },
 
@@ -825,6 +940,121 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          */
         stateHashKey: function() {
             return PageableCollection.stateHashKey(this.inputName);
+        },
+
+        /**
+         * Packs state
+         * (packs state value to minified representation)
+         *
+         * @param {Object} data
+         * @protected
+         */
+        _packStateData: function(data) {
+            data.columns = this._packColumnsStateData(data.columns);
+        },
+
+        /**
+         * Converts column state object into a string
+         *
+         * @param {Object} state
+         * @returns {string}
+         * @protected
+         */
+        _packColumnsStateData: function(state) {
+            // convert columns state to array
+            var packedState = _.map(state, function(item, columnName) {
+                return _.extend({name: columnName}, item);
+            });
+
+            // sort columns by their order
+            packedState = _.sortBy(packedState, 'order');
+
+            // stringify state parts
+            packedState = _.map(packedState, function(item) {
+                return item.name + String(Number(item.renderable));
+            }).join('.');
+
+            return packedState;
+        },
+
+        /**
+         * Unpacks state
+         * (extract state value from minified object)
+         *
+         * @param {Object} data
+         * @protected
+         */
+        _unpackStateData: function(data) {
+            data.columns = this._unpackColumnsStateData(data.columns);
+        },
+
+        /**
+         * Extract column state from string
+         *
+         * @param {string} packedState
+         * @return {Object}
+         * @protected
+         */
+        _unpackColumnsStateData: function(packedState) {
+            return _.object(_.map(packedState.split('.'), function(value, index) {
+                var columnName = value.substr(0, value.length - 1);
+                return [columnName, {
+                    renderable: Boolean(Number(value.substr(-1))),
+                    order: index
+                }];
+            }));
+        },
+
+        /**
+         * Compare strings to perform sorting
+         *
+         * @param {String} sortKey
+         * @param {Integer} order
+         * @return {Function}
+         * @protected
+         */
+        _makeComparator: function(sortKey, order) {
+            var state = this.state;
+
+            sortKey = sortKey || state.sortKey;
+            order = order || state.order;
+
+            if (!sortKey || !order) {
+                return;
+            }
+
+            return function(left, right) {
+                var l = left.get(sortKey);
+                var r = right.get(sortKey);
+                var t;
+
+                if (order === 1) {
+                    t = l;
+                    l = r;
+                    r = t;
+                }
+
+                if (isNaN(l)) {
+                    if (!isNaN(r)) {
+                        return 1;
+                    }
+                    l = String(l).toLowerCase();
+                }
+                if (isNaN(r)) {
+                    if (!isNaN(l)) {
+                        return -1;
+                    }
+                    r = String(r).toLowerCase();
+                }
+
+                if (l === r) {
+                    return 0;
+                } else if (l < r) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            };
         }
     });
 

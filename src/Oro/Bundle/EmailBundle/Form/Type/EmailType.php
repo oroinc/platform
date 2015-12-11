@@ -10,9 +10,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class EmailType extends AbstractType
@@ -23,11 +24,26 @@ class EmailType extends AbstractType
     protected $securityContext;
 
     /**
-     * @param SecurityContextInterface $securityContext
+     * @var EmailRenderer
      */
-    public function __construct(SecurityContextInterface $securityContext)
-    {
+    protected $emailRenderer;
+
+    /** @var EmailModelBuilderHelper */
+    protected $emailModelBuilderHelper;
+
+    /**
+     * @param SecurityContextInterface $securityContext
+     * @param EmailRenderer $emailRenderer
+     * @param EmailModelBuilderHelper $emailModelBuilderHelper
+     */
+    public function __construct(
+        SecurityContextInterface $securityContext,
+        EmailRenderer $emailRenderer,
+        EmailModelBuilderHelper $emailModelBuilderHelper
+    ) {
         $this->securityContext = $securityContext;
+        $this->emailRenderer = $emailRenderer;
+        $this->emailModelBuilderHelper = $emailModelBuilderHelper;
     }
 
     /**
@@ -108,16 +124,26 @@ class EmailType extends AbstractType
             ->add('signature', 'hidden')
             ->add(
                 'contexts',
-                'oro_email_contexts_select',
+                'oro_activity_contexts_select',
                 [
-                    'label'    => 'oro.email.contexts.label',
-                    'tooltip'  => 'oro.email.contexts.tooltip',
-                    'required' => false,
-                    'read_only' => true,
+                    'tooltip'   => 'oro.email.contexts.tooltip',
+                    'read_only' => !$this->securityContext->isGranted(
+                        'EDIT',
+                        'entity:Oro\Bundle\EmailBundle\Entity\EmailUser'
+                    ),
+                    'configs'   => [
+                        'containerCssClass' => 'taggable-email',
+                        'route_name'       => 'oro_activity_form_autocomplete_search',
+                        'route_parameters' => [
+                            'activity' => 'emails',
+                            'name'     => 'emails'
+                        ],
+                    ]
                 ]
             );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'fillFormByTemplate']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
     }
 
@@ -156,15 +182,35 @@ class EmailType extends AbstractType
             ],
             ['choice_list', 'choices']
         );
+    }
 
-        if ($this->securityContext->isGranted('EDIT', 'entity:Oro\Bundle\EmailBundle\Entity\EmailUser')) {
-            FormUtils::replaceField(
-                $form,
-                'contexts',
-                [
-                    'read_only' => false,
-                ]
-            );
+    /**
+     * @param FormEvent $event
+     */
+    public function fillFormByTemplate(FormEvent $event)
+    {
+        /** @var Email|null $data */
+        $data = $event->getData();
+        if (null === $data || !is_object($data) || null === $data->getTemplate()) {
+            return;
+        }
+
+        if (null !== $data->getSubject() && null !== $data->getBody()) {
+            return;
+        }
+
+        $emailTemplate = $data->getTemplate();
+
+        $targetEntity = $this->emailModelBuilderHelper->getTargetEntity($data->getEntityClass(), $data->getEntityId());
+
+        list($emailSubject, $emailBody) = $this->emailRenderer
+            ->compileMessage($emailTemplate, ['entity' => $targetEntity]);
+
+        if (null === $data->getSubject()) {
+            $data->setSubject($emailSubject);
+        }
+        if (null === $data->getBody()) {
+            $data->setBody($emailBody);
         }
     }
 

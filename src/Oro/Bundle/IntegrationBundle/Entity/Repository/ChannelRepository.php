@@ -53,6 +53,86 @@ class ChannelRepository extends EntityRepository
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
+
+    /**
+     * @param string[]|string $commandName
+     * @param string[]|string|null $arguments
+     * @param string[]|string|null $states
+     *
+     * @return QueryBuilder
+     */
+    protected function getQBSyncJobs($commandName, $arguments = null, $states = null)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getEntityManager()
+            ->getRepository('JMSJobQueueBundle:Job')
+            ->createQueryBuilder('j');
+
+        if (is_array($commandName)) {
+            $qb->andWhere('j.command in (:commandName)');
+        } else {
+            $qb->andWhere('j.command=:commandName');
+        }
+
+        if (!empty($states)) {
+            if (is_array($states)) {
+                $qb->andWhere('j.state in (:stateName)');
+            } else {
+                $qb->andWhere('j.state=:stateName');
+            }
+        }
+
+        $qb->setParameter('stateName', $states)
+            ->setParameter('commandName', $commandName);
+
+        if (!empty($arguments)) {
+            if (is_array($arguments)) {
+                $orX = $qb->expr()->orX();
+                foreach ($arguments as $key => $argument) {
+                    $orX->add($qb->expr()->like('cast(j.args as text)', ':args_' . $key));
+                    $qb->setParameter('args_' . $key, '%' . $argument . '%');
+                }
+
+                $qb->andWhere($orX);
+            } else {
+                $qb->andWhere($qb->expr()->like('cast(j.args as text)', ':args'))
+                    ->setParameter('args', '%' . $arguments . '%');
+            }
+        }
+
+        return $qb;
+    }
+
+    /**
+     * @param string[]|string $commandName
+     * @param string[]|string|null $arguments
+     * @param string[]|string|null $states
+     *
+     * @return QueryBuilder
+     */
+    protected function getQBSyncJobsCount($commandName, $arguments = null, $states = null)
+    {
+        $qb = $this->getQBSyncJobs($commandName, $arguments, $states);
+        $qb->select('count(j.id)');
+
+        return $qb;
+    }
+
+    /**
+     * @param string $commandName
+     * @param string[]|string|null $arguments
+     * @param string[]|string|null $states
+     *
+     * @return int
+     */
+    public function getSyncJobsCount($commandName, $states = null, $arguments = null)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getQBSyncJobsCount($commandName, $arguments, $states);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
     /**
      * Returns latest status for integration's connector and code if it exists.
      *
@@ -166,12 +246,24 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * Adds status to integration, manual persist of newly created statuses
+     * Adds status to integration, manual persist of newly created statuses and do flush.
      *
+     * @deprecated 1.9.0:1.11.0 Use $this->addStatusAndFlush() instead
      * @param Integration $integration
      * @param Status  $status
      */
     public function addStatus(Integration $integration, Status $status)
+    {
+        $this->addStatusAndFlush($integration, $status);
+    }
+
+    /**
+     * Adds status to integration, manual persist of newly created statuses and do flush.
+     *
+     * @param Integration $integration
+     * @param Status  $status
+     */
+    public function addStatusAndFlush(Integration $integration, Status $status)
     {
         if ($this->getEntityManager()->isOpen()) {
             $integration = $this->getOrLoadById($integration->getId());

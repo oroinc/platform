@@ -87,7 +87,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial eu.{id, email, folder}
+                    - partial eu.{id, email}
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
@@ -104,19 +104,19 @@ datagrid:
                             alias: thread
                         -
                             join: e.recipients
-                            alias: recipients
-                        -
-                            join: e.recipients
                             alias: r_to
-                            conditionType: WITH
-                            condition: r_to.type = 'to'
                         -
                             join: e.recipients
-                            alias: r_cc_bcc
+                            alias: r_cc
                             conditionType: WITH
-                            condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
+                            condition: r_cc.type = 'cc'
                         -
-                            join: eu.folder
+                            join: e.recipients
+                            alias: r_bcc
+                            conditionType: WITH
+                            condition: r_bcc.type = 'bcc'
+                        -
+                            join: eu.folders
                             alias: f
                         -
                             join: f.origin
@@ -174,35 +174,16 @@ datagrid:
             query:
                 where:
                     and:
-                        - >
-                            eu.id = (
-                                SELECT
-                                    MIN(seu2.id)
-                                FROM
-                                    OroEmailBundle:EmailUser seu2
-                                WHERE seu2.email = (
-                                    SELECT
-                                        CASE
-                                            WHEN (MIN(se.id) IS NOT NULL) THEN MIN(se.id)
-                                            WHEN (e.head = true) THEN e.id
-                                            ELSE 0
-                                        END
-                                    FROM
-                                        OroEmailBundle:EmailUser seu
-                                    JOIN
-                                        seu.email se
-                                    LEFT JOIN
-                                        se.thread sthread
-                                    WHERE
-                                        sthread.id IS NOT NULL AND sthread.id = thread.id AND seu.seen = false
-                                )
-                            )
+                        - e.head = true
         filters:
             columns:
                 subject: { type: string,   data_name: e.subject }
-                to:      { type: string,   data_name: r_to.name, label: oro.email.to.label }
-                ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
-                date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
+                from:    { type: string,   data_name: e.fromName, label: oro.email.from_email_address.label }
+                to:      { type: string,   data_name: r_to.name,  label: oro.email.to.label }
+                cc:      { type: string,   data_name: r_cc.name,  label: oro.email.cc.label, enabled: false }
+                bcc:     { type: string,   data_name: r_bcc.name, label: oro.email.bcc.label, enabled: false }
+                date:    { type: datetime, data_name: e.sentAt,   label: oro.email.date_time.label }
+
                 folder:
                     label: oro.email.message_type.label
                     type: multiselect-messagetype
@@ -300,6 +281,9 @@ datagrid:
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 icon: minus
+        options:
+            toolbarOptions:
+                addColumnManager: false
 
     dashboard-recent-emails-grid:
         source:
@@ -318,12 +302,9 @@ datagrid:
                             join: eu.email
                             alias: e
                     inner:
-                        - { join: eu.folder, alias: f }
+                        - { join: eu.folders, alias: f }
                         - { join: f.origin, alias: o }
                         - { join: e.fromEmailAddress, alias: a }
-                where:
-                    and:
-                        - o.id IN (:origin_ids)
         properties:
             id: ~
             row_class_name:

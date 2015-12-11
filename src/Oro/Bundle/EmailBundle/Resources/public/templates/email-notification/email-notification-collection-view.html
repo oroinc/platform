@@ -1,0 +1,33 @@
+<div class="content short-emails-list default-<% switch(defaultActionId) {
+    case 2: %>reply-action<% ; break;
+    case 3: %>forward-action<% ; break;
+    default: %>reply-all-action<% ; break;
+}%>">
+<% if (length > 0) { %>
+    <div class="header row-fluid">
+        <a class="my-emails pull-left" href="<%=userEmailsUrl %>">
+            <%=_.__('oro.email.notification.user_emails.label') %>
+        </a>
+        <% if (countNewEmail) { %>
+            <% if (hasMarkVisibleButton) { %>
+            <button class="mark-visible-as-read pull-right btn btn-primary">
+                <i class="icon-check"></i>
+                <%=_.__('oro.email.recent_emails_widget.mark_visible_read.label') %>
+            </button>
+            <% } %>
+            <% if (hasMarkAllButton) { %>
+            <button class="mark-as-read pull-right btn btn-primary">
+                <i class="icon-check"></i>
+                <%=_.__('oro.email.notification.mark_read.label') %>
+            </button>
+            <% } %>
+        <% } %>
+    </div>
+    <ul class="items"></ul>
+    <% if (moreUnreadEmails) { %>
+    <div class="more-unread">+<%=moreUnreadEmails %> <%=_.__('oro.email.notification.more_unread') %></div>
+    <% } %>
+<% } else { %>
+    <div class="empty"><%=_.__('oro.email.notification.empty') %></div>
+<% } %>
+</div>

@@ -23,7 +23,10 @@ parameters:
     oro_email.autoresponserule_manager.class:     Oro\Bundle\EmailBundle\Manager\AutoResponseManager
     oro_email.manager.email.api.class:            Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager
     oro_email.manager.email_origin.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailOriginApiEntityManager
+    oro_email.manager.email_activity.api.class:   Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
+    oro_email.manager.email_activity_entity.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityEntityApiEntityManager
     oro_email.manager.email_activity_search.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySearchApiEntityManager
+    oro_email.manager.email_activity_suggestion.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySuggestionApiEntityManager
     oro_email.entity.cache.warmer.class:          Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
     oro_email.entity.cache.clearer.class:         Oro\Bundle\EmailBundle\Cache\EntityCacheClearer
     oro_email.direct_mailer.class:                Oro\Bundle\EmailBundle\Mailer\DirectMailer
@@ -38,6 +41,7 @@ parameters:
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
     oro_email.email_websocket.processor.class:    Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor
+    oro_email.placeholder.send_email.filter.class: Oro\Bundle\EmailBundle\Placeholder\SendEmailPlaceholderFilter
 
     oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -45,9 +49,6 @@ parameters:
 
     # Email template API
     oro_email.manager.emailtemplate.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-
-    # Entity config event listener
-    oro_email.listener.config_subscriber.class: Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber
 
     # Entity email user listener
     oro_email.event_listener.email_user_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailUserListener
@@ -86,7 +87,6 @@ parameters:
     oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
     oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.recent.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener
-    oro_email.listener.datagrid.context.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\ContextGridListener
 
     # Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
@@ -105,7 +105,6 @@ parameters:
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
     oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
     oro_email.acl.voter.email_user_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailUserVoter
-    oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
 
     # Email DataGrid
     oro_email.datagrid.origin_folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
@@ -304,10 +303,6 @@ services:
         arguments:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @oro_entity_config.config_manager
-            - @oro_security.security_facade
-            - @router
 
     oro_email.manager.email_origin.api:
         class: %oro_email.manager.email_origin.api.class%
@@ -333,14 +328,16 @@ services:
     oro_email.cache:
           parent: oro.cache.abstract
           calls:
-              - [setNamespace, ['oro_email.cache']]
+              - [setNamespace, [ 'oro_email' ] ]
 
     # Available variables services
-    oro_email.listener.config_subscriber:
-        class:      %oro_email.listener.config_subscriber.class%
-        arguments:  [@oro_email.cache, %oro_email.cache.available_in_template_key%]
+    oro_email.listener.config_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\EntityConfigListener
+        arguments:
+            - @oro_email.cache
+            - %oro_email.cache.available_in_template_key%
         tags:
-            - { name: kernel.event_subscriber}
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
     # email template twig instance
     oro_email.twig.string_loader:
@@ -386,11 +383,11 @@ services:
         class: %oro_email.emailtemplate.variable_provider.entity.class%
         arguments:
             - @translator
-            - @oro_entity_config.provider.email
-            - @oro_entity_config.provider.entity
+            - @oro_entity_config.config_manager
             - @doctrine
             - @oro_ui.formatter
         lazy: true
+        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 
@@ -402,6 +399,7 @@ services:
             - @oro_config.user
             - @oro_locale.formatter.date_time
         lazy: true
+        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
@@ -414,6 +412,7 @@ services:
             - @oro_entity.entity_name_resolver
             - @oro_config.user
         lazy: true
+        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
@@ -579,6 +578,8 @@ services:
             - @oro_activity.manager
             - @oro_email.activity_list.provider
             - @oro_email.email.thread.provider
+            - @security.token_storage
+            - @oro_security.owner.entity_owner_accessor.link
 
     oro_email.email.thread.provider:
         class: %oro_email.email.thread.provider.class%
@@ -604,6 +605,7 @@ services:
             - @oro_email.manager.email_attachment_manager
             - @doctrine.orm.entity_manager
             - @oro_email.mailbox.process_storage
+            - @oro_security.security_facade
         tags:
             - { name: twig.extension }
 
@@ -611,6 +613,10 @@ services:
           class: %oro_email.listener.search_listener.class%
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 10 }
+
+    oro_email.link.entity_manager:
+        tags:
+            - { name: oro_service_link, service: doctrine.orm.entity_manager }
 
     oro_email.mailbox.process_storage.link:
         tags:
@@ -620,7 +626,7 @@ services:
         class: %oro_email.activity_list.provider.class%
         arguments:
            - @oro_entity.doctrine_helper
-           - @oro_entity_config.link.entity_manager
+           - @oro_email.link.entity_manager
            - @oro_entity.entity_name_resolver
            - @router
            - @oro_entity_config.config_manager
@@ -761,6 +767,16 @@ services:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
+            - @security.token_storage
+
+    oro_email.manager.email_activity_entity.api:
+        class: %oro_email.manager.email_activity_entity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.email.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+            - @security.token_storage
 
     oro_email.manager.email_activity_search.api:
         class: %oro_email.manager.email_activity_search.api.class%
@@ -770,6 +786,17 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
             - @oro_search.index
+            - @oro_entity.entity_name_resolver
+
+    oro_email.manager.email_activity_suggestion.api:
+        class: %oro_email.manager.email_activity_suggestion.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.email.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+            - @oro_search.index
+            - @oro_entity.entity_name_resolver
 
     oro_email.email.flag.manager:
         class: %oro_email.email.flag.manager.class%
@@ -791,9 +818,8 @@ services:
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @security.context
-            - @translator
+            - @doctrine
+            - @oro_security.security_facade
 
     oro_email.mailbox.process_storage:
         class: %oro_email.mailbox.process_storage.class%
@@ -918,3 +944,6 @@ services:
             - @doctrine.orm.entity_manager
         tags:
             - { name: oro_workflow.action, alias: add_email_activity_target }
+
+    oro_email.placeholder.send_email.filter:
+        class: %oro_email.placeholder.send_email.filter.class%

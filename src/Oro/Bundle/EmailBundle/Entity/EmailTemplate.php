@@ -150,7 +150,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @JMS\Type("string")
      * @JMS\Expose
      */
-    protected $type;
+    protected $type = 'html';
 
     /**
      * @var string

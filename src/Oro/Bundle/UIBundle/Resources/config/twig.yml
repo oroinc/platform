@@ -42,12 +42,19 @@ services:
     oro_ui.twig.mobile_extension:
         class: %oro_ui.twig.mobile.class%
         arguments:
-            - @service_container
+            - @oro_ui.user_agent_provider
         tags:
             - { name: twig.extension }
 
     oro_ui.twig.form_extension:
         class: %oro_ui.twig.form.class%
+        arguments:
+            - @event_dispatcher
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.view_extension:
+        class: Oro\Bundle\UIBundle\Twig\ViewExtension
         arguments:
             - @event_dispatcher
         tags:

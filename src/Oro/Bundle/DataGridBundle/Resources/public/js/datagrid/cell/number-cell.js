@@ -42,11 +42,30 @@ define([
         /**
          * @inheritDoc
          */
-        enterEditMode: function(e) {
+        render: function() {
+            var render = NumberCell.__super__.render.apply(this, arguments);
+
+            this.enterEditMode();
+
+            return render;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        enterEditMode: function() {
             if (this.column.get('editable')) {
-                e.stopPropagation();
+                NumberCell.__super__.enterEditMode.apply(this, arguments);
             }
-            return NumberCell.__super__.enterEditMode.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        exitEditMode: function() {
+            if (!this.column.get('editable')) {
+                NumberCell.__super__.exitEditMode.apply(this, arguments);
+            }
         }
     });
 

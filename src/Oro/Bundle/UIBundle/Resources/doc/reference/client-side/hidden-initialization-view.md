@@ -2,11 +2,6 @@
 ## HiddenInitializationView ⇐ <code>BaseView</code>
 **Kind**: global class  
 **Extends:** <code>BaseView</code>  
-
-* [HiddenInitializationView](#HiddenInitializationView) ⇐ <code>BaseView</code>
-  * [new HiddenInitializationView()](#new_HiddenInitializationView_new)
-  * [.autoRender](#HiddenInitializationView#autoRender)
-
 <a name="new_HiddenInitializationView_new"></a>
 ### new HiddenInitializationView()
 View allows hide part of DOM tree till all page components will be initialized
@@ -24,6 +19,3 @@ Usage sample:
 </div>
 ```
 
-<a name="HiddenInitializationView#autoRender"></a>
-### hiddenInitializationView.autoRender
-**Kind**: instance class of <code>[HiddenInitializationView](#HiddenInitializationView)</code>  

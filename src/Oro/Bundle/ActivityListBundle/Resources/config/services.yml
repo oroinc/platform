@@ -8,7 +8,6 @@ parameters:
     oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
-    oro_activity_list.event_listener.actitity_list_changes_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListChangesListener
     oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
     oro_activity_list.provider.email_recipients.class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
     oro_activity_list.event_listener.segment_widget_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener
@@ -28,11 +27,19 @@ parameters:
 
     # helper
     oro_activity_list.helper.acl_criteria.class: Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper
+    oro_activity_list.helper.activity_inheritance_targets.class: Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper
+
+    # Strategies
+    oro_activity_list.strategy.replace.class: Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy
+    oro_activity_list.strategy.unite.class: Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy
+    
+    # merge
+    oro_activity_list.listener.merge_listener.class: Oro\Bundle\ActivityListBundle\EventListener\MergeListener
+    oro_activity_list.accessor.activity.class: Oro\Bundle\ActivityListBundle\Model\Accessor\ActivityAccessor
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
         arguments:
-            - @doctrine
             - @oro_security.security_facade
             - @oro_entity.entity_name_resolver
             - @oro_datagrid.extension.pager.orm.pager
@@ -42,6 +49,7 @@ services:
             - @oro_comment.comment.api_manager
             - @oro_entity.doctrine_helper
             - @oro_activity_list.helper.acl_criteria
+            - @oro_activity_list.helper.activity_inheritance_targets
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
@@ -73,15 +81,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-
-    oro_activity_list.event_listener.actitity_list_changes_listener:
-        class:  %oro_activity_list.event_listener.actitity_list_changes_listener.class%
-        arguments:
-            - @oro_security.security_facade.link
-            - @oro_activity_list.provider.chain
-        tags:
-            - { name: doctrine.event_listener, event: prePersist }
-            - { name: doctrine.event_listener, event: preUpdate }
 
     oro_activity_list.provider.chain:
         class: %oro_activity_list.provider.chain.class%
@@ -183,3 +182,45 @@ services:
         arguments:
             - @oro_security.acl_helper
             - @oro_entity_config.link.security_context
+
+    oro_activity_list.helper.activity_inheritance_targets:
+        class: %oro_activity_list.helper.activity_inheritance_targets.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine
+   
+    # Strategies
+    oro_activity_list.strategy.replace:
+        class: %oro_activity_list.strategy.replace.class%
+        arguments:
+            - @oro_activity_list.manager
+            - @oro_entity.doctrine_helper
+            - @oro_activity.manager
+        tags:
+            - { name: oro_entity_merge.strategy }
+
+    oro_activity_list.strategy.unite:
+        class: %oro_activity_list.strategy.unite.class%
+        arguments:
+            - @oro_activity_list.manager
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: oro_entity_merge.strategy }
+
+    # Merge accessor
+    oro_activity_list.accessor.activity:
+        class: %oro_activity_list.accessor.activity.class%
+        arguments:
+          - @doctrine
+        tags:
+            - { name: oro_entity_merge.accessor }
+
+    # Merge listener
+    oro_activity_list.listener.merge_listener:
+        class: %oro_activity_list.listener.merge_listener.class%
+        arguments:
+          - @translator
+          - @oro_entity_config.provider.entity
+          - @oro_activity.manager
+        tags:
+          - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata, priority: -10 }

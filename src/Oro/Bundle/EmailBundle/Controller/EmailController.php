@@ -33,7 +33,6 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
@@ -60,7 +59,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-        $this->getEmailManager()->setSeenStatus($entity);
+        $this->getEmailManager()->setSeenStatus($entity, true);
 
         return [
             'entity' => $entity,
@@ -81,12 +80,13 @@ class EmailController extends Controller
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emailNotificationManager = $this->get('oro_email.manager.notification');
+
         return [
-            'clank_event' => WebSocketSendProcessor::getUserTopic($this->getUser(), $currentOrganization),
             'emails' => json_encode($emailNotificationManager->getEmails(
                 $this->getUser(),
                 $currentOrganization,
-                $maxEmailsDisplay
+                $maxEmailsDisplay,
+                null
             )),
             'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
         ];
@@ -94,6 +94,9 @@ class EmailController extends Controller
 
     /**
      * Get last N user emails (N - can be configured by application config)
+     * Extra GET params for Route:
+     *  "limit" - It defines amount of returned values.
+     *  "folderId" -  It defines folder id.
      *
      * @Route("/last", name="oro_email_last")
      * @AclAncestor("oro_email_email_view")
@@ -102,12 +105,22 @@ class EmailController extends Controller
      */
     public function lastAction()
     {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $maxEmailsDisplay = (int)$request->get('limit');
+        $folderId = (int)$request->get('folderId');
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
-        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        if (!$maxEmailsDisplay) {
+            $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        }
         $emailNotificationManager = $this->get('oro_email.manager.notification');
         $result = [
-            'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization),
-            'emails' => $emailNotificationManager->getEmails($this->getUser(), $currentOrganization, $maxEmailsDisplay)
+            'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization, $folderId),
+            'emails' => $emailNotificationManager->getEmails(
+                $this->getUser(),
+                $currentOrganization,
+                $maxEmailsDisplay,
+                $folderId
+            )
         ];
 
         return new JsonResponse($result);
@@ -120,7 +133,7 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
-        $this->getEmailManager()->setSeenStatus($entity, true);
+        $this->getEmailManager()->setSeenStatus($entity, true, true);
 
         return ['entity' => $entity];
     }
@@ -378,51 +391,6 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/context/{id}", name="oro_email_context", requirements={"id"="\d+"})
-     * @Template("OroEmailBundle:Email:context.html.twig")
-     * @AclAncestor("oro_email_email_view")
-     *
-     * @param Email $emailEntity
-     *
-     * @return array
-     */
-    public function contextAction(Email $emailEntity)
-    {
-        $entityTargets = $this->get('oro_entity.entity_context_provider')->getSupportedTargets($emailEntity);
-        return [
-            'sourceEntity' => $emailEntity,
-            'entityTargets' => $entityTargets,
-            'params' => [
-                'grid_path' => $this->generateUrl(
-                    'oro_email_context_grid',
-                    ['activityId' => $emailEntity->getId()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                )
-            ]
-        ];
-    }
-
-    /**
-     * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
-     * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
-     *
-     * @param string $entityClass
-     * @param string $activityId
-     *
-     * @return array
-     */
-    public function contextGridAction($activityId, $entityClass = null)
-    {
-        $gridName = $this->get('oro_entity.entity_context_provider')->getContextGridByEntity($entityClass);
-        return [
-            'gridName' => $gridName,
-            'multiselect' => false,
-            'params' => ['activityId' => $activityId],
-            'renderParams' => []
-        ];
-    }
-
-    /**
      * Togle user emails seen status
      *
      * @Route("/toggle-seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
@@ -434,35 +402,33 @@ class EmailController extends Controller
      */
     public function toggleSeenAction(EmailUser $emailUser)
     {
-        if ($emailUser) {
-            $this->getEmailManager()->toggleEmailUserSeen($emailUser);
-        }
+        $this->getEmailManager()->toggleEmailUserSeen($emailUser);
 
-        return new JsonResponse(['successful' => (bool)$emailUser]);
+        return new JsonResponse(['successful' => true]);
     }
 
     /**
-     * Mark email as seen for user
+     * Change email seen status for current user for single email or thread
      *
-     * @Route("/mark-seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
+     * @Route(
+     *      "/mark-seen/{id}/{status}/{checkThread}",
+     *      name="oro_email_mark_seen",
+     *      requirements={"id"="\d+", "status"="\d+", "checkThread"="\d+"},
+     *      defaults={"checkThread"=true}
+     * )
      * @AclAncestor("oro_email_email_user_edit")
      *
      * @param Email $email
      * @param string $status
+     * @param bool $checkThread if false it will be applied for single email instead of thread
      *
      * @return JsonResponse
      */
-    public function markSeenAction(Email $email, $status)
+    public function markSeenAction(Email $email, $status, $checkThread)
     {
-        if ($email) {
-            if ((bool)$status) {
-                $this->getEmailManager()->setSeenStatus($email, true);
-            } else {
-                $this->getEmailManager()->setUnseenStatus($email, true);
-            }
-        }
+        $this->getEmailManager()->setSeenStatus($email, (bool) $status, (bool) $checkThread);
 
-        return new JsonResponse(['successful' => (bool)$email]);
+        return new JsonResponse(['successful' => true]);
     }
 
     /**
@@ -476,10 +442,11 @@ class EmailController extends Controller
     {
         $loggedUser = $this->get('oro_security.security_facade')->getLoggedUser();
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        $ids = $this->container->get('request_stack')->getCurrentRequest()->query->get('ids', []);
         $result = false;
 
         if ($loggedUser) {
-            $result = $this->getEmailManager()->markAllEmailsAsSeen($loggedUser, $currentOrganization);
+            $result = $this->getEmailManager()->markAllEmailsAsSeen($loggedUser, $currentOrganization, $ids);
         }
 
         return new JsonResponse(['successful' => (bool)$result]);

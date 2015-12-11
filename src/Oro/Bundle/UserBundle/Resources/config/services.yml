@@ -34,6 +34,8 @@ parameters:
     oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
 
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
+    oro_user.provider.filter.user_choice_tree.class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
+
 
 services:
     oro_user.manager:
@@ -73,7 +75,7 @@ services:
     oro_user.cache:
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_user.cache" ] ]
+            - [ setNamespace, [ 'oro_user' ] ]
 
     oro_user.user_menu:
         class:                        %oro_user.user_menu.builder.class%
@@ -289,10 +291,17 @@ services:
             - @session.flash_bag
             - @translator
 
-    oro_email.listener.datagrid.context.user:
-        class: %oro_email.listener.datagrid.context.class%
+    oro_activity.listener.datagrid.context.user:
+        class: %oro_activity.listener.datagrid.context.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_class_name_helper
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-for-context-grid, method: onBuildAfter }
 
+
+    oro_user.provider.filter.user_choice_tree:
+        class: %oro_user.provider.filter.user_choice_tree.class%
+        arguments:
+            - @doctrine
+            - @oro_security.acl_helper

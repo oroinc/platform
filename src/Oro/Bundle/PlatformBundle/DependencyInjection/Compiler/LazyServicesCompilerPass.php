@@ -24,7 +24,7 @@ class LazyServicesCompilerPass implements CompilerPassInterface
         $this->setLazyServicesByConfig($container);
 
         foreach ($this->lazyServicesTags as $tagName) {
-            $this->setLazyServicesByTag($container, $tagName);
+            $this->setLazyPrivateServicesByTag($container, $tagName);
         }
     }
 
@@ -56,13 +56,13 @@ class LazyServicesCompilerPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @param string $tagName
      */
-    protected function setLazyServicesByTag(ContainerBuilder $container, $tagName)
+    protected function setLazyPrivateServicesByTag(ContainerBuilder $container, $tagName)
     {
         $lazyServices = array_keys($container->findTaggedServiceIds($tagName));
 
         foreach ($lazyServices as $serviceId) {
             if ($container->hasDefinition($serviceId)) {
-                $container->getDefinition($serviceId)->setLazy(true);
+                $container->getDefinition($serviceId)->setLazy(true)->setPublic(false);
             }
         }
     }

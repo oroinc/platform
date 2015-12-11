@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -345,7 +345,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'multiple' => false
                         ],
                     ],
-                    'mode'    => ConfigModelManager::MODE_HIDDEN,
+                    'mode'    => ConfigModel::MODE_HIDDEN,
                     'fields'  => [
                         'id'       => [
                             'configs' => [
@@ -458,7 +458,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'test_attr' => 'test'
                         ],
                     ],
-                    'mode'    => ConfigModelManager::MODE_HIDDEN,
+                    'mode'    => ConfigModel::MODE_HIDDEN,
                     'fields'  => [
                         'id'       => [
                             'configs' => [
@@ -645,87 +645,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 ],
                                 'enum'   => [
                                     'enum_code' => $enumCode
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
-            ]
-        );
-    }
-
-    public function testAddOptionSetWithNoOptions()
-    {
-        $schema    = $this->getExtendSchema();
-        $extension = $this->getExtendExtension();
-
-        $table1 = $schema->createTable('table1');
-        $table1->addColumn('id', 'integer');
-        $extension->addOptionSet(
-            $schema,
-            $table1,
-            'option_set1'
-        );
-
-        $this->assertSchemaSql(
-            $schema,
-            [
-                'CREATE TABLE table1 (id INT NOT NULL)'
-            ]
-        );
-        $this->assertExtendOptions(
-            $schema,
-            [
-                'Acme\AcmeBundle\Entity\Entity1' => [
-                    'fields' => [
-                        'option_set1' => [
-                            'type'    => 'optionSet',
-                            'configs' => [
-                                'extend' => [
-                                    'is_extend' => true,
-                                    'owner'     => ExtendScope::OWNER_SYSTEM
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
-            ]
-        );
-    }
-
-    public function testAddOptionSet()
-    {
-        $schema    = $this->getExtendSchema();
-        $extension = $this->getExtendExtension();
-
-        $table1 = $schema->createTable('table1');
-        $table1->addColumn('id', 'integer');
-        $extension->addOptionSet(
-            $schema,
-            $table1,
-            'option_set1',
-            [
-                'extend' => ['is_extend' => true]
-            ]
-        );
-
-        $this->assertSchemaSql(
-            $schema,
-            [
-                'CREATE TABLE table1 (id INT NOT NULL)'
-            ]
-        );
-        $this->assertExtendOptions(
-            $schema,
-            [
-                'Acme\AcmeBundle\Entity\Entity1' => [
-                    'fields' => [
-                        'option_set1' => [
-                            'type'    => 'optionSet',
-                            'configs' => [
-                                'extend' => [
-                                    'is_extend' => true,
-                                    'owner'     => ExtendScope::OWNER_SYSTEM
                                 ]
                             ]
                         ]

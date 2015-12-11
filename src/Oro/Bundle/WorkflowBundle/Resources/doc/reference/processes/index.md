@@ -80,6 +80,8 @@ definitions:                                                 # list of definitio
         entity: OroCRM\Bundle\ContactBundle\Entity\Contact   # related entity
         order: 20                                            # processing order
         exclude_definitions: [contact_definition]            # during handling those definitions won't trigger
+        pre_conditions:                                      # List of preconditions to check before scheduling process
+            @equal: [$source.name, 'other']                  # Perform process only for entities that have "other" source
         actions_configuration:                               # list of actions to perform
             - @find_entity:                                  # find existing entity
                 conditions:                                  # action conditions
@@ -152,9 +154,9 @@ REST API
 OroWorkflowBundle provides REST API that allows activation and deactivation of processes.
 
 Activation URL attributes:
-* **route:** ``oro_workflow_api_rest_process_activate``
+* **route:** ``oro_api_process_activate``
 * **parameter:** workflowDefinition - name of the appropriate process definition
 
 Deactivation URL attributes:
-* **route:** ``oro_workflow_api_rest_process_deactivate``
+* **route:** ``oro_api_process_deactivate``
 * **parameter:** workflowDefinition - name of the appropriate process definition

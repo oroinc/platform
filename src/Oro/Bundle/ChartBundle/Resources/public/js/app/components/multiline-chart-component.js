@@ -159,7 +159,7 @@ define(function(require) {
                         title: this.narrowScreen ? ' ' : options.data_schema.label.label,
                         mode:    options.xaxis.mode,
                         noTicks: options.xaxis.noTicks,
-                        labelsAngle: this.narrowScreen ? 45 : 0,
+                        labelsAngle: this.narrowScreen ? 90 : 0,
                         margin: true
                     },
                     HtmlText: false,

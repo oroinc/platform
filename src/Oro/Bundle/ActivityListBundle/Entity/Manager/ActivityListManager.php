@@ -8,6 +8,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
+use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
@@ -21,12 +23,11 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
+use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ActivityListManager
 {
-    /** @var EntityManager */
-    protected $em;
-
     /** @var Pager */
     protected $pager;
 
@@ -51,8 +52,10 @@ class ActivityListManager
     /** @var ActivityListAclCriteriaHelper */
     protected $activityListAclHelper;
 
+    /** @var ActivityInheritanceTargetsHelper */
+    protected $activityInheritanceTargetsHelper;
+
     /**
-     * @param Registry                      $doctrine
      * @param SecurityFacade                $securityFacade
      * @param EntityNameResolver            $entityNameResolver
      * @param Pager                         $pager
@@ -62,11 +65,11 @@ class ActivityListManager
      * @param CommentApiManager             $commentManager
      * @param DoctrineHelper                $doctrineHelper
      * @param ActivityListAclCriteriaHelper $aclHelper
+     * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        Registry $doctrine,
         SecurityFacade $securityFacade,
         EntityNameResolver $entityNameResolver,
         Pager $pager,
@@ -75,9 +78,9 @@ class ActivityListManager
         ActivityListFilterHelper $activityListFilterHelper,
         CommentApiManager $commentManager,
         DoctrineHelper $doctrineHelper,
-        ActivityListAclCriteriaHelper $aclHelper
+        ActivityListAclCriteriaHelper $aclHelper,
+        ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
     ) {
-        $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
         $this->entityNameResolver       = $entityNameResolver;
         $this->pager                    = $pager;
@@ -87,6 +90,7 @@ class ActivityListManager
         $this->commentManager           = $commentManager;
         $this->doctrineHelper           = $doctrineHelper;
         $this->activityListAclHelper    = $aclHelper;
+        $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
     }
 
     /**
@@ -94,7 +98,7 @@ class ActivityListManager
      */
     public function getRepository()
     {
-        return $this->em->getRepository(ActivityList::ENTITY_NAME);
+        return $this->doctrineHelper->getEntityRepository(ActivityList::ENTITY_NAME);
     }
 
     /**
@@ -107,10 +111,7 @@ class ActivityListManager
      */
     public function getList($entityClass, $entityId, $filter, $page)
     {
-        $qb = $this->getBaseQB($entityClass, $entityId);
-
-        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
-        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        $qb = $this->prepareQB($entityClass, $entityId, $filter);
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
@@ -131,13 +132,11 @@ class ActivityListManager
      * @param integer $entityId
      * @param array   $filter
      *
-     * @return ActivityList[]
+     * @return int
      */
     public function getListCount($entityClass, $entityId, $filter)
     {
-        $qb = $this->getBaseQB($entityClass, $entityId);
-        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
-        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        $qb = $this->prepareQB($entityClass, $entityId, $filter);
         $qb->resetDQLPart('orderBy');
 
         $query             = $qb->getQuery();
@@ -152,7 +151,7 @@ class ActivityListManager
 
         $result = $statement->fetchColumn();
 
-        return $result;
+        return (int)$result;
     }
 
     /**
@@ -368,5 +367,113 @@ class ActivityListManager
         }
 
         return $relatedActivityEntities;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param int $entityId
+     * @param array $filter
+     *
+     * @return QueryBuilder
+     */
+    protected function prepareQB($entityClass, $entityId, $filter)
+    {
+        $qb = $this->getBaseQB($entityClass, $entityId);
+        $this->activityInheritanceTargetsHelper
+            ->applyInheritanceActivity($qb, $entityClass, $entityId);
+        if ($this->config->get('oro_activity_list.grouping')) {
+            $qb->andWhere($qb->expr()->andX('activity.head = true'));
+        }
+        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        return $qb;
+    }
+
+    /**
+     * This method should be used for fast changing data in 'relation' tables, because
+     * it uses Plain SQL for updating data in tables.
+     * Currently there is no another way for updating big amount of data: with Doctrine way
+     * it takes a lot of time(because of big amount of operations with objects, event listeners etc.);
+     * with DQL currently it impossible to build query, because DQL works only with entities, but
+     * 'relation' tables are not entities. For example: there is 'relation'
+     * table 'oro_rel_c3990ba6b28b6f38c460bc' and it has activitylist_id and account_id columns,
+     * in fact to solve initial issue with big amount of data we need update only account_id column
+     * with new values.
+     *
+     * @param array       $activityIds
+     * @param string      $targetClass
+     * @param integer     $oldTargetId
+     * @param integer     $newTargetId
+     * @param null|string $activityClass
+     *
+     * @return $this
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     */
+    public function replaceActivityTargetWithPlainQuery(
+        array $activityIds,
+        $targetClass,
+        $oldTargetId,
+        $newTargetId,
+        $activityClass = null
+    ) {
+        if (is_null($activityClass)) {
+            $associationName = $this->getActivityListAssociationName($targetClass);
+            $entityClass = ActivityList::ENTITY_NAME;
+        } else {
+            $associationName = $this->getActivityAssociationName($targetClass);
+            $entityClass = $activityClass;
+        }
+
+        $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        if (!empty($activityIds) && $entityMetadata->hasAssociation($associationName)) {
+            $association = $entityMetadata->getAssociationMapping($associationName);
+            $tableName = $association['joinTable']['name'];
+            $activityField = current(array_keys($association['relationToSourceKeyColumns']));
+            $targetField = current(array_keys($association['relationToTargetKeyColumns']));
+
+            $where = "WHERE $targetField = :sourceEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
+            $dbConnection = $this->doctrineHelper
+                ->getEntityManager(ActivityList::ENTITY_NAME)
+                ->getConnection()
+                ->prepare("UPDATE $tableName SET $targetField = :masterEntityId $where");
+
+            $dbConnection->bindValue('masterEntityId', $newTargetId);
+            $dbConnection->bindValue('sourceEntityId', $oldTargetId);
+            $dbConnection->execute();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get Activity List Association name
+     *
+     * @param string $className
+     *
+     * @return string
+     */
+    protected function getActivityListAssociationName($className)
+    {
+        return ExtendHelper::buildAssociationName(
+            $className,
+            ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
+        );
+    }
+
+    /**
+     * Get Activity Association name
+     *
+     * @param string $className
+     *
+     * @return string
+     */
+    protected function getActivityAssociationName($className)
+    {
+        return ExtendHelper::buildAssociationName(
+            $className,
+            ActivityScope::ASSOCIATION_KIND
+        );
     }
 }

@@ -1,5 +1,4 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-
 <script type="text/template" id="email-notification-item-template">
     <div class="info" data-id="<%= id %>">
         <div class="body">
@@ -7,10 +6,10 @@
             <div class="description nowrap-ellipsis"><%= bodyContent %></div>
         </div>
         <% if (seen) {  %>
-            <i class="icon-envelope"></i>
+        <i class="icon-envelope" title="{{ 'oro.email.datagrid.emails.action.mark_as_unread'|trans }}" data-role="toggle-read-status"></i>
         <% } else { %>
-            <i class="icon-envelope new"></i>
-        <% }  %>
+        <i class="icon-envelope highlight" title="{{ 'oro.email.datagrid.emails.action.mark_as_read'|trans }}" data-role="toggle-read-status"></i>
+        <% } %>
     </div>
     <div class="footer row-fluid">
         <span class="pull-left fromName">
@@ -20,17 +19,14 @@
                 <%= fromName %>
             <% } %>
         </span>
-        <span class="pull-right replay">
+        <span class="pull-right reply-all-action">
             {{- UI.clientLink({
-                'dataUrl': "<%= route %>",
+                'dataUrlRaw': "<%= replyAllRoute %>",
                 'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-                'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply' : 'icon-reply',
-                'label': 'oro.email.reply'|trans,
+                'label': 'oro.email.reply_all'|trans,
                 'widget': {
                     'type': 'dialog',
                     'multiple': false,
-                    'refresh-widget-alias': 'activity-list-widget',
-                    'reload-widget-alias': 'thread-view',
                     'options': {
                         'alias': 'reply-dialog',
                         'dialogOptions' : {
@@ -45,54 +41,66 @@
                 }
             }) -}}
         </span>
+        <span class="pull-right reply-action">
+            {{- UI.clientLink({
+                'dataUrlRaw': "<%= replyRoute %>",
+                'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+                'label': 'oro.email.reply'|trans,
+                'widget': {
+                    'type': 'dialog',
+                    'multiple': false,
+                    'options': {
+                        'alias': 'reply-dialog',
+                        'dialogOptions' : {
+                            'title' : 'oro.email.reply_all'|trans,
+                            'allowMaximize': true,
+                            'allowMinimize': true,
+                            'dblclick': 'maximize',
+                            'maximizedHeightDecreaseBy': 'minimize-bar',
+                            'width': 1000
+                        }
+                    }
+                }
+            }) -}}
+        </span>
+        <span class="pull-right forward-action">
+            {{- UI.clientLink({
+                'dataUrlRaw': "<%= forwardRoute %>",
+                'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+                'label': 'oro.email.forward'|trans,
+                'widget': {
+                    'type': 'dialog',
+                    'multiple': false,
+                    'options': {
+                        'alias': 'reply-dialog',
+                        'dialogOptions' : {
+                            'title' : 'oro.email.forward'|trans,
+                            'allowMaximize': true,
+                            'allowMinimize': true,
+                            'dblclick': 'maximize',
+                            'maximizedHeightDecreaseBy': 'minimize-bar',
+                            'width': 1000
+                        }
+                    }
+                }
+            }) -}}
+        </span>
     </div>
 </script>
-{% if count > 0 %}
-    {%  set classNew = 'new' %}
-{% else %}
-    {%  set classNew = '' %}
-{% endif %}
-
-{% set options = {
-    'clank_event': clank_event,
-    'emails': emails,
-    'count': count
-} %}
-
+{% if oro_config_value('oro_email.show_recent_emails_in_user_bar') %}
 <li class="email-notification-menu dropdown"
-    data-page-component-options="{{ options|json_encode }}"
-    data-layout="separate"
-    style="display: none;">
-    <a href="#" class="oro-dropdown-toggle">
-        <i class="icon-envelope {{ classNew }}">
-            <span>
-                {% if (count > 10) %}
-                    10+
-                {% elseif (count > 0 ) %}
-                    {{ count }}
-                {% endif %}
-            </span>
-        </i>
-    </a>
-    <div class="dropdown-menu pull-right" tabindex="0">
-        <div class="content" >
-            <div class="header row-fluid">
-                <a class="my-emails pull-left" href="{{ path("oro_email_user_emails") }}">
-                    {{ "oro.email.menu.user_emails"|trans }}
-                </a>
-                <button class="mark-as-read pull-right btn btn-primary">
-                    <i class="icon-check"></i>
-                    {{ "oro.email.notification.mark_read.label"|trans }}
-                </button>
-            </div>
-            <ul class="items">
-            </ul>
-        </div>
-        <div class="empty">
-            {{ "oro.email.notification.empty"|trans }}
-        </div>
-        <div class="notification">
-            {{ "oro.email.notification.new_email"|trans }}
-        </div>
-    </div>
+    title="{{ 'oro.email.notification.menu_item.hint'|trans }}"
+    data-page-component-options="{{ {
+        'emails': emails,
+        'count': count,
+        'hasMarkAllButton': true,
+        'clankEvent': oro_get_email_clank_event()
+    }|json_encode }}"
+    data-layout="separate">
+    {% if isDesktopVersion() %}
+    <a href="#" class="oro-dropdown-toggle email-notification-icon"></a>
+    {% endif %}
+    <div class="dropdown-menu pull-right" tabindex="0"></div>
+    <div class="new-email-notification"> {{ 'oro.email.notification.new_email'|trans }}</div>
 </li>
+{% endif %}

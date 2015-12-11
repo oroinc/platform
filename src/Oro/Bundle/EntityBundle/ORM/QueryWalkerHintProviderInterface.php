@@ -2,17 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
+use Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface as BaseQueryWalkerHintProviderInterface;
+
 /**
- * An interface for providers of query walker hints
+ * @deprecated since 1.9. use {@see Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface}
  */
-interface QueryWalkerHintProviderInterface
+interface QueryWalkerHintProviderInterface extends BaseQueryWalkerHintProviderInterface
 {
-    /**
-     * Returns the list of hints of a query walker
-     *
-     * @param mixed $params The walker parameters
-     *
-     * @return array
-     */
-    public function getHints($params);
 }

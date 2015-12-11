@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
+use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
 class FieldType extends AbstractType
 {
@@ -23,66 +24,34 @@ class FieldType extends AbstractType
     const GROUP_FIELDS                   = 'fields';
     const GROUP_RELATIONS                = 'relations';
 
-    /**
-     * @var array
-     */
-    protected $types = [
-        self::GROUP_FIELDS       => [
-            'string',
-            'integer',
-            'smallint',
-            'bigint',
-            'boolean',
-            'decimal',
-            'date',
-            'datetime',
-            'text',
-            'float',
-            'money',
-            'percent',
-            'file',
-            'image',
-            'optionSet',
-            'enum',
-            'multiEnum',
-        ],
-        self::GROUP_RELATIONS    => [
-//            BAP-5875
-//            RelationTypeBase::ONE_TO_ONE,
-            RelationTypeBase::ONE_TO_MANY,
-            RelationTypeBase::MANY_TO_ONE,
-            RelationTypeBase::MANY_TO_MANY,
-        ],
-    ];
-
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var ExtendDbIdentifierNameGenerator
-     */
+    /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var FieldTypeProvider */
+    protected $fieldTypeProvider;
+
     /**
-     * @param ConfigManager                   $configManager
-     * @param TranslatorInterface             $translator
+     * @param ConfigManager $configManager
+     * @param TranslatorInterface $translator
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param FieldTypeProvider $fieldTypeProvider
      */
     public function __construct(
         ConfigManager $configManager,
         TranslatorInterface $translator,
-        ExtendDbIdentifierNameGenerator $nameGenerator
+        ExtendDbIdentifierNameGenerator $nameGenerator,
+        FieldTypeProvider $fieldTypeProvider
     ) {
         $this->configManager = $configManager;
-        $this->translator    = $translator;
+        $this->translator = $translator;
         $this->nameGenerator = $nameGenerator;
+        $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
     /**
@@ -161,10 +130,10 @@ class FieldType extends AbstractType
     {
         $fieldTypes = $relationTypes = [];
 
-        foreach ($this->types[self::GROUP_FIELDS] as $type) {
+        foreach ($this->fieldTypeProvider->getSupportedFieldTypes() as $type) {
             $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
-        foreach ($this->types[self::GROUP_RELATIONS] as $type) {
+        foreach ($this->fieldTypeProvider->getSupportedRelationTypes() as $type) {
             $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
 

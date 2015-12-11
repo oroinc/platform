@@ -1,0 +1,96 @@
+.grid-toolbar {
+  padding: @contentPadding 10px;
+  margin-bottom: -@contentPadding;
+  &:after {
+    content: '';
+    clear: both;
+    display: table;
+    line-height: 0;
+  }
+  label {
+    font-size: @baseFontSize;
+    line-height: 32px;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    vertical-align: top;
+  }
+  .pagination-container {
+    min-width: 210px;
+    box-sizing: content-box;
+    margin-bottom: @contentPadding / 2;
+  }
+  .separator{
+    float: left;
+    margin: 0 10px;
+  }
+  .pagination {
+    float: left;
+    margin-left: 0;
+    .icons-holder{
+      text-align: center;
+    }
+    & > ul > li a {
+      width: 28px;
+      height: 32px;
+    }
+    input[type="number"] {
+      width: 28px;
+      height: 22px;
+    }
+  }
+  .btn-group {
+    .btn {
+      height: 32px;
+      padding-left: 12px;
+      padding-right: 14px;
+      font-size: @baseFontSize;
+      &.dropdown-toggle{
+        padding-right: 9px;
+      }
+      .caret {
+        margin-left: 12px;
+      }
+    }
+    & > .dropdown-menu li a {
+      padding-left: 12px;
+      padding-right: 21px;
+    }
+  }
+  .separator{
+    line-height: 27px;
+    font-size: 32px;
+    color: transparent;
+    text-align: center;
+    height: 0;
+    overflow: hidden;
+    .forScreen(430px, height, 32px);
+  }
+}
+
+.other-scroll-container {
+  margin: 10px 10px 10px 10px;
+}
+.grid-scrollable-container {
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
+  margin: 0;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  border: none;
+  max-width: auto;
+  width: auto;
+  > .loader-mask {
+    left: @verticalPadding;
+    right: @verticalPadding;
+    top: @topPadding;
+  }
+
+  .grid-container {
+    table.grid {
+      width: auto;
+      max-width: none;
+      min-width: 100%;
+    }
+  }
+}

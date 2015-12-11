@@ -8,14 +8,15 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailUserRepository extends EntityRepository
 {
     /**
-     * @param Email $email
-     * @param User $user
+     * @param Email        $email
+     * @param User         $user
      * @param Organization $organisation
      *
      * @return EmailUser[]
@@ -23,8 +24,8 @@ class EmailUserRepository extends EntityRepository
     public function findByEmailAndOwner(Email $email, User $user, Organization $organisation)
     {
         return $this->findBy([
-            'email' => $email,
-            'owner' => $user,
+            'email'        => $email,
+            'owner'        => $user,
             'organization' => $organisation
         ]);
     }
@@ -45,17 +46,17 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
-     * @param array $folderTypes
-     * @param bool $isSeen
+     * @param array        $folderTypes
+     * @param bool         $isSeen
      * @return array
      */
     public function getEmailUserList(User $user, Organization $organization, array $folderTypes = [], $isSeen = null)
     {
         $qb = $this->createQueryBuilder('eu');
         $qb
-            ->join('eu.folder', 'f')
+            ->join('eu.folders', 'f')
             ->join('f.origin', 'o')
             ->andWhere($qb->expr()->eq('eu.owner', $user->getId()))
             ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()))
@@ -68,7 +69,7 @@ class EmailUserRepository extends EntityRepository
 
         if ($isSeen !== null) {
             $qb->andWhere($qb->expr()->eq('eu.seen', ':seen'))
-            ->setParameter('seen', (bool)$isSeen);
+                ->setParameter('seen', (bool) $isSeen);
         }
 
         return $qb->getQuery()->getResult();
@@ -85,7 +86,8 @@ class EmailUserRepository extends EntityRepository
         $qb = $this->createQueryBuilder('email_user');
 
         $qb->select('email_user.id')
-            ->andWhere('email_user.folder = :folder')
+            ->leftJoin('email_user.folders', 'folders')
+            ->andWhere($qb->expr()->in('folders', ':folder'))
             ->setParameter('folder', $folder);
 
         if ($ids) {
@@ -123,28 +125,33 @@ class EmailUserRepository extends EntityRepository
     /**
      * Get all unseen user email
      *
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
      * @return mixed
      */
-    public function findUnseenUserEmail(User $user, Organization $organization)
+    public function findUnseenUserEmail(User $user, Organization $organization, $ids = [])
     {
         $qb = $this->createQueryBuilder('eu');
-
-        return $qb
-            ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
+        $qb->andWhere($qb->expr()->eq('eu.owner', ':owner'))
             ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
             ->andWhere($qb->expr()->eq('eu.seen', ':seen'))
             ->setParameter('owner', $user)
             ->setParameter('organization', $organization)
             ->setParameter('seen', false);
+
+        if (!empty($ids)) {
+            $qb->andWhere($qb->expr()->in('eu.email', ':ids'))
+                ->setParameter('ids', $ids);
+        }
+
+        return $qb;
     }
 
     /**
-     * @param array $ids
-     * @param User $user
-     * @param string $folderType
-     * @param bool $isAllSelected
+     * @param array                $ids
+     * @param User                 $user
+     * @param string|string[]|null $folderType
+     * @param bool                 $isAllSelected
      * @return QueryBuilder
      */
     public function getEmailUserBuilderForMassAction($ids, User $user, $folderType, $isAllSelected)
@@ -168,7 +175,7 @@ class EmailUserRepository extends EntityRepository
 
     /**
      * @param array $threadIds
-     * @param User $user
+     * @param User  $user
      * @return QueryBuilder
      */
     public function getEmailUserByThreadId($threadIds, User $user)
@@ -188,11 +195,20 @@ class EmailUserRepository extends EntityRepository
      *
      * @return QueryBuilder
      */
-    public function getEmailUserByFolder($folder)
+    public function getEmailUserByFolder($folder, $limit = null, $offset = null)
     {
-        $queryBuilder = $this->createQueryBuilder('eu')
-            ->andWhere('eu.folder = :folder')
-            ->setParameter('folder', $folder);
+        $queryBuilder = $this->createQueryBuilder('eu');
+        $queryBuilder
+            ->leftJoin('eu.folders', 'folders')
+            ->andWhere($queryBuilder->expr()->in('folders', ':folder'))
+            ->setParameter('folder', $folder->getId())
+            ->groupBy('eu');
+        if ($offset) {
+            $queryBuilder->setFirstResult($offset);
+        }
+        if ($limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
 
         return $queryBuilder;
     }
@@ -205,17 +221,19 @@ class EmailUserRepository extends EntityRepository
     public function getEmailUsersByFolderAndMessageIds(EmailFolder $folder, array $messages)
     {
         return $this
-            ->getEmailUserByFolder($folder)
+            ->createQueryBuilder('eu')
             ->leftJoin('eu.email', 'email')
             ->andWhere('email.messageId IN (:messageIds)')
+            ->andWhere('eu.origin IN (:origin)')
             ->setParameter('messageIds', $messages)
+            ->setParameter('origin', $folder->getOrigin())
             ->getQuery()
             ->getResult();
     }
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param User $user
+     * @param User         $user
      * @return $this
      */
     protected function applyOwnerFilter(QueryBuilder $queryBuilder, User $user)
@@ -228,7 +246,7 @@ class EmailUserRepository extends EntityRepository
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param array $ids
+     * @param array        $ids
      * @return $this
      */
     protected function applyIdFilter(QueryBuilder $queryBuilder, $ids)
@@ -241,27 +259,45 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     * @param string $type
+     * @param QueryBuilder    $queryBuilder
+     * @param string|string[] $type
      * @return $this
      */
     protected function applyFolderFilter(QueryBuilder $queryBuilder, $type)
     {
-        $queryBuilder->join('eu.folder', 'f');
-        $queryBuilder->andWhere($queryBuilder->expr()->eq('f.type', $queryBuilder->expr()->literal($type)));
+        $queryBuilder->join('eu.folders', 'f');
+
+        if (!is_array($type)) {
+            $type = [$type];
+        }
+
+        $expressions = [];
+        foreach ($type as $folderType) {
+            $expressions[] = $queryBuilder->expr()->eq('f.type', $queryBuilder->expr()->literal($folderType));
+        }
+
+        /**
+         * In case of "inbox" type we should include "other" type too.
+         * Case with selective email folder sync, e.g. when syncing some folder different from "Inbox".
+         */
+        if (in_array(FolderType::INBOX, $type)) {
+            $expressions[] = $queryBuilder->expr()->eq('f.type', $queryBuilder->expr()->literal(FolderType::OTHER));
+        }
+
+        $expr = call_user_func_array([$queryBuilder->expr(), 'orX'], $expressions);
+        $queryBuilder->andWhere($expr);
 
         return $this;
     }
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param bool $isHead
+     * @param bool         $isHead
      */
     protected function applyHeadFilter(QueryBuilder $queryBuilder, $isHead = true)
     {
-        $queryBuilder->add(
-            'where',
-            $queryBuilder->expr()->andX($queryBuilder->expr()->eq('e.head', ':head'))
-        )->setParameters(['head' => (bool)$isHead]);
+        $queryBuilder
+            ->add('where', $queryBuilder->expr()->andX($queryBuilder->expr()->eq('e.head', ':head')))
+            ->setParameters(['head' => (bool) $isHead]);
     }
 }

@@ -58,17 +58,20 @@ class EmailNotificationManager
     }
 
     /**
-     * @param User $user
-     * @param $maxEmailsDisplay
+     * @param User          $user
+     * @param Organization  $organization
+     * @param int           $maxEmailsDisplay
+     * @param int|null      $folderId
      *
      * @return array
      */
-    public function getEmails(User $user, Organization $organization, $maxEmailsDisplay)
+    public function getEmails(User $user, Organization $organization, $maxEmailsDisplay, $folderId)
     {
         $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails(
             $user,
             $organization,
-            $maxEmailsDisplay
+            $maxEmailsDisplay,
+            $folderId
         );
 
         $emailsData = [];
@@ -88,9 +91,12 @@ class EmailNotificationManager
                 // no content
             }
 
+            $emailId = $email->getId();
             $emailsData[] = [
-                'route' => $this->router->generate('oro_email_email_reply', ['id' => $email->getId()]),
-                'id' => $email->getId(),
+                'replyRoute' => $this->router->generate('oro_email_email_reply', ['id' => $emailId]),
+                'replyAllRoute' => $this->router->generate('oro_email_email_reply_all', ['id' => $emailId]),
+                'forwardRoute' => $this->router->generate('oro_email_email_forward', ['id' => $emailId]),
+                'id' => $emailId,
                 'seen' => $isSeen,
                 'subject' => $email->getSubject(),
                 'bodyContent' => $bodyContent,
@@ -106,12 +112,14 @@ class EmailNotificationManager
      * Get count new emails
      *
      * @param User $user
+     * @param Organization  $organization
+     * @param int|null      $folderId
      *
      * @return integer
      */
-    public function getCountNewEmails(User $user, Organization $organization)
+    public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization);
+        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization, $folderId);
     }
 
     /**

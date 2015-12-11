@@ -1,0 +1,10 @@
+<div class="column-manager-title"><%= _.__('oro.datagrid.column_manager.title') %></div>
+<% if (!_.isMobile()) { %>
+<span class="column-manager-hint"><%= _.__('oro.datagrid.column_manager.tooltip')%></span>
+<% } %>
+<a href="#" class="close">×</a>
+<div class="column-manager-filter"></div>
+<div class="column-manager-actions">
+    <a href="#" data-role="column-manager-select-all" class="pull-right"><%= _.__('oro.datagrid.column_manager.select_all')%></a>
+</div>
+<div class="column-manager-table"></div>

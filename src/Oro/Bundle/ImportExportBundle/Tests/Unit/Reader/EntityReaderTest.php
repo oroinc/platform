@@ -224,17 +224,18 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
 
-        $queryBuilder->expects($this->once())->method('getEntityManager')
-            ->will($this->returnValue($entityManager));
-
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
         $repository->expects($this->once())->method('createQueryBuilder')
             ->with('o')
             ->will($this->returnValue($queryBuilder));
 
-        $this->managerRegistry->expects($this->once())->method('getRepository')
+        $entityManager->expects($this->once())->method('getRepository')
             ->with($entityName)
             ->will($this->returnValue($repository));
+
+        $this->managerRegistry->expects($this->once())->method('getManagerForClass')
+            ->with($entityName)
+            ->will($this->returnValue($entityManager));
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
         $context->expects($this->at(0))->method('hasOption')->with('entityName')->will($this->returnValue(true));
@@ -327,17 +328,19 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->with('o')
             ->will($this->returnValue($queryBuilder));
 
-        $this->managerRegistry->expects($this->once())
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+
+        $entityManager->expects($this->once())
             ->method('getRepository')
             ->with($name)
             ->will($this->returnValue($repository));
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
         $entityManager->expects($this->once())->method('getClassMetadata')
             ->with($name)
             ->will($this->returnValue($classMetadata));
 
-        $queryBuilder->expects($this->once())->method('getEntityManager')
+        $this->managerRegistry->expects($this->once())->method('getManagerForClass')
+            ->with($name)
             ->will($this->returnValue($entityManager));
 
         $organization = new Organization();

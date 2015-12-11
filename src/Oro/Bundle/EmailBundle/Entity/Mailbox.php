@@ -71,10 +71,10 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $processSettings;
 
     /**
-     * @var UserEmailOrigin
+     * @var EmailOrigin
      *
      * @ORM\OneToOne(
-     *     targetEntity="Oro\Bundle\ImapBundle\Entity\UserEmailOrigin",
+     *     targetEntity="EmailOrigin",
      *     cascade={"persist"}, inversedBy="mailbox"
      * )
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
@@ -134,7 +134,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $autoResponseRules;
 
     /**
-     * @var \Datetime $created
+     * @var \Datetime
      *
      * @ORM\Column(name="created_at", type="datetime")
      * @ConfigField(
@@ -148,7 +148,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $createdAt;
 
     /**
-     * @var \Datetime $updated
+     * @var \Datetime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      * @ConfigField(
@@ -204,7 +204,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function getLabel()
     {
-        return $this->label;
+        return (string)$this->label;
     }
 
     /**
@@ -281,11 +281,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param UserEmailOrigin|null $origin
+     * @param EmailOrigin|null $origin
      *
      * @return $this
      */
-    public function setOrigin(UserEmailOrigin $origin = null)
+    public function setOrigin(EmailOrigin $origin = null)
     {
         $currentOrigin = $this->getOrigin();
         if ($currentOrigin && ($origin === null || $currentOrigin !== $origin)) {

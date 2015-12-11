@@ -17,7 +17,7 @@ define(['jquery'], function($) {
         setCursorPosition: function(index) {
             return this.each(function() {
                 var el = this;
-                if ('selectionStart' in el) {
+                if ('selectionStart' in el && el.type !== 'number') {
                     el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
                 }
             });
@@ -37,7 +37,9 @@ define(['jquery'], function($) {
             var $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
             var $autoFocus = $input.filter('[autofocus]');
-            ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
+            if ($autoFocus.length || $input.length) {
+                ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
+            }
         },
 
         focus: (function(orig) {
@@ -102,6 +104,38 @@ define(['jquery'], function($) {
                 } else {
                     el.value += str;
                 }
+            });
+        },
+
+        /**
+         * Thanks http://stackoverflow.com/questions/290254/how-to-order-events-bound-with-jquery
+         */
+        bindFirst: function(eventType, eventData, handler) {
+            var indexOfDot = eventType.indexOf('.');
+            var eventNameSpace = indexOfDot > 0 ? eventType.substring(indexOfDot) : '';
+
+            eventType = indexOfDot > 0 ? eventType.substring(0, indexOfDot) : eventType;
+            handler = handler === undefined ? eventData : handler;
+            eventData = typeof eventData === 'function' ? {} : eventData;
+
+            return this.each(function() {
+                var $this = $(this);
+                var currentAttrListener = this['on' + eventType];
+
+                if (currentAttrListener) {
+                    $this.bind(eventType, function(e) {
+                        return currentAttrListener(e.originalEvent);
+                    });
+
+                    this['on' + eventType] = null;
+                }
+
+                $this.bind(eventType + eventNameSpace, eventData, handler);
+
+                var allEvents = $this.data('events') || $._data($this[0], 'events');
+                var typeEvents = allEvents[eventType];
+                var newEvent = typeEvents.pop();
+                typeEvents.unshift(newEvent);
             });
         }
     });

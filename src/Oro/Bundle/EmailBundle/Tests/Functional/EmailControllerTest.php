@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class EmailControllerTest extends WebTestCase
@@ -121,9 +120,26 @@ class EmailControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
-    public function testEmailSeen()
+    public function testEmailToggleSeen()
     {
         $url = $this->getUrl('oro_email_toggle_seen', ['id' => $this->getReference('emailUser_1')->getId()]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful']);
+    }
+
+    public function testEmailMarkSeen()
+    {
+        $emailId = $this->getReference('emailUser_1')->getEmail()->getId();
+
+        $url = $this->getUrl('oro_email_mark_seen', ['id' => $emailId, 'status' => 1]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful']);
+
+        $url = $this->getUrl('oro_email_mark_seen', ['id' => $emailId, 'status' => 0, 'checkThread' => 0]);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $data = json_decode($result->getContent(), true);

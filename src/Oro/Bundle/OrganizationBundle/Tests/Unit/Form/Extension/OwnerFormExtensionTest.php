@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Form\Extension;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Extension;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -12,14 +12,13 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 
 class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $managerRegistry;
+    private $doctrineHelper;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -71,7 +70,13 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntity')
+            ->willReturn(true);
+
         $this->ownershipMetadataProvider =
             $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
                 ->disableOriginalConstructor()
@@ -140,7 +145,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->extension = new OwnerFormExtension(
-            $this->managerRegistry,
+            $this->doctrineHelper,
             $this->ownershipMetadataProvider,
             $this->businessUnitManager,
             $this->securityFacade,
@@ -293,44 +298,6 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
-    public function eventCallback(OwnerFormSubscriber $listener)
-    {
-        $this->assertAttributeEquals($this->managerRegistry, 'managerRegistry', $listener);
-        $this->assertAttributeEquals($this->fieldName, 'fieldName', $listener);
-        $this->assertAttributeEquals('Owner', 'fieldLabel', $listener);
-        $this->assertAttributeEquals(false, 'isAssignGranted', $listener);
-        $this->assertAttributeEquals(current($this->organizations), 'defaultOwner', $listener);
-
-        /*
-        $args = func_get_args();
-        $this->assertEquals($args[0], FormEvents::POST_SET_DATA);
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $form->expects($this->any())->method('has')->will($this->returnValue(true));
-        $form->expects($this->any())->method('get')->with($this->fieldName)->will($this->returnself());
-        $form->expects($this->once())->method('remove')->with($this->fieldName);
-        $form->expects($this->once())->method('add')->with(
-            $this->fieldName,
-            'text',
-            array(
-                'disabled' => true,
-                'data' => '',
-                'mapped' => false,
-                'required' => false,
-                'label' => 'Owner'
-            )
-        );
-        $formEvent = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $formEvent->expects($this->any())->method('getForm')->will($this->returnValue($form));
-
-        $formEvent->expects($this->any())->method('getData')->will($this->returnValue($this->user));
-        call_user_func($args[1], $formEvent);
-        */
-    }
-
     protected function mockConfigs(array $values)
     {
         $this->securityFacade->expects($this->any())->method('getOrganization')
@@ -359,7 +326,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->extension = new OwnerFormExtension(
-            $this->managerRegistry,
+            $this->doctrineHelper,
             $this->ownershipMetadataProvider,
             $this->businessUnitManager,
             $this->securityFacade,

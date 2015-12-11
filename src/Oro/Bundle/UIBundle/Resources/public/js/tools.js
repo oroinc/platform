@@ -167,7 +167,7 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          * Are we currently on mobile
          */
         isMobile: function() {
-            return $('body').hasClass('mobile-version');
+            return _.isMobile();
         },
 
         /**
@@ -205,6 +205,41 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         },
 
         /**
+         * Loads single module through requireJS and returns promise
+         *
+         * @param {string} module name
+         * @return ($.Promise}
+         */
+        loadModule: function(module) {
+            var deferred = $.Deferred();
+            require([module], function(moduleRealization) {
+                deferred.resolve(moduleRealization);
+            }, function(e) {
+                deferred.reject(e);
+            });
+            return deferred.promise();
+        },
+
+        /**
+         * Loads single module through requireJS and replaces the property
+         *
+         * @param {Object} container where to replace property
+         * @param {string} property name to replace module ref to concrete realization
+         * @return ($.Promise}
+         */
+        loadModuleAndReplace: function(container, moduleProperty) {
+            if (_.isFunction(container[moduleProperty])) {
+                var deferred = $.Deferred();
+                deferred.resolve(container[moduleProperty]);
+                return deferred.promise();
+            }
+            return this.loadModule(container[moduleProperty]).then(function(realization) {
+                container[moduleProperty] = realization;
+                return realization;
+            });
+        },
+
+        /**
          * Check if current page is an error page (404, 503, 504, etc.)
          * @returns {boolean}
          */
@@ -221,8 +256,22 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         safeRegExp: function(str, flags) {
             var expression;
             str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-            expression = new RegExp(str, flags);
+            expression = new RegExp('(' + str + ')', flags);
             return expression;
+        },
+
+        /**
+         * Generates Version 4 random UUIDs (https://en.wikipedia.org/wiki/Universally_unique_identifier)
+         * @return {string}
+         */
+        createRandomUUID: function() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                // jshint -W016
+                var r = Math.random() * 16 | 0;
+                var v = c === 'x' ? r : (r & 0x3 | 0x8);
+                // jshint +W016
+                return v.toString(16);
+            });
         },
 
         /**

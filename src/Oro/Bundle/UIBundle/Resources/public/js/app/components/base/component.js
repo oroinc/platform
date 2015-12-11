@@ -78,7 +78,7 @@ define([
             this.off();
             // dispose and remove all own properties
             _.each(this, function(item, name) {
-                if (item && typeof item.dispose === 'function') {
+                if (item && typeof item.dispose === 'function' && !item.disposed) {
                     item.dispose();
                 }
                 delete this[name];

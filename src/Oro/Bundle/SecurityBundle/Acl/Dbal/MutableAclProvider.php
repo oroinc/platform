@@ -199,7 +199,7 @@ class MutableAclProvider extends BaseMutableAclProvider
             $username = false;
         } else {
             throw new \InvalidArgumentException(
-                '$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.'
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity.'
             );
         }
 

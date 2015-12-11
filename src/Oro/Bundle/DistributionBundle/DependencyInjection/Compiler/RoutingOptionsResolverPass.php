@@ -32,7 +32,7 @@ class RoutingOptionsResolverPass implements CompilerPassInterface
         }
 
         // sort by priority and flatten
-        ksort($resolvers);
+        krsort($resolvers);
         $resolvers = call_user_func_array('array_merge', $resolvers);
 
         // register

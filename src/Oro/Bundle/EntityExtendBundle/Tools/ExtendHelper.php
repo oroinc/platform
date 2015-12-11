@@ -4,8 +4,14 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\Common\Inflector\Inflector;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExtendHelper
 {
     const ENTITY_NAMESPACE = 'Extend\\Entity\\';
@@ -13,6 +19,7 @@ class ExtendHelper
     const MAX_ENUM_VALUE_ID_LENGTH = 32;
     const MAX_ENUM_SNAPSHOT_LENGTH = 500;
     const BASE_ENUM_VALUE_CLASS    = 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue';
+    const ENUM_SNAPSHOT_SUFFIX     = 'Snapshot';
 
     /**
      * @param string $type
@@ -124,12 +131,13 @@ class ExtendHelper
      *
      * @param string $entityClassName
      * @param string $fieldName
+     * @param string $maxEnumCodeSize
      *
      * @return string The enum code.
      *
      * @throws \InvalidArgumentException
      */
-    public static function generateEnumCode($entityClassName, $fieldName)
+    public static function generateEnumCode($entityClassName, $fieldName, $maxEnumCodeSize = null)
     {
         if (empty($entityClassName)) {
             throw new \InvalidArgumentException('$entityClassName must not be empty.');
@@ -137,13 +145,35 @@ class ExtendHelper
         if (empty($fieldName)) {
             throw new \InvalidArgumentException('$fieldName must not be empty.');
         }
+        if (null !== $maxEnumCodeSize && $maxEnumCodeSize < 21) {
+            throw new \InvalidArgumentException('$maxEnumCodeSize must be greater or equal than 21 chars.');
+        }
 
-        return sprintf(
+        $shortClassName = self::getShortClassName($entityClassName);
+
+        $enumCode = sprintf(
             '%s_%s_%s',
-            Inflector::tableize(self::getShortClassName($entityClassName)),
+            Inflector::tableize($shortClassName),
             Inflector::tableize($fieldName),
             dechex(crc32($entityClassName . '::' . $fieldName))
         );
+
+        if (null !== $maxEnumCodeSize && strlen($enumCode) > $maxEnumCodeSize) {
+            $enumCode = sprintf(
+                '%s_%s',
+                Inflector::tableize($shortClassName),
+                dechex(crc32($entityClassName . '::' . $fieldName))
+            );
+            if (strlen($enumCode) > $maxEnumCodeSize) {
+                $enumCode = sprintf(
+                    'enum_%s_%s',
+                    dechex(crc32($shortClassName)),
+                    dechex(crc32($entityClassName . '::' . $fieldName))
+                );
+            }
+        }
+
+        return $enumCode;
     }
 
     /**
@@ -158,7 +188,7 @@ class ExtendHelper
      */
     public static function buildEnumValueId($enumValueName, $throwExceptionIfInvalidName = true)
     {
-        if (empty($enumValueName)) {
+        if (strlen($enumValueName) === 0) {
             if (!$throwExceptionIfInvalidName) {
                 return '';
             }
@@ -167,7 +197,9 @@ class ExtendHelper
         }
 
         $tr = \Transliterator::create('Latin; Latin-ASCII; Lower');
-        $enumValueName = $tr->transliterate($enumValueName);
+        if ($tr) {
+            $enumValueName = $tr->transliterate($enumValueName);
+        }
 
         $result = preg_replace(
             ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
@@ -183,7 +215,7 @@ class ExtendHelper
             $result = substr($result, 0, self::MAX_ENUM_VALUE_ID_LENGTH - strlen($hash) - 1) . '_' . $hash;
         }
 
-        if (empty($result) && $throwExceptionIfInvalidName) {
+        if ($throwExceptionIfInvalidName && strlen($result) === 0) {
             throw new \InvalidArgumentException(
                 sprintf('The conversion of "%s" to enum value id produces empty string.', $enumValueName)
             );
@@ -207,7 +239,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumCode must not be empty.');
         }
 
-        return ExtendHelper::ENTITY_NAMESPACE . 'EV_' . str_replace(" ", "_", ucwords(strtr($enumCode, "_-", "  ")));
+        return ExtendHelper::ENTITY_NAMESPACE . 'EV_' . str_replace(' ', '_', ucwords(strtr($enumCode, '_-', '  ')));
     }
 
     /**
@@ -220,7 +252,7 @@ class ExtendHelper
      */
     public static function getMultiEnumSnapshotFieldName($fieldName)
     {
-        return $fieldName . 'Snapshot';
+        return $fieldName . self::ENUM_SNAPSHOT_SUFFIX;
     }
 
     /**
@@ -319,5 +351,80 @@ class ExtendHelper
         $proxyShortClassName .= $shortClassName;
 
         return ExtendHelper::ENTITY_NAMESPACE . $proxyShortClassName;
+    }
+
+    /**
+     * Check if the given configurable entity is ready to be used in a business logic.
+     * It means that a entity class should exist and should not be marked as deleted.
+     *
+     * @param ConfigInterface $extendConfig The entity's configuration in the 'extend' scope
+     *
+     * @return bool
+     */
+    public static function isEntityAccessible(ConfigInterface $extendConfig)
+    {
+        if ($extendConfig->is('is_extend')) {
+            if ($extendConfig->is('is_deleted')) {
+                return false;
+            }
+            if ($extendConfig->is('state', ExtendScope::STATE_NEW)) {
+                return false;
+            }
+            // check if a new entity has been requested to be deleted before schema is updated
+            if ($extendConfig->is('state', ExtendScope::STATE_DELETE)
+                && !class_exists($extendConfig->getId()->getClassName())
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the given configurable entity is used to store enum values and ready to be used in a business logic.
+     * It means that a entity class should be extended from AbstractEnumValue,
+     * should exist and should not be marked as deleted.
+     *
+     * @param ConfigInterface $extendConfig The entity's configuration in the 'extend' scope
+     *
+     * @return bool
+     */
+    public static function isEnumValueEntityAccessible(ConfigInterface $extendConfig)
+    {
+        return
+            $extendConfig->is('is_extend')
+            && $extendConfig->is('inherit', self::BASE_ENUM_VALUE_CLASS)
+            && self::isEntityAccessible($extendConfig);
+    }
+
+    /**
+     * Check if the given configurable field is ready to be used in a business logic.
+     * It means that a field should exist in a class and should not be marked as deleted.
+     *
+     * @param ConfigInterface $extendFieldConfig The field's configuration in the 'extend' scope
+     *
+     * @return bool
+     */
+    public static function isFieldAccessible(ConfigInterface $extendFieldConfig)
+    {
+        if ($extendFieldConfig->is('is_extend')) {
+            if ($extendFieldConfig->is('is_deleted')) {
+                return false;
+            }
+            if ($extendFieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                return false;
+            }
+            // check if a new field has been requested to be deleted before schema is updated
+            if ($extendFieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+                /** @var FieldConfigId $fieldId */
+                $fieldId = $extendFieldConfig->getId();
+                if (!property_exists($fieldId->getClassName(), $fieldId->getFieldName())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType;
+use Oro\Bundle\EmailBundle\Validator\Constraints\AutoResponseRuleCondition as AutoResponseRuleConditionConstraint;
 
 class AutoResponseRuleType extends AbstractType
 {
@@ -43,6 +44,12 @@ class AutoResponseRuleType extends AbstractType
             ->add('conditions', 'oro_collection', [
                 'label' => 'oro.email.autoresponserule.conditions.label',
                 'type' => AutoResponseRuleConditionType::NAME,
+                'options' => [
+                    'constraints' => [
+                        new AutoResponseRuleConditionConstraint(),
+                    ],
+                    'error_bubbling' => false,
+                ],
                 'handle_primary' => false,
                 'allow_add_after' => true,
             ])
@@ -51,6 +58,8 @@ class AutoResponseRuleType extends AbstractType
                 'class' => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
                 'create_entity_form_type' => 'oro_email_autoresponse_template',
                 'select_entity_form_type' => 'oro_email_autoresponse_template_choice',
+                'editable' => true,
+                'edit_route' => 'oro_email_autoresponserule_edittemplate',
             ]);
 
         $builder->addEventSubscriber($this->autoResponseRuleSubscriber);

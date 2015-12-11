@@ -9,7 +9,6 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendEntityAliasProvider implements EntityAliasProviderInterface
@@ -35,8 +34,7 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
      */
     public function getEntityAlias($entityClass)
     {
-        $model = $this->configManager->getConfigEntityModel($entityClass);
-        if ($model) {
+        if ($this->configManager->hasConfig($entityClass)) {
             // check for enums
             $enumCode = $this->configManager->getProvider('enum')->getConfig($entityClass)->get('code');
             if ($enumCode) {
@@ -53,11 +51,6 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
             if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
                 // delegate aliases generation to default provider
                 return null;
-            }
-
-            // exclude hidden entities
-            if ($model->getMode() === ConfigModelManager::MODE_HIDDEN) {
-                return false;
             }
 
             // check for custom entities
