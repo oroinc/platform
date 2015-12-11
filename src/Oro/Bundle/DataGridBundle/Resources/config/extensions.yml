@@ -4,12 +4,15 @@ parameters:
     oro_datagrid.extension.orm_pager.class:        Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension
     oro_datagrid.extension.pager.orm.pager.class:  Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager
     oro_datagrid.extension.orm_sorter.class:       Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension
+    oro_datagrid.extension.inline_editing.class:   Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingExtension
     oro_datagrid.extension.action.class:           Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension
     oro_datagrid.extension.mass_action.class:      Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension
     oro_datagrid.extension.views.class:            Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension
     oro_datagrid.extension.export.class:           Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension
     oro_datagrid.extension.gridparams.class:       Oro\Bundle\DataGridBundle\Extension\GridParams\GridParamsExtension
     oro_datagrid.extension.totals.class:           Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension
+    oro_datagrid.extension.columns.class:          Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension
+    oro_datagrid.extension.mode.class:             Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension
 
 services:
     oro_datagrid.extension.formatter:
@@ -35,6 +38,15 @@ services:
 
     oro_datagrid.extension.orm_sorter:
         class: %oro_datagrid.extension.orm_sorter.class%
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.inline_editing:
+        class: %oro_datagrid.extension.inline_editing.class%
+        arguments:
+            - @oro_datagrid.datagrid.inline_edit_column_options_guesser
+            - @oro_security.security_facade
+            - @oro_entity.entity_class_name_helper
         tags:
             - { name: oro_datagrid.extension }
 
@@ -91,5 +103,20 @@ services:
             - @oro_locale.formatter.number
             - @oro_locale.formatter.date_time
             - @oro_security.acl_helper
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.columns:
+        class: %oro_datagrid.extension.columns.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_security.acl_helper
+            - @oro_datagrid.columns.helper
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.mode:
+        class: %oro_datagrid.extension.mode.class%
         tags:
             - { name: oro_datagrid.extension }

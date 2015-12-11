@@ -14,6 +14,7 @@ parameters:
     oro_form.type.encoded_password.class:                        Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType
     oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
     oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
+    oro_form.type.oro_autocomplete.class:                        Oro\Bundle\FormBundle\Form\Type\OroAutocompleteType
     oro_form.type.simple_color_picker.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType
     oro_form.type.simple_color_choice.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType
     oro_form.type.color_table.class:                             Oro\Bundle\FormBundle\Form\Type\OroColorTableType
@@ -22,6 +23,7 @@ parameters:
     oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\DecoratorApiType
     oro_form.type.rich_text.class:                               Oro\Bundle\FormBundle\Form\Type\OroRichTextType
     oro_form.type.resizeable_rich_text.class:                    Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType
+    oro_form.type.data_changeset.class:                          Oro\Bundle\FormBundle\Form\Type\DataChangesetType
     oro_form.type.entity_changeset.class:                        Oro\Bundle\FormBundle\Form\Type\EntityChangesetType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
@@ -155,6 +157,13 @@ services:
         tags:
             - { name: form.type, alias: oro_resizeable_rich_text }
 
+    oro_form.type.data_changeset:
+        class: %oro_form.type.data_changeset.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: form.type, alias: oro_data_changeset }
+
     oro_form.type.entity_changeset:
         class: %oro_form.type.entity_changeset.class%
         arguments:
@@ -175,6 +184,9 @@ services:
 
     oro_help.form.tooltip_extension:
         class: %oro_form.extension.tooltip.class%
+        arguments:
+            - @oro_entity_config.provider.entity
+            - @translator.default
         tags:
             - { name: form.type_extension, alias: form }
 
@@ -238,6 +250,13 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_inline }
+
+    oro_form.type.oro_autocomplete:
+        class: %oro_form.type.oro_autocomplete.class%
+        arguments:
+            - @oro_form.autocomplete.search_registry
+        tags:
+            - { name: form.type, alias: oro_autocomplete }
 
     oro_form.type.link:
         class: %oro_form.type.link.class%

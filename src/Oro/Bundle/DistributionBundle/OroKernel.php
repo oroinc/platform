@@ -14,13 +14,15 @@ use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 
 use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
 /**
  * This class should work on PHP 5.3
  * Keep old array syntax
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class OroKernel extends Kernel
 {
@@ -264,11 +266,13 @@ abstract class OroKernel extends Kernel
         }
 
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath()));
-        if (!$this->debug) {
-            $content = static::stripComments($content);
-        }
-
         $cache->write($content, $container->getResources());
+
+        // we should not use parent::stripComments method to cleanup source code from the comments to avoid
+        // memory leaks what generate token_get_all function.
+        if (!$this->debug) {
+            $cache->write(php_strip_whitespace($cache->getPath()), $container->getResources());
+        }
     }
 
     /**
@@ -305,7 +309,7 @@ abstract class OroKernel extends Kernel
      */
     protected function getContainerBuilder()
     {
-        $container = new OroContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $container = new ExtendedContainerBuilder(new ParameterBag($this->getKernelParameters()));
 
         if (class_exists('ProxyManager\Configuration')
             && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')

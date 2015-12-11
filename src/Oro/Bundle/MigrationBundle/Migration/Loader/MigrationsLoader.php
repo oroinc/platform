@@ -293,7 +293,7 @@ class MigrationsLoader
             if (isset($groupedMigrations[$bundleName])) {
                 foreach ($groupedMigrations[$bundleName] as $version => $versionedMigrations) {
                     foreach ($versionedMigrations as $migration) {
-                        $result[] = new MigrationState(
+                        $result[]  = new MigrationState(
                             $migration,
                             $bundleName,
                             $version

@@ -17,7 +17,7 @@ define([
     SelectRowCell = Backbone.View.extend({
 
         /** @property */
-        className: 'select-row-cell',
+        className: 'select-row-cell renderable',
 
         /** @property */
         tagName: 'td',
@@ -25,7 +25,7 @@ define([
         /** @property */
         events: {
             'change :checkbox': 'onChange',
-            click: 'enterEditMode'
+            'click': 'updateCheckbox'
         },
 
         /**
@@ -61,8 +61,10 @@ define([
 
         /**
          * Focuses the checkbox.
+         *
+         * @param e
          */
-        enterEditMode: function(e) {
+        updateCheckbox: function(e) {
             if (this.$checkbox[0] !== e.target) {
                 this.$checkbox.prop('checked', !this.$checkbox.prop('checked')).change();
             }
@@ -90,6 +92,7 @@ define([
             if (state.selected) {
                 this.$checkbox.prop('checked', 'checked');
             }
+            this.model.trigger('backgrid:selected', this.model, state.selected);
             return this;
         }
     });

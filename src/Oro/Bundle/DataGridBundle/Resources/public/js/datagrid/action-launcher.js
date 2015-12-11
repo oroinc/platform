@@ -1,11 +1,10 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone'
-], function($, _, Backbone) {
+define(function(require) {
     'use strict';
 
     var ActionLauncher;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var Backbone = require('backbone');
 
     /**
      * Action launcher implemented as simple link or a set of links. Click on a link triggers action run
@@ -55,57 +54,22 @@ define([
         runAction: true,
 
         /** @property {function(Object, ?Object=): String} */
-        template: _.template(
-            '<% if (links) { %><div class="btn-group"><% } %>' +
-            '<<%= tagName %>' +
-                '<% if (tagName == "a") { %> href="<%= link %>"<% } %>' +
-                ' class="action' +
-                    '<%= className ? " " + className : "" %>' +
-                    '<%= !enabled ? " disabled" : "" %>' +
-                    '<% if (links) { %> dropdown-toggle<% } %>' +
-                '"' +
-                ' <%= attributesTemplate({attributes: attributes}) %>' +
-                ' title="<%= title %>"' +
-                '<% if (links) { %> data-toggle="dropdown"<% } %>' +
-            '>' +
-                '<% if (icon) { %>' +
-                    '<i class="icon-<%= icon %> hide-text"><%= label %></i>' +
-                '<% } else { %>' +
-                    '<% if (iconClassName) { %>' +
-                        '<i class="<%= iconClassName %>"></i>' +
-                    '<% } %>' +
-                    ' <%= label %>' +
-                '<% } %>' +
-                '<% if (links) { %><i class="caret"></i><% } %>' +
-            '</<%= tagName %>>' +
-            '<% if (links) { %>' +
-                '<ul class="dropdown-menu">' +
-                '<% _.each(links, function(item) { %>' +
-                    '<li><a href="<%= link %>"' +
-                        ' title="<%= item.label %>"' +
-                        '<% if (item.attributes) { %> <%= attributesTemplate(item) %><% } %>' +
-                        ' data-key="<%= item.key %>"' +
-                    '>' +
-                    '<% if (item.icon) { %>' +
-                        '<i class="icon-<%= item.icon %> hide-text"><%= item.label %></i>' +
-                    '<% } else { %>' +
-                        '<% if (item.iconClassName) { %>' +
-                            '<i class="<%= item.iconClassName %>"></i>' +
-                        '<% } %>' +
-                        ' <%= item.label %>' +
-                    '<% } %>' +
-                    '</a></li>' +
-                '<% }) %>' +
-                '</ul>' +
-            '</div>' +
-            '<% } %>'
-        ),
+        template: require('tpl!orodatagrid/templates/datagrid/action-launcher.html'),
 
-        attributesTemplate: _.template(
-            '<% _.each(attributes, function(attribute, name) { %>' +
-                '<%= name %><% if (!_.isNull(attribute)) { %>="<%= attribute %>"<% } %> ' +
-            '<% }) %>'
-        ),
+        /**
+         * Defines map of events => handlers
+         * @return {Object}
+         */
+        events: function() {
+            var events = {};
+            var linkSelector = '';
+            if (this.links) {
+                events['click .dropdown-toggle'] = 'onToggle';
+                linkSelector = ' .dropdown-menu a';
+            }
+            events['click' + linkSelector] = 'onClick';
+            return events;
+        },
 
         /**
          * Initialize
@@ -122,7 +86,6 @@ define([
          * @throws {TypeError} If mandatory option is undefined
          */
         initialize: function(options) {
-            var linkSelector;
             var opts = options || {};
 
             if (!opts.action) {
@@ -165,14 +128,9 @@ define([
                 this.onClickReturnValue = opts.onClickReturnValue;
             }
 
-            this.events = {};
-            linkSelector = '';
             if (_.has(opts, 'links')) {
-                this.events['click .dropdown-toggle'] = 'onToggle';
                 this.links = options.links;
-                linkSelector = ' .dropdown-menu a';
             }
-            this.events['click' + linkSelector] = 'onClick';
 
             this.action = opts.action;
             ActionLauncher.__super__.initialize.apply(this, arguments);
@@ -190,17 +148,11 @@ define([
             ActionLauncher.__super__.dispose.apply(this, arguments);
         },
 
-        /**
-         * Render actions
-         *
-         * @return {*}
-         */
-        render: function() {
-            this.$el.empty();
-
+        getTemplateData: function() {
             var label = this.label || this.action.label;
-            var $el = $(this.template({
-                label: this.label || this.action.label,
+
+            return {
+                label: label,
                 icon: this.icon,
                 title: this.title || label,
                 className: this.className,
@@ -209,11 +161,19 @@ define([
                 links: this.links,
                 action: this.action,
                 attributes: this.attributes,
-                attributesTemplate: this.attributesTemplate,
                 enabled: this.enabled,
                 tagName: this.tagName
-            }));
+            };
+        },
 
+        /**
+         * Render actions
+         *
+         * @return {*}
+         */
+        render: function() {
+            this.$el.empty();
+            var $el = $(this.template(this.getTemplateData()));
             this.setElement($el);
             return this;
         },
@@ -243,7 +203,7 @@ define([
                 this.action.run();
 
                 //  skip launcher functionality, if action was executed
-                return false;
+                e.preventDefault();
             }
             return this.onClickReturnValue;
         },

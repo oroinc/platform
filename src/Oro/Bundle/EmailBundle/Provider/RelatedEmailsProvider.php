@@ -214,7 +214,7 @@ class RelatedEmailsProvider
             }
 
             $fieldConfig = $this->entityConfigProvider->getConfig($metadata->name, $fieldName);
-            if ($fieldConfig->has('contact_information') && $fieldConfig->get('contact_information') === 'email') {
+            if ($fieldConfig->get('contact_information') === 'email') {
                 $attributes[] = new EmailAttribute($fieldName);
             }
         }

@@ -11,11 +11,8 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 /**
  * Represents organization calendars
  */
-class SystemCalendarProvider implements CalendarProviderInterface
+class SystemCalendarProvider extends AbstractCalendarProvider
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
@@ -37,7 +34,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
         SystemCalendarConfig $calendarConfig,
         SecurityFacade $securityFacade
     ) {
-        $this->doctrineHelper          = $doctrineHelper;
+        parent::__construct($doctrineHelper);
         $this->calendarEventNormalizer = $calendarEventNormalizer;
         $this->calendarConfig          = $calendarConfig;
         $this->securityFacade          = $securityFacade;
@@ -116,10 +113,10 @@ class SystemCalendarProvider implements CalendarProviderInterface
         //    $end,
         //    []
         //);
-
+        $extraFields = $this->filterSupportedFields($extraFields, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
         /** @var CalendarEventRepository $repo */
-        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
+        $repo         = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $qb           = $repo->getSystemEventListByTimeIntervalQueryBuilder(
             $start,
             $end,
             [],

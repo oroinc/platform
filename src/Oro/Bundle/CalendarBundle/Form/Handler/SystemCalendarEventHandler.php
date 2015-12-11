@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class SystemCalendarEventHandler
@@ -20,19 +21,25 @@ class SystemCalendarEventHandler
     /** @var ObjectManager */
     protected $manager;
 
+    /** @var ActivityManager */
+    protected $activityManager;
+
     /**
-     * @param FormInterface $form
-     * @param Request       $request
-     * @param ObjectManager $manager
+     * @param FormInterface   $form
+     * @param Request         $request
+     * @param ObjectManager   $manager
+     * @param ActivityManager $activityManager
      */
     public function __construct(
         FormInterface $form,
         Request $request,
-        ObjectManager $manager
+        ObjectManager $manager,
+        ActivityManager $activityManager
     ) {
-        $this->form    = $form;
-        $this->request = $request;
-        $this->manager = $manager;
+        $this->form            = $form;
+        $this->request         = $request;
+        $this->manager         = $manager;
+        $this->activityManager = $activityManager;
     }
 
     /**
@@ -60,6 +67,13 @@ class SystemCalendarEventHandler
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
+                // TODO: should be refactored after finishing BAP-8722
+                // Contexts handling should be moved to common for activities form handler
+                if ($this->form->has('contexts')) {
+                    $contexts = $this->form->get('contexts')->getData();
+                    $this->activityManager->setActivityTargets($entity, $contexts);
+                }
+
                 $this->onSuccess($entity);
 
                 return true;

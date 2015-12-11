@@ -8,15 +8,12 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
-use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
-/**
- * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- */
 class OroPlatformExtension extends Extension implements PrependExtensionInterface
 {
     /**
@@ -28,6 +25,14 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             'oro_app_config',
             new YamlCumulativeFileLoader('Resources/config/oro/app.yml')
         );
+
+        // original security config
+        $securityConfig = null;
+        $securityModified = false;
+        if ($container->hasExtension('security')) {
+            $securityConfig = $container->getExtensionConfig('security');
+        }
+
         $resources    = $configLoader->load();
         $extensions   = $container->getExtensions();
         foreach ($resources as $resource) {
@@ -35,11 +40,49 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
                 if (!empty($extensions[$name])) {
                     if ($name === 'security') {
                         $this->mergeConfigIntoOne($container, $name, $config);
+                        $securityModified = true;
                     } else {
                         $container->prependExtensionConfig($name, $config);
                     }
                 }
             }
+        }
+
+        // original security config has highest priority
+        if ($securityConfig && $securityModified) {
+            $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
+        }
+
+        $this->preparePostgreSql($container);
+    }
+
+    /**
+     * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
+     *
+     * @param ContainerBuilder $container
+     */
+    public function preparePostgreSql(ContainerBuilder $container)
+    {
+        $dbDriver = $container->getParameter('database_driver');
+        if ($dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
+            $doctrineConfig = $container->getExtensionConfig('doctrine');
+            $doctrineConnectionOptions = [];
+            foreach ($doctrineConfig as $config) {
+                if (isset($config['dbal']['connections'])) {
+                    foreach (array_keys($config['dbal']['connections']) as $connectionName) {
+                        // Enable ATTR_EMULATE_PREPARES for PostgreSQL
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
+                            \PDO::ATTR_EMULATE_PREPARES => true
+                        ];
+                        // Add support of "oid" and "name" Db types for EnterpriseDB
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [
+                            'oid' => 'integer',
+                            'name' => 'string'
+                        ];
+                    }
+                }
+            }
+            $container->prependExtensionConfig('doctrine', $doctrineConnectionOptions);
         }
     }
 
@@ -54,11 +97,11 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
      */
     private function mergeConfigIntoOne(ContainerBuilder $container, $name, array $config = [])
     {
-        if (!$container instanceof OroContainerBuilder) {
+        if (!$container instanceof ExtendedContainerBuilder) {
             throw new \RuntimeException(
                 sprintf(
                     '%s is expected to be passed into OroPlatformExtension',
-                    'Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder'
+                    'Oro\Component\DependencyInjection\ExtendedContainerBuilder'
                 )
             );
         }
@@ -68,10 +111,10 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             $originalConfig[] = array();
         }
 
-        $mergedConfig = array_merge_recursive($originalConfig[0], $config);
+        $mergedConfig = ArrayUtils::arrayMergeRecursiveDistinct($originalConfig[0], $config);
         $originalConfig[0] = $mergedConfig;
 
-        $container->setExtensionConfig('security', $originalConfig);
+        $container->setExtensionConfig($name, $originalConfig);
     }
 
     /**
@@ -82,6 +125,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         $loader->load('services.yml');
+        $loader->load('doctrine.yml');
         $loader->load('session.yml');
     }
 }

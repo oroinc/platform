@@ -5,8 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Serializer;
 use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendEntityFieldFilter implements EntityFieldFilterInterface
 {
@@ -31,13 +30,12 @@ class ExtendEntityFieldFilter implements EntityFieldFilterInterface
      */
     public function isApplicableField($className, $fieldName)
     {
-        $fieldModel = $this->configManager->getConfigFieldModel($className, $fieldName);
-        if (!$fieldModel) {
+        if (null === $this->configManager->getConfigModelId($className, $fieldName)) {
             // this serializer works with non configurable entities as well
             return true;
         }
 
-        if ($fieldModel->getMode() === ConfigModelManager::MODE_HIDDEN) {
+        if (true === $this->configManager->isHiddenModel($className, $fieldName)) {
             // exclude hidden fields
             return false;
         }
@@ -50,15 +48,13 @@ class ExtendEntityFieldFilter implements EntityFieldFilterInterface
             return false;
         }
 
-        if ($extendConfig->is('is_deleted') || $extendConfig->is('state', ExtendScope::STATE_NEW)) {
-            // exclude deleted and not created yet fields
+        if (!ExtendHelper::isFieldAccessible($extendConfig)) {
             return false;
         }
 
         if ($extendConfig->has('target_entity')
-            && $extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')
+            && !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($extendConfig->get('target_entity')))
         ) {
-            // exclude associations with deleted custom entities
             return false;
         }
 

@@ -32,10 +32,11 @@ class EmailOriginApiEntityManager extends ApiEntityManager
                 'folders'           => [
                     'exclusion_policy' => 'all',
                     'fields'           => [
-                        'id'       => null,
-                        'fullName' => null,
-                        'name'     => null,
-                        'type'     => null
+                        'id'          => null,
+                        'fullName'    => null,
+                        'name'        => null,
+                        'type'        => null,
+                        'syncEnabled' => null
                     ]
                 ]
             ],

@@ -8,6 +8,9 @@ parameters:
     oro_search.formatter.result_formatter.class:          Oro\Bundle\SearchBundle\Formatter\ResultFormatter
     oro_search.prepare_result_item.listener.class:        Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener
 
+    oro_search.entity.item.class: Oro\Bundle\SearchBundle\Entity\Item
+    oro_search.entity.repository.search_index.class: Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository
+
     oro_search.extension.formatter.property.search_result_property.class: Oro\Bundle\SearchBundle\Extension\SearchResultProperty
     oro_search.extension.search_results.class:                            Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
 
@@ -37,9 +40,6 @@ services:
             - @oro_search.search.engine
             - @oro_search.mapper
             - @oro_search.security_provider
-            - @oro_entity_config.config_manager
-            - @oro_entity.entity_provider
-            - @translator
             - @oro_security.search.acl_helper
             - @event_dispatcher
 
@@ -151,7 +151,8 @@ services:
             - @oro_search.fulltext_index_manager
             - @doctrine
         tags:
-            - { name: kernel.event_listener, event: console.terminate }
+            - { name: kernel.event_listener, event: console.terminate, name: onConsoleTerminate }
+            - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
 
     oro_search.event_listener.demo_data_listener:
         class: %oro_search.event_listener.demo_data_listener.class%
@@ -161,13 +162,14 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
             - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
+            - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
 
     oro_search.event_listener.orm.fulltext_index_listener:
         class: %oro_search.event_listener.orm.fulltext_index_listener.class%
         arguments:
             - %database_driver%
         tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata }
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
     oro_search.provider.search_mapping:
         class: %oro_search.provider.search_mapping.class%
@@ -176,3 +178,16 @@ services:
         calls:
             - [setMappingConfig, [%oro_search.entities_config%]]
 
+    oro_search.cache.doctrine_metadata:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'doctrine_metadata_search' ] ]
+
+    oro_search.entity.repository.search_index:
+        class: %oro_search.entity.repository.search_index.class%
+        factory: ["@doctrine", getRepository]
+        arguments:
+            - %oro_search.entity.item.class%
+            - 'search'
+        calls:
+            - [setRegistry, [@doctrine]]

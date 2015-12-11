@@ -4,15 +4,18 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
+use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
+
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
@@ -27,14 +30,14 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $translator;
 
     /**
-     * @var NumberFormatter
+     * @var FormatterProvider
      */
-    protected $numberFormatter;
+    protected $formatterProvider;
 
     /**
-     * @var DateTimeFormatter
+     * @var ColumnsHelper
      */
-    protected $dateTimeFormatter;
+    protected $columnsHelper;
 
     /**
      * @var ContextInterface
@@ -42,22 +45,26 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $context;
 
     /**
-     *
+     * @var TypeFormatterInterface[]
+     */
+    protected $formatters = [];
+
+    /**
      * @param ServiceLink         $gridManagerLink
      * @param TranslatorInterface $translator
-     * @param NumberFormatter     $numberFormatter
-     * @param DateTimeFormatter   $dateTimeFormatter
+     * @param ColumnsHelper       $columnsHelper
+     * @param FormatterProvider   $formatterProvider
      */
     public function __construct(
         ServiceLink $gridManagerLink,
         TranslatorInterface $translator,
-        NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter
+        ColumnsHelper $columnsHelper,
+        FormatterProvider $formatterProvider
     ) {
         $this->gridManagerLink   = $gridManagerLink;
         $this->translator        = $translator;
-        $this->numberFormatter   = $numberFormatter;
-        $this->dateTimeFormatter = $dateTimeFormatter;
+        $this->columnsHelper     = $columnsHelper;
+        $this->formatterProvider = $formatterProvider;
     }
 
     /**
@@ -77,14 +84,22 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             );
         }
 
-        $result = array();
+        if ($this->context->hasOption('gridParameters')) {
+            $gridParams = $this->context->getOption('gridParameters');
+            if ($gridParams->has(ColumnsExtension::COLUMNS_PARAM)) {
+                $columnsParams = $gridParams->get(ColumnsExtension::COLUMNS_PARAM);
+                $columns       = $this->columnsHelper->reorderColumns($columns, $columnsParams);
+            }
+        }
+
+        $result = [];
         foreach ($columns as $columnName => $column) {
             if (isset($column['renderable']) && false === $column['renderable']) {
                 continue;
             }
 
-            $val = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
-            $val = $this->applyFrontendFormatting($val, $column);
+            $val  = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
+            $val  = $this->applyFrontendFormatting($val, $column);
             $result[$this->translator->trans($column['label'])] = $val;
         }
 
@@ -100,53 +115,33 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     }
 
     /**
-     * @param mixed       $val
-     * @param array       $options
+     * @param mixed $val
+     * @param array $options
      *
      * @return string|null
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyFrontendFormatting($val, $options)
     {
         if (null !== $val) {
             $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
-            switch ($frontendType) {
-                case PropertyInterface::TYPE_DATE:
-                    $val = $this->dateTimeFormatter->formatDate($val);
-                    break;
-                case PropertyInterface::TYPE_DATETIME:
-                    $val = $this->dateTimeFormatter->format($val);
-                    break;
-                case PropertyInterface::TYPE_TIME:
-                    $val = $this->dateTimeFormatter->formatTime($val);
-                    break;
-                case PropertyInterface::TYPE_DECIMAL:
-                    $val = $this->numberFormatter->formatDecimal($val);
-                    break;
-                case PropertyInterface::TYPE_INTEGER:
-                    $val = $this->numberFormatter->formatDecimal($val);
-                    break;
-                case PropertyInterface::TYPE_BOOLEAN:
-                    $val = $this->translator->trans((bool)$val ? 'Yes' : 'No', [], 'jsmessages');
-                    break;
-                case PropertyInterface::TYPE_PERCENT:
-                    $val = $this->numberFormatter->formatPercent($val);
-                    break;
-                case PropertyInterface::TYPE_CURRENCY:
-                    $val = $this->numberFormatter->formatCurrency($val);
-                    break;
-                case PropertyInterface::TYPE_SELECT:
-                    if (isset($options['choices'][$val])) {
-                        $val = $this->translator->trans($options['choices'][$val]);
-                    }
-                    break;
-                case PropertyInterface::TYPE_HTML:
-                    $val = $this->formatHtmlFrontendType(
-                        $val,
-                        isset($options['export_type']) ? $options['export_type'] : null
-                    );
-                    break;
+
+            $formatter = $this->getFormatterForType($frontendType);
+            if ($formatter) {
+                $val = $formatter->formatType($val, $frontendType);
+            } else {
+                switch ($frontendType) {
+                    case PropertyInterface::TYPE_SELECT:
+                        if (isset($options['choices'][$val])) {
+                            $val = $this->translator->trans($options['choices'][$val]);
+                        }
+                        break;
+                    case PropertyInterface::TYPE_HTML:
+                        $val = $this->formatHtmlFrontendType(
+                            $val,
+                            isset($options['export_type']) ? $options['export_type'] : null
+                        );
+                        break;
+                }
             }
         }
 
@@ -183,5 +178,22 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     public function setImportExportContext(ContextInterface $context)
     {
         $this->context = $context;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return TypeFormatterInterface
+     */
+    protected function getFormatterForType($type)
+    {
+        $formatType = $this->context->getOption(FormatterProvider::FORMAT_TYPE);
+        if (isset($this->formatters[$formatType][$type])) {
+            return $this->formatters[$formatType][$type];
+        }
+        $formatter                            = $this->formatterProvider->getFormatterFor($formatType, $type);
+        $this->formatters[$formatType][$type] = $formatter;
+
+        return $formatter;
     }
 }

@@ -56,7 +56,7 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $pageSize = min($pageSize, $this->getRowsCount());
         $entityId = rand(1, $pageSize);
-        $gridPath = "{$this->gridPath}//table[contains(@class,'grid')]";
+        $gridPath = "{$this->getDataGridPath()}//table[contains(@class,'grid')]";
         /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element[] $entity */
         $entity = $this->test
             ->elements(
@@ -170,12 +170,13 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getRows($id = null)
     {
+        $gridPath = $this->getDataGridPath();
         if (is_null($id)) {
             $records = $this->test
-                ->elements($this->test->using('xpath')->value("{$this->gridPath}//table/tbody/tr"));
+                ->elements($this->test->using('xpath')->value("{$gridPath}//table/tbody/tr"));
         } else {
             $records = $this->test
-                ->elements($this->test->using('xpath')->value("{$this->gridPath}//table/tbody/tr[{$id}]"));
+                ->elements($this->test->using('xpath')->value("{$gridPath}//table/tbody/tr[{$id}]"));
         }
 
         return $records;
@@ -190,10 +191,11 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $header = $this->getHeadersName();
         $data = array();
+        $gridPath = $this->getDataGridPath();
         foreach ($rows as $row) {
             /** @var  $row \PHPUnit_Extensions_Selenium2TestCase_Element */
             $columns = $row->elements(
-                $this->test->using('xpath')->value("//td[not(contains(@style, 'display: none;'))]")
+                $this->test->using('xpath')->value("{$gridPath}//td[not(contains(@style, 'display: none;'))]")
             );
 
             $rowData = array();
@@ -204,6 +206,19 @@ abstract class AbstractPageGrid extends AbstractPage
             $data[] = array_combine($header, $rowData);
         }
         return $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDataGridPath()
+    {
+        if ($this->gridPath) {
+            $gridPath = $this->gridPath;
+        } else {
+            $gridPath = "//div[contains(@class,'grid-container')]";
+        }
+        return $gridPath;
     }
 
     /**
@@ -245,7 +260,7 @@ abstract class AbstractPageGrid extends AbstractPage
             }
             $xpath .=  "td[contains(.,'{$entityField}')]";
         }
-        $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]";
+        $xpath = "{$this->getDataGridPath()}//table/tbody/tr[{$xpath}]";
         return $this->isElementPresent($xpath);
     }
 
@@ -275,7 +290,7 @@ abstract class AbstractPageGrid extends AbstractPage
             $postFix = "/td[{$column}]";
         }
 
-        $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]{$postFix}";
+        $xpath = "{$this->getDataGridPath()}//table/tbody/tr[{$xpath}]{$postFix}";
         $element = $this->test->byXPath($xpath);
         $this->test->moveto($element);
         return $element;
@@ -290,7 +305,8 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function delete($entityData, $actionName = 'Delete', $confirmation = true)
     {
-        return $this->action($entityData, $actionName, $confirmation);
+        $this->action($entityData, $actionName, $confirmation);
+        return $this;
     }
 
     /**
@@ -303,10 +319,15 @@ abstract class AbstractPageGrid extends AbstractPage
     public function action($entityData, $actionName = 'Update', $confirmation = false)
     {
         $entity = $this->getEntity($entityData);
-        $element = $entity->element(
-            $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '...')]")
-        );
-        $this->test->moveto($element);
+        $flag = $entity->elements($this->test->using('xpath')->value(
+            "td[contains(@class,'action-cell')]//a[contains(., '...')]"
+        ));
+        if (!empty($flag)) {
+            $element = $entity->element($this->test->using('xpath')->value(
+                "td[contains(@class,'action-cell')]//a[contains(., '...')]"
+            ));
+            $this->test->moveto($element);
+        }
 
         $entity->element(
             $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
@@ -328,9 +349,10 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getHeaders()
     {
+        $gridPath = $this->getDataGridPath();
         $records = $this->test->elements(
             $this->test->using('xpath')
-                ->value("{$this->gridPath}//table/thead[not(contains(@class,'thead-sizing'))]/tr/th")
+                ->value("{$gridPath}//table/thead[not(contains(@class,'thead-sizing'))]/tr/th")
         );
         return $records;
     }
@@ -366,9 +388,10 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getColumn($columnId)
     {
+        $gridPath = $this->getDataGridPath();
         $columnData = $this->test->elements(
             $this->test->using('xpath')
-                ->value("{$this->gridPath}//table/tbody/tr/td[not(contains(@style, 'display: none;'))][{$columnId}]")
+                ->value("{$gridPath}//table/tbody/tr/td[not(contains(@style, 'display: none;'))][{$columnId}]")
         );
         $rowData = array();
         foreach ($columnData as $value) {
@@ -398,7 +421,7 @@ abstract class AbstractPageGrid extends AbstractPage
                 $orderFull = $order;
         }
 
-        $theadPath = "{$this->gridPath}//table/thead[not(contains(@class,'thead-sizing'))]";
+        $theadPath = "{$this->getDataGridPath()}//table/thead[not(contains(@class,'thead-sizing'))]";
         //get current sort order status
         $current = $this->test->byXPath("{$theadPath}/tr/th[a[contains(., '{$columnName}')]]")
             ->attribute('class');
@@ -469,9 +492,11 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function assertNoActionMenu($actionName)
     {
-        $actionMenu =  $this->test->byXPath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($actionMenu);
-        $this->waitForAjax();
+        if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
+            $actionMenu =  $this->test->byXPath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
+            $this->test->moveto($actionMenu);
+            $this->waitForAjax();
+        }
         $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
 
         return $this;

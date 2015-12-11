@@ -8,25 +8,23 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
-use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 
 class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 {
     const BUSINESS_UNIT = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit';
-    const ORGANIZATION = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
-    const USER = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User';
-    const TEST_ENTITY = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity';
+    const ORGANIZATION  = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
+    const USER          = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User';
+    const TEST_ENTITY   = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity';
 
-    /**
-     * @var OwnershipConditionDataBuilder
-     */
+    /** @var OwnershipConditionDataBuilder */
     private $builder;
 
     /** @var OwnershipMetadataProviderStub */
@@ -146,6 +144,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->tree->addBusinessUnitRelation('bu4', null);
         $this->tree->addBusinessUnitRelation('bu41', 'bu4');
         $this->tree->addBusinessUnitRelation('bu411', 'bu41');
+
+        $this->tree->buildTree();
 
         $this->tree->addUser('user1', null);
         $this->tree->addUser('user2', 'bu2');

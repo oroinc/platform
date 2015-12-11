@@ -11,6 +11,7 @@ define(function(require) {
     var GridHeader = require('./header');
     var GridBody = require('./body');
     var GridFooter = require('./footer');
+    var GridColumns = require('./columns');
     var Toolbar = require('./toolbar');
     var ActionColumn = require('./column/action-column');
     var SelectRowCell = require('oro/datagrid/cell/select-row-cell');
@@ -19,6 +20,7 @@ define(function(require) {
     var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
 
     /**
      * Basic grid class.
@@ -41,7 +43,7 @@ define(function(require) {
         requestsCount: 0,
 
         /** @property {String} */
-        className: 'clearfix',
+        className: 'oro-datagrid',
 
         /** @property */
         template: _.template(
@@ -97,13 +99,24 @@ define(function(require) {
         defaults: {
             rowClickActionClass:    'row-click-action',
             rowClassName:           '',
-            toolbarOptions:         {addResetAction: true, addRefreshAction: true},
+            toolbarOptions:         {
+                addResetAction: true,
+                addRefreshAction: true,
+                addColumnManager: true,
+                columnManager: {}
+            },
             rowClickAction:         undefined,
             multipleSorting:        true,
             rowActions:             [],
             massActions:            [],
             enableFullScreenLayout: false
         },
+
+        /**
+         * Column indexing starts from this valus in case when 'order' is not specified in column config.
+         * This start index required to display new columns at end of already sorted columns set
+         */
+        DEFAULT_COLUMN_START_INDEX: 1000,
 
         /**
          * Initialize grid
@@ -128,6 +141,11 @@ define(function(require) {
             this.pluginManager = new PluginManager(this);
             if (options.plugins) {
                 this.pluginManager.enable(options.plugins);
+            }
+
+            this.trigger('beforeParseOptions', options);
+            if (this.className) {
+                this.$el.addClass(_.result(this, 'className'));
             }
 
             // Check required options
@@ -160,21 +178,22 @@ define(function(require) {
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
-            if (Object.keys(this.rowActions).length > 0) {
-                opts.columns.push(this._createActionsColumn());
-            }
-
-            if (opts.multiSelectRowEnabled) {
-                opts.columns.unshift(this._createSelectRowColumn());
-            }
+            this._initColumns(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
+            // use columns collection as event bus since there is no alternatives
+            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
+                this.trigger('afterMakeCell', row, cell);
+            });
+
+            this.trigger('beforeBackgridInitialize');
             Grid.__super__.initialize.apply(this, arguments);
+            this.trigger('afterBackgridInitialize');
 
             // Listen and proxy events
             this._listenToCollectionEvents();
-            this._listenToBodyEvents();
+            this._listenToContentEvents();
             this._listenToCommands();
         },
 
@@ -208,6 +227,34 @@ define(function(require) {
         },
 
         /**
+         * Initializes columns collection required to draw grid
+         *
+         * @param {Object} options
+         * @private
+         */
+        _initColumns: function(options) {
+
+            if (Object.keys(this.rowActions).length > 0) {
+                options.columns.push(this._createActionsColumn());
+            }
+
+            if (options.multiSelectRowEnabled) {
+                options.columns.unshift(this._createSelectRowColumn());
+            }
+
+            for (var i = 0; i < options.columns.length; i++) {
+                var column = options.columns[i];
+                if (column.order === void 0 && !(column instanceof Backgrid.Column)) {
+                    column.order = i + this.DEFAULT_COLUMN_START_INDEX;
+                }
+                column.metadata = _.findWhere(options.metadata.columns, {name: column.name});
+            }
+
+            this.columns = options.columns = new GridColumns(options.columns);
+            this.columns.sort();
+        },
+
+        /**
          * Init this.rowActions and this.rowClickAction
          *
          * @private
@@ -231,7 +278,9 @@ define(function(require) {
             column = new this.actionsColumn({
                 datagrid: this,
                 actions:  this.rowActions,
-                massActions: this.massActions
+                massActions: this.massActions,
+                manageable: false,
+                order: Infinity
             });
             return column;
         },
@@ -243,17 +292,19 @@ define(function(require) {
          * @private
          */
         _createSelectRowColumn: function() {
-            var coulmn;
-            coulmn = new Backgrid.Column({
+            var column;
+            column = new Backgrid.Column({
                 name:       'massAction',
                 label:      __('Selected Rows'),
                 renderable: true,
                 sortable:   false,
                 editable:   false,
+                manageable: false,
                 cell:       SelectRowCell,
-                headerCell: SelectAllHeaderCell
+                headerCell: SelectAllHeaderCell,
+                order: -Infinity
             });
-            return coulmn;
+            return column;
         },
 
         /**
@@ -288,7 +339,9 @@ define(function(require) {
             };
             _.defaults(toolbarOptions, options);
 
+            this.trigger('beforeToolbarInit', toolbarOptions);
             toolbar = new this.toolbar(toolbarOptions);
+            this.trigger('afterToolbarInit', toolbar);
             return toolbar;
         },
 
@@ -335,15 +388,14 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
                         className: 'btn',
-                        iconClassName: 'icon-refresh'
+                        iconClassName: 'icon-repeat'
                     }
                 });
-
-                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function() {
+                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
                     if (this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
-                });
+                }, 100));
 
                 this.listenTo(this.refreshAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:refresh:' + this.name, [action, options]);
@@ -365,15 +417,15 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
                         className: 'btn',
-                        iconClassName: 'icon-repeat'
+                        iconClassName: 'icon-refresh'
                     }
                 });
 
-                this.listenTo(mediator, 'datagrid:doReset:' + this.name, function() {
+                this.listenTo(mediator, 'datagrid:doReset:' + this.name, _.debounce(function() {
                     if (this.$el.is(':visible')) {
                         this.resetAction.execute();
                     }
-                });
+                }, 100));
 
                 this.listenTo(this.resetAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:reset:' + this.name, [action, options]);
@@ -450,10 +502,18 @@ define(function(require) {
          *
          * @private
          */
-        _listenToBodyEvents: function() {
+        _listenToContentEvents: function() {
             this.listenTo(this.body, 'rowClicked', function(row) {
                 this.trigger('rowClicked', this, row);
                 this._runRowClickAction(row);
+            });
+            this.listenTo(this.columns, 'change:renderable', function() {
+                this.trigger('content:update');
+            });
+            this.listenTo(this.header.row, 'columns:reorder', function() {
+                // triggers content:update event in separate process
+                // to give time body's rows to finish reordering
+                _.defer(_.bind(this.trigger, this, 'content:update'));
             });
         },
 
@@ -695,6 +755,77 @@ define(function(require) {
             var state = this.collection.state;
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];
+            }
+        },
+
+        /**
+         * Ensure that cell is visible. Works like cell.el.scrollIntoView, but in more appropriate way
+         *
+         * @param cell
+         */
+        ensureCellIsVisible: function(cell) {
+            var e = $.Event('ensureCellIsVisible');
+            this.trigger('ensureCellIsVisible', e, cell);
+            if (e.isDefaultPrevented()) {
+                return;
+            }
+            scrollHelper.scrollIntoView(cell.el);
+        },
+
+        /**
+         * Finds cell by corresponding model and column
+         *
+         * @param model
+         * @param column
+         * @return {Backgrid.Cell}
+         */
+        findCell: function(model, column) {
+            var rows = this.body.rows;
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                if (row.model === model) {
+                    var cells = row.cells;
+                    for (var j = 0; j < cells.length; j++) {
+                        var cell = cells[j];
+                        if (cell.column === column) {
+                            return cell;
+                        }
+                    }
+                }
+            }
+            return null;
+        },
+
+        /**
+         * Finds cell by model and column indexes
+         *
+         * @param {number} modelI
+         * @param {number} columnI
+         * @return {Backgrid.Cell}
+         */
+        findCellByIndex: function(modelI, columnI) {
+            try {
+                return _.findWhere(this.body.rows[modelI].cells, {
+                    column: this.columns.at(columnI)
+                });
+            } catch (e) {
+                return null;
+            }
+        },
+
+        /**
+         * Finds header cell by column index
+         *
+         * @param {number} columnI
+         * @return {Backgrid.Cell}
+         */
+        findHeaderCellByIndex: function(columnI) {
+            try {
+                return _.findWhere(this.header.row.cells, {
+                    column: this.columns.at(columnI)
+                });
+            } catch (e) {
+                return null;
             }
         }
     });

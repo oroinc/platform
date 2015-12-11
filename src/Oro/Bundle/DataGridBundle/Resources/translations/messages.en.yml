@@ -4,7 +4,6 @@ oro_datagrid:
     not_found_hint %entityHint%:  "No %entityHint% was found to match your search. Try modifying your search criteria ..."
     label_add_filter: Manage filters
     label_loading_mask: "Loading . . ."
-
 oro:
     datagrid:
         gridview:
@@ -20,6 +19,7 @@ oro:
             sorters_data.label: Sorters
             type.label: Type
             shared_by: %name% (Shared by %owner%)
+            columns_data.label: Columns data
     grid:
         mass_action:
             label: Mass Actions
@@ -53,3 +53,4 @@ oro:
             fields:
                 default_per_page.label: 'Items per Page by Default'
                 full_screen_layout_enabled.label: 'Lock headers in grids'
+                full_screen_layout_enabled.tooltip: 'This parameter controls whether grid headers will be locked on a page during scrolling'

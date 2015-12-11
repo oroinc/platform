@@ -16,7 +16,10 @@ class MergeModesListener
         $entityMetadata = $event->getEntityMetadata();
 
         foreach ($entityMetadata->getFieldsMetadata() as $fieldMetadata) {
-            $this->initMergeModes($fieldMetadata);
+            $mergeModes = $fieldMetadata->getMergeModes();
+            if (empty($mergeModes)) {
+                $this->initMergeModes($fieldMetadata);
+            }
         }
     }
 

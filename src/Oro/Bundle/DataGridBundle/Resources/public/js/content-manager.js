@@ -31,7 +31,10 @@ define([
 
         trace: function(collection) {
             updateState(collection);
-            contentManager.listenTo(collection, 'beforeReset', updateState);
+            contentManager.listenTo(collection, {
+                updateState: updateState,
+                beforeReset: updateState
+            });
             mediator.once('page:beforeChange', function() {
                 contentManager.stopListening(collection);
             });

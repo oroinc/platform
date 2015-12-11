@@ -1,14 +1,14 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
-    ], function($, _, __) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var emailRegExp = require('oroui/js/tools/patterns').email;
+    require('jquery.validate');
 
     var defaultParam = {
         message: 'This value is not a valid email address.'
     };
-
-    var emailRegExp = new RegExp(
-        '^(([^<>()[\\]\\\\.,;:\\s@\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\"]+)*)|' +
-        '(\\".+\\"))@(([^<>()[\\]\\\\.,;:\\s@\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\"]+)*)|(\\".+\\"))$', 'i');
 
     /**
      * @export oroform/js/validator/email

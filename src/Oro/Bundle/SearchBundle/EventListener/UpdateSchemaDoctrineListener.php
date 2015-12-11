@@ -4,9 +4,11 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 use Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand;
@@ -20,6 +22,9 @@ class UpdateSchemaDoctrineListener
 
     /**  @var ManagerRegistry */
     protected $registry;
+
+    /** @var bool|null */
+    protected $isExceptionOccurred;
 
     /**
      * @param FulltextIndexManager $fulltextIndexManager
@@ -36,31 +41,46 @@ class UpdateSchemaDoctrineListener
      */
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
-        if ($event->getCommand() instanceof UpdateSchemaDoctrineCommand) {
-            $output = $event->getOutput();
-            $input  = $event->getInput();
+        if (!$this->isExceptionOccurred) {
+            if ($event->getCommand() instanceof UpdateSchemaDoctrineCommand) {
+                $output = $event->getOutput();
+                $input  = $event->getInput();
 
-            if ($input->getOption('force')) {
-                $result = $this->fulltextIndexManager->createIndexes();
+                if ($input->getOption('force')) {
+                    $result = $this->fulltextIndexManager->createIndexes();
 
-                $output->writeln('Schema update and create index completed.');
-                if ($result) {
-                    $output->writeln('Indexes were created.');
+                    $output->writeln('Schema update and create index completed.');
+                    if ($result) {
+                        $output->writeln('Indexes were created.');
+                    }
+                }
+            }
+
+            if ($event->getCommand() instanceof UpdateSchemaCommand) {
+                /** @var EntityManager $searchEntityManager */
+                $searchEntityManager = $this->registry->getManagerForClass('OroSearchBundle:UpdateEntity');
+                $entities = $searchEntityManager->getRepository('OroSearchBundle:UpdateEntity')->findAll();
+                if (count($entities)) {
+                    /** @var EntityManager $em */
+                    $em = $this->registry->getManagerForClass('JMS\JobQueueBundle\Entity\Job');
+                    foreach ($entities as $entity) {
+                        $job = new Job(ReindexCommand::COMMAND_NAME, ['class' => $entity->getEntity()]);
+                        $em->persist($job);
+                        $searchEntityManager->remove($entity);
+                    }
+                    $em->flush();
+                    $searchEntityManager->flush();
                 }
             }
         }
+        $this->isExceptionOccurred = null;
+    }
 
-        if ($event->getCommand() instanceof UpdateSchemaCommand) {
-            $entities = $this->registry->getRepository('OroSearchBundle:UpdateEntity')->findAll();
-            if (count($entities)) {
-                $em = $this->registry->getManager();
-                foreach ($entities as $entity) {
-                    $job = new Job(ReindexCommand::COMMAND_NAME, ['class' => $entity->getEntity()]);
-                    $em->persist($job);
-                    $em->remove($entity);
-                }
-                $em->flush($job);
-            }
-        }
+    /**
+     * @param ConsoleExceptionEvent $event
+     */
+    public function onConsoleException(ConsoleExceptionEvent $event)
+    {
+        $this->isExceptionOccurred = true;
     }
 }

@@ -126,6 +126,29 @@ class ActivityListChainProvider
     }
 
     /**
+     * @param string $targetClassName
+     * @param string $activityClassName
+     *
+     * @return bool
+     */
+    public function isApplicableTarget($targetClassName, $activityClassName)
+    {
+        /** @var ConfigIdInterface[] $configIds */
+        $configIds = $this->configManager->getIds('entity', null, false);
+        foreach ($configIds as $configId) {
+            if (array_key_exists($activityClassName, $this->providers)) {
+                $provider = $this->getProviderByClass($activityClassName);
+                if ($provider->isApplicableTarget($configId, $this->configManager)
+                    && $configId->getClassName() === $targetClassName) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get array with supported activity classes
      *
      * @return array

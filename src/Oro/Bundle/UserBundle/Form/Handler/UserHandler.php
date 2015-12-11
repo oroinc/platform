@@ -11,12 +11,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -27,13 +23,10 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
  *
  * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  */
-class UserHandler extends AbstractUserHandler implements TagHandlerInterface
+class UserHandler extends AbstractUserHandler
 {
     /** @var DelegatingEngine */
     protected $templating;
-
-    /** ConfigManager */
-    protected $cm;
 
     /** @var \Swift_Mailer */
     protected $mailer;
@@ -47,13 +40,10 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var TagManager */
-    protected $tagManager;
-
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /** @var UserConfigManager */
+    /** @var ConfigManager */
     protected $userConfigManager;
 
     /** @var SecurityFacade */
@@ -63,39 +53,34 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
      * @param FormInterface $form
      * @param Request $request
      * @param UserManager $manager
-     * @param UserConfigManager $userConfigManager
-     * @param ConfigManager $cm
+     * @param ConfigManager $userConfigManager
      * @param DelegatingEngine $templating
      * @param \Swift_Mailer $mailer
      * @param FlashBagInterface $flashBag
      * @param TranslatorInterface $translator
      * @param LoggerInterface $logger
-     * @param ServiceLink $serviceLink
+     * @param SecurityFacade $securityFacade
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         UserManager $manager,
-        UserConfigManager $userConfigManager = null,
-        ConfigManager $cm = null,
+        ConfigManager $userConfigManager = null,
         DelegatingEngine $templating = null,
         \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,
         TranslatorInterface $translator = null,
         LoggerInterface $logger = null,
-        ServiceLink $serviceLink = null
+        SecurityFacade $securityFacade = null
     ) {
         parent::__construct($form, $request, $manager);
         $this->userConfigManager = $userConfigManager;
         $this->templating = $templating;
-        $this->cm = $cm;
         $this->mailer = $mailer;
         $this->flashBag = $flashBag;
         $this->translator = $translator;
         $this->logger = $logger;
-        if ($serviceLink !== null) {
-            $this->securityFacade = $serviceLink->getService();
-        }
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -122,14 +107,6 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setTagManager(TagManager $tagManager)
-    {
-        $this->tagManager = $tagManager;
-    }
-
-    /**
      * @param BusinessUnitManager $businessUnitManager
      */
     public function setBusinessUnitManager(BusinessUnitManager $businessUnitManager)
@@ -143,7 +120,6 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     protected function onSuccess(User $user)
     {
         $this->manager->updateUser($user);
-        $this->tagManager->saveTagging($user);
 
         if ($this->form->has('inviteUser')
             && $this->form->has('plainPassword')
@@ -168,7 +144,13 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         // to avoid "Call to a member function on a non-object".
         $this->manager->reloadUser($user);
         if ($this->form->has('signature') && $this->userConfigManager !== null) {
-            $this->userConfigManager->saveUserConfigSignature($this->form->get('signature')->getData());
+            $signature = $this->form->get('signature')->getData();
+            if ($signature) {
+                $this->userConfigManager->set('oro_email.signature', $signature);
+            } else {
+                $this->userConfigManager->reset('oro_email.signature');
+            }
+            $this->userConfigManager->flush();
         }
     }
 
@@ -182,11 +164,11 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
      */
     protected function sendInviteMail(User $user, $plainPassword)
     {
-        if (in_array(null, [$this->cm, $this->mailer, $this->templating], true)) {
+        if (in_array(null, [$this->userConfigManager, $this->mailer, $this->templating], true)) {
             throw new \RuntimeException('Unable to send invitation email, unmet dependencies detected.');
         }
-        $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
-        $senderName = $this->cm->get('oro_notification.email_notification_sender_name');
+        $senderEmail = $this->userConfigManager->get('oro_notification.email_notification_sender_email');
+        $senderName = $this->userConfigManager->get('oro_notification.email_notification_sender_name');
 
         $message = \Swift_Message::newInstance()
             ->setSubject('Invite user')

@@ -25,10 +25,16 @@ define([
             // server could return object instead of array
             // read them to array
             this.colors = [];
-            for (var i = 0; options.colors[i]; i++) {
-                this.colors[i] = options.colors[i];
+            var i;
+            if (options.colors) {
+                for (i = 0; options.colors[i]; i++) {
+                    this.colors[i] = options.colors[i];
+                }
             }
-            this.defaultColor = options.colors[15];
+            if (this.colors.length > 0) {
+                var lastIndex = this.colors.length - 1;
+                this.defaultColor = options.colors[lastIndex];
+            }
             this.calendarColors = {};
         },
 

@@ -21,15 +21,29 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var config = options.configs;
+            var config = options.configs || {};
             this.perPage = _.result(config, 'per_page') || this.perPage;
             this.url = _.result(options, 'url') || '';
             this.excluded = _.result(options, 'excluded') || this.excluded;
             config = this.preConfig(config);
             config = this.setConfig(config);
             if (options._sourceElement.is('select') || config.query || config.ajax || config.data || config.tags) {
-                this.view = new this.ViewType({el: options._sourceElement, select2Config: config});
+                this.view = new this.ViewType(this.prepareViewOptions(options, config));
             }
+        },
+
+        /**
+         * Prepares options for the related view
+         *
+         * @param {Object} options - component's options
+         * @param {Object} config - select2's options
+         * @return {Object}
+         */
+        prepareViewOptions: function(options, config) {
+            return {
+                el: options._sourceElement,
+                select2Config: config
+            };
         },
 
         preConfig: function(config) {
@@ -187,7 +201,10 @@ define(function(require) {
             }
         );
 
-        if (selectedData.length > 0) {
+        var emptySelection = selectedData.length === 0 ||
+            (selectedData.length === 1 && _.first(selectedData).id === null && _.first(selectedData).name === null);
+
+        if (!emptySelection) {
             dataIds = _.map(selectedData, function(item) {
                 return item.id;
             });

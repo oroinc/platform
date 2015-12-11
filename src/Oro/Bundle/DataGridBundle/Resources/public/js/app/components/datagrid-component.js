@@ -15,6 +15,7 @@ define(function(require) {
     var gridContentManager = require('orodatagrid/js/content-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
+    var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
 
     helpers = {
         cellType: function(type) {
@@ -47,6 +48,7 @@ define(function(require) {
                     return module === 'orofilter/js/datafilter-builder';
                 });
             }
+            options.builders.push('orodatagrid/js/inline-editing/builder');
 
             var self = this;
             this._deferredInit();
@@ -145,17 +147,29 @@ define(function(require) {
          * Build grid
          */
         build: function() {
+            var collectionModels;
             var collectionOptions;
             var grid;
 
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
+
+            collectionModels = {};
+            if (this.data && this.data.data) {
+                collectionModels = this.data.data;
+            }
+
+            collectionOptions = this.combineCollectionOptions();
+            if (this.data && this.data.options) {
+                _.extend(collectionOptions, this.data.options);
+            }
+
             if (!collection) {
                 // otherwise, create collection from metadata
-                collectionOptions = this.combineCollectionOptions();
-                collection = new PageableCollection(this.data, collectionOptions);
+                collection = new PageableCollection(collectionModels, collectionOptions);
             } else if (this.data) {
-                collection.reset(this.data, {parse: true});
+                _.extend(collectionOptions, {parse: true});
+                collection.reset(collectionModels, collectionOptions);
             }
 
             // create grid
@@ -167,7 +181,7 @@ define(function(require) {
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
-            mediator.trigger('datagrid:rendered');
+            mediator.trigger('datagrid:rendered', grid);
 
             if (options.routerEnabled !== false) {
                 // trace collection changes
@@ -196,9 +210,11 @@ define(function(require) {
                 url: '\/user\/json',
                 state: _.extend({
                     filters: {},
-                    sorters: {}
+                    sorters: {},
+                    columns: {}
                 }, this.metadata.state),
-                initialState: this.metadata.initialState
+                initialState: this.metadata.initialState,
+                mode: this.metadata.mode || 'server'
             }, this.metadata.options);
             return options;
         },
@@ -217,11 +233,12 @@ define(function(require) {
             };
             var modules = this.modules;
             var metadata = this.metadata;
-            var plugins = [];
+            var plugins = this.metadata.plugins || [];
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
-                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'];
+                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align',
+                    'order', 'manageable', 'required'];
                 var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
                 var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
                 var cellType = modules[helpers.cellType(cell.type)];
@@ -248,6 +265,10 @@ define(function(require) {
                 if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
+            }
+
+            if (metadata.options.toolbarOptions.addColumnManager) {
+                plugins.push(ColumnManagerPlugin);
             }
 
             return {

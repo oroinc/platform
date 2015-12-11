@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Util\ClassUtils;
+
+use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
@@ -15,7 +18,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class DynamicFieldsExtension extends \Twig_Extension
@@ -25,13 +28,13 @@ class DynamicFieldsExtension extends \Twig_Extension
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $extendProvider;
 
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $entityProvider;
 
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $viewProvider;
 
     /** @var PropertyAccessor */
@@ -76,7 +79,6 @@ class DynamicFieldsExtension extends \Twig_Extension
     public function getFields($entity, $entityClass = null)
     {
         $dynamicRow = [];
-        $priorities = [];
 
         if (null === $entityClass) {
             $entityClass = ClassUtils::getRealClass($entity);
@@ -100,15 +102,17 @@ class DynamicFieldsExtension extends \Twig_Extension
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
             $dynamicRow[$fieldName] = [
-                'type'  => $fieldType,
-                'label' => $fieldConfig->get('label') ?: $fieldName,
-                'value' => $event->getFieldViewValue(),
+                'type'     => $fieldType,
+                'label'    => $fieldConfig->get('label') ?: $fieldName,
+                'value'    => $event->getFieldViewValue(),
+                'priority' => $this->viewProvider->getConfigById($fieldConfigId)->get('priority', false, 0)
             ];
-
-            $priorities[] = $this->viewProvider->getConfigById($fieldConfigId)->get('priority', false, 0);
         }
 
-        array_multisort($priorities, SORT_DESC, $dynamicRow);
+        ArrayUtil::sortBy($dynamicRow, true);
+        foreach ($dynamicRow as &$row) {
+            unset($row['priority']);
+        }
 
         return $dynamicRow;
     }
@@ -123,10 +127,9 @@ class DynamicFieldsExtension extends \Twig_Extension
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $extendConfig->getId();
 
-        // skip system, new and deleted fields
+        // skip system and not accessible fields
         if (!$config->is('owner', ExtendScope::OWNER_CUSTOM)
-            || $config->is('state', ExtendScope::STATE_NEW)
-            || $config->is('is_deleted')
+            || !ExtendHelper::isFieldAccessible($config)
         ) {
             return false;
         }
@@ -136,10 +139,12 @@ class DynamicFieldsExtension extends \Twig_Extension
             return false;
         }
 
-        // skip relations if they are referenced to deleted entity
+        // skip relations if they are referenced to not accessible entity
         $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
-        if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations)
-            && $this->extendProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
+        if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations, true)
+            && !ExtendHelper::isEntityAccessible(
+                $this->extendProvider->getConfig($extendConfig->get('target_entity'))
+            )
         ) {
             return false;
         }

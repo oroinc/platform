@@ -22,11 +22,30 @@ define([
         /**
          * @inheritDoc
          */
-        enterEditMode: function(e) {
+        render: function() {
+            var render = StringCell.__super__.render.apply(this, arguments);
+
+            this.enterEditMode();
+
+            return render;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        enterEditMode: function() {
             if (this.column.get('editable')) {
-                e.stopPropagation();
+                StringCell.__super__.enterEditMode.apply(this, arguments);
             }
-            return StringCell.__super__.enterEditMode.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        exitEditMode: function() {
+            if (!this.column.get('editable')) {
+                StringCell.__super__.exitEditMode.apply(this, arguments);
+            }
         }
     });
 
