@@ -67,7 +67,7 @@ define(function(require) {
     var RelatedIdRelationEditorView = require('./related-id-relation-editor-view');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var select2autosizer = require('../../../utils/select2-autosizer');
+    var select2autosizer = require('oroui/js/tools/select2-autosizer');
 
     MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @exports MultiRelationEditorView.prototype */{
         className: 'multi-relation-editor',

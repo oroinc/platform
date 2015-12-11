@@ -68,10 +68,15 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var $ = require('jquery');
+    var select2autosizer = require('oroui/js/tools/select2-autosizer');
 
     TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
         className: 'tags-select-editor',
         DEFAULT_PER_PAGE: 20,
+
+        listen: {
+            'change:visibility': 'autoSize'
+        },
 
         initialize: function(options) {
             TagsEditorView.__super__.initialize.apply(this, arguments);
@@ -93,6 +98,10 @@ define(function(require) {
             var isOwner = tag.owner === void 0 ? true : tag.owner;
             tag.locked = this.permissions.oro_tag_unassign_global ? false : !isOwner;
             return tag;
+        },
+
+        autoSize: function() {
+            select2autosizer.applyTo(this.$el, this);
         },
 
         getSelect2Options: function() {
