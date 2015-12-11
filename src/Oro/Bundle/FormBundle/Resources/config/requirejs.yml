@@ -49,6 +49,8 @@ config:
         'oroform/js/validator/type': 'bundles/oroform/js/validator/type.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
 
+        #inline editing
+        'oroform/js/tools/frontend-type-map': 'bundles/oroform/js/tools/frontend-type-map.js'
         'oroform/js/app/components/inline-editable-view-component': 'bundles/oroform/js/app/components/inline-editable-view-component.js'
         'oroform/js/app/views/editor/text-editor-view': 'bundles/oroform/js/app/views/editor/text-editor-view.js'
         'oroform/js/app/views/editor/date-editor-view': 'bundles/oroform/js/app/views/editor/date-editor-view.js'
@@ -59,6 +61,7 @@ config:
         'oroform/js/app/views/editor/related-id-select-editor-view': 'bundles/oroform/js/app/views/editor/related-id-select-editor-view.js'
         'oroform/js/app/views/editor/select-editor-view': 'bundles/oroform/js/app/views/editor/select-editor-view.js'
         'oroform/js/app/views/editor/abstract-relation-editor-view': 'bundles/oroform/js/app/views/editor/abstract-relation-editor-view.js'
+        'oroform/js/app/views/editor/multi-checkbox-editor-view': 'bundles/oroform/js/app/views/editor/multi-checkbox-editor-view.js'
 
         'oroform/js/formatter/field': 'bundles/oroform/js/formatter/field.js'
 
@@ -72,6 +75,7 @@ config:
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
 
         'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view.js'
+        'oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view.js'
         'oroform/js/app/views/simple-color-picker-view': 'bundles/oroform/js/app/views/simple-color-picker-view.js'
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
