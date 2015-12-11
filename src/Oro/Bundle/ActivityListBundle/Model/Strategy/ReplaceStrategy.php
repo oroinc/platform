@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -11,6 +10,7 @@ use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
  * Class ReplaceStrategy
@@ -54,7 +54,7 @@ class ReplaceStrategy implements StrategyInterface
         $activityClass = $fieldMetadata->get('type');
 
         $activityListItems = $this->getActivitiesByEntity($masterEntity, $activityClass);
-        $activityIds = array_column($activityListItems, 'relatedActivityId');
+        $activityIds = ArrayUtils::arrayColumn($activityListItems, 'relatedActivityId');
 
         $activities = $this->doctrineHelper->getEntityRepository($activityClass)->findBy(['id' => $activityIds]);
         foreach ($activities as $activity) {
@@ -63,7 +63,7 @@ class ReplaceStrategy implements StrategyInterface
 
         $activityListItems = $this->getActivitiesByEntity($sourceEntity, $activityClass);
 
-        $activityIds = array_column($activityListItems, 'id');
+        $activityIds = ArrayUtils::arrayColumn($activityListItems, 'id');
         $entityClass = ClassUtils::getRealClass($masterEntity);
         $this->activityListManager
             ->replaceActivityTargetWithPlainQuery(
@@ -73,7 +73,7 @@ class ReplaceStrategy implements StrategyInterface
                 $masterEntity->getId()
             );
 
-        $activityIds = array_column($activityListItems, 'relatedActivityId');
+        $activityIds = ArrayUtils::arrayColumn($activityListItems, 'relatedActivityId');
         $this->activityListManager
             ->replaceActivityTargetWithPlainQuery(
                 $activityIds,
@@ -114,4 +114,5 @@ class ReplaceStrategy implements StrategyInterface
     {
         return 'activity_replace';
     }
+
 }

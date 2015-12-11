@@ -3,13 +3,13 @@
 namespace Oro\Bundle\NoteBundle\Model\Strategy;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 use Oro\Bundle\NoteBundle\Model\MergeModes;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
  * Class ReplaceStrategy
@@ -60,7 +60,7 @@ class ReplaceStrategy implements StrategyInterface
             ->getActivityListQueryBuilderByActivityClass($entityClass, $sourceEntity->getId(), $activityClass);
         $activityListItems = $queryBuilder->getQuery()->getResult();
 
-        $activityIds = array_column($activityListItems, 'id');
+        $activityIds = ArrayUtils::arrayColumn($activityListItems, 'id');
         $this->activityListManager
             ->replaceActivityTargetWithPlainQuery(
                 $activityIds,
