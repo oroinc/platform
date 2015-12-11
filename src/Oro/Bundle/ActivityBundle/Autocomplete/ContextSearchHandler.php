@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\ActivityBundle\Autocomplete;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Util\ClassUtils;
@@ -12,8 +13,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -22,6 +24,7 @@ use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 
 /**
  * This is specified handler that search targets entities for specified activity class.
@@ -60,20 +63,23 @@ class ContextSearchHandler implements ConverterInterface
     /** @var ObjectMapper */
     protected $mapper;
 
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
     /** @var string */
     protected $class;
 
     /**
-     * @param TokenStorageInterface $token
-     * @param TranslatorInterface   $translator
-     * @param Indexer               $indexer
-     * @param ActivityManager       $activityManager
-     * @param ConfigManager         $configManager
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param EntityNameResolver    $entityNameResolver
-     * @param ObjectManager         $objectManager
-     * @param ObjectMapper          $mapper
-     * @param string|null           $class
+     * @param TokenStorageInterface    $token
+     * @param TranslatorInterface      $translator
+     * @param Indexer                  $indexer
+     * @param ActivityManager          $activityManager
+     * @param ConfigManager            $configManager
+     * @param EntityClassNameHelper    $entityClassNameHelper
+     * @param ObjectManager            $objectManager
+     * @param ObjectMapper             $mapper
+     * @param EventDispatcherInterface $dispatcher
+     * @param string|null              $class
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -84,9 +90,9 @@ class ContextSearchHandler implements ConverterInterface
         ActivityManager $activityManager,
         ConfigManager $configManager,
         EntityClassNameHelper $entityClassNameHelper,
-        EntityNameResolver $entityNameResolver,
         ObjectManager $objectManager,
         ObjectMapper $mapper,
+        EventDispatcherInterface $dispatcher,
         $class = null
     ) {
         $this->token                 = $token;
@@ -95,9 +101,9 @@ class ContextSearchHandler implements ConverterInterface
         $this->activityManager       = $activityManager;
         $this->configManager         = $configManager;
         $this->entityClassNameHelper = $entityClassNameHelper;
-        $this->entityNameResolver    = $entityNameResolver;
         $this->objectManager         = $objectManager;
         $this->mapper                = $mapper;
+        $this->dispatcher            = $dispatcher;
         $this->class                 = $class;
     }
 
@@ -185,7 +191,14 @@ class ContextSearchHandler implements ConverterInterface
         $text      = $item->getRecordTitle();
         $className = $item->getEntityName();
 
-        if (strlen($text) === 0 || !$this->mapper->getEntityMapParameter($className, 'title_fields')) {
+        $entityMapParameter = $this->mapper->getEntityMapParameter($className, 'title_fields');
+
+        if ($text === null && $entityMapParameter) {
+            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+            $text = $item->getRecordTitle();
+        }
+
+        if (strlen($text) === 0 && !$entityMapParameter) {
             $text = $this->translator->trans('oro.entity.item', ['%id%' => $item->getRecordId()]);
         }
 
