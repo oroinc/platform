@@ -50,10 +50,10 @@ class EmailManager
         EmailThreadProvider $emailThreadProvider,
         SecurityFacade $securityFacade
     ) {
-        $this->em = $em;
-        $this->emailThreadManager = $emailThreadManager;
+        $this->em                  = $em;
+        $this->emailThreadManager  = $emailThreadManager;
         $this->emailThreadProvider = $emailThreadProvider;
-        $this->securityFacade = $securityFacade;
+        $this->securityFacade      = $securityFacade;
     }
 
     /**
@@ -82,14 +82,13 @@ class EmailManager
      */
     public function setSeenStatus(Email $entity, $isSeen = true, $checkThread = false)
     {
-        $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
-        foreach ($emails as $email) {
-            $emailUsers = $this->getCurrentEmailUser($email);
-            if ($emailUsers) {
-                foreach ($emailUsers as $emailUser) {
-                    $this->setEmailUserSeen($emailUser, $isSeen);
-                }
-            }
+        $user         = $this->securityFacade->getToken()->getUser();
+        $organization = $this->securityFacade->getOrganization();
+        $emailUsers   = $this->getEmailUserRepository()
+            ->getAllEmailUsersByEmail($entity, $user, $organization, $checkThread);
+
+        foreach ($emailUsers as $emailUser) {
+            $this->setEmailUserSeen($emailUser, $isSeen);
         }
 
         $this->em->flush();
@@ -102,7 +101,7 @@ class EmailManager
      */
     public function toggleEmailUserSeen(EmailUser $entity)
     {
-        $seen = !((bool) $entity->isSeen());
+        $seen = !((bool)$entity->isSeen());
         $this->setEmailUserSeen($entity, $seen);
         $this->em->persist($entity);
 
@@ -125,7 +124,7 @@ class EmailManager
     /**
      * Mark all email as seen
      *
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
      *
      * @return boolean
@@ -136,7 +135,7 @@ class EmailManager
             ->em
             ->getRepository('OroEmailBundle:EmailUser')
             ->findUnseenUserEmail($user, $organization, $ids);
-        $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
+        $unseenUserEmails      = $emailUserQueryBuilder->getQuery()->getResult();
 
         foreach ($unseenUserEmails as $userEmail) {
             $this->setEmailUserSeen($userEmail);
@@ -153,7 +152,7 @@ class EmailManager
 
     /**
      * @param Email $entity
-     * @param $target
+     * @param       $target
      */
     public function addContextToEmailThread(Email $entity, $target)
     {
@@ -167,7 +166,7 @@ class EmailManager
 
     /**
      * @param Email $entity
-     * @param $target
+     * @param       $target
      */
     public function deleteContextFromEmailThread(Email $entity, $target)
     {
@@ -188,7 +187,7 @@ class EmailManager
      */
     protected function getCurrentEmailUser(Email $entity)
     {
-        $user = $this->securityFacade->getToken()->getUser();
+        $user                = $this->securityFacade->getToken()->getUser();
         $currentOrganization = $this->securityFacade->getOrganization();
 
         return array_merge(
@@ -201,7 +200,7 @@ class EmailManager
      * Prepare emails to set status. If need get all from thread
      *
      * @param Email $entity
-     * @param bool $checkThread Get threaded emails
+     * @param bool  $checkThread Get threaded emails
      *
      * @return Email[]
      */
