@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Extension;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
 use Oro\Bundle\DataGridBundle\Layout\Block\Extension\TaggableDatagridExtension;
@@ -53,30 +54,22 @@ class TaggableDatagridExtensionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @dataProvider buildViewOptionsDataProvider
-     * @param array $options
-     * @param array $expectedVars
-     */
-    public function testBuildView(array $options, array $expectedVars)
+    public function testBuildView()
     {
         $view = new BlockView();
+        /** @var BlockInterface $block */
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $this->extension->buildView($view, $block, $options);
-        unset($view->vars['attr']);
-        $this->assertEquals($expectedVars, $view->vars);
+        $this->extension->buildView($view, $block, ['enable_tagging' => true]);
+        $this->assertTrue($view->vars['enable_tagging']);
     }
 
-    /**
-     * @return array
-     */
-    public function buildViewOptionsDataProvider()
+    public function testFinishView()
     {
-        return [
-            [
-                ['enable_tagging' => true],
-                ['enable_tagging' => true]
-            ]
-        ];
+        $view = new BlockView();
+        $view->vars['block_prefixes'] = [];
+        /** @var BlockInterface $block */
+        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $this->extension->finishView($view, $block, ['enable_tagging' => true]);
+        $this->assertEquals('taggable_datagrid', $view->vars['block_prefixes'][0]);
     }
 }

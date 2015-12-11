@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
@@ -85,5 +87,56 @@ class DatagridTypeTest extends BlockTypeTestCase
         $type = new DatagridType($this->nameStrategy);
 
         $this->assertSame(DatagridType::NAME, $type->getName());
+    }
+
+    /**
+     * @dataProvider optionsDataProvider
+     * @param array $options
+     * @param array $expectedOptions
+     */
+    public function testSetDefaultOptions(array $options, array $expectedOptions)
+    {
+        $datagridType = new DatagridType($this->nameStrategy);
+        $resolver = new OptionsResolver();
+        $datagridType->setDefaultOptions($resolver);
+
+        $actual = $resolver->resolve($options);
+        $this->assertEquals($expectedOptions, $actual);
+    }
+
+    /**
+     * @return array
+     */
+    public function optionsDataProvider()
+    {
+        return [
+            'default' => [
+                [
+                    'grid_name' => 'test_grid',
+                ],
+                [
+                    'grid_name' => 'test_grid',
+                    'grid_parameters' => [
+                        'enableFullScreenLayout' => true,
+                    ],
+                ]
+            ],
+            'custom' => [
+                [
+                    'grid_name' => 'test_grid',
+                    'grid_scope' => 'test_scope',
+                    'grid_parameters' => [
+                        'enableFullScreenLayout' => false,
+                    ],
+                ],
+                [
+                    'grid_name' => 'test_grid',
+                    'grid_scope' => 'test_scope',
+                    'grid_parameters' => [
+                        'enableFullScreenLayout' => false,
+                    ],
+                ]
+            ],
+        ];
     }
 }
