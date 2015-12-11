@@ -74,6 +74,10 @@ define(function(require) {
         className: 'tags-select-editor',
         DEFAULT_PER_PAGE: 20,
 
+        events: {
+            'change input[name=value]': 'autoSize'
+        },
+
         listen: {
             'change:visibility': 'autoSize'
         },
