@@ -48,7 +48,7 @@ class MailboxRepository extends EntityRepository
         return $qb->getQuery()->getResult();
     }
 
-        /**
+    /**
      * Returns a list of ids of mailboxes available to user.
      *
      * @param User|integer $user User or user id
