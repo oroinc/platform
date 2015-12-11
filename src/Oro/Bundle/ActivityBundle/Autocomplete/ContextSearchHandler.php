@@ -16,7 +16,6 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -53,9 +52,6 @@ class ContextSearchHandler implements ConverterInterface
 
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
-
-    /** @var EntityNameResolver  */
-    protected $entityNameResolver;
 
     /** @var ObjectManager */
     protected $objectManager;
