@@ -604,6 +604,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_email.mailbox.process_storage
             - @oro_security.security_facade
+            - @oro_email.related_emails.provider
         tags:
             - { name: twig.extension }
 
