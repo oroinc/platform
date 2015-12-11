@@ -293,10 +293,12 @@
     float: left;
     border-left: 1px solid #eaeaea;
     padding: 15px 0 25px;
-    margin-left: -1px;
     text-align: center;
     /* width: 20%; calculated on backend and depends on a number of items */
     #gradient > .vertical(#ffffff, #f1f1f1);
+    &:first-child{
+      border: 0;
+    }
     &:hover{
       #gradient > .vertical(#f1f1f1, #ffffff);
     }
