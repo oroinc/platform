@@ -142,161 +142,90 @@ class DictionaryTest extends OrmTestCase
         );
     }
 
-//    public function testApply()
-//    {
-//        $qb = $this->em->createQueryBuilder()
-//            ->select('o.id')
-//            ->from('Stub:TestEntity', 'o');
-//
-//        $values = [
-//            new TestEnumValue('val1', 'Value1'),
-//            new TestEnumValue('val2', 'Value2')
-//        ];
-//        $data   = [
-//            'value' => $values
-//        ];
-//
-//        $params = [
-//            'null_value'                 => ':empty:',
-//            FilterUtility::DATA_NAME_KEY => 'o.values'
-//        ];
-//        $this->filter->init('test', $params);
-//
-//        /** @var OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
-//        $ds = $this->getMock(
-//            'Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter',
-//            ['generateParameterName'],
-//            [$qb]
-//        );
-//        $ds->expects($this->any())
-//            ->method('generateParameterName')
-//            ->will($this->returnValue('param1'));
-//
-//        $this->filter->apply($ds, $data);
-//
-//        $result = $qb->getQuery()->getDQL();
-//        $this->assertEquals(
-//            'SELECT o.id FROM Stub:TestEntity o'
-//            . ' WHERE o IN('
-//            . 'SELECT filter_test'
-//            . ' FROM Stub:TestEntity filter_test'
-//            . ' INNER JOIN filter_test.values filter_test_rel'
-//            . ' WHERE filter_test_rel IN(:param1))',
-//            $result
-//        );
-//        $this->assertEquals(
-//            $values,
-//            $qb->getParameter('param1')->getValue()
-//        );
-//    }
-//
-//    public function testApplyNot()
-//    {
-//        $qb = $this->em->createQueryBuilder()
-//            ->select('o.id')
-//            ->from('Stub:TestEntity', 'o');
-//
-//        $values = [
-//            new TestEnumValue('val1', 'Value1'),
-//            new TestEnumValue('val2', 'Value2')
-//        ];
-//        $data   = [
-//            'type'  => ChoiceFilterType::TYPE_NOT_CONTAINS,
-//            'value' => $values
-//        ];
-//
-//        $params = [
-//            'null_value'                 => ':empty:',
-//            FilterUtility::DATA_NAME_KEY => 'o.values'
-//        ];
-//        $this->filter->init('test', $params);
-//
-//        /** @var OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
-//        $ds = $this->getMock(
-//            'Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter',
-//            ['generateParameterName'],
-//            [$qb]
-//        );
-//        $ds->expects($this->any())
-//            ->method('generateParameterName')
-//            ->will($this->returnValue('param1'));
-//
-//        $this->filter->apply($ds, $data);
-//
-//        $result = $qb->getQuery()->getDQL();
-//        $this->assertEquals(
-//            'SELECT o.id FROM Stub:TestEntity o'
-//            . ' WHERE o NOT IN('
-//            . 'SELECT filter_test'
-//            . ' FROM Stub:TestEntity filter_test'
-//            . ' INNER JOIN filter_test.values filter_test_rel'
-//            . ' WHERE filter_test_rel IN(:param1))',
-//            $result
-//        );
-//        $this->assertEquals(
-//            $values,
-//            $qb->getParameter('param1')->getValue()
-//        );
-//    }
-//
-//    public function testApplyNull()
-//    {
-//        $qb = $this->em->createQueryBuilder()
-//            ->select('o.id')
-//            ->from('Stub:TestEntity', 'o');
-//
-//        $data = [
-//            'value' => [':empty:']
-//        ];
-//
-//        $params = [
-//            'null_value'                 => ':empty:',
-//            FilterUtility::DATA_NAME_KEY => 'o.values'
-//        ];
-//        $this->filter->init('test', $params);
-//
-//        $this->filter->apply(new OrmFilterDatasourceAdapter($qb), $data);
-//
-//        $result = $qb->getQuery()->getDQL();
-//        $this->assertEquals(
-//            'SELECT o.id FROM Stub:TestEntity o'
-//            . ' WHERE o IN('
-//            . 'SELECT null_filter_test'
-//            . ' FROM Stub:TestEntity null_filter_test'
-//            . ' LEFT JOIN null_filter_test.values null_filter_test_rel'
-//            . ' WHERE null_filter_test_rel IS NULL)',
-//            $result
-//        );
-//    }
-//
-//    public function testApplyNullNot()
-//    {
-//        $qb = $this->em->createQueryBuilder()
-//            ->select('o.id')
-//            ->from('Stub:TestEntity', 'o');
-//
-//        $data = [
-//            'type'  => ChoiceFilterType::TYPE_NOT_CONTAINS,
-//            'value' => [':empty:']
-//        ];
-//
-//        $params = [
-//            'null_value'                 => ':empty:',
-//            FilterUtility::DATA_NAME_KEY => 'o.values'
-//        ];
-//        $this->filter->init('test', $params);
-//
-//        $this->filter->apply(new OrmFilterDatasourceAdapter($qb), $data);
-//
-//        $result = $qb->getQuery()->getDQL();
-//        $this->assertEquals(
-//            'SELECT o.id FROM Stub:TestEntity o'
-//            . ' WHERE o IN('
-//            . 'SELECT null_filter_test'
-//            . ' FROM Stub:TestEntity null_filter_test'
-//            . ' LEFT JOIN null_filter_test.values null_filter_test_rel'
-//            . ' WHERE null_filter_test_rel IS NOT NULL)',
-//            $result
-//        );
-//    }
+    public function testApply()
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('o.id')
+            ->from('Stub:TestEntity', 'o');
+
+        $values = [
+            new TestEnumValue('val1', 'Value1'),
+            new TestEnumValue('val2', 'Value2')
+        ];
+        $data   = [
+            'value' => $values
+        ];
+
+        $params = [
+            'null_value'                 => ':empty:',
+            FilterUtility::DATA_NAME_KEY => 'o.values'
+        ];
+        $this->filter->init('test', $params);
+
+        /** @var OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
+        $ds = $this->getMock(
+            'Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter',
+            ['generateParameterName'],
+            [$qb]
+        );
+        $ds->expects($this->any())
+            ->method('generateParameterName')
+            ->will($this->returnValue('param1'));
+
+        $this->filter->apply($ds, $data);
+
+        $result = $qb->getQuery()->getDQL();
+        $this->assertEquals(
+            'SELECT o.id FROM Stub:TestEntity o WHERE test IN(:param1)',
+            $result
+        );
+        $this->assertEquals(
+            $values,
+            $qb->getParameter('param1')->getValue()
+        );
+    }
+
+    public function testApplyNot()
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('o.id')
+            ->from('Stub:TestEntity', 'o');
+
+        $values = [
+            new TestEnumValue('val1', 'Value1'),
+            new TestEnumValue('val2', 'Value2')
+        ];
+        $data   = [
+            'type'  => ChoiceFilterType::TYPE_NOT_CONTAINS,
+            'value' => $values
+        ];
+
+        $params = [
+            'null_value'                 => ':empty:',
+            FilterUtility::DATA_NAME_KEY => 'o.values'
+        ];
+        $this->filter->init('test', $params);
+
+        /** @var OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
+        $ds = $this->getMock(
+            'Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter',
+            ['generateParameterName'],
+            [$qb]
+        );
+        $ds->expects($this->any())
+            ->method('generateParameterName')
+            ->will($this->returnValue('param1'));
+
+        $this->filter->apply($ds, $data);
+
+        $result = $qb->getQuery()->getDQL();
+        $this->assertEquals(
+            'SELECT o.id FROM Stub:TestEntity o WHERE test NOT IN(:param1)',
+            $result
+        );
+        $this->assertEquals(
+            $values,
+            $qb->getParameter('param1')->getValue()
+        );
+    }
 }

@@ -60,7 +60,6 @@ class EnumFilterTypeTest extends TypeTestCase
 
         $this->translator->expects($this->any())
             ->method('trans')
-//            ->with('oro.filter.form.label_type_not_in')
             ->will($this->returnValue('None'));
 
         $resolver = $this->getOptionsResolver();

@@ -24,6 +24,9 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
         parent::__construct($factory, $util);
     }
 
+    /**
+     * @return array
+     */
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
