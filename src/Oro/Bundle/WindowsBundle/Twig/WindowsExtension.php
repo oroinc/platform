@@ -4,6 +4,7 @@ namespace Oro\Bundle\WindowsBundle\Twig;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
@@ -39,9 +40,7 @@ class WindowsExtension extends \Twig_Extension
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -80,9 +79,15 @@ class WindowsExtension extends \Twig_Extension
 
         $this->rendered = true;
 
+        try {
+            $windowsStates = $this->windowsStateManager->getWindowsStates();
+        } catch (AccessDeniedException $e) {
+            $windowsStates = [];
+        }
+
         return $environment->render(
             'OroWindowsBundle::states.html.twig',
-            ['windowStates' => $this->windowsStateManager->getWindowsStates()]
+            ['windowStates' => $windowsStates]
         );
     }
 
@@ -96,6 +101,8 @@ class WindowsExtension extends \Twig_Extension
      */
     public function renderFragment(\Twig_Environment $environment, AbstractWindowsState $windowState)
     {
+        $result = '';
+        $scheduleDelete = false;
         $windowState->setRenderedSuccessfully(false);
 
         try {
@@ -103,22 +110,29 @@ class WindowsExtension extends \Twig_Extension
 
             /** @var HttpKernelExtension $httpKernelExtension */
             $httpKernelExtension = $environment->getExtension('http_kernel');
+            $result = $httpKernelExtension->renderFragment($uri);
             $windowState->setRenderedSuccessfully(true);
 
-            return $httpKernelExtension->renderFragment($uri);
+            return $result;
         } catch (NotFoundHttpException $e) {
-            $this->windowsStateManager->deleteWindowsState($windowState->getId());
+            $scheduleDelete = true;
         } catch (\InvalidArgumentException $e) {
-            $this->windowsStateManager->deleteWindowsState($windowState->getId());
+            $scheduleDelete = true;
         }
 
-        return '';
+        if ($scheduleDelete) {
+            try {
+                $this->windowsStateManager->deleteWindowsState($windowState->getId());
+            } catch (AccessDeniedException $e) {
+                return $result;
+            }
+        }
+
+        return $result;
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {

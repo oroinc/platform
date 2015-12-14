@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WindowsBundle\Manager;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -64,7 +65,11 @@ class WindowsStateManager
      */
     public function updateWindowsState($windowId)
     {
-        return (bool)$this->getRepository()->update($this->getUser(), $windowId, $this->requestStateManager->getData());
+        return (bool)$this->getRepository()->update(
+            $this->getUser(),
+            $this->filterId($windowId),
+            $this->requestStateManager->getData()
+        );
     }
 
     /**
@@ -73,7 +78,7 @@ class WindowsStateManager
      */
     public function deleteWindowsState($windowId)
     {
-        return (bool)$this->getRepository()->delete($this->getUser(), $windowId);
+        return (bool)$this->getRepository()->delete($this->getUser(), $this->filterId($windowId));
     }
 
     /**
@@ -90,7 +95,7 @@ class WindowsStateManager
      */
     public function getWindowsState($windowId)
     {
-        return $this->getRepository()->findBy(['user' => $this->getUser(), 'id' => (int)$windowId]);
+        return $this->getRepository()->findBy(['user' => $this->getUser(), 'id' => $this->filterId($windowId)]);
     }
 
     /**
@@ -102,6 +107,20 @@ class WindowsStateManager
     }
 
     /**
+     * @param mixed $windowId
+     * @return int
+     */
+    protected function filterId($windowId)
+    {
+        $windowId = filter_var($windowId, FILTER_VALIDATE_INT);
+        if (false === $windowId) {
+            throw new \InvalidArgumentException('Wrong $windowId type');
+        }
+
+        return $windowId;
+    }
+
+    /**
      * @return UserInterface
      *
      * @see TokenInterface::getUser()
@@ -109,11 +128,11 @@ class WindowsStateManager
     public function getUser()
     {
         if (null === $token = $this->tokenStorage->getToken()) {
-            return null;
+            throw new AccessDeniedException();
         }
 
         if (!is_object($user = $token->getUser())) {
-            return null;
+            throw new AccessDeniedException();
         }
 
         return $user;

@@ -23,19 +23,23 @@ class WindowsStateRequestManager
     public function getData()
     {
         $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            throw new \InvalidArgumentException('Missing $request');
+        }
+
         $data = $request->request->all();
 
         if (!array_key_exists('data', $data)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException('Missing data in $request');
         }
 
         if (!array_key_exists('url', $data['data'])) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException('Missing url in $data');
         }
 
-        $cleanUrl = str_replace($request->server->get('SCRIPT_NAME'), '', $data['data']['url']);
+        $cleanUrl = str_replace($request->getScriptName(), '', $data['data']['url']);
         if (!$cleanUrl) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException('$cleanUrl is empty');
         }
 
         $data['data']['cleanUrl'] = $cleanUrl;
@@ -49,6 +53,7 @@ class WindowsStateRequestManager
      */
     public function getUri(array $data)
     {
+        $uri = null;
         if (isset($data['cleanUrl'])) {
             if (isset($data['type'])) {
                 $wid = isset($data['wid']) ? $data['wid'] : $this->getUniqueIdentifier();
@@ -58,8 +63,8 @@ class WindowsStateRequestManager
             }
         }
 
-        if (!$uri) {
-            throw new \InvalidArgumentException();
+        if (null === $uri) {
+            throw new \InvalidArgumentException('cleanUrl is missing');
         }
 
         return $uri;
@@ -94,6 +99,6 @@ class WindowsStateRequestManager
      */
     protected function getUniqueIdentifier()
     {
-        return str_replace('.', '-', uniqid('windows_state', true));
+        return str_replace('.', '-', uniqid('', true));
     }
 }

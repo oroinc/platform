@@ -79,17 +79,18 @@ abstract class AbstractWindowsState
      */
     public function getData()
     {
-        return json_decode($this->data, true);
+        return $this->data;
     }
 
     /**
      * Get JSON data
      *
      * @return string
+     * @deprecated use getData method instead
      */
     public function getJsonData()
     {
-        return $this->data;
+        return json_encode($this->data);
     }
 
     /**
