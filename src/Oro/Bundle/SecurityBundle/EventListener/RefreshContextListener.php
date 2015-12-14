@@ -88,6 +88,8 @@ class RefreshContextListener
         }
         $user = $this->refreshEntity($user, $userClass, $em);
         if ($user) {
+            // prevent invoke update event after reload user
+            $em->getUnitOfWork()->markReadOnly($user);
             $token->setUser($user);
         } else {
             $this->securityTokenStorage->setToken(null);
