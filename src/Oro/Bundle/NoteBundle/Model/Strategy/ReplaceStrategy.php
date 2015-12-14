@@ -3,13 +3,13 @@
 namespace Oro\Bundle\NoteBundle\Model\Strategy;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 use Oro\Bundle\NoteBundle\Model\MergeModes;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
  * Class ReplaceStrategy
@@ -41,33 +41,35 @@ class ReplaceStrategy implements StrategyInterface
         $masterEntity  = $entityData->getMasterEntity();
         $sourceEntity  = $fieldData->getSourceEntity();
 
-        $queryBuilder = $this->doctrineHelper->getEntityRepository('OroNoteBundle:Note')
-            ->getBaseAssociatedNotesQB(ClassUtils::getRealClass($masterEntity), $masterEntity->getId());
-        $notes = $queryBuilder->getQuery()->getResult();
+        if ($masterEntity->getId() !== $sourceEntity->getId()) {
+            $queryBuilder = $this->doctrineHelper->getEntityRepository('OroNoteBundle:Note')
+                ->getBaseAssociatedNotesQB(ClassUtils::getRealClass($masterEntity), $masterEntity->getId());
+            $notes = $queryBuilder->getQuery()->getResult();
 
-        if (!empty($notes)) {
-            $entityManager = $this->doctrineHelper->getEntityManager(current($notes));
-            foreach ($notes as $note) {
-                $entityManager->remove($note);
+            if (!empty($notes)) {
+                $entityManager = $this->doctrineHelper->getEntityManager(current($notes));
+                foreach ($notes as $note) {
+                    $entityManager->remove($note);
+                }
             }
+
+            $fieldMetadata = $fieldData->getMetadata();
+            $activityClass = $fieldMetadata->get('type');
+            $entityClass = ClassUtils::getRealClass($sourceEntity);
+            $queryBuilder = $this->doctrineHelper
+                ->getEntityRepository(ActivityList::ENTITY_NAME)
+                ->getActivityListQueryBuilderByActivityClass($entityClass, $sourceEntity->getId(), $activityClass);
+            $activityListItems = $queryBuilder->getQuery()->getResult();
+
+            $activityIds = ArrayUtils::arrayColumn($activityListItems, 'id');
+            $this->activityListManager
+                ->replaceActivityTargetWithPlainQuery(
+                    $activityIds,
+                    $entityClass,
+                    $sourceEntity->getId(),
+                    $masterEntity->getId()
+                );
         }
-
-        $fieldMetadata = $fieldData->getMetadata();
-        $activityClass = $fieldMetadata->get('type');
-        $entityClass = ClassUtils::getRealClass($sourceEntity);
-        $queryBuilder = $this->doctrineHelper
-            ->getEntityRepository(ActivityList::ENTITY_NAME)
-            ->getActivityListQueryBuilderByActivityClass($entityClass, $sourceEntity->getId(), $activityClass);
-        $activityListItems = $queryBuilder->getQuery()->getResult();
-
-        $activityIds = array_column($activityListItems, 'id');
-        $this->activityListManager
-            ->replaceActivityTargetWithPlainQuery(
-                $activityIds,
-                $entityClass,
-                $sourceEntity->getId(),
-                $masterEntity->getId()
-            );
     }
 
     /**
