@@ -202,8 +202,6 @@ services:
             - @translator
             - @logger
             - @oro_security.security_facade
-        tags:
-            - { name: oro_tag.tag_manager }
         calls:
             - [setBusinessUnitManager, ["@oro_organization.business_unit_manager"]]
 
@@ -214,8 +212,6 @@ services:
             - @oro_user.form.user.api
             - @request
             - @oro_user.manager
-        tags:
-            - { name: oro_tag.tag_manager }
 
     oro_user.form.handler.role.api:
         class:                        %oro_user.form.handler.role.class%

@@ -10,74 +10,81 @@ define(function(require) {
      */
     var defaultEditors = {
         /**
-         * Please see [text-editor-view](../frontend/editor/text-editor-view.md) for details
+         * Please see [text-editor-view](../../../../FormBundle/Resources/doc/editor/text-editor-view.md) for details
          *
          * @type {function(new:TextEditorView)}
          */
-        string: require('orodatagrid/js/app/views/editor/text-editor-view'),
+        string: require('oroform/js/app/views/editor/text-editor-view'),
 
         /**
-         * Please see [text-editor-view](../frontend/editor/text-editor-view.md) for details
+         * Please see [text-editor-view](../../../../FormBundle/Resources/doc/editor/text-editor-view.md) for details
          *
          * @type {function(new:TextEditorView)}
          */
-        phone: require('orodatagrid/js/app/views/editor/text-editor-view'),
+        phone: require('oroform/js/app/views/editor/text-editor-view'),
 
         /**
-         * Please see [datetime-editor-view](../frontend/editor/datetime-editor-view.md) for details
+         * Please see [datetime-editor-view](../../../../FormBundle/Resources/doc/editor/datetime-editor-view.md)
+         * for details
          *
          * @type {Function}
          */
-        datetime: require('orodatagrid/js/app/views/editor/datetime-editor-view'),
+        datetime: require('oroform/js/app/views/editor/datetime-editor-view'),
 
         /**
-         * Please see [date-editor-view](../frontend/editor/date-editor-view.md) for details
+         * Please see [date-editor-view](../../../../FormBundle/Resources/doc/editor/date-editor-view.md) for details
          *
          * @type {Function}
          */
-        date: require('orodatagrid/js/app/views/editor/date-editor-view'),
+        date: require('oroform/js/app/views/editor/date-editor-view'),
 
         /**
-         * Please see [number-editor-view](../frontend/editor/number-editor-view.md) for details
+         * Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+         * for details
          *
          * @type {Function}
          */
-        currency: require('orodatagrid/js/app/views/editor/number-editor-view'),
+        currency: require('oroform/js/app/views/editor/number-editor-view'),
 
         /**
-         * Please see [number-editor-view](../frontend/editor/number-editor-view.md) for details
+         * Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+         * for details
          *
          * @type {Function}
          */
-        number: require('orodatagrid/js/app/views/editor/number-editor-view'),
+        number: require('oroform/js/app/views/editor/number-editor-view'),
 
         /**
-         * Please see [number-editor-view](../frontend/editor/number-editor-view.md) for details
+         * Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+         * for details
          *
          * @type {Function}
          */
-        integer: require('orodatagrid/js/app/views/editor/number-editor-view'),
+        integer: require('oroform/js/app/views/editor/number-editor-view'),
 
         /**
-         * Please see [number-editor-view](../frontend/editor/number-editor-view.md) for details
+         * Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
+         * for details
          *
          * @type {Function}
          */
-        decimal: require('orodatagrid/js/app/views/editor/number-editor-view'),
+        decimal: require('oroform/js/app/views/editor/number-editor-view'),
 
         /**
-         * Please see [percent-editor-view](../frontend/editor/percent-editor-view.md) for details
+         * Please see [percent-editor-view](../../../../FormBundle/Resources/doc/editor/percent-editor-view.md)
+         * for details
          *
          * @type {Function}
          */
-        percent: require('orodatagrid/js/app/views/editor/percent-editor-view'),
+        percent: require('oroform/js/app/views/editor/percent-editor-view'),
 
         /**
-         * Please see [select-editor-view](../frontend/editor/select-editor-view.md) for details
+         * Please see [select-editor-view](../../../../FormBundle/Resources/doc/editor/select-editor-view.md)
+         * for details
          *
          * @type {Function}
          */
-        select: require('orodatagrid/js/app/views/editor/select-editor-view')
+        select: require('oroform/js/app/views/editor/select-editor-view')
     };
 
     return defaultEditors;

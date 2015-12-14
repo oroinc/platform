@@ -116,7 +116,8 @@ class RefreshContextListener
         if (!$organization) {
             return;
         }
-
+        // prevent invoke update event after reload organization
+        $em->getUnitOfWork()->markReadOnly($organization);
         $token->setOrganizationContext($organization);
     }
 

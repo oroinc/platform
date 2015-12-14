@@ -69,17 +69,19 @@ define(function(require) {
 
         DEFAULT_HTTP_METHOD: 'GET',
 
+        clientCacheExpires: 30 * 60 * 1000,
+
         formName: void 0,
 
         /**
-         * @param {Object} Options passed to the constructor
+         * @param {Object} options passed to the constructor
          */
         initialize: function(options) {
             if (!options) {
                 options = {};
             }
             this.initialOptions = options;
-            this.httpMethod = options.http_method || this.DEFAULT_HTTP_METHOD;
+            this.httpMethod = options.http_method ? options.http_method.toUpperCase() : this.DEFAULT_HTTP_METHOD;
             this.headers = _.extend({}, this.DEFAULT_HEADERS, options.headers || {});
             this.formName = options.form_name;
             this.routeParametersRenameMap = options.route_parameters_rename_map || {};
@@ -91,6 +93,25 @@ define(function(require) {
                 routeName: options.route,
                 routeQueryParameterNames: options.query_parameter_names
             }));
+            this.cache = {};
+            if (options.clientCache && options.clientCache.enable) {
+                if (!this.isCacheAllowed()) {
+                    throw new Error('Cache is not allowed');
+                }
+                this.enableClientCache = true;
+                if (options.clientCache.expires) {
+                    this.clientCacheExpires = options.clientCache.expires;
+                }
+            }
+        },
+
+        /**
+         * Returns true if selected HTTP_METHOD allows caching
+         *
+         * @returns {boolean}
+         */
+        isCacheAllowed: function() {
+            return this.httpMethod === 'GET' || this.httpMethod === 'OPTIONS' || this.httpMethod === 'HEAD';
         },
 
         /**
@@ -124,7 +145,7 @@ define(function(require) {
          * @returns {$.Promise} - $.Promise instance with abort() support
          */
         send: function(urlParameters, body, headers, options) {
-            var promise = $.ajax({
+            var promise = this._makeAjaxRequest({
                 headers: this.getHeaders(headers),
                 type: this.httpMethod,
                 url: this.getUrl(urlParameters),
@@ -142,6 +163,58 @@ define(function(require) {
             }
             resultPromise.abort = _.bind(promise.abort, promise);
             return resultPromise;
+        },
+
+        /**
+         * Makes Ajax request or returns result from cache
+         *
+         * @param {Object} options - options to pass to ajax call
+         * @protected
+         */
+        _makeAjaxRequest: function(options) {
+            if (this.enableClientCache) {
+                var hash = this.hashCode(options.url);
+                var time = (new Date()).getTime();
+                var cacheRecord = this.cache[hash];
+                if (!cacheRecord || cacheRecord.expires < time) {
+                    cacheRecord = this.cache[hash] = {
+                        expires: time + this.clientCacheExpires,
+                        request: $.ajax(options)
+                    };
+                    // remove item from cache when request fails
+                    cacheRecord.request.fail(_.bind(function() {
+                        delete this.cache[hash];
+                    }, this));
+                }
+                return cacheRecord.request;
+            }
+            return $.ajax(options);
+        },
+
+        /**
+         * Returns hash code of url
+         *
+         * @param {string} url
+         * @returns {string}
+         */
+        hashCode: function(url) {
+            return url;
+        },
+
+        /**
+         * Returns true if data is cached for concrete urlParameters
+         *
+         * @param {Object} urlParameters - url parameters to check
+         * @protected
+         */
+        isCacheExistsFor: function(urlParameters) {
+            if (this.enableClientCache) {
+                var hash = this.hashCode(this.getUrl(urlParameters));
+                var time = (new Date()).getTime();
+                var cacheRecord = this.cache[hash];
+                return cacheRecord && cacheRecord.expires > time;
+            }
+            return false;
         },
 
         /**
