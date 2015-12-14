@@ -73,7 +73,7 @@ define([
          *
          * @property
          */
-        placeholder: __('All'),
+        placeholder: null,
 
         /**
          * Label of filter

@@ -2,14 +2,18 @@
     <div class="filter-item oro-drop">
         <a href="<%= nullLink %>"
            class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %>: <% } %>
-            <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
-            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
-                ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+            <% if (showLabel) { %>Filter By <%= label %> <% } %>
             <span class="caret"></span>
         </a>
         <div class="filter-criteria dropdown-menu" />
     </div>
+</script>
+<script type="text/template" id="filter-criteria-template">
+    <span class="label" style="margin: 0 7px 5px 0;">
+        <%= label %>: <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
+        <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+        ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+    </span>
 </script>
 <script type="text/template" id="none-filter-template">
     <div><%= popupHint %></div>

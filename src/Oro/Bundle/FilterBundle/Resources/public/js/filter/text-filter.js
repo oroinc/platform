@@ -1,12 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    './empty-filter'
-], function($, _, __, EmptyFilter) {
+define(function(require) {
     'use strict';
 
     var TextFilter;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var EmptyFilter = require('./empty-filter');
+    var FilterHint = require('orofilter/js/filter-hint');
 
     /**
      * Text grid filter.
@@ -47,6 +47,9 @@ define([
          * @property {String}
          */
         criteriaSelector: '.filter-criteria',
+
+
+        filterHint: FilterHint,
 
         /**
          * Element enclosing a criteria dropdown
@@ -94,6 +97,16 @@ define([
                     value: ''
                 };
             }
+
+            var hintView = new this.filterHint({
+                'hint': this._getCriteriaHint(),
+                'label': this.label,
+                autoRender: true
+            });
+
+            this.subview('hint', hintView);
+
+            this.listenTo(hintView, 'reset', this.reset);
 
             TextFilter.__super__.initialize.apply(this, arguments);
         },
@@ -283,10 +296,14 @@ define([
          * @return {*}
          */
         _updateCriteriaHint: function() {
-            this.$(this.criteriaHintSelector)
-                .html(_.escape(this._getCriteriaHint()))
-                .closest('.filter-criteria-selector')
-                .toggleClass('filter-default-value', this.isEmptyValue());
+            var hint = this._getCriteriaHint();
+            $('.filter-criteria-hint', this.subview('hint').$el)
+                .html(_.escape(hint));
+            if (hint === null) {
+                this.subview('hint').hide();
+            } else {
+                this.subview('hint').show();
+            }
             return this;
         },
 
