@@ -4,7 +4,7 @@ namespace Oro\Bundle\TagBundle\Form\Type\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\DictionaryFilterType;
 
 class TagsReportFilterType extends DictionaryFilterType
 {
