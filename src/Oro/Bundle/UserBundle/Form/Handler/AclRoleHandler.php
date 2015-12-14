@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Form\Handler;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,11 +16,16 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AclRoleHandler
 {
     /**
@@ -60,6 +66,11 @@ class AclRoleHandler
     protected $privilegeRepository;
 
     /**
+     * @var AclCacheInterface
+     */
+    protected $aclCache;
+
+    /**
      * @var array
      */
     protected $privilegeConfig;
@@ -73,11 +84,13 @@ class AclRoleHandler
 
     /**
      * @param FormFactory $formFactory
+     * @param AclCacheInterface $aclCache
      * @param array $privilegeConfig
      */
-    public function __construct(FormFactory $formFactory, array $privilegeConfig)
+    public function __construct(FormFactory $formFactory, AclCacheInterface $aclCache, array $privilegeConfig)
     {
         $this->formFactory = $formFactory;
+        $this->aclCache = $aclCache;
         $this->privilegeConfig = $privilegeConfig;
     }
 
@@ -162,13 +175,6 @@ class AclRoleHandler
             $this->privilegeConfig[$configName]['permissions']
                 = $this->privilegeRepository->getPermissionNames($config['types']);
         }
-
-        //TODO: Removing 'SHARE' from config. Remove this code after sharing is implemented.
-        if ($ignoreShare && isset($this->privilegeConfig['entity']['permissions']) &&
-            $key = array_search('SHARE', $this->privilegeConfig['entity']['permissions'], true)
-        ) {
-            unset($this->privilegeConfig['entity']['permissions'][$key]);
-        }
     }
 
     /**
@@ -225,6 +231,7 @@ class AclRoleHandler
      */
     protected function setRolePrivileges(AbstractRole $role)
     {
+        $allPrivileges = array();
         $privileges = $this->getRolePrivileges($role);
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
@@ -232,7 +239,30 @@ class AclRoleHandler
             $this->applyOptions($sortedPrivileges, $config);
 
             $this->form->get($fieldName)->setData($sortedPrivileges);
+            $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
         }
+
+        $formPrivileges = [];
+        foreach ($allPrivileges as $key => $privilege) {
+            /** @var AclPrivilege $privilege */
+            $result = [
+                'identity' => [
+                    'id' => $privilege->getIdentity()->getId(),
+                    'name' => $privilege->getIdentity()->getName(),
+                ],
+                'permissions' => [],
+            ];
+            foreach ($privilege->getPermissions() as $permissionName => $permission) {
+                /** @var AclPermission $permission */
+                $result['permissions'][$permissionName] = [
+                    'name' => $permission->getName(),
+                    'accessLevel' => $permission->getAccessLevel(),
+                ];
+            }
+            $formPrivileges[$privilege->getExtensionKey()][$key] = $result;
+        }
+
+        $this->form->get('privileges')->setData(json_encode($formPrivileges));
     }
 
     /**
@@ -276,9 +306,23 @@ class AclRoleHandler
      */
     protected function processPrivileges(AbstractRole $role)
     {
-        $formPrivileges = array();
+        $decodedPrivileges = json_decode($this->form->get('privileges')->getData(), true);
+        $formPrivileges = [];
         foreach ($this->privilegeConfig as $fieldName => $config) {
-            $privileges = $this->form->get($fieldName)->getData();
+            $privilegesArray = $decodedPrivileges[$fieldName];
+            $privileges = [];
+            foreach ($privilegesArray as $privilege) {
+                $aclPrivilege = new AclPrivilege();
+                foreach ($privilege['permissions'] as $name => $permission) {
+                    $aclPrivilege->addPermission(new AclPermission($permission['name'], $permission['accessLevel']));
+                }
+                $aclPrivilegeIdentity = new AclPrivilegeIdentity(
+                    $privilege['identity']['id'],
+                    $privilege['identity']['name']
+                );
+                $aclPrivilege->setIdentity($aclPrivilegeIdentity);
+                $privileges[] = $aclPrivilege;
+            }
             if ($config['fix_values']) {
                 $this->fxPrivilegeValue($privileges, $config['default_value']);
             }
@@ -296,6 +340,7 @@ class AclRoleHandler
             $this->aclManager->getSid($role),
             new ArrayCollection($formPrivileges)
         );
+        $this->aclCache->clearCache();
     }
 
     /**

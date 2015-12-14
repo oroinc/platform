@@ -249,4 +249,12 @@ class EmailAttachment
     {
         $this->id = null;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getFileName();
+    }
 }

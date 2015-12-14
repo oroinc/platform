@@ -150,4 +150,12 @@ class ActivityOwner
 
         return (bool) count($stack->matching($criteria));
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

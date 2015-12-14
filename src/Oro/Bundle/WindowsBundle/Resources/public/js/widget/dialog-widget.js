@@ -240,6 +240,14 @@ define(function(require) {
             return this.widget;
         },
 
+        /**
+         * @inheritDoc
+         */
+        getLayoutElement: function() {
+            // covers not only widget body, but whole .ui-dialog, including .ui-dialog-buttonpane
+            return this.widget.parent();
+        },
+
         getActionsElement: function() {
             if (!this.actionsEl) {
                 this.actionsEl = $('<div class="pull-right"/>').appendTo(
@@ -276,7 +284,7 @@ define(function(require) {
                 this.widget = $('<div/>');
                 this._bindDialogEvents();
                 this.widget.html(this.$el).dialog(dialogOptions);
-                this.widget.attr('data-layout', 'separate');
+                this.getLayoutElement().attr('data-layout', 'separate');
             } else {
                 this.widget.html(this.$el);
             }

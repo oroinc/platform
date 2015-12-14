@@ -62,7 +62,7 @@ class MergeFieldType extends AbstractType
                     'multiple' => false,
                     'expanded' => false,
                     'label'    => 'oro.entity_merge.form.strategy',
-                    'tooltip'  => 'oro.entity_merge.form.strategy_tooltip'
+                    'tooltip'  => 'oro.entity_merge.form.strategy.tooltip'
                 )
             );
         } else {

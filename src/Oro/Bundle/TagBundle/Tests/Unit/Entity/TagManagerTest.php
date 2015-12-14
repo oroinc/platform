@@ -26,9 +26,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $mapper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -41,11 +38,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
-
-        $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
@@ -66,7 +58,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
             $this->em,
             'Oro\Bundle\TagBundle\Entity\Tag',
             'Oro\Bundle\TagBundle\Entity\Tagging',
-            $this->mapper,
             $this->securityFacade,
             $this->router
         );
@@ -134,22 +125,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider tagIdsProvider
-     */
-    public function testDeleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy, $expectedCallArg)
-    {
-        $repo = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\Repository\TagRepository')
-            ->disableOriginalConstructor()->getMock();
-        $repo->expects($this->once())->method('deleteTaggingByParams')
-            ->with($expectedCallArg, $entityName, $recordId, $createdBy);
-
-        $this->em->expects($this->once())->method('getRepository')
-            ->will($this->returnValue($repo));
-
-        $this->manager->deleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy);
-    }
-
-    /**
      * @return array
      */
     public function tagIdsProvider()
@@ -186,17 +161,10 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadTagging()
     {
-        $collection = $this->getMock('Doctrine\Common\Collections\ArrayCollection');
-        $collection->expects($this->once())->method('add');
-
-        $resource = $this->getMockForAbstractClass('Oro\Bundle\TagBundle\Entity\Taggable');
-        $resource->expects($this->once())->method('getTags')
-            ->will($this->returnValue($collection));
-
-        $repo = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\Repository\TagRepository')
+        $resource   = $this->getMockForAbstractClass('Oro\Bundle\TagBundle\Entity\Taggable');
+        $repo       = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\Repository\TagRepository')
             ->disableOriginalConstructor()->getMock();
-        $repo->expects($this->once())->method('getTagging')
-            ->with($resource, null, false)
+        $repo->expects($this->once())->method('getTags')
             ->will(
                 $this->returnValue(
                     array(
@@ -205,7 +173,8 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->em->expects($this->once())->method('getRepository')->with('Oro\Bundle\TagBundle\Entity\Tag')
+        $this->em->expects($this->once())->method('getRepository')
+            ->with('Oro\Bundle\TagBundle\Entity\Tag')
             ->will($this->returnValue($repo));
 
         $this->manager->loadTagging($resource);
@@ -266,14 +235,15 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
 
         $repo = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\Repository\TagRepository')
             ->disableOriginalConstructor()->getMock();
-        $repo->expects($this->once())->method('getTagging')->with($resource, null, false)
+        $repo->expects($this->once())->method('getTags')
             ->will(
                 $this->returnValue(
                     array($tag1, $tag2)
                 )
             );
 
-        $this->em->expects($this->once())->method('getRepository')->with('Oro\Bundle\TagBundle\Entity\Tag')
+        $this->em->expects($this->once())->method('getRepository')
+            ->with('Oro\Bundle\TagBundle\Entity\Tag')
             ->will($this->returnValue($repo));
 
         $result = $this->manager->getPreparedArray($resource);

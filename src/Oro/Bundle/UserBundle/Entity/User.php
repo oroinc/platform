@@ -20,8 +20,6 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\TagBundle\Entity\Tag;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 
@@ -38,7 +36,10 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeName="oro_user_index",
  *      routeView="oro_user_view",
  *      defaultValues={
- *          "entity"={"icon"="icon-user","context-grid"="users-for-context-grid"},
+ *          "entity"={
+ *              "icon"="icon-user",
+ *              "context-grid"="users-for-context-grid"
+ *          },
  *          "grouping"={
  *              "groups"={"dictionary"}
  *          },
@@ -63,13 +64,15 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "form"={
  *              "form_type"="oro_user_select",
  *              "grid_name"="users-select-grid"
+ *          },
+ *          "tag"={
+ *              "enabled"=true
  *          }
  *      }
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
 class User extends ExtendUser implements
-    Taggable,
     EmailOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
@@ -352,11 +355,6 @@ class User extends ExtendUser implements
      * )
      */
     protected $emails;
-
-    /**
-     * @var Tag[]
-     */
-    protected $tags;
 
     /**
      * @var BusinessUnit[]|Collection
@@ -819,14 +817,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getTaggableId()
-    {
-        return $this->getId();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getId()
@@ -844,28 +834,6 @@ class User extends ExtendUser implements
         $this->id = $id;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTags()
-    {
-        if (!$this->tags) {
-            $this->tags = new ArrayCollection();
-        }
-
-        return $this->tags;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return User
-     */
-    public function setTags($tags)
-    {
-        $this->tags = $tags;
     }
 
     /**

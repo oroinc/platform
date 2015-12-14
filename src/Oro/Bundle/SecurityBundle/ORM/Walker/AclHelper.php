@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\AST\SelectStatement;
@@ -11,7 +12,6 @@ use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -50,14 +50,22 @@ class AclHelper
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var AclConditionalFactorBuilder */
+    protected $aclConditionFactorBuilder;
+
     /**
      * @param OwnershipConditionDataBuilder $builder
      * @param EventDispatcherInterface      $eventDispatcher
+     * @param AclConditionalFactorBuilder   $aclConditionFactorBuilder
      */
-    public function __construct(OwnershipConditionDataBuilder $builder, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->builder         = $builder;
+    public function __construct(
+        OwnershipConditionDataBuilder $builder,
+        EventDispatcherInterface $eventDispatcher,
+        AclConditionalFactorBuilder $aclConditionFactorBuilder
+    ) {
+        $this->builder = $builder;
         $this->eventDispatcher = $eventDispatcher;
+        $this->aclConditionFactorBuilder = $aclConditionFactorBuilder;
     }
 
     /**
@@ -111,6 +119,7 @@ class AclHelper
     public function apply($query, $permission = 'VIEW', $checkRelations = true)
     {
         $this->entityAliases = [];
+
         if ($query instanceof QueryBuilder) {
             $query = $query->getQuery();
         }
@@ -122,7 +131,7 @@ class AclHelper
             list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
             $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : []);
             if ($ast->whereClause) {
-                $this->processSubselects($ast, $conditionStorage, $permission, $query);
+                $this->processSubselects($ast, $conditionStorage, $permission);
             }
 
             // We have access level check conditions. So mark query for acl walker.
@@ -136,6 +145,7 @@ class AclHelper
                     $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
                 }
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
+                $query->setHint(AclWalker::ORO_ACL_FACTOR_BUILDER, $this->aclConditionFactorBuilder);
             }
         }
 

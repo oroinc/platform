@@ -1,7 +1,12 @@
-.oro-datagrid {
+.table {
   th, td {
     /* should center content in cell right */
     line-height: 19px; //@baseFontSize + 2 * floor((@baseLineHeight - @baseFontSize)/2);
+  }
+}
+
+.oro-datagrid {
+  th, td {
     display: none;
   }
   th.renderable, td.renderable {
@@ -18,7 +23,6 @@
   border-left: none;
   border-color: #dddddd;
   border-radius: 0;
-
 }
 
 .no-data {
@@ -153,7 +157,9 @@ table.grid {
   tbody tr.row-click-action {
       cursor: pointer;
   }
-
+  tbody tr.row-selected {
+    background-color: #FDF8E4;
+  }
   .string-cell,
   .uri-cell,
   .email-cell,
@@ -163,6 +169,14 @@ table.grid {
   .datetime-cell,
   .boolean-cell {
       text-align: left;
+  }
+  .multi-select-cell, .multi-relation-cell {
+    .value-item:after{
+      content: ', '
+    }
+    .value-item:last-child:after{
+      content: ''
+    }
   }
   .number-cell,
   .integer-cell {
@@ -184,6 +198,13 @@ table.grid {
   }
   .select-row-cell input[type=checkbox] {
       margin-top: -3px;
+  }
+  .tags-cell {
+    .tags-item {
+      border: 1px solid #CCCCCC;
+      border-radius: 4px;
+      padding: 2px 4px;
+    }
   }
 }
 
@@ -293,4 +314,23 @@ td > .nowrap-ellipsis {
   input, label {
     margin: auto;
   }
+}
+.more-bar-holder.action-row{
+  .launcher-item {
+    padding: 2px 12px;
+  }
+  .launcher-item a {
+    margin: 0;
+    border: none;
+    padding: 0;
+  }
+  .nav-pills {
+    padding: 0;
+  }
+}
+.action-cell .more-bar-holder .dropdown-toggle {
+  margin-left: 5px;
+}
+.grid .action-column >.dropdown {
+  margin-left: 0;
 }

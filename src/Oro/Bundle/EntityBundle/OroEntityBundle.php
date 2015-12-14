@@ -7,11 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityClassNameProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityNameProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\ExclusionProviderPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
@@ -48,5 +51,14 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new VirtualRelationProvidersCompilerPass());
         $container->addCompilerPass(new DictionaryValueListProviderPass());
         $container->addCompilerPass(new QueryHintResolverPass());
+        $container->addCompilerPass(new EntityFieldHandlerPass());
+
+        if ($container instanceof ExtendedContainerBuilder) {
+            $container->addCompilerPass(new GeneratedValueStrategyListenerPass());
+            $container->moveCompilerPassBefore(
+                'Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass',
+                'Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass'
+            );
+        }
     }
 }

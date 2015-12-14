@@ -45,6 +45,7 @@ parameters:
     oro_entity_extend.entity_class_name_provider.enum.class:  Oro\Bundle\EntityExtendBundle\Provider\EnumEntityClassNameProvider
     oro_entity_extend.enum_value_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider
     oro_entity_extend.dictionary_value_list_provider.enum.class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider
+    oro_entity_extend.field_type_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -164,9 +165,23 @@ services:
     oro_entity_extend.validator.unique_extend_entity_field_validator:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldValidator
         arguments:
-             - @oro_entity_config.provider.entity
+            - @oro_entity_extend.extend.field_name_validation_helper
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
+
+    oro_entity_extend.validator.default_relation_field:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldValidator
+        arguments:
+            - @oro_entity_extend.extend.field_name_validation_helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.default_relation_field }
+
+    oro_entity_extend.validator.multi_enum_snapshot:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\MultiEnumSnapshotFieldValidator
+        arguments:
+            - @oro_entity_extend.extend.field_name_validation_helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.multi_enum_snapshot }
 
     oro_entity_extend.validator.unique_enum_name:
         class: %oro_entity_extend.validator.unique_enum_name.class%
@@ -199,6 +214,11 @@ services:
         class: %oro_entity_extend.extend.field_type_helper.class%
         arguments:
             - []
+
+    oro_entity_extend.extend.field_name_validation_helper:
+        class: Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper
+        arguments:
+            - @oro_entity_config.provider.extend
 
     oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:
         class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%
@@ -392,6 +412,14 @@ services:
         tags:
             - { name: oro_service_link, service: oro_security.acl_helper }
 
+    oro_entity_extend.exclusion_provider:
+        class: Oro\Bundle\EntityExtendBundle\Provider\ExtendExclusionProvider
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity.exclusion_provider.api, priority: 10 }
+
     oro_entity_extend.entity_alias_provider:
         class: %oro_entity_extend.entity_alias_provider.class%
         public: false
@@ -423,3 +451,32 @@ services:
             - @doctrine
         tags:
             - { name: oro_entity.dictionary_value_list_provider, priority: -90 }
+
+    oro_entity_extend.field_type_provider:
+        class: %oro_entity_extend.field_type_provider.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            -
+                - string
+                - integer
+                - smallint
+                - bigint
+                - boolean
+                - decimal
+                - date
+                - datetime
+                - text
+                - float
+                - money
+                - percent
+                - file
+                - image
+                - enum
+                - multiEnum
+            -
+                #BAP-5875
+                #- oneToOne
+                - oneToMany
+                - manyToOne
+                - manyToMany

@@ -5,9 +5,15 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
+use Oro\Component\EntitySerializer\ConfigNormalizer;
+use Oro\Component\EntitySerializer\DataNormalizer;
+use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use Oro\Component\EntitySerializer\FieldAccessor;
+use Oro\Component\EntitySerializer\QueryFactory;
+use Oro\Component\EntitySerializer\ValueTransformer;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
@@ -66,12 +72,17 @@ abstract class EntitySerializerTestCase extends OrmTestCase
 
         $queryHintResolver = $this->getMock('Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface');
 
+        $doctrineHelper   = new DoctrineHelper($doctrine);
+        $dataAccessor     = new EntityDataAccessor();
+        $fieldAccessor    = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);
         $this->serializer = new EntitySerializer(
-            $doctrine,
-            $this->entityFieldFilter,
-            new EntityDataAccessor(),
-            new EntityDataTransformer($this->container),
-            $queryHintResolver
+            $doctrineHelper,
+            $dataAccessor,
+            new EntityDataTransformer($this->container, new ValueTransformer()),
+            new QueryFactory($doctrineHelper, $queryHintResolver),
+            $fieldAccessor,
+            new ConfigNormalizer(),
+            new DataNormalizer()
         );
     }
 

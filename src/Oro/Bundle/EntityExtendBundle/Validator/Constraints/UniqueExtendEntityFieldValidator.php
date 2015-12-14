@@ -2,75 +2,52 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
-use Doctrine\Common\Inflector\Inflector;
-
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-class UniqueExtendEntityFieldValidator extends ConstraintValidator
+/**
+ * Validates field name for uniqueness. When generating setter and getter methods, characters `_` and `-` are removed
+ * and as result e.g for names `id` and `i_d` methods names are identical.
+ */
+class UniqueExtendEntityFieldValidator extends AbstractFieldValidator
 {
-    /** @var ConfigProvider  */
-    protected $configProvider;
-
-    /**
-     * @param ConfigProvider $configProvider
-     */
-    public function __construct(ConfigProvider $configProvider)
-    {
-        $this->configProvider = $configProvider;
-    }
+    const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_field';
 
     /**
      * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
-        if (!$value instanceof FieldConfigModel) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel supported only, %s given',
-                    is_object($value) ? get_class($value) : gettype($value)
-                )
-            );
-        }
-
-        $newFieldName = strtolower(Inflector::classify(($value->getFieldName())));
-
-        // Need hardcoded check for the `id`, `serialized_data` fields.
-        if (in_array($newFieldName, ['id', strtolower(Inflector::classify('serialized_data'))], true)) {
-            $this->addViolation($constraint);
-
-            return;
-        }
+        $this->assertValidatingValue($value);
 
         $className = $value->getEntity()->getClassName();
-        $configs   = $this->configProvider->getConfigs($className, true);
-        foreach ($configs as $config) {
-            /** @var FieldConfigId $configId */
-            $configId  = $config->getId();
-            $fieldName = $configId->getFieldName();
-            if ($newFieldName === strtolower(Inflector::classify($fieldName))) {
-                $this->addViolation($constraint);
+        $fieldName = $value->getFieldName();
 
-                return;
+        // A special case for `id` field
+        if ($this->validationHelper->normalizeFieldName($fieldName) === 'id') {
+            $this->addDuplicateFieldViolation($fieldName, 'id', $constraint);
+        } else {
+            // other fields
+            $fieldConfig = $this->validationHelper->findExtendFieldConfig($className, $fieldName);
+            if ($fieldConfig && $this->validationHelper->hasFieldNameConflict($fieldName, $fieldConfig)) {
+                $this->addDuplicateFieldViolation($fieldName, $fieldConfig->getId()->getFieldName(), $constraint);
             }
         }
     }
 
     /**
-     * @param Constraint $constraint
+     * @param string                  $newFieldName
+     * @param string                  $existingFieldName
+     * @param UniqueExtendEntityField $constraint
      */
-    protected function addViolation(Constraint $constraint)
-    {
-        /** @var ExecutionContextInterface $context */
-        $context = $this->context;
-        $context->buildViolation($constraint->message)
-            ->atPath($constraint->path)
-            ->addViolation();
+    protected function addDuplicateFieldViolation(
+        $newFieldName,
+        $existingFieldName,
+        UniqueExtendEntityField $constraint
+    ) {
+        if ($newFieldName === $existingFieldName) {
+            $this->addViolation($constraint->sameFieldMessage, $newFieldName, $existingFieldName);
+        } else {
+            $this->addViolation($constraint->similarFieldMessage, $newFieldName, $existingFieldName);
+        }
     }
 }

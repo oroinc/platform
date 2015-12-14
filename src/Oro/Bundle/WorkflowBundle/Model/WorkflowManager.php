@@ -17,11 +17,6 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 class WorkflowManager
 {
     /**
-     * Limit of workflows items to make a flush 
-     */
-    const LIMIT_WORKFLOWS_TO_PROCESS = 50;
-    
-    /**
      * @var ManagerRegistry
      */
     protected $registry;
@@ -193,17 +188,16 @@ class WorkflowManager
      *      ...
      * )
      *
-     * @param array $workflowList
+     * @param array $data
      * @throws \Exception
      */
-    public function massStartWorkflow(array $workflowList)
+    public function massStartWorkflow(array $data)
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManager();
         $em->beginTransaction();
         try {
-            $i = 1;
-            foreach ($workflowList as $row) {
+            foreach ($data as $row) {
                 if (empty($row['workflow']) || empty($row['entity'])) {
                     continue;
                 }
@@ -215,11 +209,6 @@ class WorkflowManager
 
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
-                
-                if ($i % self::LIMIT_WORKFLOWS_TO_PROCESS == 0) {
-                    $em->flush();
-                }
-                ++$i;
             }
 
             $em->flush();
@@ -245,7 +234,52 @@ class WorkflowManager
         $em->beginTransaction();
         try {
             $workflow->transit($workflowItem, $transition);
-            $workflowItem->setUpdated();
+            $workflowItem->setUpdated(); // transition might not change workflow item
+            $em->flush();
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Transit several workflow items in one transaction
+     *
+     * Input data format:
+     * array(
+     *      array(
+     *          'workflowItem' => <workflow item entity: WorkflowItem>,
+     *          'transition'   => <transition name: string|Transition>
+     *      ),
+     *      ...
+     * )
+     *
+     * @param array $data
+     * @throws \Exception
+     */
+    public function massTransit(array $data)
+    {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManager();
+        $em->beginTransaction();
+        try {
+            foreach ($data as $row) {
+                if (empty($row['workflowItem']) || !$row['workflowItem'] instanceof WorkflowItem
+                    || empty($row['transition'])
+                ) {
+                    continue;
+                }
+
+                /** @var WorkflowItem $workflowItem */
+                $workflowItem = $row['workflowItem'];
+                $workflow = $this->getWorkflow($workflowItem);
+                $transition = $row['transition'];
+
+                $workflow->transit($workflowItem, $transition);
+                $workflowItem->setUpdated(); // transition might not change workflow item
+            }
+
             $em->flush();
             $em->commit();
         } catch (\Exception $e) {

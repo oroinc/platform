@@ -12,6 +12,21 @@
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
+        {% if extend_config.is('is_extend') %}
+            {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
+                entity_class: 'Oro\\Bundle\\EntityConfigBundle\\Entity\\FieldConfigModel',
+                importJob: 'entity_fields_import_from_csv',
+                importProcessor: 'oro_entity_config_entity_field.add_or_replace',
+                importTitle: 'oro.entity_config.import.title'|trans,
+                exportTemplateJob: 'entity_export_template_to_csv',
+                exportTemplateProcessor: 'oro_entity_config_entity_field.export_template',
+                refreshPageOnSuccess: true,
+                afterRefreshPageMessage: 'oro.entity_config.import.message.require_update_schema'|trans,
+                options: {'entity_id': entity.id},
+                importLabel: 'oro.entity_config.import.label'|trans,
+            } %}
+        {% endif %}
+
         {{ UI.editButton({'path': path('oro_entityconfig_update', { id: entity.id })}) }}
         {% for button in button_config %}
             {{ UI.button({

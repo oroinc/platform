@@ -5,6 +5,7 @@ define(function(require) {
     var document = window.document;
     var $ = require('jquery');
     var _ = require('underscore');
+    var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
     var mediator = require('oroui/js/mediator');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
@@ -227,13 +228,7 @@ define(function(require) {
          * @private
          */
         _getUniqueIdentifier: function() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                // jshint -W016
-                var r = Math.random() * 16 | 0;
-                var v = c === 'x' ? r : (r & 0x3 | 0x8);
-                // jshint +W016
-                return v.toString(16);
-            });
+            return tools.createRandomUUID();
         },
 
         /**
@@ -275,7 +270,7 @@ define(function(require) {
             if (adoptedActionsContainer.length > 0) {
                 var self = this;
                 var form = adoptedActionsContainer.closest('form');
-                var actions = adoptedActionsContainer.find('button, input, a');
+                var actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
 
                 if (form.length > 0) {
                     this.form = form;
@@ -284,7 +279,7 @@ define(function(require) {
                 _.each(actions, function(action, idx) {
                     var $action = $(action);
                     var actionId = $action.data('action-name') || 'adopted_action_' + idx;
-                    switch (action.type.toLowerCase()) {
+                    switch (action.type && action.type.toLowerCase()) {
                         case 'submit':
                             var submitReplacement = $('<input type="submit"/>');
                             submitReplacement.css({

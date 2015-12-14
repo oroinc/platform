@@ -7,6 +7,9 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolation
+ */
 class ChannelRepositoryTest extends WebTestCase
 {
     /**
@@ -17,7 +20,12 @@ class ChannelRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadStatusData']);
+        $this->loadFixtures(
+            [
+                'Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadStatusData',
+                'Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadJobData'
+            ]
+        );
         $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroIntegrationBundle:Channel');
     }
 
@@ -46,5 +54,39 @@ class ChannelRepositoryTest extends WebTestCase
             $this->getReference('oro_integration:bar_first_connector_first_status_completed'),
             $this->repository->getLastStatusForConnector($barIntegration, 'first_connector', Status::STATUS_COMPLETED)
         );
+    }
+
+    /**
+     * @dataProvider getRunningSyncJobsCountDataProvider
+     *
+     * @param string        $command
+     * @param int           $expectedCount
+     * @param null|string   $integration
+     */
+    public function testGetRunningSyncJobsCount($command, $expectedCount, $integration = null)
+    {
+        $integration = $integration ? $this->getReference($integration)->getId() : null;
+        $actual = $this->repository->getRunningSyncJobsCount($command, $integration);
+
+        $this->assertEquals($expectedCount, $actual);
+    }
+
+    public function getRunningSyncJobsCountDataProvider()
+    {
+        return [
+            [
+                'command' => 'first_test_command',
+                'expectedCount' => 2
+            ],
+            [
+                'command' => 'second_test_command',
+                'expectedCount' => 1
+            ],
+            [
+                'command' => 'third_test_command',
+                'expectedCount' => 2,
+                'integration' => 'oro_integration:foo_integration',
+            ]
+        ];
     }
 }

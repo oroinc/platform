@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Formatter;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
 class FormatterProvider
@@ -57,9 +58,7 @@ class FormatterProvider
             return $formatter;
         }
 
-        throw new InvalidArgumentException(
-            sprintf('No available formatters for "%s" format_type and "%s" data_type.', $formatType, $dataType)
-        );
+        return null;
     }
 
     /**

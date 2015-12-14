@@ -72,6 +72,18 @@ class Email extends AbstractPageEntity
     }
 
     /**
+     * @param $value
+     * @return $this
+     */
+    public function assertBodyContains($value)
+    {
+        $content = $this->test->byXpath("//*[@data-ftid='oro_email_email_body']")->attribute('value');
+        $this->assertContains($value, $content, "Email body doesn't contains '{$value}'");
+
+        return $this;
+    }
+
+    /**
      * Method clicks Send button on compose email widget-window
      * @return $this
      */

@@ -46,6 +46,9 @@ class OwnershipConditionDataBuilder
     /** @var AclGroupProviderInterface */
     protected $aclGroupProvider;
 
+    /** @var null|mixed */
+    protected $user = null;
+
     /**
      * @param ServiceLink                    $securityContextLink
      * @param ObjectIdAccessor               $objectIdAccessor
@@ -221,20 +224,17 @@ class OwnershipConditionDataBuilder
     /**
      * Gets the id of logged in user
      *
-     * @return int|string
+     * @return int|string|null
      */
     public function getUserId()
     {
-        $token = $this->getSecurityContext()->getToken();
-        if (!$token) {
-            return null;
-        }
-        $user = $token->getUser();
-        if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
-            return null;
+        $user = $this->getUser();
+
+        if ($user) {
+            return $this->objectIdAccessor->getId($user);
         }
 
-        return $this->objectIdAccessor->getId($user);
+        return null;
     }
 
     /**
@@ -426,5 +426,30 @@ class OwnershipConditionDataBuilder
     protected function getTree()
     {
         return $this->treeProvider->getTree();
+    }
+
+    /**
+     * Gets the logged user
+     *
+     * @return null|mixed
+     */
+    public function getUser()
+    {
+        if ($this->user) {
+            return $this->user;
+        }
+
+        $token = $this->getSecurityContext()->getToken();
+        if (!$token) {
+            return null;
+        }
+        $user = $token->getUser();
+        if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
+            return null;
+        }
+
+        $this->user = $user;
+
+        return $this->user;
     }
 }
