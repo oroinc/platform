@@ -5,18 +5,28 @@ namespace Oro\Bundle\TagBundle\Provider;
 use Doctrine\ORM\Query\Expr\Join;
 
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagVirtualRelationProvider implements VirtualRelationProviderInterface
 {
     const RELATION_NAME = 'tags_virtual';
     const TARGET_ALIAS  = 'virtualTag';
 
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
+    /** @param TaggableHelper $helper */
+    public function __construct(TaggableHelper $helper)
+    {
+        $this->taggableHelper = $helper;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function isVirtualRelation($className, $fieldName)
     {
-        return $this->isTaggableEntity($className) && $fieldName === self::RELATION_NAME;
+        return $this->isTaggable($className) && $fieldName === self::RELATION_NAME;
     }
 
     /**
@@ -37,7 +47,7 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
      */
     public function getVirtualRelations($className)
     {
-        if ($this->isTaggableEntity($className)) {
+        if ($this->isTaggable($className)) {
             return [self::RELATION_NAME => $this->getRelationDefinition($className)];
         }
 
@@ -53,18 +63,20 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
     }
 
     /**
-     * Return true if given class name implements Taggable interface
+     * Return true if given class name is taggable
      *
      * @param $className
+     *
      * @return bool
      */
-    protected function isTaggableEntity($className)
+    protected function isTaggable($className)
     {
-        return is_a($className, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
+        return $this->taggableHelper->isTaggable($className);
     }
 
     /**
      * @param string $className
+     *
      * @return array
      */
     protected function getRelationDefinition($className)
