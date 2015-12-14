@@ -61,7 +61,7 @@ class EmailExtension extends Twig_Extension
         EntityManager $em,
         MailboxProcessStorage $mailboxProcessStorage,
         SecurityFacade $securityFacade,
-         RelatedEmailsProvider $relatedEmailsProvider
+        RelatedEmailsProvider $relatedEmailsProvider
     ) {
         $this->emailHolderHelper = $emailHolderHelper;
         $this->emailAddressHelper = $emailAddressHelper;
