@@ -1,13 +1,11 @@
-define([
-    'backgrid',
-    'underscore',
-    'orotranslation/js/translator',
-    'orotag/js/app/views/viewer/tags-view',
-    'routing'
-], function(Backgrid, _, __, TagsView, routing) {
+define(function(require) {
     'use strict';
 
     var TagsCell;
+    var Backgrid = require('backgrid');
+    var _ = require('underscore');
+    var TagsView = require('orotag/js/app/views/viewer/tags-view');
+    var mixin = _.pick(TagsView.prototype, ['template', 'getTemplateFunction', 'getTemplateData', 'render']);
 
     /**
      * Cell able to display tags values.
@@ -23,44 +21,24 @@ define([
      * @class   oro.datagrid.cell.TagsCell
      * @extends oro.datagrid.cell.StringCell
      */
-    TagsCell = Backgrid.StringCell.extend({
-        /**
-         * @property {string}
-         */
-        type: 'tags',
+    TagsCell = Backgrid.StringCell.extend(
+        _.extend({
+            /**
+             * @property {string}
+             */
+            type: 'tags',
 
-        /**
-         * @property {string}
-         */
-        className: 'tags-cell tags-container',
+            /**
+             * @property {string}
+             */
+            className: 'tags-cell tags-container',
 
-        template: TagsView.prototype.template,
-
-        tagSortCallback: TagsView.prototype.tagSortCallback,
-
-        /**
-         * @inheritDoc
-         */
-        render: function() {
-            // preparing urls
-            var data = this.model.toJSON();
-            var tags = data[this.column.get('name')];
-            for (var i = 0; i < tags.length; i++) {
-                tags[i].url = routing.generate('oro_tag_search', {
-                    id: tags[i].id
-                });
+            initialize: function() {
+                Backgrid.StringCell.__super__.initialize.apply(this, arguments);
+                this.fieldName = this.column.get('name');
             }
-
-            this.$el.html(this.template({
-                model: data,
-                showDefault: false,
-                fieldName: this.column.get('name'),
-                tagSortCallback: this.tagSortCallback
-            }));
-
-            return this;
-        }
-    });
+        }, mixin)
+    );
 
     return TagsCell;
 });
