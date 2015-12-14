@@ -55,7 +55,7 @@ define(function(require) {
     var MultiSelectEditorView;
     var SelectEditorView = require('./select-editor-view');
     var _ = require('underscore');
-    var select2autosizer = require('../../../utils/select2-autosizer');
+    var select2autosizer = require('oroui/js/tools/select2-autosizer');
 
     MultiSelectEditorView = SelectEditorView.extend(/** @exports MultiSelectEditorView.prototype */{
         className: 'multi-select-editor',
