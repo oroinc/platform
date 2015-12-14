@@ -371,17 +371,37 @@ define(function(require) {
             }
         },
 
-        setPosition: function(position) {
+        internalSetDialogPosition: function(position, leftShift, topShift) {
+            if (!leftShift) {
+                leftShift = 0;
+            }
+            if (!topShift) {
+                topShift = 0;
+            }
             if (!this.widget) {
                 throw new Error('this function must be called only after dialog is created');
             }
-            var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
+            var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             dialog.css({
                 maxWidth: containerEl.clientWidth,
                 maxHeight: containerEl.clientHeight
             });
             dialog.position(position);
+            // must update manually 'cause $.position call gives side effects
+            dialog.css({
+                top: parseInt(dialog.css('top')) + topShift,
+                left: parseInt(dialog.css('left')) + leftShift
+            });
+        },
+
+        setPosition: function(position, leftShift, topShift) {
+            if (!this.widget) {
+                throw new Error('this function must be called only after dialog is created');
+            }
+            var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
+            var dialog = this.widget.closest('.ui-dialog');
+            this.internalSetDialogPosition(position, leftShift, topShift);
             /*
              * Left and Width adjustments
              * **************************
