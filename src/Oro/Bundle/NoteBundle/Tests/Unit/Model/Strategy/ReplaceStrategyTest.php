@@ -8,6 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\NoteBundle\Model\ExtendNote;
 use Oro\Bundle\NoteBundle\Model\MergeModes;
 use Oro\Bundle\NoteBundle\Model\Strategy\ReplaceStrategy;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -69,7 +70,7 @@ class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $queryBuilder->expects($this->any())
             ->method('getResult')
-            ->will($this->returnValue([['id' => 1, 'relatedActivityId' => 11], ['id' => 3, 'relatedActivityId' => 2]]));
+            ->will($this->returnValue([new ExtendNote()]));
 
         $repository = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
             ->disableOriginalConstructor()
@@ -78,9 +79,20 @@ class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $repository->expects($this->any())
             ->method('getBaseAssociatedNotesQB')
             ->willReturn($queryBuilder);
+
+        $activityQueryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->setMethods(['getQuery', 'getResult'])
+            ->getMock();
+        $activityQueryBuilder->expects($this->any())
+            ->method('getQuery')
+            ->will($this->returnSelf());
+        $activityQueryBuilder->expects($this->any())
+            ->method('getResult')
+            ->will($this->returnValue([['id' => 1, 'relatedActivityId' => 11], ['id' => 3, 'relatedActivityId' => 2]]));
         $repository->expects($this->any())
             ->method('getActivityListQueryBuilderByActivityClass')
-            ->willReturn($queryBuilder);
+            ->willReturn($activityQueryBuilder);
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
