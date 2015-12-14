@@ -13,6 +13,7 @@ UPGRADE FROM 1.8 to 1.9
 
 ####AddressBundle
 - `oro_address.address.manager` service was marked as private
+- Validation `AbstractAddress::isRegionValid` was moved to `Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion` constraint
 
 ####CalendarBundle
 - `oro_calendar.calendar_provider.user` service was marked as private

@@ -764,6 +764,10 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
+    /**
+     * @param ExecutionContextInterface $context
+     * @deprecated Use \Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator instead
+     */
     public function isRegionValid(ExecutionContextInterface $context)
     {
         if ($this->getCountry() && $this->getCountry()->hasRegions() && !$this->region && !$this->regionText) {
