@@ -73,6 +73,10 @@ define(function(require) {
         SELECTED_ITEMS_V_MARGIN_BETWEEN: 6,
         SELECTED_ITEMS_H_INCREMENT: 2,
 
+        events: {
+            'updatePosition': 'updatePosition'
+        },
+
         initialize: function(options) {
             SelectEditorView.__super__.initialize.apply(this, arguments);
             this.availableChoices = this.getAvailableOptions(options);
@@ -134,6 +138,10 @@ define(function(require) {
                     SelectEditorView.__super__.onGenericEnterKeydown.call(_this, e);
                 }
             });
+        },
+
+        updatePosition: function() {
+            this.$('input[name=value]').select2('positionDropdown');
         },
 
         /**
