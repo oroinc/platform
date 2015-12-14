@@ -52,6 +52,8 @@ class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $account1 = new User();
         $account2 = new User();
+        $this->setId($account1, 1);
+        $this->setId($account2, 2);
         $entityMetadata = new EntityMetadata(['type' => ClassUtils::getRealClass($account1)]);
         $entityData = new EntityData($entityMetadata, [$account1, $account2]);
         $fieldData = new FieldData($entityData, new FieldMetadata());
@@ -104,5 +106,18 @@ class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     public function testGetName()
     {
         $this->assertEquals('notes_replace', $this->strategy->getName());
+    }
+
+    /**
+     * @param $object
+     * @param $value
+     */
+    protected function setId($object, $value)
+    {
+        $class = new \ReflectionClass($object);
+        $property  = $class->getProperty('id');
+        $property->setAccessible(true);
+
+        $property->setValue($object, $value);
     }
 }
