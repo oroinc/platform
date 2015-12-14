@@ -16,20 +16,18 @@ define([
             elSelector: '',
             formName: '',
             formSelector: '',
-            labelSelector: '',
             privilegesSelector: '',
             appendUsersSelector: '',
             removeUsersSelector: '',
-            tokenSelector: ''
+            fields: ''
         },
         privileges: null,
 
         $form: null,
-        $label: null,
         $privileges: null,
         $appendUsers: null,
         $removeUsers: null,
-        $token: null,
+        $fields: null,
 
         events: {
             'click': 'onSubmit'
@@ -48,12 +46,19 @@ define([
             this.options = _.defaults(options || {}, this.options);
             this.$el = $(this.options.elSelector);
             this.$form = $(this.options.formSelector);
-            this.$label = $(this.options.labelSelector);
             this.$privileges = $(this.options.privilegesSelector);
             this.$appendUsers = $(this.options.appendUsersSelector);
             this.$removeUsers = $(this.options.removeUsersSelector);
-            this.$token = $(this.options.tokenSelector);
             this.privileges = JSON.parse(this.$privileges.val());
+
+            var fields = {};
+            _.each(
+                this.options.fields,
+                function(selector, name) {
+                    fields[name] = $(selector);
+                }
+            );
+            this.$fields = fields;
         },
 
         /**
@@ -65,12 +70,11 @@ define([
             }
 
             delete this.$form;
-            delete this.$label;
             delete this.$privileges;
             delete this.$appendUsers;
             delete this.$removeUsers;
-            delete this.$token;
             delete this.privileges;
+            delete this.$fields;
 
             RoleView.__super__.dispose.call(this);
         },
@@ -79,7 +83,16 @@ define([
          * onSubmit event listener
          */
         onSubmit: function(event) {
-            if (this.$label.hasClass('error')) {
+            var hasErrors = false;
+            _.each(
+                this.$fields,
+                function(element) {
+                    if (element.hasClass('error')) {
+                        hasErrors = true;
+                    }
+                }
+            );
+            if (hasErrors) {
                 return;
             }
             var $form = this.$form;
@@ -122,11 +135,18 @@ define([
         getData: function() {
             var data = {};
 
-            data[this.options.formName + '[label]'] = this.$label.val();
-            data[this.options.formName + '[privileges]'] = JSON.stringify(this.privileges);
-            data[this.options.formName + '[appendUsers]'] = this.$appendUsers.val();
-            data[this.options.formName + '[removeUsers]'] = this.$removeUsers.val();
-            data[this.options.formName + '[_token]'] = this.$token.val();
+            var formName = this.options.formName;
+            _.each(
+                this.$fields,
+                function(element, name) {
+                    debugger;
+                    data[formName+ '[' + name +']'] = element.val();
+                }
+            );
+
+            data[formName + '[privileges]'] = JSON.stringify(this.privileges);
+            data[formName + '[appendUsers]'] = this.$appendUsers.val();
+            data[formName + '[removeUsers]'] = this.$removeUsers.val();
 
             return data;
         },
