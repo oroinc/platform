@@ -11,6 +11,6 @@ define(function() {
                 (percentile90 + marginsData.SELECTED_ITEMS_H_MARGIN_BETWEEN) * widthPieces +
                 marginsData.SELECTED_ITEMS_H_INCREMENT
             );
-        },
+        }
     };
 });
