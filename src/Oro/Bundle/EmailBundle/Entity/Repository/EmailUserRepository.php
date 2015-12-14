@@ -128,6 +128,7 @@ class EmailUserRepository extends EntityRepository
      *
      * @param User         $user
      * @param Organization $organization
+     * @param array        $ids
      *
      * @return mixed
      */
@@ -196,6 +197,8 @@ class EmailUserRepository extends EntityRepository
 
     /**
      * @param EmailFolder $folder
+     * @param int|null $limit
+     * @param int|null $offset
      *
      * @return QueryBuilder
      */
@@ -237,8 +240,8 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
-     * Gets array of EmailUser's by Email or by thread of this email
-     * of current user and organization or which have mailbox owner.
+     * Gets array of EmailUser's by Email or EmailThread of this email depends on $checkThread flag
+     * for current user and organization or which have mailbox owner.
      *
      * @param Email        $email
      * @param User         $user

@@ -304,17 +304,10 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             $emailUsers
         );
 
-        $token = $this
-            ->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-            ->getMock();
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user);
         $this->securityFacade
             ->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
+            ->method('getLoggedUser')
+            ->willReturn($user);
         $this->securityFacade
             ->expects($this->once())
             ->method('getOrganization')

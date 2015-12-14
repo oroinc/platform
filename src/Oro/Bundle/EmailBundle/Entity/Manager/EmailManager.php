@@ -12,28 +12,18 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 
-/**
- * Class EmailManager
- * @package Oro\Bundle\EmailBundle\Entity\Manager
- */
 class EmailManager
 {
-    /**
-     * @var EmailThreadManager
-     */
+    /** @var EmailThreadManager */
     protected $emailThreadManager;
 
-    /**
-     * @var EmailThreadProvider
-     */
+    /** @var EmailThreadProvider */
     protected $emailThreadProvider;
 
     /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
     /**
@@ -82,7 +72,7 @@ class EmailManager
      */
     public function setSeenStatus(Email $entity, $isSeen = true, $checkThread = false)
     {
-        $user         = $this->securityFacade->getToken()->getUser();
+        $user         = $this->securityFacade->getLoggedUser();
         $organization = $this->securityFacade->getOrganization();
         $emailUsers   = $this->getEmailUserRepository()
             ->getAllEmailUsersByEmail($entity, $user, $organization, $checkThread);
@@ -101,7 +91,7 @@ class EmailManager
      */
     public function toggleEmailUserSeen(EmailUser $entity)
     {
-        $seen = !((bool)$entity->isSeen());
+        $seen = !$entity->isSeen();
         $this->setEmailUserSeen($entity, $seen);
         $this->em->persist($entity);
 
@@ -126,6 +116,7 @@ class EmailManager
      *
      * @param User         $user
      * @param Organization $organization
+     * @param array        $ids
      *
      * @return boolean
      */
@@ -176,24 +167,6 @@ class EmailManager
         }
         $this->em->persist($entity);
         $this->em->flush();
-    }
-
-    /**
-     * Find EmilUser User logged in system
-     *
-     * @param Email $entity - entity Email
-     *
-     * @return EmailUser[]
-     */
-    protected function getCurrentEmailUser(Email $entity)
-    {
-        $user                = $this->securityFacade->getToken()->getUser();
-        $currentOrganization = $this->securityFacade->getOrganization();
-
-        return array_merge(
-            $this->getEmailUserRepository()->findByEmailAndOwner($entity, $user, $currentOrganization),
-            $this->getEmailUserRepository()->findByEmailForMailbox($entity)
-        );
     }
 
     /**
