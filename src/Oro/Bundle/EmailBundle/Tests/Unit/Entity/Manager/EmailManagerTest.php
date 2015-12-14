@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +26,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
     protected $queryBuilder;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFasade;
+    protected $securityFacade;
 
     protected function setUp()
     {
@@ -43,7 +46,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFasade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -51,7 +54,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->emailThreadManager,
             $this->emailThreadProvider,
-            $this->securityFasade
+            $this->securityFacade
         );
     }
 
@@ -280,6 +283,58 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([$emailUser]));
 
         $this->manager->markAllEmailsAsSeen($user, $organization);
+    }
+
+    public function testSetSeenStatus()
+    {
+        $user       = new User();
+        $organization = new Organization();
+        $email = new Email();
+        $emailUsers = [
+            new EmailUser(),
+            new EmailUser(),
+            new EmailUser()
+        ];
+
+        array_map(
+            function (EmailUser $emailUser) use ($email) {
+                $emailUser->setEmail($email);
+                $this->assertFalse($emailUser->isSeen());
+            },
+            $emailUsers
+        );
+
+        $this->securityFacade
+            ->expects($this->once())
+            ->method('getLoggedUser')
+            ->willReturn($user);
+        $this->securityFacade
+            ->expects($this->once())
+            ->method('getOrganization')
+            ->willReturn($organization);
+        $emailUsersRepo = $this
+            ->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailUsersRepo
+            ->expects($this->once())
+            ->method('getAllEmailUsersByEmail')
+            ->with($email, $user, $organization, false)
+            ->willReturn($emailUsers);
+        $this->em
+            ->expects($this->once())
+            ->method('getRepository')
+            ->with('OroEmailBundle:EmailUser')
+            ->willReturn($emailUsersRepo);
+
+        $this->manager->setSeenStatus($email, true);
+
+        array_map(
+            function (EmailUser $emailUser) use ($email) {
+                $this->assertTrue($emailUser->isSeen());
+            },
+            $emailUsers
+        );
     }
 
     public function dataSeenProvider()
