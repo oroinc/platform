@@ -49,39 +49,42 @@ class ReplaceStrategy implements StrategyInterface
         $entityData    = $fieldData->getEntityData();
         $masterEntity  = $entityData->getMasterEntity();
         $sourceEntity  = $fieldData->getSourceEntity();
-        $fieldMetadata = $fieldData->getMetadata();
 
-        $activityClass = $fieldMetadata->get('type');
+        if ($masterEntity->getId() !== $sourceEntity->getId()) {
+            $fieldMetadata = $fieldData->getMetadata();
 
-        $activityListItems = $this->getActivitiesByEntity($masterEntity, $activityClass);
-        $activityIds = ArrayUtils::arrayColumn($activityListItems, 'relatedActivityId');
+            $activityClass = $fieldMetadata->get('type');
 
-        $activities = $this->doctrineHelper->getEntityRepository($activityClass)->findBy(['id' => $activityIds]);
-        foreach ($activities as $activity) {
-            $this->activityManager->removeActivityTarget($activity, $masterEntity);
+            $activityListItems = $this->getActivitiesByEntity($masterEntity, $activityClass);
+            $activityIds = ArrayUtils::arrayColumn($activityListItems, 'relatedActivityId');
+
+            $activities = $this->doctrineHelper->getEntityRepository($activityClass)->findBy(['id' => $activityIds]);
+            foreach ($activities as $activity) {
+                $this->activityManager->removeActivityTarget($activity, $masterEntity);
+            }
+
+            $activityListItems = $this->getActivitiesByEntity($sourceEntity, $activityClass);
+
+            $activityIds = ArrayUtils::arrayColumn($activityListItems, 'id');
+            $entityClass = ClassUtils::getRealClass($masterEntity);
+            $this->activityListManager
+                ->replaceActivityTargetWithPlainQuery(
+                    $activityIds,
+                    $entityClass,
+                    $sourceEntity->getId(),
+                    $masterEntity->getId()
+                );
+
+            $activityIds = ArrayUtils::arrayColumn($activityListItems, 'relatedActivityId');
+            $this->activityListManager
+                ->replaceActivityTargetWithPlainQuery(
+                    $activityIds,
+                    $entityClass,
+                    $sourceEntity->getId(),
+                    $masterEntity->getId(),
+                    $activityClass
+                );
         }
-
-        $activityListItems = $this->getActivitiesByEntity($sourceEntity, $activityClass);
-
-        $activityIds = ArrayUtils::arrayColumn($activityListItems, 'id');
-        $entityClass = ClassUtils::getRealClass($masterEntity);
-        $this->activityListManager
-            ->replaceActivityTargetWithPlainQuery(
-                $activityIds,
-                $entityClass,
-                $sourceEntity->getId(),
-                $masterEntity->getId()
-            );
-
-        $activityIds = ArrayUtils::arrayColumn($activityListItems, 'relatedActivityId');
-        $this->activityListManager
-            ->replaceActivityTargetWithPlainQuery(
-                $activityIds,
-                $entityClass,
-                $sourceEntity->getId(),
-                $masterEntity->getId(),
-                $activityClass
-            );
     }
 
     /**
@@ -114,5 +117,4 @@ class ReplaceStrategy implements StrategyInterface
     {
         return 'activity_replace';
     }
-
 }

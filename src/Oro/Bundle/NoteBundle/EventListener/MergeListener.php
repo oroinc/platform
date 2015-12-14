@@ -54,7 +54,7 @@ class MergeListener
                 'activity'      => true,
                 'template'      => 'OroActivityListBundle:Merge:value.html.twig',
                 'type'          => Note::ENTITY_NAME,
-                'field_name'    => $this->getNoteFieldName(),
+                'field_name'    => $this->getNoteFieldName($entityMetadata),
                 'is_collection' => true,
                 'label'         => $this->translator->trans($this->getNoteAlias()),
                 'merge_modes'   => [ActivityMergeModes::ACTIVITY_UNITE, MergeModes::NOTES_REPLACE]
@@ -80,10 +80,23 @@ class MergeListener
     }
  
     /**
+     * @param EntityMetadata $entityMetadata
+     *
      * @return string
      */
-    protected function getNoteFieldName()
+    protected function getNoteFieldName($entityMetadata)
     {
+        $fieldsMetadata = $entityMetadata->getFieldsMetadata();
+
+        foreach ($fieldsMetadata as $fieldName => $fieldMetadata) {
+            //if there is Metadata field already exists,
+            //it should be changed to custom Metadata field(with appropriate logic and Strategy)
+            if ($fieldMetadata->getSourceClassName() === Note::ENTITY_NAME) {
+                return $fieldName;
+            }
+        }
+
+        //or generate default name
         return strtolower(str_replace('\\', '_', Note::ENTITY_NAME));
     }
 
