@@ -8,7 +8,6 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider;
 
 abstract class AbstractTagsExtension extends AbstractExtension
 {
@@ -98,33 +97,6 @@ abstract class AbstractTagsExtension extends AbstractExtension
     /**
      * @param DatagridConfiguration $config
      *
-     * @return string
-     */
-    protected function getTagFieldAlias(DatagridConfiguration $config)
-    {
-        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
-        if (isset($aliases[TagVirtualFieldProvider::TAG_FIELD])) {
-            return $aliases[TagVirtualFieldProvider::TAG_FIELD];
-        }
-
-        return 'id';
-    }
-
-    /**
-     * @param DatagridConfiguration $config
-     *
-     * @return string
-     */
-    protected function hasTagFieldAlias(DatagridConfiguration $config)
-    {
-        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
-
-        return isset($aliases[TagVirtualFieldProvider::TAG_FIELD]);
-    }
-
-    /**
-     * @param DatagridConfiguration $config
-     *
      * @return string|null
      */
     protected function getEntityClassName(DatagridConfiguration $config)
@@ -143,7 +115,7 @@ abstract class AbstractTagsExtension extends AbstractExtension
     }
 
     /**
-     * Get definition for tag column
+     * Gets definition for tag column
      *
      * @param DatagridConfiguration $config
      *
@@ -152,11 +124,20 @@ abstract class AbstractTagsExtension extends AbstractExtension
     abstract protected function getColumnDefinition(DatagridConfiguration $config);
 
     /**
-     * Get definition for tag column filter
+     * Gets definition for tag column filter
      *
      * @param DatagridConfiguration $config
      *
      * @return array
      */
     abstract protected function getColumnFilterDefinition(DatagridConfiguration $config);
+
+    /**
+     * Gets alias for the tag field
+     *
+     * @param DatagridConfiguration $config
+     *
+     * @return string
+     */
+    abstract protected function getTagFieldAlias(DatagridConfiguration $config);
 }

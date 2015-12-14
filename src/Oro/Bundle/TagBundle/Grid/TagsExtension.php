@@ -130,6 +130,14 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
+    protected function getTagFieldAlias(DatagridConfiguration $config)
+    {
+        return 'id';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getColumnFilterDefinition(DatagridConfiguration $config)
     {
         $className = $this->getEntityClassName($config);

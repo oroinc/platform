@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider;
 
 class TagsReportExtension extends AbstractTagsExtension
 {
@@ -66,6 +67,28 @@ class TagsReportExtension extends AbstractTagsExtension
         $config->offsetSetByPath('[columns]', array_merge($columns, $column));
         $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
         $config->offsetSetByPath(self::GRID_SORTERS_PATH, $sorters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTagFieldAlias(DatagridConfiguration $config)
+    {
+        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
+
+        return $aliases[TagVirtualFieldProvider::TAG_FIELD];
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     *
+     * @return string
+     */
+    protected function hasTagFieldAlias(DatagridConfiguration $config)
+    {
+        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
+
+        return isset($aliases[TagVirtualFieldProvider::TAG_FIELD]);
     }
 
     /**
