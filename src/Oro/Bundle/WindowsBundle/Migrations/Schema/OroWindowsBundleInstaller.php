@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WindowsBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -14,7 +15,7 @@ class OroWindowsBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
@@ -39,7 +40,7 @@ class OroWindowsBundleInstaller implements Installation
         $table = $schema->createTable('oro_windows_state');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('data', 'text', []);
+        $table->addColumn('data', Type::JSON_ARRAY, []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
