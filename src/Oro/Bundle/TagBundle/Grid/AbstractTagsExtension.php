@@ -60,10 +60,7 @@ abstract class AbstractTagsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $aliases    = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
-        $identifier = isset($aliases[TagVirtualFieldProvider::TAG_FIELD])
-            ? $aliases[TagVirtualFieldProvider::TAG_FIELD]
-            : 'id';
+        $identifier = $this->getTagFieldAlias($config);
 
         $rows = (array)$result->offsetGetOr('data', []);
         $ids  = array_map(
@@ -96,6 +93,33 @@ abstract class AbstractTagsExtension extends AbstractExtension
                 $rows
             )
         );
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     *
+     * @return string
+     */
+    protected function getTagFieldAlias(DatagridConfiguration $config)
+    {
+        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
+        if (isset($aliases[TagVirtualFieldProvider::TAG_FIELD])) {
+            return $aliases[TagVirtualFieldProvider::TAG_FIELD];
+        }
+
+        return 'id';
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     *
+     * @return string
+     */
+    protected function hasTagFieldAlias(DatagridConfiguration $config)
+    {
+        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
+
+        return isset($aliases[TagVirtualFieldProvider::TAG_FIELD]);
     }
 
     /**

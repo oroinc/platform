@@ -63,22 +63,16 @@ class TagsExtension extends AbstractTagsExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
         $columns = $config->offsetGetByPath('[columns]', []);
-        $sorters = $config->offsetGetByPath(self::GRID_SORTERS_PATH, []);
-
-        $column = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
-        $filter = $this->getColumnFilterDefinition($config);
-
-
+        $column  = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
         $config->offsetSetByPath('[columns]', array_merge($columns, $column));
-        // do not add tag filter if $filters are empty(case when they are disabled).
-        if (!empty($filters)) {
-            $filters[self::FILTER_COLUMN_NAME] = $filter;
-        }
 
-        $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
-        $config->offsetSetByPath(self::GRID_SORTERS_PATH, $sorters);
+        // do not add tag filter if $filters are empty(case when they are disabled).
+        $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
+        if (!empty($filters)) {
+            $filters[self::FILTER_COLUMN_NAME] = $this->getColumnFilterDefinition($config);
+            $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
+        }
     }
 
     /**

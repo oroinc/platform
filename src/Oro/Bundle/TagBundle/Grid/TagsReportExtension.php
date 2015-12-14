@@ -8,7 +8,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider;
 
 class TagsReportExtension extends AbstractTagsExtension
 {
@@ -41,9 +40,9 @@ class TagsReportExtension extends AbstractTagsExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
-
-        return isset($aliases[TagVirtualFieldProvider::TAG_FIELD]) && $this->isReportOrSegmentGrid($config);
+        return
+            $this->hasTagFieldAlias($config) &&
+            $this->isReportOrSegmentGrid($config);
     }
 
     /**
@@ -58,9 +57,8 @@ class TagsReportExtension extends AbstractTagsExtension
         $column = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
         $filter = $this->getColumnFilterDefinition($config);
 
-        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
         // Replace virtual tags filter and virtual tags column with properly configured one.
-        $tagAlias           = $aliases[TagVirtualFieldProvider::TAG_FIELD];
+        $tagAlias           = $this->getTagFieldAlias($config);
         $filters[$tagAlias] = $filter;
         unset($columns[$tagAlias]);
         unset($sorters[$tagAlias]);
