@@ -49,12 +49,13 @@ input[type=text].hasDatepicker.ui-datepicker-dialog-is-below:focus,
   }
 }
 
-.inline-editor-wrapper.dropdown-below-input {
-  span.validation-failed {
-    #floating-validation-message();
-    position: absolute;
-    top: -30px;
-  }
+.inline-editor-wrapper.dropdown-below-input span.validation-failed,
+.inline-editor-wrapper .select2-drop-below + span.validation-failed {
+  #floating-validation-message();
+  position: absolute;
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 5px;
 }
 
 .datetimepicker-dialog-is-below.timepicker-error + span.validation-failed:after {
