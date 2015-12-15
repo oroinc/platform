@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TagBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -11,8 +10,6 @@ use Oro\Bundle\TagBundle\Entity\TagManager;
 
 abstract class AbstractTagsExtension extends AbstractExtension
 {
-    const COLUMN_NAME = 'tags';
-
     const GRID_EXTEND_ENTITY_PATH = '[extended_entity_name]';
     const GRID_FROM_PATH          = '[source][query][from]';
     const GRID_COLUMN_ALIAS_PATH  = '[source][query_config][column_aliases]';
@@ -55,46 +52,6 @@ abstract class AbstractTagsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
-    {
-        $identifier = $this->getTagFieldAlias($config);
-
-        $rows = (array)$result->offsetGetOr('data', []);
-        $ids  = array_map(
-            function (ResultRecord $item) use ($identifier) {
-                return $item->getValue($identifier);
-            },
-            $rows
-        );
-
-        $tags = array_reduce(
-            $this->tagManager->getTagsByEntityIds($this->getEntityClassName($config), $ids),
-            function ($entitiesTags, $item) {
-                $entitiesTags[$item['entityId']][] = $item;
-
-                return $entitiesTags;
-            },
-            []
-        );
-
-        $result->offsetSet(
-            'data',
-            array_map(
-                function (ResultRecord $item) use ($tags, $identifier) {
-                    $id   = $item->getValue($identifier);
-                    $data = isset($tags[$id]) ? $tags[$id] : [];
-                    $item->addData(['tags' => $data]);
-
-                    return $item;
-                },
-                $rows
-            )
-        );
-    }
-
-    /**
      * @param DatagridConfiguration $config
      *
      * @return string|null
@@ -114,30 +71,60 @@ abstract class AbstractTagsExtension extends AbstractExtension
         return $entityClassName;
     }
 
+    protected function getTagsForEntityClass($entityClass, array $ids)
+    {
+        return array_reduce(
+            $this->tagManager->getTagsByEntityIds($entityClass, $ids),
+            function ($tags, $item) {
+                $tags[$item['entityId']][] = $item;
+
+                return $tags;
+            },
+            []
+        );
+    }
+
     /**
-     * Gets definition for tag column
-     *
-     * @param DatagridConfiguration $config
+     * Extract entity ids from rows by identifier.
+     * @param array  $rows
+     * @param string $idField
      *
      * @return array
      */
-    abstract protected function getColumnDefinition(DatagridConfiguration $config);
+    protected function extractEntityIds(array $rows, $idField)
+    {
+        return array_reduce(
+            $rows,
+            function ($entityIds, ResultRecord $item) use ($idField) {
+                $entityIds[] = $item->getValue($idField);
+
+                return $entityIds;
+            },
+            []
+        );
+    }
 
     /**
-     * Gets definition for tag column filter
+     * Add tags data to result rows for every entity id founded in tags array.
      *
-     * @param DatagridConfiguration $config
+     * @param array  $rows
+     * @param array  $tags
+     * @param string $identifier
+     * @param string $tagsColumnId
      *
      * @return array
      */
-    abstract protected function getColumnFilterDefinition(DatagridConfiguration $config);
+    protected function addTagsToData(array  $rows, array $tags, $identifier, $tagsColumnId)
+    {
+        return array_map(
+            function (ResultRecord $item) use ($tags, $identifier, $tagsColumnId) {
+                $id   = $item->getValue($identifier);
+                $data = isset($tags[$id]) ? $tags[$id] : [];
+                $item->addData([$tagsColumnId => $data]);
 
-    /**
-     * Gets alias for the tag field
-     *
-     * @param DatagridConfiguration $config
-     *
-     * @return string
-     */
-    abstract protected function getTagFieldAlias(DatagridConfiguration $config);
+                return $item;
+            },
+            $rows
+        );
+    }
 }
