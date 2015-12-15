@@ -91,7 +91,9 @@ class TagsReportExtension extends AbstractTagsExtension
      */
     protected function hasTagFields(DatagridConfiguration $config)
     {
-        return !empty($this->getTagColumnDefinitions($config));
+        $columnDefinitions = $this->getTagColumnDefinitions($config);
+
+        return !empty($columnDefinitions);
     }
 
     /**
