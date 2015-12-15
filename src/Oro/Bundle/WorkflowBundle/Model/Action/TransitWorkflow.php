@@ -28,6 +28,11 @@ class TransitWorkflow extends AbstractAction
     protected $transition;
 
     /**
+     * @var array
+     */
+    protected $data = [];
+
+    /**
      * @param ContextAccessor $contextAccessor
      * @param WorkflowManager $workflowManager
      */
@@ -53,6 +58,12 @@ class TransitWorkflow extends AbstractAction
                 )
             );
         }
+
+        $data = $this->getData($context);
+        if ($data) {
+            $workflowItem->getData()->add($data);
+        }
+
         $this->workflowManager->transit($workflowItem, $transition);
     }
     /**
@@ -74,5 +85,26 @@ class TransitWorkflow extends AbstractAction
         } else {
             throw new InvalidParameterException('Option "transition" is required.');
         }
+
+        if (isset($options['data'])) {
+            $this->data = $options['data'];
+        } elseif (isset($options[2])) {
+            $this->data = $options[2];
+        }
+    }
+
+    /**
+     * @param mixed $context
+     * @return array
+     */
+    protected function getData($context)
+    {
+        $data = $this->data;
+
+        foreach ($data as $key => $value) {
+            $data[$key] = $this->contextAccessor->getValue($context, $value);
+        }
+
+        return $data;
     }
 }
