@@ -5,7 +5,6 @@ define(function(require) {
     var Backgrid = require('backgrid');
     var _ = require('underscore');
     var TagsView = require('orotag/js/app/views/viewer/tags-view');
-    var mixin = _.pick(TagsView.prototype, ['template', 'getTemplateFunction', 'getTemplateData', 'render']);
 
     /**
      * Cell able to display tags values.
@@ -21,8 +20,13 @@ define(function(require) {
      * @class   oro.datagrid.cell.TagsCell
      * @extends oro.datagrid.cell.StringCell
      */
-    TagsCell = Backgrid.StringCell.extend(
-        _.extend({
+    TagsCell = Backgrid.StringCell.extend(_.extend(
+        _.pick(TagsView.prototype, [
+            'template',
+            'getTemplateFunction',
+            'getTemplateData',
+            'render'
+        ]), {
             /**
              * @property {string}
              */
@@ -37,7 +41,7 @@ define(function(require) {
                 Backgrid.StringCell.__super__.initialize.apply(this, arguments);
                 this.fieldName = this.column.get('name');
             }
-        }, mixin)
+        })
     );
 
     return TagsCell;
