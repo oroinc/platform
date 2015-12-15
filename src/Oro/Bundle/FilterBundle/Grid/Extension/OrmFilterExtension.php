@@ -125,7 +125,7 @@ class OrmFilterExtension extends AbstractExtension
                 [
                     'label' => $metadata[FilterUtility::TRANSLATABLE_KEY]
                         ? $this->translator->trans($metadata['label'])
-                        : $metadata['label']
+                        : $metadata['label'],
                 ]
             );
 
@@ -135,6 +135,7 @@ class OrmFilterExtension extends AbstractExtension
             ->offsetAddToArray('initialState', ['filters' => $initialFiltersState])
             ->offsetAddToArray('state', ['filters' => $filtersState])
             ->offsetAddToArray('filters', $filtersMetaData)
+            ->offsetSet('displayFilterHintsInline', $config->offsetGetByPath(Configuration::DISPLAY_HINTS_INLINE_PATH))
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
     }
 
