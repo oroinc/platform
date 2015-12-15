@@ -30,6 +30,9 @@ class TaggableControllerTest extends WebTestCase
                 ]
             ]
         );
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertNotEmpty($result);
+        $this->assertCount(2, $result, 'Result should contains information about 2 tags.');
     }
 }
