@@ -877,7 +877,7 @@ services:
             - @doctrine
             - @oro_security.acl_helper
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre, method: onPreBuild }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.base-mailboxes-grid, method: onPreBuild }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-mailboxes-grid, method: onBuildAfter }
 
     oro_email.workflow.condition.instanceof:
