@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\ArrayCollection;
 use Oro\Component\Layout\BlockView;
 
 class LayoutTestCase extends \PHPUnit_Framework_TestCase
@@ -13,7 +14,15 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function assertBlockView(array $expected, BlockView $actual, $ignoreAuxiliaryVariables = true)
     {
-        $this->completeView($expected);
+        $views = [];
+        $collectViews = function (BlockView $view) use (&$collectViews, &$views) {
+            $views[$view->vars['id']] = $view;
+            array_walk($view->children, $collectViews);
+        };
+        $collectViews($actual);
+        $views = new ArrayCollection($views);
+
+        $this->completeView($expected, ['views' => $views]);
         $actualArray = $this->convertBlockViewToArray($actual, $ignoreAuxiliaryVariables);
 
         // compare hierarchy
@@ -28,10 +37,11 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $view
+     * @param array $vars
      *
      * @return array
      */
-    protected function completeView(array &$view)
+    protected function completeView(array &$view, $vars)
     {
         if (!isset($view['vars'])) {
             $view['vars'] = [];
@@ -51,7 +61,12 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         if (!isset($view['vars']['class_prefix'])) {
             $view['vars']['class_prefix'] = null;
         }
-        array_walk($view['children'], [$this, 'completeView']);
+
+        $view['vars'] = array_merge($vars, $view['vars']);
+
+        foreach ($view['children'] as &$child) {
+            $this->completeView($child, $vars);
+        }
     }
 
     /**
