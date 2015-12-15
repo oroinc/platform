@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow;
@@ -11,8 +12,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
 {
-    const REDIRECT_PATH = 'redirectUrl';
-
     /**
      * @var TransitWorkflow
      */
@@ -36,6 +35,7 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new TransitWorkflow(new ContextAccessor(), $this->workflowManager);
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -44,22 +44,37 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->router);
-        unset($this->action);
+        unset($this->router, $this->action);
     }
 
     public function testExecuteWorks()
     {
         $expectedEntity = new \stdClass();
+        $expectedParameter = new \DateTime();
         $context = new ItemStub();
         $context->test = $expectedEntity;
+        $context->parameter = $expectedParameter;
 
         $options = [
             'entity' => new PropertyPath('test'),
             'transition' => 'test_transition',
+            'data' => [
+                'scalar' => 'value',
+                'path' => new PropertyPath('parameter'),
+            ],
         ];
 
+        $expectedData = array_merge($options['data'], ['path' => $expectedParameter]);
+
+        $workflowData = $this->getMock('Oro\Bundle\WorkflowBundle\Model\WorkflowData');
+        $workflowData->expects($this->once())
+            ->method('add')
+            ->with($expectedData);
+
         $expectedWorkflowItem = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
+        $expectedWorkflowItem->expects($this->once())
+            ->method('getData')
+            ->willReturn($workflowData);
 
         $this->workflowManager->expects($this->once())
             ->method('getWorkflowItemByEntity')
@@ -90,17 +105,13 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
             'transition' => 'test_transition',
         ];
 
-        $expectedWorkflowItem = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
-
         $this->workflowManager->expects($this->once())
             ->method('getWorkflowItemByEntity')
             ->with($expectedEntity)
             ->will($this->returnValue(null));
 
         $this->workflowManager->expects($this->never())
-            ->method('transit')
-            ->with($expectedWorkflowItem, $options['transition'])
-            ->will($this->returnValue($expectedWorkflowItem));
+            ->method('transit');
 
         $this->action->initialize($options);
         $this->action->execute($context);
@@ -110,13 +121,15 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
      * @param array $options
      * @param string $expectedEntity
      * @param string $expectedTransition
+     * @param array $expectedData
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options, $expectedEntity, $expectedTransition)
+    public function testInitialize(array $options, $expectedEntity, $expectedTransition, $expectedData = [])
     {
         $this->action->initialize($options);
         $this->assertAttributeEquals($expectedEntity, 'entity', $this->action);
         $this->assertAttributeEquals($expectedTransition, 'transition', $this->action);
+        $this->assertAttributeEquals($expectedData, 'data', $this->action);
     }
 
     /**
@@ -133,6 +146,22 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
                 'expectedEntity' => new PropertyPath('test'),
                 'expectedTransition' => 'test_transition',
             ],
+            'associated array options with data' => [
+                'options' => [
+                    'entity' => new PropertyPath('test'),
+                    'transition' => 'test_transition',
+                    'data' => [
+                        'scalar' => 'value',
+                        'path' => new PropertyPath('parameter'),
+                    ]
+                ],
+                'expectedEntity' => new PropertyPath('test'),
+                'expectedTransition' => 'test_transition',
+                'expectedData' => [
+                    'scalar' => 'value',
+                    'path' => new PropertyPath('parameter'),
+                ],
+            ],
             'indexed array options' => [
                 'options' => [
                     new PropertyPath('test'),
@@ -140,6 +169,22 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedEntity' => new PropertyPath('test'),
                 'expectedTransition' => 'test_transition',
+            ],
+            'indexed array options with data' => [
+                'options' => [
+                    new PropertyPath('test'),
+                    'test_transition',
+                    [
+                        'scalar' => 'value',
+                        'path' => new PropertyPath('parameter'),
+                    ]
+                ],
+                'expectedEntity' => new PropertyPath('test'),
+                'expectedTransition' => 'test_transition',
+                'expectedData' => [
+                    'scalar' => 'value',
+                    'path' => new PropertyPath('parameter'),
+                ],
             ],
         ];
     }
