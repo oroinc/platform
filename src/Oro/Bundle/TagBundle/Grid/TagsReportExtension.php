@@ -3,9 +3,11 @@
 namespace Oro\Bundle\TagBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider;
@@ -17,6 +19,9 @@ class TagsReportExtension extends AbstractTagsExtension
 
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
+
+    /** @var JoinIdentifierHelper */
+    protected $joinIdentifierHelper;
 
     /**
      * @param TagManager          $tagManager
@@ -39,10 +44,18 @@ class TagsReportExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
+    public function getPriority()
+    {
+        return 10;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $this->hasTagFieldAlias($config) &&
+            $this->hasTagFields($config) &&
             $this->isReportOrSegmentGrid($config);
     }
 
@@ -55,28 +68,20 @@ class TagsReportExtension extends AbstractTagsExtension
         $columns = $config->offsetGetByPath('[columns]', []);
         $sorters = $config->offsetGetByPath(self::GRID_SORTERS_PATH, []);
 
-        $column = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
-        $filter = $this->getColumnFilterDefinition($config);
 
-        // Replace virtual tags filter and virtual tags column with properly configured one.
-        $tagAlias           = $this->getTagFieldAlias($config);
-        $filters[$tagAlias] = $filter;
-        unset($columns[$tagAlias]);
-        unset($sorters[$tagAlias]);
+        foreach ($this->getTagColumnDefinitions($config) as $tagColumnDefinition) {
+            // Replace virtual tags filters and virtual tags columns with properly configured one.
+            $idAlias           = $tagColumnDefinition['idAlias'];
+            $entityClass       = $tagColumnDefinition['entityClass'];
+            $columns[$idAlias] = $this->getColumnDefinition($config, $idAlias, $entityClass);
+            $filter            = $this->getColumnFilterDefinition($config, $idAlias, $entityClass);
+            $filters[$idAlias] = $filter;
+            unset($sorters[$idAlias]);
+        }
 
-        $config->offsetSetByPath('[columns]', array_merge($columns, $column));
+        $config->offsetSetByPath('[columns]', $columns);
         $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
         $config->offsetSetByPath(self::GRID_SORTERS_PATH, $sorters);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTagFieldAlias(DatagridConfiguration $config)
-    {
-        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
-
-        return $aliases[TagVirtualFieldProvider::TAG_FIELD];
     }
 
     /**
@@ -84,25 +89,32 @@ class TagsReportExtension extends AbstractTagsExtension
      *
      * @return string
      */
-    protected function hasTagFieldAlias(DatagridConfiguration $config)
+    protected function hasTagFields(DatagridConfiguration $config)
     {
-        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
-
-        return isset($aliases[TagVirtualFieldProvider::TAG_FIELD]);
+        return !empty($this->getTagColumnDefinitions($config));
     }
 
     /**
-     * {@inheritdoc}
+     * Gets definition for tag column.
+     *
+     * @param DatagridConfiguration $config
+     * @param string                $idAlias
+     * @param string                $entityClass
+     *
+     * @return array
      */
-    protected function getColumnDefinition(DatagridConfiguration $config)
+    protected function getColumnDefinition(DatagridConfiguration $config, $idAlias, $entityClass)
     {
+        $columns = $config->offsetGetByPath('[columns]');
+        $label = isset($columns[$idAlias]['label']) ? $columns[$idAlias]['label'] : 'oro.tag.tags_label';
+        $tagColumnId = $this->buildTagColumnId($idAlias, $entityClass);
         return [
-            'label'         => 'oro.tag.tags_label',
+            'label'         => $label,
             'type'          => 'callback',
             'frontend_type' => 'tags',
             'callable'      =>
-                function (ResultRecordInterface $record) {
-                    return $record->getValue('tags');
+                function (ResultRecordInterface $record) use ($tagColumnId) {
+                    return $record->getValue($tagColumnId);
                 },
             'editable'      => false,
             'translatable'  => true,
@@ -111,28 +123,123 @@ class TagsReportExtension extends AbstractTagsExtension
     }
 
     /**
-     * {@inheritdoc}
+     * Gets definition for tag column filter.
+     *
+     * @param DatagridConfiguration $config
+     * @param string                $idAlias
+     * @param string                $entityClass
+     *
+     * @return array
      */
-    protected function getColumnFilterDefinition(DatagridConfiguration $config)
+    protected function getColumnFilterDefinition(DatagridConfiguration $config, $idAlias, $entityClass)
     {
+        $columns = $config->offsetGetByPath('[columns]');
+        $label = isset($columns[$idAlias]['label']) ? $columns[$idAlias]['label'] : 'oro.tag.entity_plural_label';
         return [
-            'type'      => 'tag',
-            'data_name' => 'tag.id',
-            'label'     => 'oro.tag.entity_plural_label',
-            'enabled'   => true,
-            'options'   => [
+        'type'      => 'tag',
+        'data_name' => $idAlias,
+        'label'     => $label,
+        'enabled'   => true,
+        'options'   => [
                 'field_options' => [
-                    'entity_class' => $this->getEntityClassName($config),
+                    'entity_class' => $entityClass,
                 ]
             ]
         ];
     }
 
     /**
+     * Returns [['entityClass' => $entityClass, 'idAlias' => $entityIdAlias], ...] for all configured tags columns.
+     *
+     * @param DatagridConfiguration $config
+     *
+     * @return array
+     */
+    protected function getTagColumnDefinitions(DatagridConfiguration $config)
+    {
+        $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
+        $tagColumns = [];
+
+        if (null === $aliases) {
+            return $tagColumns;
+        }
+        $joinIdentifierHelper = $this->getJoinIdentifierHelper();
+        foreach ($aliases as $key => $alias) {
+            $field = $joinIdentifierHelper->getFieldName($key);
+            if ($field === TagVirtualFieldProvider::TAG_FIELD) {
+                // get entity class from relations aliases if tag_field configured for relations
+                $entityClassName = $joinIdentifierHelper->getEntityClassName($key)?:parent::getEntityClassName($config);
+                $tagColumns[]    = [
+                    'idAlias' => $alias,
+                    'entityClass' => $entityClassName
+                ];
+            }
+        }
+
+        return $tagColumns;
+    }
+
+    /**
+     * Returns [$entityClass => $entityIdAlias, ...] for all configured tags columns.
+     *
+     * @param DatagridConfiguration $config
+     *
+     * @return array
+     */
+    protected function getTagsColumns(DatagridConfiguration $config)
+    {
+        $entityIdsFields = [];
+
+        foreach ($this->getTagColumnDefinitions($config) as $columnDefinition) {
+            $entityIdsFields[$columnDefinition['entityClass']] = $columnDefinition['idAlias'];
+        }
+
+        return $entityIdsFields;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        return 10;
+        $identifiers = $this->getTagsColumns($config);
+        $rows = (array)$result->offsetGetOr('data', []);
+        $entitiesTags = [];
+        foreach ($identifiers as $entityClass => $idAlias) {
+            $entitiesTags[$entityClass] = $this->getTagsForEntityClass(
+                $entityClass,
+                $this->extractEntityIds($rows, $idAlias)
+            );
+        }
+
+        foreach ($entitiesTags as $entityClass => $entityTags) {
+            $idAlias = $identifiers[$entityClass];
+            $this->addTagsToData($rows, $entityTags, $idAlias, $this->buildTagColumnId($idAlias, $entityClass));
+        }
+    }
+
+    /**
+     * @return JoinIdentifierHelper
+     */
+    protected function getJoinIdentifierHelper()
+    {
+        if (null === $this->joinIdentifierHelper) {
+            $this->joinIdentifierHelper = new JoinIdentifierHelper(null);
+        }
+
+        return $this->joinIdentifierHelper;
+    }
+
+    /**
+     * Build tag column identifier by entity id alias and entityClass.
+     *
+     * @param string $idAlias
+     * @param string $entityClass
+     *
+     * @return string
+     */
+    protected function buildTagColumnId($idAlias, $entityClass)
+    {
+        return sprintf('%s.%s', $idAlias, $entityClass);
     }
 }
