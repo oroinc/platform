@@ -68,14 +68,14 @@ class TagsReportExtension extends AbstractTagsExtension
         $columns = $config->offsetGetByPath('[columns]', []);
         $sorters = $config->offsetGetByPath(self::GRID_SORTERS_PATH, []);
 
-
         foreach ($this->getTagColumnDefinitions($config) as $tagColumnDefinition) {
             // Replace virtual tags filters and virtual tags columns with properly configured one.
             $idAlias           = $tagColumnDefinition['idAlias'];
             $entityClass       = $tagColumnDefinition['entityClass'];
             $columns[$idAlias] = $this->getColumnDefinition($config, $idAlias, $entityClass);
-            $filter            = $this->getColumnFilterDefinition($config, $idAlias, $entityClass);
-            $filters[$idAlias] = $filter;
+            $filters[$idAlias] = $this->getColumnFilterDefinition($config, $idAlias, $entityClass);
+
+            // Remove sorter from the grid for the tags column.
             unset($sorters[$idAlias]);
         }
 
@@ -105,9 +105,10 @@ class TagsReportExtension extends AbstractTagsExtension
      */
     protected function getColumnDefinition(DatagridConfiguration $config, $idAlias, $entityClass)
     {
-        $columns = $config->offsetGetByPath('[columns]');
-        $label = isset($columns[$idAlias]['label']) ? $columns[$idAlias]['label'] : 'oro.tag.tags_label';
+        $columns     = $config->offsetGetByPath('[columns]');
+        $label       = isset($columns[$idAlias]['label']) ? $columns[$idAlias]['label'] : 'oro.tag.tags_label';
         $tagColumnId = $this->buildTagColumnId($idAlias, $entityClass);
+
         return [
             'label'         => $label,
             'type'          => 'callback',
@@ -134,13 +135,14 @@ class TagsReportExtension extends AbstractTagsExtension
     protected function getColumnFilterDefinition(DatagridConfiguration $config, $idAlias, $entityClass)
     {
         $columns = $config->offsetGetByPath('[columns]');
-        $label = isset($columns[$idAlias]['label']) ? $columns[$idAlias]['label'] : 'oro.tag.entity_plural_label';
+        $label   = isset($columns[$idAlias]['label']) ? $columns[$idAlias]['label'] : 'oro.tag.tags_label';
+
         return [
-        'type'      => 'tag',
-        'data_name' => $idAlias,
-        'label'     => $label,
-        'enabled'   => true,
-        'options'   => [
+            'type'      => 'tag',
+            'data_name' => $idAlias,
+            'label'     => $label,
+            'enabled'   => true,
+            'options'   => [
                 'field_options' => [
                     'entity_class' => $entityClass,
                 ]
