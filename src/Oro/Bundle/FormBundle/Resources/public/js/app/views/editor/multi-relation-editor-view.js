@@ -67,7 +67,7 @@ define(function(require) {
     var RelatedIdRelationEditorView = require('./related-id-relation-editor-view');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var select2autosizer = require('../../../utils/select2-autosizer');
+    var select2autosizer = require('oroui/js/tools/select2-autosizer');
 
     MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @exports MultiRelationEditorView.prototype */{
         className: 'multi-relation-editor',
@@ -121,7 +121,7 @@ define(function(require) {
         },
 
         getModelValue: function() {
-            var value = this.model.get(this.column.get('name'));
+            var value = this.model.get(this.fieldName);
             if (_.isString(value)) {
                 value = JSON.parse(value);
             }
@@ -155,7 +155,7 @@ define(function(require) {
 
         getServerUpdateData: function() {
             var data = {};
-            data[this.column.get('name')] = this.getValue();
+            data[this.fieldName] = this.getValue();
             return data;
         },
 

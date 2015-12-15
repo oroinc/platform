@@ -16,7 +16,7 @@ class MultiSelectGuesser extends ChoicesGuesser
     /** Frontend type */
     const MULTI_SELECT = 'multi-select';
 
-    const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/multi-select-editor-view';
+    const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/multi-checkbox-editor-view';
 
     /**
      * {@inheritdoc}
