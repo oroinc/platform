@@ -2,6 +2,8 @@
 define(function(require) {
     'use strict';
     var BaseView = require('oroui/js/app/views/base/view');
+    var _ = require('underscore');
+    var routing = require('routing');
 
     /**
      * Tags view, able to handle tags array in model.
@@ -35,11 +37,17 @@ define(function(require) {
             return TagsView.__super__.initialize.apply(this, arguments);
         },
         getTemplateData: function() {
+            var tags = this.model.get(this.fieldName);
+            tags = _.map(tags, function(tag) {
+                tag.url = routing.generate('oro_tag_search', {
+                    id: tag.id
+                });
+                return tag;
+            });
+            tags = _.sortBy(tags, this.tagSortCallback);
             return {
-                model: this.model.toJSON(),
-                showDefault: true,
-                fieldName: this.fieldName,
-                tagSortCallback: this.tagSortCallback
+                tags: tags,
+                showDefault: true
             };
         },
         tagSortCallback: function(a, b) {
