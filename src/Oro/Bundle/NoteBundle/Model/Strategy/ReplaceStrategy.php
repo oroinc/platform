@@ -53,6 +53,16 @@ class ReplaceStrategy implements StrategyInterface
                 }
             }
 
+            $queryBuilder = $this->doctrineHelper->getEntityRepository('OroNoteBundle:Note')
+                ->getBaseAssociatedNotesQB(ClassUtils::getRealClass($masterEntity), $sourceEntity->getId());
+            $notes = $queryBuilder->getQuery()->getResult();
+
+            if (!empty($notes)) {
+                foreach ($notes as $note) {
+                    $note->setTarget($masterEntity);
+                }
+            }
+
             $fieldMetadata = $fieldData->getMetadata();
             $activityClass = $fieldMetadata->get('type');
             $entityClass = ClassUtils::getRealClass($sourceEntity);
