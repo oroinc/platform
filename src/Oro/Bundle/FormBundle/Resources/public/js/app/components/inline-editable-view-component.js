@@ -147,6 +147,7 @@ define(function(require) {
                 this.inlineEditingOptions.editor.view_options :
                 {};
             var viewInstance = new View(_.extend({}, viewConfiguration, {
+                className: 'inline-view-editor',
                 autoRender: true,
                 model: this.model,
                 fieldName: this.fieldName,

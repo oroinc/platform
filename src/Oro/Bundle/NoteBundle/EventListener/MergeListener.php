@@ -57,7 +57,7 @@ class MergeListener
                 'field_name'    => $this->getNoteFieldName($entityMetadata),
                 'is_collection' => true,
                 'label'         => $this->translator->trans($this->getNoteAlias()),
-                'merge_modes'   => [ActivityMergeModes::ACTIVITY_UNITE, MergeModes::NOTES_REPLACE]
+                'merge_modes'   => [MergeModes::NOTES_UNITE, MergeModes::NOTES_REPLACE]
             ];
 
             $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
