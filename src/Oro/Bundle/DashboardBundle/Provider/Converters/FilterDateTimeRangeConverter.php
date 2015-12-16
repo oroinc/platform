@@ -71,13 +71,13 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
             case AbstractDateFilterType::TYPE_MORE_THAN:
                 return sprintf(
                     '%s %s',
-                    $this->translator->trans('oro.filter.form.label_date_type_later_than'),
+                    $this->translator->trans('oro.filter.form.label_date_type_more_than'),
                     $this->formatter->formatDate($value['start'])
                 );
             case AbstractDateFilterType::TYPE_LESS_THAN:
                 return sprintf(
                     '%s %s',
-                    $this->translator->trans('oro.filter.form.label_date_type_earlier_than'),
+                    $this->translator->trans('oro.filter.form.label_date_type_less_than'),
                     $this->formatter->formatDate($value['end'])
                 );
         }
