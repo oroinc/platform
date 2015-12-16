@@ -29,7 +29,7 @@ define(function(require) {
         /**
          * Format of date/datetime that original input accepts
          */
-        backendFormat: datetimeFormatter.backendFormats.datetime,
+        backendFormat: datetimeFormatter.getBackendDateTimeFormat(),
 
         /**
          * @type {string}
@@ -93,6 +93,7 @@ define(function(require) {
             this.$frontTimeField = $('<input />');
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
+            this.$frontTimeField.attr('data-fake-front-field', '');
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
             this.$frontDateField.on('blur', function(e) {
                 $(this).parent().removeClass(dialogBelowClass);

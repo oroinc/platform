@@ -104,6 +104,8 @@ define(function(require) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
+            } else if (this.dayValueHelper.isDayValue(value)) {
+                value = this.dayValueHelper.formatDisplayValue(value);
             } else if (datetimeFormatter.isValueValid(value, this.backendFormat)) {
                 momentInstance = moment(value, this.backendFormat, true);
                 value = momentInstance.format(datetimeFormatter.getDateTimeFormat());
@@ -122,6 +124,8 @@ define(function(require) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
+            } else if (this.dayValueHelper.isDayValue(value)) {
+                value = this.dayValueHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateTimeValid(value)) {
                 momentInstance = moment(value, datetimeFormatter.getDateTimeFormat(), true);
                 value = momentInstance.format(this.backendFormat);
