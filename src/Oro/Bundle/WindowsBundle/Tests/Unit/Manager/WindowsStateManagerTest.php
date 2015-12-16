@@ -42,7 +42,8 @@ class WindowsStateManagerTest extends \PHPUnit_Framework_TestCase
             $this->tokenStorage,
             $this->doctrineHelper,
             $this->requestStateManager,
-            'Oro\Bundle\WindowsBundle\Entity\WindowsState'
+            'Oro\Bundle\WindowsBundle\Entity\WindowsState',
+            'Oro\Bundle\UserBundle\Entity\User'
         );
     }
 
@@ -220,5 +221,23 @@ class WindowsStateManagerTest extends \PHPUnit_Framework_TestCase
         $state->setData($data);
 
         return $state;
+    }
+
+    public function testIsApplicableWithoutUser()
+    {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token->expects($this->once())->method('getUser')->willReturn(null);
+        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
+
+        $this->assertFalse($this->manager->isApplicable());
+    }
+
+    public function testIsApplicable()
+    {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token->expects($this->once())->method('getUser')->willReturn(new User());
+        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
+
+        $this->assertTrue($this->manager->isApplicable());
     }
 }

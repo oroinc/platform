@@ -7,7 +7,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
-use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
+use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 
 class WindowsExtension extends \Twig_Extension
@@ -21,21 +21,21 @@ class WindowsExtension extends \Twig_Extension
      */
     protected $rendered = false;
 
-    /** @var WindowsStateManager */
-    protected $windowsStateManager;
+    /** @var WindowsStateManagerRegistry */
+    protected $windowsStateManagerRegistry;
 
     /** @var WindowsStateRequestManager */
     protected $windowsStateRequestManager;
 
     /**
-     * @param WindowsStateManager $windowsStateManager
+     * @param WindowsStateManagerRegistry $windowsStateManagerRegistry
      * @param WindowsStateRequestManager $windowsStateRequestManager
      */
     public function __construct(
-        WindowsStateManager $windowsStateManager,
+        WindowsStateManagerRegistry $windowsStateManagerRegistry,
         WindowsStateRequestManager $windowsStateRequestManager
     ) {
-        $this->windowsStateManager = $windowsStateManager;
+        $this->windowsStateManagerRegistry = $windowsStateManagerRegistry;
         $this->windowsStateRequestManager = $windowsStateRequestManager;
     }
 
@@ -80,7 +80,7 @@ class WindowsExtension extends \Twig_Extension
         $this->rendered = true;
 
         try {
-            $windowsStates = $this->windowsStateManager->getWindowsStates();
+            $windowsStates = $this->windowsStateManagerRegistry->getManager()->getWindowsStates();
         } catch (AccessDeniedException $e) {
             $windowsStates = [];
         }
@@ -122,7 +122,7 @@ class WindowsExtension extends \Twig_Extension
 
         if ($scheduleDelete) {
             try {
-                $this->windowsStateManager->deleteWindowsState($windowState->getId());
+                $this->windowsStateManagerRegistry->getManager()->deleteWindowsState($windowState->getId());
             } catch (AccessDeniedException $e) {
                 return $result;
             }

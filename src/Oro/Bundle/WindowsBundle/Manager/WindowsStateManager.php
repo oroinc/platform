@@ -24,22 +24,28 @@ class WindowsStateManager
     /** @var string */
     protected $className;
 
+    /** @var string */
+    protected $userClassName;
+
     /**
      * @param TokenStorageInterface $tokenStorage
      * @param DoctrineHelper $doctrineHelper
      * @param WindowsStateRequestManager $requestStateManager
      * @param string $className
+     * @param string $userClassName
      */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         DoctrineHelper $doctrineHelper,
         WindowsStateRequestManager $requestStateManager,
-        $className
+        $className,
+        $userClassName
     ) {
         $this->tokenStorage = $tokenStorage;
         $this->doctrineHelper = $doctrineHelper;
-        $this->className = $className;
         $this->requestStateManager = $requestStateManager;
+        $this->className = $className;
+        $this->userClassName = $userClassName;
     }
 
     /**
@@ -125,7 +131,7 @@ class WindowsStateManager
      *
      * @see TokenInterface::getUser()
      */
-    public function getUser()
+    protected function getUser()
     {
         if (null === $token = $this->tokenStorage->getToken()) {
             throw new AccessDeniedException();
@@ -136,5 +142,15 @@ class WindowsStateManager
         }
 
         return $user;
+    }
+
+    /** @return bool */
+    public function isApplicable()
+    {
+        try {
+            return is_a($this->getUser(), $this->userClassName);
+        } catch (AccessDeniedException $e) {
+            return false;
+        }
     }
 }

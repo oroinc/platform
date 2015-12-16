@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
+use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 use Oro\Bundle\WindowsBundle\Twig\WindowsExtension;
@@ -29,6 +30,11 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
     protected $stateManager;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManagerRegistry
+     */
+    protected $stateManagerRegistry;
+
+    /**
      * @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateRequestManager
      */
     protected $requestStateManager;
@@ -41,12 +47,17 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
         $this->stateManager = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Manager\WindowsStateManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->stateManagerRegistry = $this
+            ->getMockBuilder('Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->stateManagerRegistry->expects($this->any())->method('getManager')->willReturn($this->stateManager);
         $this->requestStateManager = $this
             ->getMockBuilder('Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager')
             ->setMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extension = new WindowsExtension($this->stateManager, $this->requestStateManager);
+        $this->extension = new WindowsExtension($this->stateManagerRegistry, $this->requestStateManager);
     }
 
     public function testGetFunctions()
