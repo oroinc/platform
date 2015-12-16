@@ -19,13 +19,11 @@ class OroDataGridBundle implements Migration
 
         $table->addColumn('columnsData', 'array', ['comment' => '(DC2Type:array)', 'notnull' => false]);
 
-        if ($table->hasColumn('columnsData')) {
-            $queries->addPostQuery(
-                new ParametrizedSqlMigrationQuery(
-                    'UPDATE oro_grid_view SET columnsData = :columnsData WHERE columnsData is NULL; ',
-                    ['columnsData' => serialize([])]
-                )
-            );
-        }
+        $queries->addPostQuery(
+            new ParametrizedSqlMigrationQuery(
+                'UPDATE oro_grid_view SET columnsData = :columnsData WHERE columnsData is NULL; ',
+                ['columnsData' => serialize([])]
+            )
+        );
     }
 }
