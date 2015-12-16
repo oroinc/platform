@@ -55,17 +55,16 @@ define(function(require) {
 
         constructor: function() {
             this.onKeyDown = _.bind(this.onKeyDown, this);
-            this.hidePopover = _.bind(this.hidePopover, this);
             InlineEditingPlugin.__super__.constructor.apply(this, arguments);
         },
 
         enable: function() {
             this.listenTo(this.main, {
                 afterMakeCell: this.onAfterMakeCell,
-                shown: this.onGridShown,
-                rowClicked: this.onGridRowClicked
+                shown: this.onGridShown
             });
             this.listenTo(mediator, 'page:beforeChange', function() {
+                this.hidePopover();
                 if (this.editModeEnabled) {
                     this.exitEditMode(true);
                 }
@@ -84,8 +83,8 @@ define(function(require) {
             if (this.editModeEnabled) {
                 this.exitEditMode(true);
             }
-            this.hidePopover();
             this.main.body.refresh();
+            this.destroyPopover();
             InlineEditingPlugin.__super__.disable.call(this);
         },
 
@@ -93,7 +92,6 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.destroyPopover();
             return InlineEditingPlugin.__super__.dispose.call(this);
         },
 
@@ -115,7 +113,6 @@ define(function(require) {
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
                     this.events = _.extend(Object.create(this.events), {
                         'dblclick': enterEditModeIfNeeded,
-                        'mouseleave': _this.hidePopover,
                         'mousedown .icon-edit': enterEditModeIfNeeded,
                         'click': _.noop
                     });
@@ -130,15 +127,10 @@ define(function(require) {
             this.initPopover();
         },
 
-        onGridRowClicked: function(grid, row) {
-            row.$('.editable').removeClass('editable');
-            this.hidePopover();
-        },
-
         initPopover: function() {
             this.main.$el.popover({
                 content: __('oro.form.inlineEditing.helpMessage'),
-                container: document.body,
+                container: this.main.$el,
                 selector: 'td.editable',
                 placement: 'bottom',
                 delay: {show: 1400, hide: 0},
@@ -155,6 +147,7 @@ define(function(require) {
 
         destroyPopover: function() {
             if (this.main.$el.data('popover')) {
+                this.hidePopover();
                 this.main.$el.popover('destroy');
             }
         },
@@ -242,6 +235,7 @@ define(function(require) {
                 this.exitEditMode(false);
             } else {
                 if (backdropManager.isReleased(this.backdropId)) {
+                    this.hidePopover(); // before adding backdrop
                     this.backdropId = backdropManager.hold();
                     $(document).on('keydown', this.onKeyDown);
                 }
