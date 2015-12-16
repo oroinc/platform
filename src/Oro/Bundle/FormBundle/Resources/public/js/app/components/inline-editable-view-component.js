@@ -264,11 +264,11 @@ define(function(require) {
                 var _this = this;
                 this.wrapper.$el.addClass('save-success');
                 if (response) {
-                    for (var i in response) {
+                    _.each(response, function(item, i) {
                         if (this.model.has(i)) {
-                            this.model.set(i, response[i]);
+                            this.model.set(i, item);
                         }
-                    }
+                    }, this);
                 }
 
                 _.delay(function() {

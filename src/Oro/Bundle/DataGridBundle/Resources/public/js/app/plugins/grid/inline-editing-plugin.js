@@ -571,17 +571,16 @@ define(function(require) {
         }
     }, {
         onSaveSuccess: function(response) {
-            var propName;
             if (!this.cell.disposed && this.cell.$el) {
                 if (response) {
                     var routeParametersRenameMap = _.invert(this.cell.column.get('metadata').inline_editing.
                         save_api_accessor.routeParametersRenameMap);
-                    for (var i in response) {
-                        propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
+                    _.each(response, function(item, i) {
+                        var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
                         if (this.cell.model.has(propName)) {
-                            this.cell.model.set(propName, response[i]);
+                            this.cell.model.set(propName, item);
                         }
-                    }
+                    }, this);
                 }
 
                 var _this = this;
