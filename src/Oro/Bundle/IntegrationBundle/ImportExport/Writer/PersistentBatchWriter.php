@@ -9,8 +9,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\BatchBundle\Step\StepExecutionRestoreInterface;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
@@ -21,10 +19,7 @@ use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
-class PersistentBatchWriter implements
-    ItemWriterInterface,
-    StepExecutionAwareInterface,
-    StepExecutionRestoreInterface
+class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
     /** @var RegistryInterface */
     protected $registry;
@@ -40,9 +35,6 @@ class PersistentBatchWriter implements
 
     /** @var LoggerInterface */
     protected $logger;
-
-    /** @var StepExecution|null */
-    protected $previousStepExecution;
 
     /**
      * @param RegistryInterface        $registry
@@ -132,16 +124,6 @@ class PersistentBatchWriter implements
      */
     public function setStepExecution(StepExecution $stepExecution)
     {
-        $this->previousStepExecution = $this->stepExecution;
-
         $this->stepExecution = $stepExecution;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function restoreStepExecution()
-    {
-        $this->stepExecution = $this->previousStepExecution;
     }
 }
