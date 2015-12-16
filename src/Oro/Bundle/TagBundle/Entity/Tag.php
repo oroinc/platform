@@ -228,6 +228,16 @@ class Tag extends ExtendTag
     }
 
     /**
+     * @param Tagging $tagging
+     */
+    public function addTagging(Tagging $tagging)
+    {
+        if (!$this->tagging->contains($tagging)) {
+            $this->tagging->add($tagging);
+        }
+    }
+
+    /**
      * To string
      *
      * @return string
