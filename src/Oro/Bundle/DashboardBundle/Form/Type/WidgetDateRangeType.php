@@ -100,9 +100,9 @@ class WidgetDateRangeType extends AbstractType
             AbstractDateFilterType::TYPE_BETWEEN
                 => $this->translator->trans('oro.filter.form.label_date_type_between'),
             AbstractDateFilterType::TYPE_MORE_THAN
-                => $this->translator->trans('oro.filter.form.label_date_type_later_than'),
+                => $this->translator->trans('oro.filter.form.label_date_type_more_than'),
             AbstractDateFilterType::TYPE_LESS_THAN
-                => $this->translator->trans('oro.filter.form.label_date_type_earlier_than')
+                => $this->translator->trans('oro.filter.form.label_date_type_less_than')
         ];
     }
 }

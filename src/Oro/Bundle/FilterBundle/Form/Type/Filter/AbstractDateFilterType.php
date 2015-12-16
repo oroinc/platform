@@ -75,8 +75,8 @@ abstract class AbstractDateFilterType extends AbstractType
         return [
             self::TYPE_BETWEEN     => $this->translator->trans('oro.filter.form.label_date_type_between'),
             self::TYPE_NOT_BETWEEN => $this->translator->trans('oro.filter.form.label_date_type_not_between'),
-            self::TYPE_MORE_THAN   => $this->translator->trans('oro.filter.form.label_date_type_later_than'),
-            self::TYPE_LESS_THAN   => $this->translator->trans('oro.filter.form.label_date_type_earlier_than'),
+            self::TYPE_MORE_THAN   => $this->translator->trans('oro.filter.form.label_date_type_more_than'),
+            self::TYPE_LESS_THAN   => $this->translator->trans('oro.filter.form.label_date_type_less_than'),
             self::TYPE_EQUAL       => $this->translator->trans('oro.filter.form.label_date_type_equals'),
             self::TYPE_NOT_EQUAL   => $this->translator->trans('oro.filter.form.label_date_type_not_equals')
         ];

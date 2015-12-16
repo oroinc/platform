@@ -29,10 +29,8 @@ oro:
             label_type_range_less_equals: equals or less than
             label_date_type_between:      between
             label_date_type_not_between:  not between
-            label_date_type_more_than:    more than
-            label_date_type_less_than:    less than
-            label_date_type_later_than:   later than
-            label_date_type_earlier_than: earlier than
+            label_date_type_more_than:    later than
+            label_date_type_less_than:    earlier than
             label_date_type_equals:       equals
             label_date_type_not_equals:   not equals
             label_not_selected:           Not Selected

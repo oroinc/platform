@@ -63,8 +63,8 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
                     'operator_choices' => array(
                         DateRangeFilterType::TYPE_BETWEEN => 'oro.filter.form.label_date_type_between',
                         DateRangeFilterType::TYPE_NOT_BETWEEN => 'oro.filter.form.label_date_type_not_between',
-                        DateRangeFilterType::TYPE_MORE_THAN => 'oro.filter.form.label_date_type_later_than',
-                        DateRangeFilterType::TYPE_LESS_THAN => 'oro.filter.form.label_date_type_earlier_than',
+                        DateRangeFilterType::TYPE_MORE_THAN => 'oro.filter.form.label_date_type_more_than',
+                        DateRangeFilterType::TYPE_LESS_THAN => 'oro.filter.form.label_date_type_less_than',
                         DateRangeFilterType::TYPE_EQUAL => 'oro.filter.form.label_date_type_equals',
                         DateRangeFilterType::TYPE_NOT_EQUAL => 'oro.filter.form.label_date_type_not_equals'
                     ),
