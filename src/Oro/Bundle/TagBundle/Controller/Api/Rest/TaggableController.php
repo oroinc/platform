@@ -48,7 +48,7 @@ class TaggableController extends RestController
 
                 // Returns tags for the updated entity.
                 return $this->buildResponse(
-                    $result,
+                    ['tags' => $result],
                     self::ACTION_READ,
                     ['result' => $result],
                     Codes::HTTP_OK
