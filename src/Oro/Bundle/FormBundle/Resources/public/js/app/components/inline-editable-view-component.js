@@ -226,7 +226,7 @@ define(function(require) {
                     processingMessage: __('oro.form.inlineEditing.saving_progress'),
                     preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
                 })
-                .done(_.bind(InlineEditableViewComponent.onSaveSuccess, ctx))
+                .done(_.bind(InlineEditableViewComponent.onSaveSuccess, this))
                 .fail(_.bind(InlineEditableViewComponent.onSaveError, ctx))
                 .always(function() {
                     wrapper.$el.removeClass('loading');
@@ -259,10 +259,18 @@ define(function(require) {
             });
         }
     }, {
-        onSaveSuccess: function() {
+        onSaveSuccess: function(response) {
             if (!this.wrapper.disposed && this.wrapper.$el) {
                 var _this = this;
                 this.wrapper.$el.addClass('save-success');
+                if (response) {
+                    for (var i in response) {
+                        if (this.model.has(i)) {
+                            this.model.set(i, response[i]);
+                        }
+                    }
+                }
+
                 _.delay(function() {
                     _this.wrapper.$el.removeClass('save-success');
                 }, 2000);
