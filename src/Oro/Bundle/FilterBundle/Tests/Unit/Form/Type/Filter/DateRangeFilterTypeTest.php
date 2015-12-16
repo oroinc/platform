@@ -55,22 +55,26 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
             array(
                 'defaultOptions' => array(
                     'field_type' => DateRangeType::NAME,
-                    'operator_choices' => array(
-                        DateRangeFilterType::TYPE_BETWEEN => 'oro.filter.form.label_date_type_between',
-                        DateRangeFilterType::TYPE_NOT_BETWEEN => 'oro.filter.form.label_date_type_not_between',
-                        DateRangeFilterType::TYPE_MORE_THAN => 'oro.filter.form.label_date_type_more_than',
-                        DateRangeFilterType::TYPE_LESS_THAN => 'oro.filter.form.label_date_type_less_than',
-                    ),
                     'widget_options' => array(
                         'showDatevariables' => true,
                         'showTime'          => false,
                         'showTimepicker'    => false,
                     ),
+                    'operator_choices' => array(
+                        DateRangeFilterType::TYPE_BETWEEN => 'oro.filter.form.label_date_type_between',
+                        DateRangeFilterType::TYPE_NOT_BETWEEN => 'oro.filter.form.label_date_type_not_between',
+                        DateRangeFilterType::TYPE_MORE_THAN => 'oro.filter.form.label_date_type_more_than',
+                        DateRangeFilterType::TYPE_LESS_THAN => 'oro.filter.form.label_date_type_less_than',
+                        DateRangeFilterType::TYPE_EQUAL => 'oro.filter.form.label_date_type_equals',
+                        DateRangeFilterType::TYPE_NOT_EQUAL => 'oro.filter.form.label_date_type_not_equals'
+                    ),
                     'type_values' => array(
                         'between'    => DateRangeFilterType::TYPE_BETWEEN,
                         'notBetween' => DateRangeFilterType::TYPE_NOT_BETWEEN,
                         'moreThan'   => DateRangeFilterType::TYPE_MORE_THAN,
-                        'lessThan'   => DateRangeFilterType::TYPE_LESS_THAN
+                        'lessThan'   => DateRangeFilterType::TYPE_LESS_THAN,
+                        'equal'      => DateRangeFilterType::TYPE_EQUAL,
+                        'notEqual'   => DateRangeFilterType::TYPE_NOT_EQUAL
                     )
                 )
             )
