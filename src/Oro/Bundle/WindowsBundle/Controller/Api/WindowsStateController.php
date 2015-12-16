@@ -107,7 +107,7 @@ class WindowsStateController extends FOSRestController
     }
 
     /**
-     * @retrun WindowsStateManager
+     * @return WindowsStateManager
      */
     protected function getWindowsStatesManager()
     {

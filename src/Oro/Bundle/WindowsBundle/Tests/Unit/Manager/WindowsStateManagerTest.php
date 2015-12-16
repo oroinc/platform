@@ -14,6 +14,7 @@ class WindowsStateManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
     protected $tokenStorage;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
