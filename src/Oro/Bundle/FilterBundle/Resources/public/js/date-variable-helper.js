@@ -71,10 +71,13 @@ define(function(require) {
          */
         isDateVariable: function(value) {
             var result;
+            //replace -5 +60 modifiers to '', we need clear variable
+            value = value.replace(/([\-+]+(\d+)?)/, '');
+
             result = _.some(this.index, function(displayValue, index) {
-                var rawValue = '{{' + index + '}}';
-                return rawValue === value.substr(0, rawValue.length) ||
-                    displayValue === value.substr(0, displayValue.length);
+                var regexpValue = new RegExp('^'+value+'$', 'i');
+
+                return value === '{{' + index + '}}' || regexpValue.test(displayValue)
             });
             return result;
         },
@@ -103,7 +106,7 @@ define(function(require) {
         formatRawValue: function(value) {
             for (var i in this.index) {
                 if (this.index.hasOwnProperty(i)) {
-                    value = value.replace(new RegExp(this.index[i], 'g'), '{{' + i + '}}');
+                    value = value.replace(new RegExp(this.index[i], 'gi'), '{{' + i + '}}');
                 }
             }
             return value;
