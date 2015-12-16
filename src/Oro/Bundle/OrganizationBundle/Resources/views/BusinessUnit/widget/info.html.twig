@@ -1,5 +1,6 @@
 {% import 'OroUIBundle::macros.html.twig' as ui %}
 {% import 'OroEmailBundle::macros.html.twig' as email %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
 <div class="widget-content">
     <div class="row-fluid form-horizontal">
@@ -7,6 +8,8 @@
             {{ ui.renderProperty('oro.organization.businessunit.name.label'|trans, entity.name) }}
             {{ ui.renderProperty('oro.organization.businessunit.organization.label'|trans, entity.organization) }}
             {{ ui.renderHtmlProperty('oro.organization.businessunit.website.label'|trans, entity.website ? ui.renderUrl(entity.website) : null) }}
+
+            {{ entityConfig.renderDynamicFields(entity) }}
         </div>
 
         <div class="responsive-block">

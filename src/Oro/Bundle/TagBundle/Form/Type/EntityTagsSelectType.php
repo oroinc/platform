@@ -46,15 +46,21 @@ class EntityTagsSelectType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $choices = function (Options $options) {
-            if (empty($options['entity_class'])) {
-                return [];
+
+
+            $queryBuilder = $this->doctrine->getRepository('OroTagBundle:Tag')
+                ->createQueryBuilder('t')
+                ->distinct(true)
+                ->join('t.tagging', 'tagging')
+                ->orderBy('t.name');
+
+            if (!empty($options['entity_class'])) {
+                $queryBuilder
+                    ->where('tagging.entityName = :entity')
+                    ->setParameter('entity', $options['entity_class']);
             }
 
-            return $this->aclHelper->apply($this->doctrine->getRepository('OroTagBundle:Tag')
-                ->createQueryBuilder('t')
-                ->join('t.tagging', 'tagging')
-                ->where('tagging.entityName = :entity')
-                ->setParameter('entity', $options['entity_class']))
+            return $this->aclHelper->apply($queryBuilder)
                 ->getResult();
         };
 

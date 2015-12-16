@@ -23,6 +23,7 @@ parameters:
     oro_workflow.workflow.action.remove_entity.class:  Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity
     oro_workflow.workflow.action.assign_constant_value.class:  Oro\Bundle\WorkflowBundle\Model\Action\AssignConstantValue
     oro_workflow.workflow.action.copy_tagging.class:  Oro\Bundle\WorkflowBundle\Model\Action\CopyTagging
+    oro_workflow.workflow.action.transit_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow
 
 services:
     oro_workflow.action_factory:
@@ -198,5 +199,14 @@ services:
         arguments:
             - @oro_workflow.context_accessor
             - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
         tags:
             - { name: oro_workflow.action, alias: copy_tagging }
+
+    oro_workflow.workflow.action.transit_workflow:
+        class: %oro_workflow.workflow.action.transit_workflow.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_workflow.manager
+        tags:
+            - { name: oro_workflow.action, alias: transit_workflow }

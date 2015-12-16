@@ -1,1 +1,8 @@
 "Not tagged": "Not tagged"
+oro:
+    tag:
+        inline_editing:
+            new_tag: "New tag"
+            existing_tag: "This tag is already added"
+            loading: "Loading..."
+            no_matches: "No matches found"
