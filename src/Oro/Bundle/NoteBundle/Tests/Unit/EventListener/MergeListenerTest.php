@@ -99,7 +99,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             'template' => 'OroActivityListBundle:Merge:value.html.twig',
             'label' => 'Items',
             'merge_modes' =>
-                [\Oro\Bundle\ActivityListBundle\Model\MergeModes::ACTIVITY_UNITE, MergeModes::NOTES_REPLACE]
+                [MergeModes::NOTES_UNITE, MergeModes::NOTES_REPLACE]
         ];
         $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
 
