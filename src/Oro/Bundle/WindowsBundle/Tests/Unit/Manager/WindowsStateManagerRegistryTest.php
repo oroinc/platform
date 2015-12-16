@@ -39,7 +39,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->addManager($manager);
 
         $this->defaultManager->expects($this->never())->method($this->anything());
-        $manager->expects($this->once())->method('isApplicable')->willReturn(true);
+        $manager->expects($this->exactly(2))->method('isApplicable')->willReturn(true);
 
         $this->assertTrue($this->registry->getManager()->isApplicable());
     }
