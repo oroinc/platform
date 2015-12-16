@@ -34,7 +34,7 @@ class WindowsStateRepositoryTest extends WebTestCase
         /** @var WindowsStateRepository $repo */
         $repo = $registry->getRepository('OroWindowsBundle:WindowsState');
 
-        $this->assertEquals(true, $repo->update($state->getUser(), $state->getId(), ['cleanUrl' => '/path?a=1']));
+        $this->assertEquals(1, $repo->update($state->getUser(), $state->getId(), ['cleanUrl' => '/path?a=1']));
 
         $registry->getManager()->clear();
 
@@ -55,7 +55,7 @@ class WindowsStateRepositoryTest extends WebTestCase
         /** @var WindowsStateRepository $repo */
         $repo = $registry->getRepository('OroWindowsBundle:WindowsState');
 
-        $this->assertEquals(false, $repo->update($user, $state->getId(), ['cleanUrl' => '/path?a=1']));
+        $this->assertEquals(0, $repo->update($user, $state->getId(), ['cleanUrl' => '/path?a=1']));
     }
 
     public function testDelete()
@@ -68,7 +68,7 @@ class WindowsStateRepositoryTest extends WebTestCase
         /** @var WindowsStateRepository $repo */
         $repo = $registry->getRepository('OroWindowsBundle:WindowsState');
 
-        $this->assertEquals(true, $repo->delete($state->getUser(), $state->getId()));
+        $this->assertEquals(1, $repo->delete($state->getUser(), $state->getId()));
 
         $registry->getManager()->clear();
 
@@ -86,6 +86,6 @@ class WindowsStateRepositoryTest extends WebTestCase
         /** @var WindowsStateRepository $repo */
         $repo = $registry->getRepository('OroWindowsBundle:WindowsState');
 
-        $this->assertEquals(false, $repo->delete($user, $state->getId()));
+        $this->assertEquals(0, $repo->delete($user, $state->getId()));
     }
 }
