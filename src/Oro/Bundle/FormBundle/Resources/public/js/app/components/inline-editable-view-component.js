@@ -222,11 +222,15 @@ define(function(require) {
                 newData[this.saveApiAccessor.initialOptions.field_name] = serverUpdateData[keys[0]];
                 serverUpdateData = newData;
             }
-            this.saveApiAccessor.send(this.model.toJSON(), serverUpdateData, {}, {
-                    processingMessage: __('oro.form.inlineEditing.saving_progress'),
-                    preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
-                })
-                .done(_.bind(InlineEditableViewComponent.onSaveSuccess, ctx))
+            var savePromise = this.saveApiAccessor.send(this.model.toJSON(), serverUpdateData, {}, {
+                processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
+            });
+
+            if (this.classes.editor.processSavePromise) {
+                savePromise = this.classes.editor.component.processSavePromise(savePromise, this.metadata);
+            }
+            savePromise.done(_.bind(InlineEditableViewComponent.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditableViewComponent.onSaveError, ctx))
                 .always(function() {
                     wrapper.$el.removeClass('loading');

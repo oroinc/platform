@@ -197,10 +197,11 @@ define(function(require) {
             var data;
             if (this.currentPage === 1) {
                 data = $.extend({}, this.firstPageData);
-                data.results = this.filterTermFromResults(this.currentTerm, data.results);
                 if (this.currentPage === 1) {
                     if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
-                        if (this.firstPageData.term === this.currentTerm) {
+                        if (this.firstPageData.term === this.currentTerm &&
+                            -1 === this.indexOfTermInResults(this.currentTerm, data.results)) {
+                            data.results = this.filterTermFromResults(this.currentTerm, data.results);
                             data.results.unshift({
                                 id: this.currentTerm,
                                 label: this.currentTerm,
@@ -223,6 +224,16 @@ define(function(require) {
             this.currentCallback(data);
         },
 
+        indexOfTermInResults: function(term, results) {
+            for (var i = 0; i < results.length; i++) {
+                var result = results[i];
+                if (result.label === term) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+
         filterTermFromResults: function(term, results) {
             results = _.clone(results);
             for (var i = 0; i < results.length; i++) {
@@ -236,7 +247,8 @@ define(function(require) {
         },
 
         tagSortCallback: function(a, b) {
-            return this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
+            var firstCondition = this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
+            return firstCondition !== 0 ? firstCondition : a.label.length - b.label.length;
         },
 
         getTermSimilarity: function(term) {
@@ -301,7 +313,13 @@ define(function(require) {
             return data;
         }
     }, {
-        processMetadata: AbstractRelationEditorView.processMetadata
+        processMetadata: AbstractRelationEditorView.processMetadata,
+        processSavePromise: function(promise, metadata) {
+            promise.done(function() {
+                metadata.inline_editing.autocomplete_api_accessor.instance.clearCache();
+            });
+            return promise;
+        }
     });
 
     return TagsEditorView;

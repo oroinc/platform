@@ -348,11 +348,17 @@ define(function(require) {
                 newData[this.editor.save_api_accessor.initialOptions.field_name] = serverUpdateData[keys[0]];
                 serverUpdateData = newData;
             }
-            this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
-                    processingMessage: __('oro.form.inlineEditing.saving_progress'),
-                    preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
-                })
-                .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
+            var savePromise = this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
+                processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
+            });
+            if (this.editor.component.processSavePromise) {
+                savePromise = this.editor.component.processSavePromise(savePromise, cell.column.get('metadata'));
+            }
+            if (this.editor.view.processSavePromise) {
+                savePromise = this.editor.view.processSavePromise(savePromise, cell.column.get('metadata'));
+            }
+            savePromise.done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
                 .always(function() {
                     cell.$el.removeClass('loading');
