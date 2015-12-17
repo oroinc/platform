@@ -68,7 +68,7 @@ interface LayoutRegistryInterface
      * @param BlockBuilderInterface $builder The block builder
      * @param array                 $options The options
      */
-    public function buildBlock($name, BlockBuilderInterface $builder, array &$options);
+    public function buildBlock($name, BlockBuilderInterface $builder, array $options);
 
     /**
      * Builds the block view.
@@ -117,4 +117,19 @@ interface LayoutRegistryInterface
      * @param ContextInterface $context The context
      */
     public function configureContext(ContextInterface $context);
+
+    /**
+     * Update block options after they way resolved.
+     *
+     * @param  string $name
+     * @param array $options
+     * @param ContextInterface $context
+     * @param DataAccessorInterface $data
+     */
+    public function normalizeOptions(
+        $name,
+        array &$options,
+        ContextInterface $context,
+        DataAccessorInterface $data
+    );
 }

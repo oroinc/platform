@@ -1,9 +1,7 @@
 parameters:
-    oro_layout.layout_factory_builder.class:            Oro\Component\Layout\LayoutFactoryBuilder
-    oro_layout.layout_manager.class:                    Oro\Component\Layout\LayoutManager
-    oro_layout.form_layout_builder.class:               Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder
-    oro_layout.assetic.layout_formula_loader.class:     Oro\Bundle\LayoutBundle\Assetic\LayoutFormulaLoader
-    oro_layout.assetic.layout_resource.class:           Oro\Bundle\LayoutBundle\Assetic\LayoutResource
+    oro_layout.layout_factory_builder.class:    Oro\Component\Layout\LayoutFactoryBuilder
+    oro_layout.layout_manager.class:            Oro\Component\Layout\LayoutManager
+    oro_layout.form_layout_builder.class:       Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder
 
 services:
     oro_layout.extension:
@@ -16,6 +14,7 @@ services:
             - {} # layout updates
             - {} # context configurators
             - {} # data providers
+            - {} # option normalizers
 
     oro_layout.layout_factory_builder:
         public: false
@@ -138,13 +137,13 @@ services:
 
     oro_layout.assetic.layout_formula_loader:
         public: false
-        class: %oro_layout.assetic.layout_formula_loader.class%
+        class: Oro\Bundle\LayoutBundle\Assetic\LayoutFormulaLoader
         tags:
             - { name: assetic.formula_loader, alias: layout }
 
     oro_layout.assetic.layout_resource:
         public: false
-        class: %oro_layout.assetic.layout_resource.class%
+        class: Oro\Bundle\LayoutBundle\Assetic\LayoutResource
         arguments:
             - @oro_layout.theme_manager
         tags:

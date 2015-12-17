@@ -6,7 +6,8 @@ use Oro\Component\ConfigExpression\AssemblerInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
-use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
@@ -39,13 +40,28 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array &$options)
+    public function normalizeOptions($name, array &$options, ContextInterface $context, DataAccessorInterface $data)
     {
-        $context = $builder->getContext();
-        $evaluate = $context->getOr('expressions_evaluate');
-        $encoding = $context->getOr('expressions_encoding');
-        if ($evaluate || $encoding !== null) {
-            $data = $builder->getDataAccessor();
+        if ($this->shouldBeProcessed($context, false)) {
+            $evaluate = $context->getOr('expressions_evaluate');
+            $encoding = $context->getOr('expressions_encoding');
+
+            $this->processExpressions($options, $context, $data, $evaluate, $encoding);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    {
+        $context = $block->getContext();
+
+        if ($this->shouldBeProcessed($context, true)) {
+            $evaluate = $context->getOr('expressions_evaluate');
+            $encoding = $context->getOr('expressions_encoding');
+
+            $data = $block->getData();
             $this->processExpressions($options, $context, $data, $evaluate, $encoding);
         }
     }
@@ -56,6 +72,23 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
     public function getExtendedType()
     {
         return BaseType::NAME;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param bool $isDeferred
+     * @return bool
+     */
+    protected function shouldBeProcessed(ContextInterface $context, $isDeferred)
+    {
+        $evaluateDeferred = $context->getOr('expressions_evaluate_deferred');
+        if ($evaluateDeferred === $isDeferred) {
+            $evaluate = $context->getOr('expressions_evaluate');
+            $encoding = $context->getOr('expressions_encoding');
+
+            return $evaluate || $encoding !== null;
+        }
+        return false;
     }
 
     /**

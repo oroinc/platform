@@ -9,7 +9,7 @@ abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array &$options)
+    public function buildBlock(BlockBuilderInterface $builder, array $options)
     {
     }
 
@@ -32,5 +32,13 @@ abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function normalizeOptions($name, array &$options, ContextInterface $context, DataAccessorInterface $data)
+    {
+
     }
 }

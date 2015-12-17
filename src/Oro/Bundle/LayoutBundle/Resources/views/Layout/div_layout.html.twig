@@ -1,8 +1,5 @@
 {% block block_widget -%}
-    {% if tag %}
-        <{{ tag }}{{ block('block_attributes') }}>
-        </{{ tag }}>
-    {% endif %}
+    {{ block('block_attributes') }}>
 {%- endblock %}
 
 {% block block_label -%}
@@ -131,11 +128,11 @@
 {% endblock %}
 
 {% block text_widget -%}
-    {{ text|block_text(translation_domain) }}
-{%- endblock %}
-
-{% block html_widget -%}
-    {{ text|block_text(translation_domain)|raw }}
+    {% if escape %}
+        {{ text|block_text(translation_domain) }}
+    {% else %}
+        {{ text|block_text(translation_domain)|raw }}
+    {% endif %}
 {%- endblock %}
 
 {% block link_widget -%}

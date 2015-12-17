@@ -27,7 +27,6 @@ class InputTypeTest extends BlockTypeTestCase
     {
         $this->assertEquals(
             [
-                'tag' => 'input',
                 'type' => 'text',
                 'id' => null,
                 'name' => null,
@@ -44,7 +43,7 @@ class InputTypeTest extends BlockTypeTestCase
             'value' => '***',
             'placeholder' => 'Enter password',
         ];
-        $this->assertEquals(['tag' => 'input'] + $options, $this->resolveOptions(InputType::NAME, $options));
+        $this->assertEquals($options, $this->resolveOptions(InputType::NAME, $options));
     }
 
     public function testBuildViewPassword()

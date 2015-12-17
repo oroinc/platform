@@ -17,7 +17,7 @@ interface BlockTypeExtensionInterface
      * @param BlockBuilderInterface $builder
      * @param array                 $options
      */
-    public function buildBlock(BlockBuilderInterface $builder, array &$options);
+    public function buildBlock(BlockBuilderInterface $builder, array $options);
 
     /**
      * Builds the block view.
@@ -53,6 +53,14 @@ interface BlockTypeExtensionInterface
      * @param OptionsResolverInterface $resolver The resolver for the options.
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver);
+
+    /**
+     * @param $name
+     * @param array $options
+     * @param ContextInterface $context
+     * @param DataAccessorInterface $data
+     */
+    public function normalizeOptions($name, array &$options, ContextInterface $context, DataAccessorInterface $data);
 
     /**
      * Returns the name of the block type being extended.
