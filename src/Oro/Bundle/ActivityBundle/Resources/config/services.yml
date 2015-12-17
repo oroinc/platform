@@ -113,7 +113,7 @@ services:
         parent: oro_soap.handler.delete.abstract
         calls:
             - [setSecurityFacade, [@oro_security.security_facade]]
-            - [setSecurityManager, [@oro_activity.manager]]
+            - [setActivityManager, [@oro_activity.manager]]
 
     oro_activity.form.handler.autocomplete:
         class: Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler
