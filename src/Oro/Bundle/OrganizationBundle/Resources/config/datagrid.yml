@@ -1,5 +1,6 @@
 datagrid:
     business-unit-grid:
+        extended_entity_name: %oro_organization.business_unit.entity.class%
         options:
             entityHint: business unit
             skip_acl_check: true
@@ -16,7 +17,7 @@ datagrid:
                     - u.createdAt
                     - owner.name as ownerName
                 from:
-                    - { table: OroOrganizationBundle:BusinessUnit, alias: u }
+                    - { table: %oro_organization.business_unit.entity.class%, alias: u }
                 join:
                     left:
                         owner:

@@ -5,35 +5,18 @@ namespace Oro\Bundle\TagBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-class TagsExtension extends AbstractExtension
+class TagsExtension extends AbstractTagsExtension
 {
     const COLUMN_NAME = 'tags';
 
-    const GRID_EXTEND_ENTITY_PATH = '[extended_entity_name]';
-    const GRID_FROM_PATH          = '[source][query][from]';
-    const GRID_COLUMN_ALIAS_PATH  = '[source][query_config][column_aliases]';
-    const GRID_FILTERS_PATH       = '[filters][columns]';
-    const GRID_SORTERS_PATH       = '[sorters][columns]';
-    const GRID_NAME_PATH          = 'name';
-    const FILTER_COLUMN_NAME      = 'tagname';
-    const PROPERTY_ID_PATH        = '[properties][id]';
-
-    /** @var TagManager */
-    protected $tagManager;
-
     /** @var TaggableHelper */
     protected $taggableHelper;
-
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
 
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
@@ -43,21 +26,21 @@ class TagsExtension extends AbstractExtension
 
     /**
      * @param TagManager          $tagManager
-     * @param TaggableHelper      $helper
      * @param EntityClassResolver $resolver
+     * @param TaggableHelper      $helper
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param SecurityFacade      $securityFacade
      */
     public function __construct(
         TagManager $tagManager,
-        TaggableHelper $helper,
         EntityClassResolver $resolver,
+        TaggableHelper $helper,
         EntityRoutingHelper $entityRoutingHelper,
         SecurityFacade $securityFacade
     ) {
-        $this->tagManager          = $tagManager;
+        parent::__construct($tagManager, $resolver);
+
         $this->taggableHelper      = $helper;
-        $this->entityClassResolver = $resolver;
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->securityFacade      = $securityFacade;
     }
@@ -65,16 +48,25 @@ class TagsExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
+    public function getPriority()
+    {
+        return 10;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $isReports = $this->isReportGrid($config);
+        $className = $this->getEntityClassName($config);
 
         return
+            !$this->isReportOrSegmentGrid($config) &&
+            $className &&
+            $this->taggableHelper->isTaggable($className) &&
+            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
             null !== $this->securityFacade->getToken() &&
-            $this->taggableHelper->isTaggable($this->getEntityClassName($config)) &&
-            ($isReports || null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)) &&
-            // Do not add column with tags in cases when user does not have access to view tags, except report/segments.
-            ($isReports || $this->securityFacade->isGranted('oro_tag_view'));
+            $this->securityFacade->isGranted('oro_tag_view');
     }
 
     /**
@@ -82,109 +74,26 @@ class TagsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        // @TODO Reports logic should be removed from this extension
-        $isReports = $this->isReportGrid($config);
-        $filters   = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
-        $columns   = $config->offsetGetByPath('[columns]', []);
-        $sorters   = $config->offsetGetByPath(self::GRID_SORTERS_PATH, []);
+        $columns = $config->offsetGetByPath('[columns]', []);
+        $column  = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
+        $config->offsetSetByPath('[columns]', array_merge($columns, $column));
 
-        $column = [self::COLUMN_NAME => $this->getColumnDefinition($config, $isReports)];
-        $filter = $this->getColumnFilterDefinition($config, $isReports);
-
-        if ($isReports) {
-            $aliases = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
-            // if it is report/segment grid and it has tags column we
-            // replace it with properly configured one
-            // and add tag filter.
-            if (isset($aliases['tag_field'])) {
-                $tagAlias           = $aliases['tag_field'];
-                $filters[$tagAlias] = $filter;
-                unset($columns[$tagAlias]);
-                unset($sorters[$tagAlias]);
-                $config->offsetSetByPath(
-                    '[columns]',
-                    array_merge(
-                        $columns,
-                        $column
-                    )
-                );
-            }
-        } else {
-            $config->offsetSetByPath('[columns]', array_merge($columns, $column));
-            // do not add tag filter if $filters are empty(case when they are disabled).
-            if (!empty($filters)) {
-                $filters[self::FILTER_COLUMN_NAME] = $filter;
-            }
+        // do not add tag filter if $filters are empty(case when they are disabled).
+        $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
+        if (!empty($filters)) {
+            $filters[self::FILTER_COLUMN_NAME] = $this->getColumnFilterDefinition($config);
+            $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
         }
-
-        $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
-        $config->offsetSetByPath(self::GRID_SORTERS_PATH, $sorters);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
-    {
-        $aliases    = $config->offsetGetByPath(self::GRID_COLUMN_ALIAS_PATH);
-        $identifier = isset($aliases['tag_field']) ? $aliases['tag_field'] : 'id';
-
-        $rows = (array)$result->offsetGetOr('data', []);
-        $ids  = array_map(
-            function (ResultRecord $item) use ($identifier) {
-                return $item->getValue($identifier);
-            },
-            $rows
-        );
-
-        $tags = array_reduce(
-            $this->tagManager->getTagsByEntityIds($this->getEntityClassName($config), $ids),
-            function ($entitiesTags, $item) {
-                $entitiesTags[$item['entityId']][] = $item;
-
-                return $entitiesTags;
-            },
-            []
-        );
-
-        $result->offsetSet(
-            'data',
-            array_map(
-                function (ResultRecord $item) use ($tags, $identifier) {
-                    $id   = $item->getValue($identifier);
-                    $data = isset($tags[$id]) ? $tags[$id] : [];
-                    $item->addData(['tags' => $data]);
-
-                    return $item;
-                },
-                $rows
-            )
-        );
-    }
-
-    /**
-     * Checks if configuration is for report or segment grid
+     * Gets definition for tag column.
      *
      * @param DatagridConfiguration $config
-     *
-     * @return bool
-     */
-    protected function isReportGrid(DatagridConfiguration $config)
-    {
-        $gridName = $config->offsetGetByPath(self::GRID_NAME_PATH);
-
-        return
-            strpos($gridName, 'oro_report') === 0 ||
-            strpos($gridName, 'oro_segment') === 0;
-    }
-
-    /**
-     * @param DatagridConfiguration $config
-     * @param bool                  $isReports
      *
      * @return array
      */
-    protected function getColumnDefinition(DatagridConfiguration $config, $isReports)
+    protected function getColumnDefinition(DatagridConfiguration $config)
     {
         $className        = $this->getEntityClassName($config);
         $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
@@ -199,11 +108,11 @@ class TagsExtension extends AbstractExtension
             'type'           => 'callback',
             'frontend_type'  => 'tags',
             'callable'       => function (ResultRecordInterface $record) {
-                return $record->getValue('tags');
+                return $record->getValue(self::COLUMN_NAME);
             },
             'editable'       => false,
             'translatable'   => true,
-            'renderable'     => $this->taggableHelper->isEnableGridColumn($className) || $isReports,
+            'renderable'     => $this->taggableHelper->isEnableGridColumn($className),
             'inline_editing' => [
                 'enable'                    => $this->securityFacade->isGranted(
                     TagManager::ACL_RESOURCE_ASSIGN_ID_KEY
@@ -234,23 +143,25 @@ class TagsExtension extends AbstractExtension
     }
 
     /**
+     * Gets definition for tag column filter.
+     *
      * @param DatagridConfiguration $config
-     * @param bool                  $isReports
      *
      * @return array
      */
-    protected function getColumnFilterDefinition(DatagridConfiguration $config, $isReports)
+    protected function getColumnFilterDefinition(DatagridConfiguration $config)
     {
         $className = $this->getEntityClassName($config);
+        $from = $config->offsetGetByPath(self::GRID_FROM_PATH);
 
         return [
             'type'      => 'tag',
-            'data_name' => 'tag.id',
+            'data_name' => $from[0]['alias'] .'.id',
             'label'     => 'oro.tag.entity_plural_label',
-            'enabled'   => $this->taggableHelper->isEnableGridFilter($className) || $isReports,
+            'enabled'   => $this->taggableHelper->isEnableGridFilter($className),
             'options'   => [
                 'field_options' => [
-                    'entity_class' => $this->getEntityClassName($config),
+                    'entity_class' => $className,
                 ]
             ]
         ];
@@ -259,28 +170,15 @@ class TagsExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        return 10;
-    }
+        $rows    = (array)$result->offsetGetOr('data', []);
+        $idField = 'id';
+        $tags    = $this->getTagsForEntityClass(
+            $this->getEntityClassName($config),
+            $this->extractEntityIds($rows, $idField)
+        );
 
-    /**
-     * @param DatagridConfiguration $config
-     *
-     * @return string|null
-     */
-    protected function getEntityClassName(DatagridConfiguration $config)
-    {
-        $entityClassName = $config->offsetGetByPath(self::GRID_EXTEND_ENTITY_PATH);
-        if (!$entityClassName) {
-            $from = $config->offsetGetByPath(self::GRID_FROM_PATH);
-            if (!$from) {
-                return null;
-            }
-
-            $entityClassName = $this->entityClassResolver->getEntityClass($from[0]['table']);
-        }
-
-        return $entityClassName;
+        $this->addTagsToData($rows, $tags, $idField, self::COLUMN_NAME);
     }
 }
