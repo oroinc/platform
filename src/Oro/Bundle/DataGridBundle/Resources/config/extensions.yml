@@ -60,7 +60,7 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.mass_delete_action:
-        class: Oro\Bundle\DataGridBundle\Extension\Action\MassDeleteActionExtension
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassDeleteActionExtension
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_datagrid.grid_configuration.helper
