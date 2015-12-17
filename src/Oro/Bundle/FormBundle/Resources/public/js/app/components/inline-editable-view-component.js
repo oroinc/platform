@@ -228,7 +228,7 @@ define(function(require) {
             });
 
             if (this.classes.editor.processSavePromise) {
-                savePromise = this.classes.editor.component.processSavePromise(savePromise, this.metadata);
+                savePromise = this.classes.editor.processSavePromise(savePromise, this.metadata);
             }
             savePromise.done(_.bind(InlineEditableViewComponent.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditableViewComponent.onSaveError, ctx))
