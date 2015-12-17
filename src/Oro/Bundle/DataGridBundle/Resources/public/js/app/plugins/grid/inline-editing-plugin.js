@@ -88,13 +88,6 @@ define(function(require) {
             InlineEditingPlugin.__super__.disable.call(this);
         },
 
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            return InlineEditingPlugin.__super__.dispose.call(this);
-        },
-
         onAfterMakeCell: function(row, cell) {
             var _this = this;
             function enterEditModeIfNeeded(e) {
