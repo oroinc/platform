@@ -14,7 +14,6 @@ services:
             - {} # layout updates
             - {} # context configurators
             - {} # data providers
-            - {} # option normalizers
 
     oro_layout.layout_factory_builder:
         public: false
