@@ -3,3 +3,4 @@ css:
       - 'bundles/orotag/css/tag-grid.less'
       - 'bundles/orotag/css/tags-container.less'
       - 'bundles/orotag/css/form.less'
+      - 'bundles/orotag/css/config.less'
