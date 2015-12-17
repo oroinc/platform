@@ -200,7 +200,6 @@ define(function(require) {
                 if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
                     if (this.firstPageData.term === this.currentTerm &&
                         -1 === this.indexOfTermInResults(this.currentTerm, data.results)) {
-                        data.results = this.filterTermFromResults(this.currentTerm, data.results);
                         data.results.unshift({
                             id: this.currentTerm,
                             label: this.currentTerm,
