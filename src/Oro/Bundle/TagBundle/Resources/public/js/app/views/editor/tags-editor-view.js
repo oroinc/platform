@@ -197,23 +197,21 @@ define(function(require) {
             var data;
             if (this.currentPage === 1) {
                 data = $.extend({}, this.firstPageData);
-                if (this.currentPage === 1) {
-                    if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
-                        if (this.firstPageData.term === this.currentTerm &&
-                            -1 === this.indexOfTermInResults(this.currentTerm, data.results)) {
-                            data.results = this.filterTermFromResults(this.currentTerm, data.results);
-                            data.results.unshift({
-                                id: this.currentTerm,
-                                label: this.currentTerm,
-                                isNew: true,
-                                owner: true
-                            });
-                        }
-                    } else {
-                        if (this.firstPageData.isDummy) {
-                            // do not update list until choices will be loaded
-                            return;
-                        }
+                if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
+                    if (this.firstPageData.term === this.currentTerm &&
+                        -1 === this.indexOfTermInResults(this.currentTerm, data.results)) {
+                        data.results = this.filterTermFromResults(this.currentTerm, data.results);
+                        data.results.unshift({
+                            id: this.currentTerm,
+                            label: this.currentTerm,
+                            isNew: true,
+                            owner: true
+                        });
+                    }
+                } else {
+                    if (this.firstPageData.isDummy) {
+                        // do not update list until choices will be loaded
+                        return;
                     }
                 }
                 data.results.sort(_.bind(this.tagSortCallback, this));
