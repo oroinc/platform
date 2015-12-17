@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\Action;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -26,9 +25,6 @@ class MassDeleteActionExtension extends AbstractExtension
 
     /** @var string|null */
     protected $entityClassName;
-
-    /** @var array */
-    protected static $excludeParams = [ActionInterface::ACL_KEY];
 
     /**
      * @param DoctrineHelper          $doctrineHelper
