@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -99,11 +100,6 @@ class SyncProcessor extends AbstractSyncProcessor
                 }
                 $status = $this->processIntegrationConnector($integration, $connector, $parameters);
 
-                /**
-                 * Moved from ChannelRepository::addStatus method contract
-                 */
-                $this->doctrineRegistry->getManager()->flush();
-
                 $isSuccess = $isSuccess && $this->isIntegrationConnectorProcessSuccess($status);
                 $processedConnectorStatuses[$connector->getType()] = $status;
             } catch (\Exception $exception) {
@@ -168,21 +164,12 @@ class SyncProcessor extends AbstractSyncProcessor
      */
     protected function getSortedConnectors(array $connectors)
     {
-        usort($connectors, function ($firstConnector, $secondConnector) {
-            $firstConnectorOrder = $secondConnectorOrder = OrderedConnectorInterface::DEFAULT_ORDER;
-            if ($firstConnector instanceof OrderedConnectorInterface) {
-                $firstConnectorOrder = $firstConnector->getOrder();
-            }
-            if ($secondConnector instanceof OrderedConnectorInterface) {
-                $secondConnectorOrder = $firstConnector->getOrder();
-            }
-
-            if ($firstConnectorOrder == $secondConnectorOrder) {
-                return 0;
-            }
-
-            return ($firstConnectorOrder < $secondConnectorOrder) ? -1 : 1;
-        });
+        $sortCallback = function ($connector) {
+            return $connector instanceof OrderedConnectorInterface
+                ? $connector->getOrder()
+                : OrderedConnectorInterface::DEFAULT_ORDER;
+        };
+        ArrayUtil::sortBy($connectors, false, $sortCallback);
 
         return $connectors;
     }
