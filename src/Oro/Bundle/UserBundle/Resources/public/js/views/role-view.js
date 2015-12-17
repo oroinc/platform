@@ -139,7 +139,6 @@ define([
             _.each(
                 this.$fields,
                 function(element, name) {
-                    debugger;
                     data[formName + '[' + name + ']'] = element.val();
                 }
             );
