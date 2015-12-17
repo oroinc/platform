@@ -1,9 +1,15 @@
 define([
     'jquery',
     'underscore',
-    'backgrid'
-], function($, _, Backgrid) {
+    'backgrid',
+    'module'
+], function($, _, Backgrid, module) {
     'use strict';
+
+    var config = module.config();
+    config = _.extend({
+        showCloseButton: false
+    }, config);
 
     var ActionCell;
 
@@ -28,6 +34,9 @@ define([
         /** @property {Array} */
         launchers: undefined,
 
+        /** @property Boolean */
+        showCloseButton: config.showCloseButton,
+
         /** @property */
         template: _.template(
             '<div class="more-bar-holder">' +
@@ -36,6 +45,11 @@ define([
                     '<ul class="dropdown-menu pull-right launchers-dropdown-menu"></ul>' +
                 '</div>' +
             '</div>'
+        ),
+
+        /** @property */
+        closeButtonTemplate: _.template(
+            '<li class="dropdown-close"><i class="icon-remove hide-text">' + _.__('Close') + '</i></li>'
         ),
 
         /** @property */
@@ -71,9 +85,10 @@ define([
 
         /** @property */
         events: {
-            'click': '_toggleDropdown',
-            'mouseover .dropdown-toggle': '_toggleDropdown',
-            'mouseleave .dropdown-menu': '_toggleDropdown'
+            'click': '_showDropdown',
+            'mouseover .dropdown-toggle': '_showDropdown',
+            'mouseleave .dropdown-menu': '_hideDropdown',
+            'click .dropdown-close .icon-remove': '_hideDropdown'
         },
 
         /**
@@ -194,6 +209,10 @@ define([
             launchers = this.getLaunchersByIcons();
             $listsContainer = this.$(this.launchersContainerSelector);
 
+            if (this.showCloseButton) {
+                $listsContainer.append(this.closeButtonTemplate());
+            }
+
             if (launchers.withIcons.length) {
                 this.renderLaunchersList(launchers.withIcons, {withIcons: true})
                     .appendTo($listsContainer);
@@ -268,13 +287,28 @@ define([
         },
 
         /**
-         * Open/close dropdown
+         * Show dropdown
          *
          * @param {Event} e
          * @protected
          */
-        _toggleDropdown: function(e) {
-            this.$('.dropdown-toggle').dropdown('toggle');
+        _showDropdown: function(e) {
+            if (!this.$('.dropdown-toggle').parent().hasClass('open')) {
+                this.$('.dropdown-toggle').dropdown('toggle');
+            }
+            e.stopPropagation();
+        },
+
+        /**
+         * Hide dropdown
+         *
+         * @param {Event} e
+         * @protected
+         */
+        _hideDropdown: function(e) {
+            if (this.$('.dropdown-toggle').parent().hasClass('open')) {
+                this.$('.dropdown-toggle').dropdown('toggle');
+            }
             e.stopPropagation();
         }
     });
