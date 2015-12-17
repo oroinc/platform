@@ -452,6 +452,13 @@ define(function(require) {
                     dialog.css('min-height', containerEl.clientHeight - top);
                 }
             }
+            if (!tools.isMobile()) {
+                // freeze width and height for proper layout
+                dialog.css({
+                    width: dialog.outerWidth(),
+                    height: dialog.outerHeight()
+                });
+            }
         },
 
         /**
