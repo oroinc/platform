@@ -277,10 +277,7 @@ define(function(require) {
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.view.disposed && this.view.$el) {
-                this.view.$el.addClass('save-fail');
-                _.delay(_.bind(function() {
-                    this.view.$el.removeClass('save-fail');
-                }, this), 2000);
+                this.view.$el.addClassTemporarily('save-fail', 2000);
             }
             if (!this.model.disposed) {
                 this.model.set(this.oldState);
