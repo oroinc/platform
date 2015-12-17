@@ -294,6 +294,7 @@ define(function(require) {
 
         _afterLayoutInit: function() {
             this.widget.closest('.invisible').removeClass('invisible');
+            this.freezeWidgetSize();
             if (this.deferredRender) {
                 this._resolveDeferredRender();
             }
@@ -424,6 +425,16 @@ define(function(require) {
             this.forEachComponent(function(component) {
                 component.trigger('parentResizeStop', event, this);
             });
+        },
+        freezeWidgetSize: function () {
+            if (!tools.isMobile()) {
+                // freeze width and height for proper layout
+                var dialog = this.widget.closest('.ui-dialog');
+                dialog.css({
+                    width: dialog.outerWidth(),
+                    height: dialog.outerHeight()
+                });
+            }
         }
     });
 
