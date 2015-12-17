@@ -28,6 +28,7 @@ define(function(require) {
      * @exports TagsView
      */
     var TagsView = BaseView.extend(/** @exports TagsView.prototype */{
+        showDefault: true,
         template: require('tpl!orotag/templates/viewer/tags-view.html'),
         listen: {
             'change model': 'render'
@@ -47,7 +48,7 @@ define(function(require) {
             tags = _.sortBy(tags, this.tagSortCallback);
             return {
                 tags: tags,
-                showDefault: true
+                showDefault: this.showDefault
             };
         },
         tagSortCallback: function(a, b) {

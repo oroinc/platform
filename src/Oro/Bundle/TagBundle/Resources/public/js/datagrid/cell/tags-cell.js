@@ -27,6 +27,8 @@ define(function(require) {
             'getTemplateData',
             'render'
         ]), {
+
+            showDefault: false,
             /**
              * @property {string}
              */
