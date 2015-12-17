@@ -78,7 +78,8 @@ define(function(require) {
 
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
-                placeholder: __('oro.form.choose_date')
+                placeholder: __('oro.form.choose_date'),
+                'data-validation': JSON.stringify({Date: {}})
             },
             datePickerOptions: {
                 altFormat: 'yy-mm-dd',
@@ -89,7 +90,8 @@ define(function(require) {
             },
             timeInputAttrs: {
                 placeholder: __('oro.form.choose_time'),
-                'class': 'input-small timepicker-input'
+                'class': 'input-small timepicker-input',
+                'data-validation': JSON.stringify({Time: {}})
             },
             timePickerOptions: {
             }
@@ -97,7 +99,9 @@ define(function(require) {
 
         events: {
             'keydown .hasDatepicker': 'onDateEditorKeydown',
-            'keydown .timepicker-input': 'onTimeEditorKeydown'
+            'keydown .timepicker-input': 'onTimeEditorKeydown',
+            'showTimepicker .ui-timepicker-input': 'onTimepickerShow',
+            'hideTimepicker .ui-timepicker-input': 'onTimepickerHide'
         },
 
         format: datetimeFormatter.backendFormats.datetime,
@@ -165,6 +169,15 @@ define(function(require) {
             if (e.shiftKey) {
                 e.stopPropagation();
             }
+        },
+
+        onTimepickerHide: function() {
+            this.toggleDropdownBelowClass(false);
+        },
+
+        onTimepickerShow: function(e) {
+            var isBelow = !$(e.currentTarget).data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+            this.toggleDropdownBelowClass(isBelow);
         }
     });
 

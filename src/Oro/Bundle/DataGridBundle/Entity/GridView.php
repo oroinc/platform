@@ -90,7 +90,7 @@ class GridView
     /**
      * @var array
      *
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="array", nullable=true)
      */
     protected $columnsData = [];
 
@@ -240,6 +240,10 @@ class GridView
      */
     public function getColumnsData()
     {
+        if ($this->columnsData === null) {
+            $this->columnsData = [];
+        }
+
         return $this->columnsData;
     }
 
@@ -280,7 +284,7 @@ class GridView
      */
     public function createView()
     {
-        $view = new View($this->id, $this->filtersData, $this->sortersData, $this->type, $this->columnsData);
+        $view = new View($this->id, $this->filtersData, $this->sortersData, $this->type, $this->getColumnsData());
         $view->setLabel($this->name);
 
         return $view;

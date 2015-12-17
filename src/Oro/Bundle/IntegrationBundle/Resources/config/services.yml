@@ -115,6 +115,7 @@ services:
         class: %oro_integration.manager.types_registry.class%
         arguments:
             - []
+        lazy: true
 
     oro_integration.manager.fields_changes:
         class: %oro_integration.manager.fields_changes.class%
