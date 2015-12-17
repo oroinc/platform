@@ -4,9 +4,9 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
