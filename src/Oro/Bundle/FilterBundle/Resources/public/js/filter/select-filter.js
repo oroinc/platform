@@ -84,6 +84,13 @@ define([
         },
 
         /**
+         * Selector, jQuery object or HTML element that will be target for append multiselect dropdown menu
+         *
+         * @property
+         */
+        container: 'body',
+
+        /**
          * Select widget menu opened flag
          *
          * @property
@@ -114,7 +121,7 @@ define([
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'choices');
+            var opts = _.pick(options || {}, ['choices', 'container']);
             _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
@@ -208,7 +215,8 @@ define([
                         setTimeout(_.bind(function() {
                             this.selectDropdownOpened = false;
                         }, this), 100);
-                    }, this)
+                    }, this),
+                    appendTo: this.container
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
             });
