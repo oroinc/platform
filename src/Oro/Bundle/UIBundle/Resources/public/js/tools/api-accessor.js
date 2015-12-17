@@ -119,6 +119,7 @@ define(function(require) {
          */
         clearCache: function() {
             this.cache = {};
+            this.trigger('cache:clear');
         },
 
         /**
