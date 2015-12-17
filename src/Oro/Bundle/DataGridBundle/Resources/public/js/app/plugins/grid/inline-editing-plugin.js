@@ -582,11 +582,7 @@ define(function(require) {
                         }
                     }, this);
                 }
-
-                this.cell.$el.addClass('save-success');
-                _.delay(_.bind(function() {
-                    this.cell.$el.removeClass('save-success');
-                }, this), 2000);
+                this.cell.$el.addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },

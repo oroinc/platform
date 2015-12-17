@@ -262,10 +262,7 @@ define(function(require) {
     }, {
         onSaveSuccess: function(response) {
             if (!this.view.disposed && this.view.$el) {
-                this.view.$el.addClass('save-success');
-                _.delay(_.bind(function() {
-                    this.view.$el.removeClass('save-success');
-                }, this), 2000);
+                this.view.$el.addClassTemporarily('save-success', 2000);
             }
             if (response && !this.model.disposed) {
                 _.each(response, function(item, i) {
