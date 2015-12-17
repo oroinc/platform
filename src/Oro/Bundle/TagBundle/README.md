@@ -31,9 +31,9 @@ Tags can also be enabled/disabled for an entity in the UI `System->Entities->Ent
 Tags in grids
 -------------
 
-In case if tags are enabled for an entity, tags filter and tags column will be automatically added to the grid of its 
-records. 
-You can use migration to hide tags column or tags filter from the grid by default. 
+In case if tags are enabled for an entity, tags filter and tags column will be automatically added to the grid of its
+records.
+You can use migration to hide tags column or tags filter from the grid by default.
 The following example shows it:
 
 ``` php
@@ -55,13 +55,13 @@ class AcmeTestBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $options = new OroOptions();
-        
+
         // Hide tags column from grid by default.
         $options->set('tag', 'enableGridColumn', false);
-        
+
         // Hide tags filter from grid by default.
         $options->set('tag', 'enableGridFilter', false);
-        
+
         $table->addOption(OroOptions::KEY, $options);
     }
 }

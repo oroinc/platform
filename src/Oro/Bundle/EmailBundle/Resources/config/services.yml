@@ -604,6 +604,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_email.mailbox.process_storage
             - @oro_security.security_facade
+            - @oro_email.related_emails.provider
         tags:
             - { name: twig.extension }
 
@@ -877,7 +878,7 @@ services:
             - @doctrine
             - @oro_security.acl_helper
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre, method: onPreBuild }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.base-mailboxes-grid, method: onPreBuild }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-mailboxes-grid, method: onBuildAfter }
 
     oro_email.workflow.condition.instanceof:
