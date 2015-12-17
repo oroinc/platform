@@ -2,23 +2,32 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 
 class CronCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:cron';
+
     protected function configure()
     {
         $this
-            ->setName('oro:cron')
-            ->setDescription('Cron commands launcher');
+            ->setName(self::NAME)
+            ->setDescription('Cron commands launcher')
+            ->addOption(
+                'skipCheckDaemon',
+                null,
+                InputOption::VALUE_NONE,
+                'Skipping check daemon is running'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -31,13 +40,14 @@ class CronCommand extends ContainerAwareCommand
             return;
         }
 
-        $commands   = $this->getApplication()->all('oro:cron');
-        $em         = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $daemon     = $this->getContainer()->get('oro_cron.job_daemon');
-        $schedules  = $em->getRepository('OroCronBundle:Schedule')->findAll();
+        $commands = $this->getApplication()->all('oro:cron');
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $daemon = $this->getContainer()->get('oro_cron.job_daemon');
+        $schedules = $em->getRepository('OroCronBundle:Schedule')->findAll();
+        $skipCheckDaemon = $input->getOption('skipCheckDaemon');
 
         // check if daemon is running
-        if (!$daemon->getPid()) {
+        if (!$skipCheckDaemon && !$daemon->getPid()) {
             $output->writeln('');
             $output->write('Daemon process not found, running.. ');
 
@@ -53,60 +63,22 @@ class CronCommand extends ContainerAwareCommand
         foreach ($commands as $name => $command) {
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
 
-            if (!$command instanceof CronCommandInterface) {
-                $output->writeln(
-                    '<error>Unable to setup, command must be instance of CronCommandInterface</error>'
-                );
-
+            if ($this->skipCommand($command, $output)) {
                 continue;
             }
 
-            if (!$command->getDefaultDefinition()) {
-                $output->writeln('<error>no cron definition found, check command</error>');
-
-                continue;
-            }
-
-            $schedule = array_filter(
-                $schedules,
-                function ($element) use ($name) {
-                    return $element->getCommand() == $name;
-                }
-            );
-
-            if (empty($schedule)) {
-                $output->writeln('<comment>new command found, setting up schedule..</comment>');
-
-                $schedule = new Schedule();
-                $schedule
-                    ->setCommand($name)
-                    ->setDefinition($command->getDefaultDefinition());
-
+            if (empty($schedule = $this->getSchedule($schedules, $name))) {
+                $schedule = $this->createSchedule($command, $name, $output);
                 $em->persist($schedule);
-
                 continue;
             }
 
             $schedule = current($schedule);
+            $this->checkDefinition($command, $schedule);
+            $job = $this->createJob($output, $schedule, $name);
 
-            $defaultDefinition = $command->getDefaultDefinition();
-            if ($schedule->getDefinition() != $defaultDefinition) {
-                $schedule->setDefinition($defaultDefinition);
-            }
-
-            $cron = \Cron\CronExpression::factory($schedule->getDefinition());
-
-            /**
-             * @todo Add "Oro timezone" setting as parameter to isDue method
-             */
-            if ($cron->isDue() && !$this->hasJobInQueue($name)) {
-                $job = new Job($name);
-
+            if ($job) {
                 $em->persist($job);
-
-                $output->writeln('<comment>added to job queue</comment>');
-            } else {
-                $output->writeln('<comment>skipped</comment>');
             }
         }
 
@@ -114,6 +86,112 @@ class CronCommand extends ContainerAwareCommand
 
         $output->writeln('');
         $output->writeln('All commands finished');
+    }
+
+    /**
+     * @param $command
+     * @param OutputInterface $output
+     *
+     * @return bool
+     */
+    protected function skipCommand($command, OutputInterface $output)
+    {
+        if (!$command instanceof CronCommandInterface) {
+            $output->writeln(
+                '<error>Unable to setup, command must be instance of CronCommandInterface</error>'
+            );
+
+            return true;
+        }
+
+        if (!$command->getDefaultDefinition()) {
+            $output->writeln('<error>no cron definition found, check command</error>');
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Schedule[] $schedules
+     * @param $name
+     *
+     * @return array
+     */
+    protected function getSchedule($schedules, $name)
+    {
+        $schedule = array_filter(
+            $schedules,
+            function ($element) use ($name) {
+                /** @var Schedule $element */
+                return $element->getCommand() == $name;
+            }
+        );
+
+        return $schedule;
+    }
+
+    /**
+     * @param CronCommandInterface $command
+     * @param $name
+     * @param OutputInterface $output
+     *
+     * @return Schedule
+     */
+    protected function createSchedule(CronCommandInterface $command, $name, OutputInterface $output)
+    {
+        $output->writeln('<comment>new command found, setting up schedule..</comment>');
+
+        $schedule = new Schedule();
+        $schedule
+            ->setCommand($name)
+            ->setDefinition($command->getDefaultDefinition());
+
+        return $schedule;
+    }
+
+    /**
+     * @param \Oro\Bundle\CronBundle\Command\CronCommandInterface $command
+     * @param Schedule $schedule
+     */
+    protected function checkDefinition(CronCommandInterface $command, Schedule $schedule)
+    {
+        $defaultDefinition = $command->getDefaultDefinition();
+        if ($schedule->getDefinition() != $defaultDefinition) {
+            $schedule->setDefinition($defaultDefinition);
+        }
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param Schedule $schedule
+     * @param $name
+     *
+     * @return bool|Job
+     */
+    protected function createJob(OutputInterface $output, Schedule $schedule, $name)
+    {
+        $cronHelper = $this->getContainer()->get('oro_cron.helper.cron');
+        $cron = $cronHelper->createCron($schedule->getDefinition());
+        /**
+         * @todo Add "Oro timezone" setting as parameter to isDue method
+         */
+        if ($cron->isDue()) {
+            if (!$this->hasJobInQueue($name)) {
+                $job = new Job($name);
+
+                $output->writeln('<comment>added to job queue</comment>');
+
+                return $job;
+            } else {
+                $output->writeln('<comment>already exists in job queue</comment>');
+            }
+        } else {
+            $output->writeln('<comment>skipped</comment>');
+        }
+
+        return false;
     }
 
     /**
