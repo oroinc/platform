@@ -583,11 +583,10 @@ define(function(require) {
                     }, this);
                 }
 
-                var _this = this;
                 this.cell.$el.addClass('save-success');
-                _.delay(function() {
-                    _this.cell.$el.removeClass('save-success');
-                }, 2000);
+                _.delay(_.bind(function() {
+                    this.cell.$el.removeClass('save-success');
+                }, this), 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },

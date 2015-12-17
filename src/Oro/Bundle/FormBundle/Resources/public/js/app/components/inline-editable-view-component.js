@@ -209,7 +209,8 @@ define(function(require) {
             var modelUpdateData = this.editorView.getModelUpdateData();
             wrapper.$el.addClass('loading');
             var ctx = {
-                wrapper: wrapper,
+                view: wrapper,
+                model: this.model,
                 oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData))
             };
             this.updateModel(this.model, this.editorView, modelUpdateData);
@@ -226,7 +227,7 @@ define(function(require) {
                     processingMessage: __('oro.form.inlineEditing.saving_progress'),
                     preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
                 })
-                .done(_.bind(InlineEditableViewComponent.onSaveSuccess, this))
+                .done(_.bind(InlineEditableViewComponent.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditableViewComponent.onSaveError, ctx))
                 .always(function() {
                     wrapper.$el.removeClass('loading');
@@ -260,35 +261,33 @@ define(function(require) {
         }
     }, {
         onSaveSuccess: function(response) {
-            if (!this.wrapper.disposed && this.wrapper.$el) {
-                var _this = this;
-                this.wrapper.$el.addClass('save-success');
-                if (response) {
-                    _.each(response, function(item, i) {
-                        if (this.model.has(i)) {
-                            this.model.set(i, item);
-                        }
-                    }, this);
-                }
-
-                _.delay(function() {
-                    _this.wrapper.$el.removeClass('save-success');
-                }, 2000);
+            if (!this.view.disposed && this.view.$el) {
+                this.view.$el.addClass('save-success');
+                _.delay(_.bind(function() {
+                    this.view.$el.removeClass('save-success');
+                }, this), 2000);
+            }
+            if (response && !this.model.disposed) {
+                _.each(response, function(item, i) {
+                    if (this.model.has(i)) {
+                        this.model.set(i, item);
+                    }
+                }, this);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },
 
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
-            if (!this.wrapper.disposed && this.wrapper.$el) {
-                var _this = this;
-                this.wrapper.$el.addClass('save-fail');
-                _.delay(function() {
-                    _this.wrapper.$el.removeClass('save-fail');
-                }, 2000);
+            if (!this.view.disposed && this.view.$el) {
+                this.view.$el.addClass('save-fail');
+                _.delay(_.bind(function() {
+                    this.view.$el.removeClass('save-fail');
+                }, this), 2000);
             }
-            this.wrapper.model.set(this.oldState);
-            this.main.trigger('content:update');
+            if (!this.model.disposed) {
+                this.model.set(this.oldState);
+            }
 
             var errors = [];
             switch (errorCode) {
