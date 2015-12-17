@@ -38,7 +38,7 @@ class OroDataGridBundleInstaller implements Installation
         $table->addColumn('type', 'string', ['length' => 255]);
         $table->addColumn('filtersData', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('sortersData', 'array', ['comment' => '(DC2Type:array)']);
-        $table->addColumn('columnsData', 'array', ['comment' => '(DC2Type:array)']);
+        $table->addColumn('columnsData', 'array', ['comment' => '(DC2Type:array)', 'notnull' => false]);
         $table->addColumn('gridName', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id'], 'IDX_5B73FBCB9EB185F9', []);
