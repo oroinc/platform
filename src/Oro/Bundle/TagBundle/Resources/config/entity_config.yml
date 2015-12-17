@@ -13,7 +13,7 @@ oro_entity_config:
                         options:
                             block:          other
                             required:       true
-                            label:          oro.tag.enabled
+                            label:          oro.tag.config.enabled
 
                 # this attribute can be used to prohibit changing the tag state (no matter whether it is enabled or not)
                 # for the entity if TRUE than the current state cannot be changed
