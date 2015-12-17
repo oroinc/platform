@@ -1,29 +1,29 @@
 define([
     'jquery',
     'underscore',
-    'orotranslation/js/translator',
     'oroui/js/app/views/base/view',
-    'oroui/js/tools'
-], function($, _, __, BaseView, tools) {
+    'module',
+    'orofilter/js/filter-template'
+], function($, _, BaseView, module, FilterTemplate) {
     'use strict';
+
+    var config = module.config();
+    config = _.extend({
+        inline: true
+    }, config);
 
     var FilterHint;
 
-    /**
-     *
-     * @export  oro/filter/abstract-filter
-     * @class   oro.filter.AbstractFilter
-     * @extends Backbone.View
-     */
-    FilterHint = BaseView.extend({
+    FilterHint = BaseView.extend(_.extend({}, FilterTemplate, {
+        inline: config.inline,
 
-        template: '',
+        $filter: null,
 
-        templateSelector: '#filter-criteria-template',
+        label: '',
 
         hint: '',
 
-        label: '',
+        templateSelector: '#filter-criteria-hint-template',
 
         /**
          * View events
@@ -41,61 +41,54 @@ define([
          * @param {Boolean} [options.enabled]
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'hint', 'label', 'templateSelector', 'templateTheme');
+            var opts = _.pick(options || {}, '$filter', 'label', 'hint', 'templateSelector', 'templateTheme');
             _.extend(this, opts);
 
             this._defineTemplate();
-            if (this.hint === null) {
-                this.hide();
-            }
 
             FilterHint.__super__.initialize.apply(this, arguments);
         },
 
+        render: function($filter) {
+            this.setElement(this.template({
+                label: this.inline ? null : this.label
+            }));
+
+            if (this.inline) {
+                $filter.find('.filter-criteria-hint-inline').append(this.$el);
+            } else {
+                $filter.closest('.filter-container').find('.filter-items-hint').append(this.$el);
+            }
+
+            this.update(this.hint);
+        },
 
         /**
          * Show filter criteria
          *
          * @return {*}
          */
-        show: function() {
-            this.$el.css('display', 'inline-block');
+        update: function(hint) {
+            this.$el.find('.filter-criteria-hint').html(_.escape(hint));
+            if (!this.inline && hint === null) {
+                this.$el.hide();
+            } else {
+                this.$el.show();
+            }
             return this;
         },
 
         /**
-         * Hide filter criteria
+         * Handles click on filter-item reset button
          *
-         * @return {*}
-         */
-        hide: function() {
-            this.$el.hide();
-            return this;
-        },
-
-        /**
-         * Defines which template to use
-         *
+         * @param {jQuery.Event} e
          * @private
          */
-        _defineTemplate: function() {
-            this.template = this._getTemplate(this.templateSelector);
-        },
-
-        _getTemplate: function(selector) {
-            var src = $(selector).text();
-
-            return _.template(src)({
-                criteriaHint: this.hint,
-                label: this.label
-            });
-        },
-
         _onClickResetFilter: function(e) {
-            e.stopImmediatePropagation();
+            e.stopPropagation();
             this.trigger('reset');
         }
-    });
+    }));
 
     return FilterHint;
 });

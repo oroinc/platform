@@ -62,7 +62,7 @@ define([
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
-            'click .reset-filter': '_onClickResetFilter'
+            //'click .reset-filter': '_onClickResetFilter'
         },
 
         /**

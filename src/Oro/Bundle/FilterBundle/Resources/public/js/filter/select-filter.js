@@ -105,7 +105,7 @@ define([
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
             'change select': '_onSelectChange',
-            'click .reset-filter': '_onClickResetFilter'
+            //'click .reset-filter': '_onClickResetFilter'
         },
 
         /**
@@ -162,10 +162,9 @@ define([
 
             this.setElement((
                 this.template({
-                    label: this.label,
+                    label: this.labelPrefix + this.label,
                     showLabel: this.showLabel,
                     options: options,
-                    placeholder: this.placeholder,
                     nullLink: this.nullLink,
                     canDisable: this.canDisable,
                     selected: _.extend({}, this.emptyValue, this.value),
@@ -213,8 +212,9 @@ define([
                 contextSearch: this.contextSearch
             });
 
+            this.selectWidget.multiselect('getButton').hide();
+
             this.selectWidget.setViewDesign(this);
-            this.$(this.buttonSelector).append('<span class="caret"></span>');
             this.selectWidget.getWidget().on('keyup', _.bind(function(e) {
                 if (e.keyCode === 27) {
                     this._onClickFilterArea(e);
@@ -333,8 +333,6 @@ define([
         _onValueUpdated: function(newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');
-            this.$(this.buttonSelector)
-                .toggleClass('filter-default-value', this.isEmpty());
         },
 
         /**

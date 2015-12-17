@@ -101,7 +101,7 @@ define(function(require) {
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
             'click .choice-value': '_onClickChoiceValue',
-            'click .reset-filter': '_onClickResetFilter',
+            //'click .reset-filter': '_onClickResetFilter',
             'change input[type="checkbox"]': '_onChangeBusinessUnit',
             'click .button-all': '_onClickButtonAll',
             'click .button-selected': '_onClickButtonSelected'

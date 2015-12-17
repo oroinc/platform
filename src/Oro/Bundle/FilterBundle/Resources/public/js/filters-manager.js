@@ -304,18 +304,15 @@ define(function(require) {
         render: function() {
             var $container = $(this.template({filters: this.filters}));
             this.setElement($container);
-            var filtersFragment = document.createDocumentFragment();
-            var filterHintsFragment = document.createDocumentFragment();
+            var $filterItems = $container.find('.filter-items');
 
             _.each(this.filters, function(filter) {
                 filter.render();
                 if (!filter.enabled) {
                     filter.hide();
                 }
-                filtersFragment.appendChild(filter.$el.get(0));
-                var hint = filter.subview('hint');
-
-                filterHintsFragment.appendChild(hint.$el.get(0));
+                $filterItems.append(filter.$el);
+                filter.subview('hint').render(filter.$el);
             }, this);
 
             this.trigger('rendered');
@@ -323,10 +320,6 @@ define(function(require) {
             if (_.isEmpty(this.filters)) {
                 $container.hide();
             } else {
-                $container.find('.filter-container').append(filtersFragment);
-
-                $container.append(filterHintsFragment);
-
                 this._initializeSelectWidget();
             }
 

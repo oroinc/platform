@@ -6,7 +6,6 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var EmptyFilter = require('./empty-filter');
-    var FilterHint = require('orofilter/js/filter-hint');
 
     /**
      * Text grid filter.
@@ -48,9 +47,6 @@ define(function(require) {
          */
         criteriaSelector: '.filter-criteria',
 
-
-        filterHint: FilterHint,
-
         /**
          * Element enclosing a criteria dropdown
          *
@@ -82,7 +78,7 @@ define(function(require) {
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
-            'click .reset-filter': '_onClickResetFilter'
+            //'click .reset-filter': '_onClickResetFilter'
         },
 
         /**
@@ -97,16 +93,6 @@ define(function(require) {
                     value: ''
                 };
             }
-
-            var hintView = new this.filterHint({
-                'hint': this._getCriteriaHint(),
-                'label': this.label,
-                autoRender: true
-            });
-
-            this.subview('hint', hintView);
-
-            this.listenTo(hintView, 'reset', this.reset);
 
             TextFilter.__super__.initialize.apply(this, arguments);
         },
@@ -279,32 +265,6 @@ define(function(require) {
             return {
                 value: this._getInputValue(this.criteriaValueSelectors.value)
             };
-        },
-
-        /**
-         * @inheritDoc
-         */
-        _onValueUpdated: function(newValue, oldValue) {
-            TextFilter.__super__._onValueUpdated.apply(this, arguments);
-            this._updateCriteriaHint();
-        },
-
-        /**
-         * Updates criteria hint element with actual criteria hint value
-         *
-         * @protected
-         * @return {*}
-         */
-        _updateCriteriaHint: function() {
-            var hint = this._getCriteriaHint();
-            $('.filter-criteria-hint', this.subview('hint').$el)
-                .html(_.escape(hint));
-            if (hint === null) {
-                this.subview('hint').hide();
-            } else {
-                this.subview('hint').show();
-            }
-            return this;
         },
 
         /**
