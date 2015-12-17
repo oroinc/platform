@@ -32,8 +32,6 @@ class ItemStep extends BaseItemStep implements StepExecutionWarningHandlerInterf
 
         $stepExecutor->execute($this);
         $this->flushStepElements();
-
-        $this->restoreStepElements();
     }
 
     /**
@@ -69,18 +67,6 @@ class ItemStep extends BaseItemStep implements StepExecutionWarningHandlerInterf
         foreach ($this->getConfigurableStepElements() as $element) {
             if (method_exists($element, 'flush')) {
                 $element->flush();
-            }
-        }
-    }
-
-    /**
-     * Restores step elements to a state that was before a job execution.
-     */
-    protected function restoreStepElements()
-    {
-        foreach ($this->getConfigurableStepElements() as $element) {
-            if ($element instanceof StepExecutionRestoreInterface) {
-                $element->restoreStepExecution();
             }
         }
     }
