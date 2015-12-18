@@ -36,7 +36,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand(CronCommand::NAME, []);
         $this->assertNotEmpty($result);
 
-        $this->checkMessage('allCommandNew', $result);
+        $this->checkMessage('allJobNew', $result);
 
         $result = $this->runCommand(CronCommand::NAME, []);
         $this->checkMessage('AllJobAdded', $result);
@@ -68,7 +68,7 @@ class CronCommandTest extends WebTestCase
     protected function checkMessage($key, $result)
     {
         $messages = [
-            'allCommandNew' => [
+            'allJobNew' => [
                 'Processing command "oro:cron:enterprise:license": new command found, setting up schedule..',
                 'Processing command "oro:cron:integration:sync": new command found, setting up schedule..',
                 'Processing command "oro:cron:batch:cleanup": new command found, setting up schedule..',
