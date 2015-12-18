@@ -1,25 +1,26 @@
 <script type="text/html" id="filter-container">
     <% if (!_.isEmpty(filters)) { %>
         {% if isMobileVersion() %}
-            <div class="filter-box oro-clearfix-width">
-                <div class="dropdown">
-                    <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-toggle="dropdown">{{ 'Filter Results'|trans|e('html')|raw }}</a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <div class="filter-container">
-                                <a class="reset-filter-button" href="javascript:void(0);">{{ 'Reset'|trans|e('html')|raw }}</a>
-                                <select data-action="add-filter-select" multiple>
-                                    <% _.each(filters, function (filter, name) { %>
-                                    <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
-                                    <%- filter.label %>
-                                    </option>
-                                    <% }); %>
-                                </select>
-                            </div>
-                        </li>
-                    </ul>
+            <div class="filter-box filter-box_mobile oro-clearfix-width">
+                <div class="oro-more-info-toggler oro-more-info-toggler_indented">
+                    <i class="icon-play fs13"></i>
+                    <a href="javascript:void(0);" class="base-color fs13" data-more-info-expand><span class="red">{{ 'Filter Search'|trans|e('html')|raw }}</span></a>
+                    <div class="oro-more-info-toggler__container" data-more-info>
+                        <div class="filter-container">
+                            <!-- <a class="reset-filter-button" href="javascript:void(0);">{{ 'Reset'|trans|e('html')|raw }}</a>
+                              ToDo: Move reset filter button to the filter results block -->
+                            <select data-action="add-filter-select" multiple>
+                                <% _.each(filters, function (filter, name) { %>
+                                <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                                <%- filter.label %>
+                                </option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <!-- ToDo: Move filter mobile layout to the grid toolbar -->
         {% else %}
             <div class="filter-box oro-clearfix-width">
                 <div class="filter-container">
