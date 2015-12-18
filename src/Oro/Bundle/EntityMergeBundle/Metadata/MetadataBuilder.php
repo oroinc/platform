@@ -136,10 +136,16 @@ class MetadataBuilder
 
                 $associationMapping['mappedBySourceEntity'] = false;
 
+                $mergeModes = [MergeModes::UNITE];
+                if ($associationMapping['type'] === ClassMetadataInfo::ONE_TO_ONE) {
+                    //for fields with ONE_TO_ONE relation Unite strategy is impossible, so Replace is used
+                    $mergeModes = [MergeModes::REPLACE];
+                }
+
                 $fieldMetadata = $this->metadataFactory->createFieldMetadata(
                     array(
                         'field_name' => $this->createInverseAssociationFieldName($currentClassName, $fieldName),
-                        'merge_modes' => array(MergeModes::UNITE),
+                        'merge_modes' => $mergeModes,
                         'source_field_name' => $fieldName,
                         'source_class_name' => $currentClassName,
                     ),
