@@ -76,7 +76,7 @@ define([
 
             this.setElement((
                 this.template({
-                    label: this.label,
+                    label: this.labelPrefix + this.label,
                     showLabel: this.showLabel,
                     options: options,
                     placeholder: this.placeholder,
