@@ -235,7 +235,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                 }
 
                 if ($entity) {
-                    //$this->entityManager->remove($entity);
+                    $this->entityManager->remove($entity);
                     $iteration++;
 
                     if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
