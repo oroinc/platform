@@ -4,7 +4,6 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockBuilder;
 use Oro\Component\Layout\BlockTypeHelperInterface;
-use Oro\Component\Layout\DataAccessor;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\LayoutRegistryInterface;
@@ -27,9 +26,6 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var BlockBuilder */
     protected $blockBuilder;
 
-    /** @var DataAccessor */
-    protected $dataAccessor;
-
     /** @var LayoutRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
@@ -40,14 +36,12 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
         $this->context           = new LayoutContext();
         $this->layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
         $this->registry          = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
-        $this->dataAccessor      = new DataAccessor($this->registry, $this->context);
 
         $this->blockBuilder      = new BlockBuilder(
             $this->layoutManipulator,
             $this->rawLayout,
             $this->typeHelper,
-            $this->context,
-            $this->dataAccessor
+            $this->context
         );
     }
 
@@ -59,11 +53,6 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
     public function testGetContext()
     {
         $this->assertSame($this->context, $this->blockBuilder->getContext());
-    }
-
-    public function testGetDataAccessor()
-    {
-        $this->assertSame($this->dataAccessor, $this->blockBuilder->getDataAccessor());
     }
 
     public function testGetLayoutManipulator()

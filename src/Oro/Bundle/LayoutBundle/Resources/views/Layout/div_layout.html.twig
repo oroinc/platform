@@ -1,5 +1,5 @@
 {% block block_widget -%}
-    {{ block('block_attributes') }}>
+    {{ block('block_attributes') }}
 {%- endblock %}
 
 {% block block_label -%}
@@ -44,9 +44,7 @@
             placeholder: attr.placeholder|block_text(translation_domain)
         }) %}
     {% endif %}
-    {{ block_widget(block, {
-        attr: attr
-    }) }}
+    <input {{ block_widget(block, {attr: attr}) }} />
 {%- endblock %}
 
 {% block container_widget -%}

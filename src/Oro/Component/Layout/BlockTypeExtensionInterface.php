@@ -55,6 +55,8 @@ interface BlockTypeExtensionInterface
     public function setDefaultOptions(OptionsResolverInterface $resolver);
 
     /**
+     * Normalize options after they was resolved.
+     *
      * @param $name
      * @param array $options
      * @param ContextInterface $context
