@@ -257,7 +257,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('normalizeOptions')
             ->will(
                 $this->returnCallback(
-                    function ($name, array &$options, ContextInterface $context, DataAccessorInterface $data) {
+                    function (array &$options, ContextInterface $context, DataAccessorInterface $data) {
                         if ($options['test_option_2'] === '{BG}:red') {
                             $options['test_option_2'] = ['background'=> 'red'];
                         }

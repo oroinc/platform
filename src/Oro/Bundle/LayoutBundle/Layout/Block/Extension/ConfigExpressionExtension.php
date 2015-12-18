@@ -31,7 +31,7 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function normalizeOptions($name, array &$options, ContextInterface $context, DataAccessorInterface $data)
+    public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data)
     {
         if (false !== $context->getOr('expressions_evaluate_deferred')) {
             return;

@@ -134,7 +134,7 @@ class LayoutRegistry implements LayoutRegistryInterface
             ? $this->typeExtensions[$name]
             : $this->loadTypeExtensions($name);
         foreach ($extensions as $extension) {
-            $extension->normalizeOptions($name, $options, $context, $data);
+            $extension->normalizeOptions($options, $context, $data);
         }
     }
 

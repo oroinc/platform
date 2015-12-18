@@ -228,7 +228,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([$typeExtension]));
         $typeExtension->expects($this->once())
             ->method('normalizeOptions')
-            ->with($name, $options, $context, $data);
+            ->with($options, $context, $data);
 
         $this->registry->normalizeOptions($name, $options, $context, $data);
     }

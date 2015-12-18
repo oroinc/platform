@@ -57,12 +57,11 @@ interface BlockTypeExtensionInterface
     /**
      * Normalize options after they was resolved.
      *
-     * @param $name
      * @param array $options
      * @param ContextInterface $context
      * @param DataAccessorInterface $data
      */
-    public function normalizeOptions($name, array &$options, ContextInterface $context, DataAccessorInterface $data);
+    public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data);
 
     /**
      * Returns the name of the block type being extended.

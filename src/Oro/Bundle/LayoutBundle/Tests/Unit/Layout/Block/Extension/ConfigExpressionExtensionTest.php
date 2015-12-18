@@ -48,7 +48,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('processExpressions')
             ->with($options, $context, $data, true, 'json');
 
-        $this->extension->normalizeOptions('test', $options, $context, $data);
+        $this->extension->normalizeOptions($options, $context, $data);
     }
 
     /**
