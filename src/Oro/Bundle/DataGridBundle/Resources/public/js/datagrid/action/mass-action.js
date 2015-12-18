@@ -49,6 +49,11 @@ define([
             }
         },
 
+        /**
+         * Checks if any records are selected.
+         *
+         * @returns {boolean}
+         */
         checkSelectionState: function() {
             var selectionState = this.datagrid.getSelectionState();
             if (_.isEmpty(selectionState.selectedModels) && selectionState.inset) {

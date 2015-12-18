@@ -1,10 +1,9 @@
 define([
     'oroui/js/delete-confirmation',
-    'routing',
     'orotranslation/js/translator',
     'underscore',
     './mass-action'
-], function(DeleteConfirmation, routing, __, _, MassAction) {
+], function(DeleteConfirmation, __, _, MassAction) {
     'use strict';
 
     var DeleteMassAction;
@@ -41,12 +40,26 @@ define([
         /** @property {String} */
         confirmMessage: null,
 
+        /**
+         * As in this action we need to send POST request to get data for confirm message
+         * we set this.confirmation = false at initialization to prevent opening confirm window.
+         *
+         * @param options
+         */
         initialize: function(options) {
             DeleteMassAction.__super__.initialize.apply(this, arguments);
             this.confirmMessage = __(this.defaultMessages.confirm_content);
             this.confirmation = false;
         },
 
+        /**
+         * Need to handle POST and DELETE requests differently.
+         *
+         *  - POST request: we prepare confirm message from result data
+         *    and set requestType = DELETE and this.confirmation = true, to prepare actually request for deleting.
+         *  - DELETE request: handled as ordinary mass action request.
+         *
+         */
         _onAjaxSuccess: function(data, textStatus, jqXHR) {
             if (this.requestType === 'POST') {
                 this.requestType = 'DELETE';
@@ -61,6 +74,11 @@ define([
             }
         },
 
+        /**
+         * Sends POST request to prepare confirm message.
+         * Normal action request will be send manually after handling POST request.
+         * Sets this.confirmModal = null to rebuild confirm window after each request.
+         */
         execute: function() {
             this.requestType = 'POST';
             this.confirmModal = null;
@@ -69,10 +87,18 @@ define([
             }
         },
 
+        /**
+         * @inheritDoc
+         */
         getConfirmContentMessage: function() {
             return this.confirmMessage;
         },
 
+        /**
+         * Sets confirm message from received data.
+         *
+         * @param data
+         */
         setConfirmMessage: function(data) {
             if (this.isDefined(data.selected) && this.isDefined(data.deletable) && this.isDefined(data.max_limit)) {
                 if (data.deletable <= data.max_limit) {
