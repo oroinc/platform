@@ -76,8 +76,10 @@ class ResultRecord implements ResultRecordInterface
      */
     public function getRootEntity()
     {
-        if (array_key_exists(0, $this->valueContainers) && is_object($this->valueContainers[0])) {
-            return $this->valueContainers[0];
+        foreach ($this->valueContainers as $value) {
+            if (is_object($value)) {
+                return $value;
+            }
         }
 
         return null;

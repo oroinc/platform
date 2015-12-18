@@ -44,6 +44,7 @@ and will put response to console after completion
 * [ApiAccessor](#module_ApiAccessor) ⇐ <code>[BaseClass](./base-class.md)</code>
   * [.initialize(options)](#module_ApiAccessor#initialize)
   * [.isCacheAllowed()](#module_ApiAccessor#isCacheAllowed) ⇒ <code>boolean</code>
+  * [.clearCache()](#module_ApiAccessor#clearCache)
   * [.validateUrlParameters(urlParameters)](#module_ApiAccessor#validateUrlParameters) ⇒ <code>boolean</code>
   * [.send(urlParameters, body, headers, options)](#module_ApiAccessor#send) ⇒ <code>$.Promise</code>
   * [._makeAjaxRequest(options)](#module_ApiAccessor#_makeAjaxRequest)
@@ -66,6 +67,11 @@ and will put response to console after completion
 <a name="module_ApiAccessor#isCacheAllowed"></a>
 ### apiAccessor.isCacheAllowed() ⇒ <code>boolean</code>
 Returns true if selected HTTP_METHOD allows caching
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+<a name="module_ApiAccessor#clearCache"></a>
+### apiAccessor.clearCache()
+Clears response cache
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 <a name="module_ApiAccessor#validateUrlParameters"></a>
