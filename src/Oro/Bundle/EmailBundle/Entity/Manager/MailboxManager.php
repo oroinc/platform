@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -56,5 +56,20 @@ class MailboxManager
             ->createAvailableMailboxesQuery($user, $organization);
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param User $user
+     * @param Organization $organization
+     *
+     * @return EmailOrigin
+     */
+    public function findAvailableOrigins(User $user, Organization $organization)
+    {
+        return $this->registry->getRepository('OroEmailBundle:EmailOrigin')->findBy([
+            'owner' => $user,
+            'organization' => $organization,
+            'isActive' => true,
+        ]);
     }
 }

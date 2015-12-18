@@ -45,7 +45,10 @@ class MailboxChoiceList
             $this->securityFacade->getLoggedUser(),
             $this->getOrganization()
         );
-        $origins = $this->getOriginsList();
+        $origins = $this->mailboxManager->findAvailableOrigins(
+            $this->securityFacade->getLoggedUser(),
+            $this->getOrganization()
+        );
 
         $choiceList = [];
         foreach ($origins as $origin) {
@@ -69,18 +72,5 @@ class MailboxChoiceList
     protected function getOrganization()
     {
         return $this->securityFacade->getOrganization();
-    }
-
-    /**
-     * @return EmailOrigin[]
-     */
-    protected function getOriginsList()
-    {
-        $criteria = [
-            'owner' => $this->securityFacade->getLoggedUser(),
-            'isActive' => true,
-        ];
-
-        return $this->doctrine->getRepository('OroEmailBundle:EmailOrigin')->findBy($criteria);
     }
 }
