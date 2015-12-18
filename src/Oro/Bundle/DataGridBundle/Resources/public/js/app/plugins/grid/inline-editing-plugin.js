@@ -566,20 +566,16 @@ define(function(require) {
         onSaveSuccess: function(response) {
             if (!this.cell.disposed && this.cell.$el) {
                 if (response) {
-                    var routeParametersRenameMap
-                        = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
-                    for (var i in routeParametersRenameMap) {
-                        if (typeof response[routeParametersRenameMap[i]] !== 'undefined') {
-                            this.cell.model.set(i, response[routeParametersRenameMap[i]]);
+                    var routeParametersRenameMap = _.invert(this.cell.column.get('metadata').inline_editing.
+                        save_api_accessor.routeParametersRenameMap);
+                    _.each(response, function(item, i) {
+                        var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
+                        if (this.cell.model.has(propName)) {
+                            this.cell.model.set(propName, item);
                         }
-                    }
+                    }, this);
                 }
-
-                var _this = this;
-                this.cell.$el.addClass('save-success');
-                _.delay(function() {
-                    _this.cell.$el.removeClass('save-success');
-                }, 2000);
+                this.cell.$el.addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },
@@ -587,11 +583,7 @@ define(function(require) {
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.cell.disposed && this.cell.$el) {
-                var _this = this;
-                this.cell.$el.addClass('save-fail');
-                _.delay(function() {
-                    _this.cell.$el.removeClass('save-fail');
-                }, 2000);
+                this.cell.$el.addClassTemporarily('save-fail', 2000);
             }
             this.cell.model.set(this.oldState);
             this.main.trigger('content:update');
