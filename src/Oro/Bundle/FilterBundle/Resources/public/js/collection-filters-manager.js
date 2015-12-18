@@ -148,11 +148,6 @@ define([
                     }
                 } else {
                     filter.reset();
-                    if (filter.defaultEnabled) {
-                        toEnable.push(filter);
-                    } else {
-                        toDisable.push(filter);
-                    }
                 }
             }, this);
 

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="oro_test_serializer_group")
+ * @ORM\Table(name="group_table")
  */
 class Group
 {
@@ -134,5 +134,13 @@ class Group
         $this->isException = $exception;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComputedName()
+    {
+        return sprintf('%s (COMPUTED)', $this->name);
     }
 }
