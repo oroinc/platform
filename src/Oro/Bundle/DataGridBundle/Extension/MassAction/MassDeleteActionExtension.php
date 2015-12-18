@@ -94,7 +94,7 @@ class MassDeleteActionExtension extends AbstractExtension
     {
         $actions = $config->offsetGetOr(static::MASS_ACTION_KEY, []);
 
-        $actions[] = $this->getMassDeleteActionConfig($config);
+        $actions['delete'] = $this->getMassDeleteActionConfig($config);
 
         $config->offsetSet(static::MASS_ACTION_KEY, $actions);
     }
