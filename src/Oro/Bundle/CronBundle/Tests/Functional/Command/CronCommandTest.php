@@ -1,10 +1,7 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Unit\Command;
+namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
 
-use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
@@ -16,24 +13,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class CronCommandTest extends WebTestCase
 {
-    /** @var CronCommand */
-    protected $command;
-//
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $container;
-//
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $emMock;
-
-
     protected function setUp()
     {
         $this->initClient();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->container, $this->command, $this->emMock);
     }
 
     public function testCheckRunDuplicateJob()
