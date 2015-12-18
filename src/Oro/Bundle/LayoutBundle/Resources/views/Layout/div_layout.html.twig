@@ -127,9 +127,9 @@
 
 {% block text_widget -%}
     {% if escape %}
-        {{ text|block_text(translation_domain) }}
+        {{- text|block_text(translation_domain) -}}
     {% else %}
-        {{ text|block_text(translation_domain)|raw }}
+        {{- text|block_text(translation_domain)|raw -}}
     {% endif %}
 {%- endblock %}
 
