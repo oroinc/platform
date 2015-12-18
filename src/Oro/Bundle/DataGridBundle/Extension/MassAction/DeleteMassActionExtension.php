@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class MassDeleteActionExtension extends AbstractExtension
+class DeleteMassActionExtension extends AbstractExtension
 {
     const ACTION_KEY         = 'actions';
     const MASS_ACTION_KEY    = 'mass_actions';
