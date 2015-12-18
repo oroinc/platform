@@ -6,8 +6,9 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailQueryFactory
@@ -67,13 +68,16 @@ class EmailQueryFactory
     public function applyAcl(QueryBuilder $qb)
     {
         $user = $this->securityFacade->getLoggedUser();
-        $organization = $this->securityFacade->getOrganization();
+        $organization = $this->getOrganization();
 
         $mailboxIds = $this->mailboxManager->findAvailableMailboxIds($user, $organization);
-        $uoCheck = $qb->expr()->andX(
-            $qb->expr()->eq('eu.owner', ':owner'),
-            $qb->expr()->eq('eu.organization ', ':organization')
-        );
+
+        $exprs = [$qb->expr()->eq('eu.owner', ':owner')];
+        if ($organization) {
+            $exprs[] = $qb->expr()->eq('eu.organization ', ':organization');
+            $qb->setParameter('organization', $organization->getId());
+        }
+        $uoCheck = call_user_func_array([$qb->expr(), 'andX'], $exprs);
 
         if (!empty($mailboxIds)) {
             $qb->andWhere(
@@ -87,7 +91,14 @@ class EmailQueryFactory
             $qb->andWhere($uoCheck);
         }
         $qb->setParameter('owner', $user->getId());
-        $qb->setParameter('organization', $organization->getId());
+    }
+
+    /**
+     * @return Organization|null
+     */
+    protected function getOrganization()
+    {
+        return $this->securityFacade->getOrganization();
     }
 
     /**

@@ -46,11 +46,11 @@ class MailboxManager
      * Returns a list of mailboxes available to user logged under organization.
      *
      * @param User|integer $user User or user id
-     * @param Organization $organization
+     * @param Organization $organization|null
      *
      * @return Collection|Mailbox[] Array or collection of Mailboxes
      */
-    public function findAvailableMailboxes($user, Organization $organization)
+    public function findAvailableMailboxes($user, Organization $organization = null)
     {
         $qb = $this->registry->getRepository('OroEmailBundle:Mailbox')
             ->createAvailableMailboxesQuery($user, $organization);
