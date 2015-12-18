@@ -13,9 +13,6 @@ class LayoutFormulaLoaderTest extends \PHPUnit_Framework_TestCase
         $formulae = [1, 2, 3];
         $loader = new LayoutFormulaLoader();
 
-        /** @var ResourceInterface|\PHPUnit_Framework_MockObject_MockObject $resource */
-        $resource = $this->getMock('Assetic\Factory\Resource\ResourceInterface');
-
         /** @var ResourceInterface|\PHPUnit_Framework_MockObject_MockObject $layoutResource */
         $layoutResource = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Assetic\LayoutResource')
             ->disableOriginalConstructor()
@@ -24,7 +21,6 @@ class LayoutFormulaLoaderTest extends \PHPUnit_Framework_TestCase
             ->method('getContent')
             ->willReturn($formulae);
 
-        $this->assertEquals([], $loader->load($resource));
         $this->assertEquals($formulae, $loader->load($layoutResource));
     }
 }
