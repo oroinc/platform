@@ -13,6 +13,9 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TagsExtension extends AbstractTagsExtension
 {
+    const TAGS_ROOT_PARAM = '_tags';
+    const DISABLED_PARAM  = '_disabled';
+
     const COLUMN_NAME = 'tags';
 
     /** @var TaggableHelper */
@@ -58,13 +61,44 @@ class TagsExtension extends AbstractTagsExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $className = $this->getEntityClassName($config);
+        return
+            !$this->isDisabled() &&
+            !$this->isReportOrSegmentGrid($config) &&
+            $this->isGridRootEntityTaggable($config) &&
+            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
+            $this->isAccessGranted();
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isDisabled()
+    {
+        $tagParameters = $this->getParameters()->get(self::TAGS_ROOT_PARAM);
 
         return
-            !$this->isReportOrSegmentGrid($config) &&
-            $className &&
-            $this->taggableHelper->isTaggable($className) &&
-            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
+            $tagParameters &&
+            !empty($tagParameters[self::DISABLED_PARAM]);
+    }
+
+    /**
+     * @param DatagridConfiguration $configuration
+     *
+     * @return bool
+     */
+    protected function isGridRootEntityTaggable(DatagridConfiguration $configuration)
+    {
+        $className = $this->getEntityClassName($configuration);
+
+        return $className && $this->taggableHelper->isTaggable($className);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAccessGranted()
+    {
+        return
             null !== $this->securityFacade->getToken() &&
             $this->securityFacade->isGranted('oro_tag_view');
     }

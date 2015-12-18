@@ -414,6 +414,9 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testManyToOneBidirectionalWithManyToMany()
     {
         $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
