@@ -36,11 +36,12 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand(CronCommand::NAME, []);
         $this->assertNotEmpty($result);
 
+        $this->checkMessage('allCommandNew', $result);
+
+        $result = $this->runCommand(CronCommand::NAME, []);
         $this->checkMessage('AllJobAdded', $result);
 
         $result = $this->runCommand(CronCommand::NAME, []);
-        $this->assertContains('Processing command "oro:cron:cleanup": already exists in job queue', $result);
-
         $this->checkMessage('AllJobAlreadyExist', $result);
     }
 
@@ -67,6 +68,25 @@ class CronCommandTest extends WebTestCase
     protected function checkMessage($key, $result)
     {
         $messages = [
+            'allCommandNew' => [
+                'Processing command "oro:cron:enterprise:license": new command found, setting up schedule..',
+                'Processing command "oro:cron:integration:sync": new command found, setting up schedule..',
+                'Processing command "oro:cron:batch:cleanup": new command found, setting up schedule..',
+                'Processing command "oro:cron:cleanup": new command found, setting up schedule..',
+                'Processing command "oro:cron:daemon": new command found, setting up schedule..',
+                'Processing command "oro:cron:imap-sync": new command found, setting up schedule..',
+                'Processing command "oro:cron:ews-sync": new command found, setting up schedule..',
+                'Processing command "oro:cron:import-tracking": new command found, setting up schedule..',
+                'Processing command "oro:cron:tracking:parse": new command found, setting up schedule..',
+                'Processing command "oro:cron:send-reminders": new command found, setting up schedule..',
+                'Processing command "oro:cron:calculate-tracking-event-summary": new command found, setting up',
+                'Processing command "oro:cron:send-email-campaigns": new command found, setting up schedule..',
+                'Processing command "oro:cron:lifetime-average:aggregate": new command found, setting up schedule..',
+                'Processing command "oro:cron:analytic:calculate": new command found, setting up schedule..',
+                'Processing command "oro:cron:magento:cart:expiration": new command found, setting up schedule..',
+                'Processing command "oro:cron:mailchimp:export": new command found, setting up schedule..',
+                'Processing command "oro:cron:dotmailer:export-status:update": new command found, setting up schedule..'
+            ],
             'AllJobAlreadyExist' => [
                 'Processing command "oro:cron:enterprise:license": already exists in job queue',
                 'Processing command "oro:cron:cleanup": already exists in job queue',
