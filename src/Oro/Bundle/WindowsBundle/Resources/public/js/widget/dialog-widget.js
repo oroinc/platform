@@ -313,14 +313,22 @@ define(function(require) {
         _initAdjustHeight: function(content) {
             this.widget.off('.adjust-height-events');
             var scrollableContent = content.find('.scrollable-container');
+            var resizeEvents = [
+                'dialogresize.adjust-height-events',
+                'dialogmaximize.adjust-height-events',
+                'dialogrestore.adjust-height-events'
+            ].join(' ');
+            this.widget.on('dialogresizestart.adjust-height-events', _.bind(function() {
+                var dialog = this.widget.closest('.ui-dialog');
+                var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
+                dialog.css({
+                    maxWidth: containerEl.clientWidth,
+                    maxHeight: containerEl.clientHeight
+                });
+            }, this));
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
-                var events = [
-                    'dialogresize.adjust-height-events',
-                    'dialogmaximize.adjust-height-events',
-                    'dialogrestore.adjust-height-events'
-                ];
-                this.widget.on(events.join(''), _.bind(this._fixScrollableHeight, this));
+                this.widget.on(resizeEvents, _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
         },
@@ -451,13 +459,6 @@ define(function(require) {
                 if (minHeight > containerEl.clientHeight - top) {
                     dialog.css('min-height', containerEl.clientHeight - top);
                 }
-            }
-            if (!tools.isMobile()) {
-                // freeze width and height for proper layout
-                dialog.css({
-                    width: dialog.outerWidth(),
-                    height: dialog.outerHeight()
-                });
             }
         },
 
