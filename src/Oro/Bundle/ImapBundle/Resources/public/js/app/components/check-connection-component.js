@@ -16,13 +16,13 @@ define(function(require) {
          */
         initialize: function(options) {
             if (options.elementNamePrototype) {
-                var viewOptions = {
+                var viewOptions = _.extend({
                     'model': new CheckConnectionModel({}),
                     'el': $(options._sourceElement).closest(options.parentElementSelector),
                     'entity': options.forEntity || 'user',
                     'entityId': options.id,
                     'organization': options.organization || ''
-                };
+                }, options.viewOptions || {});
                 if (/^.+\[\w+]$/i.test(options.elementNamePrototype)) {
                     viewOptions.formPrefix = options.elementNamePrototype.match(/(.+)\[\w+]$/i)[1];
                 }
