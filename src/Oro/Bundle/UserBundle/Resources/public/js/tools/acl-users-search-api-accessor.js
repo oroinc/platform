@@ -44,6 +44,21 @@ define(function(require) {
                 urlParameters.id, ''].join(';');
             urlParameters.name = this.searchHandlerName;
             return urlParameters;
+        },
+
+        /**
+         * Returns hash code of url
+         *
+         * @param {string} url
+         * @returns {string}
+         */
+        hashCode: function(url) {
+            // throw away entity id ...
+            return url.replace(/query=(\w*)%3B(\w+)%3B(\w+)%3B(\d+)%3B/,
+                function(full, term, entity, operation, entityId) {
+                    return 'query=' + term + '%3B' + entity + '%3B' + operation + '%3B%3B';
+                }
+            );
         }
     });
 

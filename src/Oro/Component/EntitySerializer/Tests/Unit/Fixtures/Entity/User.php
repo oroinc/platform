@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="oro_test_serializer_user")
+ * @ORM\Table(name="user_table")
  */
 class User
 {
@@ -32,7 +32,7 @@ class User
 
     /**
      * @ORM\ManyToMany(targetEntity="Group")
-     * @ORM\JoinTable(name="oro_test_serializer_user_to_group",
+     * @ORM\JoinTable(name="rel_user_to_group_table",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="user_group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
@@ -103,8 +103,6 @@ class User
     }
 
     /**
-     * Gets the groups related to contact
-     *
      * @return Group[]|Collection
      */
     public function getGroups()

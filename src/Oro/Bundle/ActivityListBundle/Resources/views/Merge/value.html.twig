@@ -1,0 +1,10 @@
+{% set empty_cell %}
+    <span class="empty">-- {{ 'oro.entity_merge.form.empty'|trans }} --</span>
+{% endset %}
+
+{% if convertedValue|length %}
+    {{ convertedValue }}
+    {{ 'oro.activitylist.merge.items.label'|transchoice(convertedValue) }}
+{% else %}
+    {{ empty_cell }}
+{% endif %}
