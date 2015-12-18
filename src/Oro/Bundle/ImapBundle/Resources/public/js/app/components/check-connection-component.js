@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
+    var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var CheckConnectionView = require('../views/check-connection-view');
     var CheckConnectionModel = require('../models/check-connection-model');
