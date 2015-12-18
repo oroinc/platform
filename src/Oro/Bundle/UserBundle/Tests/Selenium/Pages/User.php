@@ -254,17 +254,22 @@ class User extends AbstractPageEntity
                 if ($condition != '') {
                     $condition .= ' or ';
                 }
-                $condition .= "normalize-space(text()) = '{$role}'";
+                $condition .= "contains(., '{$role}')";
             }
             $element = $this->roles->element(
-                $this->test->using('xpath')->value("div[label[{$condition}]]/input")
+                $this->test->using('xpath')->value(
+                    "//div[@data-ftid='oro_user_user_form_roles']/div[label[{$condition}]]/input"
+                )
             );
             $this->test->moveto($element);
             $element->click();
         } else {
             foreach ($roles as $role) {
                 $element = $this->roles->element(
-                    $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
+                    $this->test->using('xpath')->value(
+                        "//div[@data-ftid='oro_user_user_form_roles']".
+                        "/div[label[contains(normalize-space(text()), '{$role}')]]/input"
+                    )
                 );
                 $this->test->moveto($element);
                 $element->click();
