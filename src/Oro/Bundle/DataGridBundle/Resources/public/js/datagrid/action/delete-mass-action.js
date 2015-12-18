@@ -79,7 +79,7 @@ define([
                     if (data.deletable >= data.selected) {
                         this.confirmMessage = __(this.confirmMessages.selected_message, {selected: data.selected});
                     } else {
-                        this.confirmMessage = __(this.confirmMessages.restricted_access_message, {deletable: data.deletable});
+                        this.confirmMessage = __(this.confirmMessages.restricted_access_message, {deletable: data.deletable, selected: data.selected});
                     }
                 } else {
                     this.confirmMessage = __(this.confirmMessages.max_limit_message, {max_limit: data.max_limit});

@@ -86,11 +86,11 @@ oro:
         mass_action:
             delete:
                 selected_message: >
-                    You have selected {{ selected }} record(s).<br/>
-                    Are you sure you want to delete {{ selected }} record(s)?
+                    You have selected {{ selected }} records.<br/>
+                    Are you sure you want to delete {{ selected }} records?
                 max_limit_message: >
-                    Due to perfomance max amount of records to delete at once is {{ max_limit }}.<br/>
-                    Are you sure you want to delete {{ max_limit }} records?
+                    Due to performance limitations the maximum amount of records to be deleted at once is {{ max_limit }}.<br/>
+                    Are you sure you want to delete first {{ max_limit }} records in the selection?
                 restricted_access_message: >
-                    Due to your access settings you are able to delete {{ deletable }} record(s).<br/>
-                    Are you sure you want to delete {{ deletable }} record(s)?
+                    You have permissions to delete {{ deletable }} records out of {{ selected }} selected.<br/>
+                    Are you sure you want to delete {{ deletable }} records?

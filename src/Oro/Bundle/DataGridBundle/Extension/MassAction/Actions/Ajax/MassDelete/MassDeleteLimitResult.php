@@ -7,10 +7,10 @@ class MassDeleteLimitResult
     /** @var int */
     protected $maxLimit = MassDeleteLimiter::MAX_DELETE_RECORDS;
 
-    /** @var int|null */
+    /** @var int */
     protected $selected;
 
-    /** @var int|null */
+    /** @var int */
     protected $deletable;
 
     /**
