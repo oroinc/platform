@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
+use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 class ContextRegistry
@@ -9,7 +10,7 @@ class ContextRegistry
     /**
      * @var array
      */
-    protected $contexts = array();
+    protected $contexts = [];
 
     /**
      * @param StepExecution $stepExecution
@@ -19,11 +20,13 @@ class ContextRegistry
     {
         $key = spl_object_hash($stepExecution);
 
-        if (empty($this->contexts[$key])) {
-            $this->contexts[$key] = $this->createByStepExecution($stepExecution);
+        $jobName = $stepExecution->getJobExecution()->getJobInstance()->getAlias();
+
+        if (empty($this->contexts[$jobName][$key])) {
+            $this->contexts[$jobName][$key] = $this->createByStepExecution($stepExecution);
         }
 
-        return $this->contexts[$key];
+        return $this->contexts[$jobName][$key];
     }
 
     /**
@@ -33,5 +36,13 @@ class ContextRegistry
     protected function createByStepExecution(StepExecution $stepExecution)
     {
         return new StepExecutionProxyContext($stepExecution);
+    }
+
+    /**
+     * @param JobInstance $jobInstance
+     */
+    public function clear(JobInstance $jobInstance)
+    {
+        unset($this->contexts[$jobInstance->getAlias()]);
     }
 }
