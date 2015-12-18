@@ -84,8 +84,7 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:lifetime-average:aggregate": new command found, setting up schedule..',
                 'Processing command "oro:cron:analytic:calculate": new command found, setting up schedule..',
                 'Processing command "oro:cron:magento:cart:expiration": new command found, setting up schedule..',
-                'Processing command "oro:cron:mailchimp:export": new command found, setting up schedule..',
-                'Processing command "oro:cron:dotmailer:export-status:update": new command found, setting up schedule..'
+                'Processing command "oro:cron:mailchimp:export": new command found, setting up schedule..'
             ],
             'AllJobAlreadyExist' => [
                 'Processing command "oro:cron:enterprise:license": already exists in job queue',
@@ -103,8 +102,7 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:lifetime-average:aggregate": already exists in job queue',
                 'Processing command "oro:cron:analytic:calculate": already exists in job queue',
                 'Processing command "oro:cron:magento:cart:expiration": already exists in job queue',
-                'Processing command "oro:cron:mailchimp:export": already exists in job queue',
-                'Processing command "oro:cron:dotmailer:export-status:update": already exists in job queue'
+                'Processing command "oro:cron:mailchimp:export": already exists in job queue'
             ],
             'AllJobAdded' => [
                 'Processing command "oro:cron:enterprise:license": added to job queue',
@@ -122,8 +120,7 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:lifetime-average:aggregate": added to job queue',
                 'Processing command "oro:cron:analytic:calculate": added to job queue',
                 'Processing command "oro:cron:magento:cart:expiration": added to job queue',
-                'Processing command "oro:cron:mailchimp:export": added to job queue',
-                'Processing command "oro:cron:dotmailer:export-status:update": added to job queue'
+                'Processing command "oro:cron:mailchimp:export": added to job queue'
             ],
             'AllJobSkip' => [
                 'Processing command "oro:cron:enterprise:license": skipped',
@@ -141,8 +138,7 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:lifetime-average:aggregate": skipped',
                 'Processing command "oro:cron:analytic:calculate": skipped',
                 'Processing command "oro:cron:magento:cart:expiration": skipped',
-                'Processing command "oro:cron:mailchimp:export": skipped',
-                'Processing command "oro:cron:dotmailer:export-status:update": skipped'
+                'Processing command "oro:cron:mailchimp:export": skipped'
             ]
         ];
 
