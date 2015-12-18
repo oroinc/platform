@@ -101,7 +101,6 @@ define(function(require) {
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
             'click .choice-value': '_onClickChoiceValue',
-            //'click .reset-filter': '_onClickResetFilter',
             'change input[type="checkbox"]': '_onChangeBusinessUnit',
             'click .button-all': '_onClickButtonAll',
             'click .button-selected': '_onClickButtonSelected'
@@ -397,8 +396,8 @@ define(function(require) {
             return (option ? option.label + ' ' : '') + hintValue;
         },
 
-        _onClickResetFilter: function() {
-            ChoiceTreeFilter.__super__._onClickResetFilter.apply(this, arguments);
+        reset: function() {
+            ChoiceTreeFilter.__super__.reset.apply(this, arguments);
             this._hideCriteria();
             this.checkedItems = {};
             this.$el.find('input[name="search"]').val('');

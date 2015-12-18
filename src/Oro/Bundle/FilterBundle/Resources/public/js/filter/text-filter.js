@@ -1,11 +1,12 @@
-define(function(require) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './empty-filter'
+], function($, _, __, EmptyFilter) {
     'use strict';
 
     var TextFilter;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var EmptyFilter = require('./empty-filter');
 
     /**
      * Text grid filter.
@@ -77,8 +78,7 @@ define(function(require) {
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter',
-            //'click .reset-filter': '_onClickResetFilter'
+            'click .disable-filter': '_onClickDisableFilter'
         },
 
         /**

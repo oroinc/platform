@@ -130,9 +130,7 @@ define([
         },
 
         /**
-         * Get criteria hint value
-         *
-         * @return {String}
+         * @inheritDoc
          */
         _getCriteriaHint: function() {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
@@ -143,7 +141,7 @@ define([
                 }
             });
             return choices.length > 0 ? choices.join(', ') : this.placeholder;
-        },
+        }
     });
 
     return MultiSelectFilter;

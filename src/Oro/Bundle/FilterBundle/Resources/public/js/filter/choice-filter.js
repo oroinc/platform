@@ -51,8 +51,7 @@ define([
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
-            'click .choice-value': '_onClickChoiceValue',
-            //'click .reset-filter': '_onClickResetFilter'
+            'click .choice-value': '_onClickChoiceValue'
         },
 
         /**
@@ -149,8 +148,8 @@ define([
             this._updateValueField();
         },
 
-        _onClickResetFilter: function() {
-            ChoiceFilter.__super__._onClickResetFilter.apply(this, arguments);
+        reset: function() {
+            ChoiceFilter.__super__.reset.apply(this, arguments);
             this._updateValueField();
         },
 

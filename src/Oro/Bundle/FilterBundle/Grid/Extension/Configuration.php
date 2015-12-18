@@ -12,7 +12,6 @@ class Configuration implements ConfigurationInterface
     const FILTERS_PATH         = '[filters]';
     const COLUMNS_PATH         = '[filters][columns]';
     const DEFAULT_FILTERS_PATH = '[filters][default]';
-    const DISPLAY_HINTS_INLINE_PATH = '[filters][display_hints_inline]';
 
     /** @var array */
     protected $types;
@@ -61,7 +60,6 @@ class Configuration implements ConfigurationInterface
                             ->prototype('variable')->end()
                         ->end()
                     ->end()
-                ->booleanNode('display_hints_inline')->defaultTrue()->end()
                 ->end()
             ->end();
 

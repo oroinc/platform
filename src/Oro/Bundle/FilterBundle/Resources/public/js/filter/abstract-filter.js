@@ -96,8 +96,6 @@ define([
          */
         nullLink: '#',
 
-        filterHint: FilterHint,
-
         /**
          * Initialize.
          *
@@ -122,8 +120,8 @@ define([
 
             AbstractFilter.__super__.initialize.apply(this, arguments);
 
-            var hintView = new this.filterHint({
-                $filter: this.$el,
+            var hintView = new FilterHint({
+                templateTheme: this.templateTheme,
                 label: this.label,
                 hint: this._getCriteriaHint()
             });

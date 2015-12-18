@@ -9,25 +9,45 @@ define([
 
     var config = module.config();
     config = _.extend({
-        inline: true
+        inline: true,
+        templateSelector: '#filter-hint-template',
+        selectors: {
+            filters: '.filter-container',
+            itemHint: '.filter-item-hint',
+            itemsHint: '.filter-items-hint',
+            hint: '.filter-criteria-hint'
+        }
     }, config);
 
     var FilterHint;
 
     FilterHint = BaseView.extend(_.extend({}, FilterTemplate, {
-        inline: config.inline,
-
-        $filter: null,
-
+        /**
+         * @property {String}
+         */
         label: '',
 
+        /**
+         * @property {String}
+         */
         hint: '',
 
-        templateSelector: '#filter-criteria-hint-template',
+        /**
+         * @property {String}
+         */
+        templateSelector: config.templateSelector,
 
         /**
-         * View events
-         *
+         * @property {Boolean}
+         */
+        inline: config.inline,
+
+        /**
+         * @property {Object}
+         */
+        selectors: config.selectors,
+
+        /**
          * @property {Object}
          */
         events: {
@@ -35,13 +55,10 @@ define([
         },
 
         /**
-         * Initialize.
-         *
-         * @param {Object} options
-         * @param {Boolean} [options.enabled]
+         * @inheritDoc
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, '$filter', 'label', 'hint', 'templateSelector', 'templateTheme');
+            var opts = _.pick(options || {}, 'label', 'hint', 'templateSelector', 'templateTheme', 'selectors');
             _.extend(this, opts);
 
             this._defineTemplate();
@@ -49,27 +66,29 @@ define([
             FilterHint.__super__.initialize.apply(this, arguments);
         },
 
+        /**
+         * @param {jQuery} $filter
+         */
         render: function($filter) {
             this.setElement(this.template({
                 label: this.inline ? null : this.label
             }));
 
             if (this.inline) {
-                $filter.find('.filter-criteria-hint-inline').append(this.$el);
+                $filter.find(this.selectors.itemHint).append(this.$el);
             } else {
-                $filter.closest('.filter-container').find('.filter-items-hint').append(this.$el);
+                $filter.closest(this.selectors.filters).find(this.selectors.itemsHint).append(this.$el);
             }
 
             this.update(this.hint);
         },
 
         /**
-         * Show filter criteria
-         *
-         * @return {*}
+         * @param {String|Null} hint
+         * @returns {*}
          */
         update: function(hint) {
-            this.$el.find('.filter-criteria-hint').html(_.escape(hint));
+            this.$el.find(this.selectors.hint).html(_.escape(hint));
             if (!this.inline && hint === null) {
                 this.$el.hide();
             } else {
@@ -79,7 +98,7 @@ define([
         },
 
         /**
-         * Handles click on filter-item reset button
+         * Handles click on filter reset button
          *
          * @param {jQuery.Event} e
          * @private

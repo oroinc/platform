@@ -104,8 +104,7 @@ define([
             'keydown select': '_preventEnterProcessing',
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
-            'change select': '_onSelectChange',
-            //'click .reset-filter': '_onClickResetFilter'
+            'change select': '_onSelectChange'
         },
 
         /**
