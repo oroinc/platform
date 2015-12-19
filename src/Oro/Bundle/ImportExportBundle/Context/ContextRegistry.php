@@ -7,6 +7,8 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 class ContextRegistry
 {
+    const DEFAULT_ALIAS = 'default';
+
     /**
      * @var array
      */
@@ -20,13 +22,20 @@ class ContextRegistry
     {
         $key = spl_object_hash($stepExecution);
 
-        $jobName = $stepExecution->getJobExecution()->getJobInstance()->getAlias();
-
-        if (empty($this->contexts[$jobName][$key])) {
-            $this->contexts[$jobName][$key] = $this->createByStepExecution($stepExecution);
+        $alias = self::DEFAULT_ALIAS;
+        $jobExecution = $stepExecution->getJobExecution();
+        if ($jobExecution) {
+            $jobInstance = $jobExecution->getJobInstance();
+            if ($jobInstance) {
+                $alias = $jobInstance->getAlias();
+            }
         }
 
-        return $this->contexts[$jobName][$key];
+        if (empty($this->contexts[$alias][$key])) {
+            $this->contexts[$alias][$key] = $this->createByStepExecution($stepExecution);
+        }
+
+        return $this->contexts[$alias][$key];
     }
 
     /**
@@ -39,10 +48,15 @@ class ContextRegistry
     }
 
     /**
-     * @param JobInstance $jobInstance
+     * @param JobInstance|null $jobInstance
      */
-    public function clear(JobInstance $jobInstance)
+    public function clear(JobInstance $jobInstance = null)
     {
-        unset($this->contexts[$jobInstance->getAlias()]);
+        $alias = self::DEFAULT_ALIAS;
+        if ($jobInstance) {
+            $alias = $jobInstance->getAlias();
+        }
+
+        unset($this->contexts[$alias]);
     }
 }

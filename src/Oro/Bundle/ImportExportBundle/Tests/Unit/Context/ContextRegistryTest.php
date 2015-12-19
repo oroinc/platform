@@ -45,25 +45,27 @@ class ContextRegistryTest extends \PHPUnit_Framework_TestCase
      * @param string $alias
      * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
      */
-    protected function createStepExecution($alias = 'default')
+    protected function createStepExecution($alias = null)
     {
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
-        $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
-        $jobExecution->expects($this->any())
-            ->method('getJobInstance')
-            ->will($this->returnValue($jobInstance));
+        if ($alias) {
+            $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
+            $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+            $jobExecution->expects($this->any())
+                ->method('getJobInstance')
+                ->will($this->returnValue($jobInstance));
 
-        $stepExecution->expects($this->any())
-            ->method('getJobExecution')
-            ->will($this->returnValue($jobExecution));
+            $stepExecution->expects($this->any())
+                ->method('getJobExecution')
+                ->will($this->returnValue($jobExecution));
 
-        $jobInstance->expects($this->any())
-            ->method('getAlias')
-            ->will($this->returnValue($alias));
+            $jobInstance->expects($this->any())
+                ->method('getAlias')
+                ->will($this->returnValue($alias));
+        }
 
         return $stepExecution;
     }
