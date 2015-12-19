@@ -137,6 +137,20 @@ define(['jquery'], function($) {
                 var newEvent = typeEvents.pop();
                 typeEvents.unshift(newEvent);
             });
+        },
+
+        /**
+         * Temporarily adds class to element
+         */
+        addClassTemporarily: function(className, delay) {
+            delay = delay || 0;
+            return this.each(function() {
+                var $el = $(this);
+                $el.addClass(className);
+                setTimeout(function() {
+                    $el.removeClass(className);
+                }, delay);
+            });
         }
     });
 

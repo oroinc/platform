@@ -34,15 +34,20 @@
         }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
+    {% set fields = [] %}
+    {% for name, child in form %}
+        {% if name not in ['appendUsers', 'removeUsers', 'entity', 'privileges', 'action'] %}
+            {% set fields = fields|merge({(name): '#' ~ child.vars.id}) %}
+        {% endif %}
+    {% endfor %}
     {% set options = {
         elSelector: '.btn-success.role-submit',
         formName: form.vars.name,
         formSelector: '#' ~ form.vars.id,
-        labelSelector: '#' ~ form.label.vars.id,
         privilegesSelector: '#' ~ form.privileges.vars.id,
         appendUsersSelector: '#roleAppendUsers',
         removeUsersSelector: '#roleRemoveUsers',
-        tokenSelector: '#' ~ form._token.vars.id
+        fields : fields
     } %}
     <div data-page-component-module="orouser/js/views/role-view"
          data-page-component-options="{{ options|json_encode }}">

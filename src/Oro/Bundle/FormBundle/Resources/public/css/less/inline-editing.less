@@ -40,6 +40,12 @@
           box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
       }
+      &.number-cell:hover, &.integer-cell:hover, &.align-right:hover {
+        > .icon-edit {
+          right: auto;
+          left: 0;
+        }
+      }
     }
     &.loading{
       background: #f5f5f5;
@@ -59,7 +65,7 @@
       &:hover:before {
         background-color: rgba(244, 239, 212, 0.7);;
       }
-      &.number-cell:before, &.percent-cell:before {
+      &.number-cell:before, &.integer-cell:before, &.align-right:before {
         right: auto;
         left: 1px;
       }
