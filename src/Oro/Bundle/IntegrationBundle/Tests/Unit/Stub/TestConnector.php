@@ -75,7 +75,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
      */
     public function isAllowed(Channel $integration, array $processedConnectorsStatuses)
     {
-        $this->allowed;
+        return $this->allowed;
     }
 
     /**

@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\UserBundle\Entity\User;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
@@ -33,6 +34,11 @@ class OAuthProvider extends HWIOAuthProvider
     protected $userChecker;
 
     /**
+     * @var OAuthTokenFactoryInterface
+     */
+    protected $tokenFactory;
+
+    /**
      * @param OAuthAwareUserProviderInterface $userProvider User provider
      * @param ResourceOwnerMap $resourceOwnerMap Resource owner map
      * @param UserCheckerInterface $userChecker User checker
@@ -48,12 +54,24 @@ class OAuthProvider extends HWIOAuthProvider
     }
 
     /**
+     * @param OAuthTokenFactoryInterface $tokenFactory
+     */
+    public function setTokenFactory(OAuthTokenFactoryInterface $tokenFactory)
+    {
+        $this->tokenFactory = $tokenFactory;
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @throws OAuthAwareExceptionInterface
      */
     public function authenticate(TokenInterface $token)
     {
+        if (null === $this->tokenFactory) {
+            throw new AuthenticationException('Token Factory is not set in OAuthProvider.');
+        }
+
         /* @var OAuthToken $token */
         $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName($token->getResourceOwnerName());
 
@@ -69,7 +87,7 @@ class OAuthProvider extends HWIOAuthProvider
 
         $organization = $this->guessOrganization($user, $token);
 
-        $token = new OAuthToken($token->getRawToken(), $user->getRoles());
+        $token = $this->tokenFactory->create($token->getRawToken(), $user->getRoles());
         $token->setResourceOwnerName($resourceOwner->getName());
         $token->setOrganizationContext($organization);
         $token->setUser($user);

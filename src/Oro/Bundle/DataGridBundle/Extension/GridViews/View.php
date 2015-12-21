@@ -179,6 +179,10 @@ class View
      */
     public function getColumnsData()
     {
+        if ($this->columnsData === null) {
+            $this->columnsData = [];
+        }
+
         return $this->columnsData;
     }
 
