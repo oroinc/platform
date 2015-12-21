@@ -413,3 +413,9 @@ services:
         scope: request
         arguments:
             - @doctrine
+
+    oro_layout.data_provider.abstract:
+        abstract: true
+        class: Oro\Bundle\EntityBundle\Layout\Extension\Provider\AbstractEntityDataProvider
+        arguments:
+            - @doctrine
