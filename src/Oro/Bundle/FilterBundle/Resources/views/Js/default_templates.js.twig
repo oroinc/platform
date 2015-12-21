@@ -2,14 +2,18 @@
     <div class="filter-item oro-drop">
         <a href="<%= nullLink %>"
            class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %>: <% } %>
-            <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
-            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
-            ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+            <% if (showLabel) { %><%= label %><% } %><span class="filter-item-hint"></span>
             <span class="caret"></span>
         </a>
         <div class="filter-criteria dropdown-menu" />
     </div>
+</script>
+<script type="text/template" id="filter-hint-template">
+    <span><%= label %>: <strong class="filter-criteria-hint"></strong>
+        <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>">
+            <i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i>
+        </span>
+    </span>
 </script>
 <script type="text/template" id="none-filter-template">
     <div><%= popupHint %></div>
@@ -27,20 +31,16 @@
     </div>
 </script>
 <script type="text/template" id="choice-filter-template">
-    <button type="button" class="close btn_close" aria-label="Close">
-        <i class="material-icons">clear</i>
-    </button>
     <div class="choice-filter">
-        <label class="oro-oq__filter__label">Filter by something</label>
         <div class="btn-group btn-block">
             <button class="btn dropdown-toggle" data-toggle="dropdown">
                 <%- selectedChoiceLabel %><span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
                 <% _.each(choices, function (option) { %>
-                <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
-                </li>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                        <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
                 <% }); %>
             </ul>
         </div>
@@ -48,10 +48,6 @@
             <input type="text" name="value" value="">
             <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
             <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
-            <a href="#" class="filter-widget__clear-link">
-                <i class="material-icons">clear</i>
-                <span>Clear Filter</span>
-            </a>
         </div>
     </div>
 </script>
@@ -64,9 +60,9 @@
             </button>
             <ul class="dropdown-menu">
                 <% _.each(choices, function (option) { %>
-                <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
-                </li>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                        <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
                 <% }); %>
             </ul>
         </div>
@@ -75,7 +71,7 @@
                 <div class="filter-start">
                     <input type="text" class="" value="<%= value.value %>" name="value">
                 </div>
-                <span class="filter-separator">To</span>
+                <span class="filter-separator">-</span>
                 <div class="filter-end">
                     <input type="text" value="<%= value.value_end %>" name="value_end">
                 </div>
@@ -94,9 +90,9 @@
             </button>
             <ul class="dropdown-menu">
                 <% _.each(choices, function (option) { %>
-                <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
-                </li>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                        <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
                 <% }); %>
             </ul>
         </div>
@@ -109,8 +105,8 @@
 
 <script type="text/template" id="select-field-template">
     <div class="horizontal clearfix">
-        <span class="filter-select-oro-wrapper product__select">
-            <select name="<%= name %>" class="filter-select-oro input input_sm input_block" data-chosen-selectbox>
+        <span class="filter-select-oro-wrapper">
+            <select name="<%= name %>" class="filter-select-oro">
                 <% _.each(choices, function (option) { %>
                 <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
                 <% }); %>
@@ -121,20 +117,14 @@
 
 <script type="text/template" id="date-filter-template">
     <div>
-        <button type="button" class="close btn_close" aria-label="Close">
-            <i class="material-icons">clear</i>
-        </button>
-        <label class="oro-oq__filter__label">Filter by something</label>
         <%= parts.join('') %>
-        <div class="oro-oq__filter__form__daterange oro-oq__filter__form__daterange_time">
+        <div>
             <div class="filter-start-date">
-                <span class="form-input_datepicker_icon"><i class="fa fa-calendar"></i></span>
                 <input type="text" class="<%= inputClass %>"
                        value="<%= value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
             </div>
-            <span class="filter-separator">To</span>
+            <span class="filter-separator">-</span>
             <div class="filter-end-date">
-                <span class="form-input_datepicker_icon"><i class="fa fa-calendar"></i></span>
                 <input type="text" class="<%= inputClass %>"
                        value="<%= value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
             </div>
@@ -142,10 +132,6 @@
         <div class="oro-action">
             <div class="btn-group">
                 <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
-                <a href="#" class="filter-widget__clear-link">
-                    <i class="material-icons">clear</i>
-                    <span>Clear Filter</span>
-                </a>
             </div>
         </div>
     </div>
@@ -169,36 +155,32 @@
 <script type="text/template" id="select-filter-template">
     <div class="filter-item oro-drop">
         <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %>: <% } %>
-            <strong class="select-filter-placeholder"><%= placeholder %></strong>
+            <% if (showLabel) { %><%= label %><% } %><span class="filter-item-hint"></span>
             <select>
                 <% _.each(options, function (option) { %>
                 <option value="<%= option.value %>" title="<%- option.label %>"
-                <% if (option.value == selected.value) { %> selected="selected"<% } %>>
-                <%- option.label %>
+                    <% if (option.value == selected.value) { %> selected="selected"<% } %>>
+                    <%- option.label %>
                 </option>
                 <% }); %>
             </select>
-            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
-            ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+            <span class="caret"></span>
         </div>
     </div>
 </script>
 <script type="text/template" id="multiselect-filter-template">
     <div class="filter-item oro-drop">
         <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %>: <% } %>
-            <strong class="select-filter-placeholder multiselect-filter-placeholder"><%= placeholder %></strong>
+            <% if (showLabel) { %><%= label %><% } %><span class="filter-item-hint"></span>
             <select multiple>
                 <% _.each(options, function (option) { %>
                 <option value="<%= option.value %>" title="<%- option.label %>"
-                <% if (_.isArray(selected.value)) { %><% if (_.indexOf(selected.value, option.value) !== -1) { %> selected="selected"<% } %>
-                <% } else if (option.value == selected.value) { %> selected="selected"<% } %>>
-                <%- option.label %>
+                    <% if (_.isArray(selected.value)) { %><% if (_.indexOf(selected.value, option.value) !== -1) { %> selected="selected"<% } %>
+                    <% } else if (option.value == selected.value) { %> selected="selected"<% } %>>
+                    <%- option.label %>
                 </option><% }); %>
             </select>
-            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
-            ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+            <span class="caret"></span>
         </div>
     </div>
 </script>
