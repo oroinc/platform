@@ -84,12 +84,7 @@ class PersistentBatchWriter implements
                 ->getByStepExecution($this->stepExecution)
                 ->getConfiguration();
 
-            $contextSkipClear = $this->stepExecution
-                ->getJobExecution()
-                ->getExecutionContext()
-                ->get(EntityWriter::SKIP_CLEAR);
-
-            if (empty($configuration[EntityWriter::SKIP_CLEAR]) && !$contextSkipClear) {
+            if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
                 $em->clear();
             }
         } catch (\Exception $exception) {
