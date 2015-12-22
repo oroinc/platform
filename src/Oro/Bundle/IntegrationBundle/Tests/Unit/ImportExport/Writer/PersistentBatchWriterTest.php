@@ -191,10 +191,7 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
         $jobExecution = new JobExecution();
         $jobExecution->setJobInstance($jobInstance);
 
-        $executionContext = new ExecutionContext();
-        $jobExecution->setExecutionContext($executionContext);
-
-        $stepExecution->expects($this->once())
+        $stepExecution->expects($this->any())
             ->method('getJobExecution')
             ->will($this->returnValue($jobExecution));
     }

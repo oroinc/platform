@@ -292,6 +292,9 @@ i.color {
     max-width: 100%;
     .controls {
       margin-left: 240px;
+      div.control-label {
+        text-align: left;
+      }
     }
     div.control-label,
     label.control-label {
@@ -869,14 +872,22 @@ footer {
     cursor: move;
   }
 }
-.ui-dialog:not(.ui-dialog-buttons) .ui-dialog-content{
-  height: calc(~"100% - 32px") !important;
-  border-radius: 0 0 3px 3px;
+.ui-dialog:not(.ui-dialog-buttons){
+  .ui-dialog-content{
+    border-radius: 0 0 3px 3px;
+  }
 }
-.ui-dialog.ui-resizable:not(.ui-dialog-buttons) .ui-dialog-content{
-  height: calc(~"100% - 50px") !important;
-  border-radius: 0 0 3px 3px;
-  border-bottom: 1px solid #e5e5e5;
+.ui-dialog.ui-resizable:not(.ui-dialog-buttons) {
+  &:after{
+    display: block;
+    height: 15px;
+    content: " ";
+    flex: none;
+  }
+  .ui-dialog-content{
+    border-radius: 0 0 3px 3px;
+    border-bottom: 1px solid #e5e5e5;
+  }
 }
 .ui-dialog .widget-actions-section {
   .btn, .action {
@@ -1643,6 +1654,19 @@ footer {
     }
   }
   &.ui-dialog-normal {
+    display: flex !important;
+    flex-direction: column;
+    .ui-dialog-titlebar {
+      min-height: 34px;
+      flex: none;
+    }
+    .ui-dialog-content {
+      flex: 1;
+    }
+    .ui-dialog-buttonpane {
+      height: 49px;
+      flex: none;
+    }
     [class*='ui-dialog-titlebar-'] {
       &:hover:before {
         #gradient > .vertical(darken(#838d98,5%), darken(#46515d,5%));
