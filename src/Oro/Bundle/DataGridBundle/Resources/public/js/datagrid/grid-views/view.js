@@ -1,17 +1,15 @@
-define([
-    'backbone',
-    'underscore',
-    'orotranslation/js/translator',
-    './collection',
-    './model',
-    './view-name-modal',
-    'oroui/js/mediator',
-    'oroui/js/delete-confirmation'
-], function(Backbone, _, __, GridViewsCollection, GridViewModel, ViewNameModal, mediator, DeleteConfirmation) {
+define(function(require) {
     'use strict';
 
     var GridViewsView;
+    var Backbone = require('backbone');
     var $ = Backbone.$;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var GridViewModel = require('./model');
+    var ViewNameModal = require('./view-name-modal');
+    var mediator = require('oroui/js/mediator');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
      * Datagrid views widget
@@ -50,9 +48,6 @@ define([
         enabled: true,
 
         /** @property */
-        choices: [],
-
-        /** @property */
         permissions: {
             CREATE: false,
             EDIT: false,
@@ -67,8 +62,8 @@ define([
         /** @property */
         gridName: {},
 
-        /** @property */
-        viewsCollection: GridViewsCollection,
+        /** @type {GridViewsCollection} */
+        viewsCollection: null,
 
         /** @property */
         originalTitle: null,
@@ -79,8 +74,8 @@ define([
          * @param {Object} options
          * @param {Backbone.Collection} options.collection
          * @param {Boolean} [options.enable]
-         * @param {Array}   [options.choices]
-         * @param {Array}   [options.views]
+         * @param {string}  [options.title]
+         * @param {GridViewsCollection} [options.viewsCollection]
          */
         initialize: function(options) {
             options = options || {};
@@ -89,23 +84,17 @@ define([
                 throw new TypeError('"collection" is required');
             }
 
+            if (!options.viewsCollection) {
+                throw new TypeError('"viewsCollection" is required');
+            }
+
+            _.extend(this, _.pick(options, ['viewsCollection', 'title']));
+
             this.template = _.template($('#template-datagrid-grid-view').html());
             this.titleTemplate = _.template($('#template-datagrid-grid-view-label').html());
 
-            if (options.choices) {
-                this.choices = _.union(this.choices, options.choices);
-                if (!this._getView(this.DEFAULT_GRID_VIEW_ID).label) {
-                    this._getView(this.DEFAULT_GRID_VIEW_ID).label =
-                        __('oro.datagrid.gridView.all') + (options.title || '');
-                }
-            }
-
             if (options.permissions) {
                 this.permissions = _.extend(this.permissions, options.permissions);
-            }
-
-            if (options.title) {
-                this.title = options.title;
             }
 
             this.originalTitle = $('head title').text();
@@ -114,12 +103,6 @@ define([
             this.collection = options.collection;
             this.enabled = options.enable !== false;
 
-            options.views = options.views || [];
-            _.each(options.views, function(view) {
-                view.grid_name = this.gridName;
-            }, this);
-
-            this.viewsCollection = new this.viewsCollection(options.views);
             if (!this.collection.state.gridView) {
                 this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
             }
@@ -372,15 +355,32 @@ define([
         },
 
         /**
+         * Prepares choice items for grid view dropdown
+         *
+         * @return {Array<{label:{string},value:{*}}>}
+         */
+        getViewChoices: function() {
+            var choices = this.viewsCollection.map(function(model) {
+                return {
+                    label: model.get('label'),
+                    value: model.get('name')
+                };
+            });
+
+            var defaultItem = _.findWhere(choices, {value: this.DEFAULT_GRID_VIEW_ID});
+            if (defaultItem.label === this.DEFAULT_GRID_VIEW_ID) {
+                defaultItem.label = __('oro.datagrid.gridView.all') + (this.title || '');
+            }
+
+            return choices;
+        },
+
+        /**
          * @private
          *
          * @param {GridViewModel} model
          */
-        _onModelAdd: function(model) {
-            this.choices.push({
-                label: model.get('label'),
-                value: model.get('name')
-            });
+        _onModelAdd: function() {
             this.render();
         },
 
@@ -392,10 +392,6 @@ define([
         _onModelRemove: function(model) {
             var viewId = this.collection.state.gridView;
             viewId = viewId === this.DEFAULT_GRID_VIEW_ID ? viewId : parseInt(viewId, 10);
-
-            this.choices = _.reject(this.choices, function(item) {
-                return item.value === viewId;
-            }, this);
 
             if (model.id === viewId) {
                 this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
@@ -462,7 +458,7 @@ define([
                 title: title,
                 titleLabel: this.title,
                 disabled: !this.enabled,
-                choices: this.choices,
+                choices: this.getViewChoices(),
                 dirty: this.viewDirty,
                 editedLabel: __('oro.datagrid.gridView.data_edited'),
                 actionsLabel: __('oro.datagrid.gridView.actions'),
@@ -599,15 +595,11 @@ define([
         /**
          * @private
          *
-         * @param {String} name
+         * @param {string|number} name
          * @returns {undefined|Object}
          */
         _getView: function(name) {
-            var currentViews =  _.filter(this.choices, function(item) {
-                return item.value === name;
-            }, this);
-
-            return _.first(currentViews);
+            return _.findWhere(this.getViewChoices(), {value: name});
         },
 
         /**
