@@ -15,6 +15,11 @@ define([
     }
 
     contentManager = {
+        /**
+         * Fetches grid collection from page cache storage
+         *
+         * @param {string} gridName
+         */
         get: function(gridName) {
             var hash;
             var isActual;
@@ -29,11 +34,16 @@ define([
             return collection;
         },
 
+        /**
+         * Trace grid collection changes and update it's state in page cache
+         *
+         * @param {PageableCollection} collection
+         */
         trace: function(collection) {
             updateState(collection);
             contentManager.listenTo(collection, {
                 updateState: updateState,
-                beforeReset: updateState
+                reset: updateState
             });
             mediator.once('page:beforeChange', function() {
                 contentManager.stopListening(collection);
