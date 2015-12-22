@@ -414,7 +414,7 @@ services:
         arguments:
             - @doctrine
 
-    oro_layout.data_provider.abstract:
+    oro_entity.provider.abstract_entity_data_provider:
         abstract: true
         class: Oro\Bundle\EntityBundle\Layout\Extension\Provider\AbstractEntityDataProvider
         arguments:
