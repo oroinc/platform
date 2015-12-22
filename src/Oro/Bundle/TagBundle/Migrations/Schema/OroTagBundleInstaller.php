@@ -17,7 +17,7 @@ class OroTagBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -46,10 +46,9 @@ class OroTagBundleInstaller implements Installation
         $table->addColumn('tag_id', 'integer', ['notnull' => false]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('created', 'datetime', ['comment' => '(DC2Type:datetime)']);
-        $table->addColumn('alias', 'string', ['length' => 100]);
         $table->addColumn('entity_name', 'string', ['length' => 100]);
         $table->addColumn('record_id', 'integer', []);
-        $table->addIndex(['entity_name'], 'entity_name_idx', []);
+        $table->addIndex(['entity_name', 'record_id'], 'entity_name_idx', []);
         $table->addIndex(['tag_id'], 'idx_50107502bad26311', []);
         $table->addIndex(['user_owner_id'], 'idx_501075029eb185f9', []);
         $table->addUniqueIndex(['tag_id', 'entity_name', 'record_id', 'user_owner_id'], 'tagging_idx');

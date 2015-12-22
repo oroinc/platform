@@ -9,7 +9,6 @@ class NotTaggableEntityStub
      */
     protected $id;
 
-
     public function __construct($id = null)
     {
         $this->id = $id;

@@ -108,6 +108,10 @@ define(function(require) {
         },
 
         getUrl: function() {
+            return routing.generate(this.route, this._getUrlParams());
+        },
+
+        _getUrlParams: function() {
             var params = {
                 'for_entity': this.entity,
                 'organization': this.organization
@@ -116,7 +120,7 @@ define(function(require) {
                 params.id = this.entityId;
             }
 
-            return routing.generate(this.route, params);
+            return params;
         },
 
         clear: function() {

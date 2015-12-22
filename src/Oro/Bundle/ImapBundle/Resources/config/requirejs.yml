@@ -2,3 +2,4 @@ config:
     paths:
         'oroimap/js/app/components/check-connection-component': 'bundles/oroimap/js/app/components/check-connection-component.js'
         'oroimap/js/app/components/check-config-settings': 'bundles/oroimap/js/app/components/check-config-settings.js'
+        'oroimap/js/app/views/check-connection-view': 'bundles/oroimap/js/app/views/check-connection-view.js'
