@@ -124,7 +124,10 @@
         'title': 'oro.user.imap_configuration.label'|trans,
         'subblocks': [{
             'title': '',
-            'data': [form_widget(form.imapConfiguration)]
+            'data': [
+                form(form.accountType),
+                form_widget(form.imapConfiguration)
+            ]
         }]
     }]) %}
 

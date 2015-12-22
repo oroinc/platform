@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
@@ -152,6 +153,11 @@ class UserType extends AbstractType
                     'prototype_name' => 'tag__name__'
                 ]
             )
+            ->add('accountType', 'choice', [
+                'label' => 'Account Type',
+                'choices' => ['Gmail' => 'Gmail', 'Other' => 'Other'],
+                'mapped' => false
+            ])
             ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
             ->add('change_password', ChangePasswordType::NAME)
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
