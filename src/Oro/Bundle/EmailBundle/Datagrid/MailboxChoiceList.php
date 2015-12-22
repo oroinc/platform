@@ -6,7 +6,9 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class MailboxChoiceList
 {
@@ -16,14 +18,19 @@ class MailboxChoiceList
     /** @var SecurityFacade */
     private $securityFacade;
 
+    /** @var MailboxManager */
+    private $mailboxManager;
+
     /**
      * @param Registry       $doctrine
      * @param SecurityFacade $securityFacade
+     * @param MailboxManager $mailboxManager
      */
-    public function __construct(Registry $doctrine, SecurityFacade $securityFacade)
+    public function __construct(Registry $doctrine, SecurityFacade $securityFacade, MailboxManager $mailboxManager)
     {
         $this->doctrine = $doctrine;
         $this->securityFacade = $securityFacade;
+        $this->mailboxManager = $mailboxManager;
     }
 
     /**
@@ -33,14 +40,15 @@ class MailboxChoiceList
      */
     public function getChoiceList()
     {
-        $repo = $this->doctrine->getRepository('OroEmailBundle:Mailbox');
-
         /** @var Mailbox[] $systemMailboxes */
-        $systemMailboxes = $repo->findAvailableMailboxes(
+        $systemMailboxes = $this->mailboxManager->findAvailableMailboxes(
             $this->securityFacade->getLoggedUser(),
-            $this->securityFacade->getOrganization()
+            $this->getOrganization()
         );
-        $origins = $this->getOriginsList();
+        $origins = $this->mailboxManager->findAvailableOrigins(
+            $this->securityFacade->getLoggedUser(),
+            $this->getOrganization()
+        );
 
         $choiceList = [];
         foreach ($origins as $origin) {
@@ -59,15 +67,10 @@ class MailboxChoiceList
     }
 
     /**
-     * @return EmailOrigin[]
+     * @return Organization|null
      */
-    protected function getOriginsList()
+    protected function getOrganization()
     {
-        $criteria = [
-            'owner' => $this->securityFacade->getLoggedUser(),
-            'isActive' => true,
-        ];
-
-        return $this->doctrine->getRepository('OroEmailBundle:EmailOrigin')->findBy($criteria);
+        return $this->securityFacade->getOrganization();
     }
 }
