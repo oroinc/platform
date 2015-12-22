@@ -1,6 +1,6 @@
 <?php
 
-namespace EntityBundle\Tests\Unit\Layout\Extension\Provider;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Layout\Extension\Provider;
 
 use Oro\Component\Layout\LayoutContext;
 
