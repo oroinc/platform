@@ -138,7 +138,7 @@ class MetadataBuilder
 
                 $mergeModes = [MergeModes::UNITE];
                 if ($associationMapping['type'] === ClassMetadataInfo::ONE_TO_ONE) {
-                    //for fields with ONE_TO_ONE relation Unite strategy is impossible, so Replace is used
+                    // for fields with ONE_TO_ONE relation Unite strategy is impossible, so Replace is used
                     $mergeModes = [MergeModes::REPLACE];
                 }
 
