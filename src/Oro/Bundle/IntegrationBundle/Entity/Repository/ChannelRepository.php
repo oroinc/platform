@@ -17,11 +17,46 @@ class ChannelRepository extends EntityRepository
     const BUFFER_SIZE = 100;
 
     /**
-     * @param string $commandName
+     * @info Check if task is running
+     *
+     * @param string   $commandName
      * @param int|null $integrationId
+     *
      * @return int
      */
     public function getRunningSyncJobsCount($commandName, $integrationId = null)
+    {
+        $qb = $this->getSyncJobsCountQueryBuilder($commandName, $integrationId);
+        $qb->andWhere('j.state=:stateName');
+        $qb->setParameter('stateName', Job::STATE_RUNNING);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @info Check if task is pending or running
+     *
+     * @param string   $commandName
+     * @param int|null $integrationId
+     *
+     * @return int
+     */
+    public function getExistingSyncJobsCount($commandName, $integrationId = null)
+    {
+        $qb = $this->getSyncJobsCountQueryBuilder($commandName, $integrationId);
+        $qb->andWhere($qb->expr()->in('j.state', ':states'));
+        $qb->setParameter('states', [Job::STATE_RUNNING, Job::STATE_PENDING]);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param string   $commandName
+     * @param int|null $integrationId
+     *
+     * @return QueryBuilder
+     */
+    protected function getSyncJobsCountQueryBuilder($commandName, $integrationId = null)
     {
         /** @var QueryBuilder $qb */
         $qb = $this->getEntityManager()
@@ -29,9 +64,7 @@ class ChannelRepository extends EntityRepository
             ->createQueryBuilder('j')
             ->select('count(j.id)')
             ->andWhere('j.command=:commandName')
-            ->andWhere('j.state=:stateName')
-            ->setParameter('commandName', $commandName)
-            ->setParameter('stateName', Job::STATE_RUNNING);
+            ->setParameter('commandName', $commandName);
 
         if ($integrationId) {
             $qb->andWhere(
@@ -50,12 +83,11 @@ class ChannelRepository extends EntityRepository
                 ->setParameter('noIntegrationIdType2', '%-i=%');
         }
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return $qb;
     }
 
-
     /**
-     * @param string[]|string $commandName
+     * @param string[]|string      $commandName
      * @param string[]|string|null $arguments
      * @param string[]|string|null $states
      *
@@ -104,7 +136,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * @param string[]|string $commandName
+     * @param string[]|string      $commandName
      * @param string[]|string|null $arguments
      * @param string[]|string|null $states
      *
@@ -119,7 +151,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * @param string $commandName
+     * @param string               $commandName
      * @param string[]|string|null $arguments
      * @param string[]|string|null $states
      *
@@ -137,8 +169,9 @@ class ChannelRepository extends EntityRepository
      * Returns latest status for integration's connector and code if it exists.
      *
      * @param Integration $integration
-     * @param string $connector
-     * @param int|null $code
+     * @param string      $connector
+     * @param int|null    $code
+     *
      * @return Status|null
      */
     public function getLastStatusForConnector(Integration $integration, $connector, $code = null)
@@ -153,8 +186,9 @@ class ChannelRepository extends EntityRepository
 
     /**
      * @param Integration $integration
-     * @param string $connector
-     * @param int|null $code
+     * @param string      $connector
+     * @param int|null    $code
+     *
      * @return Status[]|\Iterator
      */
     public function getConnectorStatuses(Integration $integration, $connector, $code = null)
@@ -169,8 +203,9 @@ class ChannelRepository extends EntityRepository
 
     /**
      * @param Integration $integration
-     * @param string $connector
-     * @param int|null $code
+     * @param string      $connector
+     * @param int|null    $code
+     *
      * @return QueryBuilder
      */
     public function getConnectorStatusesQueryBuilder(Integration $integration, $connector, $code = null)
@@ -215,7 +250,7 @@ class ChannelRepository extends EntityRepository
         $integrations = $qb->getQuery()->getResult();
 
         if ($isReadOnly) {
-            $unitOfWork  = $this->getEntityManager()->getUnitOfWork();
+            $unitOfWork = $this->getEntityManager()->getUnitOfWork();
 
             foreach ($integrations as $integration) {
                 $unitOfWork->markReadOnly($integration);
@@ -249,8 +284,9 @@ class ChannelRepository extends EntityRepository
      * Adds status to integration, manual persist of newly created statuses and do flush.
      *
      * @deprecated 1.9.0:1.11.0 Use $this->addStatusAndFlush() instead
+     *
      * @param Integration $integration
-     * @param Status  $status
+     * @param Status      $status
      */
     public function addStatus(Integration $integration, Status $status)
     {
@@ -261,7 +297,7 @@ class ChannelRepository extends EntityRepository
      * Adds status to integration, manual persist of newly created statuses and do flush.
      *
      * @param Integration $integration
-     * @param Status  $status
+     * @param Status      $status
      */
     public function addStatusAndFlush(Integration $integration, Status $status)
     {

@@ -44,6 +44,16 @@ class LoadJobData extends AbstractFixture implements DependentFixtureInterface
             'reference' => 'oro_integration:third_running_job'
         ],
         [
+            'command' => 'second_test_command',
+            'state' => Job::STATE_PENDING,
+            'reference' => 'oro_integration:second_pending_job'
+        ],
+        [
+            'command' => 'second_test_command',
+            'state' => Job::STATE_PENDING,
+            'reference' => 'oro_integration:third_pending_job'
+        ],
+        [
             'command' => 'third_test_command',
             'state' => Job::STATE_RUNNING,
             'integration' => 'oro_integration:bar_integration',
