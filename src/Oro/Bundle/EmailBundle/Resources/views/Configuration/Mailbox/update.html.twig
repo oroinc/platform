@@ -22,10 +22,14 @@
     },
     mailboxTitle
 ] %}
+{% set formActionParams = app.request.attributes.get('_route_params')|merge({redirectData: redirectData}) %}
+{% if app.request.query.has('form') %}
+    {% set formActionParams = formActionParams|merge({form: app.request.query.get('form')}) %}
+{% endif %}
 
 {% set formAction = path(
     app.request.attributes.get('_route'),
-    app.request.attributes.get('_route_params')|merge({redirectData: redirectData})
+    formActionParams
 ) %}
 
 {% set routeName = 'oro_config_configuration_system' %}

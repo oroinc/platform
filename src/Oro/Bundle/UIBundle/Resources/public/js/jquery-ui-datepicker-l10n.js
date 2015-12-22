@@ -76,10 +76,13 @@ define(function(require) {
                 .find('a').removeClass('ui-state-highlight');
 
             if (inst.drawYear === today.year() && inst.drawMonth === today.month()) {
-                // highlighted today date in system tumezone
+                // highlighted today date in system timezone
                 inst.dpDiv
-                    .find('td > a.ui-state-default:contains("' + today.date() + '")').addClass('ui-state-highlight')
-                    .parent().addClass('ui-datepicker-today');
+                    .find('td > a.ui-state-default').each(function() {
+                    if (today.date().toString() === this.innerHTML) {
+                        $(this).addClass('ui-state-highlight').parent().addClass('ui-datepicker-today');
+                    }
+                });
             }
         };
     })();

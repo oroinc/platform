@@ -351,9 +351,14 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     vertical-align: middle;
   }
 }
-.filter-item.filter-business-unit {
+.filter-item.choice-tree-filter {
   margin-right: 0;
   margin-bottom: 0;
+  max-width: 300px;
+  min-width: 180px;
+  .choice-tree-filter-search{
+    width: calc(~"100% - 14px");
+  }
   .buttons {
     margin-bottom: 5px;
     span {
@@ -366,7 +371,6 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     }
   }
   .list {
-    height: 200px;
     max-height: 200px;
     overflow: auto;
     margin-bottom: 10px;
@@ -375,14 +379,17 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     }
     ul {
       list-style-type: none;
-      margin-right: 25px;
       input {
         margin-right: 5px;
         margin-top: 0;
+        margin-left: -18px;
       }
-      label.search-result {
-        color: #000000;
-        font-weight: bold;
+      label{
+        padding-left: 20px;
+        .search-result {
+          color: #000000;
+          font-weight: bold;
+        }
       }
     }
   }
