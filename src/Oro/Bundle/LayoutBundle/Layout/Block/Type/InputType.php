@@ -20,7 +20,6 @@ class InputType extends AbstractType
         $resolver
             ->setDefaults(
                 [
-                    'tag' => 'input',
                     'type' => 'text',
                     'id' => null,
                     'name' => null,
