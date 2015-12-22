@@ -290,8 +290,11 @@
   & > li{
     float: left;
     border-left: 1px solid #eaeaea;
-    padding: 15px 0 25px;
     text-align: center;
+    > a {
+      padding: 15px 0 25px;
+      display: block;
+    }
     /* width: 20%; calculated on backend and depends on a number of items */
     #gradient > .vertical(#ffffff, #f1f1f1);
     &:first-child{
