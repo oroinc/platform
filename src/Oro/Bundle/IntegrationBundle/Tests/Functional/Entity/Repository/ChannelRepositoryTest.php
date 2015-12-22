@@ -89,4 +89,38 @@ class ChannelRepositoryTest extends WebTestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider getExistingSyncJobsCountDataProvider
+     *
+     * @param string      $command
+     * @param int         $expectedCount
+     * @param null|string $integration
+     */
+    public function testGetExistingSyncJobsCount($command, $expectedCount, $integration = null)
+    {
+        $integration = $integration ? $this->getReference($integration)->getId() : null;
+        $actual      = $this->repository->getExistingSyncJobsCount($command, $integration);
+
+        self::assertEquals($expectedCount, $actual);
+    }
+
+    public function getExistingSyncJobsCountDataProvider()
+    {
+        return [
+            [
+                'command'       => 'first_test_command',
+                'expectedCount' => 3
+            ],
+            [
+                'command'       => 'second_test_command',
+                'expectedCount' => 3
+            ],
+            [
+                'command'       => 'third_test_command',
+                'expectedCount' => 2,
+                'integration'   => 'oro_integration:foo_integration',
+            ]
+        ];
+    }
 }
