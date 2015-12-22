@@ -71,7 +71,8 @@ class CronCommand extends ContainerAwareCommand
                 continue;
             }
 
-            if (empty($schedule = $this->getSchedule($schedules, $name))) {
+            $schedule = $this->getSchedule($schedules, $name);
+            if (empty($schedule)) {
                 $schedule = $this->createSchedule($command, $name, $output);
                 $em->persist($schedule);
                 continue;
