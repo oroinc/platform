@@ -46,6 +46,10 @@ define(function(require) {
          */
         _isEmbedded: false,
 
+        events: {
+                'content:changed': 'resetDialogPosition'
+        },
+
         listen: {
             'adoptedFormResetClick': 'remove',
             'widgetRender': 'onWidgetRender',
