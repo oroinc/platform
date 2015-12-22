@@ -426,7 +426,8 @@ define(function(require) {
                 component.trigger('parentResizeStop', event, this);
             });
         },
-        freezeWidgetSize: function () {
+
+        freezeWidgetSize: function() {
             if (!tools.isMobile()) {
                 // freeze width and height for proper layout
                 var dialog = this.widget.closest('.ui-dialog');
