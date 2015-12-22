@@ -95,6 +95,10 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->templating = $this->getMock('Symfony\Component\Templating\EngineInterface');
 
+        $mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->helper = new EmailModelBuilderHelper(
             $this->entityRoutingHelper,
             $this->emailAddressHelper,
@@ -103,7 +107,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             $this->emailAddressManager,
             $this->entityManager,
             $this->emailCacheManager,
-            $this->templating
+            $this->templating,
+            $mailboxManager
         );
     }
 
