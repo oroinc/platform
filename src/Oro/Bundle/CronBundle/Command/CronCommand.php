@@ -9,18 +9,19 @@ use Symfony\Component\Console\Input\InputOption;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 
 class CronCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:cron';
+    const COMMAND_NAME = 'oro:cron';
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
-            ->setName(self::NAME)
+            ->setName(self::COMMAND_NAME)
             ->setDescription('Cron commands launcher')
             ->addOption(
                 'skipCheckDaemon',
@@ -30,6 +31,9 @@ class CronCommand extends ContainerAwareCommand
             );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // check for maintenance mode - do not run cron jobs if it is switched on
@@ -89,12 +93,12 @@ class CronCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param $command
+     * @param CronCommandInterface $command
      * @param OutputInterface $output
      *
      * @return bool
      */
-    protected function skipCommand($command, OutputInterface $output)
+    protected function skipCommand(CronCommandInterface $command, OutputInterface $output)
     {
         if (!$command instanceof CronCommandInterface) {
             $output->writeln(
@@ -115,11 +119,11 @@ class CronCommand extends ContainerAwareCommand
 
     /**
      * @param Schedule[] $schedules
-     * @param $name
+     * @param string $name
      *
      * @return array
      */
-    protected function getSchedule($schedules, $name)
+    protected function getSchedule(array $schedules, $name)
     {
         $schedule = array_filter(
             $schedules,
@@ -134,7 +138,7 @@ class CronCommand extends ContainerAwareCommand
 
     /**
      * @param CronCommandInterface $command
-     * @param $name
+     * @param string $name
      * @param OutputInterface $output
      *
      * @return Schedule
@@ -152,13 +156,13 @@ class CronCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param \Oro\Bundle\CronBundle\Command\CronCommandInterface $command
+     * @param CronCommandInterface $command
      * @param Schedule $schedule
      */
     protected function checkDefinition(CronCommandInterface $command, Schedule $schedule)
     {
         $defaultDefinition = $command->getDefaultDefinition();
-        if ($schedule->getDefinition() != $defaultDefinition) {
+        if ($schedule->getDefinition() !== $defaultDefinition) {
             $schedule->setDefinition($defaultDefinition);
         }
     }
@@ -166,7 +170,7 @@ class CronCommand extends ContainerAwareCommand
     /**
      * @param OutputInterface $output
      * @param Schedule $schedule
-     * @param $name
+     * @param string $name
      *
      * @return bool|Job
      */
@@ -201,7 +205,6 @@ class CronCommand extends ContainerAwareCommand
      */
     protected function hasJobInQueue($name)
     {
-        /** @var JobManager $jobManager */
         $jobManager = $this->getContainer()->get('oro_cron.job_manager');
 
         return $jobManager->hasJobInQueue($name, '[]');
