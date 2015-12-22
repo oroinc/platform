@@ -13,53 +13,51 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class CronCommandTest extends WebTestCase
 {
+    /** @var  Application */
+    protected $application;
+
     protected function setUp()
     {
         $this->initClient();
+
+        $kernel = self::getContainer()->get('kernel');
+        $this->application = new Application($kernel);
+        $this->application->add(new CronCommand());
     }
 
     public function testCheckRunDuplicateJob()
     {
-        $kernel = self::getContainer()->get('kernel');
-
         $this->mockCronHelper(true);
-        $application = new Application($kernel);
-        $application->add(new CronCommand());
-
-        $command = $application->find('oro:cron');
+        $command = $this->application->find('oro:cron');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
             'command'      => $command->getName(),
             '--skipCheckDaemon' => true,
         ));
 
-        $result = $this->runCommand(CronCommand::NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
         $this->assertNotEmpty($result);
 
         $this->checkMessage('allJobNew', $result);
 
-        $result = $this->runCommand(CronCommand::NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
         $this->checkMessage('AllJobAdded', $result);
 
-        $result = $this->runCommand(CronCommand::NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
         $this->checkMessage('AllJobAlreadyExist', $result);
     }
 
     public function testSkipAllJob()
     {
-        $kernel = self::getContainer()->get('kernel');
         $this->mockCronHelper();
-        $application = new Application($kernel);
-        $application->add(new CronCommand());
-
-        $command = $application->find('oro:cron');
+        $command = $this->application->find('oro:cron');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
             'command'      => $command->getName(),
             '--skipCheckDaemon' => true,
         ));
 
-        $result = $this->runCommand(CronCommand::NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
         $this->assertNotEmpty($result);
 
         $this->checkMessage('AllJobSkip', $result);
@@ -69,80 +67,44 @@ class CronCommandTest extends WebTestCase
     {
         $messages = [
             'allJobNew' => [
-                'Processing command "oro:cron:enterprise:license": new command found, setting up schedule..',
                 'Processing command "oro:cron:integration:sync": new command found, setting up schedule..',
                 'Processing command "oro:cron:batch:cleanup": new command found, setting up schedule..',
                 'Processing command "oro:cron:cleanup": new command found, setting up schedule..',
                 'Processing command "oro:cron:daemon": new command found, setting up schedule..',
                 'Processing command "oro:cron:imap-sync": new command found, setting up schedule..',
-                'Processing command "oro:cron:ews-sync": new command found, setting up schedule..',
                 'Processing command "oro:cron:import-tracking": new command found, setting up schedule..',
                 'Processing command "oro:cron:tracking:parse": new command found, setting up schedule..',
-                'Processing command "oro:cron:send-reminders": new command found, setting up schedule..',
-                'Processing command "oro:cron:calculate-tracking-event-summary": new command found, setting up',
-                'Processing command "oro:cron:send-email-campaigns": new command found, setting up schedule..',
-                'Processing command "oro:cron:lifetime-average:aggregate": new command found, setting up schedule..',
-                'Processing command "oro:cron:analytic:calculate": new command found, setting up schedule..',
-                'Processing command "oro:cron:magento:cart:expiration": new command found, setting up schedule..',
-                'Processing command "oro:cron:mailchimp:export": new command found, setting up schedule..',
-                'Processing command "oro:cron:dotmailer:export-status:update": new command found, setting up schedule..'
+                'Processing command "oro:cron:send-reminders": new command found, setting up schedule..'
             ],
             'AllJobAlreadyExist' => [
-                'Processing command "oro:cron:enterprise:license": already exists in job queue',
-                'Processing command "oro:cron:cleanup": already exists in job queue',
-                'Processing command "oro:cron:daemon": already exists in job queue',
                 'Processing command "oro:cron:integration:sync": already exists in job queue',
                 'Processing command "oro:cron:batch:cleanup": already exists in job queue',
+                'Processing command "oro:cron:cleanup": already exists in job queue',
+                'Processing command "oro:cron:daemon": already exists in job queue',
                 'Processing command "oro:cron:imap-sync": already exists in job queue',
-                'Processing command "oro:cron:ews-sync": already exists in job queue',
                 'Processing command "oro:cron:import-tracking": already exists in job queue',
                 'Processing command "oro:cron:tracking:parse": already exists in job queue',
-                'Processing command "oro:cron:send-reminders": already exists in job queue',
-                'Processing command "oro:cron:calculate-tracking-event-summary": already exists in job queue',
-                'Processing command "oro:cron:send-email-campaigns": already exists in job queue',
-                'Processing command "oro:cron:lifetime-average:aggregate": already exists in job queue',
-                'Processing command "oro:cron:analytic:calculate": already exists in job queue',
-                'Processing command "oro:cron:magento:cart:expiration": already exists in job queue',
-                'Processing command "oro:cron:mailchimp:export": already exists in job queue',
-                'Processing command "oro:cron:dotmailer:export-status:update": already exists in job queue'
+                'Processing command "oro:cron:send-reminders": already exists in job queue'
             ],
             'AllJobAdded' => [
-                'Processing command "oro:cron:enterprise:license": added to job queue',
-                'Processing command "oro:cron:cleanup": added to job queue',
-                'Processing command "oro:cron:daemon": added to job queue',
                 'Processing command "oro:cron:integration:sync": added to job queue',
                 'Processing command "oro:cron:batch:cleanup": added to job queue',
+                'Processing command "oro:cron:cleanup": added to job queue',
+                'Processing command "oro:cron:daemon": added to job queue',
                 'Processing command "oro:cron:imap-sync": added to job queue',
-                'Processing command "oro:cron:ews-sync": added to job queue',
                 'Processing command "oro:cron:import-tracking": added to job queue',
                 'Processing command "oro:cron:tracking:parse": added to job queue',
-                'Processing command "oro:cron:send-reminders": added to job queue',
-                'Processing command "oro:cron:calculate-tracking-event-summary": added to job queue',
-                'Processing command "oro:cron:send-email-campaigns": added to job queue',
-                'Processing command "oro:cron:lifetime-average:aggregate": added to job queue',
-                'Processing command "oro:cron:analytic:calculate": added to job queue',
-                'Processing command "oro:cron:magento:cart:expiration": added to job queue',
-                'Processing command "oro:cron:mailchimp:export": added to job queue',
-                'Processing command "oro:cron:dotmailer:export-status:update": added to job queue'
+                'Processing command "oro:cron:send-reminders": added to job queue'
             ],
             'AllJobSkip' => [
-                'Processing command "oro:cron:enterprise:license": skipped',
-                'Processing command "oro:cron:cleanup": skipped',
-                'Processing command "oro:cron:daemon": skipped',
                 'Processing command "oro:cron:integration:sync": skipped',
                 'Processing command "oro:cron:batch:cleanup": skipped',
+                'Processing command "oro:cron:cleanup": skipped',
+                'Processing command "oro:cron:daemon": skipped',
                 'Processing command "oro:cron:imap-sync": skipped',
-                'Processing command "oro:cron:ews-sync": skipped',
                 'Processing command "oro:cron:import-tracking": skipped',
                 'Processing command "oro:cron:tracking:parse": skipped',
-                'Processing command "oro:cron:send-reminders": skipped',
-                'Processing command "oro:cron:calculate-tracking-event-summary": skipped',
-                'Processing command "oro:cron:send-email-campaigns": skipped',
-                'Processing command "oro:cron:lifetime-average:aggregate": skipped',
-                'Processing command "oro:cron:analytic:calculate": skipped',
-                'Processing command "oro:cron:magento:cart:expiration": skipped',
-                'Processing command "oro:cron:mailchimp:export": skipped',
-                'Processing command "oro:cron:dotmailer:export-status:update": skipped'
+                'Processing command "oro:cron:send-reminders": skipped'
             ]
         ];
 
