@@ -135,6 +135,31 @@
         'formErrors': form_errors(form)? form_errors(form) : null,
         'dataBlocks': dataBlocks,
     } %}
+
+    {% set options = {
+        'formSelector': '#'~formSelector|default(form.vars.id),
+        'typeSelector': 'Gmail'
+    } %}
+
+    {#$(function () {#}
+    {#var options = {#}
+    {#formSelector:          '#{{ formSelector|default(form.vars.id) }}',#}
+    {#typeSelector:          '#{{ form.type.vars.id }}',#}
+    {#transportTypeSelector: '#{{ form.transportType.vars.id }}',#}
+    {#fieldsSets:            {#}
+    {#type:          {{ fieldsToSendOnTypeChange|json_encode|raw }},#}
+    {#transportType: {{ fieldsToSendOnTransportTypeChange|json_encode|raw }}#}
+    {#}#}
+    {#};#}
+{##}
+    {#new ChannelView(options);#}
+    {#});#}
+
+    <div class="container-change-account-type"
+         data-page-component-module="orouser/js/components/account-type-component"
+         data-page-component-options="{{ options|json_encode }}">
+    </div>
+
     {{ parent() }}
     </div>
 {% endblock content_data %}

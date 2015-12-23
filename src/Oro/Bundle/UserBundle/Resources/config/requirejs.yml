@@ -5,3 +5,5 @@ config:
         'oro/select2-acl-user-autocomplete-component': 'bundles/orouser/js/components/select2-acl-user-autocomplete-component.js'
         'orouser/js/views/role-view': 'bundles/orouser/js/views/role-view.js'
         'orouser/js/tools/acl-users-search-api-accessor': 'bundles/orouser/js/tools/acl-users-search-api-accessor.js'
+
+        'orouser/js/components/account-type-component': 'bundles/orouser/js/components/account-type-component.js'
