@@ -50,7 +50,6 @@ define(['jquery', '../locale-settings', './name'
             });
 
             var addressLines = formatted
-                .replace(/ *(\\n)+/g, '\\n')
                 .split('\\n');
             addressLines = addressLines.filter(function(element) {
                 return $.trim(element) !== '';
