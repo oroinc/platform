@@ -264,11 +264,13 @@ abstract class OroKernel extends Kernel
         }
 
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath()));
-        if (!$this->debug) {
-            $content = static::stripComments($content);
-        }
-
         $cache->write($content, $container->getResources());
+
+        // we should not use parent::stripComments method to cleanup source code from the comments to avoid
+        // memory leaks what generate token_get_all function.
+        if (!$this->debug) {
+            $cache->write(php_strip_whitespace($cache->getPath()), $container->getResources());
+        }
     }
 
     /**

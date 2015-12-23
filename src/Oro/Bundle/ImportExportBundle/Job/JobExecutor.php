@@ -33,7 +33,6 @@ class JobExecutor
     const JOB_EXPORT_TEMPLATE_TO_CSV = 'entity_export_template_to_csv';
     const JOB_IMPORT_FROM_CSV = 'entity_import_from_csv';
     const JOB_VALIDATE_IMPORT_FROM_CSV = 'entity_import_validation_from_csv';
-    const JOB_SKIP_CLEAR = 'jobSkipClear';
     const JOB_CONTEXT_DATA_KEY = 'contextData';
 
     /**
@@ -60,11 +59,6 @@ class JobExecutor
      * @var BatchJobRepository
      */
     protected $batchJobRepository;
-
-    /**
-     * @var bool
-     */
-    protected $skipClear = false;
 
     /**
      * @var bool
@@ -139,10 +133,7 @@ class JobExecutor
 
             // trigger save of JobExecution and JobInstance
             $this->batchJobRepository->getJobManager()->flush();
-
-            if (!$this->isClearSkipped($jobExecution)) {
-                $this->batchJobRepository->getJobManager()->clear();
-            }
+            $this->batchJobRepository->getJobManager()->clear();
         } catch (\Exception $exception) {
             if (!$isTransactionRunning) {
                 $this->entityManager->rollback();
@@ -343,6 +334,8 @@ class JobExecutor
                 $jobResult->setContext($context);
             }
         }
+
+        $this->contextRegistry->clear($jobInstance);
     }
 
     /**
@@ -392,38 +385,6 @@ class JobExecutor
         }
 
         return $jobExecution;
-    }
-
-    /**
-     * @param JobExecution $jobExecution
-     * @return bool
-     */
-    protected function isClearSkipped(JobExecution $jobExecution)
-    {
-        if ($this->skipClear) {
-            return true;
-        }
-
-        return (bool)$jobExecution->getExecutionContext()->get(self::JOB_SKIP_CLEAR);
-    }
-
-    /**
-     * @param bool $skipClear
-     * @return JobExecutor
-     */
-    public function setSkipClear($skipClear)
-    {
-        $this->skipClear = $skipClear;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSkipClear()
-    {
-        return $this->skipClear;
     }
 
     /**
