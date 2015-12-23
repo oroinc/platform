@@ -129,22 +129,15 @@ class ConnectionController extends Controller
 
 
     /**
-     * @Route("/account/change", name="oro_imap_change_account_type", methods={"POST"})
+     * @Route("/account/change", name="oro_imap_change_account_type", methods={"GET", "POST"})
      */
     public function getFormAction()
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $type = $request->get('type');
-
-        $form = $this->container->get('oro_imap_choice_account_type')
-
-            $form = $this->createForm(ChoiceAccountType::class, ['accountType', 'Other'], array(
-//                'action' => $this->generateUrl('target_route'),
-//                'method' => 'GET',
-            ));
-
-        $html = $this->renderView('YourAppBundle:Blah:form.html.twig', array('form' => $form->createView() ) );
-
+//      $form = $this->container->get('oro_imap_choice_account_type')
+        $form = $this->createForm('oro_imap_choice_account_type', ['accountType', 'Other']);
+        $html = $this->renderView('OroImapBundle:Form:other.html.twig', array('form' => $form->createView() ) );
         $response = ['html' => $html];
 
         return new JsonResponse($response);

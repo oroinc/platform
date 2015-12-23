@@ -28,3 +28,17 @@
          data-page-component-options="">
     </div>
 {% endblock %}
+
+{% block oro_imap_choice_account_type_widget %}
+    {{- block('form_widget') -}}
+
+    {% set options = {
+        'url' :  path("oro_imap_change_account_type"),
+        'formSelector': '#'~formSelector|default(form.vars.id)
+    } %}
+
+    <div class="container-change-account-type"
+        data-page-component-module="oroimap/js/app/components/account-type-component"
+        data-page-component-options="{{ options|json_encode }}">
+    </div>
+{% endblock %}

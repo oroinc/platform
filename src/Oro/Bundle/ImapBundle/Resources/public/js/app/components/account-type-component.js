@@ -13,31 +13,37 @@ define(['jquery', 'underscore', 'oroui/js/mediator'], function($, _, mediator) {
 
         this.options = options;
 
-        var processChange = function () {
+        var processChange = function (e) {
             //this.memoizeValue($el);
-debugger;
-            var $form = $(this.options.formSelector);
-            var data = $form.serializeArray();
-            var url = $form.attr('action');
-            //var fieldsSet = $el.is(this.options.typeSelector) ? this.fieldsSets.type : this.fieldsSets.transportType;
+            debugger;
+
+            var url = this.options.url;
+
+            // var fieldsSet = $el.is(this.options.typeSelector) ? this.fieldsSets.type : this.fieldsSets.transportType;
             //
-            //data = _.filter(data, function(field) {
+            // data = _.filter(data, function(field) {
             //    return _.indexOf(fieldsSet, field.name) !== -1;
-            //});
-            //data.push({name: this.UPDATE_MARKER, value: 1});
+            // });
+            // data.push({name: this.UPDATE_MARKER, value: 1});
+            // var data = [];
 
-            //var data = [];
-
-            var event = {formEl: $form, data: data, reloadManually: true};
+            //var event = {formEl: $form, data: data, reloadManually: true};
             //mediator.trigger('integrationFormReload:before', event);
 
-            if (event.reloadManually) {
-                mediator.execute('submitPage', {url: url, type: $form.attr('method'), data: $.param(data)});
-            }
+            $.ajax({
+                url : url,
+                method: "POST",
+                data: {
+                    'type':$(e.target).val()
+                },
+                success: function(response) {
+                    $('').html(response.html);
+                }
+            });
         };
 
 
-        $('select[name="oro_user_user_form[accountType]"]').change(_.bind(processChange, self));
+        $('select[name="oro_user_user_form[imapAccountTppe][accountType]"]').change(_.bind(processChange, self));
 
         //var $el = $(options._sourceElement);
         //var $parentContainer = $el.parent();

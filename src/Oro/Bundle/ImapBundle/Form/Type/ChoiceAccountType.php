@@ -36,8 +36,8 @@ class ChoiceAccountType extends AbstractType
     protected function initEvents(FormBuilderInterface $builder)
     {
         $builder->addEventListener(FormEvents::POST_SET_DATA, function(FormEvent $formEvent) {
-            $product = $event->getData();
-            $form = $event->getForm();
+            $product = $formEvent->getData();
+            $form = $formEvent->getForm();
 //            $form->add('name', TextType::class);
         });
     }
