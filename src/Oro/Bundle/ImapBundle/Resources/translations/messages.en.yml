@@ -1,4 +1,12 @@
 oro.imap:
+    system_configuration:
+        groups:
+            google_imap_settings.title: IMAP Sync
+        fields:
+            enable_google_imap:
+                label: Enable
+                tooltip: Enables using IMAP sync using OAuth 2.0. Please, make sure that Gmail API is enabled in <a href="https://console.developers.google.com/" target="_blank">Google Developers Console</a>.
+
     configuration:
         imap_host.label: IMAP Host
         imap_port.label: IMAP Port

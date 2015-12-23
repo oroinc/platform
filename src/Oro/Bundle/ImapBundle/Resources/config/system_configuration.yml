@@ -1,14 +1,15 @@
 oro_system_configuration:
     groups:
-        google_sso_settings:
-            title: oro.sso.system_configuration.groups.google_sso_settings.title
+        google_imap_settings:
+            title: oro.imap.system_configuration.groups.google_imap_settings.title
 
     fields:
-        oro_sso.enable_google_sso:
+        oro_imap.enable_google_imap:
             data_type: boolean
             type: oro_config_checkbox
             options:
-                label: oro.sso.system_configuration.fields.enable_google_sso.label
+                label: oro.imap.system_configuration.fields.enable_google_imap.label
+                tooltip: oro.imap.system_configuration.fields.enable_google_imap.tooltip
                 required: false
                 resettable: false
             priority: 10
@@ -21,6 +22,6 @@ oro_system_configuration:
                         children:
                             google_settings:
                                 children:
-                                    google_sso_settings:
+                                    google_imap_settings:
                                         children:
-                                            - oro_sso.enable_google_sso
+                                            - oro_imap.enable_google_imap
