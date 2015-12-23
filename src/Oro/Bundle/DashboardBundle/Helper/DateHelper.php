@@ -96,6 +96,11 @@ class DateHelper
 
         $currentItems = $this->getDatePeriod($currentFrom, $currentTo);
 
+        $countDiff = count($items) - count($currentItems);
+        if ($countDiff > 0) {
+            $items = array_slice($items, $countDiff);
+        }
+
         $mixedItems = array_combine(array_keys($currentItems), array_values($items));
         foreach ($mixedItems as $currentDate => $previousData) {
             $previousData['date']       = $currentItems[$currentDate]['date'];
