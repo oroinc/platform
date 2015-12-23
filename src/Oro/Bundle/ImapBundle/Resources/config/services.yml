@@ -16,6 +16,7 @@ parameters:
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
     oro_imap.listener.user_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
 
+    oro_imap.form.type.choice_account.class:          Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType
 services:
     oro_imap.connector.factory:
         class: %oro_imap.connector.factory.class%
@@ -78,6 +79,11 @@ services:
             - @translator
         tags:
              - { name: form.type, alias: oro_imap_configuration }
+
+    oro_imap.form.type.choice_account:
+        class: %oro_imap.form.type.choice_account.class%
+        tags:
+             - { name: form.type, alias: oro_imap_choice_account_type }
 
     oro_imap.listener.user_email_origin:
         class: %oro_imap.listener.user_email_origin.class%

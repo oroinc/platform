@@ -125,21 +125,23 @@
         'subblocks': [{
             'title': '',
             'data': [
-                form(form.accountType),
-                form_widget(form.imapConfiguration)
+                form_widget(form.imapAccountTppe)
+
             ]
         }]
     }]) %}
+
+    {#form_widget(form.imapConfiguration)#}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,
         'dataBlocks': dataBlocks,
     } %}
 
-    {% set options = {
-        'formSelector': '#'~formSelector|default(form.vars.id),
-        'typeSelector': 'Gmail'
-    } %}
+    {#{% set options = {#}
+        {#'formSelector': '#'~formSelector|default(form.vars.id),#}
+        {#'typeSelector': 'Gmail'#}
+    {#} %}#}
 
     {#$(function () {#}
     {#var options = {#}
@@ -155,10 +157,10 @@
     {#new ChannelView(options);#}
     {#});#}
 
-    <div class="container-change-account-type"
-         data-page-component-module="orouser/js/components/account-type-component"
-         data-page-component-options="{{ options|json_encode }}">
-    </div>
+    {#<div class="container-change-account-type"#}
+         {#data-page-component-module="orouser/js/components/account-type-component"#}
+         {#data-page-component-options="{{ options|json_encode }}">#}
+    {#</div>#}
 
     {{ parent() }}
     </div>

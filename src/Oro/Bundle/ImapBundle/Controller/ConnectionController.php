@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Controller;
 use FOS\RestBundle\Util\Codes;
 
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -124,6 +125,29 @@ class ConnectionController extends Controller
         }
 
         return new Response('', $responseCode);
+    }
+
+
+    /**
+     * @Route("/account/change", name="oro_imap_change_account_type", methods={"POST"})
+     */
+    public function getFormAction()
+    {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $type = $request->get('type');
+
+        $form = $this->container->get('oro_imap_choice_account_type')
+
+            $form = $this->createForm(ChoiceAccountType::class, ['accountType', 'Other'], array(
+//                'action' => $this->generateUrl('target_route'),
+//                'method' => 'GET',
+            ));
+
+        $html = $this->renderView('YourAppBundle:Blah:form.html.twig', array('form' => $form->createView() ) );
+
+        $response = ['html' => $html];
+
+        return new JsonResponse($response);
     }
 
     /**
