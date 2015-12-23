@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -76,12 +79,30 @@ class MassDeleteLimiter
      */
     public function getLimitResult(MassActionHandlerArgs $args)
     {
-        $queryBuilder       = $args->getResults()->getSource();
-        $resultsForSelected = new DeletionIterableResult($queryBuilder);
-        $deletableQuery     = clone $queryBuilder;
+        $query              = $args->getResults()->getSource();
+        $resultsForSelected = new DeletionIterableResult($query);
+        $deletableQuery     = $this->cloneQuery($query);
+
         $accessLimitedQuery = $this->aclHelper->apply($deletableQuery, 'DELETE');
         $resultsForDelete   = new DeletionIterableResult($accessLimitedQuery);
 
         return new MassDeleteLimitResult($resultsForSelected->count(), $resultsForDelete->count());
+    }
+
+    /**
+     * Clones $query. Also clones parameters for Doctrine\ORM\Query case.
+     *
+     * @param Query|QueryBuilder $query
+     *
+     * @return Query|QueryBuilder
+     */
+    protected function cloneQuery($query)
+    {
+        $cloned = clone $query;
+        if ($query instanceof Query) {
+            $cloned->setParameters(clone $query->getParameters());
+        }
+
+        return $cloned;
     }
 }
