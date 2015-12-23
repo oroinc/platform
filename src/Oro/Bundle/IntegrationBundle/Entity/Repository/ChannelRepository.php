@@ -45,7 +45,7 @@ class ChannelRepository extends EntityRepository
     {
         $qb = $this->getSyncJobsCountQueryBuilder($commandName, $integrationId);
         $qb->andWhere($qb->expr()->in('j.state', ':states'));
-        $qb->setParameter('states', [Job::STATE_RUNNING, Job::STATE_PENDING]);
+        $qb->setParameter('states', [Job::STATE_RUNNING, Job::STATE_PENDING, Job::STATE_NEW]);
 
         return (int)$qb->getQuery()->getSingleScalarResult();
     }

@@ -114,11 +114,11 @@ class ChannelRepositoryTest extends WebTestCase
             ],
             [
                 'command'       => 'second_test_command',
-                'expectedCount' => 3
+                'expectedCount' => 4
             ],
             [
                 'command'       => 'third_test_command',
-                'expectedCount' => 2,
+                'expectedCount' => 3,
                 'integration'   => 'oro_integration:foo_integration',
             ]
         ];
