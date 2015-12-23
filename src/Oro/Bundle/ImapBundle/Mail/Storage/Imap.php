@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 use Zend\Mail\Storage\Exception as BaseException;
 
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 
 /**
@@ -22,6 +23,12 @@ class Imap extends \Zend\Mail\Storage\Imap
     const FLAGS            = 'FLAGS';
     const UID              = 'UID';
     const INTERNALDATE     = 'INTERNALDATE';
+
+    /**
+     * Indicates protocol capabilities
+     */
+    const CAPABILITY_IMAP4_REV_1      = 'IMAP4rev1';
+    const CAPABILITY_IMAP4            = 'IMAP4';
 
     /**
      * Indicates whether IMAP server can store the same message in different folders
@@ -325,7 +332,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         );
         if (!$selectResponse) {
             $this->currentFolder = '';
-            throw new BaseException\RuntimeException('cannot change folder, maybe it does not exist');
+            throw new UnselectableFolderException('cannot change folder, maybe it does not exist');
         }
 
         $this->uidValidity = $selectResponse['uidvalidity'];
@@ -413,6 +420,7 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     protected function supportUidSearch()
     {
-        return false;
+        return in_array(self::CAPABILITY_IMAP4, $this->capability(), true)
+            || in_array(self::CAPABILITY_IMAP4_REV_1, $this->capability(), true);
     }
 }

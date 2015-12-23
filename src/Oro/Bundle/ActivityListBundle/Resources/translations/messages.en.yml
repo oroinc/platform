@@ -50,3 +50,4 @@ oro:
         condition_builder:
             criteria:
                 activity: Activity
+        activity_owners.label: Activity Owners

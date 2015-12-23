@@ -219,7 +219,7 @@ class Email extends ExtendEmail
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     *      cascade={"remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emailUsers;
@@ -737,6 +737,8 @@ class Email extends ExtendEmail
     }
 
     /**
+     * todo: remove this method
+     *
      * @param EmailFolder $emailFolder
      *
      * @return EmailUser|null
@@ -745,7 +747,12 @@ class Email extends ExtendEmail
     {
         $emailUsers = $this->getEmailUsers()->filter(function ($entry) use ($emailFolder) {
             /** @var EmailUser $entry */
-            return $entry->getFolder() === $emailFolder;
+            if ($entry->getFolders()) {
+                foreach ($entry->getFolders() as $folder) {
+                    return $folder === $emailFolder;
+                }
+            }
+            return false;
         });
         if ($emailUsers != null && count($emailUsers) > 0) {
             return $emailUsers->first();
@@ -809,5 +816,13 @@ class Email extends ExtendEmail
         }
 
         return array_keys(AcceptHeader::fromString($this->acceptLanguageHeader)->all());
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getSubject();
     }
 }
