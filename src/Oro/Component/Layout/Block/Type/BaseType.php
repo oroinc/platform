@@ -19,7 +19,6 @@ class BaseType extends AbstractType
         $resolver->setOptional(
             [
                 'vars',
-                'tag',
                 'attr',
                 'label',
                 'label_attr',
@@ -30,7 +29,6 @@ class BaseType extends AbstractType
         $resolver->setAllowedTypes(
             [
                 'vars'       => 'array',
-                'tag'        => 'string',
                 'attr'       => 'array',
                 'label_attr' => 'array',
                 'class_prefix' => 'string'
@@ -51,7 +49,6 @@ class BaseType extends AbstractType
         // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
         $view->vars['block'] = $view;
 
-        $view->vars['tag'] = isset($options['tag']) ? $options['tag'] : null;
         $view->vars['class_prefix'] = null;
         if (isset($options['class_prefix'])) {
             $view->vars['class_prefix'] = $options['class_prefix'];
