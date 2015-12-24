@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TagBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -12,6 +13,11 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TagsExtension extends AbstractTagsExtension
 {
+    const TAGS_ROOT_PARAM = '_tags';
+    const DISABLED_PARAM  = '_disabled';
+
+    const COLUMN_NAME = 'tags';
+
     /** @var TaggableHelper */
     protected $taggableHelper;
 
@@ -45,15 +51,54 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
+    public function getPriority()
+    {
+        return 10;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $className = $this->getEntityClassName($config);
+        return
+            !$this->isDisabled() &&
+            !$this->isReportOrSegmentGrid($config) &&
+            $this->isGridRootEntityTaggable($config) &&
+            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
+            $this->isAccessGranted();
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isDisabled()
+    {
+        $tagParameters = $this->getParameters()->get(self::TAGS_ROOT_PARAM);
 
         return
-            !$this->isReportOrSegmentGrid($config) &&
-            $className &&
-            $this->taggableHelper->isTaggable($className) &&
-            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
+            $tagParameters &&
+            !empty($tagParameters[self::DISABLED_PARAM]);
+    }
+
+    /**
+     * @param DatagridConfiguration $configuration
+     *
+     * @return bool
+     */
+    protected function isGridRootEntityTaggable(DatagridConfiguration $configuration)
+    {
+        $className = $this->getEntityClassName($configuration);
+
+        return $className && $this->taggableHelper->isTaggable($className);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAccessGranted()
+    {
+        return
             null !== $this->securityFacade->getToken() &&
             $this->securityFacade->isGranted('oro_tag_view');
     }
@@ -76,7 +121,11 @@ class TagsExtension extends AbstractTagsExtension
     }
 
     /**
-     * {@inheritdoc}
+     * Gets definition for tag column.
+     *
+     * @param DatagridConfiguration $config
+     *
+     * @return array
      */
     protected function getColumnDefinition(DatagridConfiguration $config)
     {
@@ -93,7 +142,7 @@ class TagsExtension extends AbstractTagsExtension
             'type'           => 'callback',
             'frontend_type'  => 'tags',
             'callable'       => function (ResultRecordInterface $record) {
-                return $record->getValue('tags');
+                return $record->getValue(self::COLUMN_NAME);
             },
             'editable'       => false,
             'translatable'   => true,
@@ -128,28 +177,25 @@ class TagsExtension extends AbstractTagsExtension
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getTagFieldAlias(DatagridConfiguration $config)
-    {
-        return 'id';
-    }
-
-    /**
-     * {@inheritdoc}
+     * Gets definition for tag column filter.
+     *
+     * @param DatagridConfiguration $config
+     *
+     * @return array
      */
     protected function getColumnFilterDefinition(DatagridConfiguration $config)
     {
         $className = $this->getEntityClassName($config);
+        $from = $config->offsetGetByPath(self::GRID_FROM_PATH);
 
         return [
             'type'      => 'tag',
-            'data_name' => 'tag.id',
+            'data_name' => $from[0]['alias'] .'.id',
             'label'     => 'oro.tag.entity_plural_label',
             'enabled'   => $this->taggableHelper->isEnableGridFilter($className),
             'options'   => [
                 'field_options' => [
-                    'entity_class' => $this->getEntityClassName($config),
+                    'entity_class' => $className,
                 ]
             ]
         ];
@@ -158,8 +204,15 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        return 10;
+        $rows    = (array)$result->offsetGetOr('data', []);
+        $idField = 'id';
+        $tags    = $this->getTagsForEntityClass(
+            $this->getEntityClassName($config),
+            $this->extractEntityIds($rows, $idField)
+        );
+
+        $this->addTagsToData($rows, $tags, $idField, self::COLUMN_NAME);
     }
 }

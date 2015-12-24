@@ -120,6 +120,7 @@ parameters:
     oro_email.listener.mailbox.authorization.class:     Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener
     oro_email.listener.datagrid.mailbox_grid.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\MailboxGridListener
     oro_email.autocomplete.mailbox_user_search_handler.class: Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler
+    oro_email.mailbox.manager.class:                    Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager
 
     # Workflow conditions
     oro_email.workflow.condition.instanceof.class:      Oro\Bundle\EmailBundle\Model\Condition\IsInstanceOf
@@ -211,6 +212,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_email.email.cache.manager
             - @templating
+            - @oro_email.mailbox.manager
 
     oro_email.email.entity.builder:
         class: %oro_email.email.entity.builder.class%
@@ -441,7 +443,7 @@ services:
         arguments:
             - @oro_email.email.owner.provider.storage
             - @oro_entity.entity_name_resolver
-            - @doctrine
+            - @oro_email.mailbox.manager
             - @oro_security.security_facade
 
     oro_email.emailtemplate.datagrid_view_list:
@@ -604,6 +606,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_email.mailbox.process_storage
             - @oro_security.security_facade
+            - @oro_email.related_emails.provider
         tags:
             - { name: twig.extension }
 
@@ -616,6 +619,10 @@ services:
         tags:
             - { name: oro_service_link, service: doctrine.orm.entity_manager }
 
+    oro_email.mailbox.process_storage.link:
+        tags:
+            - { name: oro_service_link, service: oro_email.mailbox.process_storage }
+
     oro_email.activity_list.provider:
         class: %oro_email.activity_list.provider.class%
         arguments:
@@ -627,7 +634,7 @@ services:
            - @oro_email.email.thread.provider
            - @oro_ui.html_tag_helper
            - @oro_security.security_facade.link
-           - @oro_email.mailbox.process_storage
+           - @oro_email.mailbox.process_storage.link
         calls:
            - [ setSecurityContextLink, [@security.context.link] ]
         tags:
@@ -828,6 +835,7 @@ services:
         arguments:
             - @doctrine
             - @oro_security.security_facade
+            - @oro_email.mailbox.manager
 
     oro_email.mailbox.manager.api:
         class: %oro_email.mailbox.manager.api.class%
@@ -879,6 +887,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.base-mailboxes-grid, method: onPreBuild }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-mailboxes-grid, method: onBuildAfter }
+
+    oro_email.mailbox.manager:
+        class: %oro_email.mailbox.manager.class%
+        arguments:
+            - @doctrine
 
     oro_email.workflow.condition.instanceof:
         class: %oro_email.workflow.condition.instanceof.class%

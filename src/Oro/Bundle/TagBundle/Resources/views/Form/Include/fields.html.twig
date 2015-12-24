@@ -1,0 +1,9 @@
+{% block oro_tag_config_choice_widget %}
+    {{ block('choice_widget') }}
+
+    {% if(value) %}
+        <div class="alert alert-danger tags-config">
+            {{ 'oro.tag.config.disable.alert'|trans }}
+        </div>
+    {% endif %}
+{% endblock %}

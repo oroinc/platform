@@ -5,13 +5,13 @@
     {% else %}
         {% set forEntity = 'mailbox' %}
     {% endif %}
-    {% set options = {
+    {% set options = form.vars.options|default({})|merge({
         elementNamePrototype: full_name,
         id: form.parent.vars.value and form.parent.vars.value.id is defined ? form.parent.vars.value.id : null,
         forEntity: forEntity,
         organization: data and data.organization is defined and data.organization ? data.organization.id : null,
         parentElementSelector: 'fieldset'
-    } %}
+    }) %}
     {% set attr = attr|merge({
         'data-role': 'check-connection-btn',
         'data-page-component-module':  'oroimap/js/app/components/check-connection-component',
