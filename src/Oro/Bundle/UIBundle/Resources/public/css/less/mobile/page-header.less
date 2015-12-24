@@ -10,6 +10,10 @@
   padding-right: 0;
   padding-left: 0;
 }
+.page-title h1 {
+  line-height: @fontSizeLarge * 2;
+  margin: 0;
+}
 .navbar-extra {
   .container-fluid.page-title;
   & > .row > [class^=span] {
@@ -25,11 +29,6 @@
   .user-info-state + .title-buttons-container:not(:empty) {
     margin-top: 10px;
   }
-  .pull-left{
-    .oro-subtitle{
-      margin: 8px 0 0;
-    }
-  }
   .pull-left-extra{
     margin-left: 0;
   }
@@ -41,9 +40,13 @@
     .views-group>.dropdown-toggle {
       height: auto;
     }
+    .actions-group {
+      line-height: 35px;
+    }
     .actions-group+.edited-label,
     .actions-group .dropdown-toggle {
-      height: 28px;
+      line-height: 35px;
+      vertical-align: top;
       &:after {
         content: '';
         font-size: 20px;
@@ -83,7 +86,6 @@
 }
 
 .title-buttons-container, .ui-dialog-buttonpane .widget-actions {
-  margin-top: 5px;
   .btn [class*=icon-].hide-text,
   .btn-group > .dropdown-menu li [class^=icon-] {
     width: 20px;
@@ -99,22 +101,22 @@
   }
   .btn {
     font-size: @fontSizeLarge;
-    line-height: @fontSizeLarge * 1.8;
+    line-height: @fontSizeLarge * 2;
     height: 34px;
     padding-left: 14px;
     padding-right: 14px;
     .caret {
       border-top-color: #666;
-      margin-top: 15px;
-    }
-    &:active .cater{
-      border-top-color: #444;
+      margin-top: 16px;
     }
     [class^=icon-].hide-text:before {
-      margin: 7px 0 0 -9px;
+      margin: 0 0 0 -9px;
+      line-height: 35px;
     }
-    &:active [class^=icon-]:before {
-      color: #444;
+    &:active {
+      [class^=icon-]:before, .caret {
+        color: #444;
+      }
     }
   }
   .btn-group > .dropdown-menu {
