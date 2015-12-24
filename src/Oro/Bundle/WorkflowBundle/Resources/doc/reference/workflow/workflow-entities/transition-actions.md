@@ -386,9 +386,11 @@ Call Method
 **Description:** Triggers call of object method with parameters.
 
 **Parameters:**
+ - attribute - (optional) target path where result of action will be saved
  - object - path to callee object
- - method - name of method to call
- - method_parameters - list of parameters that will be passed to method call.
+ - method - method name of callee object
+ - method_parameters - (optional) list of parameters that will be passed to method call
+
 
 **Configuration Example**
 ```
@@ -396,6 +398,7 @@ Call Method
     conditions:
         # optional condition configuration
     parameters:
+        attribute: $.leadContactAddAddress
         object: $lead.contact
         method: addAddress
         method_parameters: [$.result.address]
@@ -403,6 +406,7 @@ Call Method
 OR
 
 - @call_method: # add Address to Contact
+    attribute: $.leadContactAddAddress
     object: $lead.contact
     method: addAddress
     method_parameters: [$.result.address]
