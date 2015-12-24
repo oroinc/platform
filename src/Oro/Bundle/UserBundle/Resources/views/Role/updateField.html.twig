@@ -8,19 +8,33 @@
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_user_role_index')) }}
 
-    {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success', 'label': 'Save and Close'|trans}) %}
+    {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success role-submit', 'label': 'Save and Close'|trans}) %}
     {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
-        {% set html = html ~ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save'|trans, 'action': 'save_and_stay'}) %}
+        {# button attribute 'action' is avoided because of there is unacceptable submit binding on .action-button in init-layout.js #}
+        {% set html = html ~ UI.buttonType({
+            'type': 'button',
+            'class': 'btn-success main-group role-submit',
+            'label': 'Save'|trans,
+            'data': {
+                'action': 'save_and_stay'
+            }
+        }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
 
+    {% set fields = [] %}
+    {% for name, child in form %}
+        {% if name not in ['appendUsers', 'removeUsers', 'field', 'privileges', 'action'] %}
+            {% set fields = fields|merge({(name): '#' ~ child.vars.id}) %}
+        {% endif %}
+    {% endfor %}
+
     {% set options = {
-        elSelector: '.btn-success',
+        elSelector: '.btn-success.role-submit',
         formName: form.vars.name,
         formSelector: '#' ~ form.vars.id,
-        labelSelector: '#' ~ form.label.vars.id,
         privilegesSelector: '#' ~ form.privileges.vars.id,
-        tokenSelector: '#' ~ form._token.vars.id
+        fields : fields
     } %}
     <div data-page-component-module="orouser/js/views/role-view"
          data-page-component-options="{{ options|json_encode }}">
