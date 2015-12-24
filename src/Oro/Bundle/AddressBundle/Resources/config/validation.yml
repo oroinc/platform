@@ -57,8 +57,7 @@ Oro\Bundle\AddressBundle\Entity\Address:
         postalCode:
             - NotBlank: ~
     constraints:
-        - Callback:
-            methods: [isRegionValid]
+        - Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion: ~
 
 Oro\Bundle\AddressBundle\Entity\AbstractEmail:
     properties:

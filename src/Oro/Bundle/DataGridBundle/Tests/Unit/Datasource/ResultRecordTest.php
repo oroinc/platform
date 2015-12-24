@@ -74,4 +74,39 @@ class ResultRecordTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider getRootEntityProvider
+     */
+    public function testGetRootEntity($data, $expectedValue)
+    {
+        $resultRecord = new ResultRecord($data);
+
+        $this->assertEquals($expectedValue, $resultRecord->getRootEntity());
+    }
+
+    public function getRootEntityProvider()
+    {
+        $obj        = new \stdClass();
+        $obj->item1 = 'val1';
+
+        return [
+            [
+                'data'          => [],
+                'expectedValue' => null
+            ],
+            [
+                'data'          => ['item1' => 'val1'],
+                'expectedValue' => null
+            ],
+            [
+                'data'          => $obj,
+                'expectedValue' => $obj
+            ],
+            [
+                'data'          => [['item1' => 'val1'], $obj],
+                'expectedValue' => $obj
+            ],
+        ];
+    }
 }
