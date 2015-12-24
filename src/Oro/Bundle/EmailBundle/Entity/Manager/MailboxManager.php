@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -46,15 +46,30 @@ class MailboxManager
      * Returns a list of mailboxes available to user logged under organization.
      *
      * @param User|integer $user User or user id
-     * @param Organization $organization
+     * @param Organization $organization|null
      *
      * @return Collection|Mailbox[] Array or collection of Mailboxes
      */
-    public function findAvailableMailboxes($user, Organization $organization)
+    public function findAvailableMailboxes($user, Organization $organization = null)
     {
         $qb = $this->registry->getRepository('OroEmailBundle:Mailbox')
             ->createAvailableMailboxesQuery($user, $organization);
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param User $user
+     * @param Organization $organization
+     *
+     * @return EmailOrigin
+     */
+    public function findAvailableOrigins(User $user, Organization $organization)
+    {
+        return $this->registry->getRepository('OroEmailBundle:EmailOrigin')->findBy([
+            'owner' => $user,
+            'organization' => $organization,
+            'isActive' => true,
+        ]);
     }
 }
