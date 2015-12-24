@@ -11,7 +11,7 @@ Resource Types
 Resource Merge
 --------------
 
- - [Configuration Merger](./Resources/doc/configuration_merger.md) provides a way to merge configurations of some resource both from one or many bundles. Supports two strategy: replace and append config.
+ - [Configuration Merger](./Resources/doc/configuration_merger.md) provides a way to merge configurations of some resource both from one or many bundles. Supports two strategy: replace and append.
 
 
 System Aware Resolver
