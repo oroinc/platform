@@ -54,10 +54,11 @@ class ChoiceTreeBusinessUnitProvider
         $response = [];
 
         $qb = $businessUnitRepo->getQueryBuilder();
-
-        $qb->andWhere(
-            $qb->expr()->in('businessUnit.id', ':ids')
-        );
+        $qb
+            ->andWhere(
+                $qb->expr()->in('businessUnit.id', ':ids')
+            )
+            ->orderBy('businessUnit.id', 'ASC');
 
         $qb->setParameter('ids', $this->getBusinessUnitIds());
 
@@ -111,25 +112,18 @@ class ChoiceTreeBusinessUnitProvider
      */
     protected function getBusinessUnitIds()
     {
-        $user         = $this->getUser();
-        $organization = $user->getOrganization();
-
         /** @var OwnerTree $tree */
-        $tree = $this->treeProvider->getTree();
-
-        $userBUIds = $tree->getUserBusinessUnitIds(
-            $user->getId(),
-            $organization->getId()
-        );
-
+        $tree   = $this->treeProvider->getTree();
+        $user   = $this->getUser();
         $result = [];
-        foreach ($userBUIds as $businessUnitId) {
-            $subordinateBUIds = $tree->getSubordinateBusinessUnitIds($businessUnitId);
-            $result           = array_merge($subordinateBUIds, $result);
+
+        $organizations = $user->getOrganizations();
+
+        foreach ($organizations as $organization) {
+            $subBUIds = $tree->getUserSubordinateBusinessUnitIds($user->getId(), $organization->getId());
+            $result   = array_merge($result, $subBUIds);
         }
 
-        return array_unique(
-            array_merge($userBUIds, $result)
-        );
+        return array_unique($result);
     }
 }

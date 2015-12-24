@@ -49,7 +49,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getListDataProvider
      */
-    public function testGetList($userBUIds, $subordinateBUIds, $times, $queryResult, $result)
+    public function testGetList($userBUIds, $queryResult, $result)
     {
         $businessUnitRepos = $this->getMockBuilder('BusinessUnitRepository')
             ->disableOriginalConstructor()
@@ -62,16 +62,16 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $treeOwner = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTree')
-            ->setMethods(['getUserBusinessUnitIds', 'getSubordinateBusinessUnitIds'])
+            ->setMethods(['getUserSubordinateBusinessUnitIds'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->treeProvider->expects(self::once())->method('getTree')->willReturn($treeOwner);
-        $treeOwner->expects(self::once())->method('getUserBusinessUnitIds')->willReturn($userBUIds);
+
         $treeOwner
-            ->expects(self::exactly($times))
-            ->method('getSubordinateBusinessUnitIds')
-            ->willReturn($subordinateBUIds);
+            ->expects(self::once())
+            ->method('getUserSubordinateBusinessUnitIds')
+            ->willReturn($userBUIds);
 
         $this->aclHelper->expects(self::any())->method('apply')->willReturn($qb);
         $businessUnitRepos->expects(self::any())->method('getQueryBuilder')->willReturn($qb);
@@ -88,13 +88,13 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
         $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
         $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->setMethods(['getId', 'getOrganization'])
+            ->setMethods(['getId', 'getOrganizations'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
         $organization->expects(self::once())->method('getId')->willReturn(1);
-        $user->expects(self::once())->method('getOrganization')->willReturn($organization);
+        $user->expects(self::once())->method('getOrganizations')->willReturn([$organization]);
         $this->securityFacade->expects(self::once())->method('getToken')->willReturn($tokenStorage);
         $tokenStorage->expects(self::once())->method('getUser')->willReturn($user);
 
@@ -116,9 +116,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'Three elements in the list' => [
-                'userBUIds'        => [1],
-                'subordinateBUIds' => [2, 3],
-                'times'            => 1,
+                'userBUIds'        => [1, 2, 3],
                 'queryResult'      => $this->getBusinessUnits('one'),
                 'result'           => [
                     [
@@ -139,9 +137,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'Six elements in the list'   => [
-                'userBUIds'        => [1, 2],
-                'subordinateBUIds' => [3, 4, 5, 6],
-                'times'            => 2,
+                'userBUIds'        => [1, 2, 3, 4, 5, 6],
                 'queryResult'      => $this->getBusinessUnits('two'),
                 'result'           => [
                     [
@@ -183,8 +179,6 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
             ],
             'empty list'                 => [
                 'userBUIds'        => [],
-                'subordinateBUIds' => [],
-                'times'            => 0,
                 'queryResult'      => [],
                 'result'           => []
             ],
