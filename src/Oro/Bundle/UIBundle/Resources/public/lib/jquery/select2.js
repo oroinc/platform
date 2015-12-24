@@ -2944,7 +2944,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     self.updateSelection(data);
                     self.clearSearch();
                     if (triggerChange) {
-                        self.triggerChange(this.buildChangeDetails(oldData, this.data()));
+                        self.triggerChange(self.buildChangeDetails(oldData, self.data()));
                     }
                 });
             }
