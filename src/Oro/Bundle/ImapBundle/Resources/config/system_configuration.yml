@@ -6,7 +6,7 @@ oro_system_configuration:
     fields:
         oro_imap.enable_google_imap:
             data_type: boolean
-            type: oro_config_checkbox
+            type: oro_config_google_imap_sync_checkbox
             options:
                 label: oro.imap.system_configuration.fields.enable_google_imap.label
                 tooltip: oro.imap.system_configuration.fields.enable_google_imap.tooltip

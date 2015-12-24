@@ -6,6 +6,8 @@ oro.imap:
             enable_google_imap:
                 label: Enable
                 tooltip: Enables using IMAP sync using OAuth 2.0. Please, make sure that Gmail API is enabled in <a href="https://console.developers.google.com/" target="_blank">Google Developers Console</a>.
+                error.label: Error checking IMAP
+                success.label: Success
 
     configuration:
         imap_host.label: IMAP Host
