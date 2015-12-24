@@ -249,9 +249,9 @@ define(function(require) {
         },
 
         _convertToTree: function(data) {
-            var response = [],
-                idToNodeMap = {},
-                element = {};
+            var response = [];
+            var idToNodeMap = {};
+            var element = {};
 
             _.each(data, function(value) {
                 element = {};
