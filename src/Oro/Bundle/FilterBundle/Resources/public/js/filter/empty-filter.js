@@ -157,6 +157,7 @@ define([
          */
         _onClickCriteriaSelector: function(e) {
             e.stopPropagation();
+            e.preventDefault();
             $('body').trigger('click');
             if (!this.popupCriteriaShowed) {
                 this._showCriteria();
