@@ -213,7 +213,9 @@ define([
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
                         setTimeout(_.bind(function() {
-                            this.selectDropdownOpened = false;
+                            if (!this.disposed) {
+                                this.selectDropdownOpened = false;
+                            }
                         }, this), 100);
                     }, this),
                     appendTo: this.container
