@@ -137,7 +137,7 @@ class JobManager
             ->andWhere('j.command=:command')
             ->andWhere('j.state in (:stateName)')
             ->setParameter('command', $name)
-            ->setParameter('stateName', [Job::STATE_RUNNING, Job::STATE_PENDING]);
+            ->setParameter('stateName', [Job::STATE_NEW, Job::STATE_RUNNING, Job::STATE_PENDING]);
 
         if ($args) {
             $qb->andWhere($qb->expr()->like('cast(j.args as text)', ':args'));

@@ -13,6 +13,7 @@ UPGRADE FROM 1.8 to 1.9
 
 ####AddressBundle
 - `oro_address.address.manager` service was marked as private
+- Validation `AbstractAddress::isRegionValid` was moved to `Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion` constraint
 
 ####CalendarBundle
 - `oro_calendar.calendar_provider.user` service was marked as private
@@ -29,11 +30,41 @@ UPGRADE FROM 1.8 to 1.9
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
+- `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` has `@InheritanceType("SINGLE_TABLE")`
+- `audit-grid` and `audit-history-grid` based on `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` now. Make join to get your entity on grid
 
 ####DataGridBundle
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
 - JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
- 
+- Grid merge uses distinct policy
+
+```
+grid-name:
+    source:
+        value: 1
+grid-name:
+    source:
+        value: 2
+```
+
+will result
+
+```
+grid-name:
+    source:
+        value: 2
+```
+
+instead of
+
+```
+grid-name:
+    source:
+        value:
+            - 1
+            - 2
+```
+
 ####DistributionBundle:
 - Fix `priority` attribute handling for `routing.options_resolver` tag to be conform Symfony standards. New behaviour: the higher the priority, the sooner the resolver gets executed.
 
