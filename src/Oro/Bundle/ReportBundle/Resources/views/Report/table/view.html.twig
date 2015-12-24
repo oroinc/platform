@@ -41,7 +41,17 @@
             </div>
         {% endif %}
         {% set renderParams = renderParams|default({})|merge({enableFullScreenLayout: true}) %}
-        {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
+        {% set params = params|default({})|merge({
+                '_grid_view': {
+                    '_disabled': true
+                },
+                '_tags': {
+                    '_disabled': true
+                }
+            })
+        %}
+
+        {{ dataGrid.renderGrid(gridName, params, renderParams) }}
     {% else %}
         <div class="container-fluid">
             <div class="grid-container">
