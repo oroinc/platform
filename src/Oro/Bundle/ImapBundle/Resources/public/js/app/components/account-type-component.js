@@ -1,5 +1,9 @@
-define(['jquery', 'underscore', 'oroui/js/mediator'], function($, _, mediator) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
 
     /**
      * Initialize component
@@ -8,27 +12,12 @@ define(['jquery', 'underscore', 'oroui/js/mediator'], function($, _, mediator) {
      * @param {string} options.elementNamePrototype
      */
     return function(options) {
-        debugger;
         var self = this;
 
         this.options = options;
 
         var processChange = function (e) {
-            //this.memoizeValue($el);
-            debugger;
-
             var url = this.options.url;
-
-            // var fieldsSet = $el.is(this.options.typeSelector) ? this.fieldsSets.type : this.fieldsSets.transportType;
-            //
-            // data = _.filter(data, function(field) {
-            //    return _.indexOf(fieldsSet, field.name) !== -1;
-            // });
-            // data.push({name: this.UPDATE_MARKER, value: 1});
-            // var data = [];
-
-            //var event = {formEl: $form, data: data, reloadManually: true};
-            //mediator.trigger('integrationFormReload:before', event);
 
             $.ajax({
                 url : url,
@@ -37,53 +26,16 @@ define(['jquery', 'underscore', 'oroui/js/mediator'], function($, _, mediator) {
                     'type':$(e.target).val()
                 },
                 success: function(response) {
-                    $('').html(response.html);
+                    $('.responsive-section.responsive-section-no-blocks').last().find('.row-fluid').html(response.html);
+                    mediator.trigger('init');
                 }
             });
         };
 
-
-        $('select[name="oro_user_user_form[imapAccountTppe][accountType]"]').change(_.bind(processChange, self));
-
-        //var $el = $(options._sourceElement);
-        //var $parentContainer = $el.parent();
-        //var useImap = $parentContainer.find('.imap-config:checkbox');
-        //var useSmtp = $parentContainer.find('.smtp-config:checkbox');
-        //var imapFields = $parentContainer.find('input.imap-config,select.imap-config').not(':checkbox');
-        //var smtpFields = $parentContainer.find('input.smtp-config,select.smtp-config').not(':checkbox');
-        //
-        //if (useImap.prop('checked') === false) {
-        //    imapFields.each(function() {
-        //        $(this).parents('.control-group').hide();
-        //        $(this).enable(false);
-        //    });
-        //}
-        //if (useSmtp.prop('checked') === false) {
-        //    smtpFields.each(function() {
-        //        $(this).parents('.control-group').hide();
-        //        $(this).enable(false);
-        //    });
-        //}
-        //
-        //$(useImap).on('change', function() {
-        //    configShowHide(useImap, imapFields);
-        //});
-        //$(useSmtp).on('change', function() {
-        //    configShowHide(useSmtp, smtpFields);
-        //});
-        //
-        //var configShowHide = function(controlCheckbox, configValues) {
-        //    if (controlCheckbox.is(':checked')) {
-        //        configValues.each(function() {
-        //            $(this).parents('.control-group').show();
-        //            $(this).enable();
-        //        });
-        //    } else {
-        //        configValues.each(function() {
-        //            $(this).parents('.control-group').hide();
-        //            $(this).enable(false);
-        //        });
-        //    }
-        //};
+        $('form[name="oro_user_user_form"]').on(
+            'change',
+            'select[name="oro_user_user_form[imapAccountTppe][accountType]"]',
+            _.bind(processChange, self)
+        );
     };
 });

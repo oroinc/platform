@@ -16,6 +16,7 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -397,6 +398,11 @@ class User extends ExtendUser implements
      * )
      */
     protected $createdAt;
+
+    /**
+     * @var AccountTypeModel
+     */
+    protected $imapAccountType;
 
     /**
      * @var \DateTime $updatedAt
@@ -979,6 +985,23 @@ class User extends ExtendUser implements
             ? null
             : $items->first();
     }
+
+    /**
+     * @param AccountTypeModel $accountTypeModel
+     */
+    public function setImapAccountType(AccountTypeModel $accountTypeModel)
+    {
+        $this->imapAccountType = $accountTypeModel;
+    }
+
+    /**
+     * @return AccountTypeModel
+     */
+    public function getImapAccountType()
+    {
+        return $this->imapAccountType;
+    }
+
 
     /**
      * Delete email origin

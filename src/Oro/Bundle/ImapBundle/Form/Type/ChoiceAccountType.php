@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class ChoiceAccountType extends AbstractType
@@ -27,27 +29,37 @@ class ChoiceAccountType extends AbstractType
         $builder->add('accountType', 'choice', [
             'label' => 'Account Type',
             'choices' => ['Gmail' => 'Gmail', 'Other' => 'Other'],
-            'mapped' => false
         ]);
 
         $this->initEvents($builder);
     }
 
+    /**
+     * Update form if accountType is Other
+     *
+     * @param FormBuilderInterface $builder
+     */
     protected function initEvents(FormBuilderInterface $builder)
     {
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function(FormEvent $formEvent) {
-            $product = $formEvent->getData();
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $formEvent) {
+            $accountTypeModel = $formEvent->getData();
             $form = $formEvent->getForm();
-//            $form->add('name', TextType::class);
+
+            if ($accountTypeModel instanceof AccountTypeModel) {
+                if ($accountTypeModel->getAccountType() === 'Other') {
+                    $form->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label', 'mapped' => false]);
+                }
+            }
         });
     }
 
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function setDefaultOptions(OptionsResolverInterface $resolver)
-//    {
-//
-//    }
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'data_class' => 'Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel',
+        ]);
+    }
 }
