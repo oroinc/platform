@@ -11,7 +11,7 @@ class TrueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->condition = new Condition\True();
+        $this->condition = new Condition\TrueCompatible();
     }
 
     public function testEvaluate()
