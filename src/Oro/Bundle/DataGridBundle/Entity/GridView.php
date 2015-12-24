@@ -133,14 +133,14 @@ class GridView
      *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      * )
      */
-    protected $chosenDefaultUsers;
+    protected $users;
 
     /**
      * GridView constructor.
      */
     public function __construct()
     {
-        $this->chosenDefaultUsers = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     /**
@@ -349,9 +349,9 @@ class GridView
     /**
      * @return ArrayCollection|User[]
      */
-    public function getChosenDefaultUsers()
+    public function getUsers()
     {
-        return $this->chosenDefaultUsers;
+        return $this->users;
     }
 
     /**
@@ -359,10 +359,10 @@ class GridView
      *
      * @return $this
      */
-    public function addChosenDefaultUser(User $user)
+    public function addUser(User $user)
     {
-        if (!$this->chosenDefaultUsers->contains($user)) {
-            $this->chosenDefaultUsers->add($user);
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
         }
 
         return $this;
@@ -371,8 +371,8 @@ class GridView
     /**
      * @param User $user
      */
-    public function removeChosenDefaultUser(User $user)
+    public function removeUser(User $user)
     {
-        $this->chosenDefaultUsers->removeElement($user);
+        $this->users->removeElement($user);
     }
 }
