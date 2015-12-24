@@ -248,20 +248,27 @@ define(function(require) {
             return rootArray;
         },
 
-        _convertToTree: function(data) {
-            var self = this;
-            var response = [];
-            _.each(data, function(value) {
-                if (!value.owner_id) {
-                    response.push({
-                        value: value,
-                        children: []
-                    });
-                }
-            });
+        _convertToTree: function (data) {
+            var response = [],
+                idToNodeMap = {};
 
-            _.each(response, function(value, key) {
-                response[key].children = self.searchEngine.findChild(value, data);
+            _.each(data, function (value) {
+                var datum = {};
+                datum.value = value;
+                datum.children = [];
+
+                idToNodeMap[datum.value.id] = datum;
+
+                if (!datum.value.owner_id) {
+                    response.push(datum);
+                } else {
+                    var parentNode = idToNodeMap[datum.value.owner_id];
+                    if (parentNode) {
+                        parentNode.children.push(datum);
+                    } else {
+                        response.push(datum);
+                    }
+                }
             });
 
             return response;

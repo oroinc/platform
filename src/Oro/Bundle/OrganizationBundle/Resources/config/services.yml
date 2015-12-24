@@ -200,6 +200,7 @@ services:
             - @doctrine
             - @oro_security.security_facade
             - @oro_security.acl_helper
+            - @oro_security.ownership_tree_provider.chain
 
     oro_organization.autocomplete.business_unit.search_handler:
         class: %oro_organization.autocomplete.business_unit.search_handler.class%
