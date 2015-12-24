@@ -48,6 +48,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hide')->defaultFalse()->end()
+                        ->booleanNode('onePage')->defaultFalse()->end()
                     ->end()
                 ->end()
                 ->arrayNode('columnManager')

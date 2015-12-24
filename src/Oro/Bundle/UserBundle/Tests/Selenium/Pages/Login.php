@@ -45,10 +45,20 @@ class Login extends AbstractPage
 
     public function loggedIn()
     {
-        if (strtolower($this->title()) == 'login' or $this->url()=='user/login') {
+        if (strtolower($this->getTest()->title()) == 'login' or $this->getTest()->url()=='user/login') {
             return false;
         } else {
             return true;
         }
+    }
+
+    /**
+     * Method returns login form error message
+     * @return string
+     */
+    public function getErrorLoginMessage()
+    {
+        $this->assertElementPresent("//form[@id='login-form']", 'No login form available');
+        return $this->test->byXPath("//div[@class='alert alert-error']/div")->text();
     }
 }

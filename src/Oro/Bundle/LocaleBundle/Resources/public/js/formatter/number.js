@@ -151,6 +151,43 @@ define(['numeral', '../locale-settings', 'underscore'
                 ];
                 return doFormat(value, options, formattersChain);
             },
+            /**
+             * Takes number of seconds and converts it into time duration formatted string
+             * (formats 21811 => "06:03:31")
+             *
+             * @param {number} value
+             * @return {string}
+             */
+            formatDuration: function(value) {
+                var result = [];
+                result.push(Math.floor(value / 3600));    // hours
+                result.push(Math.floor(value / 60) % 60); // minutes
+                result.push(value % 60);                  // seconds
+                for (var i = 0; i < result.length; i++) {
+                    result[i] = String(result[i]);
+                    if (result[i].length < 2) {
+                        result[i] = '0' + result[i];
+                    }
+                }
+                return result.join(':');
+            },
+            /**
+             * Parses time duration formatted string and returns number of seconds
+             * (converts "06:03:31" => 21811)
+             *
+             * @param {string} value
+             * @return {number}
+             */
+            unformatDuration: function(value) {
+                var result = value.split(':');
+                result[0] = parseInt(result[0], 10) * 3600; // hours
+                result[1] = parseInt(result[1], 10) * 60;   // minutes
+                result[2] = parseInt(result[2], 10);        // seconds
+                result = _.reduce(result, function(res, item) {
+                    return res + item;
+                });
+                return result;
+            },
             unformat: function(value) {
                 var options = localeSettings.getNumberFormats('decimal');
                 var result = String(value);

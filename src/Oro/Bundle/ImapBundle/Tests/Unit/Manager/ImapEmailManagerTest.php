@@ -265,6 +265,45 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $email->getMultiMessageId());
     }
 
+    public function testConvertToEmailWithMultiValueAcceptLanguage()
+    {
+        $msg = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Message')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $msg->expects($this->once())
+            ->method('getHeaders')
+            ->will($this->returnValue($headers));
+        $headers->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['UID', $this->getHeader('123')],
+                        ['Subject', $this->getHeader('Subject')],
+                        ['From', $this->getHeader('fromEmail')],
+                        ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
+                        ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
+                        ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
+                        ['Message-ID', $this->getHeader('MessageId')],
+                        ['Importance', false],
+                        ['References', $this->getHeader('References')],
+                        ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
+                        ['X-GM-THR-ID', $this->getHeader('XThrId1')],
+                        ['X-GM-LABELS', false],
+                        ['Accept-Language', $this->getMultiValueHeader(['en-US', 'en-US'])],
+                    ]
+                )
+            );
+
+        $email = $this->manager->convertToEmail($msg);
+
+        $this->assertNotEmpty($email->getMessageId());
+        $this->assertEquals('en-US', $email->getAcceptLanguageHeader());
+    }
+
     public function getEmailsProvider()
     {
         return [

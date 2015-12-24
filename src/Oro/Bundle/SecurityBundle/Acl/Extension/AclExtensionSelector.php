@@ -82,8 +82,9 @@ class AclExtensionSelector
                 }
                 $id = $val->getType();
             } elseif ($val instanceof FieldVote) {
+                // field extension shouldn't depend on actual entity identifier
                 $type = get_class($val->getDomainObject());
-                $id = $this->objectIdAccessor->getId($val->getDomainObject()) ?: 'field';
+                $id = 'field';
             } else {
                 $type = get_class($val);
                 $id = $this->objectIdAccessor->getId($val);
@@ -91,7 +92,7 @@ class AclExtensionSelector
         }
 
         if ($type !== null) {
-            $cacheKey = $id ?: 'null' . '!' . $type;
+            $cacheKey = ($id ?: 'null') . '!' . $type;
             if (isset($this->localCache[$cacheKey])) {
                 return $this->localCache[$cacheKey];
             }

@@ -79,7 +79,6 @@ define([
          * onSubmit event listener
          */
         onSubmit: function(event) {
-            event.preventDefault();
             if (this.$label.hasClass('error')) {
                 return;
             }
@@ -105,13 +104,18 @@ define([
                 url = (url.match(/^([^#]+)/) || [])[1];
             }
 
+            var data = this.getData();
+            var dataAction = $(event.target).attr('data-action');
+            if (dataAction) {
+                data.input_action = dataAction;
+            }
+
             var options = {
                 url: url,
                 type: method || 'GET',
-                data: $.param(this.getData())
+                data: $.param(data)
             };
             mediator.execute('submitPage', options);
-            this.dispose();
         },
 
         /**

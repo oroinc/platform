@@ -1,0 +1,23 @@
+data:
+  0:
+    type: users
+    id: "1"
+    attributes:
+      username: "admin"
+      email: "admin@example.com"
+      firstName: "John"
+      lastName: "Doe"
+    relationships:
+      owner:
+        data: { type: businessunits, id: 1 }
+      organization:
+        data: { type: organizations, id: 1 }
+      roles:
+        data:
+          - { type: userroles, id: 3 }
+included:
+  0:
+    type: organizations
+    id: "1"
+    attributes:
+      enabled: true

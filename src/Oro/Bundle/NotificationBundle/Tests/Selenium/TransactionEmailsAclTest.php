@@ -59,7 +59,33 @@ class TransactionEmailsAclTest extends Selenium2TestCase
     }
 
     /**
+     * @return string
+     */
+    public function testCreateEmailTemplateForCreateUser()
+    {
+        $templateName = 'CreateUser_EmailTemplate_'.mt_rand();
+
+        $login = $this->login();
+        $login->openEmailTemplates('Oro\Bundle\EmailBundle')
+            ->assertTitle('All - Templates - Emails - System')
+            ->add()
+            ->assertTitle('Create Email Template - Templates - Emails - System')
+            ->setEntityName('User')
+            ->setType('Html')
+            ->setName($templateName)
+            ->setSubject('Subject')
+            ->setContent('Template content')
+            ->save()
+            ->assertMessage('Template saved')
+            ->assertTitle('All - Templates - Emails - System')
+            ->close();
+
+        return $templateName;
+    }
+
+    /**
      * @depends testCreateUser
+     * @depends testCreateEmailTemplateForCreateUser
      * @return string
      */
     public function testCreateTransactionEmail()
@@ -73,7 +99,7 @@ class TransactionEmailsAclTest extends Selenium2TestCase
             ->setEmail($email)
             ->setEntityName('User')
             ->setEvent('Entity create')
-            ->setTemplate('user')
+            ->setTemplate('CreateUser_EmailTemplate')
             ->setUser('admin')
             ->setGroups(array('Marketing'))
             ->save()

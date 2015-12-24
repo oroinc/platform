@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Form\EntityField;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
 
 use Symfony\Component\Form\FormFactory;
@@ -62,7 +63,14 @@ class FormBuilder
     public function getForm($entity)
     {
         $form = $this->formFactory
-            ->createBuilder('form', $entity, ['csrf_protection' => false])
+            ->createBuilder(
+                'form',
+                $entity,
+                [
+                    'csrf_protection' => false,
+                    'dynamic_fields_disabled' => true
+                ]
+            )
             ->getForm();
 
         return $form;
@@ -152,10 +160,19 @@ class FormBuilder
             'type' => 'entity',
         ];
 
-        if ($fieldInfo['type'] == 2) {
+        if ($fieldInfo['type'] === ClassMetadataInfo::MANY_TO_ONE
+            || $fieldInfo['type'] === ClassMetadataInfo::ONE_TO_ONE) {
             $data['options'] = [
                 'class' => $fieldInfo['targetEntity'],
                 'choice_label' => $fieldInfo['joinColumns'][0]['referencedColumnName']
+            ];
+        }
+
+        if ($fieldInfo['type'] === ClassMetadataInfo::MANY_TO_MANY) {
+            $data['options'] = [
+                'class' => $fieldInfo['targetEntity'],
+                'choice_label' => $fieldInfo['joinTable']['joinColumns'][0]['referencedColumnName'],
+                'multiple' => true
             ];
         }
 
