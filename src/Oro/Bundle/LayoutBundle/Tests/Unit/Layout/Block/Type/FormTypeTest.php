@@ -28,6 +28,7 @@ class FormTypeTest extends BlockTypeTestCase
             'no options'                     => [
                 'options'  => [],
                 'expected' => [
+                    'form'              => null,
                     'form_name'         => 'form',
                     'preferred_fields'  => [],
                     'groups'            => [],
@@ -41,6 +42,7 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name' => 'test'
                 ],
                 'expected' => [
+                    'form'              => null,
                     'form_name'         => 'test',
                     'preferred_fields'  => [],
                     'groups'            => [],
@@ -55,6 +57,7 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_prefix' => 'test_prefix'
                 ],
                 'expected' => [
+                    'form'              => null,
                     'form_name'         => 'test_form',
                     'preferred_fields'  => [],
                     'groups'            => [],
@@ -73,6 +76,7 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_group_prefix' => 'form_group_prefix_'
                 ],
                 'expected' => [
+                    'form'              => null,
                     'form_name'         => 'test',
                     'preferred_fields'  => ['field1'],
                     'groups'            => ['group1' => ['title' => 'TestGroup']],
@@ -168,7 +172,7 @@ class FormTypeTest extends BlockTypeTestCase
 
         $view         = new BlockView();
         $block        = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface');
         $context      = new LayoutContext();
         $formView     = new FormView();
 
