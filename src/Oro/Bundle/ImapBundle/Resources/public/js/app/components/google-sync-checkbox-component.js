@@ -33,12 +33,20 @@ define(function(require) {
             var self = this;
             this.$googleSyncCheckbox.on('change', function() {
                 if ($(this).is(':checked')) {
+                    var checkAuthorization = function(result) {
+                        if (result && !result.error) {
+                            self.showSuccess();
+                        } else {
+                            self.showError(result);
+                        }
+                    };
+
                     gapi.auth.authorize(
                         {
                             'client_id': self.$clientIdElement.val(),
                             'scope': self.scopes.join(' '),
                             'immediate': true
-                        }, self.checkAuthorization);
+                        }, checkAuthorization);
                 } else {
                     self.hideMessages();
                 }
@@ -55,17 +63,9 @@ define(function(require) {
             this.$successMessage.show();
         },
 
-        showError: function() {
+        showError: function(result) {
             this.hideMessages();
             this.$errorMessage.show();
-        },
-
-        checkAuthorization: function(result) {
-            if (result && !result.error) {
-                this.showSuccess();
-            } else {
-                this.showError();
-            }
         },
 
         /**
