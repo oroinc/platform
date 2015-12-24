@@ -34,7 +34,7 @@ define(function(require) {
 
         $('form[name="oro_user_user_form"]').on(
             'change',
-            'select[name="oro_user_user_form[imapAccountTppe][accountType]"]',
+            'select[name="oro_user_user_form[imapAccountType][accountType]"]',
             _.bind(processChange, self)
         );
     };
