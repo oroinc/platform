@@ -45,7 +45,7 @@ define(function(require) {
                         {
                             'client_id': self.$clientIdElement.val(),
                             'scope': self.scopes.join(' '),
-                            'immediate': true
+                            'immediate': false
                         }, checkAuthorization);
                 } else {
                     self.hideMessages();
