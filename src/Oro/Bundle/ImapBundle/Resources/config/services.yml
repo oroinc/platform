@@ -14,6 +14,7 @@ parameters:
     oro_imap.workflow.action.dependency_job.class:   Oro\Bundle\ImapBundle\Workflow\Action\DependencyJob
 
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
+    oro_imap.form.type.check_button.class:          Oro\Bundle\ImapBundle\Form\Type\CheckButtonType
     oro_imap.listener.user_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
 
     oro_imap.form.type.choice_account.class:          Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType
@@ -79,6 +80,11 @@ services:
             - @translator
         tags:
              - { name: form.type, alias: oro_imap_configuration }
+
+    oro_imap.form.type.check_button:
+        class: %oro_imap.form.type.check_button.class%
+        tags:
+            - { name: form.type, alias: oro_imap_configuration_check }
 
     oro_imap.form.type.choice_account:
         class: %oro_imap.form.type.choice_account.class%

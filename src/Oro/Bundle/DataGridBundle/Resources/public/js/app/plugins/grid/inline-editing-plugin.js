@@ -59,6 +59,7 @@ define(function(require) {
         },
 
         enable: function() {
+            this.main.$el.addClass('grid-editable');
             this.listenTo(this.main, {
                 afterMakeCell: this.onAfterMakeCell,
                 shown: this.onGridShown
@@ -83,6 +84,7 @@ define(function(require) {
             if (this.editModeEnabled) {
                 this.exitEditMode(true);
             }
+            this.main.$el.removeClass('grid-editable');
             this.main.body.refresh();
             this.destroyPopover();
             InlineEditingPlugin.__super__.disable.call(this);
@@ -99,20 +101,21 @@ define(function(require) {
             }
             var originalRender = cell.render;
             cell.render = function() {
-                originalRender.apply(this, arguments);
-                var originalEvents = this.events;
-                if (_this.isEditable(this)) {
-                    this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    this.$el.append('<i class="icon-edit hide-text">Edit</i>');
-                    this.events = _.extend(Object.create(this.events), {
+                var cell = this;
+                originalRender.apply(cell, arguments);
+                var originalEvents = cell.events;
+                if (_this.isEditable(cell)) {
+                    cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
+                    cell.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    cell.events = _.extend(Object.create(cell.events), {
                         'dblclick': enterEditModeIfNeeded,
                         'mousedown .icon-edit': enterEditModeIfNeeded,
                         'click': _.noop
                     });
                 }
-                this.delegateEvents();
-                this.events = originalEvents;
-                return this;
+                cell.delegateEvents();
+                cell.events = originalEvents;
+                return cell;
             };
         },
 
