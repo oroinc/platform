@@ -110,4 +110,3 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('Oro\Component\Layout\DataAccessorInterface');
     }
 }
-
