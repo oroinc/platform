@@ -15,7 +15,7 @@ class MassDeleteLimiter
     const LIMIT_ACCESS             = 2;
     const LIMIT_MAX_RECORDS        = 3;
     const LIMIT_ACCESS_MAX_RECORDS = 4;
-    const MAX_DELETE_RECORDS       = 1000;
+    const MAX_DELETE_RECORDS       = 5000;
 
     /** @var AclHelper */
     protected $aclHelper;
