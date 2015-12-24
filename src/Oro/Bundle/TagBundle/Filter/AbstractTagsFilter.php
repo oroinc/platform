@@ -8,17 +8,11 @@ use Doctrine\ORM\Query\Expr\Func;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 
 abstract class AbstractTagsFilter extends AbstractFilter
 {
-    /**
-     * Returns the class name of an entity for which filtering will be applied.
-     *
-     * @return string
-     */
-    abstract protected function getEntityClassName();
-
     /**
      * {@inheritdoc}
      */
@@ -29,11 +23,12 @@ abstract class AbstractTagsFilter extends AbstractFilter
 
         $data = $this->parseData($data);
         if ($data !== false) {
-            $filterExpr = $this->buildFilterExpr($ds, $data);
+            $className = $this->getEntityClassName();
+            $entityClassParam = 'tags_filter_entity_class_' . $this->clearEntityClassName($className);
+            $filterExpr = $this->buildFilterExpr($ds, $data, $entityClassParam);
             if (false !== $filterExpr) {
                 $this->applyFilterToClause($ds, $filterExpr);
-                $className = $this->getEntityClassName();
-                $ds->setParameter('tag_filter_entity_class_name', $className);
+                $ds->setParameter($entityClassParam, $className);
 
                 return true;
             }
@@ -48,14 +43,16 @@ abstract class AbstractTagsFilter extends AbstractFilter
      * @param OrmFilterDatasourceAdapter $ds
      * @param array                      $data
      *
-     * @return bool| Func
+     * @param string                     $entityClassParam
+     *
+     * @return bool|Func
      */
-    protected function buildFilterExpr(OrmFilterDatasourceAdapter $ds, array $data)
+    protected function buildFilterExpr(OrmFilterDatasourceAdapter $ds, array $data, $entityClassParam)
     {
         $expr = false;
 
         $qb            = $ds->getQueryBuilder();
-        $entityIdAlias = $qb->getRootAliases()[0] . '.id';
+        $entityIdAlias = $this->get(FilterUtility::DATA_NAME_KEY);
 
         $taggingAlias = $ds->generateParameterName('tagging');
         $tagAlias     = $ds->generateParameterName('tag');
@@ -64,7 +61,7 @@ abstract class AbstractTagsFilter extends AbstractFilter
             ->createQueryBuilder($taggingAlias)
             ->select($taggingAlias . '.recordId')
             ->join($taggingAlias . '.tag', $tagAlias)
-            ->where($taggingAlias . '.entityName = :tag_filter_entity_class_name')
+            ->where(sprintf('%s.entityName = :%s', $taggingAlias, $entityClassParam))
             ->andWhere($qb->expr()->in($tagAlias . '.id', $data['value']))
             ->getDQL();
 
@@ -122,4 +119,23 @@ abstract class AbstractTagsFilter extends AbstractFilter
 
         return $data;
     }
+
+    /**
+     * Clears entity's class name.
+     *
+     * @param string $entityClassName
+     *
+     * @return string
+     */
+    protected function clearEntityClassName($entityClassName)
+    {
+        return str_replace('\\', '_', $entityClassName);
+    }
+
+    /**
+     * Returns the class name of an entity for which filtering will be applied.
+     *
+     * @return string
+     */
+    abstract protected function getEntityClassName();
 }

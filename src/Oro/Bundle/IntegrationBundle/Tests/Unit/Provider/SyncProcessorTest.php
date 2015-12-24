@@ -103,7 +103,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
         $jobResult = new JobResult();
         $jobResult->setContext(new TestContext());
         $jobResult->setSuccessful(true);
-        $mocker = $this->jobExecutor->expects($this->any())
+        $mocker = $this->jobExecutor->expects($this->exactly(count($expected)))
             ->method('executeJob');
         call_user_func_array([$mocker, 'withConsecutive'], $expected);
         $mocker->willReturn($jobResult);
@@ -164,6 +164,8 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
                         $firstTestConnector = 'firstTestConnector',
                         $secondTestConnector = 'secondTestConnector',
                         $thirdTestConnector = 'thirdTestConnector',
+                        $fourthTestConnector = 'fourthTestConnector',
+                        $fifthTestConnector = 'fifthTestConnector',
                     ],
                     'integrationType'       => $integrationType = 'testChannelType',
                     'channel'               => $channel = 'testChannel',
@@ -197,14 +199,60 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
                             $this->prepareConnectorStub(
                                 $thirdTestConnector,
                                 $thirdTestConnectorJob = 'third test job',
-                                $firstTestConnectorEntity = 'thirdTestEntity',
+                                $thirdTestConnectorEntity = 'thirdTestEntity',
                                 false,
+                                50
+                            )
+                        ],
+                        [
+                            $integrationType,
+                            $fourthTestConnector,
+                            $this->prepareConnectorStub(
+                                $fourthTestConnector,
+                                $fourthTestConnectorJob = 'fourth test job',
+                                $fourthTestConnectorEntity = 'fourthTestEntity',
+                                true,
+                                50
+                            )
+                        ],
+                        [
+                            $integrationType,
+                            $fifthTestConnector,
+                            $this->prepareConnectorStub(
+                                $fifthTestConnector,
+                                $fifthTestConnectorJob = 'fifth test job',
+                                $fifthTestConnectorEntity = 'fifthTestEntity',
+                                true,
                                 50
                             )
                         ]
                     ]
                 ],
                 'expected' => [
+                    [
+                        'import',
+                        $fourthTestConnectorJob,
+                        [
+                            'import' => [
+                                'processorAlias' => false,
+                                'entityName'     => $fourthTestConnectorEntity,
+                                'channel'        => $channel,
+                                'channelType'    => $integrationType
+                            ]
+                        ]
+                    ],
+                    [
+                        'import',
+                        $fifthTestConnectorJob,
+                        [
+                            'import' => [
+                                'processorAlias' => false,
+                                'entityName'     => $fifthTestConnectorEntity,
+                                'channel'        => $channel,
+                                'channelType'    => $integrationType
+                            ]
+                        ]
+                    ],
                     [
                         'import',
                         $secondTestConnectorJob,
