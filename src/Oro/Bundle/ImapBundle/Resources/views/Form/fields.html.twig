@@ -11,7 +11,7 @@
         forEntity: forEntity,
         organization: data and data.organization is defined and data.organization ? data.organization.id : null,
         parentElementSelector: 'fieldset'
-    } %}
+    }) %}
     {% set attr = attr|merge({
         'data-role': 'check-connection-btn',
         'data-page-component-module':  'oroimap/js/app/components/check-connection-component',
