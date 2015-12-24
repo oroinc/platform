@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Validator\Constraints as Assert;
@@ -39,12 +40,12 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 class GridView
 {
     const TYPE_PRIVATE = 'private';
-    const TYPE_PUBLIC = 'public';
+    const TYPE_PUBLIC  = 'public';
 
     /** @var array */
     protected static $types = [
         self::TYPE_PRIVATE => self::TYPE_PRIVATE,
-        self::TYPE_PUBLIC => self::TYPE_PUBLIC,
+        self::TYPE_PUBLIC  => self::TYPE_PUBLIC,
     ];
 
     /**
@@ -120,6 +121,29 @@ class GridView
     protected $organization;
 
     /**
+     * Collection of users who have chosen this grid view as default.
+     *
+     * @var ArrayCollection|User[]
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\UserBundle\Entity\User"
+     * )
+     * @ORM\JoinTable(name="oro_default_grid_view_users",
+     *     joinColumns={@ORM\JoinColumn(name="grid_view_id", referencedColumnName="id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     * )
+     */
+    protected $chosenDefaultUsers;
+
+    /**
+     * GridView constructor.
+     */
+    public function __construct()
+    {
+        $this->chosenDefaultUsers = new ArrayCollection();
+    }
+
+    /**
      * @return int
      */
     public function getId()
@@ -178,7 +202,7 @@ class GridView
     /**
      * @param int $id
      *
-     * @return this
+     * @return $this
      */
     public function setId($id)
     {
@@ -190,7 +214,7 @@ class GridView
     /**
      * @param string $name
      *
-     * @return this
+     * @return $this
      */
     public function setName($name)
     {
@@ -202,7 +226,7 @@ class GridView
     /**
      * @param string $type
      *
-     * @return this
+     * @return $this
      */
     public function setType($type)
     {
@@ -214,7 +238,7 @@ class GridView
     /**
      * @param array $filtersData
      *
-     * @return this
+     * @return $this
      */
     public function setFiltersData(array $filtersData = [])
     {
@@ -226,7 +250,7 @@ class GridView
     /**
      * @param array $sortersData
      *
-     * @return this
+     * @return $this
      */
     public function setSortersData(array $sortersData = [])
     {
@@ -258,7 +282,7 @@ class GridView
     /**
      * @param string $gridName
      *
-     * @return this
+     * @return $this
      */
     public function setGridName($gridName)
     {
@@ -270,7 +294,7 @@ class GridView
     /**
      * @param User $owner
      *
-     * @return this
+     * @return $this
      */
     public function setOwner(User $owner = null)
     {
@@ -302,6 +326,7 @@ class GridView
      * Set organization
      *
      * @param OrganizationInterface $organization
+     *
      * @return User
      */
     public function setOrganization(OrganizationInterface $organization = null)
@@ -319,5 +344,35 @@ class GridView
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @return ArrayCollection|User[]
+     */
+    public function getChosenDefaultUsers()
+    {
+        return $this->chosenDefaultUsers;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function addChosenDefaultUser(User $user)
+    {
+        if (!$this->chosenDefaultUsers->contains($user)) {
+            $this->chosenDefaultUsers->add($user);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function removeChosenDefaultUser(User $user)
+    {
+        $this->chosenDefaultUsers->removeElement($user);
     }
 }
