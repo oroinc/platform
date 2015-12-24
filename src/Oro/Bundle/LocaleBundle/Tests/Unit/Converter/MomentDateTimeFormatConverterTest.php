@@ -70,7 +70,7 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     {
         return [
             'en default' => ["MMM D", self::LOCALE_EN],
-            'ru default' => ["D.MMM", self::LOCALE_RU],
+            'ru default' => ["DD.MM", self::LOCALE_RU],
         ];
     }
 }
