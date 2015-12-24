@@ -12,6 +12,8 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 
 class FieldAclExtension extends EntityAclExtension
 {
+    const EXTENSION_KEY = 'field';
+
     /**
      * {@inheritdoc}
      */
@@ -32,18 +34,27 @@ class FieldAclExtension extends EntityAclExtension
 
         // override permission map for fields
         $this->permissionToMaskBuilderIdentity = [
-            'VIEW' => EntityMaskBuilder::IDENTITY,
-            'EDIT' => EntityMaskBuilder::IDENTITY,
+            'VIEW'   => EntityMaskBuilder::IDENTITY,
+            'CREATE' => EntityMaskBuilder::IDENTITY,
+            'EDIT'   => EntityMaskBuilder::IDENTITY,
         ];
-        $this->map                             = [
-            'VIEW' => [
+
+        $this->map = [
+            'VIEW'   => [
                 EntityMaskBuilder::MASK_VIEW_BASIC,
                 EntityMaskBuilder::MASK_VIEW_LOCAL,
                 EntityMaskBuilder::MASK_VIEW_DEEP,
                 EntityMaskBuilder::MASK_VIEW_GLOBAL,
                 EntityMaskBuilder::MASK_VIEW_SYSTEM,
             ],
-            'EDIT' => [
+            'CREATE' => [
+                EntityMaskBuilder::MASK_CREATE_BASIC,
+                EntityMaskBuilder::MASK_CREATE_LOCAL,
+                EntityMaskBuilder::MASK_CREATE_DEEP,
+                EntityMaskBuilder::MASK_CREATE_GLOBAL,
+                EntityMaskBuilder::MASK_CREATE_SYSTEM,
+            ],
+            'EDIT'   => [
                 EntityMaskBuilder::MASK_EDIT_BASIC,
                 EntityMaskBuilder::MASK_EDIT_LOCAL,
                 EntityMaskBuilder::MASK_EDIT_DEEP,
@@ -106,7 +117,7 @@ class FieldAclExtension extends EntityAclExtension
         $identity = parent::getObjectIdentity($val);
 
         if (null === $identity->getIdentifier()) {
-            $identity = new ObjectIdentity('field', $identity->getType());
+            $identity = new ObjectIdentity('entity', $identity->getType());
         }
 
         return $identity;
@@ -117,6 +128,6 @@ class FieldAclExtension extends EntityAclExtension
      */
     public function getExtensionKey()
     {
-        return 'field';
+        return self::EXTENSION_KEY;
     }
 }

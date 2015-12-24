@@ -616,6 +616,7 @@ services:
         arguments:
             - @oro_security.security_facade
             - @oro_entity.orm.entity_class_resolver
+            - @oro_entity.doctrine_helper
         tags:
             - { name: form.type_extension, alias: form }
 

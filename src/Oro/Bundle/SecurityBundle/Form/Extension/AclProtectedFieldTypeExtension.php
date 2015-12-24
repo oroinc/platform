@@ -9,10 +9,10 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
@@ -26,13 +26,20 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var array */
     protected $allowedFields = [];
 
-    public function __construct(SecurityFacade $securityFacade, EntityClassResolver $entityClassResolver)
-    {
+    public function __construct(
+        SecurityFacade $securityFacade,
+        EntityClassResolver $entityClassResolver,
+        DoctrineHelper $doctrineHelper
+    ) {
         $this->securityFacade  = $securityFacade;
         $this->entityClassResolver = $entityClassResolver;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -163,8 +170,10 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         if (false === $isMapped || !$entity instanceof $className) {
             $isGranted = true;
         } else {
+            $isNewEntity = is_null($this->doctrineHelper->getSingleEntityIdentifier($entity));
+
             $isGranted = $this->securityFacade->isGranted(
-                'EDIT',
+                $isNewEntity ? 'CREATE' : 'EDIT',
                 new FieldVote($entity, $this->getPropertyByForm($form))
             );
         }
