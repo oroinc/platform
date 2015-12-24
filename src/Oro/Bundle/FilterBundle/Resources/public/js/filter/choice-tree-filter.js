@@ -192,7 +192,7 @@ define(function(require) {
                 items = this._getSelectedItems(items);
                 var temp = [];
                 _.each(items, function(value) {
-                    temp .push({
+                    temp.push({
                         value: value,
                         children: []
                     });
@@ -248,25 +248,26 @@ define(function(require) {
             return rootArray;
         },
 
-        _convertToTree: function (data) {
+        _convertToTree: function(data) {
             var response = [],
-                idToNodeMap = {};
+                idToNodeMap = {},
+                element = {};
 
-            _.each(data, function (value) {
-                var datum = {};
-                datum.value = value;
-                datum.children = [];
+            _.each(data, function(value) {
+                element = {};
+                element.value = value;
+                element.children = [];
 
-                idToNodeMap[datum.value.id] = datum;
+                idToNodeMap[element.value.id] = element;
 
-                if (!datum.value.owner_id) {
-                    response.push(datum);
+                if (!element.value.owner_id) {
+                    response.push(element);
                 } else {
-                    var parentNode = idToNodeMap[datum.value.owner_id];
+                    var parentNode = idToNodeMap[element.value.owner_id];
                     if (parentNode) {
-                        parentNode.children.push(datum);
+                        parentNode.children.push(element);
                     } else {
-                        response.push(datum);
+                        response.push(element);
                     }
                 }
             });
@@ -305,12 +306,12 @@ define(function(require) {
                 var id = self.name + '-' + value.value.id;
 
                 template += '<li>' +
-                '<label for="' + id + '" class="' + classSearchResult + '">' +
+                    '<label for="' + id + '" class="' + classSearchResult + '">' +
                     '<input id="' + id + '" ' +
-                            'value="' + value.value.id + '" ' +
-                            'type="checkbox" ' + classSelected + '>' +
+                    'value="' + value.value.id + '" ' +
+                    'type="checkbox" ' + classSelected + '>' +
                     value.value.name +
-                '</label>';
+                    '</label>';
                 if (value.children.length > 0) {
                     template += self.getListTemplate(value.children);
                 }
@@ -340,12 +341,12 @@ define(function(require) {
         },
 
         /**
-        * Set raw value to filter
-        *
-        * @param value
-        * @param skipRefresh
-        * @return {*}
-        */
+         * Set raw value to filter
+         *
+         * @param value
+         * @param skipRefresh
+         * @return {*}
+         */
         setValue: function(value, skipRefresh) {
             if (!tools.isEqualsLoosely(this.value, value)) {
                 var oldValue = this.value;
