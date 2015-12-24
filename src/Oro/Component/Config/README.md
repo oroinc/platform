@@ -8,6 +8,12 @@ Resource Types
 
  - [Cumulative Resources](./Resources/doc/cumulative_resources.md) provides a way to configure a bundle from other bundles.
 
+Resource Merge
+--------------
+
+ - [Configuration Merger](./Resources/doc/configuration_merger.md) provides a way to merge configurations of some resource both from one or many bundles. Supports two strategy: replace and append config.
+
+
 System Aware Resolver
 ---------------------
 

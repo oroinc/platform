@@ -4,8 +4,6 @@ namespace Oro\Component\Config\Merger;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
-
 class ConfigurationMerger
 {
     const EXTENDS_NODE_NAME = 'extends';
@@ -22,7 +20,7 @@ class ConfigurationMerger
      */
     public function __construct(array $kernelBundles)
     {
-        $this->kernelBundles = array_values($kernelBundles);
+        $this->kernelBundles = array_flip(array_values($kernelBundles));
     }
 
     /**
@@ -31,23 +29,26 @@ class ConfigurationMerger
      */
     public function mergeConfiguration(array $rawConfigurationByBundles)
     {
-        $configs = $this->prepareRawConfiguration($rawConfigurationByBundles);
+        $actions = $this->prepareRawConfiguration($rawConfigurationByBundles);
 
-        foreach ($configs as $actionName => $actionConfigs) {
-            $data = array_shift($actionConfigs);
+        foreach ($actions as &$configs) {
+            $data = array_shift($configs);
 
-            foreach ($actionConfigs as $config) {
+            foreach ($configs as $config) {
                 $data = $this->merge($data, $config);
             }
 
-            $configs[$actionName] = (array)$data;
+            $configs = (array)$data;
+        }
+        unset($configs);
+
+        foreach ($actions as $actionName => &$actionConfig) {
+            $actionConfig = $this->unsetReplaceNodeRecursive(
+                $this->resolveExtends($actions, $actionName)
+            );
         }
 
-        foreach ($configs as $actionName => &$actionConfig) {
-            $this->resolveExtends($configs, $actionConfig, $actionName);
-        }
-
-        return $configs;
+        return $actions;
     }
 
     /**
@@ -59,14 +60,12 @@ class ConfigurationMerger
         $actionConfigs = [];
 
         foreach ($rawConfigurationByBundles as $bundle => $actions) {
-            $bundleNumber = array_search($bundle, $this->kernelBundles, true);
+            if (array_key_exists($bundle, $this->kernelBundles)) {
+                $bundleNumber = $this->kernelBundles[$bundle];
 
-            if ($bundleNumber === false) {
-                continue;
-            }
-
-            foreach ($actions as $actionName => $config) {
-                $actionConfigs[$actionName][$bundleNumber] = $config;
+                foreach ($actions as $actionName => $config) {
+                    $actionConfigs[$actionName][$bundleNumber] = $config;
+                }
             }
         }
 
@@ -87,7 +86,6 @@ class ConfigurationMerger
     protected function merge(array $data, array $config)
     {
         $replaces = empty($config[self::REPLACES_NODE_NAME]) ? [] : (array)$config[self::REPLACES_NODE_NAME];
-        unset($data[self::REPLACES_NODE_NAME], $config[self::REPLACES_NODE_NAME]);
 
         foreach ($replaces as $key) {
             if (empty($config[$key])) {
@@ -119,37 +117,59 @@ class ConfigurationMerger
 
     /**
      * @param array $configs
-     * @param array $config
      * @param string $actionName
+     * @return array
      * @throws InvalidConfigurationException
      */
-    protected function resolveExtends(array &$configs, array &$config, $actionName)
+    protected function resolveExtends(array $configs, $actionName)
     {
-        $this->processedConfigs[] = $actionName;
+        if (!in_array($actionName, $this->processedConfigs, true)) {
+            $this->processedConfigs[] = $actionName;
+        }
 
+        $config = $configs[$actionName];
         if (!array_key_exists(self::EXTENDS_NODE_NAME, $config) || empty($config[self::EXTENDS_NODE_NAME])) {
-            return;
+            return $config;
         }
 
         $extends = $config[self::EXTENDS_NODE_NAME];
+        unset($config[self::EXTENDS_NODE_NAME]);
+
         if (!array_key_exists($extends, $configs)) {
             throw new InvalidConfigurationException(
                 sprintf('Could not found configuration of %s for dependant configuration %s.', $extends, $actionName)
             );
         }
 
-        $extendsConfig = &$configs[$extends];
-        if (array_key_exists(self::EXTENDS_NODE_NAME, $extendsConfig)) {
+        if (array_key_exists(self::EXTENDS_NODE_NAME, $configs[$extends])) {
             if (in_array($extends, $this->processedConfigs, true)) {
                 throw new InvalidConfigurationException(
                     sprintf('Found circular "extends" references %s and %s configurations.', $extends, $actionName)
                 );
             }
 
-            $this->resolveExtends($configs, $extendsConfig, $extends);
+            $configs[$extends] = $this->resolveExtends($configs, $extends);
         }
 
-        $config = ArrayUtils::arrayMergeRecursiveDistinct($extendsConfig, $config);
-        unset($config[self::EXTENDS_NODE_NAME]);
+        return $this->merge($configs[$extends], $config);
+    }
+
+    /**
+     * @param array $config
+     * @return array
+     */
+    protected function unsetReplaceNodeRecursive(array $config)
+    {
+        if (array_key_exists(self::REPLACES_NODE_NAME, $config)) {
+            unset($config[self::REPLACES_NODE_NAME]);
+        }
+
+        foreach ($config as &$subConfig) {
+            if (is_array($subConfig)) {
+                $subConfig = $this->unsetReplaceNodeRecursive($subConfig);
+            }
+        }
+
+        return $config;
     }
 }

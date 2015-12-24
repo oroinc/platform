@@ -64,6 +64,11 @@ class ConfigurationMergerTest extends \PHPUnit_Framework_TestCase
             'merge configuration from bundles with replace' => [
                 'rawConfig' => [
                     self::BUNDLE1 => [
+                        'test_config_base' => [
+                            'array_base' => [
+                                'base_param' => ['base_value']
+                            ]
+                        ],
                         'test_config' => [
                             'label' => 'Test Config',
                             'params' => ['test_param_bundle1'],
@@ -77,7 +82,8 @@ class ConfigurationMergerTest extends \PHPUnit_Framework_TestCase
                     ],
                     self::BUNDLE2 => [
                         'test_config' => [
-                            'replace' => ['params'],
+                            'extends' => 'test_config_base',
+                            'replace' => ['params', 'array_base'],
                             'params' => ['test_param_bundle2' => 'data'],
                             'array' => [
                                 'replace' => ['sub_array'],
@@ -89,6 +95,11 @@ class ConfigurationMergerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'expected' => [
+                    'test_config_base' => [
+                        'array_base' => [
+                            'base_param' => ['base_value']
+                        ]
+                    ],
                     'test_config' => [
                         'label' => 'Test Config',
                         'params' => ['test_param_bundle2' => 'data'],
@@ -165,6 +176,18 @@ class ConfigurationMergerTest extends \PHPUnit_Framework_TestCase
                                 'sub_config2' => 'data2',
                                 'sub_config3' => 'data3',
                             ]
+                        ],
+                        'test_config5' => [
+                            'extends' => 'test_config3',
+                            'replace' => ['params'],
+                            'params' => ['my'],
+                            'array' => [
+                                'replace' => 'param',
+                                'param' => [
+                                    'value3'
+                                ],
+                                'single_param' => 123
+                            ]
                         ]
                     ],
                     self::BUNDLE2 => [
@@ -190,7 +213,13 @@ class ConfigurationMergerTest extends \PHPUnit_Framework_TestCase
                         ],
                         'test_config3' => [
                             'extends' => 'test_config2',
-                            'params' => ['test_param_bundle3_new']
+                            'params' => ['test_param_bundle3_new'],
+                            'array' => [
+                                'param' => [
+                                    'value1',
+                                    'value2'
+                                ]
+                            ]
                         ]
                     ],
                     'UnknownBundle' => [
@@ -209,13 +238,24 @@ class ConfigurationMergerTest extends \PHPUnit_Framework_TestCase
                         'label' => 'Test Config2 Bundle3',
                         'params' => ['test_param_bundle3']
                     ],
+                    'test_config3' => [
+                        'label' => 'Test Config2 Bundle3',
+                        'params' => ['test_param_bundle3', 'test_param_bundle3_new'],
+                        'array' => [
+                            'param' => ['value1', 'value2']
+                        ]
+                    ],
                     'test_config4' => [
                         'label' => 'Test Config4',
                         'some_config' => ['sub_config2' => 'data2', 'sub_config3' => 'replaced data']
                     ],
-                    'test_config3' => [
+                    'test_config5' => [
                         'label' => 'Test Config2 Bundle3',
-                        'params' => ['test_param_bundle3', 'test_param_bundle3_new']
+                        'params' => ['my'],
+                        'array' => [
+                            'param' => ['value3'],
+                            'single_param' => 123
+                        ]
                     ]
                 ]
             ]
