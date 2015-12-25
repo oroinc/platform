@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Migrations\Schema\v1_4;
 
+use Doctrine\DBAL\Schema\SchemaException;
+
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -21,7 +23,7 @@ class OroImapBundle implements Migration
      * Adds Access Token field to the oro_email_origin table
      *
      * @param Schema $schema
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     public static function addAccessTokenFieldToOroEmailOriginTable(Schema $schema)
     {
