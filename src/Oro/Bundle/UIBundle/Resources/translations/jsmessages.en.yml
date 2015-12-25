@@ -78,3 +78,6 @@ oro:
             single: Changes are being saved and may be lost
             group_title: Server is being updated and the following changes might be lost
             other: Other
+        jstree:
+            move_category_error: "You can not move node {{ nodeText }} here."
+            add_new_root_warning: "You can not create new root category."
