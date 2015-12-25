@@ -8,7 +8,9 @@ Basically, think of a **theme** as a skin for your application. Files, that the 
 
 ## Configuration
 
-The configuration file should be placed at `Resources/config/oro/` and named `layout.yml`.
+The configuration file should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
+Deprecated method: placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`
+Theme folder(name) must match [a-zA-Z][a-zA-Z0-9_\-:]* expression.
 
 ### Themes configuration reference
 
@@ -27,27 +29,23 @@ You can find additional information if you execute the `app/console config:dump-
 **Example:**
 
 ```yaml
-# src/Acme/Bundle/DemoBundle/Resources/config/oro/layout.yml
+# src/Acme/Bundle/DemoBundle/Resources/views/layouts/base/theme.yml
+# The layout theme that is used to add the page content and common page elements
+# for all themes in "main" group
+label:  ~ # this is a "hidden" theme
+groups: [ main ]
 
-oro_layout:
-    themes:
-        base:
-            # The layout theme that is used to add the page content and common page elements
-            # for all themes in "main" group
-            label:  ~ # this is a "hidden" theme
-            groups: [ main ]
+# src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro/theme.yml
+# Default layout theme for the Oro Platform
+label:  Oro Theme
+icon:   bundles/oroui/themes/oro/images/favicon.ico
+parent: base
+groups: [ main ]
 
-        oro:
-            # Default layout theme for the Oro Platform
-            label:  Oro Theme
-            icon:   bundles/oroui/themes/oro/images/favicon.ico
-            parent: base
-            groups: [ main ]
-
-        oro-gold:
-            label:          Nice ORO gold theme
-            directory:      OroGold
-            parent:         oro
+# src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro-gold/theme.yml
+label:          Nice ORO gold theme
+directory:      OroGold
+parent:         oro
 ```
 
 Where `base`, `oro` and `oro-gold` are unique theme identifiers.

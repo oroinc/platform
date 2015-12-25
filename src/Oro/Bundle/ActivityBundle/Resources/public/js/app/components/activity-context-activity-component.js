@@ -12,12 +12,7 @@ define(function(require) {
 
         initialize: function(options) {
             this.options = options;
-            this.init();
-        },
-
-        init: function() {
             this.initView();
-            this.contextsView.render();
         },
 
         initView: function() {

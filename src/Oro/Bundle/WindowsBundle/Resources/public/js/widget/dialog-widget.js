@@ -46,9 +46,13 @@ define(function(require) {
          */
         _isEmbedded: false,
 
+        events: {
+            'content:changed': 'resetDialogPosition'
+        },
+
         listen: {
             'adoptedFormResetClick': 'remove',
-            'widgetRender': '_initAdjustHeight',
+            'widgetRender': 'onWidgetRender',
             'contentLoad': 'onContentUpdated',
             'page:request mediator': 'onPageChange'
         },
@@ -85,6 +89,11 @@ define(function(require) {
             dialogManager.add(this);
 
             this.initializeWidget(options);
+        },
+
+        onWidgetRender: function(content) {
+            this._initAdjustHeight(content);
+            this._setMaxSize();
         },
 
         setTitle: function(title) {
@@ -313,16 +322,27 @@ define(function(require) {
         _initAdjustHeight: function(content) {
             this.widget.off('.adjust-height-events');
             var scrollableContent = content.find('.scrollable-container');
+            var resizeEvents = [
+                'dialogresize.adjust-height-events',
+                'dialogmaximize.adjust-height-events',
+                'dialogrestore.adjust-height-events'
+            ].join(' ');
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
-                var events = [
-                    'dialogresize.adjust-height-events',
-                    'dialogmaximize.adjust-height-events',
-                    'dialogrestore.adjust-height-events'
-                ];
-                this.widget.on(events.join(''), _.bind(this._fixScrollableHeight, this));
+                this.widget.on(resizeEvents, _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
+        },
+        _setMaxSize: function() {
+            this.widget.off('.set-max-size-events');
+            this.widget.on('dialogresizestart.set-max-size-events', _.bind(function() {
+                var dialog = this.widget.closest('.ui-dialog');
+                var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
+                dialog.css({
+                    maxWidth: containerEl.clientWidth,
+                    maxHeight: containerEl.clientHeight
+                });
+            }, this));
         },
 
         _fixDialogMinHeight: function(isEnabled) {
@@ -382,11 +402,6 @@ define(function(require) {
                 throw new Error('this function must be called only after dialog is created');
             }
             var dialog = this.widget.closest('.ui-dialog');
-            var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
-            dialog.css({
-                maxWidth: containerEl.clientWidth,
-                maxHeight: containerEl.clientHeight
-            });
             dialog.position(position);
             // must update manually 'cause $.position call gives side effects
             dialog.css({

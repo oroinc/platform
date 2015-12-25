@@ -49,6 +49,7 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
         $fullDefinition->setDirectory('OroBlack');
         $fullDefinition->setGroups(['main', 'frontend']);
         $fullDefinition->setDescription('description');
+        $fullDefinition->setData(['key' => 'value']);
 
         return [
             'minimal definition given' => [
@@ -66,7 +67,8 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
                     'icon'       => 'oro-black-icon.ico',
                     'logo'       => 'oro-black-logo.png',
                     'directory'  => 'OroBlack',
-                    'description' => 'description'
+                    'description' => 'description',
+                    'data' => ['key' => 'value']
                 ],
                 '$expectedResult' => $fullDefinition,
             ]

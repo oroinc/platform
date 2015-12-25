@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
-use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -28,14 +26,11 @@ class EmailQueryFactoryTest extends OrmTestCase
     /** @var EmailQueryFactory */
     protected $factory;
 
-    /** @var Registry */
-    protected $doctrine;
-
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var MailboxRepository */
-    protected $mailboxRepository;
+    /** @var MailboxManager */
+    protected $mailboxManager;
 
     public function setUp()
     {
@@ -44,18 +39,9 @@ class EmailQueryFactoryTest extends OrmTestCase
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()->getMock();
 
-        $this->mailboxRepository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository')
+        $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrine->expects($this->any())
-            ->method('getRepository')
-            ->with($this->equalTo('OroEmailBundle:Mailbox'))
-            ->will($this->returnValue($this->mailboxRepository));
 
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
@@ -64,7 +50,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         $this->factory = new EmailQueryFactory(
             $this->providerStorage,
             $this->entityNameResolver,
-            $this->doctrine,
+            $this->mailboxManager,
             $this->securityFacade
         );
     }
@@ -75,7 +61,7 @@ class EmailQueryFactoryTest extends OrmTestCase
             $this->factory,
             $this->entityNameResolver,
             $this->providerStorage,
-            $this->mailboxRepository,
+            $this->mailboxManager,
             $this->doctrine
         );
     }
@@ -141,7 +127,7 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->method('getOrganization')
             ->will($this->returnValue($organization));
 
-        $this->mailboxRepository->expects($this->any())
+        $this->mailboxManager->expects($this->any())
             ->method('findAvailableMailboxIds')
             ->with($user, $organization)
             ->will($this->returnValue([1, 3, 5]));
@@ -174,7 +160,7 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->method('getOrganization')
             ->will($this->returnValue($organization));
 
-        $this->mailboxRepository->expects($this->any())
+        $this->mailboxManager->expects($this->any())
             ->method('findAvailableMailboxIds')
             ->with($user, $organization)
             ->will($this->returnValue([1, 3, 5]));

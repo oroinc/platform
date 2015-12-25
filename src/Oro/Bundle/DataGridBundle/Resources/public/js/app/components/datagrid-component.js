@@ -167,9 +167,6 @@ define(function(require) {
             if (!collection) {
                 // otherwise, create collection from metadata
                 collection = new PageableCollection(collectionModels, collectionOptions);
-            } else if (this.data) {
-                _.extend(collectionOptions, {parse: true});
-                collection.reset(collectionModels, collectionOptions);
             }
 
             // create grid
@@ -205,7 +202,11 @@ define(function(require) {
          */
         combineCollectionOptions: function() {
             var options = _.extend({
-                inputName: this.inputName,
+                /*
+                 * gridName contains extended information "inputName + scopeName"
+                 * (allows to differentiate grid instances)
+                 */
+                inputName: this.gridName,
                 parse: true,
                 url: '\/user\/json',
                 state: _.extend({
