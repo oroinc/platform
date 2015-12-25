@@ -142,7 +142,7 @@ define(function(require) {
 
         initFields: function() {
             if (!this.model.get('email').get('bcc').length || !this.model.get('email').get('cc').length) {
-                this.$('[id^=oro_email_email_to]').parents('.controls').find('ul.select2-choices').after(
+                this.$('[data-ftid$="_email_to"]').parents('.controls').find('ul.select2-choices').after(
                     '<div class="cc-bcc-holder"/>'
                 );
             }
@@ -156,7 +156,7 @@ define(function(require) {
 
         showField: function(fieldName) {
             var field = fieldName.toLowerCase();
-            var $field = this.$('[data-ftid=oro_email_email_' + field + ']');
+            var $field = this.$('[data-ftid$="_email_' + field + '"]');
             $field.parents('.control-group.taggable-field').show();
             $field.parents('.controls').find('input.select2-input')
                 .unbind('focusout')
@@ -169,7 +169,7 @@ define(function(require) {
                 }, this))
                 .focus();
 
-            this.$('[data-ftid=oro_email_email_to]')
+            this.$('[data-ftid$="_email_to"]')
                 .parents('.control-group.taggable-field')
                 .find('label').html(__('oro.email.to'));
             this.addForgedAsterisk();
@@ -178,7 +178,7 @@ define(function(require) {
 
         hideField: function(fieldName) {
             var field = fieldName.toLowerCase();
-            var $field = this.$('[data-ftid=oro_email_email_' + field + ']');
+            var $field = this.$('[data-ftid$="_email_' + field + '"]');
             $field.parents('.control-group.taggable-field').hide();
 
             if (this.$('span.show' + fieldName).length > 0) {

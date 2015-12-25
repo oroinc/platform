@@ -155,8 +155,15 @@ class RendererTest extends LayoutTestCase
                 ]
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
-            ->add('content', 'root', 'body', ['class_prefix' => 'content'])
-            ->add('top_content', 'content', 'html', ['text' => '<header>Renderer <b>Test</b>!</header>'])
+            ->add(
+                'content',
+                'root',
+                'body',
+                [
+                    'class_prefix' => 'content',
+                    'attr' => ['class' => '{{ class_prefix }}-body']
+                ]
+            )
             ->add('list', 'content', 'list')
             ->add(
                 'list_item_1',
@@ -280,20 +287,6 @@ class RendererTest extends LayoutTestCase
                 ['name' => 'search'],
                 'button'
             )
-            ->add(
-                'block_tag',
-                'content',
-                'block',
-                [
-                    'tag' => 'input',
-                    'attr' => [
-                        'type' => 'button',
-                        'value' => 'Block button',
-                        'class' => '{{ class_prefix }}_input',
-                    ]
-                ],
-                'button'
-            )
             // test manipulations of 'class' attribute
             ->appendOption('content', 'attr.class', ['@join' => [' ', 'class1', 'class2']])
             ->replaceOption('content', 'attr.class', 'class1', ['@value' => ['$context.body_class']])
@@ -350,12 +343,10 @@ class RendererTest extends LayoutTestCase
         </script>
         <link rel="stylesheet" href="test.css"/>
     </head>
-<body class="test-body class2">
+<body class="content-body test-body class2">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
-    <input type="button" value="Block button" class="content_input"></input>
-    <input type="text" name="search"></input>
+    <input type="text" name="search"/>
     <input type="submit" name="btn2" value="Btn2"/>
-    <header>Renderer <b>Test</b>!</header>
     <ul>
         <li>Hi World!</li>
         <li class="list-item-2"><a href="http://example.com">Hi World!</a></li>

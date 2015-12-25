@@ -44,10 +44,9 @@ class NoteRepositoryTest extends OrmTestCase
             . ' INNER JOIN Test\Entity e WITH note.entity_2929d33a = e'
             . ' LEFT JOIN note.owner c'
             . ' LEFT JOIN note.updatedBy u'
-            . ' WHERE e.id = :entity_id',
+            . ' WHERE e.id IN(123)',
             $qb->getDQL()
         );
-        $this->assertEquals(123, $qb->getParameter('entity_id')->getValue());
         $this->assertNull($qb->getFirstResult());
         $this->assertNull($qb->getMaxResults());
     }
@@ -65,10 +64,10 @@ class NoteRepositoryTest extends OrmTestCase
             . ' INNER JOIN Test\Entity e WITH note.entity_2929d33a = e'
             . ' LEFT JOIN note.owner c'
             . ' LEFT JOIN note.updatedBy u'
-            . ' WHERE e.id = :entity_id',
+            . ' WHERE e.id IN(123)',
             $qb->getDQL()
         );
-        $this->assertEquals(123, $qb->getParameter('entity_id')->getValue());
+
         $this->assertEquals(450, $qb->getFirstResult());
         $this->assertEquals(50, $qb->getMaxResults());
     }

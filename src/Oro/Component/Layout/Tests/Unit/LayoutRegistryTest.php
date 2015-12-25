@@ -209,6 +209,30 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->setDefaultOptions($name, $resolver);
     }
 
+    public function testNormalizeOptions()
+    {
+        $name     = 'test';
+        $options = ['foo'=> 'bar'];
+        $context= $this->getMock('Oro\Component\Layout\ContextInterface');
+        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+
+        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+
+        $this->extension->expects($this->once())
+            ->method('hasTypeExtensions')
+            ->with($name)
+            ->will($this->returnValue(true));
+        $this->extension->expects($this->once())
+            ->method('getTypeExtensions')
+            ->with($name)
+            ->will($this->returnValue([$typeExtension]));
+        $typeExtension->expects($this->once())
+            ->method('normalizeOptions')
+            ->with($options, $context, $data);
+
+        $this->registry->normalizeOptions($name, $options, $context, $data);
+    }
+
     public function testBuildBlock()
     {
         $name    = 'test';

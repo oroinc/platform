@@ -1,22 +1,5 @@
 config:
-    shim:
-        'jquery.multiselect':
-            deps:
-                - 'jquery-ui'
-        'jquery.multiselect.filter':
-            deps:
-                - 'jquery.multiselect'
-    map:
-        '*':
-            'jquery.multiselect': 'orofilter/js/extend/multiselect'
-            'jquery.multiselect.filter': 'orofilter/js/extend/multiselect-filter'
-        'orofilter/js/extend/multiselect':
-            'jquery.multiselect': 'jquery.multiselect'
-        'orofilter/js/extend/multiselect-filter':
-            'jquery.multiselect.filter': 'jquery.multiselect.filter'
     paths:
-        'jquery.multiselect': 'bundles/orofilter/lib/multiselect/jquery.multiselect.js'
-        'jquery.multiselect.filter': 'bundles/orofilter/lib/multiselect/jquery.multiselect.filter.js'
         'oro/filter/abstract-filter': 'bundles/orofilter/js/filter/abstract-filter.js'
         'oro/filter/choice-filter': 'bundles/orofilter/js/filter/choice-filter.js'
         'oro/filter/choice-tree-filter': 'bundles/orofilter/js/filter/choice-tree-filter.js'
@@ -40,11 +23,3 @@ config:
         'orofilter/js/multiselect-decorator': 'bundles/orofilter/js/multiselect-decorator.js'
         'orofilter/js/filter-hint': 'bundles/orofilter/js/filter-hint.js'
         'oro/filter/dictionary-filter': 'bundles/orofilter/js/filter/dictionary-filter.js'
-
-build:
-    paths:
-#       jQuery.UI after v.1.11.2 started to support AMD. And that broke a js-build with
-#       files which does not support AMD. jquery.multiselect and jquery.multiselect.filter
-#       use AMD without dependency, therefore it's excluded
-        'jquery.multiselect': 'empty:'
-        'jquery.multiselect.filter': 'empty:'

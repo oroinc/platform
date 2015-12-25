@@ -87,8 +87,7 @@ class BlockFactory implements BlockFactoryInterface
             $this->layoutManipulator,
             $this->rawLayout,
             $this->typeHelper,
-            $this->context,
-            $this->dataAccessor
+            $this->context
         );
         $this->block           = new Block(
             $this->rawLayout,
@@ -215,6 +214,7 @@ class BlockFactory implements BlockFactoryInterface
         $this->blockBuilder->initialize($id);
         // iterate from parent to current
         foreach ($types as $type) {
+            $this->registry->normalizeOptions($type->getName(), $resolvedOptions, $this->context, $this->dataAccessor);
             $type->buildBlock($this->blockBuilder, $resolvedOptions);
             $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
         }

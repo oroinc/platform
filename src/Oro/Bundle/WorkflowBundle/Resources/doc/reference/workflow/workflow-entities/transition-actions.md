@@ -10,6 +10,7 @@ Table of Contents
  - [Unset Value](#unset-value)
  - [Create Object](#create-object)
  - [Create Entity](#create-entity)
+ - [Remove Entity](#remove-entity)
  - [Create Related Entity](#create-related-entity)
  - [Find Entity](#find-entity)
  - [Format Name](#format-name)
@@ -18,6 +19,7 @@ Table of Contents
  - [Create Date](#create-date)
  - [Create Date Time](#create-date-time)
  - [Start Workflow](#start-workflow)
+ - [Transit Workflow](#transit-workflow)
  - [Redirect](#redirect)
  - [Tree Executor](#tree-executor)
  - [Foreach](#foreach)
@@ -229,6 +231,24 @@ OR
         successful: $conversation_successful
         call: $managed_entity
 
+```
+
+Remove Entity
+-------------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity
+
+**Alias:** remove_entity
+
+**Description:** Removes entity with specified class instance.
+
+**Parameters:**
+ - target - target that will contain entity instance;
+
+**Configuration Example**
+```
+- @remove_entity:
+    target: $.data #remove the entity being processed
 ```
 
 Create Related Entity
@@ -481,6 +501,49 @@ OR
     entity: $.result.opportunity
     transition: develop
 ```
+
+
+Transit Workflow
+--------------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow
+
+**Alias:** transit_workflow
+
+**Description:** Performs transition for workflow on a specific entity. Workflow must be already started. 
+
+**Parameters:**
+ - entity (or first parameter) - path to entity used for transition operation
+ - transition (or second parameter) - name of the transition
+ - data (or third parameter) - additional data passed to workflow item before transition (optional)
+ 
+**Configuration Example**
+```
+- @transit_workflow:
+    entity: $opportunity
+    transition: develop
+    data:
+        budget_amount: 1000
+        probability: 0.95
+        
+OR
+
+- @transit_workflow:
+    conditions:
+        # optional condition configuration
+    parameters:
+        entity: $opportunity
+        transition: develop
+        data:
+            budget_amount: 1000
+            probability: 0.95
+        
+OR
+
+- @transit_workflow:
+    [$opportunity, 'develop', { budget_amount: 1000, probability: 0.95 }]
+```
+
 
 Redirect
 --------
