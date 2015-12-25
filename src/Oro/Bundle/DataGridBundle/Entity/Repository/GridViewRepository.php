@@ -50,6 +50,7 @@ class GridViewRepository extends EntityRepository
             ->join('gv.users', 'user')
             ->where('gv.gridName = :gridName')
             ->andWhere('user = :user')
+            ->setMaxResults(1)
             ->setParameters(
                 [
                     'gridName' => $gridName,
