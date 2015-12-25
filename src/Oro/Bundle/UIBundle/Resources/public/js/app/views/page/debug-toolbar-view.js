@@ -30,7 +30,11 @@ define([
          * @override
          */
         onPageUpdate: function(data, actionArgs, xhr) {
-            if (!xhr) {
+            if (!actionArgs.route.previous) {
+                this.sendUpdates();
+                // nothing to do, the page just loaded
+                return;
+            } else if (!xhr) {
                 this.$el.empty();
                 mediator.trigger('layout:adjustHeight');
                 return;
