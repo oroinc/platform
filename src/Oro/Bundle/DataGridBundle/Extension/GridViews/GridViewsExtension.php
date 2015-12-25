@@ -15,6 +15,9 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class GridViewsExtension extends AbstractExtension
 {
+    const GRID_VIEW_ROOT_PARAM = '_grid_view';
+    const DISABLED_PARAM       = '_disabled';
+
     const VIEWS_LIST_KEY           = 'views_list';
     const VIEWS_PARAM_KEY          = 'view';
     const MINIFIED_VIEWS_PARAM_KEY = 'v';
@@ -45,15 +48,25 @@ class GridViewsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return true;
+        return !$this->isDisabled();
     }
 
     /**
-     * {@inheritDoc}
+     * @return bool
+     */
+    protected function isDisabled()
+    {
+        $parameters = $this->getParameters()->get(self::GRID_VIEW_ROOT_PARAM, []);
+
+        return !empty($parameters[self::DISABLED_PARAM]);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
