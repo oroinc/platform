@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ImapBundle\Migrations\Schema\v1_3\OroImapBundle as v13;
+use Oro\Bundle\ImapBundle\Migrations\Schema\v1_4\OroImapBundle as v14;
 
 class OroImapBundleInstaller implements Installation
 {
@@ -28,7 +29,7 @@ class OroImapBundleInstaller implements Installation
         $this->createOroEmailFolderImapTable($schema);
         $this->createOroEmailImapTable($schema);
         v13::addSmtpFieldsToOroEmailOriginTable($schema);
-        $this->addAccessTokenFieldToOroEmailOriginTable($schema);
+        v14::addAccessTokenFieldToOroEmailOriginTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroEmailFolderImapForeignKeys($schema);
@@ -119,17 +120,5 @@ class OroImapBundleInstaller implements Installation
             ['onDelete' => null, 'onUpdate' => null],
             'FK_17E00D834F00B133'
         );
-    }
-
-    /**
-     * Adds Access Token field to the oro_email_origin table
-     *
-     * @param Schema $schema
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    protected function addAccessTokenFieldToOroEmailOriginTable(Schema $schema)
-    {
-        $table = $schema->getTable('oro_email_origin');
-        $table->addColumn('access_token', 'string', ['notnull' => false, 'length' => 255]);
     }
 }
