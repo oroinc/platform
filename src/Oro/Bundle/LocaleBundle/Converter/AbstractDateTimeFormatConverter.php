@@ -168,8 +168,7 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
             '/((,|\/|\.|\-|\s*)\s*[y]+$)|(^[y]+\s*(,|\/|\.|\-|\s*))/i',
             '/.[y]+ \'г\'\./i',
             '/(\.[y]+\.)|([y]+\.$)/i',
-            '/སྤྱི་ལོ་[y]+ ཟླ་/i',
-            '/\s+\'lia\'/i',
+            '/སྤྱི་ལོ་[y]+ /i',
             '/\s*\'gada\'\s*/i',
         ];
         return trim(preg_replace($regexp, '', $format));
