@@ -1,8 +1,8 @@
 datagrid:
     email-auto-response-rules:
+        acl_resource: oro_email_autoresponserule_view
         source:
             type: orm
-            acl_resource: oro_email_autoresponserule_view
             query:
                 select:
                     - r.id
@@ -85,6 +85,7 @@ datagrid:
     base-email-grid:
         source:
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - partial eu.{id, email}
@@ -159,7 +160,6 @@ datagrid:
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
-            skip_acl_check: true
 
     simplified-email-grid:
         extends: base-email-grid
@@ -412,9 +412,9 @@ datagrid:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
     email-templates:
+        acl_resource: oro_email_emailtemplate_index
         source:
             type: orm
-            acl_resource: oro_email_emailtemplate_index
             query:
                 select:
                     - t.id
@@ -520,6 +520,7 @@ datagrid:
     base-mailboxes-grid:
         source:
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - m
@@ -564,7 +565,6 @@ datagrid:
                 params:
                     id: id
         options:
-            skip_acl_check: true
             toolbarOptions:
                 hide: true
         actions:

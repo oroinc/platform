@@ -8,7 +8,6 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -70,7 +69,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) === OrmDatasource::TYPE;
+        return $config->getDatasourceType() === OrmDatasource::TYPE;
     }
 
     /**
@@ -123,7 +122,7 @@ class OrmTotalsExtension extends AbstractExtension
                         $result,
                         $rowConfig['columns'],
                         $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY],
-                        $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)
+                        $config->isDatasourceSkipAclApply()
                     )
                 );
             }

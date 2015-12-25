@@ -1,8 +1,8 @@
 datagrid:
     calendar-event-grid:
+        acl_resource: oro_calendar_event_view
         source:
             type: orm
-            acl_resource: oro_calendar_event_view
             query:
                 select:
                     - event.id
@@ -119,25 +119,25 @@ datagrid:
                 label:        Accept
                 link:         accept_link
                 icon:         ok
-                acl_recource: oro_calendar_event_view
+                acl_resource: oro_calendar_event_view
             tentatively:
                 type:         ajax
                 label:        Tentative
                 link:         tentatively_link
                 icon:         question
-                acl_recource: oro_calendar_event_view
+                acl_resource: oro_calendar_event_view
             decline:
                 type:         ajax
                 label:        Decline
                 link:         decline_link
                 icon:         remove
-                acl_recource: oro_calendar_event_view
+                acl_resource: oro_calendar_event_view
             view:
                 type:         navigate
                 label:        View
                 link:         view_link
                 icon:         eye-open
-                acl_recource: oro_calendar_event_view
+                acl_resource: oro_calendar_event_view
                 rowAction:    true
             update:
                 type:          navigate
@@ -157,9 +157,9 @@ datagrid:
             entity_pagination: true
 
     widget-base-calendar-event-grid:
+        acl_resource: oro_calendar_event_view
         source:
             type: orm
-            acl_resource: oro_calendar_event_view
             query:
                 select:
                     - event.id
@@ -210,10 +210,10 @@ datagrid:
                     data_name: event.end
 
     users-calendar-select-grid-exclude-owner:
+        acl_resource: oro_user_user_view
         options:
             entityHint: calendar
         source:
-            acl_resource: oro_user_user_view
             type: orm
             query:
                 select:
@@ -289,6 +289,7 @@ datagrid:
     base-system-calendar-event-grid:
         source:
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - event.id
@@ -355,7 +356,7 @@ datagrid:
                 label:        View
                 link:         view_link
                 icon:         eye-open
-                acl_recource: oro_calendar_event_view
+                acl_resource: oro_calendar_event_view
                 rowAction:    true
             update:
                 type:          navigate
@@ -371,7 +372,6 @@ datagrid:
                 link:          delete_link
         options:
             entityHint: calendar_events
-            skip_acl_check: true
             entity_pagination: true
 
     system-calendar-event-grid:
@@ -395,6 +395,7 @@ datagrid:
     system-calendar-grid:
         source:
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - sc.id
@@ -464,5 +465,4 @@ datagrid:
                 icon:          trash
                 link:          delete_link
         action_configuration: @oro_calendar.listener.datagrid.system_calendar->getActionConfigurationClosure
-        options:
-            skip_acl_check: true
+
