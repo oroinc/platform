@@ -14,7 +14,17 @@ class OroImapBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        /** Add Access Token field to the oro_email_origin table **/
+        self::addAccessTokenFieldToOroEmailOriginTable($schema);
+    }
+
+    /**
+     * Adds Access Token field to the oro_email_origin table
+     *
+     * @param Schema $schema
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function addAccessTokenFieldToOroEmailOriginTable(Schema $schema)
+    {
         $table = $schema->getTable('oro_email_origin');
         $table->addColumn('access_token', 'string', ['notnull' => false, 'length' => 255]);
     }
