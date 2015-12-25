@@ -275,15 +275,14 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($rootView))
             ->will($this->returnValue($layout));
 
-        $rawLayout->expects($this->once())
-            ->method('getRootId')
+        $rawLayout->expects($this->once())->method('getRootId')
             ->will($this->returnValue($rootId));
         $rawLayout->expects($this->once())
             ->method('getBlockThemes')
             ->will(
                 $this->returnValue(
                     [
-                        $rootId      => ['RootTheme1', 'RootTheme2', 'RootTheme3'],
+                        $rootId => ['RootTheme1', 'RootTheme2', 'RootTheme3'],
                         'test_block' => ['TestTheme1', 'TestTheme2', 'TestTheme3']
                     ]
                 )
@@ -297,13 +296,8 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $layout->expects($this->exactly(2))
             ->method('setBlockTheme');
 
-        $rawLayout->expects($this->once())
-            ->method('getFormThemes')
-            ->will(
-                $this->returnValue(
-                    ['TestFormTheme1', 'TestFormTheme2']
-                )
-            );
+        $rawLayout->expects($this->once())->method('getFormThemes')
+            ->will($this->returnValue(['TestFormTheme1', 'TestFormTheme2']));
         $layout->expects($this->at(2))
             ->method('setFormTheme')
             ->with(['TestFormTheme1', 'TestFormTheme2']);
