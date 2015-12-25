@@ -88,13 +88,20 @@ define([
         },
 
         _initializeItemGrid: function(items) {
+            var comparator = function(model) {
+                return model.get('order');
+            };
             var $itemContainer = this.$('.item-container');
-            var showedItems    = items.where({show: true});
-            var filteredItems  = new ItemCollection(showedItems);
+            var showedItems    = items.where({show: true}).map(function(model) {
+                return model.toJSON();
+            });
+            var filteredItems  = new ItemCollection(showedItems, {comparator: comparator});
 
             $itemContainer.itemsManagerTable({
                 itemTemplate: Backbone.$(this.itemTplSelector).html(),
-                collection: filteredItems
+                collection: filteredItems,
+                moveUpHandler: _.bind(this.moveUpHandler, this),
+                moveDownHandler: _.bind(this.moveDownHandler, this)
             });
 
             filteredItems.on('sort add', function() {
@@ -118,10 +125,13 @@ define([
             });
 
             $itemContainer.on('change', function(e) {
+                var value;
                 var $target = Backbone.$(e.target);
                 var item = items.get($target.closest('tr').data('cid'));
-                var value = $target.is(':checkbox') ? $target.is(':checked') : $target.val();
-                item.set($target.data('name'), value);
+                if (item) {
+                    value = $target.is(':checkbox') ? $target.is(':checked') : $target.val();
+                    item.set($target.data('name'), value);
+                }
             });
         },
 
@@ -147,6 +157,29 @@ define([
                 this.$('.add-button').removeClass('disabled');
             } else {
                 this.$('.add-button').addClass('disabled');
+            }
+        },
+
+        moveUpHandler: function(model) {
+            this._moveModel(model, -1);
+        },
+
+        moveDownHandler: function(model) {
+            this._moveModel(model, +1);
+        },
+
+        _moveModel: function(model, shift) {
+            var order;
+            var targetModel;
+            var collection = model.collection;
+            var targetIndex = collection.indexOf(model) + shift;
+            if (targetIndex >= 0 && targetIndex < collection.length) {
+                targetModel = collection.at(targetIndex);
+                order = model.get('order');
+                model.set('order', targetModel.get('order'));
+                targetModel.set('order', order);
+                collection.sort();
+                collection.trigger('reset');
             }
         }
     });

@@ -21,9 +21,18 @@
                     data-collection-action="delete">
                 <i class="icon-trash hide-text"></i>
             </a>
+            <% if (!_.isMobile()) { %>
             <span title="{{ 'oro.dashboard.datagrid.actions.move_column.label'|trans }}">
                 <i class="icon-resize-vertical handle"></i>
             </span>
+            <% } else { %>
+            <span class="btn move-up<% if (isFirst) { %> disabled<% } %>" data-collection-action="moveUp" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
+                <i class="icon-chevron-up"></i>
+            </span>
+            <span class="btn move-down<% if (isLast) { %> disabled<% } %>" data-collection-action="moveDown" title="{{ 'oro.dashboard.datagrid.actions.move_column_down.label'|trans }}">
+                <i class="icon-chevron-down"></i>
+            </span>
+            <% } %>
         </td>
     </tr>
 </script>

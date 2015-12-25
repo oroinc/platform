@@ -161,7 +161,12 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _renderModel: function(model) {
-            var data = _.extend({cid: model.cid}, model.toJSON());
+            var index = model.collection.indexOf(model);
+            var data = _.extend({
+                cid: model.cid,
+                isFirst: index === 0,
+                isLast: index === model.collection.length -1
+            }, model.toJSON());
             return this._itemRender(this.itemTemplate, data);
         },
 
