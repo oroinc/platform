@@ -73,8 +73,8 @@ define(function(require) {
                         promises.push(tools.loadModule(editor.component)
                             .then(function(realization) {
                                 editor.component = realization;
-                                if (_.isFunction(realization.processColumnMetadata)) {
-                                    return realization.processColumnMetadata(columnMeta);
+                                if (_.isFunction(realization.processMetadata)) {
+                                    return realization.processMetadata(columnMeta);
                                 }
                                 return realization;
                             }));
@@ -83,8 +83,8 @@ define(function(require) {
                         promises.push(tools.loadModule(editor.view)
                             .then(function(realization) {
                                 editor.view = realization;
-                                if (_.isFunction(realization.processColumnMetadata)) {
-                                    return realization.processColumnMetadata(columnMeta);
+                                if (_.isFunction(realization.processMetadata)) {
+                                    return realization.processMetadata(columnMeta);
                                 }
                                 return realization;
                             }));

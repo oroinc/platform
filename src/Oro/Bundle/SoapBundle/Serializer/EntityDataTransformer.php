@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\Serializer;
 
+use Oro\Component\EntitySerializer\ValueTransformer;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Component\EntitySerializer\EntityDataTransformer as BaseEntityDataTransformer;
 
 /**
@@ -9,4 +12,11 @@ use Oro\Component\EntitySerializer\EntityDataTransformer as BaseEntityDataTransf
  */
 class EntityDataTransformer extends BaseEntityDataTransformer implements DataTransformerInterface
 {
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container, new ValueTransformer());
+    }
 }

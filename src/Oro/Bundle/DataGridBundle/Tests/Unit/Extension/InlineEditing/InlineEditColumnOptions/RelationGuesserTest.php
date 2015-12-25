@@ -47,7 +47,7 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
                     'frontend_type' => 'relation',
                     'inline_editing' => [
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/related-id-relation-editor-view'
+                            'view' => 'oroform/js/app/views/editor/related-id-relation-editor-view'
                         ],
                         'autocomplete_api_accessor' => [
                             'class' => 'oroui/js/tools/search-api-accessor'
@@ -61,7 +61,7 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
                 [
                     'inline_editing' => [
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/related-id-relation-editor-view'
+                            'view' => 'oroform/js/app/views/editor/related-id-relation-editor-view'
                         ],
                         'autocomplete_api_accessor' => [
                             'class' => 'oroui/js/tools/search-api-accessor'
@@ -81,7 +81,7 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
                 [
                     'inline_editing' => [
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/related-id-relation-editor-view'
+                            'view' => 'oroform/js/app/views/editor/related-id-relation-editor-view'
                         ]
                     ]
                 ]
@@ -91,7 +91,7 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
                     'frontend_type' => 'relation',
                     'inline_editing' => [
                         'editor' => [
-                            'view' => 'orodatagrid/js/app/views/editor/related-id-relation-editor-view'
+                            'view' => 'oroform/js/app/views/editor/related-id-relation-editor-view'
                         ]
                     ]
                 ],

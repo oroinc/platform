@@ -10,12 +10,17 @@ class EntityDataTransformer implements DataTransformerInterface
     /** @var ContainerInterface */
     protected $container;
 
+    /** @var DataTransformerInterface */
+    protected $baseDataTransformer;
+
     /**
-     * @param ContainerInterface $container
+     * @param ContainerInterface            $container
+     * @param DataTransformerInterface|null $baseDataTransformer
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, DataTransformerInterface $baseDataTransformer = null)
     {
-        $this->container = $container;
+        $this->container           = $container;
+        $this->baseDataTransformer = $baseDataTransformer;
     }
 
     /**
@@ -23,26 +28,19 @@ class EntityDataTransformer implements DataTransformerInterface
      */
     public function transform($class, $property, $value, $config)
     {
-        if (isset($config['data_transformer'])) {
-            foreach ((array)$config['data_transformer'] as $transformerServiceId) {
-                $transformer = $this->container->get($transformerServiceId);
-                $value       = $this->transformByCustomTransformer($transformer, $class, $property, $value, $config);
+        if (isset($config[ConfigUtil::DATA_TRANSFORMER])) {
+            foreach ((array)$config[ConfigUtil::DATA_TRANSFORMER] as $transformer) {
+                $value = $this->transformByCustomTransformer($transformer, $class, $property, $value, $config);
             }
         }
 
-        if (is_object($value)) {
-            if (method_exists($value, '__toString')) {
-                $value = (string)$value;
-            } elseif ($value instanceof \DateTime) {
-                $value = $value->format('c');
-            }
-        }
-
-        return $value;
+        return null !== $this->baseDataTransformer
+            ? $this->baseDataTransformer->transform($class, $property, $value, $config)
+            : $value;
     }
 
     /**
-     * @param object $transformer
+     * @param mixed  $transformer
      * @param string $class
      * @param string $property
      * @param mixed  $value
@@ -54,6 +52,21 @@ class EntityDataTransformer implements DataTransformerInterface
      */
     protected function transformByCustomTransformer($transformer, $class, $property, $value, $config)
     {
+        if (is_string($transformer)) {
+            $transformerService = $this->container->get($transformer, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+            if (null === $transformerService) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Undefined data transformer service "%s". Class: %s. Property: %s.',
+                        $transformer,
+                        $class,
+                        $property
+                    )
+                );
+            }
+            $transformer = $transformerService;
+        }
+
         if ($transformer instanceof DataTransformerInterface) {
             return $transformer->transform($class, $property, $value, $config);
         }
@@ -63,8 +76,12 @@ class EntityDataTransformer implements DataTransformerInterface
 
         throw new \InvalidArgumentException(
             sprintf(
-                'Not supported data transformer type: %s',
-                is_object($transformer) ? get_class($transformer) : gettype($transformer)
+                'Unexpected type of data transformer "%s". Expected "%s" or "%s". Class: %s. Property: %s.',
+                is_object($transformer) ? get_class($transformer) : gettype($transformer),
+                'Oro\Component\EntitySerializer\DataTransformerInterface',
+                'Symfony\Component\Form\DataTransformerInterface',
+                $class,
+                $property
             )
         );
     }

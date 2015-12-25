@@ -31,3 +31,9 @@ services:
            - @doctrine
         tags:
            - {name: oro_activity_list.provider}
+
+    oro_test.entity_alias_provider:
+        class: Oro\Bundle\TestFrameworkBundle\Provider\EntityAliasProvider
+        public: false
+        tags:
+            - { name: oro_entity.alias_provider }
