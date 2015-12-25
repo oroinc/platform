@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class GridViewRepository extends EntityRepository
 {
@@ -35,5 +36,27 @@ class GridViewRepository extends EntityRepository
             ->orderBy('gv.gridName');
 
         return $aclHelper->apply($qb)->getResult();
+    }
+
+    /**
+     * @param string $gridName
+     * @param User $user
+     *
+     * @return GridView|null
+     */
+    public function findDefaultGridView($gridName, User $user)
+    {
+        $qb = $this->createQueryBuilder('gv')
+            ->join('gv.users', 'user')
+            ->where('gv.gridName = :gridName')
+            ->andWhere('user = :user')
+            ->setParameters(
+                [
+                    'gridName' => $gridName,
+                    'user'     => $user,
+                ]
+            );
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }
