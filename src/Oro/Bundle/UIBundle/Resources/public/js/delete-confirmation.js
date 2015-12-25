@@ -1,6 +1,9 @@
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
-    ], function(_, __, Modal) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Modal = require('oroui/js/modal');
 
     /**
      * Delete confirmation dialog
@@ -12,27 +15,8 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
     return Modal.extend({
 
         /** @property {String} */
-        template: '\
-    <% if (title) { %>\
-      <div class="modal-header">\
-        <% if (allowCancel) { %>\
-          <a class="close">×</a>\
-        <% } %>\
-        <h3>{{title}}</h3>\
-      </div>\
-    <% } %>\
-    <div class="modal-body">{{content}}</div>\
-    <div class="modal-footer">\
-      <% if (allowCancel) { %>\
-        <% if (cancelText) { %>\
-          <a href="#" class="btn cancel">{{cancelText}}</a>\
-        <% } %>\
-      <% } %>\
-      <% if (allowOk) { %>\
-        <a href="#" class="btn ok btn-primary">{{okText}}</a>\
-      <% } %>\
-    </div>\
-  ',
+        template: require('text!oroui/templates/delete-confirmation.html'),
+
         /** @property {String} */
         className: 'modal oro-modal-danger',
 

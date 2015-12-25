@@ -77,7 +77,6 @@ define([
             return this.confirmModal;
         },
 
-
         /**
          * Need to handle POST and DELETE requests differently.
          *
