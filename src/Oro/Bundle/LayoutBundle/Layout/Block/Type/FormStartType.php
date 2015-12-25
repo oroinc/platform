@@ -37,8 +37,6 @@ class FormStartType extends AbstractFormType
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
-        $view->vars['form'] = $formAccessor->getView();
-
         // form action
         if (isset($options['form_action'])) {
             $path = $options['form_action'];
@@ -89,6 +87,10 @@ class FormStartType extends AbstractFormType
      */
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
+        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+
+        $view->vars['form'] = $formAccessor->getView();
+
         // final check of the view vars and their modification (if required)
         // we have to do this in the finishView because only here we can be sure that
         // expressions have been evaluated (if $context.expressions_evaluate is true)

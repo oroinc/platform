@@ -123,4 +123,16 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $result = $layout->render();
         $this->assertEquals($expected, $result);
     }
+
+    public function testSetFormTheme()
+    {
+        $theme = 'MyBundle::forms.html.twig';
+        $view = new BlockView();
+        $this->renderer->expects($this->once())
+            ->method('setFormTheme')
+            ->with([$theme]);
+        $layout = new Layout($view, $this->rendererRegistry);
+        $layout->setFormTheme($theme);
+        $layout->render();
+    }
 }

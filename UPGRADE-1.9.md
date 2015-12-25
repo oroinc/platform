@@ -221,6 +221,8 @@ after:
 
 ####LayoutBundle
 - `Oro\Bundle\LayoutBundle\EventListener\ThemeListener` added to the class cache as performance improvement
+- The theme definition should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
+- Deprecated method: placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`
 
 ####LocaleBundle
 - `Oro\Bundle\LocaleBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
