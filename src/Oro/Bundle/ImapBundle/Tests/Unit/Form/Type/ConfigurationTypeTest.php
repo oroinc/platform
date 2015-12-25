@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailFolderType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -26,6 +27,9 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
 
     protected function setUp()
     {
@@ -53,7 +57,13 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->setMethods(['hasConfig', 'getConfig', 'get'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -62,13 +72,14 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     protected function getExtensions()
     {
-        $tooltipExtension = new TooltipFormExtension();
+        $tooltipExtension = new TooltipFormExtension($this->configProvider, $this->translator);
 
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
+                        'oro_imap_configuration_check' => new CheckButtonType(),
                         'oro_email_email_folder' => new EmailFolderType(),
                         'oro_email_email_folder_tree' => new EmailFolderTreeType(),
                     ],
@@ -298,5 +309,11 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $this->assertNotSame($entity, $form->getData());
         $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertNull($form->getData());
+    }
+
+    public function testGetName()
+    {
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $this->assertEquals(ConfigurationType::NAME, $type->getName());
     }
 }
