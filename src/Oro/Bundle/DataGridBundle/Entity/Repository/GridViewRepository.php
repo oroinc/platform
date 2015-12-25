@@ -36,4 +36,26 @@ class GridViewRepository extends EntityRepository
 
         return $aclHelper->apply($qb)->getResult();
     }
+
+    /**
+     * @param AclHelper     $aclHelper
+     * @param UserInterface $user
+     * @param               $gridName
+     *
+     * @return mixed
+     */
+    public function findUserDefaultGridView(AclHelper $aclHelper, UserInterface $user, $gridName)
+    {
+        $qb = $this->createQueryBuilder('gv');
+        $qb->innerJoin('gv.users', 'u')
+            ->where('gv.gridName = :gridName')
+            ->andWhere('u = :user')
+            ->setParameters([
+                'gridName' => $gridName,
+                'user'    => $user
+            ])
+            ->setMaxResults(1);
+
+        return $aclHelper->apply($qb)->getOneOrNullResult();
+    }
 }

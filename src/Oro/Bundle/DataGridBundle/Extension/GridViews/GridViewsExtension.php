@@ -76,8 +76,9 @@ class GridViewsExtension extends AbstractExtension
         }
 
         /** @var AbstractViewsList $list */
-        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
-        $gridViews = [
+        $list          = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
+        $systemAllView = new View(self::DEFAULT_VIEW_ID);
+        $gridViews     = [
             'choices' => [
                 [
                     'label' => $allLabel,
@@ -85,7 +86,7 @@ class GridViewsExtension extends AbstractExtension
                 ],
             ],
             'views' => [
-                (new View(self::DEFAULT_VIEW_ID))->getMetadata(),
+                $systemAllView->getMetadata(),
             ],
         ];
         if ($list !== false) {
@@ -100,7 +101,7 @@ class GridViewsExtension extends AbstractExtension
             $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
             $gridViews = $event->getGridViews();
         }
-
+        $systemAllView->setIsDefault($gridViews['default'] === null);
         $gridViews['gridName'] = $config->getName();
         $gridViews['permissions'] = $this->getPermissions();
         $data->offsetAddToArray('gridViews', $gridViews);

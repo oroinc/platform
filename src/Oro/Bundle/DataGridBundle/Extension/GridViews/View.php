@@ -25,6 +25,9 @@ class View
     /** @var bool */
     protected $deletable = false;
 
+    /** @var bool */
+    protected $isDefault = false;
+
     /**
      * @var array
      *
@@ -195,6 +198,26 @@ class View
     }
 
     /**
+     * @return boolean
+     */
+    public function isIsDefault()
+    {
+        return $this->isDefault;
+    }
+
+    /**
+     * @param boolean $isDefault
+     *
+     * @return $this
+     */
+    public function setIsDefault($isDefault)
+    {
+        $this->isDefault = $isDefault;
+
+        return $this;
+    }
+
+    /**
      * Convert to view data
      *
      * @return array
@@ -202,14 +225,15 @@ class View
     public function getMetadata()
     {
         return [
-            'name'      => $this->getName(),
-            'label'     => $this->label,
-            'type'      => $this->getType(),
-            'filters'   => $this->getFiltersData(),
-            'sorters'   => $this->getSortersData(),
-            'columns'   => $this->columnsData,
-            'editable'  => $this->editable,
-            'deletable' => $this->deletable,
+            'name'       => $this->getName(),
+            'label'      => $this->label,
+            'type'       => $this->getType(),
+            'filters'    => $this->getFiltersData(),
+            'sorters'    => $this->getSortersData(),
+            'columns'    => $this->columnsData,
+            'editable'   => $this->editable,
+            'deletable'  => $this->deletable,
+            'is_default' => $this->isDefault
         ];
     }
 }

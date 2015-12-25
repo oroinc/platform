@@ -20,7 +20,8 @@ define([
             sorters: [],
             columns: {},
             deletable: false,
-            editable:  false
+            editable:  false,
+            is_default: false
         },
 
         /** @property */
@@ -77,7 +78,7 @@ define([
          * @returns {Array}
          */
         toJSON: function() {
-            return _.omit(this.attributes, ['editable', 'deletable']);
+            return _.omit(this.attributes, ['editable', 'deletable', 'is_default']);
         }
     });
 

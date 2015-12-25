@@ -55,18 +55,19 @@ class GridViewsLoadListener
             return;
         }
 
-        $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
+        $gridViewRepository = $this->getGridViewRepository();
+        $gridViews          = $gridViewRepository->findGridViews($this->aclHelper, $currentUser, $gridName);
+        $defaultGridView    = $gridViewRepository->findUserDefaultGridView($this->aclHelper, $currentUser, $gridName);
         if (!$gridViews) {
             return;
         }
-
         $choices = [];
         $views = [];
         foreach ($gridViews as $gridView) {
             $view = $gridView->createView();
             $view->setEditable($this->securityFacade->isGranted('EDIT', $gridView));
             $view->setDeletable($this->securityFacade->isGranted('DELETE', $gridView));
-
+            $view->setIsDefault($defaultGridView === $gridView);
             $views[] = $view->getMetadata();
             $choices[] = [
                 'label' => $this->createGridViewLabel($currentUser, $gridView),
@@ -77,6 +78,7 @@ class GridViewsLoadListener
         $newGridViews = $event->getGridViews();
         $newGridViews['choices'] = array_merge($newGridViews['choices'], $choices);
         $newGridViews['views'] = array_merge($newGridViews['views'], $views);
+        $newGridViews['default'] = $defaultGridView;
 
         $event->setGridViews($newGridViews);
     }

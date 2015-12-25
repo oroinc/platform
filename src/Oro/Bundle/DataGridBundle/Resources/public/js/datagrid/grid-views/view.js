@@ -34,7 +34,8 @@ define([
             'click a.unshare': 'onUnshare',
             'click a.delete': 'onDelete',
             'click a.rename': 'onRename',
-            'click a.discard_changes': 'onDiscardChanges'
+            'click a.discard_changes': 'onDiscardChanges',
+            'click a.use_as_default': 'onUseAsDefault'
         },
 
         /** @property */
@@ -372,6 +373,14 @@ define([
         },
 
         /**
+         * @param {Event} e
+         */
+        onUseAsDefault: function(e) {
+            var model = this._getCurrentViewModel();
+            var self = this;
+        },
+
+        /**
          * @private
          *
          * @param {GridViewModel} model
@@ -543,6 +552,11 @@ define([
                     name: 'delete',
                     enabled: typeof currentView !== 'undefined' &&
                             currentView.get('deletable')
+                },
+                {
+                    label: __('oro.datagrid.action.use_as_default_grid_view'),
+                    name: 'use_as_default',
+                    enabled: !currentView.get('is_default')
                 }
             ];
         },
