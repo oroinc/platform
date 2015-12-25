@@ -14,8 +14,10 @@ parameters:
     oro_imap.workflow.action.dependency_job.class:   Oro\Bundle\ImapBundle\Workflow\Action\DependencyJob
 
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
-    oro_imap.form.type.check_button.class:          Oro\Bundle\ImapBundle\Form\Type\CheckButtonType
+    oro_imap.form.type.check_button.class:           Oro\Bundle\ImapBundle\Form\Type\CheckButtonType
     oro_imap.listener.user_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
+
+    oro_imap.form.type.google_sync_checkbox.class:   Oro\Bundle\ImapBundle\Form\Type\GoogleSyncConfigCheckbox
 
     oro_imap.form.type.choice_account.class:          Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType
 services:
@@ -119,3 +121,8 @@ services:
             - @doctrine
         tags:
             - { name: oro_workflow.action, alias: job_add_dependency }
+
+    oro_imap.form.type.google_sync_checkbox:
+        class: %oro_imap.form.type.google_sync_checkbox.class%
+        tags:
+            - { name: form.type, alias: oro_config_google_imap_sync_checkbox }
