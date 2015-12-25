@@ -3,5 +3,3 @@ data:
         styles:
             inputs:
                 - 'bundles/orofilter/css/less/oro.filter.less'
-                - 'bundles/orofilter/lib/multiselect/jquery.multiselect.css'
-                - 'bundles/orofilter/lib/multiselect/jquery.multiselect.filter.css'
