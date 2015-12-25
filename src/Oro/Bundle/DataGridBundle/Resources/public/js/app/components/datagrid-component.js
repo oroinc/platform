@@ -167,9 +167,6 @@ define(function(require) {
             if (!collection) {
                 // otherwise, create collection from metadata
                 collection = new PageableCollection(collectionModels, collectionOptions);
-            } else if (this.data) {
-                _.extend(collectionOptions, {parse: true});
-                collection.reset(collectionModels, collectionOptions);
             }
 
             // create grid
