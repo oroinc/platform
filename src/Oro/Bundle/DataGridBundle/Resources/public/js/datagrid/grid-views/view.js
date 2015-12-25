@@ -6,8 +6,9 @@ define([
     './model',
     './view-name-modal',
     'oroui/js/mediator',
-    'oroui/js/delete-confirmation'
-], function(Backbone, _, __, GridViewsCollection, GridViewModel, ViewNameModal, mediator, DeleteConfirmation) {
+    'oroui/js/delete-confirmation',
+    'routing'
+], function(Backbone, _, __, GridViewsCollection, GridViewModel, ViewNameModal, mediator, DeleteConfirmation, routing) {
     'use strict';
 
     var GridViewsView;
@@ -376,8 +377,33 @@ define([
          * @param {Event} e
          */
         onUseAsDefault: function(e) {
-            var model = this._getCurrentViewModel();
             var self = this;
+            var isDefault = 1;
+            var defaultModel = this._getCurrentDefaultViewModel();
+            var currentViewModel = this._getCurrentViewModel();
+            var id = currentViewModel.id;
+            if (this._isSystemView()) {
+                isDefault = 0;
+                id = defaultModel.id;
+                if (defaultModel.id === self.DEFAULT_GRID_VIEW_ID) {
+                    return self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                }
+            }
+
+            return $.post(
+                routing.generate('oro_datagrid_api_rest_gridview_set_default', {
+                    id: id,
+                    default: isDefault
+                }),
+                {},
+                function(response) {
+                    defaultModel.set('is_default', false);
+                    currentViewModel.set('is_default', true);
+                    mediator.trigger('datagrid:' + this.gridName + ':views:change', currentViewModel);
+
+                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                }
+            );
         },
 
         /**
@@ -584,6 +610,30 @@ define([
             return this.viewsCollection.findWhere({
                 name: this._getCurrentView().value
             });
+        },
+
+        /**
+         * @private
+         *
+         * @returns {undefined|GridViewModel}
+         */
+        _getCurrentDefaultViewModel: function() {
+            if (!this._hasActiveView()) {
+                return;
+            }
+
+            return this.viewsCollection.findWhere({
+                is_default: true
+            });
+        },
+
+        /**
+         * @private
+         *
+         * @returns {boolean}
+         */
+        _isSystemView: function() {
+            return this._getCurrentView().value === this.DEFAULT_GRID_VIEW_ID;
         },
 
         /**

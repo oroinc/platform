@@ -57,7 +57,7 @@ class GridViewsLoadListener
 
         $gridViewRepository = $this->getGridViewRepository();
         $gridViews          = $gridViewRepository->findGridViews($this->aclHelper, $currentUser, $gridName);
-        $defaultGridView    = $gridViewRepository->findUserDefaultGridView($this->aclHelper, $currentUser, $gridName);
+        $defaultGridView    = $gridViewRepository->findDefaultGridView($currentUser, $gridName);
         if (!$gridViews) {
             return;
         }

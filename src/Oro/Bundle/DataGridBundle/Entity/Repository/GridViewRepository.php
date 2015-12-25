@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity\Repository;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -38,13 +40,48 @@ class GridViewRepository extends EntityRepository
     }
 
     /**
-     * @param AclHelper     $aclHelper
      * @param UserInterface $user
-     * @param               $gridName
+     * @param string        $gridName
      *
-     * @return mixed
+     * @return GridView|null
      */
-    public function findUserDefaultGridView(AclHelper $aclHelper, UserInterface $user, $gridName)
+    public function findDefaultGridView(UserInterface $user, $gridName)
+    {
+        $qb = $this->getFindDefaultGridViewQb($user, $gridName);
+
+        return $qb->setMaxResults(1)->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * @param User     $user
+     * @param GridView $gridView
+     * @param bool     $default
+     */
+    public function setGridViewDefault(User $user, GridView $gridView, $default)
+    {
+        /** @var GridView[] $defaultGridViews */
+        $defaultGridViews = $this
+            ->getFindDefaultGridViewQb($user, $gridView->getGridName())
+            ->getQuery()
+            ->getResult();
+
+        foreach ($defaultGridViews as $view) {
+            $view->removeUser($user);
+        }
+        if ($default) {
+            $gridView->addUser($user);
+        }
+
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param string        $gridName
+     *
+     * @return QueryBuilder
+     */
+    protected function getFindDefaultGridViewQb(UserInterface $user, $gridName)
     {
         $qb = $this->createQueryBuilder('gv');
         $qb->innerJoin('gv.users', 'u')
@@ -52,10 +89,9 @@ class GridViewRepository extends EntityRepository
             ->andWhere('u = :user')
             ->setParameters([
                 'gridName' => $gridName,
-                'user'    => $user
-            ])
-            ->setMaxResults(1);
+                'user'     => $user
+            ]);
 
-        return $aclHelper->apply($qb)->getOneOrNullResult();
+        return $qb;
     }
 }

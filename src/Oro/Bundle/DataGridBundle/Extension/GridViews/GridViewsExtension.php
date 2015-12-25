@@ -85,9 +85,7 @@ class GridViewsExtension extends AbstractExtension
                     'value' => self::DEFAULT_VIEW_ID,
                 ],
             ],
-            'views' => [
-                $systemAllView->getMetadata(),
-            ],
+            'views' => [],
         ];
         if ($list !== false) {
             $configuredGridViews = $list->getMetadata();
@@ -101,9 +99,11 @@ class GridViewsExtension extends AbstractExtension
             $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
             $gridViews = $event->getGridViews();
         }
-        $systemAllView->setIsDefault($gridViews['default'] === null);
+        $systemAllView->setIsDefault(empty($gridViews['default']));
+        unset($gridViews['default']);
         $gridViews['gridName'] = $config->getName();
         $gridViews['permissions'] = $this->getPermissions();
+        $gridViews['views'][] = $systemAllView->getMetadata();
         $data->offsetAddToArray('gridViews', $gridViews);
     }
 
