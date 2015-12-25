@@ -15,9 +15,9 @@ define(function(require) {
         scopes: ['https://www.googleapis.com/auth/gmail.readonly'],
 
         initialize: function(options) {
-            require(['//apis.google.com/js/client.js?onload=checkAuth']);
-
-            this.$clientIdElement = $('input[id*="client_id"]');
+            this.$clientIdElement = options._sourceElement
+                .closest('form[name="google_settings"]')
+                .find('input[id*="client_id"]');
 
             this.view = new GoogleSyncCheckboxView({
                 el: options._sourceElement,
@@ -25,7 +25,9 @@ define(function(require) {
                 successMessage: options.successMessage
             });
 
-            this.listenTo(this.view, 'requestToken', this.requestToken);
+            require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
+                this.listenTo(this.view, 'requestToken', this.requestToken);
+            }, this));
         },
 
         requestToken: function() {

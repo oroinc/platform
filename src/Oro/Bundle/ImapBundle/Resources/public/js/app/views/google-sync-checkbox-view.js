@@ -19,11 +19,13 @@ define(function(require) {
             'change input[type=checkbox]' : 'onChangeCheckBox'
         },
 
+        listen: {
+            'change:canShowMessage': 'render'
+        },
+
         initialize: function(options) {
             this.$errorMessage = this.$el.find(options.errorMessage);
             this.$successMessage = this.$el.find(options.successMessage);
-
-            this.listenTo(this, 'change:canShowMessage', this.render);
         },
 
         render: function() {
