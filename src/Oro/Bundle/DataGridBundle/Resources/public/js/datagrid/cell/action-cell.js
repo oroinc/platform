@@ -209,7 +209,7 @@ define([
             launchers = this.getLaunchersByIcons();
             $listsContainer = this.$(this.launchersContainerSelector);
 
-            if (this.showCloseButton) {
+            if (this.showCloseButton && this.launchers.length >= this.actionsHideCount) {
                 $listsContainer.append(this.closeButtonTemplate());
             }
 
