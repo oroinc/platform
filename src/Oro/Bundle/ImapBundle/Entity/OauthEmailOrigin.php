@@ -6,6 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
+/**
+ * Class OauthEmailOrigin
+ * @package Oro\Bundle\ImapBundle\Entity
+ *
+ * @ORM\Entity
+ */
 class OauthEmailOrigin extends EmailOrigin
 {
     /**
@@ -24,11 +30,11 @@ class OauthEmailOrigin extends EmailOrigin
     }
 
     /**
-     * @param $accessToken
+     * @param string $accessToken
      *
      * @return OauthEmailOrigin
      */
-    public function setServer($accessToken)
+    public function setAccessToken($accessToken)
     {
         $this->accessToken = $accessToken;
 
