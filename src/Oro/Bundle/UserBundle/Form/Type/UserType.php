@@ -153,8 +153,14 @@ class UserType extends AbstractType
                     'prototype_name' => 'tag__name__'
                 ]
             )
+            ->add(
+                'imapAccountType',
+                'oro_imap_choice_account_type',
+                [
+                    'label' => 'oro.user.imap_configuration.label',
+                ]
+            )
 
-            ->add('imapAccountType', 'oro_imap_choice_account_type', ['label' => 'oro.user.imap_configuration.label'])
             ->add('change_password', ChangePasswordType::NAME)
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 

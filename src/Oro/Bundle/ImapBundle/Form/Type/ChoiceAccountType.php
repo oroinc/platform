@@ -28,7 +28,7 @@ class ChoiceAccountType extends AbstractType
 
         $builder->add('accountType', 'choice', [
             'label' => 'Account Type',
-            'choices' => ['Gmail' => 'Gmail', 'Other' => 'Other'],
+            'choices' => ['Select' => 'Select Type', 'Gmail' => 'Gmail', 'Other' => 'Other'],
         ]);
 
         $this->initEvents($builder);
@@ -47,7 +47,11 @@ class ChoiceAccountType extends AbstractType
 
             if ($accountTypeModel instanceof AccountTypeModel) {
                 if ($accountTypeModel->getAccountType() === 'Other') {
-                    $form->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label', 'mapped' => false]);
+                    $form->add('imapConfiguration', 'oro_imap_configuration', ['mapped' => false]);
+                }
+
+                if ($accountTypeModel->getAccountType() === 'Gmail') {
+                    $form->add('imapGmailConfiguration', 'oro_imap_configuration_gmail');
                 }
             }
         });

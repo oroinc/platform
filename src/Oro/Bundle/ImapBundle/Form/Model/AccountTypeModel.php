@@ -6,6 +6,8 @@ class AccountTypeModel
 {
     protected $accountType;
 
+    protected $imapGmailConfiguration;
+
     public function getAccountType()
     {
         return $this->accountType;
@@ -14,5 +16,15 @@ class AccountTypeModel
     public function setAccountType($value)
     {
         $this->accountType = $value;
+    }
+
+    public function getImapGmailConfiguration()
+    {
+        return $this->imapGmailConfiguration;
+    }
+
+    public function setImapGmailConfiguration($value)
+    {
+        $this->imapGmailConfiguration = $value;
     }
 }

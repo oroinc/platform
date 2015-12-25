@@ -1,3 +1,11 @@
 <fieldset class="form-horizontal">
-    {{ form_widget(form.imapAccountType) }}
+    {{ form_row(form.imapAccountType.accountType) }}
+
+    {% if form.imapAccountType.imapConfiguration is defined %}
+        {{ form_widget(form.imapAccountType.imapConfiguration) }}
+    {% endif %}
+
+    {% if form.imapAccountType.imapGmailConfiguration is defined %}
+        {{ form_widget(form.imapAccountType.imapGmailConfiguration) }}
+    {% endif %}
 </fieldset>

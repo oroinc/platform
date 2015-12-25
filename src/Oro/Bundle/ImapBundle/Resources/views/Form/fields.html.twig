@@ -1,4 +1,4 @@
-{% block oro_imap_configuration_check_row %}
+{% block oro_imap_configuration_check_widget %}
     {% set data = form.parent.parent.vars.value %}
     {% if data and data.username is defined %}
         {% set forEntity = 'user' %}
@@ -26,11 +26,10 @@
     <div class="container-config-group"
          data-page-component-module="oroimap/js/app/components/check-config-settings"
          data-page-component-options="">
-    </div>
+    </div>`
 {% endblock %}
 
 {% block oro_imap_choice_account_type_widget %}
-    {{- block('form_widget') -}}
 
     {% set options = {
         'url' :  path("oro_imap_change_account_type"),
@@ -40,5 +39,20 @@
     <div class="container-change-account-type"
         data-page-component-module="oroimap/js/app/components/account-type-component"
         data-page-component-options="{{ options|json_encode }}">
+        {{- block('form_widget') -}}
+    </div>
+{% endblock %}
+
+{% block oro_imap_configuration_gmail_widget %}
+
+    {% set options = {
+        'url' :  path("oro_imap_change_account_type"),
+        'formSelector': '#'~formSelector|default(form.vars.id)
+    } %}
+
+    <div class="container-imap-gmail-container"
+         data-page-component-module="oroimap/js/app/components/imap-gmail-component"
+         data-page-component-options="{{ options|json_encode }}">
+        {{- block('form_widget') -}}
     </div>
 {% endblock %}

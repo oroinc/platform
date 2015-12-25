@@ -6,6 +6,7 @@ use FOS\RestBundle\Util\Codes;
 
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Model\IMapGmailModel;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -128,15 +129,31 @@ class ConnectionController extends Controller
     }
 
     /**
-     * @Route("imap/connection/account/change", name="oro_imap_change_account_type", methods={"POST"})
+     * @Route("gmail/connection/check", name="oro_imap_connection_gmail_check", methods={"POST"})
+     */
+    public function checkGmailAction(Request $request)
+    {
+        $response = [];
+
+        return new JsonResponse($response);
+    }
+
+    /**
+     * @Route("imap/connection/account/change", name="oro_imap_change_account_type", methods={"GET"})
      */
     public function getFormAction()
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
 
         $type = $request->get('type');
+        $token = $request->get('token');
+
+        $iMapGmailModel = new IMapGmailModel();
+        $iMapGmailModel->setToken($token);
+
         $accountTypeModel = new AccountTypeModel();
         $accountTypeModel->setAccountType($type);
+        $accountTypeModel->setImapGmailConfiguration($iMapGmailModel);
 
         $user = new User();
         $user->setImapAccountType($accountTypeModel);
