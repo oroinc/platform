@@ -878,13 +878,8 @@ footer {
   }
 }
 .ui-dialog.ui-resizable:not(.ui-dialog-buttons) {
-  &:after{
-    display: block;
-    height: 15px;
-    content: " ";
-    flex: none;
-  }
   .ui-dialog-content{
+    height: calc(~"100% - 50px") !important;
     border-radius: 0 0 3px 3px;
     border-bottom: 1px solid #e5e5e5;
   }
@@ -1654,19 +1649,6 @@ footer {
     }
   }
   &.ui-dialog-normal {
-    display: flex !important;
-    flex-direction: column;
-    .ui-dialog-titlebar {
-      min-height: 34px;
-      flex: none;
-    }
-    .ui-dialog-content {
-      flex: 1;
-    }
-    .ui-dialog-buttonpane {
-      height: 49px;
-      flex: none;
-    }
     [class*='ui-dialog-titlebar-'] {
       &:hover:before {
         #gradient > .vertical(darken(#838d98,5%), darken(#46515d,5%));
@@ -2643,7 +2625,7 @@ label.radio.error {
   float: left;
   background: none;
   margin: 0;
-  padding: 6px 15px 0 20px;
+  padding: 6px 15px 6px 20px;
 }
 .breadcrumb > li.active,
 .breadcrumb > li {

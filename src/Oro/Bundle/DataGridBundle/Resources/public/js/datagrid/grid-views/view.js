@@ -590,10 +590,10 @@ define([
             var currentView = this._getCurrentView();
 
             if (typeof currentView === 'undefined') {
-                return this.title ? this.title : __('Please select view');
+                return this.title ? $.trim(this.title) : __('Please select view');
             }
 
-            return currentView.label;
+            return $.trim(currentView.label);
         },
 
         /**
