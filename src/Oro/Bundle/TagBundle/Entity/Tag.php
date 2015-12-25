@@ -30,6 +30,14 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "organization_field_name"="organization",
  *              "organization_column_name"="organization_id"
  *          },
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "virtual_fields"={"id"},
+ *              "search_fields"={"name"},
+ *              "representation_field"="name",
+ *          },
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
@@ -44,6 +52,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "immutable"=true
  *          },
  *          "attachment"={
+ *              "immutable"=true
+ *          },
+ *          "tag"={
  *              "immutable"=true
  *          }
  *      }
@@ -214,6 +225,16 @@ class Tag extends ExtendTag
     public function getTagging()
     {
         return $this->tagging;
+    }
+
+    /**
+     * @param Tagging $tagging
+     */
+    public function addTagging(Tagging $tagging)
+    {
+        if (!$this->tagging->contains($tagging)) {
+            $this->tagging->add($tagging);
+        }
     }
 
     /**

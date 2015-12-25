@@ -8,3 +8,4 @@ config:
         'oro/select2-entity-field-component': 'bundles/oroentity/js/components/select2-entity-field-component.js'
         'oro/select2-entity-field-choice-component': 'bundles/oroentity/js/components/select2-entity-field-choice-component.js'
         'oro/select2-entity-field-select-component': 'bundles/oroentity/js/components/select2-entity-field-select-component.js'
+        'oroentity/js/tools/entity-select-search-api-accessor': 'bundles/oroentity/js/tools/entity-select-search-api-accessor.js'

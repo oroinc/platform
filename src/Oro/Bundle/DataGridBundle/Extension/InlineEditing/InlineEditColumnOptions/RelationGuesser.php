@@ -11,7 +11,7 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
  */
 class RelationGuesser implements GuesserInterface
 {
-    const DEFAULT_EDITOR_VIEW = 'orodatagrid/js/app/views/editor/related-id-relation-editor-view';
+    const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/related-id-relation-editor-view';
     const DEFAULT_API_ACCESSOR_CLASS = 'oroui/js/tools/search-api-accessor';
 
     /** Frontend type */

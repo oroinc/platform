@@ -1,0 +1,2 @@
+bundles:
+    - OroTagBundle:Form/Include:fields.html.twig

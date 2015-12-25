@@ -53,11 +53,6 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
                 return null;
             }
 
-            // exclude hidden entities
-            if ($this->configManager->isHiddenModel($entityClass)) {
-                return false;
-            }
-
             // check for custom entities
             if (ExtendHelper::isCustomEntity($entityClass)) {
                 $entityAlias = $this->getEntityAliasFromConfig($entityClass);

@@ -11,7 +11,7 @@ define(function(require) {
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var backdropManager = require('oroui/js/tools/backdrop-manager');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
-    require('orodatagrid/js/app/views/editor/text-editor-view');
+    require('oroform/js/app/views/editor/text-editor-view');
 
     InlineEditingPlugin = BasePlugin.extend({
         /**
@@ -29,7 +29,7 @@ define(function(require) {
         /**
          * This view is used by default for editing
          */
-        DEFAULT_VIEW: 'orodatagrid/js/app/views/editor/text-editor-view',
+        DEFAULT_VIEW: 'oroform/js/app/views/editor/text-editor-view',
 
         /**
          * This view is used by default for editing
@@ -55,17 +55,17 @@ define(function(require) {
 
         constructor: function() {
             this.onKeyDown = _.bind(this.onKeyDown, this);
-            this.hidePopover = _.bind(this.hidePopover, this);
             InlineEditingPlugin.__super__.constructor.apply(this, arguments);
         },
 
         enable: function() {
+            this.main.$el.addClass('grid-editable');
             this.listenTo(this.main, {
                 afterMakeCell: this.onAfterMakeCell,
-                shown: this.onGridShown,
-                rowClicked: this.onGridRowClicked
+                shown: this.onGridShown
             });
             this.listenTo(mediator, 'page:beforeChange', function() {
+                this.hidePopover();
                 if (this.editModeEnabled) {
                     this.exitEditMode(true);
                 }
@@ -84,17 +84,10 @@ define(function(require) {
             if (this.editModeEnabled) {
                 this.exitEditMode(true);
             }
-            this.hidePopover();
+            this.main.$el.removeClass('grid-editable');
             this.main.body.refresh();
-            InlineEditingPlugin.__super__.disable.call(this);
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
             this.destroyPopover();
-            return InlineEditingPlugin.__super__.dispose.call(this);
+            InlineEditingPlugin.__super__.disable.call(this);
         },
 
         onAfterMakeCell: function(row, cell) {
@@ -108,21 +101,21 @@ define(function(require) {
             }
             var originalRender = cell.render;
             cell.render = function() {
-                originalRender.apply(this, arguments);
-                var originalEvents = this.events;
-                if (_this.isEditable(this)) {
-                    this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    this.$el.append('<i class="icon-edit hide-text">Edit</i>');
-                    this.events = _.extend(Object.create(this.events), {
+                var cell = this;
+                originalRender.apply(cell, arguments);
+                var originalEvents = cell.events;
+                if (_this.isEditable(cell)) {
+                    cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
+                    cell.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    cell.events = _.extend(Object.create(cell.events), {
                         'dblclick': enterEditModeIfNeeded,
-                        'mouseleave': _this.hidePopover,
                         'mousedown .icon-edit': enterEditModeIfNeeded,
                         'click': _.noop
                     });
                 }
-                this.delegateEvents();
-                this.events = originalEvents;
-                return this;
+                cell.delegateEvents();
+                cell.events = originalEvents;
+                return cell;
             };
         },
 
@@ -130,15 +123,10 @@ define(function(require) {
             this.initPopover();
         },
 
-        onGridRowClicked: function(grid, row) {
-            row.$('.editable').removeClass('editable');
-            this.hidePopover();
-        },
-
         initPopover: function() {
             this.main.$el.popover({
-                content: __('oro.datagrid.inlineEditing.helpMessage'),
-                container: document.body,
+                content: __('oro.form.inlineEditing.helpMessage'),
+                container: this.main.$el,
                 selector: 'td.editable',
                 placement: 'bottom',
                 delay: {show: 1400, hide: 0},
@@ -155,6 +143,7 @@ define(function(require) {
 
         destroyPopover: function() {
             if (this.main.$el.data('popover')) {
+                this.hidePopover();
                 this.main.$el.popover('destroy');
             }
         },
@@ -242,6 +231,7 @@ define(function(require) {
                 this.exitEditMode(false);
             } else {
                 if (backdropManager.isReleased(this.backdropId)) {
+                    this.hidePopover(); // before adding backdrop
                     this.backdropId = backdropManager.hold();
                     $(document).on('keydown', this.onKeyDown);
                 }
@@ -348,11 +338,17 @@ define(function(require) {
                 newData[this.editor.save_api_accessor.initialOptions.field_name] = serverUpdateData[keys[0]];
                 serverUpdateData = newData;
             }
-            this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
-                    processingMessage: __('oro.datagrid.inlineEditing.saving_progress'),
-                    preventWindowUnload: __('oro.datagrid.inlineEditing.inline_edits')
-                })
-                .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
+            var savePromise = this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
+                processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
+            });
+            if (this.editor.component.processSavePromise) {
+                savePromise = this.editor.component.processSavePromise(savePromise, cell.column.get('metadata'));
+            }
+            if (this.editor.view.processSavePromise) {
+                savePromise = this.editor.view.processSavePromise(savePromise, cell.column.get('metadata'));
+            }
+            savePromise.done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
                 .always(function() {
                     cell.$el.removeClass('loading');
@@ -459,7 +455,7 @@ define(function(require) {
         },
 
         _onRequireJsError: function() {
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.loadingError'));
+            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.loadingError'));
         },
 
         /**
@@ -573,32 +569,24 @@ define(function(require) {
         onSaveSuccess: function(response) {
             if (!this.cell.disposed && this.cell.$el) {
                 if (response) {
-                    var routeParametersRenameMap
-                        = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
-                    for (var i in routeParametersRenameMap) {
-                        if (typeof response[routeParametersRenameMap[i]] !== 'undefined') {
-                            this.cell.model.set(i, response[routeParametersRenameMap[i]]);
+                    var routeParametersRenameMap = _.invert(this.cell.column.get('metadata').inline_editing.
+                        save_api_accessor.routeParametersRenameMap);
+                    _.each(response, function(item, i) {
+                        var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
+                        if (this.cell.model.has(propName)) {
+                            this.cell.model.set(propName, item);
                         }
-                    }
+                    }, this);
                 }
-
-                var _this = this;
-                this.cell.$el.addClass('save-success');
-                _.delay(function() {
-                    _this.cell.$el.removeClass('save-success');
-                }, 2000);
+                this.cell.$el.addClassTemporarily('save-success', 2000);
             }
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.successMessage'));
+            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },
 
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.cell.disposed && this.cell.$el) {
-                var _this = this;
-                this.cell.$el.addClass('save-fail');
-                _.delay(function() {
-                    _this.cell.$el.removeClass('save-fail');
-                }, 2000);
+                this.cell.$el.addClassTemporarily('save-fail', 2000);
             }
             this.cell.model.set(this.oldState);
             this.main.trigger('content:update');

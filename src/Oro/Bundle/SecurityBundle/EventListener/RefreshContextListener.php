@@ -116,7 +116,6 @@ class RefreshContextListener
         if (!$organization) {
             return;
         }
-
         $token->setOrganizationContext($organization);
     }
 

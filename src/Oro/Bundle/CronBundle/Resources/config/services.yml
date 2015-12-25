@@ -39,3 +39,6 @@ services:
             - @oro_cron.command_args_tokenizer
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
+
+    oro_cron.helper.cron:
+        class: Oro\Bundle\CronBundle\Helper\CronHelper
