@@ -34,11 +34,15 @@ define([
         confirmMessages: {
             selected_message: 'oro.datagrid.mass_action.delete.selected_message',
             max_limit_message: 'oro.datagrid.mass_action.delete.max_limit_message',
-            restricted_access_message: 'oro.datagrid.mass_action.delete.restricted_access_message'
+            restricted_access_message: 'oro.datagrid.mass_action.delete.restricted_access_message',
+            restricted_access_empty_message: 'oro.datagrid.mass_action.delete.restricted_access_empty_message'
         },
 
         /** @property {String} */
         confirmMessage: null,
+
+        /** @property {Boolean} */
+        allowOk: true,
 
         /**
          * As in this action we need to send POST request to get data for confirm message
@@ -51,6 +55,28 @@ define([
             this.confirmMessage = __(this.defaultMessages.confirm_content);
             this.confirmation = false;
         },
+
+        /**
+         * Get view for confirm modal
+         *
+         * @return {oroui.Modal}
+         */
+        getConfirmDialog: function(callback) {
+            if (!this.confirmModal) {
+                this.confirmModal = (new this.confirmModalConstructor({
+                    title: __(this.messages.confirm_title),
+                    content: this.getConfirmContentMessage(),
+                    okText: __(this.messages.confirm_ok),
+                    cancelText: __(this.messages.confirm_cancel),
+                    allowOk: this.allowOk
+                }));
+                this.listenTo(this.confirmModal, 'ok', callback);
+
+                this.subviews.push(this.confirmModal);
+            }
+            return this.confirmModal;
+        },
+
 
         /**
          * Need to handle POST and DELETE requests differently.
@@ -100,8 +126,12 @@ define([
          * @param data
          */
         setConfirmMessage: function(data) {
+            this.allowOk = true;
             if (this.isDefined(data.selected) && this.isDefined(data.deletable) && this.isDefined(data.max_limit)) {
-                if (data.deletable <= data.max_limit) {
+                if (data.deletable === 0) {
+                    this.confirmMessage = __(this.confirmMessages.restricted_access_empty_message);
+                    this.allowOk = false;
+                } else if (data.deletable <= data.max_limit) {
                     if (data.deletable >= data.selected) {
                         this.confirmMessage = __(this.confirmMessages.selected_message, {selected: data.selected});
                     } else {
