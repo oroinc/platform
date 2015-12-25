@@ -83,6 +83,15 @@ oro:
             close_tooltip: "Close Column Manager"
             empty_list: "No columns found"
         not_number: Not a number
+        inline_editing:
+            help: |
+                <ul style="margin-bottom: 0px;">
+                    <li><span style="font-family: monospace">Enter</span>, <span style="font-family: monospace">Shift + Enter</span> - Save and edit next/previous cell in column</li>
+                	<li><span style="font-family: monospace">Tab</span>, <span style="font-family: monospace">Shift + Tab</span> - Save and edit next/previous cell in row</li>
+                	<li><span style="font-family: monospace">Alt + ←/↑/→/↓  </span> - Navigate between cells</li>
+                	<li><span style="font-family: monospace">Ctrl + Enter</span> - Save and close</li>
+                	<li><span style="font-family: monospace">Escape</span> - Quit</li>
+                </ul>
         mass_action:
             delete:
                 selected_message: >

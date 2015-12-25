@@ -11,6 +11,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockBuilderInterface;
 
+use Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
 
 /**
@@ -69,6 +70,9 @@ class FormType extends AbstractFormType
                 }
             ]
         );
+        $resolver
+            ->setOptional(['form_data']);
+
         $resolver->setAllowedTypes(
             [
                 'preferred_fields'  => 'array',
@@ -95,7 +99,12 @@ class FormType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
+        $view->vars['form_data'] = isset($options['form_data']) ? $options['form_data'] : null;
+
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        if ($formAccessor instanceof ConfigurableFormAccessorInterface) {
+            $formAccessor->setFormData($view->vars['form_data']);
+        }
 
         $view->vars['form'] = $formAccessor->getView();
     }

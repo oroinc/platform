@@ -16,7 +16,7 @@ class AuditGridListener
     protected $em;
 
     /** @var null|array */
-    protected $objectClassChoices = null;
+    protected $objectClassChoices;
 
     /**
      * @param EntityManager $em
@@ -34,11 +34,11 @@ class AuditGridListener
     public function getObjectClassOptions()
     {
         if (is_null($this->objectClassChoices)) {
-            $options = array();
+            $options = [];
 
             $result = $this->em->createQueryBuilder()
-                ->add('select', 'a.objectClass')
-                ->add('from', 'Oro\Bundle\DataAuditBundle\Entity\Audit a')
+                ->select('a.objectClass')
+                ->from('Oro\Bundle\DataAuditBundle\Entity\AbstractAudit', 'a')
                 ->distinct('a.objectClass')
                 ->getQuery()
                 ->getArrayResult();
