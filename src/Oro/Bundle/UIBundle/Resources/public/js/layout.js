@@ -53,10 +53,24 @@ define(function(require) {
          * @returns {number} development toolbar height in dev mode, 0 in production mode
          */
         getDevToolbarHeight: function() {
-            if (!this.devToolbarHeight) {
+            if (!mediator.execute('retrieveOption', 'debug')) {
+                return 0;
+            }
+            if (!this.devToolbarHeightListenersAttached) {
+                this.devToolbarHeightListenersAttached = true;
+                $(window).on('resize', function() {
+                    delete layout.devToolbarHeight;
+                });
+                mediator.on('debugToolbar:afterUpdateView', function() {
+                    delete layout.devToolbarHeight;
+                });
+            }
+            if (this.devToolbarHeight === void 0) {
                 var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
-                if (devToolbarComposition && devToolbarComposition.view) {
-                    this.devToolbarHeight = devToolbarComposition.view.$el.height();
+                if (devToolbarComposition &&
+                    devToolbarComposition.view &&
+                    devToolbarComposition.view.$('.sf-toolbarreset').is(':visible')) {
+                    this.devToolbarHeight = devToolbarComposition.view.$('.sf-toolbarreset').height();
                 } else {
                     this.devToolbarHeight = 0;
                 }
