@@ -19,7 +19,6 @@ class TextType extends AbstractType
     {
         $resolver->setDefaults(['escape' => true]);
         $resolver->setRequired(['text']);
-        $resolver->setAllowedTypes(['escape'=> 'bool']);
     }
 
     /**

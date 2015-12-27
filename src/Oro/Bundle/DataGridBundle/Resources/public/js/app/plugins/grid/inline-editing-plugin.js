@@ -59,6 +59,7 @@ define(function(require) {
         },
 
         enable: function() {
+            this.main.$el.addClass('grid-editable');
             this.listenTo(this.main, {
                 afterMakeCell: this.onAfterMakeCell,
                 shown: this.onGridShown
@@ -83,6 +84,7 @@ define(function(require) {
             if (this.editModeEnabled) {
                 this.exitEditMode(true);
             }
+            this.main.$el.removeClass('grid-editable');
             this.main.body.refresh();
             this.destroyPopover();
             InlineEditingPlugin.__super__.disable.call(this);
@@ -99,20 +101,21 @@ define(function(require) {
             }
             var originalRender = cell.render;
             cell.render = function() {
-                originalRender.apply(this, arguments);
-                var originalEvents = this.events;
-                if (_this.isEditable(this)) {
-                    this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    this.$el.append('<i class="icon-edit hide-text">Edit</i>');
-                    this.events = _.extend(Object.create(this.events), {
+                var cell = this;
+                originalRender.apply(cell, arguments);
+                var originalEvents = cell.events;
+                if (_this.isEditable(cell)) {
+                    cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
+                    cell.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    cell.events = _.extend(Object.create(cell.events), {
                         'dblclick': enterEditModeIfNeeded,
                         'mousedown .icon-edit': enterEditModeIfNeeded,
                         'click': _.noop
                     });
                 }
-                this.delegateEvents();
-                this.events = originalEvents;
-                return this;
+                cell.delegateEvents();
+                cell.events = originalEvents;
+                return cell;
             };
         },
 
@@ -335,11 +338,17 @@ define(function(require) {
                 newData[this.editor.save_api_accessor.initialOptions.field_name] = serverUpdateData[keys[0]];
                 serverUpdateData = newData;
             }
-            this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
-                    processingMessage: __('oro.form.inlineEditing.saving_progress'),
-                    preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
-                })
-                .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
+            var savePromise = this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
+                processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
+            });
+            if (this.editor.component.processSavePromise) {
+                savePromise = this.editor.component.processSavePromise(savePromise, cell.column.get('metadata'));
+            }
+            if (this.editor.view.processSavePromise) {
+                savePromise = this.editor.view.processSavePromise(savePromise, cell.column.get('metadata'));
+            }
+            savePromise.done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
                 .always(function() {
                     cell.$el.removeClass('loading');
@@ -560,20 +569,16 @@ define(function(require) {
         onSaveSuccess: function(response) {
             if (!this.cell.disposed && this.cell.$el) {
                 if (response) {
-                    var routeParametersRenameMap
-                        = this.cell.column.get('metadata').inline_editing.save_api_accessor.routeParametersRenameMap;
-                    for (var i in routeParametersRenameMap) {
-                        if (typeof response[routeParametersRenameMap[i]] !== 'undefined') {
-                            this.cell.model.set(i, response[routeParametersRenameMap[i]]);
+                    var routeParametersRenameMap = _.invert(this.cell.column.get('metadata').inline_editing.
+                        save_api_accessor.routeParametersRenameMap);
+                    _.each(response, function(item, i) {
+                        var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
+                        if (this.cell.model.has(propName)) {
+                            this.cell.model.set(propName, item);
                         }
-                    }
+                    }, this);
                 }
-
-                var _this = this;
-                this.cell.$el.addClass('save-success');
-                _.delay(function() {
-                    _this.cell.$el.removeClass('save-success');
-                }, 2000);
+                this.cell.$el.addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },
@@ -581,11 +586,7 @@ define(function(require) {
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.cell.disposed && this.cell.$el) {
-                var _this = this;
-                this.cell.$el.addClass('save-fail');
-                _.delay(function() {
-                    _this.cell.$el.removeClass('save-fail');
-                }, 2000);
+                this.cell.$el.addClassTemporarily('save-fail', 2000);
             }
             this.cell.model.set(this.oldState);
             this.main.trigger('content:update');

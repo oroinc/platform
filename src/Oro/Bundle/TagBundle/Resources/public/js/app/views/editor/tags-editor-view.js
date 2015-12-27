@@ -84,6 +84,7 @@ define(function(require) {
 
         initialize: function(options) {
             TagsEditorView.__super__.initialize.apply(this, arguments);
+            this.listenTo(this.autocompleteApiAccessor, 'cache:clear', this.onCacheClear);
             this.permissions = options.permissions || {};
         },
 
@@ -139,8 +140,8 @@ define(function(require) {
                     return _this.isLoading ?
                         __('oro.tag.inline_editing.loading') :
                         (_this.isCurrentTagSelected() ?
-                            __('oro.tag.inline_editing.existing_tag') :
-                            __('oro.tag.inline_editing.no_matches')
+                                __('oro.tag.inline_editing.existing_tag') :
+                                __('oro.tag.inline_editing.no_matches')
                         );
                 },
                 initSelection: function(element, callback) {
@@ -155,23 +156,12 @@ define(function(require) {
                         // immediately show first item
                         _this.showResults();
                     }
-                    options.callback = function(data) {
-                        _this.currentData = data;
-                        if (data.page === 1) {
-                            _this.firstPageData = data;
-                        }
-                        _this.isLoading = false;
-                        _this.showResults();
-                    };
+                    options.callback = _.bind(_this.commonDataCallback, _this);
                     if (_this.currentRequest && _this.currentRequest.term !== '' &&
                         _this.currentRequest.state() !== 'resolved') {
                         _this.currentRequest.abort();
                     }
-                    var autoCompleteUrlParameters = _.extend(_this.model.toJSON(), {
-                        term: options.term,
-                        page: options.page,
-                        per_page: _this.perPage
-                    });
+                    var autoCompleteUrlParameters = _this.buildAutoCompleteUrlParameters();
                     if (options.term !== '' &&
                         !_this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
                         _this.debouncedMakeRequest(options, autoCompleteUrlParameters);
@@ -180,6 +170,32 @@ define(function(require) {
                     }
                 }
             };
+        },
+
+        buildAutoCompleteUrlParameters: function() {
+            return _.extend(this.model.toJSON(), {
+                term: this.currentTerm,
+                page: this.currentPage,
+                per_page: this.perPage
+            });
+        },
+
+        commonDataCallback: function(data) {
+            this.currentData = data;
+            if (data.page === 1) {
+                this.firstPageData = data;
+            }
+            this.isLoading = false;
+            this.showResults();
+        },
+
+        onCacheClear: function() {
+            this.makeRequest({
+                callback: _.bind(this.commonDataCallback, this),
+                term: this.currentTerm,
+                page: this.currentPage,
+                per_page: this.perPage
+            }, this.buildAutoCompleteUrlParameters());
         },
 
         isCurrentTagSelected: function() {
@@ -197,22 +213,20 @@ define(function(require) {
             var data;
             if (this.currentPage === 1) {
                 data = $.extend({}, this.firstPageData);
-                data.results = this.filterTermFromResults(this.currentTerm, data.results);
-                if (this.currentPage === 1) {
-                    if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
-                        if (this.firstPageData.term === this.currentTerm) {
-                            data.results.unshift({
-                                id: this.currentTerm,
-                                label: this.currentTerm,
-                                isNew: true,
-                                owner: true
-                            });
-                        }
-                    } else {
-                        if (this.firstPageData.isDummy) {
-                            // do not update list until choices will be loaded
-                            return;
-                        }
+                if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
+                    if (this.firstPageData.term === this.currentTerm &&
+                        -1 === this.indexOfTermInResults(this.currentTerm, data.results)) {
+                        data.results.unshift({
+                            id: this.currentTerm,
+                            label: this.currentTerm,
+                            isNew: true,
+                            owner: true
+                        });
+                    }
+                } else {
+                    if (this.firstPageData.isDummy) {
+                        // do not update list until choices will be loaded
+                        return;
                     }
                 }
                 data.results.sort(_.bind(this.tagSortCallback, this));
@@ -221,6 +235,16 @@ define(function(require) {
                 data.results = this.filterTermFromResults(this.currentTerm, data.results);
             }
             this.currentCallback(data);
+        },
+
+        indexOfTermInResults: function(term, results) {
+            for (var i = 0; i < results.length; i++) {
+                var result = results[i];
+                if (result.label === term) {
+                    return i;
+                }
+            }
+            return -1;
         },
 
         filterTermFromResults: function(term, results) {
@@ -236,7 +260,8 @@ define(function(require) {
         },
 
         tagSortCallback: function(a, b) {
-            return this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
+            var firstCondition = this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
+            return firstCondition !== 0 ? firstCondition : a.label.length - b.label.length;
         },
 
         getTermSimilarity: function(term) {
@@ -301,7 +326,13 @@ define(function(require) {
             return data;
         }
     }, {
-        processMetadata: AbstractRelationEditorView.processMetadata
+        processMetadata: AbstractRelationEditorView.processMetadata,
+        processSavePromise: function(promise, metadata) {
+            promise.done(function() {
+                metadata.inline_editing.autocomplete_api_accessor.instance.clearCache();
+            });
+            return promise;
+        }
     });
 
     return TagsEditorView;

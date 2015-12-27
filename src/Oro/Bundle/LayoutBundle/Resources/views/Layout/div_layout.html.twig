@@ -44,7 +44,7 @@
             placeholder: attr.placeholder|block_text(translation_domain)
         }) %}
     {% endif %}
-    <input {{ block_widget(block, {attr: attr}) }} />
+    <input{{ block('block_attributes') }}/>
 {%- endblock %}
 
 {% block container_widget -%}

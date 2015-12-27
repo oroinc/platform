@@ -102,7 +102,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field1',
                 self::GROUP_PREFIX . 'group2',
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(1))
@@ -111,7 +111,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2:field21',
                 self::GROUP_PREFIX . 'group1',
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(2))
@@ -177,7 +177,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2:field22',
                 self::GROUP_PREFIX . 'group1',
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2.field22']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field22']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(1))
@@ -186,7 +186,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field1',
                 self::GROUP_PREFIX . 'group2',
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(2))
@@ -195,7 +195,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2:field21',
                 self::GROUP_PREFIX . 'group1',
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(3))
@@ -261,7 +261,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field1',
                 self::GROUP_PREFIX . 'group2',
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(1))
@@ -270,7 +270,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2:field21',
                 self::GROUP_PREFIX . 'group1',
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(2))
@@ -279,7 +279,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2:field22',
                 self::GROUP_PREFIX . 'group1',
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2.field22']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field22']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(3))
@@ -320,6 +320,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
     protected function getOptions()
     {
         return [
+            'form'              => null,
             'form_name'         => self::FORM_NAME,
             'preferred_fields'  => [],
             'groups'            => [],

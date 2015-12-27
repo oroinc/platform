@@ -136,6 +136,7 @@ class Tagging extends ExtendTagging
     public function setTag(Tag $tag)
     {
         $this->tag = $tag;
+        $this->tag->addTagging($this);
     }
 
     /**

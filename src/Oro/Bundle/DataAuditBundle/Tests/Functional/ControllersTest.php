@@ -129,7 +129,7 @@ class ControllersTest extends WebTestCase
             $this->assertEquals($this->userData[$key], $value);
         }
 
-        $this->assertEquals('John Doe  - admin@example.com', $result['author']);
+        $this->assertEquals('John Doe - admin@example.com', $result['author']);
     }
 
     protected function clearResult($result)

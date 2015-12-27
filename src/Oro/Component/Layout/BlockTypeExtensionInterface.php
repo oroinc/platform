@@ -56,6 +56,7 @@ interface BlockTypeExtensionInterface
 
     /**
      * Normalize options after they was resolved.
+     * You can implement this function to manipulate block options before build.
      *
      * @param array $options
      * @param ContextInterface $context

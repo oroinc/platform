@@ -10,6 +10,7 @@ Table of Contents
  - [Unset Value](#unset-value)
  - [Create Object](#create-object)
  - [Create Entity](#create-entity)
+ - [Remove Entity](#remove-entity)
  - [Create Related Entity](#create-related-entity)
  - [Find Entity](#find-entity)
  - [Format Name](#format-name)
@@ -230,6 +231,24 @@ OR
         successful: $conversation_successful
         call: $managed_entity
 
+```
+
+Remove Entity
+-------------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity
+
+**Alias:** remove_entity
+
+**Description:** Removes entity with specified class instance.
+
+**Parameters:**
+ - target - target that will contain entity instance;
+
+**Configuration Example**
+```
+- @remove_entity:
+    target: $.data #remove the entity being processed
 ```
 
 Create Related Entity

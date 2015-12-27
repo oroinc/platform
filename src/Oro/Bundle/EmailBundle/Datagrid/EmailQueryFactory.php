@@ -5,8 +5,10 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailQueryFactory
@@ -21,7 +23,7 @@ class EmailQueryFactory
     protected $fromEmailExpression;
 
     /** @var Registry */
-    protected $doctrine;
+    protected $mailboxManager;
 
     /** @var SecurityFacade */
     protected $securityFacade;
@@ -29,18 +31,18 @@ class EmailQueryFactory
     /**
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EntityNameResolver        $entityNameResolver
-     * @param Registry                  $doctrine
+     * @param MailboxManager            $mailboxManager
      * @param SecurityFacade            $securityFacade
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
         EntityNameResolver $entityNameResolver,
-        Registry $doctrine,
+        MailboxManager $mailboxManager,
         SecurityFacade $securityFacade
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
         $this->entityNameResolver        = $entityNameResolver;
-        $this->doctrine                  = $doctrine;
+        $this->mailboxManager            = $mailboxManager;
         $this->securityFacade            = $securityFacade;
     }
 
@@ -66,14 +68,16 @@ class EmailQueryFactory
     public function applyAcl(QueryBuilder $qb)
     {
         $user = $this->securityFacade->getLoggedUser();
-        $organization = $this->securityFacade->getOrganization();
+        $organization = $this->getOrganization();
 
-        $mailboxIds = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
-             ->findAvailableMailboxIds($user, $organization);
-        $uoCheck = $qb->expr()->andX(
-            $qb->expr()->eq('eu.owner', ':owner'),
-            $qb->expr()->eq('eu.organization ', ':organization')
-        );
+        $mailboxIds = $this->mailboxManager->findAvailableMailboxIds($user, $organization);
+
+        $exprs = [$qb->expr()->eq('eu.owner', ':owner')];
+        if ($organization) {
+            $exprs[] = $qb->expr()->eq('eu.organization ', ':organization');
+            $qb->setParameter('organization', $organization->getId());
+        }
+        $uoCheck = call_user_func_array([$qb->expr(), 'andX'], $exprs);
 
         if (!empty($mailboxIds)) {
             $qb->andWhere(
@@ -87,7 +91,14 @@ class EmailQueryFactory
             $qb->andWhere($uoCheck);
         }
         $qb->setParameter('owner', $user->getId());
-        $qb->setParameter('organization', $organization->getId());
+    }
+
+    /**
+     * @return Organization|null
+     */
+    protected function getOrganization()
+    {
+        return $this->securityFacade->getOrganization();
     }
 
     /**
