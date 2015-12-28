@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -15,6 +17,9 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class GridViewsExtension extends AbstractExtension
 {
+    const GRID_VIEW_ROOT_PARAM = '_grid_view';
+    const DISABLED_PARAM       = '_disabled';
+
     const VIEWS_LIST_KEY           = 'views_list';
     const VIEWS_PARAM_KEY          = 'view';
     const MINIFIED_VIEWS_PARAM_KEY = 'v';
@@ -29,42 +34,62 @@ class GridViewsExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var ManagerRegistry */
+    protected $registry;
+
     /**
      * @param EventDispatcherInterface $eventDispatcher
-     * @param SecurityFacade $securityFacade
-     * @param TranslatorInterface $translator
+     * @param SecurityFacade           $securityFacade
+     * @param TranslatorInterface      $translator
+     * @param ManagerRegistry          $registry
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         SecurityFacade $securityFacade,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        ManagerRegistry $registry
     ) {
         $this->eventDispatcher = $eventDispatcher;
-        $this->securityFacade = $securityFacade;
-        $this->translator = $translator;
+        $this->securityFacade  = $securityFacade;
+        $this->translator      = $translator;
+        $this->registry        = $registry;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return true;
+        return !$this->isDisabled();
     }
 
     /**
-     * {@inheritDoc}
+     * @return bool
+     */
+    protected function isDisabled()
+    {
+        $parameters = $this->getParameters()->get(self::GRID_VIEW_ROOT_PARAM, []);
+
+        return !empty($parameters[self::DISABLED_PARAM]);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $params  = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+        $defaultViewId = $this->getDefaultViewId($config->getName());
+        $params        = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+
         if (isset($params[self::VIEWS_PARAM_KEY])) {
             $currentView = (int)$params[self::VIEWS_PARAM_KEY];
         } else {
-            $currentView = self::DEFAULT_VIEW_ID;
+            $currentView                   = $defaultViewId;
+            $params[self::VIEWS_PARAM_KEY] = $defaultViewId;
+            $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);
         }
 
-        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
+        $data->offsetAddToArray('initialState', ['gridView' => $defaultViewId]);
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 
         $allLabel = null;
@@ -112,6 +137,22 @@ class GridViewsExtension extends AbstractExtension
         $gridViews['permissions'] = $this->getPermissions();
         $gridViews['views'][] = $systemAllView->getMetadata();
         $data->offsetAddToArray('gridViews', $gridViews);
+    }
+
+    /**
+     * @param string $gridName
+     *
+     * @return int|string
+     */
+    protected function getDefaultViewId($gridName)
+    {
+        $defaultGridView = null;
+        if ($this->securityFacade->isGranted('oro_datagrid_gridview_view')) {
+            $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
+            $defaultGridView = $repository->findDefaultGridView($gridName, $this->securityFacade->getLoggedUser());
+        }
+
+        return $defaultGridView ? $defaultGridView->getId() : self::DEFAULT_VIEW_ID;
     }
 
     /**
