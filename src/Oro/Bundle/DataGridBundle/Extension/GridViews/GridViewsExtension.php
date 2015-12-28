@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 
 class GridViewsExtension extends AbstractExtension
 {
@@ -36,6 +37,9 @@ class GridViewsExtension extends AbstractExtension
 
     /** @var ManagerRegistry */
     protected $registry;
+
+    /** @var GridView|null */
+    protected $defaultGridView;
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
@@ -64,6 +68,14 @@ class GridViewsExtension extends AbstractExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getPriority()
+    {
+        return 10;
+    }
+
+    /**
      * @return bool
      */
     protected function isDisabled()
@@ -78,19 +90,11 @@ class GridViewsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $defaultViewId = $this->getDefaultViewId($config->getName());
-        $params        = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+        $currentViewId = $this->getCurrentViewId($config);
+        $this->setDefaultParams($config);
 
-        if (isset($params[self::VIEWS_PARAM_KEY])) {
-            $currentView = (int)$params[self::VIEWS_PARAM_KEY];
-        } else {
-            $currentView                   = $defaultViewId;
-            $params[self::VIEWS_PARAM_KEY] = $defaultViewId;
-            $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);
-        }
-
-        $data->offsetAddToArray('initialState', ['gridView' => $defaultViewId]);
-        $data->offsetAddToArray('state', ['gridView' => $currentView]);
+        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
+        $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
 
         $allLabel = null;
         if (isset($config['options'])
@@ -132,19 +136,80 @@ class GridViewsExtension extends AbstractExtension
     }
 
     /**
+     * Gets id for current grid view
+     *
+     * @param DatagridConfiguration $config
+     *
+     * @return int|string
+     */
+    protected function getCurrentViewId(DatagridConfiguration $config)
+    {
+        $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+        if (isset($params[self::VIEWS_PARAM_KEY])) {
+            return (int)$params[self::VIEWS_PARAM_KEY];
+        } else {
+            return $this->getDefaultViewId($config->getName());
+        }
+    }
+
+    /**
+     * Gets id for defined as default grid view for current logged user.
+     * If is not defined returns id for raw configured grid.
+     *
      * @param string $gridName
      *
      * @return int|string
      */
     protected function getDefaultViewId($gridName)
     {
-        $defaultGridView = null;
-        if ($this->securityFacade->isGranted('oro_datagrid_gridview_view')) {
-            $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
-            $defaultGridView = $repository->findDefaultGridView($gridName, $this->securityFacade->getLoggedUser());
-        }
+        $defaultGridView = $this->getDefaultView($gridName);
 
         return $defaultGridView ? $defaultGridView->getId() : self::DEFAULT_VIEW_ID;
+    }
+
+    /**
+     * Gets defined as default grid view for current logged user.
+     *
+     * @param string $gridName
+     *
+     * @return GridView|null
+     */
+    protected function getDefaultView($gridName)
+    {
+
+        if ($this->defaultGridView === null &&
+            $this->securityFacade->isGranted('oro_datagrid_gridview_view')
+        ) {
+            $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
+            $defaultGridView = $repository->findDefaultGridView(
+                $gridName,
+                $this->securityFacade->getLoggedUser()
+            );
+
+            $this->defaultGridView = $defaultGridView;
+        }
+
+        return $this->defaultGridView;
+    }
+
+    /**
+     * Sets default parameters.
+     * Added filters and sorters for defined as default grid view for current logged user.
+     *
+     * @param DatagridConfiguration $config
+     */
+    protected function setDefaultParams(DatagridConfiguration $config)
+    {
+        $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+
+        $params[self::VIEWS_PARAM_KEY] = $this->getDefaultViewId($config->getName());
+
+        $defaultGridView = $this->getDefaultView($config->getName());
+        if ($defaultGridView) {
+            $this->getParameters()->mergeKey('_filter', $defaultGridView->getFiltersData());
+            $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
+        }
+        $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);
     }
 
     /**
