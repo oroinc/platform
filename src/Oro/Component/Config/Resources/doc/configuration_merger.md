@@ -9,7 +9,7 @@ nodes, which you want to replace, on the same level of this nodes.
 Initialization
 --------------
 
-For creating new instance of merger you need list of some keys. It will use as sorting order for merging all
+For creating new instance of merger you need list of some keys. It will be used as sorting order for merging all
 configuration from groups which have equal name.
 
 ``` php

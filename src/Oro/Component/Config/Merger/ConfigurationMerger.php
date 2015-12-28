@@ -100,14 +100,10 @@ class ConfigurationMerger
             if (is_int($key)) {
                 $data[] = $value;
             } else {
-                if (!array_key_exists($key, $data)) {
-                    $data[$key] = $value;
+                if (array_key_exists($key, $data) && is_array($value)) {
+                    $data[$key] = $this->merge($data[$key], $value);
                 } else {
-                    if (is_array($value)) {
-                        $data[$key] = $this->merge($data[$key], $value);
-                    } else {
-                        $data[$key] = $value;
-                    }
+                    $data[$key] = $value;
                 }
             }
         }
@@ -128,7 +124,7 @@ class ConfigurationMerger
         }
 
         $config = $configs[$actionName];
-        if (!array_key_exists(self::EXTENDS_NODE_NAME, $config) || empty($config[self::EXTENDS_NODE_NAME])) {
+        if (empty($config[self::EXTENDS_NODE_NAME])) {
             return $config;
         }
 
