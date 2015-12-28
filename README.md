@@ -5,7 +5,7 @@ by combining the tools they need. Built in PHP5 and the Symfony2 framework, it s
 into [OroCRM](http://www.orocrm.com/) or works entirely standalone.
 Developing custom business applications has never been so easy.
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/orocrm/platform/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/orocrm/platform/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/orocrm/platform/badges/quality-score.png?b=1.9)](https://scrutinizer-ci.com/g/orocrm/platform/?branch=1.9) [![Travis CI build status](https://travis-ci.org/orocrm/platform.svg?branch=1.9)](https://travis-ci.org/orocrm/crm/branches)
 
 ## Installation
 
