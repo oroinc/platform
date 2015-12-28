@@ -15,14 +15,14 @@ class DefaultGridViewUsersRelation implements Migration
     }
 
     /**
-     * Creates 'oro_default_grid_view_users' table which represents relationship between grid views and
+     * Creates 'oro_grid_view_users' table which represents relationship between grid views and
      * users who chosen this grid view as default.
      *
      * @param Schema $schema
      */
     public static function createOroDefaultGridViewUsersTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_default_grid_view_users');
+        $table = $schema->createTable('oro_grid_view_users');
         $table->addColumn('grid_view_id', 'integer', []);
         $table->addColumn('user_id', 'integer', []);
         $table->setPrimaryKey(['grid_view_id', 'user_id']);

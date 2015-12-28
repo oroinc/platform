@@ -49,7 +49,7 @@ class GridViewsLoadListener
      */
     public function onViewsLoad(GridViewsLoadEvent $event)
     {
-        $gridName = $event->getGridName();
+        $gridName    = $event->getGridName();
         $currentUser = $this->getCurrentUser();
         if (!$currentUser) {
             return;
@@ -62,24 +62,30 @@ class GridViewsLoadListener
             return;
         }
         $choices = [];
-        $views = [];
+        $views   = [];
+        $default = null;
         foreach ($gridViews as $gridView) {
+            $isDefault = false;
+            if ($defaultGridView === $gridView) {
+                $isDefault = true;
+                $default   = $gridView;
+            }
             $view = $gridView->createView();
             $view->setEditable($this->securityFacade->isGranted('EDIT', $gridView));
             $view->setDeletable($this->securityFacade->isGranted('DELETE', $gridView));
-            $view->setIsDefault($defaultGridView === $gridView);
-            $views[] = $view->getMetadata();
+            $view->setIsDefault($isDefault);
+            $views[]   = $view->getMetadata();
             $choices[] = [
                 'label' => $this->createGridViewLabel($currentUser, $gridView),
                 'value' => $gridView->getId(),
             ];
+
         }
 
-        $newGridViews = $event->getGridViews();
+        $newGridViews            = $event->getGridViews();
         $newGridViews['choices'] = array_merge($newGridViews['choices'], $choices);
-        $newGridViews['views'] = array_merge($newGridViews['views'], $views);
-        $newGridViews['default'] = $defaultGridView;
-
+        $newGridViews['views']   = array_merge($newGridViews['views'], $views);
+        $newGridViews['default'] = $default;
         $event->setGridViews($newGridViews);
     }
 

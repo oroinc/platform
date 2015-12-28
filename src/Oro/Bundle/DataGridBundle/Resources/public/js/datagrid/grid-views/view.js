@@ -382,14 +382,11 @@ define([
             var defaultModel = this._getCurrentDefaultViewModel();
             var currentViewModel = this._getCurrentViewModel();
             var id = currentViewModel.id;
-            if (this._isSystemView()) {
+            if (this._isCurrentViewSystem()) {
+                // in this case we need to set default to false on current default view
                 isDefault = 0;
                 id = defaultModel.id;
-                if (defaultModel.id === self.DEFAULT_GRID_VIEW_ID) {
-                    return self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
-                }
             }
-
             return $.post(
                 routing.generate('oro_datagrid_api_rest_gridview_set_default', {
                     id: id,
@@ -397,10 +394,11 @@ define([
                 }),
                 {},
                 function(response) {
-                    defaultModel.set('is_default', false);
-                    currentViewModel.set('is_default', true);
-                    mediator.trigger('datagrid:' + this.gridName + ':views:change', currentViewModel);
 
+                    // TODO how we can remove this fix with labels?
+                    // for now we need to get label from choices to save specifically built labels(shared, system)
+                    defaultModel.set({is_default:false, label: self._getView(defaultModel.get('name')).label});
+                    currentViewModel.set({is_default:true, label: self._getView(currentViewModel.get('name')).label});
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
             );
@@ -632,7 +630,7 @@ define([
          *
          * @returns {boolean}
          */
-        _isSystemView: function() {
+        _isCurrentViewSystem: function() {
             return this._getCurrentView().value === this.DEFAULT_GRID_VIEW_ID;
         },
 

@@ -122,23 +122,19 @@ class GridViewController extends RestController
      *     defaults={"default"="false"}
      * )
      * @Acl(
-     *     id="oro_datagrid_gridview_update",
+     *     id="oro_datagrid_gridview_view",
      *     type="entity",
      *     class="OroDataGridBundle:GridView",
-     *     permission="EDIT"
+     *     permission="VIEW"
      * )
      */
     public function setDefaultAction($id, $default = false)
     {
         /** @var GridView $gridView */
         $gridView = $this->getManager()->find($id);
-        if ($gridView->getType() === GridView::TYPE_PUBLIC) {
-            $this->checkEditPublicAccess($gridView);
-        }
         /** @var GridViewRepository $repository */
         $repository = $this->getManager()->getRepository();
-        $user = $this->getUser();
-        $repository->setGridViewDefault($user, $gridView, $default);
+        $repository->setGridViewDefault($this->getUser(), $gridView, $default);
 
         return new JsonResponse([], Codes::HTTP_OK);
     }
