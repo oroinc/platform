@@ -18,7 +18,6 @@ use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
-use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 
 /**
  * @Rest\NamePrefix("oro_datagrid_api_rest_gridview_")

@@ -100,8 +100,7 @@ abstract class AbstractViewsList
 
         return [
             'choices' => $this->toChoiceList(),
-            'views'   => $result->toArray(),
-            'default' => null
+            'views'   => $result->toArray()
         ];
     }
 
