@@ -40,12 +40,12 @@ class GridViewRepository extends EntityRepository
     }
 
     /**
-     * @param UserInterface $user
-     * @param string        $gridName
+     * @param User   $user
+     * @param string $gridName
      *
      * @return GridView|null
      */
-    public function findDefaultGridView(UserInterface $user, $gridName)
+    public function findDefaultGridView(User $user, $gridName)
     {
         $qb = $this->getFindDefaultGridViewQb($user, $gridName);
 
@@ -55,6 +55,7 @@ class GridViewRepository extends EntityRepository
     /**
      * @param User     $user
      * @param GridView $gridView
+     *
      * @return GridView[]
      */
     public function findDefaultGridViews(User $user, GridView $gridView)
@@ -69,12 +70,12 @@ class GridViewRepository extends EntityRepository
     }
 
     /**
-     * @param UserInterface $user
-     * @param string        $gridName
+     * @param User   $user
+     * @param string $gridName
      *
      * @return QueryBuilder
      */
-    protected function getFindDefaultGridViewQb(UserInterface $user, $gridName)
+    protected function getFindDefaultGridViewQb(User $user, $gridName)
     {
         $qb = $this->createQueryBuilder('gv');
         $qb->innerJoin('gv.users', 'u')

@@ -78,25 +78,8 @@ class GridViewsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $defaultViewId = $this->getDefaultViewId($config->getName());
-        $params        = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
-
-        if (isset($params[self::VIEWS_PARAM_KEY])) {
-            $currentView = (int)$params[self::VIEWS_PARAM_KEY];
-        } else {
-            $currentView                   = $defaultViewId;
-            $params[self::VIEWS_PARAM_KEY] = $defaultViewId;
-            $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);
-        }
-
-        $data->offsetAddToArray('initialState', ['gridView' => $defaultViewId]);
-        $data->offsetAddToArray('state', ['gridView' => $currentView]);
-
         $allLabel = null;
-        if (isset($config['options'])
-                &&isset($config['options']['gridViews'])
-                && isset($config['options']['gridViews']['allLabel'])
-            ) {
+        if (isset($config['options'], $config['options']['gridViews'], $config['options']['gridViews']['allLabel'])) {
             $allLabel = $this->translator->trans($config['options']['gridViews']['allLabel']);
         }
 
@@ -124,35 +107,31 @@ class GridViewsExtension extends AbstractExtension
             $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
             $gridViews = $event->getGridViews();
         }
-        $hasDefault = false;
+        $defaultViewId = self::DEFAULT_VIEW_ID;
         foreach ($gridViews['views'] as $view) {
             if (!empty($view['is_default'])) {
-                $hasDefault = true;
+                $defaultViewId = $view['name'];
                 break;
             }
         }
 
-        $systemAllView->setDefault(!$hasDefault);
+        $systemAllView->setDefault($defaultViewId === self::DEFAULT_VIEW_ID);
         $gridViews['gridName'] = $config->getName();
         $gridViews['permissions'] = $this->getPermissions();
         $gridViews['views'][] = $systemAllView->getMetadata();
         $data->offsetAddToArray('gridViews', $gridViews);
-    }
 
-    /**
-     * @param string $gridName
-     *
-     * @return int|string
-     */
-    protected function getDefaultViewId($gridName)
-    {
-        $defaultGridView = null;
-        if ($this->securityFacade->isGranted('oro_datagrid_gridview_view')) {
-            $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
-            $defaultGridView = $repository->findDefaultGridView($gridName, $this->securityFacade->getLoggedUser());
+        $params        = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+        if (isset($params[self::VIEWS_PARAM_KEY])) {
+            $currentView = (int)$params[self::VIEWS_PARAM_KEY];
+        } else {
+            $currentView                   = $defaultViewId;
+            $params[self::VIEWS_PARAM_KEY] = $defaultViewId;
+            $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);
         }
 
-        return $defaultGridView ? $defaultGridView->getId() : self::DEFAULT_VIEW_ID;
+        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
+        $data->offsetAddToArray('state', ['gridView' => $currentView]);
     }
 
     /**
