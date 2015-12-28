@@ -96,6 +96,30 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->collector->collect($this->getGridRequest(), 'test'));
     }
 
+    public function testCollectWithEmptyGridRequest()
+    {
+        $this->setPaginationEnabled(true);
+        $this->datagridManager->expects($this->never())
+            ->method('getDatagridByRequestParams');
+
+        $this->assertFalse($this->collector->collect(new Request(['grid' => '']), 'test'));
+    }
+
+    public function testCollectWithInvalidGridName()
+    {
+        $invalidGridName = 'invalid';
+
+        $this->setPaginationEnabled(true);
+        $this->datagridManager->expects($this->once())
+            ->method('getDatagridByRequestParams')
+            ->with($invalidGridName)
+            ->willThrowException(new \RuntimeException());
+        $this->storage->expects($this->never())
+            ->method('hasData');
+
+        $this->assertFalse($this->collector->collect(new Request(['grid' => [$invalidGridName => null]]), 'test'));
+    }
+
     public function testCollectGridNotApplicable()
     {
         $this->setPaginationEnabled(true);

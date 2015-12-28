@@ -85,13 +85,14 @@ class StorageDataCollector
 
         $gridNames = array();
         if ($request->query->get('grid')) {
-            $gridNames = array_keys($request->query->get('grid', []));
+            $gridNames = array_keys((array)$request->query->get('grid', []));
         }
         foreach ($gridNames as $gridName) {
             try {
                 // datagrid manager automatically extracts all required parameters from request
                 $dataGrid = $this->datagridManager->getDatagridByRequestParams($gridName);
             } catch (\RuntimeException $e) {
+                // processing of invalid grid names
                 continue;
             }
 
