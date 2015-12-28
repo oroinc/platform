@@ -398,7 +398,7 @@ Call Method
     conditions:
         # optional condition configuration
     parameters:
-        attribute: $.leadContactAddAddress
+        attribute: $.result.addressResult
         object: $lead.contact
         method: addAddress
         method_parameters: [$.result.address]
@@ -406,7 +406,7 @@ Call Method
 OR
 
 - @call_method: # add Address to Contact
-    attribute: $.leadContactAddAddress
+    attribute: $.result.addressResult
     object: $lead.contact
     method: addAddress
     method_parameters: [$.result.address]
