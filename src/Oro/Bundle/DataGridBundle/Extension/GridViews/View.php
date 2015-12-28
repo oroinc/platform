@@ -26,7 +26,7 @@ class View
     protected $deletable = false;
 
     /** @var bool */
-    protected $isDefault = false;
+    protected $default = false;
 
     /**
      * @var array
@@ -200,19 +200,19 @@ class View
     /**
      * @return boolean
      */
-    public function isIsDefault()
+    public function isDefault()
     {
-        return $this->isDefault;
+        return $this->default;
     }
 
     /**
-     * @param boolean $isDefault
+     * @param boolean $default
      *
      * @return $this
      */
-    public function setIsDefault($isDefault)
+    public function setDefault($default)
     {
-        $this->isDefault = $isDefault;
+        $this->default = $default;
 
         return $this;
     }
@@ -233,7 +233,7 @@ class View
             'columns'    => $this->columnsData,
             'editable'   => $this->editable,
             'deletable'  => $this->deletable,
-            'is_default' => $this->isDefault
+            'is_default' => $this->default
         ];
     }
 }

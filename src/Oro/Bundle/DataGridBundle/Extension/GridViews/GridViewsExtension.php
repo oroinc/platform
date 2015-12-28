@@ -99,8 +99,15 @@ class GridViewsExtension extends AbstractExtension
             $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
             $gridViews = $event->getGridViews();
         }
-        $systemAllView->setIsDefault(empty($gridViews['default']));
-        unset($gridViews['default']);
+        $hasDefault = false;
+        foreach ($gridViews['views'] as $view) {
+            if (!empty($view['is_default'])) {
+                $hasDefault = true;
+                break;
+            }
+        }
+
+        $systemAllView->setDefault(!$hasDefault);
         $gridViews['gridName'] = $config->getName();
         $gridViews['permissions'] = $this->getPermissions();
         $gridViews['views'][] = $systemAllView->getMetadata();

@@ -55,9 +55,9 @@ class GridViewRepository extends EntityRepository
     /**
      * @param User     $user
      * @param GridView $gridView
-     * @param bool     $default
+     * @return GridView[]
      */
-    public function setGridViewDefault(User $user, GridView $gridView, $default)
+    public function findDefaultGridViews(User $user, GridView $gridView)
     {
         /** @var GridView[] $defaultGridViews */
         $defaultGridViews = $this
@@ -65,14 +65,7 @@ class GridViewRepository extends EntityRepository
             ->getQuery()
             ->getResult();
 
-        foreach ($defaultGridViews as $view) {
-            $view->removeUser($user);
-        }
-        if ($default) {
-            $gridView->addUser($user);
-        }
-
-        $this->getEntityManager()->flush();
+        return $defaultGridViews;
     }
 
     /**

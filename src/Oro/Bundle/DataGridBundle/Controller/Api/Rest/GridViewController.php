@@ -103,12 +103,14 @@ class GridViewController extends RestController
 
 
     /**
+     * Set/unset grid view as default for current user.
+     *
      * @param int  $id
      * @param bool $default
      *
      * @return Response
      * @Post(
-     *     "/gridviews/{id}/setdefault/{default}",
+     *     "/gridviews/{id}/default/{default}",
      *     requirements={"id"="\d+", "default"="\d+"},
      *     defaults={"default"=false}
      *)
@@ -131,12 +133,11 @@ class GridViewController extends RestController
     public function setDefaultAction($id, $default = false)
     {
         /** @var GridView $gridView */
-        $gridView = $this->getManager()->find($id);
-        /** @var GridViewRepository $repository */
-        $repository = $this->getManager()->getRepository();
-        $repository->setGridViewDefault($this->getUser(), $gridView, $default);
+        $manager  = $this->getManager();
+        $gridView = $manager->find($id);
+        $manager->setGridViewDefault($this->getUser(), $gridView, $default);
 
-        return new JsonResponse([], Codes::HTTP_OK);
+        return new JsonResponse([], Codes::HTTP_NO_CONTENT);
     }
 
     /**

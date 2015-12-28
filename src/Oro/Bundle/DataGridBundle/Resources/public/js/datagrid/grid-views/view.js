@@ -394,7 +394,6 @@ define([
                 }),
                 {},
                 function(response) {
-
                     // TODO how we can remove this fix with labels?
                     // for now we need to get label from choices to save specifically built labels(shared, system)
                     defaultModel.set({is_default:false, label: self._getView(defaultModel.get('name')).label});
@@ -433,6 +432,11 @@ define([
             if (model.id === viewId) {
                 this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
                 this.viewDirty = !this._isCurrentStateSynchronized();
+            }
+
+            if (model.get('is_default')) {
+                var systemModel = this._getDefaultSystemViewModel();
+                systemModel.set({is_default:true, label: this._getView(this.DEFAULT_GRID_VIEW_ID).label});
             }
 
             this.render();
@@ -580,7 +584,7 @@ define([
                 {
                     label: __('oro.datagrid.action.use_as_default_grid_view'),
                     name: 'use_as_default',
-                    enabled: !currentView.get('is_default')
+                    enabled: typeof currentView !== 'undefined' && !currentView.get('is_default')
                 }
             ];
         },
@@ -632,6 +636,17 @@ define([
          */
         _isCurrentViewSystem: function() {
             return this._getCurrentView().value === this.DEFAULT_GRID_VIEW_ID;
+        },
+
+        /**
+         * @private
+         *
+         * @returns {undefined|GridViewModel}
+         */
+        _getDefaultSystemViewModel: function() {
+            return this.viewsCollection.findWhere({
+                name:this.DEFAULT_GRID_VIEW_ID
+            });
         },
 
         /**
