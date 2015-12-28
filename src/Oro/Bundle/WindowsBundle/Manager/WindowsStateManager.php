@@ -144,7 +144,9 @@ class WindowsStateManager
         return $user;
     }
 
-    /** @return bool */
+    /**
+     * @return bool
+     */
     public function isApplicable()
     {
         try {
