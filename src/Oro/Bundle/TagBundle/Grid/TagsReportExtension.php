@@ -5,7 +5,7 @@ namespace Oro\Bundle\TagBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
@@ -24,18 +24,18 @@ class TagsReportExtension extends AbstractTagsExtension
     protected $joinIdentifierHelper;
 
     /**
-     * @param TagManager          $tagManager
-     * @param EntityClassResolver $resolver
-     * @param TaggableHelper      $helper
-     * @param EntityRoutingHelper $entityRoutingHelper
+     * @param TagManager              $tagManager
+     * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param TaggableHelper          $helper
+     * @param EntityRoutingHelper     $entityRoutingHelper
      */
     public function __construct(
         TagManager $tagManager,
-        EntityClassResolver $resolver,
+        GridConfigurationHelper $gridConfigurationHelper,
         TaggableHelper $helper,
         EntityRoutingHelper $entityRoutingHelper
     ) {
-        parent::__construct($tagManager, $resolver);
+        parent::__construct($tagManager, $gridConfigurationHelper);
 
         $this->taggableHelper      = $helper;
         $this->entityRoutingHelper = $entityRoutingHelper;
@@ -172,7 +172,7 @@ class TagsReportExtension extends AbstractTagsExtension
             $field = $joinIdentifierHelper->getFieldName($key);
             if ($field === TagVirtualFieldProvider::TAG_FIELD) {
                 // get entity class from relations aliases if tag_field configured for relations
-                $entityClassName = $joinIdentifierHelper->getEntityClassName($key)?:parent::getEntityClassName($config);
+                $entityClassName = $joinIdentifierHelper->getEntityClassName($key) ?: parent::getEntity($config);
                 $tagColumns[]    = [
                     'idAlias' => $alias,
                     'entityClass' => $entityClassName
