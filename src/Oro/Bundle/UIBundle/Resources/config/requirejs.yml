@@ -184,6 +184,7 @@ config:
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/app/components/basic-tree-component': 'bundles/oroui/js/app/components/basic-tree-component.js'
+        'oroui/js/app/components/basic-tree-manage-component': 'bundles/oroui/js/app/components/basic-tree-manage-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'

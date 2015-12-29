@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var TreeManageComponent;
+    var BasicTreeManageComponent;
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -12,11 +12,11 @@ define(function(require) {
     var BasicTreeComponent = require('oroui/js/app/components/basic-tree-component');
 
     /**
-     * @export oroui/js/app/components/tree-manage-component
+     * @export oroui/js/app/components/basic-tree-manage-component
      * @extends oroui.app.components.BasicTreeComponent
-     * @class oroui.app.components.TreeManageComponent
+     * @class oroui.app.components.BasicTreeManageComponent
      */
-    TreeManageComponent = BasicTreeComponent.extend({
+    BasicTreeManageComponent = BasicTreeComponent.extend({
         /**
          * @property {Boolean}
          */
@@ -46,7 +46,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            TreeManageComponent.__super__.initialize.call(this, options);
+            BasicTreeManageComponent.__super__.initialize.call(this, options);
             if (!this.$tree) {
                 return;
             }
@@ -104,12 +104,6 @@ define(function(require) {
                 return;
             }
 
-            if (data.parent === '#' && data.old_parent === '#') {
-                this.rollback(data);
-                messenger.notificationFlashMessage('warning', __('oro.ui.jstree.move_root_page_warning'));
-                return;
-            }
-
             var self = this;
             $.ajax({
                 async: false,
@@ -125,7 +119,7 @@ define(function(require) {
                         self.rollback(data);
                         messenger.notificationFlashMessage(
                             'error',
-                            __('oro.ui.jstree.move_page_error', {nodeText: data.node.text})
+                            __('oro.ui.jstree.move_node_error', {nodeText: data.node.text})
                         );
                     } else if (self.reloadWidget) {
                         widgetManager.getWidgetInstanceByAlias(self.reloadWidget, function(widget) {
@@ -158,9 +152,9 @@ define(function(require) {
                 .off('select_node.jstree')
                 .off('move_node.jstree');
 
-            TreeManageComponent.__super__.dispose.call(this);
+            BasicTreeManageComponent.__super__.dispose.call(this);
         }
     });
 
-    return TreeManageComponent;
+    return BasicTreeManageComponent;
 });
