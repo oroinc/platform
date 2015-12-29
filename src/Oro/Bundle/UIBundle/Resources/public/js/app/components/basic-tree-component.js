@@ -118,8 +118,6 @@ define(function(require) {
                 return;
             }
 
-            console.log(container);
-
             var fixHeight = function() {
                 var anchor = $('#bottom-anchor').position().top;
                 var containerTop = container.position().top;
