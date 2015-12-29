@@ -125,7 +125,7 @@ class ConfigurationType extends AbstractType
                 'attr' => ['class' => 'check-connection']
             ]);
         if ($options['add_check_button']) {
-            $builder->add('check_connection', new CheckButtonType(), [
+            $builder->add('check_connection', 'oro_imap_configuration_check', [
                 'label' => $this->translator->trans('oro.imap.configuration.connect_and_retrieve_folders')
             ]);
         }
