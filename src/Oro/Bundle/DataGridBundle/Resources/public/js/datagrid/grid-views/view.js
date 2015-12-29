@@ -10,6 +10,7 @@ define(function(require) {
     var ViewNameModal = require('./view-name-modal');
     var mediator = require('oroui/js/mediator');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var routing = require('routing');
 
     /**
      * Datagrid views widget
@@ -397,10 +398,8 @@ define(function(require) {
                 }),
                 {},
                 function(response) {
-                    // TODO how we can remove this fix with labels?
-                    // for now we need to get label from choices to save specifically built labels(shared, system)
-                    defaultModel.set({is_default:false, label: self._getView(defaultModel.get('name')).label});
-                    currentViewModel.set({is_default:true, label: self._getView(currentViewModel.get('name')).label});
+                    defaultModel.set({is_default:false});
+                    currentViewModel.set({is_default:true});
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
             );
