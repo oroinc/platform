@@ -82,14 +82,16 @@ class GridView
     protected $filtersData = [];
 
     /**
-     * @var array
+     * @var array of ['column name' => -1|1, ... ].
+     * Contains information about sorters ('-1' for 'ASC', '1' for 'DESC').
      *
      * @ORM\Column(type="array")
      */
     protected $sortersData = [];
 
     /**
-     * @var array
+     * @var array of ['column name' => ['renderable' => true|false, 'order' = int(0)], ... ].
+     * Contains information about columns orders in the grid.
      *
      * @ORM\Column(type="array", nullable=true)
      */
