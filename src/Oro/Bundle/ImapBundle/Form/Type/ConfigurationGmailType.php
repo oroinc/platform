@@ -128,7 +128,7 @@ class ConfigurationGmailType extends AbstractType
      */
     protected function updateForm(FormInterface $form, UserEmailOrigin $emailOrigin)
     {
-        if (!empty($emailOrigin->getAccessToken())) {
+        if ($emailOrigin->getAccessToken() && $emailOrigin->getAccessToken() !=== '' ) {
             $form->add('checkFolder', 'button', [
                 'label' => $this->translator->trans('oro.email.retrieve_folders.label'),
                 'attr' => ['class' => 'btn btn-primary']
