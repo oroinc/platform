@@ -2,6 +2,7 @@
 "Are you sure you want to delete this item?": "Are you sure you want to delete this item?"
 "Delete Error": "Delete Error"
 "Are you sure you want to do remove selected items?": "Are you sure you want to do remove selected items?"
+"Are you sure you want to do remove these items?": "Are you sure you want to do remove these items?"
 "Are you sure you want to remove this item?": "Are you sure you want to remove this item?"
 "Selected items were removed.": "Selected items were removed."
 "Selected items were not removed.": "Selected items were removed."
@@ -83,3 +84,25 @@ oro:
             close_tooltip: "Close Column Manager"
             empty_list: "No columns found"
         not_number: Not a number
+        inline_editing:
+            help: |
+                <ul style="margin-bottom: 0px;">
+                    <li><span style="font-family: monospace">Enter</span>, <span style="font-family: monospace">Shift + Enter</span> - Save and edit next/previous cell in column</li>
+                	<li><span style="font-family: monospace">Tab</span>, <span style="font-family: monospace">Shift + Tab</span> - Save and edit next/previous cell in row</li>
+                	<li><span style="font-family: monospace">Alt + ←/↑/→/↓  </span> - Navigate between cells</li>
+                	<li><span style="font-family: monospace">Ctrl + Enter</span> - Save and close</li>
+                	<li><span style="font-family: monospace">Escape</span> - Quit</li>
+                </ul>
+        mass_action:
+            delete:
+                selected_message: >
+                    You have selected {{ selected }} records.<br/>
+                    Are you sure you want to delete them?
+                max_limit_message: >
+                    The maximum number of records that can be deleted at once is {{ max_limit }}.<br/>
+                    Are you sure you want to delete first {{ max_limit }} records in the selection?
+                restricted_access_message: >
+                    You have permissions to delete  {{ deletable }} records out of {{ selected }} selected.<br/>
+                    Are you sure you want to delete them?
+                restricted_access_empty_message: >
+                    You don't have permissions to delete any of the selected records.
