@@ -72,8 +72,6 @@ define(function(require) {
                 self._resolveDeferredInit();
                 self.initialization = false;
             });
-
-            self._fixContainerHeight();
         },
 
         /**
@@ -100,41 +98,6 @@ define(function(require) {
                 state.core.selected = [];
             }
             return state;
-        },
-
-        /**
-         * Fix scrollable container height
-         * TODO: This method should be removed during fixing of https://magecore.atlassian.net/browse/BB-336
-         *
-         */
-        _fixContainerHeight: function() {
-            var tree = this.$tree.parent();
-            if (!tree.hasClass('category-tree')) {
-                return;
-            }
-
-            var container = tree.parent();
-            if (!container.hasClass('category-container')) {
-                return;
-            }
-
-            var fixHeight = function() {
-                var anchor = $('#bottom-anchor').position().top;
-                var container = container.position().top;
-                var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
-                var footerHeight = $('#footer:visible').height() || 0;
-                var fixContent = 1;
-
-                tree.height(anchor - container - debugBarHeight - footerHeight + fixContent);
-            };
-
-            layout.onPageRendered(fixHeight);
-            $(window).on('resize', _.debounce(fixHeight, 50));
-            mediator.on('page:afterChange', fixHeight);
-            mediator.on('layout:adjustReloaded', fixHeight);
-            mediator.on('layout:adjustHeight', fixHeight);
-
-            fixHeight();
         }
     });
 

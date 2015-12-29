@@ -58,8 +58,6 @@ define(function(require) {
 
             this.$tree.on('select_node.jstree', _.bind(this.onSelect, this));
             this.$tree.on('move_node.jstree', _.bind(this.onMove, this));
-
-            this._fixContainerHeight();
         },
 
         /**
