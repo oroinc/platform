@@ -16,17 +16,16 @@ class MassActionExtension extends ActionExtension
     protected $actions = [];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $massActions = $config->offsetGetOr(static::ACTION_KEY, []);
-
-        return !empty($massActions);
+        // Applicable due to the possibility of dynamically add mass action
+        return true;
     }
 
     /**
-     * Get grid massaction by name
+     * Get grid mass action by name
      *
      * @param string           $name
      * @param DatagridInterface $datagrid
