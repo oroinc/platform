@@ -406,6 +406,8 @@ define(function(require) {
                 function(response) {
                     if (response.status === 404) {
                         self._showFlashMessage('error', __('oro.datagrid.gridView.error.not_found'));
+                    } else {
+                        self._showFlashMessage('error', __('oro.ui.unexpected_error'));
                     }
                 }
             );
