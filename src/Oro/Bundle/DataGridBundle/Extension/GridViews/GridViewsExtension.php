@@ -97,16 +97,16 @@ class GridViewsExtension extends AbstractExtension
         $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
 
         $allLabel = null;
-        if (isset($config['options'])
-                &&isset($config['options']['gridViews'])
-                && isset($config['options']['gridViews']['allLabel'])
-            ) {
+        if (isset($config['options'], $config['options']['gridViews'], $config['options']['gridViews']['allLabel'])) {
             $allLabel = $this->translator->trans($config['options']['gridViews']['allLabel']);
         }
 
         /** @var AbstractViewsList $list */
-        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
-        $gridViews = [
+        $list          = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
+        $systemAllView = new View(self::DEFAULT_VIEW_ID);
+        $systemAllView->setDefault($currentViewId === self::DEFAULT_VIEW_ID);
+
+        $gridViews     = [
             'choices' => [
                 [
                     'label' => $allLabel,
@@ -114,7 +114,7 @@ class GridViewsExtension extends AbstractExtension
                 ],
             ],
             'views' => [
-                (new View(self::DEFAULT_VIEW_ID))->getMetadata(),
+                $systemAllView->getMetadata()
             ],
         ];
         if ($list !== false) {
@@ -182,8 +182,8 @@ class GridViewsExtension extends AbstractExtension
         ) {
             $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
             $defaultGridView = $repository->findDefaultGridView(
-                $gridName,
-                $this->securityFacade->getLoggedUser()
+                $this->securityFacade->getLoggedUser(),
+                $gridName
             );
 
             $this->defaultGridView = $defaultGridView;

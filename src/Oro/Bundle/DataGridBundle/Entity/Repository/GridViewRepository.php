@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity\Repository;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class GridViewRepository extends EntityRepository
 {
@@ -39,25 +40,52 @@ class GridViewRepository extends EntityRepository
     }
 
     /**
+     * @param User   $user
      * @param string $gridName
-     * @param User $user
      *
      * @return GridView|null
      */
-    public function findDefaultGridView($gridName, User $user)
+    public function findDefaultGridView(User $user, $gridName)
     {
-        $qb = $this->createQueryBuilder('gv')
-            ->join('gv.users', 'user')
-            ->where('gv.gridName = :gridName')
-            ->andWhere('user = :user')
-            ->setMaxResults(1)
-            ->setParameters(
-                [
-                    'gridName' => $gridName,
-                    'user'     => $user,
-                ]
-            );
+        $qb = $this->getFindDefaultGridViewQb($user, $gridName);
 
-        return $qb->getQuery()->getOneOrNullResult();
+        return $qb->setMaxResults(1)->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * @param User     $user
+     * @param GridView $gridView
+     *
+     * @return GridView[]
+     */
+    public function findDefaultGridViews(User $user, GridView $gridView)
+    {
+        /** @var GridView[] $defaultGridViews */
+        $defaultGridViews = $this
+            ->getFindDefaultGridViewQb($user, $gridView->getGridName())
+            ->getQuery()
+            ->getResult();
+
+        return $defaultGridViews;
+    }
+
+    /**
+     * @param User   $user
+     * @param string $gridName
+     *
+     * @return QueryBuilder
+     */
+    protected function getFindDefaultGridViewQb(User $user, $gridName)
+    {
+        $qb = $this->createQueryBuilder('gv');
+        $qb->innerJoin('gv.users', 'u')
+            ->where('gv.gridName = :gridName')
+            ->andWhere('u = :user')
+            ->setParameters([
+                'gridName' => $gridName,
+                'user'     => $user
+            ]);
+
+        return $qb;
     }
 }
