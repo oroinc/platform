@@ -57,6 +57,7 @@ define(function(require) {
                     'client_id': data.client_id,
                     'scope': this.scopes.join(' '),
                     'immediate': false
+                    'response_type': 'code'
                 }, _.bind(this.checkAuthorization, this));
 
             //this.checkAuthorization('1111');
@@ -64,7 +65,7 @@ define(function(require) {
 
         checkAuthorization: function(result) {
             console.log('checkAuthorization', result);
-            this.view.setToken(result);
+            this.view.setToken(result.access_token);
 
             gapi.client.load('gmail', 'v1', _.bind(this.listLabels, this));
         },
