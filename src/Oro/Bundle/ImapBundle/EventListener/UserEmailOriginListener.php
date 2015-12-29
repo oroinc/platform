@@ -96,7 +96,8 @@ class UserEmailOriginListener
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
-            $this->mcrypt->decryptData($origin->getPassword())
+            $this->mcrypt->decryptData($origin->getPassword()),
+            $origin->getAccessToken()
         );
 
         $connector = $this->connectorFactory->createImapConnector($config);

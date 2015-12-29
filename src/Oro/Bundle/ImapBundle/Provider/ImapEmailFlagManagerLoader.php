@@ -59,7 +59,8 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
-            $this->encryptor->decryptData($origin->getPassword())
+            $this->encryptor->decryptData($origin->getPassword()),
+            $origin->getAccessToken()
         );
 
         return new ImapEmailFlagManager(
