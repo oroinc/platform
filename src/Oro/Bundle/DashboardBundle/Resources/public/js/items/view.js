@@ -89,12 +89,9 @@ define([
         },
 
         _initializeItemGrid: function(items) {
-            var comparator = function(model) {
-                return model.get('order');
-            };
             var $itemContainer = this.$('.item-container');
             var showedItems    = items.where({show: true});
-            var filteredItems = this.filteredItems  = new ItemCollection(showedItems, {comparator: comparator});
+            var filteredItems = this.filteredItems  = new ItemCollection(showedItems, {comparator: 'order'});
 
             $itemContainer.itemsManagerTable({
                 itemTemplate: Backbone.$(this.itemTplSelector).html(),
@@ -104,8 +101,9 @@ define([
             });
 
             filteredItems.on('sort add', function() {
-                $itemContainer.find('input.order').each(function(index) {
-                    Backbone.$(this)
+                this.each(function(model, index) {
+                    model.set('order', index, {silent: true});
+                    $itemContainer.find('[data-cid="' + model.cid + '"] input.order')
                         .val(index)
                         .trigger('change');
                 });
@@ -118,8 +116,6 @@ define([
             items.on('change:show', function(model) {
                 if (model.get('show')) {
                     filteredItems.add(model);
-                    filteredItems.trigger('reset');
-                    filteredItems.trigger('sort');
                 } else {
                     filteredItems.remove(model);
                 }
@@ -180,8 +176,6 @@ define([
                 model.set('order', targetModel.get('order'));
                 targetModel.set('order', order);
                 collection.sort();
-                collection.trigger('reset');
-                collection.trigger('sort');
             }
         }
     });
