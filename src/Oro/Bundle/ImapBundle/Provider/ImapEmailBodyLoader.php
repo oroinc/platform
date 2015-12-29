@@ -60,7 +60,8 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
-            $this->encryptor->decryptData($origin->getPassword())
+            $this->encryptor->decryptData($origin->getPassword()),
+            $origin->getAccessToken()
         );
 
         $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
