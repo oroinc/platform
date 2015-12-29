@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Model;
 
-use Oro\Bundle\ImapBundle\Entity\OauthEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 class AccountTypeModel
 {
     /** @var string|null */
     protected $accountType;
 
-    /** @var OauthEmailOrigin */
+    /** @var UserEmailOrigin */
     protected $imapGmailConfiguration;
 
     /**
@@ -29,7 +29,7 @@ class AccountTypeModel
     }
 
     /**
-     * @return OauthEmailOrigin
+     * @return UserEmailOrigin
      */
     public function getImapGmailConfiguration()
     {
@@ -37,9 +37,9 @@ class AccountTypeModel
     }
 
     /**
-     * @param OauthEmailOrigin $value
+     * @param UserEmailOrigin $value
      */
-    public function setImapGmailConfiguration(OauthEmailOrigin $value)
+    public function setImapGmailConfiguration(UserEmailOrigin $value)
     {
         $this->imapGmailConfiguration = $value;
     }

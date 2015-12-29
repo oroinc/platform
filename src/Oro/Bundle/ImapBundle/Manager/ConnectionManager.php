@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImapBundle\Manager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\ImapBundle\Entity\OauthEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -40,7 +39,7 @@ class ConnectionManager
      */
     public function getFormCheckGmailConnection($accessToken)
     {
-        $oauth = new OauthEmailOrigin();
+        $oauth = new UserEmailOrigin();
         $oauth->setAccessToken($accessToken);
 
         $form = $this->FormFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
@@ -76,7 +75,7 @@ class ConnectionManager
      */
     public function getFormGmailConnect($type, $accessToken)
     {
-        $oauthEmailOrigin = new OauthEmailOrigin();
+        $oauthEmailOrigin = new UserEmailOrigin();
         $oauthEmailOrigin->setAccessToken($accessToken);
 
         $accountTypeModel = new AccountTypeModel();

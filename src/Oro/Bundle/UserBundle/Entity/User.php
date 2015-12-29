@@ -15,7 +15,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\ImapBundle\Entity\OauthEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
@@ -975,7 +974,7 @@ class User extends ExtendUser implements
         $items = $this->emailOrigins->filter(
             function ($item) {
                 return
-                    ($item instanceof UserEmailOrigin || $item instanceof OauthEmailOrigin)
+                    ($item instanceof UserEmailOrigin)
                     && $item->isActive()
                     && !$item->getMailbox()
                     && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
@@ -988,12 +987,14 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param AccountTypeModel $accountTypeModel
+     * @param AccountTypeModel|null $accountTypeModel
      */
-    public function setImapAccountType(AccountTypeModel $accountTypeModel)
+    public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
     {
         $this->imapAccountType = $accountTypeModel;
-        $this->setImapConfiguration($accountTypeModel->getImapGmailConfiguration());
+        if ($accountTypeModel instanceof AccountTypeModel) {
+            $this->setImapConfiguration($accountTypeModel->getImapGmailConfiguration());
+        }
     }
 
     /**
@@ -1002,7 +1003,7 @@ class User extends ExtendUser implements
     public function getImapAccountType()
     {
         if ($this->imapAccountType === null) {
-            /** @var OauthEmailOrigin $imapConfiguration */
+            /** @var UserEmailOrigin $imapConfiguration */
             $imapConfiguration = $this->getImapConfiguration();
             $accountTypeModel = null;
             if ($imapConfiguration) {

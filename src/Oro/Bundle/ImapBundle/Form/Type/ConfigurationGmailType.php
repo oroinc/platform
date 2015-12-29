@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -11,7 +10,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ImapBundle\Entity\OauthEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -56,7 +55,7 @@ class ConfigurationGmailType extends AbstractType
         $form = $formEvent->getForm();
         $emailOrigin = $form->getData();
 
-        if ($emailOrigin instanceof OauthEmailOrigin) {
+        if ($emailOrigin instanceof UserEmailOrigin) {
             $this->updateForm($form, $emailOrigin);
         }
     }
@@ -69,7 +68,7 @@ class ConfigurationGmailType extends AbstractType
         $form = $formEvent->getForm();
         $emailOrigin = $formEvent->getData();
 
-        if ($emailOrigin instanceof OauthEmailOrigin) {
+        if ($emailOrigin instanceof UserEmailOrigin) {
             $this->updateForm($form, $emailOrigin);
         }
     }
@@ -80,7 +79,7 @@ class ConfigurationGmailType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Oro\\Bundle\\ImapBundle\\Entity\\OauthEmailOrigin'
+            'data_class' => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin'
         ]);
     }
 
@@ -103,9 +102,9 @@ class ConfigurationGmailType extends AbstractType
 
     /**
      * @param FormInterface $form
-     * @param OauthEmailOrigin $emailOrigin
+     * @param UserEmailOrigin $emailOrigin
      */
-    protected function updateForm(FormInterface $form, OauthEmailOrigin $emailOrigin)
+    protected function updateForm(FormInterface $form, UserEmailOrigin $emailOrigin)
     {
         if (!empty($emailOrigin->getAccessToken())) {
             $form->add('checkFolder', 'button', [
@@ -113,12 +112,13 @@ class ConfigurationGmailType extends AbstractType
                 'attr' => ['class' => 'btn btn-primary']
             ])
                 ->add('folders', 'oro_email_email_folder_tree', [
-                    'label' => $this->translator->trans('oro.email.folders.label'),
-                    'attr' => ['class' => 'folder-tree'],
-                    'tooltip' => $this->translator->trans('oro.email.folders.tooltip'),
-                ])->add('mailboxName', 'hidden', [
-                    'data' => 'Local'
-                ]);
+                'label' => $this->translator->trans('oro.email.folders.label'),
+                'attr' => ['class' => 'folder-tree'],
+                'tooltip' => $this->translator->trans('oro.email.folders.tooltip'),
+            ])
+                ->add('mailboxName', 'hidden', [
+                'data' => 'Local'
+            ]);
 
             $form->remove('check');
         }
