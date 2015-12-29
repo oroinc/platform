@@ -392,7 +392,7 @@ define(function(require) {
                 id = defaultModel.id;
             }
             return $.post(
-                routing.generate('oro_datagrid_api_rest_gridview_set_default', {
+                routing.generate('oro_datagrid_api_rest_gridview_default', {
                     id: id,
                     default: isDefault
                 }),

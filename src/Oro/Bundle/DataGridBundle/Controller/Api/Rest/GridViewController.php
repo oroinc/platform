@@ -129,12 +129,12 @@ class GridViewController extends RestController
      *     permission="VIEW"
      * )
      */
-    public function setDefaultAction($id, $default = false)
+    public function defaultAction($id, $default = false)
     {
         /** @var GridView $gridView */
         $manager  = $this->getManager();
         $gridView = $manager->find($id);
-        $manager->setGridViewDefault($this->getUser(), $gridView, $default);
+        $manager->setDefaultGridView($this->getUser(), $gridView, $default);
 
         return new JsonResponse([], Codes::HTTP_NO_CONTENT);
     }

@@ -14,7 +14,7 @@ class GridViewApiEntityManager extends ApiEntityManager
      * @param GridView $gridView
      * @param bool     $default
      */
-    public function setGridViewDefault(User $user, GridView $gridView, $default)
+    public function setDefaultGridView(User $user, GridView $gridView, $default)
     {
         /** @var GridViewRepository $repository */
         $repository = $this->getRepository();
