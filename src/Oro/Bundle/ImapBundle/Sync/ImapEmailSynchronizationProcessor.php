@@ -93,7 +93,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
                 $startDate = $folder->getSynchronizedAt();
                 $checkStartDate = clone $startDate;
-                $checkStartDate->modify('-1 month');
+                $checkStartDate->modify('-6 month');
 
                 // set seen flags from previously synchronized emails
                 $this->checkFlags($imapFolder, $checkStartDate);
@@ -124,8 +124,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
             $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
 
-            $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder());
-            $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder());
+            $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder(), $startDate);
+            $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder(), $startDate);
 
             $emailUserRepository->setEmailUsersSeen($ids, false);
             $emailUserRepository->setEmailUsersSeen($invertedIds, true);

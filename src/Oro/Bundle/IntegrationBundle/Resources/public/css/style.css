@@ -4,16 +4,15 @@
     height: 16px;
     width: 16px;
     background-size: contain !important;
+    margin-right: 4px;
+    margin-top: -2px;
+    vertical-align: middle;
+    float: left;
 }
 
 .select2-results .select2-result-label .aware-icon-block {
     position: relative;
     top: 3px;
-}
-
-.select2-choice .select2-chosen .aware-icon-block-selected,
-.select2-results .select2-result-label .aware-icon-block-selected {
-    margin-bottom: 5px;
 }
 
 .integration-icon,

@@ -42,9 +42,30 @@
   }
 }
 .box-type1 {
+  margin: 0 @contentPadding @contentPadding;
+  /*border: 1px solid #b6b6b6;*/
+  .border-radius(3px);
+  .title{
+    padding: @contentPadding @contentPadding @contentPadding 0;
+  }
   .calendar-container {
     padding: 0;
   }
+}
+.contact-widget-wrapper{
+  padding-left: 0;
+}
+.contact-widget-wrapper{
+  .box-type1{
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+.contact-box-wrapper{
+  padding: 0;
+}
+.contact-box{
+  width: calc(~"100% - 20px");
 }
 .oro-tabs{
   .pagination-container{
