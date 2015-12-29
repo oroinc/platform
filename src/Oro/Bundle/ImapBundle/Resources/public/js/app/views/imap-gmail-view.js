@@ -61,8 +61,11 @@ define(function(require) {
             return {
                 type : 'Gmail',
                 accessToken : token,
-                client_id : this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][clientId]"]').val()
-
+                clientId : this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][clientId]"]').val(),
+                mailboxName: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][mailboxName]"]').val(),
+                user: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][user]"]').val(),
+                imapPort: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapPort]"]').val(),
+                imapHost: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapHost]"]').val()
             };
         },
 
