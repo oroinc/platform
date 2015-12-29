@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\ImapBundle\Entity\OauthEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
@@ -947,7 +948,7 @@ class User extends ExtendUser implements
      *
      * @return User
      */
-    public function setImapConfiguration(UserEmailOrigin $imapConfiguration = null)
+    public function setImapConfiguration($imapConfiguration = null)
     {
         $currentImapConfiguration = $this->getImapConfiguration();
         if ($currentImapConfiguration &&
@@ -974,7 +975,7 @@ class User extends ExtendUser implements
         $items = $this->emailOrigins->filter(
             function ($item) {
                 return
-                    $item instanceof UserEmailOrigin
+                    ($item instanceof UserEmailOrigin || $item instanceof OauthEmailOrigin)
                     && $item->isActive()
                     && !$item->getMailbox()
                     && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
@@ -992,6 +993,7 @@ class User extends ExtendUser implements
     public function setImapAccountType(AccountTypeModel $accountTypeModel)
     {
         $this->imapAccountType = $accountTypeModel;
+        $this->setImapConfiguration($accountTypeModel->getImapGmailConfiguration());
     }
 
     /**
@@ -999,6 +1001,23 @@ class User extends ExtendUser implements
      */
     public function getImapAccountType()
     {
+        if ($this->imapAccountType === null) {
+            /** @var OauthEmailOrigin $imapConfiguration */
+            $imapConfiguration = $this->getImapConfiguration();
+            $accountTypeModel = null;
+            if ($imapConfiguration) {
+                if (!empty($imapConfiguration->getAccessToken())) {
+                    $accountTypeModel = new AccountTypeModel();
+                    $accountTypeModel->setAccountType('Gmail');
+                    $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
+                }
+            }
+
+            if ($accountTypeModel) {
+                return $accountTypeModel;
+            }
+        }
+
         return $this->imapAccountType;
     }
 

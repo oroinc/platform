@@ -90,11 +90,15 @@ services:
 
     oro_imap.form.type.choice_account:
         class: %oro_imap.form.type.choice_account.class%
+        arguments:
+             - @translator
         tags:
              - { name: form.type, alias: oro_imap_choice_account_type }
 
     oro_imap.form.type.configuration.gmail:
         class: Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType
+        arguments:
+             - @translator
         tags:
              - { name: form.type, alias: oro_imap_configuration_gmail }
 
@@ -126,3 +130,10 @@ services:
         class: %oro_imap.form.type.google_sync_checkbox.class%
         tags:
             - { name: form.type, alias: oro_config_google_imap_sync_checkbox }
+
+    oro_imap.manager.controller.connection:
+        class: Oro\Bundle\ImapBundle\Manager\ConnectionManager
+        scope: request
+        arguments:
+            - @oro_user.form.user
+            - @form.factory

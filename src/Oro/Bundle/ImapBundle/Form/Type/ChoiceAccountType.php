@@ -2,16 +2,34 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ChoiceAccountType extends AbstractType
 {
+    const ACCOUNT_TYPE_GMAIL = 'Gmail';
+    const ACCOUNT_TYPE_OTHER = 'Other';
+    const ACCOUNT_TYPE_NO_SELECT = 'Select Type';
+
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(
+        TranslatorInterface $translator
+    ) {
+        $this->translator = $translator;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -25,36 +43,42 @@ class ChoiceAccountType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder->add('accountType', 'choice', [
-            'label' => 'Account Type',
-            'choices' => ['Select' => 'Select Type', 'Gmail' => 'Gmail', 'Other' => 'Other'],
+            'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
+            'choices' => [
+                'Select' => self::ACCOUNT_TYPE_NO_SELECT,
+                'Gmail' => self::ACCOUNT_TYPE_GMAIL,
+                'Other' => self::ACCOUNT_TYPE_OTHER
+            ],
         ]);
 
         $this->initEvents($builder);
     }
 
     /**
-     * Update form if accountType is Other
-     *
-     * @param FormBuilderInterface $builder
+     * @param FormEvent $formEvent
      */
-    protected function initEvents(FormBuilderInterface $builder)
+    public function preSubmit(FormEvent $formEvent)
     {
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $formEvent) {
-            $accountTypeModel = $formEvent->getData();
-            $form = $formEvent->getForm();
+        $form = $formEvent->getForm();
+        $accountTypeModel = $form->getData();
 
-            if ($accountTypeModel instanceof AccountTypeModel) {
-                if ($accountTypeModel->getAccountType() === 'Other') {
-                    $form->add('imapConfiguration', 'oro_imap_configuration', ['mapped' => false]);
-                }
+        if ($accountTypeModel instanceof AccountTypeModel) {
+            $this->updateForm($form, $accountTypeModel);
+        }
+    }
 
-                if ($accountTypeModel->getAccountType() === 'Gmail') {
-                    $form->add('imapGmailConfiguration', 'oro_imap_configuration_gmail');
-                }
-            }
-        });
+    /**
+     * @param FormEvent $formEvent
+     */
+    public function preSetData(FormEvent $formEvent)
+    {
+        $accountTypeModel = $formEvent->getData();
+        $form = $formEvent->getForm();
+
+        if ($accountTypeModel instanceof AccountTypeModel) {
+            $this->updateForm($form, $accountTypeModel);
+        }
     }
 
     /**
@@ -65,5 +89,33 @@ class ChoiceAccountType extends AbstractType
         $resolver->setDefaults([
             'data_class' => 'Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel',
         ]);
+    }
+
+    /**
+     * Update form if accountType is changed
+     *
+     * @param FormBuilderInterface $builder
+     */
+    protected function initEvents(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param AccountTypeModel $accountTypeModel
+     */
+    protected function updateForm(FormInterface $form, AccountTypeModel $accountTypeModel)
+    {
+        if ($accountTypeModel instanceof AccountTypeModel) {
+            if ($accountTypeModel->getAccountType() === self::ACCOUNT_TYPE_OTHER) {
+                $form->add('imapConfiguration', 'oro_imap_configuration', ['mapped' => false]);
+            }
+
+            if ($accountTypeModel->getAccountType() === self::ACCOUNT_TYPE_GMAIL) {
+                $form->add('imapGmailConfiguration', 'oro_imap_configuration_gmail');
+            }
+        }
     }
 }

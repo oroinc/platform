@@ -18,10 +18,13 @@ define(function(require) {
         initialize: function(options) {
             var config = options.configs || {};
             this.url = _.result(options, 'url') || '';
+            this.urlGetFolders = _.result(options, 'urlGetFolders') || '';
 
             var viewConfig = this.prepareViewOptions(options, config);
             this.view = new this.ViewType(viewConfig);
+
             this.listenTo(this.view, 'imapGmailConnectionSetToken', this.onSetToken);
+            this.listenTo(this.view, 'imapGmailConnectionGetFolders', this.onGetFolders);
         },
 
         /**
@@ -33,8 +36,7 @@ define(function(require) {
          */
         prepareViewOptions: function(options, config) {
             return {
-                el: options._sourceElement,
-                url: options.url
+                el: options._sourceElement
             };
         },
 
@@ -44,14 +46,31 @@ define(function(require) {
                 method: "GET",
                 data: {
                     'type': 'Gmail',
-                    'token': value
+                    'accessToken': value.token
                 },
                 success: _.bind(this.templateLoaded, this)
             });
         },
 
-        templateLoaded: function(response) {
+        onGetFolders: function(value) {
+            $.ajax({
+                url : this.urlGetFolders,
+                method: "POST",
+                data: {
+                    'accessToken': value.token
+                },
+                success: _.bind(this.handlerGetFolders, this)
+            });
+        },
 
+        templateLoaded: function(response) {
+            this.view.setHtml(response.html);
+            this.view.render();
+        },
+
+        handlerGetFolders: function(response) {
+            this.view.setHtml(response.html);
+            this.view.render();
         }
     });
 

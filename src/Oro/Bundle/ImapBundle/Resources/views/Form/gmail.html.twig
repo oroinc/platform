@@ -1,0 +1,5 @@
+<fieldset class="form-horizontal">
+    {% if form.imapAccountType.imapGmailConfiguration is defined %}
+        {{ form_widget(form.imapAccountType.imapGmailConfiguration) }}
+    {% endif %}
+</fieldset>
