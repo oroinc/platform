@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var accountTypeView;
+    var ImapGmailView;
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
 
-    accountTypeView =  BaseView.extend({
+    ImapGmailView =  BaseView.extend({
         events: {
             'click button[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][check]"]': 'onClickConnect',
             'click button[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][checkFolder]"]': 'onCheckFolder'
@@ -72,5 +72,5 @@ define(function(require) {
         }
     });
 
-    return accountTypeView;
+    return ImapGmailView;
 });

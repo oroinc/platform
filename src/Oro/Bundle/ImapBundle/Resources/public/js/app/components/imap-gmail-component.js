@@ -5,11 +5,11 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
-    var accountTypeView = require('oroimap/js/app/views/imap-gmail-view');
+    var ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     IMapGmailComponent = BaseComponent.extend({
-        ViewType: accountTypeView,
+        ViewType: ImapGmailView,
 
         scopes: ['https://mail.google.com/'],
 
@@ -18,14 +18,13 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var config = options.configs || {};
             this.url = _.result(options, 'url') || '';
             this.urlGetFolders = _.result(options, 'urlGetFolders') || '';
 
-            var viewConfig = this.prepareViewOptions(options, config);
+            var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
 
-            this.listenTo(this.view, 'imapGmailConnectionSetToken', this.onSetToken);
+            this.listenTo(this.view, 'imapGmailConnectionSetToken', this.requestToken);
             this.listenTo(this.view, 'imapGmailConnectionGetFolders', this.onGetFolders);
 
             require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
@@ -37,17 +36,12 @@ define(function(require) {
          * Prepares options for the related view
          *
          * @param {Object} options - component's options
-         * @param {Object} config - select2's options
          * @return {Object}
          */
-        prepareViewOptions: function(options, config) {
+        prepareViewOptions: function(options) {
             return {
                 el: options._sourceElement
             };
-        },
-
-        onSetToken: function() {
-            this.requestToken();
         },
 
         requestToken: function() {
@@ -61,29 +55,24 @@ define(function(require) {
         },
 
         checkAuthorization: function(result) {
-            console.log('checkAuthorization', result);
             this.view.setToken(result.access_token);
 
-            gapi.client.load('gmail', 'v1', _.bind(this.listLabels, this));
+            gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
         },
 
-        listLabels: function() {
+        requestProfile: function() {
             var request = gapi.client.gmail.users.getProfile({
                 'userId': 'me'
             });
 
-            request.execute(_.bind(this.responseEmail, this));
+            request.execute(_.bind(this.responseProfile, this));
         },
 
-        responseEmail:function(request) {
-            console.log('request', request);
+        responseProfile:function(request) {
             if (request) {
                 this.view.setEmail(request.emailAddress);
             }
-
             this.view.render();
-
-
             this.requestFormGetFolder();
         },
 
@@ -92,8 +81,13 @@ define(function(require) {
                 url : this.url,
                 method: "GET",
                 data: this.view.getData(),
-                success: _.bind(this.templateLoaded, this)
+                success: _.bind(this.renderFormGetFolder, this)
             });
+        },
+
+        renderFormGetFolder: function(response) {
+            this.view.setHtml(response.html);
+            this.view.render();
         },
 
         onGetFolders: function(value) {
@@ -105,16 +99,10 @@ define(function(require) {
             });
         },
 
-        templateLoaded: function(response) {
-            this.view.setHtml(response.html);
-            this.view.render();
-        },
-
         handlerGetFolders: function(response) {
             this.view.setHtml(response.html);
             this.view.render();
         }
-
     });
 
     return IMapGmailComponent;
