@@ -128,7 +128,7 @@ class GridView
      * @ORM\ManyToMany(
      *      targetEntity="Oro\Bundle\UserBundle\Entity\User"
      * )
-     * @ORM\JoinTable(name="oro_default_grid_view_users",
+     * @ORM\JoinTable(name="oro_grid_view_user",
      *     joinColumns={@ORM\JoinColumn(name="grid_view_id", referencedColumnName="id", onDelete="CASCADE")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      * )
