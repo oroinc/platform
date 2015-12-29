@@ -77,6 +77,8 @@ UPGRADE FROM 1.8 to 1.9
 - Added parameters `Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Type\FieldType`
 - Services with tag `oro_entity_extend.entity_config_dumper_extension` was marked as private
 - Services with tag `oro_entity_extend.entity_generator_extension` was marked as private
+- Method `generateManyToOneRelationColumnName` of `Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator` marked as deprecated. Use `generateRelationColumnName` method instead.
+- Method `generateManyToManyRelationColumnName` of `Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator` marked as deprecated. Use `generateManyToManyJoinTableColumnName` method instead.
 
 ####EntitySerializer component
 - `Oro\Component\EntitySerializer\EntitySerializer` class has a lot of changes. This can bring a `backward compatibility break` if you have inherited classes.
