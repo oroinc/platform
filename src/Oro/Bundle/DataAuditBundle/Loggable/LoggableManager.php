@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Loggable;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
@@ -167,7 +168,7 @@ class LoggableManager
 
         $collections = array_merge($uow->getScheduledCollectionUpdates(), $uow->getScheduledCollectionDeletions());
         foreach ($collections as $collection) {
-            $this->calculateCollectionData($collection);
+            $this->calculateActualCollectionData($collection);
         }
 
         $entities = array_merge(
@@ -286,12 +287,27 @@ class LoggableManager
             }
 
             $entityIdentifier = $this->getEntityIdentifierString($owner);
-            $this->calculateCollectionData($collection, $entityIdentifier);
+            $this->calculateActualCollectionData($collection, $entityIdentifier);
 
             $entities[$entityIdentifier] = $owner;
         }
 
         return $entities;
+    }
+
+    /**
+     * @param PersistentCollection $collection
+     * @param string $entityIdentifier
+     */
+    protected function calculateActualCollectionData(PersistentCollection $collection, $entityIdentifier = null)
+    {
+        $ownerEntity = $collection->getOwner();
+        $entityState = $this->em->getUnitOfWork()->getEntityState($ownerEntity, UnitOfWork::STATE_NEW);
+        if ($entityState === UnitOfWork::STATE_REMOVED) {
+            return;
+        }
+
+        $this->calculateCollectionData($collection, $entityIdentifier);
     }
 
     /**

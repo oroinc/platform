@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormRendererInterface;
 
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
+use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 
 /**
  * LayoutHelper provides helpers to help display layout blocks
@@ -19,14 +20,22 @@ class LayoutHelper extends Helper
     /** @var TextHelper */
     private $textHelper;
 
+    /** @var FormRendererEngineInterface */
+    private $formRendererEngine;
+
     /**
      * @param FormRendererInterface $renderer
-     * @param TextHelper            $textHelper
+     * @param TextHelper $textHelper
+     * @param FormRendererEngineInterface $formRendererEngine
      */
-    public function __construct(FormRendererInterface $renderer, TextHelper $textHelper)
-    {
-        $this->renderer   = $renderer;
+    public function __construct(
+        FormRendererInterface $renderer,
+        TextHelper $textHelper,
+        FormRendererEngineInterface $formRendererEngine
+    ) {
+        $this->renderer = $renderer;
         $this->textHelper = $textHelper;
+        $this->formRendererEngine = $formRendererEngine;
     }
 
     /**
@@ -48,6 +57,18 @@ class LayoutHelper extends Helper
     public function setBlockTheme(BlockView $view, $themes)
     {
         $this->renderer->setTheme($view, $themes);
+    }
+
+    /**
+     * Sets the theme(s) to be used for rendering forms
+     *
+     * The theme format is "<Bundle>:<Controller>".
+     *
+     * @param string|string[] $themes The theme(s). For example 'MuBundle:Layout/php'
+     */
+    public function setFormTheme($themes)
+    {
+        $this->formRendererEngine->addDefaultThemes($themes);
     }
 
     /**

@@ -132,22 +132,28 @@ class ImapEmailRepository extends EntityRepository
     /**
      * @param             $uids
      * @param EmailFolder $folder
+     * @param \DateTime   $date
      *
      * @return array
      */
-    public function getEmailUserIdsByUIDs($uids, EmailFolder $folder)
+    public function getEmailUserIdsByUIDs($uids, EmailFolder $folder, $date = null)
     {
         $qb = $this->createQueryBuilder('ie');
 
-        $emailUserIds = $qb->select('email_user.id')
+        $qb = $this->createQueryBuilder('ie')->select('email_user.id')
             ->leftJoin('ie.email', 'email')
             ->leftJoin('email.emailUsers', 'email_user')
             ->leftJoin('email_user.folders', 'folders')
             ->andWhere($qb->expr()->in('folders', ':folder'))
             ->andWhere($qb->expr()->in('ie.uid', ':uids'))
             ->setParameter('uids', $uids)
-            ->setParameter('folder', $folder)
-            ->getQuery()->getArrayResult();
+            ->setParameter('folder', $folder);
+
+        if ($date) {
+            $qb->andWhere($qb->expr()->gt('email_user.receivedAt', ':date'))
+                ->setParameter('date', $date);
+        }
+        $emailUserIds = $qb->getQuery()->getArrayResult();
 
         $ids = [];
         foreach ($emailUserIds as $emailUserId) {
