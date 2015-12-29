@@ -76,7 +76,8 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
-            $this->encryptor->decryptData($origin->getPassword())
+            $this->encryptor->decryptData($origin->getPassword()),
+            $origin->getAccessToken()
         );
 
         return $this->syncProcessorFactory->create(

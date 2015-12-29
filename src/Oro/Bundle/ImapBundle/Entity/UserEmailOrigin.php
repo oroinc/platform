@@ -85,6 +85,13 @@ class UserEmailOrigin extends EmailOrigin
     protected $mailbox;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="access_token", type="string", length=255, nullable=true)
+     */
+    protected $accessToken;
+
+    /**
      * Gets the host name of IMAP server
      *
      * @return string
@@ -315,5 +322,25 @@ class UserEmailOrigin extends EmailOrigin
         if ($this->mailboxName === null) {
             $this->mailboxName = $this->user;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccessToken()
+    {
+        return $this->accessToken;
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return UserEmailOrigin
+     */
+    public function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
+
+        return $this;
     }
 }
