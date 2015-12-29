@@ -11,6 +11,8 @@ define(function(require) {
     IMapGmailComponent = BaseComponent.extend({
         ViewType: accountTypeView,
 
+        scopes: ['https://mail.google.com/'],
+
         /**
          * @constructor
          * @param {Object} options
@@ -25,6 +27,10 @@ define(function(require) {
 
             this.listenTo(this.view, 'imapGmailConnectionSetToken', this.onSetToken);
             this.listenTo(this.view, 'imapGmailConnectionGetFolders', this.onGetFolders);
+
+            require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
+                this.listenTo(this.view, 'requestToken', this.requestToken);
+            }, this));
         },
 
         /**
@@ -40,14 +46,53 @@ define(function(require) {
             };
         },
 
-        onSetToken: function(value) {
+        onSetToken: function() {
+            this.requestToken();
+        },
+
+        requestToken: function() {
+            var data = this.view.getData();
+            gapi.auth.authorize(
+                {
+                    'client_id': data.client_id,
+                    'scope': this.scopes.join(' '),
+                    'immediate': false
+                }, _.bind(this.checkAuthorization, this));
+
+            //this.checkAuthorization('1111');
+        },
+
+        checkAuthorization: function(result) {
+            this.view.setToken(result);
+
+            gapi.client.load('gmail', 'v1', _.bind(this.listLabels, this));
+        },
+
+        listLabels: function() {
+            var request = gapi.client.gmail.users.getProfile({
+                'userId': 'me'
+            });
+
+            request.execute(_.bind(this.responseEmail, this));
+        },
+
+        responseEmail:function(request) {
+            console.log('request', request);
+            if (request) {
+                this.view.setEmail(request.emailAddress);
+            }
+
+            this.view.render();
+
+
+            this.requestFormGetFolder();
+        },
+
+        requestFormGetFolder: function() {
             $.ajax({
                 url : this.url,
                 method: "GET",
-                data: {
-                    'type': 'Gmail',
-                    'accessToken': value.token
-                },
+                data: this.view.getData(),
                 success: _.bind(this.templateLoaded, this)
             });
         },
@@ -56,9 +101,7 @@ define(function(require) {
             $.ajax({
                 url : this.urlGetFolders,
                 method: "POST",
-                data: {
-                    'accessToken': value.token
-                },
+                data: value,
                 success: _.bind(this.handlerGetFolders, this)
             });
         },
@@ -72,6 +115,7 @@ define(function(require) {
             this.view.setHtml(response.html);
             this.view.render();
         }
+
     });
 
     return IMapGmailComponent;

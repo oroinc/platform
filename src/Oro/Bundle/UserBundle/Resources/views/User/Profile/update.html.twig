@@ -120,15 +120,29 @@
         }] ) %}
     {% endif %}
 
-    {% set dataBlocks = dataBlocks|merge([{
-        'title': '',
-        'subblocks': [{
+    {% if form.imapAccountType is defined %}
+        {% set dataBlocks = dataBlocks|merge([{
             'title': '',
-            'data': [
-                form_widget(form.imapAccountType)
-            ]
-        }]
-    }]) %}
+            'subblocks': [{
+                'title': '',
+                'data': [
+                    form_widget(form.imapAccountType)
+                ]
+            }]
+        }]) %}
+    {% endif %}
+
+    {% if form.imapConfiguration is defined %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': '',
+            'subblocks': [{
+                'title': '',
+                'data': [
+                    form_widget(form.imapConfiguration)
+                ]
+            }]
+        }]) %}
+    {% endif %}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,

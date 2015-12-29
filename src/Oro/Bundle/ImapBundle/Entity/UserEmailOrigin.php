@@ -92,6 +92,11 @@ class UserEmailOrigin extends EmailOrigin
     protected $accessToken;
 
     /**
+     * @var string
+     */
+    protected $clientId;
+
+    /**
      * Gets the host name of IMAP server
      *
      * @return string
@@ -342,5 +347,15 @@ class UserEmailOrigin extends EmailOrigin
         $this->accessToken = $accessToken;
 
         return $this;
+    }
+
+    public function setClientId($value)
+    {
+        $this->clientId = $value;
+    }
+
+    public function getClientId()
+    {
+        return $this->clientId;
     }
 }

@@ -10,6 +10,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 /**
@@ -23,13 +25,18 @@ class ConfigurationGmailType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** ConfigManager */
+    protected $userConfigManager;
+
     /**
      * @param TranslatorInterface $translator
      */
     public function __construct(
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        ConfigManager $userConfigManager
     ) {
         $this->translator = $translator;
+        $this->userConfigManager = $userConfigManager;
     }
 
     /**
@@ -42,7 +49,22 @@ class ConfigurationGmailType extends AbstractType
                 'label' => $this->translator->trans('oro.imap.configuration.connect'),
                 'attr' => ['class' => 'btn btn-primary']
             ])
-            ->add('accessToken', 'hidden');
+            ->add('accessToken', 'hidden')
+            ->add('imapHost', 'hidden', [
+                'label'    => 'oro.imap.configuration.imap_host.label',
+                'required' => true,
+                'data' => GmailImap::DEFAULT_GMAIL_HOST
+            ])
+            ->add('imapPort', 'hidden', [
+                'required' => true,
+                'data' => GmailImap::DEFAULT_GMAIL_PORT
+            ])
+            ->add('user', 'hidden', [
+                'required' => true,
+            ])
+            ->add('clientId', 'hidden', [
+                'data' => $this->userConfigManager->get('oro_google_integration.client_id')
+            ]);
 
         $this->initEvents($builder);
     }

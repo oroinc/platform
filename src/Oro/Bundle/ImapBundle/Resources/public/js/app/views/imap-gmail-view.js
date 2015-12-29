@@ -15,6 +15,10 @@ define(function(require) {
 
         html: '',
 
+        token: '',
+
+        email: '',
+
         /**
          * @constructor
          *
@@ -26,6 +30,8 @@ define(function(require) {
 
         render: function() {
             this.$el.html(this.html);
+            this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][accessToken]"]').val(this.token);
+            this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][user]"]').val(this.email);
             this._deferredRender();
             this.initLayout().done(_.bind(this._resolveDeferredRender, this));
         },
@@ -35,12 +41,37 @@ define(function(require) {
         },
 
         onClickConnect: function(e) {
+            //this.getToken();
+
             // todo: get token
-            this.trigger('imapGmailConnectionSetToken', {type: "Gmail", token:"1111"});
+            this.trigger('imapGmailConnectionSetToken', this.getData());
         },
 
         onCheckFolder: function() {
-            this.trigger('imapGmailConnectionGetFolders', {type: "Gmail", token:"1111"});
+            this.trigger('imapGmailConnectionGetFolders', this.getData());
+        },
+
+        getData: function() {
+            var token = this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][accessToken]"]').val();
+
+            if (!token) {
+                token = this.token;
+            }
+
+            return {
+                type : 'Gmail',
+                accessToken : token,
+                client_id : this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][clientId]"]').val()
+
+            };
+        },
+
+        setToken: function(value) {
+            this.token = value;
+        },
+
+        setEmail: function(value) {
+            this.email = value;
         }
     });
 

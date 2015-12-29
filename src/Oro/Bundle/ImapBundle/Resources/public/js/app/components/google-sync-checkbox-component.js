@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var GoogleSyncCheckboxView = require('oroimap/js/app/views/google-sync-checkbox-view');
@@ -12,7 +11,7 @@ define(function(require) {
 
         $clientIdElement: null,
 
-        scopes: ['https://www.googleapis.com/auth/gmail.readonly'],
+        scopes: ['https://mail.google.com/'],
 
         initialize: function(options) {
             this.$clientIdElement = options._sourceElement

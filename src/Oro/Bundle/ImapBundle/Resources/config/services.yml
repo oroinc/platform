@@ -99,6 +99,7 @@ services:
         class: Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType
         arguments:
              - @translator
+             - @oro_config.user
         tags:
              - { name: form.type, alias: oro_imap_configuration_gmail }
 
