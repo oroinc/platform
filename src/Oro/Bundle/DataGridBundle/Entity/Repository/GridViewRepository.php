@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -44,13 +43,13 @@ class GridViewRepository extends EntityRepository
     }
 
     /**
-     * @param AclHelper $aclHelper
-     * @param User      $user
-     * @param string    $gridName
+     * @param AclHelper     $aclHelper
+     * @param UserInterface $user
+     * @param string        $gridName
      *
      * @return GridView|null
      */
-    public function findDefaultGridView(AclHelper $aclHelper, User $user, $gridName)
+    public function findDefaultGridView(AclHelper $aclHelper, UserInterface $user, $gridName)
     {
         $qb = $this->getFindDefaultGridViewQb($user, $gridName);
         $qb->setMaxResults(1);
@@ -59,15 +58,19 @@ class GridViewRepository extends EntityRepository
     }
 
     /**
-     * @param AclHelper $aclHelper
-     * @param User      $user
-     * @param GridView  $gridView
-     * @param bool      $checkOwner
+     * @param AclHelper     $aclHelper
+     * @param UserInterface $user
+     * @param GridView      $gridView
+     * @param bool          $checkOwner
      *
      * @return GridView[]
      */
-    public function findDefaultGridViews(AclHelper $aclHelper, User $user, GridView $gridView, $checkOwner = true)
-    {
+    public function findDefaultGridViews(
+        AclHelper $aclHelper,
+        UserInterface $user,
+        GridView $gridView,
+        $checkOwner = true
+    ) {
         /** @var GridView[] $defaultGridViews */
         $qb = $this->getFindDefaultGridViewQb($user, $gridView->getGridName(), $checkOwner);
 
@@ -75,13 +78,13 @@ class GridViewRepository extends EntityRepository
     }
 
     /**
-     * @param User   $user
-     * @param string $gridName
-     * @param bool   $checkOwner
+     * @param UserInterface $user
+     * @param string        $gridName
+     * @param bool          $checkOwner
      *
      * @return QueryBuilder
      */
-    protected function getFindDefaultGridViewQb(User $user, $gridName, $checkOwner = true)
+    protected function getFindDefaultGridViewQb(UserInterface $user, $gridName, $checkOwner = true)
     {
         $parameters = [
             'gridName' => $gridName,

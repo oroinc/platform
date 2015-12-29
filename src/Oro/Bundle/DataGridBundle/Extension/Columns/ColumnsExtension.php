@@ -259,11 +259,25 @@ class ColumnsExtension extends AbstractExtension
 
     /**
      * @param DatagridConfiguration $config
+     * @param bool                  $default
      *
      * @return array
      */
-    protected function getColumnsWithOrder(DatagridConfiguration $config)
+    protected function getColumnsWithOrder(DatagridConfiguration $config, $default = false)
     {
+        if (!$default) {
+            $defaultGridView = $this->getGridViewRepository()->findDefaultGridView(
+                $this->aclHelper,
+                $this->getCurrentUser(),
+                $config->getName()
+            );
+
+            $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+            if (isset($params['view']) && $defaultGridView && $params['view'] === $defaultGridView->getId()) {
+                return $defaultGridView->getColumnsData();
+            }
+        }
+
         $columnsData  = $config->offsetGet(self::COLUMNS_PATH);
         $columnsOrder = $this->columnsHelper->buildColumnsOrder($columnsData);
         $columns      = $this->applyColumnsOrderAndRender($columnsData, $columnsOrder);
@@ -282,7 +296,7 @@ class ColumnsExtension extends AbstractExtension
     protected function createNewGridView(DatagridConfiguration $config, MetadataObject $data)
     {
         $newGridView = new View(GridViewsExtension::DEFAULT_VIEW_ID);
-        $columns     = $this->getColumnsWithOrder($config);
+        $columns     = $this->getColumnsWithOrder($config, true);
 
         /** Set config columns state to __all__ grid view */
         $newGridView->setColumnsData($columns);
