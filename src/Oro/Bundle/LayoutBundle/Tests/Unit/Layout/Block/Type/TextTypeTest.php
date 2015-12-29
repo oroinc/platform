@@ -32,7 +32,7 @@ class TextTypeTest extends BlockTypeTestCase
     {
         $view = $this->getBlockView(
             TextType::NAME,
-            ['text' => 'test']
+            ['text' => 'test', 'escape'=> false]
         );
 
         $this->assertEquals('test', $view->vars['text']);

@@ -1,5 +1,8 @@
 @import "./multi-checkbox-editor";
-.grid {
+.oro-datagrid.grid-editable .grid {
+  .number-cell, .integer-cell, .align-right, .editable {
+    padding-right: 28px;
+  }
   .row-edit-mode {
     background: #FFFCEC;
   }
@@ -58,10 +61,6 @@
       }
       &:hover:before {
         background-color: rgba(244, 239, 212, 0.7);;
-      }
-      &.number-cell:before, &.percent-cell:before {
-        right: auto;
-        left: 1px;
       }
     }
   }

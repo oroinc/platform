@@ -45,4 +45,7 @@ oro:
 
         tags_label: Tags
 
-        enabled: Enable tags
+        config:
+            enabled: Enable tags
+            disable.alert: Disabling Tags will irreversibly erase all existing tags
+

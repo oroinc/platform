@@ -79,10 +79,11 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param array       $ids
      * @param EmailFolder $folder
+     * @param \DateTime   $date
      *
      * @return array
      */
-    public function getInvertedIdsFromFolder(array $ids, EmailFolder $folder)
+    public function getInvertedIdsFromFolder(array $ids, EmailFolder $folder, $date = null)
     {
         $qb = $this->createQueryBuilder('email_user');
 
@@ -94,6 +95,11 @@ class EmailUserRepository extends EntityRepository
         if ($ids) {
             $qb->andWhere($qb->expr()->notIn('email_user.id', ':ids'))
                 ->setParameter('ids', $ids);
+        }
+
+        if ($date) {
+            $qb->andWhere($qb->expr()->gt('email_user.receivedAt', ':date'))
+                ->setParameter('date', $date);
         }
 
         $emailUserIds = $qb->getQuery()->getArrayResult();

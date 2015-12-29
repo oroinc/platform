@@ -24,6 +24,11 @@
   box-shadow: none !important;
   max-width: 100vw;
   min-width: initial !important;
+  &.ui-resizable:not(.ui-dialog-buttons) {
+    &:after {
+      display: none;
+    }
+  }
   .ui-widget-header {
     .ui-dialog-titlebar-buttonpane [class*='ui-dialog-titlebar-']:first-child:before {
       font-size: 18px;

@@ -13,6 +13,7 @@ UPGRADE FROM 1.8 to 1.9
 
 ####AddressBundle
 - `oro_address.address.manager` service was marked as private
+- Validation `AbstractAddress::isRegionValid` was moved to `Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion` constraint
 
 ####CalendarBundle
 - `oro_calendar.calendar_provider.user` service was marked as private
@@ -29,11 +30,41 @@ UPGRADE FROM 1.8 to 1.9
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
+- `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` has `@InheritanceType("SINGLE_TABLE")`
+- `audit-grid` and `audit-history-grid` based on `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` now. Make join to get your entity on grid
 
 ####DataGridBundle
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
 - JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
- 
+- Grid merge uses distinct policy
+
+```
+grid-name:
+    source:
+        value: 1
+grid-name:
+    source:
+        value: 2
+```
+
+will result
+
+```
+grid-name:
+    source:
+        value: 2
+```
+
+instead of
+
+```
+grid-name:
+    source:
+        value:
+            - 1
+            - 2
+```
+
 ####DistributionBundle:
 - Fix `priority` attribute handling for `routing.options_resolver` tag to be conform Symfony standards. New behaviour: the higher the priority, the sooner the resolver gets executed.
 
@@ -141,6 +172,8 @@ after:
 
 ####LayoutBundle
 - `Oro\Bundle\LayoutBundle\EventListener\ThemeListener` added to the class cache as performance improvement
+- The theme definition should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
+- Deprecated method: placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`
 
 ####LocaleBundle
 - `Oro\Bundle\LocaleBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
@@ -151,6 +184,9 @@ after:
 ####NavigationBundle
 - `Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener` added to the class cache as performance improvement
 - `Oro\Bundle\NavigationBundle\Event\RequestTitleListener` added to the class cache as performance improvement
+
+####NoteBundle
+ - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `\Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter`
 
 ####PlatformBundle
 - Bundle now has priority `-200` and it is loaded right after main Symfony bundles
@@ -163,9 +199,14 @@ after:
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
 - Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy) 
 - `Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener` added to the class cache and constructor have container as performance improvement
+- `Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface` and its implementation `Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory` were introduced to encapsulate creation of `UsernamePasswordOrganizationToken` in `Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider` and `Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener`
+- `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactoryInterface` and its implementation `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory` were introduced to encapsulate creation of `OrganizationRememberMeToken` in `Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider`
 
 ####SidebarBundle
 - `Oro\Bundle\SidebarBundle\EventListener\RequestHandler` added to the class cache as performance improvement
+
+####SSOBundle
+- `Oro\Bundle\SSOBundle\Security\OAuthTokenFactoryInterface` and its implementation `Oro\Bundle\SSOBundle\Security\OAuthTokenFactory` were introduced to encapsulate creation of `OAuthToken` in `Oro\Bundle\SSOBundle\Security\OAuthProvider`
 
 ####SoapBundle
 - Bundle now contains configuration of security firewall `wsse_secured` 
@@ -187,6 +228,7 @@ after:
 ####UserBundle
 - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
 - Bundle DI extension `OroUserExtension` has been updated to make sure that `main` security firewall is always the last in list
+- `Oro\Bundle\UserBundle\Security\WsseTokenFactoryInterface` and its implementation `Oro\Bundle\UserBundle\Security\WsseTokenFactory` were introduced to encapsulate creation of `WsseToken` in `Oro\Bundle\UserBundle\Security\WsseAuthProvider`
 
 ####WorkflowBundle
 - Constructor of `Oro\Bundle\WorkflowBundle\Model\Process` changed. New argument: `ConditionFactory $conditionFactory`

@@ -7,37 +7,34 @@ datagrid:
             type: orm
             query:
                 select:
-                    - a
-                    - a.id
-                    - a.action
-                    - a.version
-                    - a.objectClass
-                    - a.objectName
-                    - a.objectId
-                    - a.loggedAt
-                    - >
-                      CONCAT(
-                        CONCAT(
-                            CONCAT(u.firstName, ' '),
-                            CONCAT(u.lastName, ' ')
-                        ),
-                        CONCAT(' - ', u.email)
-                      ) as author
-                    - o.name as organization
+                    audit: a
+                    id: a.id
+                    section: a.action
+                    version: a.version
+                    objectClass: a.objectClass
+                    objectName: a.objectName
+                    objectId: a.objectId
+                    loggedAt: a.loggedAt
+                    author:  CONCAT(u.firstName, ' ', u.lastName, ' - ', u.email) as author
+                    organization: o.name as organization
                 from:
-                    - { table: OroDataAuditBundle:Audit, alias: a }
+                    - { table: OroDataAuditBundle:AbstractAudit, alias: a }
                 join:
                     left:
-                        user:
-                            join: a.user
-                            alias: u
                         organization:
                             join: a.organization
                             alias: o
                         fields:
                             join: a.fields
                             alias: f
-
+                        audit:
+                            join: OroDataAuditBundle:Audit
+                            alias: ua
+                            conditionType: WITH
+                            condition: ua.id = a.id
+                        user:
+                            join: ua.user
+                            alias: u
                 where:
                     and:
                         - o.id = @oro_security.security_facade->getOrganizationId
@@ -130,27 +127,25 @@ datagrid:
             type: orm
             query:
                 select:
-                    - a
-                    - a.id
-                    - a.loggedAt
-                    - >
-                      CONCAT(
-                        CONCAT(
-                            CONCAT(u.firstName, ' '),
-                            CONCAT(u.lastName, ' ')
-                        ),
-                        CONCAT(' - ', u.email)
-                      ) as author
+                    audit: a
+                    id: a.id
+                    loggedAt: a.loggedAt
+                    author:  CONCAT(u.firstName, ' ', u.lastName, ' - ', u.email) as author
                 from:
-                    - { table: OroDataAuditBundle:Audit, alias: a }
+                    - { table: OroDataAuditBundle:AbstractAudit, alias: a }
                 join:
                     left:
-                        user:
-                            join: a.user
-                            alias: u
                         fields:
                             join: a.fields
                             alias: f
+                        audit:
+                            join: OroDataAuditBundle:Audit
+                            alias: ua
+                            conditionType: WITH
+                            condition: ua.id = a.id
+                        user:
+                            join: ua.user
+                            alias: u
                 where:
                     and:
                         - a.objectClass = :objectClass AND a.objectId = :objectId
