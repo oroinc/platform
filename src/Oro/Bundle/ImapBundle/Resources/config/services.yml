@@ -138,3 +138,6 @@ services:
         arguments:
             - @oro_user.form.user
             - @form.factory
+            - @oro_security.encoder.mcrypt
+            - @doctrine
+            - @oro_imap.connector.factory

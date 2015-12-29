@@ -58,8 +58,6 @@ define(function(require) {
                     'scope': this.scopes.join(' '),
                     'immediate': false
                 }, _.bind(this.checkAuthorization, this));
-
-            //this.checkAuthorization('1111');
         },
 
         checkAuthorization: function(result) {
