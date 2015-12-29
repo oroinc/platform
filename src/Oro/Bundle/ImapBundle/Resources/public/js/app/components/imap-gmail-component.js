@@ -54,7 +54,7 @@ define(function(require) {
             var data = this.view.getData();
             gapi.auth.authorize(
                 {
-                    'client_id': data.client_id,
+                    'client_id': data.clientId,
                     'scope': this.scopes.join(' '),
                     'immediate': false
                 }, _.bind(this.checkAuthorization, this));
