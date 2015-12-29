@@ -63,6 +63,7 @@ define(function(require) {
         },
 
         checkAuthorization: function(result) {
+            console.log('checkAuthorization', result);
             this.view.setToken(result);
 
             gapi.client.load('gmail', 'v1', _.bind(this.listLabels, this));
