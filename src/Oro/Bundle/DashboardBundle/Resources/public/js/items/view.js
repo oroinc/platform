@@ -29,6 +29,7 @@ define([
         ],
 
         items: null,
+        filteredItems: null,
         itemSelect: null,
 
         initialize: function(options) {
@@ -92,10 +93,8 @@ define([
                 return model.get('order');
             };
             var $itemContainer = this.$('.item-container');
-            var showedItems    = items.where({show: true}).map(function(model) {
-                return model.toJSON();
-            });
-            var filteredItems  = new ItemCollection(showedItems, {comparator: comparator});
+            var showedItems    = items.where({show: true});
+            var filteredItems = this.filteredItems  = new ItemCollection(showedItems, {comparator: comparator});
 
             $itemContainer.itemsManagerTable({
                 itemTemplate: Backbone.$(this.itemTplSelector).html(),
@@ -119,6 +118,8 @@ define([
             items.on('change:show', function(model) {
                 if (model.get('show')) {
                     filteredItems.add(model);
+                    filteredItems.trigger('reset');
+                    filteredItems.trigger('sort');
                 } else {
                     filteredItems.remove(model);
                 }
@@ -171,7 +172,7 @@ define([
         _moveModel: function(model, shift) {
             var order;
             var targetModel;
-            var collection = model.collection;
+            var collection = this.filteredItems;
             var targetIndex = collection.indexOf(model) + shift;
             if (targetIndex >= 0 && targetIndex < collection.length) {
                 targetModel = collection.at(targetIndex);
@@ -180,6 +181,7 @@ define([
                 targetModel.set('order', order);
                 collection.sort();
                 collection.trigger('reset');
+                collection.trigger('sort');
             }
         }
     });
