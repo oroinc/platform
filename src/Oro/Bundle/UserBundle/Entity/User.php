@@ -1007,7 +1007,7 @@ class User extends ExtendUser implements
             $imapConfiguration = $this->getImapConfiguration();
             $accountTypeModel = null;
             if ($imapConfiguration) {
-                if (!empty($imapConfiguration->getAccessToken())) {
+                if ($imapConfiguration->getAccessToken() && $imapConfiguration->getAccessToken() !== '') {
                     $accountTypeModel = new AccountTypeModel();
                     $accountTypeModel->setAccountType('Gmail');
                     $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
