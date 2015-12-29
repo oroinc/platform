@@ -7,6 +7,9 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DataGridBundle\Common\Object;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DatagridConfiguration extends Object
 {
     const COLUMN_PATH = '[columns][%s]';
