@@ -56,7 +56,7 @@ define(function(require) {
                 {
                     'client_id': data.client_id,
                     'scope': this.scopes.join(' '),
-                    'immediate': false
+                    'immediate': false,
                     'response_type': 'code'
                 }, _.bind(this.checkAuthorization, this));
 
