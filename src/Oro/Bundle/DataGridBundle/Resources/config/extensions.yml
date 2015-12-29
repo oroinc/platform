@@ -90,6 +90,7 @@ services:
             - @oro_security.security_facade
             - @translator
             - @doctrine
+            - @oro_security.acl_helper
         tags:
             - { name: oro_datagrid.extension }
 

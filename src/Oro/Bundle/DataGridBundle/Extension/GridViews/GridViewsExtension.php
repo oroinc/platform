@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -14,7 +15,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class GridViewsExtension extends AbstractExtension
 {
@@ -38,6 +39,9 @@ class GridViewsExtension extends AbstractExtension
     /** @var ManagerRegistry */
     protected $registry;
 
+    /** @var AclHelper */
+    protected $aclHelper;
+
     /** @var GridView|null */
     protected $defaultGridView;
 
@@ -46,17 +50,20 @@ class GridViewsExtension extends AbstractExtension
      * @param SecurityFacade           $securityFacade
      * @param TranslatorInterface      $translator
      * @param ManagerRegistry          $registry
+     * @param AclHelper                $aclHelper
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         SecurityFacade $securityFacade,
         TranslatorInterface $translator,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
+        AclHelper $aclHelper
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->securityFacade  = $securityFacade;
         $this->translator      = $translator;
         $this->registry        = $registry;
+        $this->aclHelper       = $aclHelper;
     }
 
     /**
@@ -102,26 +109,26 @@ class GridViewsExtension extends AbstractExtension
         }
 
         /** @var AbstractViewsList $list */
-        $list          = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
-        $systemAllView = new View(self::DEFAULT_VIEW_ID);
-        $systemAllView->setDefault($currentViewId === self::DEFAULT_VIEW_ID);
+        $list           = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
+        $systemGridView = new View(self::DEFAULT_VIEW_ID);
+        $systemGridView->setDefault($currentViewId === self::DEFAULT_VIEW_ID);
 
-        $gridViews     = [
+        $gridViews = [
             'choices' => [
                 [
                     'label' => $allLabel,
                     'value' => self::DEFAULT_VIEW_ID,
                 ],
             ],
-            'views' => [
-                $systemAllView->getMetadata()
+            'views'   => [
+                $systemGridView->getMetadata()
             ],
         ];
         if ($list !== false) {
-            $configuredGridViews = $list->getMetadata();
-            $configuredGridViews['views'] = array_merge($gridViews['views'], $configuredGridViews['views']);
+            $configuredGridViews            = $list->getMetadata();
+            $configuredGridViews['views']   = array_merge($gridViews['views'], $configuredGridViews['views']);
             $configuredGridViews['choices'] = array_merge($gridViews['choices'], $configuredGridViews['choices']);
-            $gridViews = $configuredGridViews;
+            $gridViews                      = $configuredGridViews;
         }
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
@@ -130,7 +137,7 @@ class GridViewsExtension extends AbstractExtension
             $gridViews = $event->getGridViews();
         }
 
-        $gridViews['gridName'] = $config->getName();
+        $gridViews['gridName']    = $config->getName();
         $gridViews['permissions'] = $this->getPermissions();
         $data->offsetAddToArray('gridViews', $gridViews);
     }
@@ -182,6 +189,7 @@ class GridViewsExtension extends AbstractExtension
         ) {
             $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
             $defaultGridView = $repository->findDefaultGridView(
+                $this->aclHelper,
                 $this->securityFacade->getLoggedUser(),
                 $gridName
             );
