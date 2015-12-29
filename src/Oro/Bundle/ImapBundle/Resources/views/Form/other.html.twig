@@ -6,6 +6,14 @@
     {% endif %}
 
     {% if form.imapAccountType.imapGmailConfiguration is defined %}
+        {#{% if  form.imapAccountType.imapGmailConfiguration.check is defined %}#}
+            {#<div class="control-group">#}
+                {#<div class="controls">#}
+                    {#{{ form_widget(form.imapAccountType.imapGmailConfiguration.check) }}#}
+                {#</div>#}
+            {#</div>#}
+        {#{% endif %}#}
+        {#{{ form_widget(form.imapAccountType.imapGmailConfiguration.accessToken) }}#}
         {{ form_widget(form.imapAccountType.imapGmailConfiguration) }}
     {% endif %}
 </fieldset>

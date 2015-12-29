@@ -25,7 +25,6 @@ define(function(require) {
         },
 
         render: function() {
-            console.log(this.$el);
             this.$el.html(this.html);
             this._deferredRender();
             this.initLayout().done(_.bind(this._resolveDeferredRender, this));

@@ -171,7 +171,7 @@ oro:
 
         folders.label:            Folders
         folders.tooltip:          If a folder is uncheked, all the data saved in it will be deleted
-        check_folders.label:      Check Folder
+        retrieve_folders.label:   Retrieve Folders
         message_type:
             label:                Message type
         folder_type:

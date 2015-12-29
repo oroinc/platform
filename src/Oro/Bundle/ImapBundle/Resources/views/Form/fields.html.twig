@@ -39,7 +39,14 @@
     <div class="container-change-account-type"
         data-page-component-module="oroimap/js/app/components/account-type-component"
         data-page-component-options="{{ options|json_encode }}">
-        {{- block('form_widget') -}}
+        <div {{ block('widget_container_attributes') }}>
+            {%- if form.parent is empty -%}
+                {{ form_errors(form) }}
+            {%- endif -%}
+            {{ form_row(form.accountType) }}
+            {{ form_widget(form.imapGmailConfiguration) }}
+            {{- form_rest(form) -}}
+        </div>
     </div>
 {% endblock %}
 
@@ -47,13 +54,36 @@
 
     {% set options = {
         'url' :  path("oro_imap_change_account_type"),
+        'urlGetFolders': path("oro_imap_gmail_connection_check"),
         'formSelector': '#'~formSelector|default(form.vars.id)
     } %}
 
     <div class="container-imap-gmail-container"
          data-page-component-module="oroimap/js/app/components/imap-gmail-component"
          data-page-component-options="{{ options|json_encode }}">
-        {{- block('form_widget') -}}
+        <div {{ block('widget_container_attributes') }}>
+            {%- if form.parent is empty -%}
+                {{ form_errors(form) }}
+            {%- endif -%}
+
+            {% if form.check is defined %}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_widget(form.check) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if form.checkFolder is defined %}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_widget(form.checkFolder) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {{- form_rest(form) -}}
+        </div>
     </div>
 {% endblock %}
 
