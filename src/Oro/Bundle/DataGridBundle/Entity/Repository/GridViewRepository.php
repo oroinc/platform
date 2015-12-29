@@ -14,9 +14,9 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 class GridViewRepository extends EntityRepository
 {
     /**
-     * @param AclHelper $aclHelper
+     * @param AclHelper     $aclHelper
      * @param UserInterface $user
-     * @param string $gridName
+     * @param string        $gridName
      *
      * @return GridView[]
      */
@@ -25,15 +25,19 @@ class GridViewRepository extends EntityRepository
         $qb = $this->createQueryBuilder('gv');
         $qb
             ->andWhere('gv.gridName = :gridName')
-            ->andWhere($qb->expr()->orX(
-                'gv.owner = :owner',
-                'gv.type = :public'
-            ))
-            ->setParameters([
-                'gridName' => $gridName,
-                'owner'    => $user,
-                'public'   => GridView::TYPE_PUBLIC,
-            ])
+            ->andWhere(
+                $qb->expr()->orX(
+                    'gv.owner = :owner',
+                    'gv.type = :public'
+                )
+            )
+            ->setParameters(
+                [
+                    'gridName' => $gridName,
+                    'owner'    => $user,
+                    'public'   => GridView::TYPE_PUBLIC,
+                ]
+            )
             ->orderBy('gv.gridName');
 
         return $aclHelper->apply($qb)->getResult();
@@ -41,8 +45,8 @@ class GridViewRepository extends EntityRepository
 
     /**
      * @param AclHelper $aclHelper
-     * @param User   $user
-     * @param string $gridName
+     * @param User      $user
+     * @param string    $gridName
      *
      * @return GridView|null
      */
@@ -56,9 +60,9 @@ class GridViewRepository extends EntityRepository
 
     /**
      * @param AclHelper $aclHelper
-     * @param User     $user
-     * @param GridView $gridView
-     * @param bool     $checkOwner
+     * @param User      $user
+     * @param GridView  $gridView
+     * @param bool      $checkOwner
      *
      * @return GridView[]
      */
@@ -67,7 +71,7 @@ class GridViewRepository extends EntityRepository
         /** @var GridView[] $defaultGridViews */
         $qb = $this->getFindDefaultGridViewQb($user, $gridView->getGridName(), $checkOwner);
 
-        return $aclHelper->apply($qb)->getOneOrNullResult()->getResult();
+        return $aclHelper->apply($qb)->getResult();
     }
 
     /**
@@ -79,16 +83,15 @@ class GridViewRepository extends EntityRepository
      */
     protected function getFindDefaultGridViewQb(User $user, $gridName, $checkOwner = true)
     {
+        $parameters = [
+            'gridName' => $gridName,
+            'user'     => $user,
+        ];
+
         $qb = $this->createQueryBuilder('gv');
         $qb->innerJoin('gv.users', 'u')
             ->where('gv.gridName = :gridName')
-            ->andWhere('u = :user')
-            ->setParameters(
-                [
-                    'gridName' => $gridName,
-                    'user'     => $user,
-                ]
-            );
+            ->andWhere('u = :user');
 
         if ($checkOwner) {
             $qb->andWhere(
@@ -96,13 +99,18 @@ class GridViewRepository extends EntityRepository
                     'gv.owner = :owner',
                     'gv.type = :public'
                 )
-            )->setParameters(
+            );
+
+            $parameters = array_merge(
+                $parameters,
                 [
                     'owner'  => $user,
                     'public' => GridView::TYPE_PUBLIC
                 ]
             );
         }
+
+        $qb->setParameters($parameters);
 
         return $qb;
     }

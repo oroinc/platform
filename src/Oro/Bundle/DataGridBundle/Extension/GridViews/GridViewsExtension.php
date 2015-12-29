@@ -97,8 +97,8 @@ class GridViewsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $currentViewId = $this->getCurrentViewId($config);
-        $this->setDefaultParams($config);
+        $currentViewId = $this->getCurrentViewId($config->getName());
+        $this->setDefaultParams($config->getName());
 
         $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
         $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
@@ -111,7 +111,7 @@ class GridViewsExtension extends AbstractExtension
         /** @var AbstractViewsList $list */
         $list           = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
         $systemGridView = new View(self::DEFAULT_VIEW_ID);
-        $systemGridView->setDefault($currentViewId === self::DEFAULT_VIEW_ID);
+        $systemGridView->setDefault($this->getDefaultViewId($config->getName()) === null);
 
         $gridViews = [
             'choices' => [
@@ -145,33 +145,34 @@ class GridViewsExtension extends AbstractExtension
     /**
      * Gets id for current grid view
      *
-     * @param DatagridConfiguration $config
+     * @param string $gridName
      *
      * @return int|string
      */
-    protected function getCurrentViewId(DatagridConfiguration $config)
+    protected function getCurrentViewId($gridName)
     {
         $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         if (isset($params[self::VIEWS_PARAM_KEY])) {
             return (int)$params[self::VIEWS_PARAM_KEY];
         } else {
-            return $this->getDefaultViewId($config->getName());
+            $defaultViewId = $this->getDefaultViewId($gridName);
+
+            return $defaultViewId ? $defaultViewId : self::DEFAULT_VIEW_ID;
         }
     }
 
     /**
      * Gets id for defined as default grid view for current logged user.
-     * If is not defined returns id for raw configured grid.
      *
      * @param string $gridName
      *
-     * @return int|string
+     * @return int|null
      */
     protected function getDefaultViewId($gridName)
     {
         $defaultGridView = $this->getDefaultView($gridName);
 
-        return $defaultGridView ? $defaultGridView->getId() : self::DEFAULT_VIEW_ID;
+        return $defaultGridView ? $defaultGridView->getId() : null;
     }
 
     /**
@@ -183,10 +184,7 @@ class GridViewsExtension extends AbstractExtension
      */
     protected function getDefaultView($gridName)
     {
-
-        if ($this->defaultGridView === null &&
-            $this->securityFacade->isGranted('oro_datagrid_gridview_view')
-        ) {
+        if ($this->defaultGridView === null) {
             $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
             $defaultGridView = $repository->findDefaultGridView(
                 $this->aclHelper,
@@ -204,18 +202,20 @@ class GridViewsExtension extends AbstractExtension
      * Sets default parameters.
      * Added filters and sorters for defined as default grid view for current logged user.
      *
-     * @param DatagridConfiguration $config
+     * @param string $gridName
      */
-    protected function setDefaultParams(DatagridConfiguration $config)
+    protected function setDefaultParams($gridName)
     {
         $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+        if (!isset($params[self::VIEWS_PARAM_KEY])) {
+            $currentViewId                 = $this->getCurrentViewId($gridName);
+            $params[self::VIEWS_PARAM_KEY] = $currentViewId;
 
-        $params[self::VIEWS_PARAM_KEY] = $this->getDefaultViewId($config->getName());
-
-        $defaultGridView = $this->getDefaultView($config->getName());
-        if ($defaultGridView) {
-            $this->getParameters()->mergeKey('_filter', $defaultGridView->getFiltersData());
-            $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
+            $defaultGridView = $this->getDefaultView($gridName);
+            if ($defaultGridView) {
+                $this->getParameters()->mergeKey('_filter', $defaultGridView->getFiltersData());
+                $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
+            }
         }
         $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);
     }
