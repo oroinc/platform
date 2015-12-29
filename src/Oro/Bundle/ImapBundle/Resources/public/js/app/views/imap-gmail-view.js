@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var accountTypeView;
-    var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
@@ -24,9 +23,7 @@ define(function(require) {
          *
          * @param {Object} options
          */
-        initialize: function(options) {
-
-        },
+        initialize: function(options) {},
 
         render: function() {
             this.$el.html(this.html);
@@ -41,9 +38,6 @@ define(function(require) {
         },
 
         onClickConnect: function(e) {
-            //this.getToken();
-
-            // todo: get token
             this.trigger('imapGmailConnectionSetToken', this.getData());
         },
 

@@ -3,17 +3,18 @@
 namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
+use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
  * Class ConnectionManager
@@ -32,7 +33,7 @@ class ConnectionManager
     protected $mcrypt;
 
     /** @var Registry */
-    protected $doctrineHelper;
+    protected $doctrine;
 
     /** @var ImapConnectorFactory */
     protected $imapConnectorFactory;
@@ -47,7 +48,7 @@ class ConnectionManager
         $this->formUser = $formUser;
         $this->FormFactory = $FormFactory;
         $this->mcrypt = $mcrypt;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrine = $doctrineHelper;
         $this->imapConnectorFactory = $imapConnectorFactory;
     }
 
@@ -58,9 +59,17 @@ class ConnectionManager
      */
     public function getFormCheckGmailConnection($request)
     {
-        $form = $this->FormFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
-        $form->submit($request);
+        $userEmailOrigin = new UserEmailOrigin();
+        $userEmailOrigin->setAccessToken($request->request->get('accessToken'));
+        $userEmailOrigin->setClientId($request->request->get('clientId'));
+        $userEmailOrigin->setMailboxName($request->request->get('mailboxName'));
+        $userEmailOrigin->setUser($request->request->get('user'));
+        $userEmailOrigin->setImapHost($request->request->get('imapHost'));
+        $userEmailOrigin->setImapPort($request->request->get('imapPort'));
 
+        $form = $this->FormFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
+        $form->setData($userEmailOrigin);
+        $form->submit($request);
         /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 
@@ -78,7 +87,7 @@ class ConnectionManager
         $connector = $this->imapConnectorFactory->createImapConnector($config);
         $this->manager = new ImapEmailFolderManager(
             $connector,
-            $this->doctrineHelper->getEntityManager(),
+            $this->doctrine->getEntityManager(),
             $origin
         );
 
@@ -106,6 +115,11 @@ class ConnectionManager
     {
         $oauthEmailOrigin = new UserEmailOrigin();
         $oauthEmailOrigin->setAccessToken($accessToken);
+
+        if ($type === ChoiceAccountType::ACCOUNT_TYPE_GMAIL) {
+            $oauthEmailOrigin->setImapHost(GmailImap::DEFAULT_GMAIL_HOST);
+            $oauthEmailOrigin->setImapPort(GmailImap::DEFAULT_GMAIL_PORT);
+        }
 
         $accountTypeModel = new AccountTypeModel();
         $accountTypeModel->setAccountType($type);

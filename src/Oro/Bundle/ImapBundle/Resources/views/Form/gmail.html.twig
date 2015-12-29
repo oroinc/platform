@@ -1,5 +1,27 @@
 <fieldset class="form-horizontal">
     {% if form.imapAccountType.imapGmailConfiguration is defined %}
-        {{ form_widget(form.imapAccountType.imapGmailConfiguration) }}
+        <div {{ block('widget_container_attributes') }}>
+            {%- if form.imapAccountType.imapGmailConfiguration.parent is empty -%}
+                {{ form_errors(form.imapAccountType.imapGmailConfiguration) }}
+            {%- endif -%}
+
+            {% if form.imapAccountType.imapGmailConfiguration.check is defined %}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_widget(form.imapAccountType.imapGmailConfiguration.check) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if form.imapAccountType.imapGmailConfiguration.checkFolder is defined %}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_widget(form.imapAccountType.imapGmailConfiguration.checkFolder) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {{- form_rest(form.imapAccountType.imapGmailConfiguration) -}}
+        </div>
     {% endif %}
 </fieldset>
