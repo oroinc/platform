@@ -44,14 +44,23 @@ class ChoiceAccountType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('accountType', 'choice', [
-            'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
-            'choices' => [
-                'Select' => self::ACCOUNT_TYPE_NO_SELECT,
-                'Gmail' => self::ACCOUNT_TYPE_GMAIL,
-                'Other' => self::ACCOUNT_TYPE_OTHER
-            ],
-        ]);
+
+        if ($options['showDisconnectButton']) {
+            $builder->add('disconnect', 'button', [
+                'attr' => [
+                    'class'=>'btn btn-danger'
+                ]
+            ]);
+        } else {
+            $builder->add('accountType', 'choice', [
+                'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
+                'choices' => [
+                    'Select' => self::ACCOUNT_TYPE_NO_SELECT,
+                    'Gmail' => self::ACCOUNT_TYPE_GMAIL,
+                    'Other' => self::ACCOUNT_TYPE_OTHER
+                ],
+            ]);
+        }
 
         $this->initEvents($builder);
     }
@@ -104,6 +113,7 @@ class ChoiceAccountType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => 'Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel',
+            'showDisconnectButton' => false
         ]);
     }
 

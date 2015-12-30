@@ -61,6 +61,7 @@ class UserType extends AbstractType
     {
         $this->addEntityFields($builder);
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
     }
 
     /**
@@ -165,6 +166,7 @@ class UserType extends AbstractType
                 'oro_imap_choice_account_type',
                 [
                     'label' => 'oro.user.imap_configuration.label',
+
                 ]
             );
         } else {
@@ -275,6 +277,31 @@ class UserType extends AbstractType
                         'data'     => $this->userConfigManager->get('oro_email.signature'),
                     ]
                 );
+            }
+        }
+    }
+
+    public function preSetData(FormEvent $event)
+    {
+        /** @var Form $form */
+        $form = $event->getForm();
+        $data = $event->getData();
+
+        if ($data instanceof User) {
+            $imapAccountType = $data->getImapAccountType();
+            if ($imapAccountType) {
+                if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
+                    $form->remove('imapAccountType');
+
+                    $form->add(
+                        'imapAccountType',
+                        'oro_imap_choice_account_type',
+                        [
+                            'label' => 'oro.user.imap_configuration.label',
+                            'showDisconnectButton' => true
+                        ]
+                    );
+                }
             }
         }
     }
