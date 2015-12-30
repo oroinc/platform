@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ChoiceAccountType extends AbstractType
 {
@@ -63,6 +64,28 @@ class ChoiceAccountType extends AbstractType
         $form = $formEvent->getForm();
         $accountTypeModel = $form->getData();
 
+        if (null === $accountTypeModel) {
+            $data = $formEvent->getData();
+
+            if (null === $data) {
+                return;
+            }
+
+            $accountTypeModel =  new AccountTypeModel();
+            $accountTypeModel->setAccountType($data['accountType']);
+
+            $userEmailOrigin = new UserEmailOrigin();
+            $userEmailOrigin->setAccessToken($data['accessToken']);
+            $userEmailOrigin->setImapHost($data['imapHost']);
+            $userEmailOrigin->setImapHost($data['imapPort']);
+            $userEmailOrigin->setUser($data['user']);
+            $userEmailOrigin->setImapEncryption($data['imapEncryption']);
+            $userEmailOrigin->setClientId($data['clientId']);
+            $userEmailOrigin->setMailboxName($data['mailboxName']);
+
+            $accountTypeModel->setImapGmailConfiguration($userEmailOrigin);
+        }
+
         if ($accountTypeModel instanceof AccountTypeModel) {
             $this->updateForm($form, $accountTypeModel);
         }
@@ -75,6 +98,10 @@ class ChoiceAccountType extends AbstractType
     {
         $accountTypeModel = $formEvent->getData();
         $form = $formEvent->getForm();
+
+        if (null === $accountTypeModel) {
+            return;
+        }
 
         if ($accountTypeModel instanceof AccountTypeModel) {
             $this->updateForm($form, $accountTypeModel);
