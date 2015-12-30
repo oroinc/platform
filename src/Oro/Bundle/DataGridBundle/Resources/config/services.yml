@@ -155,6 +155,7 @@ services:
         arguments:
             - %oro_datagrid.grid_view.entity.class%
             - @doctrine.orm.entity_manager
+            - @oro_security.acl_helper
 
     oro_datagrid.form.grid_view.api:
         class:                        Symfony\Component\Form\Form

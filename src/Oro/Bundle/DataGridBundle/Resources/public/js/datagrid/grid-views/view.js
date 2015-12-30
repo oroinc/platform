@@ -398,8 +398,8 @@ define(function(require) {
                 }),
                 {},
                 function(response) {
-                    defaultModel.set({is_default:false});
-                    currentViewModel.set({is_default:true});
+                    defaultModel.set({is_default: false});
+                    currentViewModel.set({is_default: true});
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
             ).fail(
@@ -438,7 +438,7 @@ define(function(require) {
 
             if (model.get('is_default')) {
                 var systemModel = this._getDefaultSystemViewModel();
-                systemModel.set({is_default:true, label: this._getView(this.DEFAULT_GRID_VIEW_ID).label});
+                systemModel.set({is_default: true});
             }
 
             this.render();
@@ -647,7 +647,7 @@ define(function(require) {
          */
         _getDefaultSystemViewModel: function() {
             return this.viewsCollection.findWhere({
-                name:this.DEFAULT_GRID_VIEW_ID
+                name: this.DEFAULT_GRID_VIEW_ID
             });
         },
 

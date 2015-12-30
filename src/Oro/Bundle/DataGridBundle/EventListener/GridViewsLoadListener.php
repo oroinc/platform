@@ -57,10 +57,11 @@ class GridViewsLoadListener
 
         $gridViewRepository = $this->getGridViewRepository();
         $gridViews          = $gridViewRepository->findGridViews($this->aclHelper, $currentUser, $gridName);
-        $defaultGridView    = $gridViewRepository->findDefaultGridView($currentUser, $gridName);
+        $defaultGridView    = $gridViewRepository->findDefaultGridView($this->aclHelper, $currentUser, $gridName);
         if (!$gridViews) {
             return;
         }
+
         $choices = [];
         $views   = [];
         foreach ($gridViews as $gridView) {
@@ -73,9 +74,9 @@ class GridViewsLoadListener
                 'label' => $this->createGridViewLabel($currentUser, $gridView),
                 'value' => $gridView->getId(),
             ];
-
         }
 
+        /** @var array $newGridViews */
         $newGridViews            = $event->getGridViews();
         $newGridViews['choices'] = array_merge($newGridViews['choices'], $choices);
         $newGridViews['views']   = array_merge($newGridViews['views'], $views);
