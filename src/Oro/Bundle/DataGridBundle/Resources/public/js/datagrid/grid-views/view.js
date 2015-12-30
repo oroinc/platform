@@ -334,7 +334,8 @@ define(function(require) {
             var self = this;
 
             var modal = new ViewNameModal({
-                defaultValue: model.get('label')
+                defaultValue: model.get('label'),
+                defaultChecked: model.get('is_default'),
             });
             modal.on('ok', function() {
                 model.save({
