@@ -100,14 +100,14 @@ class GridViewApiHandler
      */
     protected function setDefaultGridView(GridView $gridView, $default)
     {
-        $om = $this->registry->getManagerForClass('OroDataGridBundle:GridView');
-
-        /** @var GridViewRepository $repository */
-        $repository = $om->getRepository('OroDataGridBundle:GridView');
-        $user       = $this->tokenStorage->getToken()->getUser();
-        if ($gridView->getUsers()->contains($user) !== $default) {
-
-            $gridViews = $repository->findDefaultGridViews($this->aclHelper, $user, $gridView, false);
+        $user              = $this->tokenStorage->getToken()->getUser();
+        $isGridViewDefault = $gridView->getUsers()->contains($user);
+        // Checks if default grid view changed
+        if ($isGridViewDefault !== $default) {
+            $om = $this->registry->getManagerForClass('OroDataGridBundle:GridView');
+            /** @var GridViewRepository $repository */
+            $repository = $om->getRepository('OroDataGridBundle:GridView');
+            $gridViews  = $repository->findDefaultGridViews($this->aclHelper, $user, $gridView, false);
             foreach ($gridViews as $view) {
                 $view->removeUser($user);
             }
