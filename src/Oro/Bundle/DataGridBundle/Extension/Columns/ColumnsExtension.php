@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Columns;
 
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -39,6 +40,9 @@ class ColumnsExtension extends AbstractExtension
 
     /** @var ColumnsHelper */
     protected $columnsHelper;
+
+    /** @var GridView|null */
+    protected $defaultGridView;
 
     /**
      * @param Registry       $registry
@@ -266,13 +270,8 @@ class ColumnsExtension extends AbstractExtension
     protected function getColumnsWithOrder(DatagridConfiguration $config, $default = false)
     {
         if (!$default) {
-            $defaultGridView = $this->getGridViewRepository()->findDefaultGridView(
-                $this->aclHelper,
-                $this->getCurrentUser(),
-                $config->getName()
-            );
-
-            $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+            $params          = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+            $defaultGridView = $this->getDefaultGridView($config->getName());
             if (isset($params['view']) && $defaultGridView && $params['view'] === $defaultGridView->getId()) {
                 return $defaultGridView->getColumnsData();
             }
@@ -283,6 +282,26 @@ class ColumnsExtension extends AbstractExtension
         $columns      = $this->applyColumnsOrderAndRender($columnsData, $columnsOrder);
 
         return $columns;
+    }
+
+    /**
+     * @param string $gridName
+     *
+     * @return GridView|null
+     */
+    protected function getDefaultGridView($gridName)
+    {
+        if ($this->defaultGridView === null) {
+            $defaultGridView = $this->getGridViewRepository()->findDefaultGridView(
+                $this->aclHelper,
+                $this->getCurrentUser(),
+                $gridName
+            );
+
+            $this->defaultGridView = $defaultGridView;
+        }
+
+        return $this->defaultGridView;
     }
 
     /**
