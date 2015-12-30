@@ -338,10 +338,14 @@ define(function(require) {
             });
             modal.on('ok', function() {
                 model.save({
-                    label: this.$('input[name=name]').val()
+                    label: this.$('input[name=name]').val(),
+                    is_default: this.$('input[name=is_default]').is(':checked')
                 }, {
                     wait: true,
                     success: function() {
+                        if(model.get('is_default')) {
+                            self._getCurrentDefaultViewModel().set({is_default: false});
+                        }
                         self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                     },
                     error: function(model, response, options) {
