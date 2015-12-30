@@ -6,8 +6,11 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class GridViewApiHandler
 {
@@ -20,16 +23,31 @@ class GridViewApiHandler
     /** @var Registry */
     protected $registry;
 
+    /** @var AclHelper */
+    protected $aclHelper;
+
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
+
     /**
-     * @param FormInterface $form
-     * @param Request $request
-     * @param Registry $registry
+     * @param FormInterface         $form
+     * @param Request               $request
+     * @param Registry              $registry
+     * @param AclHelper             $aclHelper
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(FormInterface $form, Request $request, Registry $registry)
-    {
-        $this->form = $form;
-        $this->request = $request;
-        $this->registry = $registry;
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        Registry $registry,
+        AclHelper $aclHelper,
+        TokenStorageInterface $tokenStorage
+    ) {
+        $this->form         = $form;
+        $this->request      = $request;
+        $this->registry     = $registry;
+        $this->aclHelper    = $aclHelper;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -67,10 +85,37 @@ class GridViewApiHandler
      */
     protected function onSuccess(GridView $entity)
     {
+        $default = $this->form->get('is_default')->getData();
+        $this->setDefaultGridView($entity, $default);
+
         $this->fixFilters($entity);
         $om = $this->registry->getManagerForClass('OroDataGridBundle:GridView');
         $om->persist($entity);
         $om->flush();
+    }
+
+    /**
+     * @param GridView $gridView
+     * @param bool     $default
+     */
+    protected function setDefaultGridView(GridView $gridView, $default)
+    {
+        $om = $this->registry->getManagerForClass('OroDataGridBundle:GridView');
+
+        /** @var GridViewRepository $repository */
+        $repository = $om->getRepository('OroDataGridBundle:GridView');
+        $user       = $this->tokenStorage->getToken()->getUser();
+        if ($gridView->getUsers()->contains($user) !== $default) {
+
+            $gridViews = $repository->findDefaultGridViews($this->aclHelper, $user, $gridView, false);
+            foreach ($gridViews as $view) {
+                $view->removeUser($user);
+            }
+
+            if ($default) {
+                $gridView->addUser($user);
+            }
+        }
     }
 
     /**

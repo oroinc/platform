@@ -78,7 +78,7 @@ define([
          * @returns {Array}
          */
         toJSON: function() {
-            return _.omit(this.attributes, ['editable', 'deletable', 'is_default']);
+            return _.omit(this.attributes, ['editable', 'deletable']);
         }
     });
 

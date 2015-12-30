@@ -232,6 +232,7 @@ define(function(require) {
             modal.on('ok', function(e) {
                 var model = self._createViewModel({
                     label: this.$('input[name=name]').val(),
+                    is_default: this.$('input[name=is_default]').is(':checked'),
                     type: 'private',
                     grid_name: self.gridName,
                     filters: self.collection.state.filters,
@@ -252,6 +253,10 @@ define(function(require) {
                         self._updateTitle();
                         self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                         mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
+
+                        if(model.get('is_default')) {
+                            self._getCurrentDefaultViewModel().set({is_default: false});
+                        }
                     },
                     error: function(model, response, options) {
                         modal.open();
@@ -438,7 +443,7 @@ define(function(require) {
 
             if (model.get('is_default')) {
                 var systemModel = this._getDefaultSystemViewModel();
-                systemModel.set({is_default: true, label: this._getView(this.DEFAULT_GRID_VIEW_ID).label});
+                systemModel.set({is_default: true});
             }
 
             this.render();
