@@ -134,9 +134,14 @@ class GridViewController extends RestController
         /** @var GridView $gridView */
         $manager  = $this->getManager();
         $gridView = $manager->find($id);
-        $manager->setDefaultGridView($this->getUser(), $gridView, $default);
+        if ($gridView) {
+            $manager->setDefaultGridView($this->getUser(), $gridView, $default);
+            $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+        } else {
+            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+        }
 
-        return new JsonResponse([], Codes::HTTP_NO_CONTENT);
+        return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $gridView]);
     }
 
     /**
