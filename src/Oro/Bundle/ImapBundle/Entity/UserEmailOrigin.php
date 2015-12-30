@@ -92,6 +92,20 @@ class UserEmailOrigin extends EmailOrigin
     protected $accessToken;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="refresh_token", type="string", length=255, nullable=true)
+     */
+    protected $refreshToken;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="access_token_expires_at", type="datetime", nullable=true)
+     */
+    protected $accessTokenExpiresAt;
+
+    /**
      * Gets the host name of IMAP server
      *
      * @return string
@@ -340,6 +354,46 @@ class UserEmailOrigin extends EmailOrigin
     public function setAccessToken($accessToken)
     {
         $this->accessToken = $accessToken;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRefreshToken()
+    {
+        return $this->refreshToken;
+    }
+
+    /**
+     * @param string $refreshToken
+     *
+     * @return UserEmailOrigin
+     */
+    public function setRefreshToken($refreshToken)
+    {
+        $this->refreshToken = $refreshToken;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getAccessTokenExpiresAt()
+    {
+        return $this->accessTokenExpiresAt;
+    }
+
+    /**
+     * @param \DateTime $datetime
+     *
+     * @return UserEmailOrigin
+     */
+    public function setAccessTokenExpiresAt(\DateTime $datetime)
+    {
+        $this->accessTokenExpiresAt = $datetime;
 
         return $this;
     }
