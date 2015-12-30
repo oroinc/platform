@@ -62,6 +62,10 @@ class ConfigurationGmailType extends AbstractType
             ->add('user', 'hidden', [
                 'required' => true,
             ])
+            ->add('imapEncryption', 'hidden', [
+                'required' => true,
+                'data' => GmailImap::DEFAULT_GMAIL_SSL
+            ])
             ->add('clientId', 'hidden', [
                 'data' => $this->userConfigManager->get('oro_google_integration.client_id')
             ]);

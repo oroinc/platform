@@ -59,7 +59,8 @@ define(function(require) {
                 mailboxName: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][mailboxName]"]').val(),
                 user: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][user]"]').val(),
                 imapPort: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapPort]"]').val(),
-                imapHost: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapHost]"]').val()
+                imapHost: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapHost]"]').val(),
+                imapEncryption: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapEncryption]"]').val()
             };
         },
 
