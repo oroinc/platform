@@ -254,7 +254,7 @@ define(function(require) {
                         self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                         mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
 
-                        if(model.get('is_default')) {
+                        if (model.get('is_default')) {
                             self._getCurrentDefaultViewModel().set({is_default: false});
                         }
                     },
@@ -344,8 +344,10 @@ define(function(require) {
                 }, {
                     wait: true,
                     success: function() {
-                        if(model.get('is_default')) {
+                        if (model.get('is_default')) {
                             self._getCurrentDefaultViewModel().set({is_default: false});
+                        } else {
+                            self._getDefaultSystemViewModel().set({is_default: true});
                         }
                         self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                     },
