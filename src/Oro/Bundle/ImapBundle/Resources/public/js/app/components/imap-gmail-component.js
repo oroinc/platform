@@ -91,12 +91,26 @@ define(function(require) {
         },
 
         onGetFolders: function(value) {
+            delete value.type;
+            var data = this.prepareDataForForm(value);
             $.ajax({
                 url : this.urlGetFolders,
                 method: "POST",
-                data: value,
+                data: data,
                 success: _.bind(this.handlerGetFolders, this)
             });
+        },
+
+        prepareDataForForm: function(values) {
+            var data = {
+                oro_imap_configuration_gmail : {}
+            };
+
+            for (var i in values) {
+                data.oro_imap_configuration_gmail[i] = values[i];
+            }
+
+            return data;
         },
 
         handlerGetFolders: function(response) {

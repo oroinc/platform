@@ -163,7 +163,7 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function setSmtpPort($smtpPort)
     {
-        $this->smtpPort = $smtpPort;
+        $this->smtpPort = (int)$smtpPort;
 
         return $this;
     }
@@ -187,7 +187,7 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function setImapPort($imapPort)
     {
-        $this->imapPort = $imapPort;
+        $this->imapPort = (int)$imapPort;
 
         return $this;
     }

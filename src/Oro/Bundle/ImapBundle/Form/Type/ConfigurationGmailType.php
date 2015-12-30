@@ -68,6 +68,9 @@ class ConfigurationGmailType extends AbstractType
             ])
             ->add('clientId', 'hidden', [
                 'data' => $this->userConfigManager->get('oro_google_integration.client_id')
+            ])
+            ->add('mailboxName', 'hidden', [
+                'data' => 'Local'
             ]);
 
         $this->initEvents($builder);
@@ -142,9 +145,7 @@ class ConfigurationGmailType extends AbstractType
                 'attr' => ['class' => 'folder-tree'],
                 'tooltip' => $this->translator->trans('oro.email.folders.tooltip'),
             ])
-                ->add('mailboxName', 'hidden', [
-                'data' => 'Local'
-            ]);
+              ;
 
             $form->remove('check');
         }

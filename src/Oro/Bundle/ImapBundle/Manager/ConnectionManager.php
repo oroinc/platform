@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 
@@ -59,18 +60,13 @@ class ConnectionManager
      */
     public function getFormCheckGmailConnection($request)
     {
-        $userEmailOrigin = new UserEmailOrigin();
-        $userEmailOrigin->setAccessToken($request->request->get('accessToken'));
-        $userEmailOrigin->setClientId($request->request->get('clientId'));
-        $userEmailOrigin->setMailboxName($request->request->get('mailboxName'));
-        $userEmailOrigin->setUser($request->request->get('user'));
-        $userEmailOrigin->setImapHost($request->request->get('imapHost'));
-        $userEmailOrigin->setImapPort($request->request->get('imapPort'));
-        $userEmailOrigin->setImapEncryption($request->request->get('imapEncryption'));
-
         $form = $this->FormFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
-        $form->setData($userEmailOrigin);
         $form->submit($request);
+
+        if (!$form->isValid()) {
+            throw new Exception("Incorrect setting for IMAP authentication");
+        }
+
         /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 
