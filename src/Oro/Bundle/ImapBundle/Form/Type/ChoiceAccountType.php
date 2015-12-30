@@ -73,17 +73,6 @@ class ChoiceAccountType extends AbstractType
 
             $accountTypeModel =  new AccountTypeModel();
             $accountTypeModel->setAccountType($data['accountType']);
-
-            $userEmailOrigin = new UserEmailOrigin();
-            $userEmailOrigin->setAccessToken($data['accessToken']);
-            $userEmailOrigin->setImapHost($data['imapHost']);
-            $userEmailOrigin->setImapHost($data['imapPort']);
-            $userEmailOrigin->setUser($data['user']);
-            $userEmailOrigin->setImapEncryption($data['imapEncryption']);
-            $userEmailOrigin->setClientId($data['clientId']);
-            $userEmailOrigin->setMailboxName($data['mailboxName']);
-
-            $accountTypeModel->setImapGmailConfiguration($userEmailOrigin);
         }
 
         if ($accountTypeModel instanceof AccountTypeModel) {

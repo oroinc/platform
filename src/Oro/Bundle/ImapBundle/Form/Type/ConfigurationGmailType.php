@@ -84,6 +84,17 @@ class ConfigurationGmailType extends AbstractType
         $form = $formEvent->getForm();
         $emailOrigin = $form->getData();
 
+        if (null === $emailOrigin) {
+            $data = $formEvent->getData();
+
+            if (null == $data) {
+                return;
+            }
+
+            $emailOrigin = new UserEmailOrigin();
+            $emailOrigin->setAccessToken($data['accessToken']);
+        }
+
         if ($emailOrigin instanceof UserEmailOrigin) {
             $this->updateForm($form, $emailOrigin);
         }
