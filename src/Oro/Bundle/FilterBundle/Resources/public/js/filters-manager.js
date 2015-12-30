@@ -91,6 +91,13 @@ define(function(require) {
          */
         buttonSelector: '.ui-multiselect.filter-list',
 
+        /**
+         * Selector, jQuery object or HTML element that will be target for append multiselect dropdown menu
+         *
+         * @property
+         */
+        container: 'body',
+
         /** @property */
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
@@ -111,6 +118,8 @@ define(function(require) {
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
+
+            _.extend(this, _.pick(options, ['addButtonHint', 'container']));
 
             if (options.filters) {
                 _.extend(this.filters, options.filters);
@@ -133,10 +142,6 @@ define(function(require) {
 
                 this.listenTo(filter, filterListeners);
             }, this);
-
-            if (options.addButtonHint) {
-                this.addButtonHint = options.addButtonHint;
-            }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
         },
@@ -340,11 +345,15 @@ define(function(require) {
                     selectedList: 0,
                     selectedText: this.addButtonHint,
                     classes: 'filter-list select-filter-widget',
+                    position: {
+                        my: 'left top+2',
+                        at: 'left bottom'
+                    },
                     open: $.proxy(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
-                        this._updateDropdownPosition();
-                    }, this)
+                    }, this),
+                    appendTo: this.container
                 }
             });
 
@@ -353,6 +362,10 @@ define(function(require) {
                 '<a class="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
                     '<span class="caret"></span></a>'
             );
+        },
+
+        refreshSelectWidget: function() {
+            this.selectWidget.multiselect('refresh');
         },
 
         /**
@@ -382,29 +395,6 @@ define(function(require) {
                     this.disableFilter(filter);
                 }
             }, this);
-
-            this._updateDropdownPosition();
-        },
-
-        /**
-         * Set dropdown position according to current element
-         *
-         * @protected
-         */
-        _updateDropdownPosition: function() {
-            var button = this.$(this.buttonSelector);
-            var buttonPosition = button.offset();
-            var widgetWidth = this.selectWidget.getWidget().outerWidth();
-            var windowWidth = $(window).width();
-            var widgetLeftOffset = buttonPosition.left;
-            if (buttonPosition.left + widgetWidth > windowWidth) {
-                widgetLeftOffset = buttonPosition.left + button.outerWidth() - widgetWidth;
-            }
-
-            this.selectWidget.getWidget().css({
-                top: buttonPosition.top + button.outerHeight(),
-                left: widgetLeftOffset
-            });
         },
 
         /**
