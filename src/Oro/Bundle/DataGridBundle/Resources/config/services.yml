@@ -149,13 +149,19 @@ services:
         tags:
             - { name: form.type, alias: oro_datagrid_sorting }
 
+    oro_datagrid.grid_view.manager:
+        class: Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager
+        arguments:
+            - @oro_security.acl_helper
+            - @doctrine
+
     oro_datagrid.grid_view.manager.api:
         class: %oro_datagrid.grid_view.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_datagrid.grid_view.entity.class%
             - @doctrine.orm.entity_manager
-            - @oro_security.acl_helper
+            - @oro_datagrid.grid_view.manager
 
     oro_datagrid.form.grid_view.api:
         class:                        Symfony\Component\Form\Form
@@ -171,7 +177,7 @@ services:
             - @oro_datagrid.form.grid_view.api
             - @request
             - @doctrine
-            - @oro_security.acl_helper
+            - @oro_datagrid.grid_view.manager
             - @security.token_storage
         scope: request
 

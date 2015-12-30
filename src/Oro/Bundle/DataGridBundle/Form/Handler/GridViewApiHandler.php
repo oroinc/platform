@@ -9,8 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
-use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 
 class GridViewApiHandler
 {
@@ -23,8 +22,8 @@ class GridViewApiHandler
     /** @var Registry */
     protected $registry;
 
-    /** @var AclHelper */
-    protected $aclHelper;
+    /** @var GridViewManager */
+    protected $gridViewManager;
 
     /** @var TokenStorageInterface */
     protected $tokenStorage;
@@ -33,21 +32,21 @@ class GridViewApiHandler
      * @param FormInterface         $form
      * @param Request               $request
      * @param Registry              $registry
-     * @param AclHelper             $aclHelper
+     * @param GridViewManager       $gridViewManager
      * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         Registry $registry,
-        AclHelper $aclHelper,
+        GridViewManager $gridViewManager,
         TokenStorageInterface $tokenStorage
     ) {
-        $this->form         = $form;
-        $this->request      = $request;
-        $this->registry     = $registry;
-        $this->aclHelper    = $aclHelper;
-        $this->tokenStorage = $tokenStorage;
+        $this->form            = $form;
+        $this->request         = $request;
+        $this->registry        = $registry;
+        $this->gridViewManager = $gridViewManager;
+        $this->tokenStorage    = $tokenStorage;
     }
 
     /**
@@ -100,22 +99,8 @@ class GridViewApiHandler
      */
     protected function setDefaultGridView(GridView $gridView, $default)
     {
-        $user              = $this->tokenStorage->getToken()->getUser();
-        $isGridViewDefault = $gridView->getUsers()->contains($user);
-        // Checks if default grid view changed
-        if ($isGridViewDefault !== $default) {
-            $om = $this->registry->getManagerForClass('OroDataGridBundle:GridView');
-            /** @var GridViewRepository $repository */
-            $repository = $om->getRepository('OroDataGridBundle:GridView');
-            $gridViews  = $repository->findDefaultGridViews($this->aclHelper, $user, $gridView, false);
-            foreach ($gridViews as $view) {
-                $view->removeUser($user);
-            }
-
-            if ($default) {
-                $gridView->addUser($user);
-            }
-        }
+        $user = $this->tokenStorage->getToken()->getUser();
+        $this->gridViewManager->setDefaultGridView($user, $gridView, $default);
     }
 
     /**
