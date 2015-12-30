@@ -10,7 +10,6 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 

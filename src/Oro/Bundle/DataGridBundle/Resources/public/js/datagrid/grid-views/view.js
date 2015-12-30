@@ -232,6 +232,7 @@ define(function(require) {
             modal.on('ok', function(e) {
                 var model = self._createViewModel({
                     label: this.$('input[name=name]').val(),
+                    is_default: this.$('input[name=is_default]').is(':checked'),
                     type: 'private',
                     grid_name: self.gridName,
                     filters: self.collection.state.filters,
@@ -252,6 +253,10 @@ define(function(require) {
                         self._updateTitle();
                         self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                         mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
+
+                        if (model.get('is_default')) {
+                            self._getCurrentDefaultViewModel().set({is_default: false});
+                        }
                     },
                     error: function(model, response, options) {
                         modal.open();
@@ -329,14 +334,21 @@ define(function(require) {
             var self = this;
 
             var modal = new ViewNameModal({
-                defaultValue: model.get('label')
+                defaultValue: model.get('label'),
+                defaultChecked: model.get('is_default'),
             });
             modal.on('ok', function() {
                 model.save({
-                    label: this.$('input[name=name]').val()
+                    label: this.$('input[name=name]').val(),
+                    is_default: this.$('input[name=is_default]').is(':checked')
                 }, {
                     wait: true,
                     success: function() {
+                        if (model.get('is_default')) {
+                            self._getCurrentDefaultViewModel().set({is_default: false});
+                        } else {
+                            self._getDefaultSystemViewModel().set({is_default: true});
+                        }
                         self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                     },
                     error: function(model, response, options) {
