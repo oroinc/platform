@@ -44,11 +44,14 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->willReturn($repo);
 
+        $aclHelper = $this->getMock('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper');
+
         $this->gridViewsExtension = new GridViewsExtension(
             $this->eventDispatcher,
             $securityFacade,
             $translator,
-            $registry
+            $registry,
+            $aclHelper
         );
     }
 

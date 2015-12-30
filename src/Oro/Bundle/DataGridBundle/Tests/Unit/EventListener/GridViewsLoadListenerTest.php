@@ -128,6 +128,7 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
                     'deletable' => true,
                     'editable'  => true,
                     'columns'   => [],
+                    'is_default' => false
                 ],
                 [
                     'label'     => 'view2',
@@ -138,6 +139,7 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
                     'deletable' => true,
                     'editable'  => true,
                     'columns'   => [],
+                    'is_default' => false
                 ],
             ]
         ];
