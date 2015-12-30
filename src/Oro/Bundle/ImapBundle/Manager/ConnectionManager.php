@@ -66,6 +66,7 @@ class ConnectionManager
         $userEmailOrigin->setUser($request->request->get('user'));
         $userEmailOrigin->setImapHost($request->request->get('imapHost'));
         $userEmailOrigin->setImapPort($request->request->get('imapPort'));
+        $userEmailOrigin->setImapEncryption($request->request->get('imapEncryption'));
 
         $form = $this->FormFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
         $form->setData($userEmailOrigin);
