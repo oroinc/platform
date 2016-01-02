@@ -12,6 +12,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFlagManager;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
@@ -27,15 +28,23 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
     protected $encryptor;
 
     /**
-     * Constructor
-     *
+     * @var ImapEmailGoogleOauth2Manager
+     */
+    protected $imapEmailGoogleOauth2Manager;
+
+    /**
      * @param ImapConnectorFactory $connectorFactory
      * @param Mcrypt $encryptor
+     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
      */
-    public function __construct(ImapConnectorFactory $connectorFactory, Mcrypt $encryptor)
-    {
+    public function __construct(
+        ImapConnectorFactory $connectorFactory,
+        Mcrypt $encryptor,
+        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+    ) {
         $this->connectorFactory = $connectorFactory;
         $this->encryptor = $encryptor;
+        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
     }
 
     /**
@@ -60,7 +69,7 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
             $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword()),
-            $origin->getAccessToken()
+            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
         );
 
         return new ImapEmailFlagManager(
