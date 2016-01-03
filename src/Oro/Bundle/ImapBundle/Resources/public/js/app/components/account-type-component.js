@@ -16,12 +16,12 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var config = options.configs || {};
             this.url = _.result(options, 'url') || '';
 
-            var viewConfig = this.prepareViewOptions(options, config);
+            var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
-            this.listenTo(this.view, 'imapConnectionChangeType', this.onChangeType);
+            this.listenTo(this.view, 'imapConnectionChangeType', this.onChangeAccountType);
+            this.listenTo(this.view, 'imapConnectionDisconnect', this.onDisconnect);
             this.listenTo(mediator, 'imapGmailConnectionSetToken', this.onIMapGotToken);
         },
 
@@ -29,17 +29,21 @@ define(function(require) {
          * Prepares options for the related view
          *
          * @param {Object} options - component's options
-         * @param {Object} config - select2's options
+         *
          * @return {Object}
          */
-        prepareViewOptions: function(options, config) {
+        prepareViewOptions: function(options) {
             return {
-                el: options._sourceElement,
-                url: options.url
+                el: options._sourceElement
             };
         },
 
-        onChangeType: function(value) {
+        /**
+         * Makes the request to get a form template if account type is changed
+         * @param value - values of the form IMAP connection
+         */
+        onChangeAccountType: function(value) {
+            mediator.execute('showLoading');
             $.ajax({
                 url : this.url,
                 method: "GET",
@@ -50,7 +54,23 @@ define(function(require) {
             });
         },
 
+        /**
+         * Makes the request to get a form template if user clicks to button "Disconnect"
+         */
+        onDisconnect: function() {
+            mediator.execute('showLoading');
+            $.ajax({
+                url : this.url,
+                method: "GET",
+                data: {
+
+                },
+                success: _.bind(this.templateLoaded, this)
+            });
+        },
+
         onIMapGotToken: function(value) {
+            mediator.execute('showLoading');
             $.ajax({
                 url : this.url,
                 method: "GET",
@@ -62,8 +82,12 @@ define(function(require) {
             });
         },
 
+        /**
+         * Handler response
+         * @param {Object} response - contain`s html of new form
+         */
         templateLoaded: function(response) {
-            //debugger;
+            mediator.execute('hideLoading');
             this.view.setHtml(response.html).render();
         }
     });

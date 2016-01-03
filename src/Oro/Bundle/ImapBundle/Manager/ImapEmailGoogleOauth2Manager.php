@@ -20,19 +20,13 @@ class ImapEmailGoogleOauth2Manager
     const OAUTH2_GMAIL_SCOPE = 'https://mail.google.com/';
     const RETRY_TIMES = 3;
 
-    /**
-     * @var Curl
-     */
+    /** @var Curl */
     protected $httpClient;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Registry
-     */
+    /** @var Registry */
     private $doctrine;
 
     /**

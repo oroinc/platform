@@ -49,7 +49,11 @@
             {% endif %}
 
             {% if (form.disconnect is defined) %}
-                {{ form_row(form.disconnect) }}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_row(form.disconnect) }}
+                    </div>
+                </div>
             {% endif %}
 
             {% if form.imapGmailConfiguration is defined %}
@@ -100,8 +104,8 @@
 
 {% block oro_config_google_imap_sync_checkbox_widget %}
     {% set options = {
-            errorMessage: '.alert-error',
-            successMessage: '.alert-success'
+        errorMessage: '.alert-error',
+        successMessage: '.alert-success'
     } %}
     <div data-page-component-module="oroimap/js/app/components/google-sync-checkbox-component"
         data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">

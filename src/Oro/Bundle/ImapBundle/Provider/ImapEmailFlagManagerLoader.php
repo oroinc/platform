@@ -27,9 +27,7 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
     /** @var Mcrypt */
     protected $encryptor;
 
-    /**
-     * @var ImapEmailGoogleOauth2Manager
-     */
+    /** @var ImapEmailGoogleOauth2Manager */
     protected $imapEmailGoogleOauth2Manager;
 
     /**

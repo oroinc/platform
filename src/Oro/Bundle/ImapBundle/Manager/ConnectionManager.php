@@ -82,13 +82,13 @@ class ConnectionManager
         );
 
         $connector = $this->imapConnectorFactory->createImapConnector($config);
-        $this->manager = new ImapEmailFolderManager(
+        $manager = new ImapEmailFolderManager(
             $connector,
             $this->doctrine->getEntityManager(),
             $origin
         );
 
-        $emailFolders = $this->manager->getFolders();
+        $emailFolders = $manager->getFolders();
         $origin->setFolders($emailFolders);
 
         $aacountType = new AccountTypeModel();

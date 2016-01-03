@@ -122,7 +122,7 @@
 
     {% if form.imapAccountType is defined %}
         {% set dataBlocks = dataBlocks|merge([{
-            'title': '',
+            'title': 'oro.user.imap_configuration.label'|trans,
             'subblocks': [{
                 'title': '',
                 'data': [
@@ -134,7 +134,7 @@
 
     {% if form.imapConfiguration is defined %}
         {% set dataBlocks = dataBlocks|merge([{
-            'title': '',
+            'title': 'oro.user.imap_configuration.label'|trans,
             'subblocks': [{
                 'title': '',
                 'data': [

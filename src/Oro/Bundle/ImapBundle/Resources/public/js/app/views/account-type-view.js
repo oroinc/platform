@@ -10,11 +10,12 @@ define(function(require) {
 
         url: '',
 
-        events: {
-            'change select[name="oro_user_user_form[imapAccountType][accountType]"]': 'changeHandler'
-        },
-
         html: '',
+
+        events: {
+            'change select[name="oro_user_user_form[imapAccountType][accountType]"]': 'onChangeAccountType',
+            'click button[name="oro_user_user_form[imapAccountType][disconnect]"]': 'onClickDisconnect'
+        },
 
         /**
          * @constructor
@@ -29,10 +30,28 @@ define(function(require) {
             this.initLayout().done(_.bind(this._resolveDeferredRender, this));
         },
 
-        changeHandler: function(e) {
+        /**
+         * handler event change AccountType
+         * @param e
+         */
+        onChangeAccountType: function(e) {
             this.trigger('imapConnectionChangeType', $(e.target).val());
-
         },
+
+        /**
+         * handler event click button Disconnect
+         */
+        onClickDisconnect: function() {
+            this.trigger('imapConnectionDisconnect');
+        },
+
+        /**
+         * Set property html
+         *
+         * @param html
+         *
+         * @returns {accountTypeView}
+         */
         setHtml: function(html) {
             this.html = html;
 

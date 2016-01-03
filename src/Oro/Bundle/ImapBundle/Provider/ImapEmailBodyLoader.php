@@ -28,9 +28,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     /** @var Mcrypt */
     protected $encryptor;
 
-    /**
-     * @var ImapEmailGoogleOauth2Manager
-     */
+    /** @var ImapEmailGoogleOauth2Manager */
     protected $imapEmailGoogleOauth2Manager;
 
     /**

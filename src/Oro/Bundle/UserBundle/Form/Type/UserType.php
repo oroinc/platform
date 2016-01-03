@@ -293,12 +293,16 @@ class UserType extends AbstractType
                 if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
                     $form->remove('imapAccountType');
 
+                    $showDisconnectButton = false;
+                    if ($data->getId() && $imapAccountType->getAccountType()) {
+                        $showDisconnectButton = true;
+                    }
                     $form->add(
                         'imapAccountType',
                         'oro_imap_choice_account_type',
                         [
                             'label' => 'oro.user.imap_configuration.label',
-                            'showDisconnectButton' => true
+                            'showDisconnectButton' => $showDisconnectButton
                         ]
                     );
                 }

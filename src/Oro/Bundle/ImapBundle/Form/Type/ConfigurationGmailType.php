@@ -13,6 +13,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -28,15 +29,22 @@ class ConfigurationGmailType extends AbstractType
     /** ConfigManager */
     protected $userConfigManager;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param TranslatorInterface $translator
+     * @param ConfigManager $userConfigManager
+     * @param SecurityFacade $securityFacade
      */
     public function __construct(
         TranslatorInterface $translator,
-        ConfigManager $userConfigManager
+        ConfigManager $userConfigManager,
+        SecurityFacade $securityFacade
     ) {
         $this->translator = $translator;
         $this->userConfigManager = $userConfigManager;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -44,6 +52,8 @@ class ConfigurationGmailType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->addOwnerOrganizationEventListener($builder);
+
         $builder
             ->add('check', 'button', [
                 'label' => $this->translator->trans('oro.imap.configuration.connect'),
@@ -69,8 +79,17 @@ class ConfigurationGmailType extends AbstractType
             ->add('clientId', 'hidden', [
                 'data' => $this->userConfigManager->get('oro_google_integration.client_id')
             ])
-            ->add('mailboxName', 'hidden', [
-                'data' => 'Local'
+            ->add('smtpHost', 'hidden', [
+                'required' => false,
+                'data' => 'smtp.gmail.com'
+            ])
+            ->add('smtpPort', 'hidden', [
+                'required' => false,
+                'data' => 465
+            ])
+            ->add('smtpEncryption', 'hidden', [
+                'required'    => false,
+                'data' => 'ssl'
             ]);
 
         $this->initEvents($builder);
@@ -151,14 +170,40 @@ class ConfigurationGmailType extends AbstractType
                 'label' => $this->translator->trans('oro.email.retrieve_folders.label'),
                 'attr' => ['class' => 'btn btn-primary']
             ])
-                ->add('folders', 'oro_email_email_folder_tree', [
+            ->add('folders', 'oro_email_email_folder_tree', [
                 'label' => $this->translator->trans('oro.email.folders.label'),
                 'attr' => ['class' => 'folder-tree'],
                 'tooltip' => $this->translator->trans('oro.email.folders.tooltip'),
-            ])
-              ;
+            ]);
 
             $form->remove('check');
         }
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addOwnerOrganizationEventListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                /** @var UserEmailOrigin $data */
+                $data = $event->getData();
+                if ($data !== null) {
+                    if (($data->getOwner() === null) && ($data->getMailbox() === null)) {
+                        $data->setOwner($this->securityFacade->getLoggedUser());
+                    }
+                    if ($data->getOrganization() === null) {
+                        $organization = $this->securityFacade->getOrganization()
+                            ? $this->securityFacade->getOrganization()
+                            : $this->securityFacade->getLoggedUser()->getOrganization();
+                        $data->setOrganization($organization);
+                    }
+
+                    $event->setData($data);
+                }
+            }
+        );
     }
 }

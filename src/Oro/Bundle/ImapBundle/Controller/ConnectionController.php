@@ -139,11 +139,11 @@ class ConnectionController extends Controller
         $userForm = $connectionManager->getFormGmailConnect($type, $token);
 
         if ($token) {
-            $html = $this->renderView('OroImapBundle:Form:gmail.html.twig', [
+            $html = $this->renderView('OroImapBundle:Form:accountTypeGmail.html.twig', [
                 'form' => $userForm->createView(),
             ]);
         } else {
-            $html = $this->renderView('OroImapBundle:Form:other.html.twig', [
+            $html = $this->renderView('OroImapBundle:Form:accountTyeOther.html.twig', [
                 'form' => $userForm->createView(),
             ]);
         }

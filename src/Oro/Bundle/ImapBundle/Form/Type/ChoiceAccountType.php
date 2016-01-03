@@ -80,8 +80,23 @@ class ChoiceAccountType extends AbstractType
                 return;
             }
 
-            $accountTypeModel =  new AccountTypeModel();
-            $accountTypeModel->setAccountType($data['accountType']);
+            $accountTypeModel = $this->createAccountTypeModelFromData($data);
+        } else {
+            $data = $formEvent->getData();
+
+            if ($data) {
+                $accountTypeModel = $this->createAccountTypeModelFromData($data);
+
+                $form->remove('disconnect');
+                $form->add('accountType', 'choice', [
+                    'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
+                    'choices' => [
+                        'Select' => self::ACCOUNT_TYPE_NO_SELECT,
+                        'Gmail' => self::ACCOUNT_TYPE_GMAIL,
+                        'Other' => self::ACCOUNT_TYPE_OTHER
+                    ],
+                ]);
+            }
         }
 
         if ($accountTypeModel instanceof AccountTypeModel) {
@@ -136,12 +151,35 @@ class ChoiceAccountType extends AbstractType
     {
         if ($accountTypeModel instanceof AccountTypeModel) {
             if ($accountTypeModel->getAccountType() === self::ACCOUNT_TYPE_OTHER) {
-                $form->add('imapConfiguration', 'oro_imap_configuration', ['mapped' => false]);
+                $form->add('imapGmailConfiguration', 'oro_imap_configuration');
             }
 
             if ($accountTypeModel->getAccountType() === self::ACCOUNT_TYPE_GMAIL) {
                 $form->add('imapGmailConfiguration', 'oro_imap_configuration_gmail');
             }
         }
+    }
+
+    /**
+     * Create object of AccountTypeModel using data of form
+     *
+     * @param array $data
+     *
+     * @return AccountTypeModel
+     */
+    protected function createAccountTypeModelFromData($data)
+    {
+        $accountTypeModel =  new AccountTypeModel();
+        $accountTypeModel->setAccountType($data['accountType']);
+
+        $userEmailOrigin = new UserEmailOrigin();
+        $userEmailOrigin->setImapHost($data['imapHost']);
+        $userEmailOrigin->setImapPort($data['imapPort']);
+        $userEmailOrigin->setImapEncryption($data['imapEncryption']);
+        $userEmailOrigin->setUser($data['user']);
+        $userEmailOrigin->setPassword($data['password']);
+        $accountTypeModel->setImapGmailConfiguration($userEmailOrigin);
+
+        return $accountTypeModel;
     }
 }
