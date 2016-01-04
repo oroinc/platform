@@ -83,13 +83,13 @@ class OwnershipConditionDataBuilder
 
     /**
      * Get data for query acl access level check
-     * Return empty array if entity has full access, null if user does't have access to the entity
-     *  and array with entity field and field values which user have access.
      *
      * @param $entityClassName
      * @param $permissions
      *
-     * @return null|array
+     * @return array Returns empty array if entity has full access,
+     *               array with null values if user does't have access to the entity
+     *               and array with entity field and field values which user have access.
      */
     public function getAclConditionData($entityClassName, $permissions = 'VIEW')
     {
