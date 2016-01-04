@@ -181,6 +181,11 @@ class BlockFactory implements BlockFactoryInterface
             $views[$id]                = $view;
         }
 
+        $viewsCollection = new ArrayCollection($views);
+        foreach ($views as $view) {
+            $view->vars['views'] = $viewsCollection;
+        }
+
         // finish the root view
         $this->finishBlockView($rootView, $rootId);
         // finish child views
