@@ -104,6 +104,13 @@ class EmailTypeTest extends TypeTestCase
             ->with($user)
             ->will($this->returnValue(['john@example.com' => 'John Smith <john@example.com>']));
 
+        $mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailboxManager->expects($this->any())
+            ->method('findAvailableMailboxEmails')
+            ->will($this->returnValue([]));
+
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -112,7 +119,7 @@ class EmailTypeTest extends TypeTestCase
         $genemuChoiceType  = new Select2Type('choice');
         $emailTemplateList = new EmailTemplateSelectType();
         $attachmentsType   = new EmailAttachmentsType();
-        $emailAddressFromType       = new EmailAddressFromType($securityFacade, $relatedEmailsProvider);
+        $emailAddressFromType = new EmailAddressFromType($securityFacade, $relatedEmailsProvider, $mailboxManager);
         $emailAddressRecipientsType = new EmailAddressRecipientsType($configManager);
 
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')

@@ -246,6 +246,7 @@ services:
         arguments:
             - @oro_security.security_facade
             - @oro_email.related_emails.provider
+            - @oro_email.mailbox.manager
         tags:
             - { name: form.type, alias: oro_email_email_address_from }
 
