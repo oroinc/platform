@@ -45,6 +45,9 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         if (!isset($view['children'])) {
             $view['children'] = [];
         }
+        if (!isset($view['vars']['class_prefix'])) {
+            $view['vars']['class_prefix'] = null;
+        }
         array_walk($view['children'], [$this, 'completeView']);
     }
 

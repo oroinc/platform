@@ -5,6 +5,11 @@
             <div class="controls">
                 <input id="gridViewName" name="name" type="text" value="<%= value %>">
             </div>
+
+            <label class="control-label" for="gridViewDefault"><%= defaultLabel %>:</label>
+            <div class="controls">
+                <input id="gridViewDefault" name="is_default" type="checkbox" <% if(defaultChecked) { %> checked <% } %> >
+            </div>
         </div>
     </div>
 </script>

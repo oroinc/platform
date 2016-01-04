@@ -9,7 +9,6 @@ php:
 
 env:
   - SYMFONY_VERSION=2.7.*
-  - PHPCS_VERSION=2.3.3
 
 cache:
   directories:
@@ -20,7 +19,7 @@ before_script:
   - composer self-update
   - phpenv config-add travis.php.ini
   - travis_wait composer require symfony/symfony:${SYMFONY_VERSION} --prefer-source --update-no-dev
-  - travis_wait composer require squizlabs/php_codesniffer:~2 --prefer-source --update-no-dev
+  - travis_wait composer require squizlabs/php_codesniffer:2.3.3 --prefer-source --update-no-dev
 
 script: 
   - phpunit

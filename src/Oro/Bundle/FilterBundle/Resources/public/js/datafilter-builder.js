@@ -64,6 +64,7 @@ define([
             var filters = {};
             var modules = this.modules;
             var collection = this.collection;
+            var container = this.$el;
             _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
                     // @TODO pass collection only for specific filters
@@ -71,7 +72,7 @@ define([
                         options.collection = collection;
                     }
                     var Filter = modules[options.type].extend(options);
-                    filters[options.name] = new Filter();
+                    filters[options.name] = new Filter({container: container});
                 }
             });
             return {filters: filters};
