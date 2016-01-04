@@ -44,8 +44,8 @@ class ColumnsExtension extends AbstractExtension
     /** @var ColumnsHelper */
     protected $columnsHelper;
 
-    /** @var GridView|null */
-    protected $defaultGridView;
+    /** @var GridView|null|bool */
+    protected $defaultGridView = false;
 
     /**
      * @param Registry       $registry
@@ -294,7 +294,7 @@ class ColumnsExtension extends AbstractExtension
      */
     protected function getDefaultGridView($gridName)
     {
-        if ($this->defaultGridView === null) {
+        if ($this->defaultGridView === false) {
             $defaultGridView = $this->getGridViewRepository()->findDefaultGridView(
                 $this->aclHelper,
                 $this->getCurrentUser(),
