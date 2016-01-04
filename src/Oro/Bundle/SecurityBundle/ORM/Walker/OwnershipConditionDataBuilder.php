@@ -89,7 +89,7 @@ class OwnershipConditionDataBuilder
      *
      * @return array Returns empty array if entity has full access,
      *               array with null values if user does't have access to the entity
-     *               and array with entity field and field values which user have access.
+     *               and array with entity field and field values which user has access to.
      */
     public function getAclConditionData($entityClassName, $permissions = 'VIEW')
     {
