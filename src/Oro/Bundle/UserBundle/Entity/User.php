@@ -17,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -1007,9 +1008,12 @@ class User extends ExtendUser implements
             $imapConfiguration = $this->getImapConfiguration();
             $accountTypeModel = null;
             if ($imapConfiguration) {
+                $accountTypeModel = new AccountTypeModel();
                 if ($imapConfiguration->getAccessToken() && $imapConfiguration->getAccessToken() !== '') {
-                    $accountTypeModel = new AccountTypeModel();
-                    $accountTypeModel->setAccountType('Gmail');
+                    $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_GMAIL);
+                    $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
+                } else {
+                    $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_OTHER);
                     $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
                 }
             }
