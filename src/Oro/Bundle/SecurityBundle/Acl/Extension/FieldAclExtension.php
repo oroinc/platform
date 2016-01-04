@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -81,20 +80,7 @@ class FieldAclExtension extends EntityAclExtension
         // either id starts with 'field' (e.g. field+fieldName)
         // or id is null (checking for new entity)
 
-        return (0 === strpos($id, 'field') || null === $id);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
-    {
-        // no need to check any additional data here
-        // but if it will be useful - it's possible override this method and add custom logic
-        // based on $securityToken
-        // read interface method comment before
-
-        return true;
+        return (0 === strpos($id, self::EXTENSION_KEY) || null === $id);
     }
 
     /**
@@ -121,6 +107,21 @@ class FieldAclExtension extends EntityAclExtension
         }
 
         return $identity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessLevelNames($object, $permissionName = null)
+    {
+        $levelNames = parent::getAccessLevelNames($object);
+
+        if ('CREATE' == $permissionName) {
+            // only system and none levels are applicable to new entities
+            $levelNames = [$levelNames[0], $levelNames[count($levelNames) - 1]];
+        }
+
+        return $levelNames;
     }
 
     /**

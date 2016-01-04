@@ -304,9 +304,10 @@ class EntitySerializer
         $resultFields   = $this->getFieldsToSerialize($entityClass, $config);
 
         foreach ($resultFields as $field) {
-            if ($this->authChecker && !$this->authChecker->isGranted('VIEW', new FieldVote($entity, $field))) {
+            if (false === $this->isAllowedField($entity, $entityClass, $field)) {
                 continue;
             }
+
             $targetFieldConfig = $this->getFieldConfig($config, $field);
             $value = $this->serializeItemField($entity, $field, $entityClass, $entityMetadata, $targetFieldConfig);
             $resultFieldName = $this->getResultFieldName($field, $targetFieldConfig);
@@ -314,6 +315,30 @@ class EntitySerializer
         }
         return $result;
     }
+
+    /**
+     * @param array|object $entity
+     * @param string       $entityClass
+     * @param string       $field
+     *
+     * @return bool
+     * @throws \Doctrine\ORM\ORMException
+     */
+    protected function isAllowedField($entity, $entityClass, $field)
+    {
+        if (!$this->authChecker) {
+            return true;
+        }
+        $entityToCheck = $entity;
+        if (is_array($entityToCheck) && !empty($entityToCheck['entityId'])) {
+            $entityToCheck = $this->doctrineHelper->getEntityManager($entityClass)->getReference(
+                $entityClass,
+                $entity['entityId']
+            );
+        }
+        return $this->authChecker->isGranted('VIEW', new FieldVote($entityToCheck, $field));
+    }
+
     /**
      * @param object         $entity
      * @param string         $field
