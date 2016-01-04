@@ -8,7 +8,7 @@ define(function(require) {
     var layout = require('oroui/js/layout');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
-    require('jquery.jstree');
+    require('jstree/jquery.jstree.min');
 
     /**
      * Options:

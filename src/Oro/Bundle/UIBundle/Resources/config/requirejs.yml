@@ -19,10 +19,9 @@ config:
         'jquery.minicolors':
             deps:
                 - 'jquery'
-        'jquery.jstree':
+        'jstree/jquery.jstree.min':
             deps:
                 - 'jquery'
-                - 'jquery.cookie'
         'jquery.cookie':
             deps:
                 - 'jquery'
@@ -129,7 +128,6 @@ config:
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/oroui/lib/jquery/jquery.cookie.js'
-        'jquery.jstree': 'bundles/oroui/lib/jstree/jstree.min.js'
         'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
 #        'bootstrap': 'bundles/oroui/js/bootstrap-dev.js'
@@ -210,6 +208,7 @@ config:
 
 build:
     paths:
+        'jstree/jquery.jstree.min': 'empty:'
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with
 #       files which does not support AMD. backbone-bootstrap-modal use AMD without dependency,
 #       therefore it's excluded
