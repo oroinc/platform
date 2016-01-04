@@ -20,6 +20,7 @@
     display: inline-block;
   }
   .dropdown > .dropdown-menu {
+    padding: 10px;
     margin: 10px auto 0;
     max-width: 506px;
     width: 100%;
@@ -52,7 +53,7 @@
     top: -7px;
   }
   .filter-container {
-    padding: 10px;
+    padding: 0;
     .reset-filter-button {
       padding: 6px 0 4px 6px;
       position: absolute;
@@ -62,6 +63,9 @@
       margin: 0 0 10px 0;
       width: 100%;
       white-space: normal;
+      &:last-child {
+        margin-bottom: 0;
+      }
       .btn-group {
         margin-bottom: 0;
       }

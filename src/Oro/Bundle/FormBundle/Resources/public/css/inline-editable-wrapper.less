@@ -15,6 +15,17 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
 }
+.mobile-version .inline-editable-wrapper:not(.loading) .inline-editable-wrapper__start-editing-button {
+  display: block !important;
+  background-color: #f7f7f7;
+  background-image: -moz-linear-gradient(top,#fdfdfd,#efefef);
+  background-image: -webkit-gradient(linear,0 0,0 100%,from(#fdfdfd),to(#efefef));
+  background-image: -webkit-linear-gradient(top,#fdfdfd,#efefef);
+  background-image: -o-linear-gradient(top,#fdfdfd,#efefef);
+  background-image: linear-gradient(to bottom,#fdfdfd,#efefef);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffdfdfd', endColorstr='#ffefefef', GradientType=0);
+}
 .inline-editable-wrapper {
   &.save-success .inline-editable-container{
     background: #F4FEE2;

@@ -15,6 +15,7 @@ oro:
             id.label: Id
             name.label: Name
             owner.label: Owner
+            users.label: Users
             organization.label: Organization
             sorters_data.label: Sorters
             type.label: Type

@@ -5,6 +5,7 @@ parameters:
 
     oro_datagrid.extension.mass_action.type.ajax.class:       Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction
     oro_datagrid.extension.mass_action.type.delete.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\DeleteMassAction
+
     oro_datagrid.extension.mass_action.type.redirect.class:   Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Redirect\RedirectMassAction
     oro_datagrid.extension.mass_action.type.widget.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WidgetMassAction
     oro_datagrid.extension.mass_action.type.window.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WindowMassAction
@@ -16,6 +17,8 @@ services:
             - @doctrine.orm.entity_manager
             - @translator
             - @oro_security.security_facade
+            - @oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter
+            - @request_stack
 
     oro_datagrid.mass_action.parameters_parser:
         class: %oro_datagrid.mass_action.parameters_parser.class%
@@ -62,3 +65,8 @@ services:
         scope: prototype
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: frontend }
+
+    oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter
+        arguments:
+            - @oro_security.acl_helper
