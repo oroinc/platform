@@ -207,10 +207,12 @@ interface AclExtensionInterface
     /**
      * Gets list of available access levels for given object
      *
-     * @param $object
-     * @return array
-     *  key = access level code,
-     *  value = access level name
+     * @param object      $object
+     * @param string|null $permissionName
+     *
+     * @return array key = access level code,
+     *   key = access level code,
+     *   value = access level name
      */
-    public function getAccessLevelNames($object);
+    public function getAccessLevelNames($object, $permissionName = null);
 }

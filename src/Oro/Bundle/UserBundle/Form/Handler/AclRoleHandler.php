@@ -316,7 +316,7 @@ class AclRoleHandler
     {
         $securityIdentity = $this->aclManager->getSid($role);
         if ($className) {
-            return $this->privilegeRepository->getClassFieldsPrivileges($securityIdentity, $className);
+            return $this->privilegeRepository->getFieldsPrivileges($securityIdentity, $className);
         }
 
         return $this->privilegeRepository->getPrivileges($securityIdentity);

@@ -161,7 +161,7 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevelNames($object)
+    public function getAccessLevelNames($object, $permissionName = null)
     {
         if ($this->getObjectClassName($object) === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             /**

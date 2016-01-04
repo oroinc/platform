@@ -285,7 +285,7 @@ class EntitySerializer
         $resultFields   = $this->fieldAccessor->getFieldsToSerialize($entityClass, $config);
 
         foreach ($resultFields as $field) {
-            if ($this->authChecker && !$this->authChecker->isGranted('VIEW', new FieldVote($entity, $field))) {
+            if (false === $this->isAllowedField($entity, $entityClass, $field)) {
                 continue;
             }
 
@@ -332,6 +332,31 @@ class EntitySerializer
         }
 
         return $result;
+    }
+
+    /**
+     * @param array|object $entity
+     * @param string       $entityClass
+     * @param string       $field
+     *
+     * @return bool
+     * @throws \Doctrine\ORM\ORMException
+     */
+    protected function isAllowedField($entity, $entityClass, $field)
+    {
+        if (!$this->authChecker) {
+            return true;
+        }
+
+        $entityToCheck = $entity;
+        if (is_array($entityToCheck) && !empty($entityToCheck['entityId'])) {
+            $entityToCheck = $this->doctrineHelper->getEntityManager($entityClass)->getReference(
+                $entityClass,
+                $entity['entityId']
+            );
+        }
+
+        return $this->authChecker->isGranted('VIEW', new FieldVote($entityToCheck, $field));
     }
 
     /**
@@ -422,14 +447,6 @@ class EntitySerializer
         $fields         = $this->fieldAccessor->getFields($entityClass, $config);
         foreach ($fields as $field) {
             if (!$entityMetadata->isCollectionValuedAssociation($field)) {
-                continue;
-            }
-
-            // check for class level field acl
-            if ($this->authChecker && !$this->authChecker->isGranted(
-                'VIEW',
-                sprintf('field+%s:%s', $field, $entityClass)
-            )) {
                 continue;
             }
 

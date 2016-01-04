@@ -46,10 +46,13 @@ define(function(require) {
                 var selectDiv = parentDiv.find(self.options.selectDivSelector);
                 var linkDiv = parentDiv.find(self.options.linkDivSelector);
                 link.hide();
+
                 var originOid = parentDiv.attr(self.options.objectIdentityAttribute);
                 var oid = originOid.replace(/\\/g, '_');
+                var permissionName = parentDiv.next().val();
+
                 $.ajax({
-                    url: routing.generate(self.options.accessLevelRoute, {oid: oid}),
+                    url: routing.generate(self.options.accessLevelRoute, {oid: oid, permission: permissionName}),
                     success: function(data) {
                         var selector = $(self.selectTemplate({
                             name: parentDiv.attr(self.options.selectorNameAttribute),
@@ -67,7 +70,7 @@ define(function(require) {
                             mediator.trigger('securityAccessLevelsComponent:link:click', {
                                 accessLevel: $(e.target).val(),
                                 identityId: originOid,
-                                permissionName: parentDiv.next().val()
+                                permissionName: permissionName
                             });
                         });
                     },

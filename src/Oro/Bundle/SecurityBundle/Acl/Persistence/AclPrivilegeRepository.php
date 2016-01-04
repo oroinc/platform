@@ -108,7 +108,7 @@ class AclPrivilegeRepository
      *
      * @return ArrayCollection|AclPrivilege[]
      */
-    public function getClassFieldsPrivileges(SID $sid, $className)
+    public function getFieldsPrivileges(SID $sid, $className)
     {
         $extensionKey = 'field';
         $extension = $this->manager->getExtensionSelector()->select(
