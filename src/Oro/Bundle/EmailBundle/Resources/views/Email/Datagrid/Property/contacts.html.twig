@@ -3,12 +3,13 @@
 {% set folders = record.getValue('folders') %}
 {% set thread = record.getValue('email.thread') %}
 {% set isNew = record.getValue('is_new') %}
+{% set folderType = folders is not null and folders[0] is defined ? folders[0].type : null %}
 
-{% if (folders[0].type == 'inbox') %}
+{% if (folderType == 'inbox') %}
     {% set sender = record.getValue('email.from_name') %}
 {% elseif thread is not null %}
     {% set recipients = oro_get_email_thread_recipients(thread) %}
-{% elseif (folders[0].type == 'sent') %}
+{% elseif (folderType == 'sent') %}
     {% set recipients = record.getValue('email.recipients') %}
 {% endif %}
 
@@ -25,45 +26,22 @@
     {% endif %}
 {% endif %}
 {% if sender is defined %}
-    {% if isNew == 1 %}
-        <strong>
-    {% endif %}
-    {{ sender|truncate(22, false, '...') }}
-    {% if isNew == 1 %}
-        </strong>
-    {% endif %}
+    {{ EA.wrapTextToTag(sender|truncate(22, false, '...'), isNew) }}
 {% elseif (recipients|length > 0 and recipients|length < 3) %}
-    {% if isNew == 1 %}
-        <strong>
-    {% endif %}
-        {{ EA.email_participants_name(recipients, true, false) }}
-    {% if isNew == 1 %}
-        </strong>
-    {% endif %}
+    {{ EA.wrapTextToTag(EA.email_participants_name(recipients, true, false), isNew) }}
 {% else %}
-        {% if isNew == 1 %}
-            <strong>
-        {% endif %}
         {% if recipients|length > 0 %}
             {% set firstEmail = recipients|first %}
             {% set lastEmail = recipients|last %}
-            {{
+            {% set firstLastRecipients =
                 EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
-            }}..{{
+                ~ '..' ~
                 EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
-            }}
-        {% endif %}
-        {% if isNew == 1 %}
-            </strong>
+            %}
+            {{ EA.wrapTextToTag(firstLastRecipients, isNew) }}
         {% endif %}
 {% endif %}
 {% if thread is not null and thread.emails|length > 1 %}
-    {% if isNew == 1 %}
-        <strong>
-    {% endif %}
-        ({{ thread.emails|length }})
-    {% if isNew == 1 %}
-        </strong>
-    {% endif %}
+    {{ EA.wrapTextToTag('(' ~ thread.emails|length ~ ')', isNew) }}
 {% endif %}
 </span>

@@ -600,3 +600,15 @@
         </div>
     </div>
 {% endmacro %}
+
+{#
+    Wrap text to tag
+#}
+{% macro wrapTextToTag(text, isWrap, tag) %}
+    {% set tag = tag is not null ? tag : 'strong' %}
+    {% if isWrap == true %}
+        <{{ tag }}>{{ text }}</{{ tag }}>
+    {% else %}
+        {{ text }}
+    {% endif %}
+{% endmacro %}
