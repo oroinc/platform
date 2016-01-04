@@ -41,9 +41,9 @@ define([
 
             var options = methods.combineOptions.call(this);
             options.collection = this.collection;
+            options.prependTo = this.$el;
             var filtersList = new FiltersManager(options);
-            this.$el.prepend(filtersList.render().$el);
-            filtersList.refreshSelectWidget();
+            filtersList.render();
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
@@ -65,7 +65,6 @@ define([
             var filters = {};
             var modules = this.modules;
             var collection = this.collection;
-            var container = tools.isMobile() ? 'body' : this.$el;
             _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
                     // @TODO pass collection only for specific filters
@@ -73,12 +72,11 @@ define([
                         options.collection = collection;
                     }
                     var Filter = modules[options.type].extend(options);
-                    filters[options.name] = new Filter({container: container});
+                    filters[options.name] = new Filter();
                 }
             });
             return {
-                filters: filters,
-                container: container
+                filters: filters
             };
         }
     };

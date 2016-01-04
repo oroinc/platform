@@ -88,7 +88,7 @@ define([
          *
          * @property
          */
-        container: 'body',
+        dropdownContainer: 'body',
 
         /**
          * Select widget menu opened flag
@@ -121,7 +121,7 @@ define([
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, ['choices', 'container']);
+            var opts = _.pick(options || {}, ['choices', 'dropdownContainer']);
             _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
@@ -186,6 +186,16 @@ define([
         },
 
         /**
+         * Set dropdownContainer for dropdown element
+         *
+         * @param {(jQuery|Element|String)} container
+         * @protected
+         */
+        setDropdownContainer: function(container) {
+            this.dropdownContainer = $(container);
+        },
+
+        /**
          * Initialize multiselect widget
          *
          * @protected
@@ -201,7 +211,9 @@ define([
                     position: {
                         my: 'left top+7',
                         at: 'left bottom',
-                        of: this.$(this.containerSelector)
+                        of: this.$(this.containerSelector),
+                        collision: 'fit none',
+                        within: this.dropdownContainer
                     },
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
@@ -218,7 +230,7 @@ define([
                             }
                         }, this), 100);
                     }, this),
-                    appendTo: this.container
+                    appendTo: this.dropdownContainer
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
             });

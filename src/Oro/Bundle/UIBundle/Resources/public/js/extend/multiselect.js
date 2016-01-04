@@ -13,26 +13,8 @@ define([
          * @override
          */
         open: function() {
-            var rect;
-            var parentRect;
-            var overlap;
-            var value;
             this._superApply(arguments);
             mask.show().onhide($.proxy(this.close, this));
-            rect = this.menu.get(0).getBoundingClientRect();
-            parentRect = this.menu.parent().get(0).getBoundingClientRect();
-            overlap =  rect.right - parentRect.right;
-            if (overlap > 0) {
-                value = parseInt(this.menu.css('left'));
-                if (!isNaN(value)) {
-                    this.menu.css('left', value - overlap + 'px');
-                } else {
-                    value = parseInt(this.menu.css('right'));
-                    if (!isNaN(value)) {
-                        this.menu.css('right', value + overlap + 'px');
-                    }
-                }
-            }
         },
 
         /**

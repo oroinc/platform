@@ -92,11 +92,18 @@ define(function(require) {
         buttonSelector: '.ui-multiselect.filter-list',
 
         /**
-         * Selector, jQuery object or HTML element that will be target for append multiselect dropdown menu
+         * jQuery object that will be target for append multiselect dropdown menus
          *
          * @property
          */
-        container: 'body',
+        dropdownContainer: 'body',
+
+        /**
+         * Selector, jQuery object or HTML element that will be target for prepend view element
+         *
+         * @property
+         */
+        prependTo: null,
 
         /** @property */
         events: {
@@ -119,7 +126,7 @@ define(function(require) {
 
             this.filters = {};
 
-            _.extend(this, _.pick(options, ['addButtonHint', 'container']));
+            _.extend(this, _.pick(options, ['addButtonHint', 'prependTo']));
 
             if (options.filters) {
                 _.extend(this.filters, options.filters);
@@ -307,12 +314,20 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            var $container = $(this.template({filters: this.filters}));
-            this.setElement($container);
+            this.$el.html(
+                this.template({filters: this.filters})
+            );
+            this.dropdownContainer = this.$el.find('.filter-container');
+            if (this.prependTo) {
+                this.prependTo.prepend(this.$el);
+            }
 
             var fragment = document.createDocumentFragment();
 
             _.each(this.filters, function(filter) {
+                if (_.isFunction(filter.setDropdownContainer)) {
+                    filter.setDropdownContainer(this.dropdownContainer);
+                }
                 filter.render();
                 if (!filter.enabled) {
                     filter.hide();
@@ -323,9 +338,9 @@ define(function(require) {
             this.trigger('rendered');
 
             if (_.isEmpty(this.filters)) {
-                $container.hide();
+                this.$el.hide();
             } else {
-                $container.find('.filter-container').append(fragment);
+                this.dropdownContainer.append(fragment);
                 this._initializeSelectWidget();
             }
 
@@ -338,13 +353,14 @@ define(function(require) {
          * @protected
          */
         _initializeSelectWidget: function() {
+            var $button;
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: {
                     multiple: true,
                     selectedList: 0,
                     selectedText: this.addButtonHint,
-                    classes: 'filter-list select-filter-widget',
+                    classes: 'select-filter-widget',
                     position: {
                         my: 'left top+2',
                         at: 'left bottom'
@@ -353,19 +369,16 @@ define(function(require) {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                     }, this),
-                    appendTo: this.container
+                    appendTo: this.dropdownContainer
                 }
             });
 
             this.selectWidget.setViewDesign(this);
-            this.$('.filter-list span:first').replaceWith(
+            $button = this.selectWidget.multiselect('instance').button;
+            $button.find('span:first').replaceWith(
                 '<a class="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
                     '<span class="caret"></span></a>'
             );
-        },
-
-        refreshSelectWidget: function() {
-            this.selectWidget.multiselect('refresh');
         },
 
         /**
