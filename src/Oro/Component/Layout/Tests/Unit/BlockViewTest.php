@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
 
-class BlockViewTest extends \PHPUnit_Framework_TestCase
+class BlockViewTest extends LayoutTestCase
 {
     /** @var BlockView */
     protected $rootView;
@@ -26,6 +26,8 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
         $headerView->children['title']      = $titleView;
         $logoView                           = new BlockView($headerView);
         $titleView->children['logo']        = $logoView;
+
+        $this->setLayoutViews(['root' => $this->rootView]);
 
         $this->assertTrue(
             isset($this->rootView['header']),
@@ -66,6 +68,8 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
         $titleView                          = new BlockView($headerView);
         $headerView->children['title']      = $titleView;
 
+        $this->setLayoutViews(['root' => $this->rootView]);
+
         $this->assertFalse(isset($this->rootView['unknown']));
     }
 
@@ -82,6 +86,8 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
         $this->rootView->children['header'] = $headerView;
         $titleView                          = new BlockView($headerView);
         $headerView->children['title']      = $titleView;
+
+        $this->setLayoutViews(['root' => $this->rootView]);
 
         $this->rootView['unknown'];
     }
@@ -103,6 +109,8 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
     {
         $headerView                         = new BlockView($this->rootView);
         $this->rootView->children['header'] = $headerView;
+
+        $this->setLayoutViews(['root' => $this->rootView]);
 
         unset($this->rootView['header']);
     }

@@ -14,15 +14,7 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function assertBlockView(array $expected, BlockView $actual, $ignoreAuxiliaryVariables = true)
     {
-        $views = [];
-        $collectViews = function (BlockView $view) use (&$collectViews, &$views) {
-            $views[$view->vars['id']] = $view;
-            array_walk($view->children, $collectViews);
-        };
-        $collectViews($actual);
-        $views = new ArrayCollection($views);
-
-        $this->completeView($expected, ['views' => $views]);
+        $this->completeView($expected);
         $actualArray = $this->convertBlockViewToArray($actual, $ignoreAuxiliaryVariables);
 
         // compare hierarchy
@@ -37,11 +29,10 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $view
-     * @param array $vars
      *
      * @return array
      */
-    protected function completeView(array &$view, $vars)
+    protected function completeView(array &$view)
     {
         if (!isset($view['vars'])) {
             $view['vars'] = [];
@@ -59,10 +50,8 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
             $view['vars']['class_prefix'] = null;
         }
 
-        $view['vars'] = array_merge($vars, $view['vars']);
-
         foreach ($view['children'] as &$child) {
-            $this->completeView($child, $vars);
+            $this->completeView($child);
         }
     }
 
@@ -130,5 +119,27 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
                 $this->buildViewHierarchy($result[$childId], $childView);
             }
         }
+    }
+
+    /**
+     * @param array $addViews
+     * @param bool $root
+     * @return array
+     */
+    protected function setLayoutViews($addViews, $root = true)
+    {
+        $views = $addViews;
+        foreach ($views as $view) {
+            $views = array_merge($views, $this->setLayoutViews($view->children, false));
+        }
+
+        if ($root) {
+            $viewsCollection = new ArrayCollection($views);
+            foreach ($views as $view) {
+                $view->layoutViews = $viewsCollection;
+            }
+        }
+
+        return $views;
     }
 }

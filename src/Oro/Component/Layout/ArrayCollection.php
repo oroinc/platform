@@ -30,7 +30,11 @@ class ArrayCollection implements \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return isset($this->elements[$offset]) ? $this->elements[$offset] : null;
+        if (isset($this->elements[$offset])) {
+            return $this->elements[$offset];
+        };
+
+        throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $offset));
     }
 
     /**
@@ -38,7 +42,7 @@ class ArrayCollection implements \ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        $this->elements[$offset] = $value;
+        throw new \BadMethodCallException('Not supported');
     }
 
     /**
@@ -46,6 +50,6 @@ class ArrayCollection implements \ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        unset($this->elements[$offset]);
+        throw new \BadMethodCallException('Not supported');
     }
 }

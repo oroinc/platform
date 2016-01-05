@@ -11,6 +11,13 @@ use Symfony\Component\Form\FormView;
 class BlockView extends FormView
 {
     /**
+     * All layout views.
+     *
+     * @var BlockView[]
+     */
+    public $layoutViews = [];
+
+    /**
      * @param BlockView $parent
      */
     public function __construct(BlockView $parent = null)
@@ -30,14 +37,9 @@ class BlockView extends FormView
      */
     public function offsetGet($id)
     {
-        if (isset($this->children[$id])) {
-            return $this->children[$id];
+        if (isset($this->layoutViews[$id])) {
+            return $this->layoutViews[$id];
         };
-        foreach ($this->children as $child) {
-            if (isset($child[$id])) {
-                return $child[$id];
-            };
-        }
 
         throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $id));
     }
@@ -51,16 +53,7 @@ class BlockView extends FormView
      */
     public function offsetExists($id)
     {
-        if (isset($this->children[$id])) {
-            return true;
-        };
-        foreach ($this->children as $child) {
-            if (isset($child[$id])) {
-                return true;
-            };
-        }
-
-        return false;
+        return isset($this->layoutViews[$id]);
     }
 
     /**
