@@ -78,5 +78,7 @@ oro_entity_config:
     grid:
         entity:
             items:
-                # indicates grid for the entity using for context
+                # grid name that used for rendering entity context
                 context: # string
+                    options:
+                        auditable:          false
