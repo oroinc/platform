@@ -52,12 +52,38 @@ define(function(require) {
                     'scope': this.scopes.join(' '),
                     'immediate': false
                 }, _.bind(this.checkAuthorization, this));
+
+            //this.checkAuthorization({access_token:"11111", expires_at: "1451920751"});
         },
 
         checkAuthorization: function(result) {
             this.view.setToken(result.access_token);
+            this.view.setExpiredAt(result.expires_at);
 
+            this.requestGoogleAuthCode();
+        },
+
+        requestGoogleAuthCode: function() {
+            var data = this.view.getData();
+
+            gapi.auth.authorize(
+                {
+                    'client_id': data.clientId,
+                    'scope': this.scopes.join(' '),
+                    'immediate': false,
+                    'access_type': 'offline',
+                    'response_type': 'code',
+                    'approval_prompt': 'force'
+                }, _.bind(this.handleResponseGoogleAuthCode, this));
+
+            //this.handleResponseGoogleAuthCode({code: '1111'});
+        },
+
+        handleResponseGoogleAuthCode: function(response) {
+            this.view.setGoogleAuthCode(response.code);
             gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
+
+            //this.requestProfile();
         },
 
         requestProfile: function() {
@@ -66,9 +92,12 @@ define(function(require) {
             });
 
             request.execute(_.bind(this.responseProfile, this));
+
+            //this.responseProfile({emailAddress: "test@test.com"});
+            //this.responseProfile({emailAddress: "test1@test.com"});
         },
 
-        responseProfile:function(request) {
+        responseProfile: function(request) {
             if (request) {
                 this.view.setEmail(request.emailAddress);
             }

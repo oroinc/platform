@@ -118,6 +118,7 @@ services:
             - @oro_imap.imap_email_google_oauth2_manager
         tags:
             - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_imap.manager.clear:
         class: %oro_imap.imap_clear_manager.class%

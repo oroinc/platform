@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -11,6 +10,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 
 class ChoiceAccountType extends AbstractType
@@ -85,6 +85,10 @@ class ChoiceAccountType extends AbstractType
             $data = $formEvent->getData();
 
             if ($data) {
+                $utcTimeZone = new \DateTimeZone('UTC');
+                $newExpireDate = new \DateTime('+' . $data['imapGmailConfiguration']['accessTokenExpiresAt'] . ' seconds', $utcTimeZone);
+
+                $data['imapGmailConfiguration']['accessTokenExpiresAt'] = $newExpireDate;
                 $accountTypeModel = $this->createAccountTypeModelFromData($data);
 
                 $form->remove('disconnect');
@@ -96,6 +100,8 @@ class ChoiceAccountType extends AbstractType
                         'Other' => self::ACCOUNT_TYPE_OTHER
                     ],
                 ]);
+
+                $formEvent->setData($data);
             }
         }
 
@@ -173,11 +179,12 @@ class ChoiceAccountType extends AbstractType
         $accountTypeModel->setAccountType($data['accountType']);
 
         $userEmailOrigin = new UserEmailOrigin();
-        $userEmailOrigin->setImapHost($data['imapHost']);
-        $userEmailOrigin->setImapPort($data['imapPort']);
-        $userEmailOrigin->setImapEncryption($data['imapEncryption']);
-        $userEmailOrigin->setUser($data['user']);
-        $userEmailOrigin->setPassword($data['password']);
+        $userEmailOrigin->setImapHost($data['imapGmailConfiguration']['imapHost']);
+        $userEmailOrigin->setImapPort($data['imapGmailConfiguration']['imapPort']);
+        $userEmailOrigin->setImapEncryption($data['imapGmailConfiguration']['imapEncryption']);
+        $userEmailOrigin->setUser($data['imapGmailConfiguration']['user']);
+        $userEmailOrigin->setGoogleAuthCode($data['imapGmailConfiguration']['googleAuthCode']);
+        $userEmailOrigin->setAccessTokenExpiresAt($data['imapGmailConfiguration']['accessTokenExpiresAt'] );
         $accountTypeModel->setImapGmailConfiguration($userEmailOrigin);
 
         return $accountTypeModel;

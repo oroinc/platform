@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -53,6 +54,7 @@ class ConfigurationGmailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->addOwnerOrganizationEventListener($builder);
+        $this->addNewOriginCreateEventListener($builder);
 
         $builder
             ->add('check', 'button', [
@@ -60,8 +62,9 @@ class ConfigurationGmailType extends AbstractType
                 'attr' => ['class' => 'btn btn-primary']
             ])
             ->add('accessToken', 'hidden')
+            ->add('accessTokenExpiresAt', 'hidden')
+            ->add('googleAuthCode', 'hidden')
             ->add('imapHost', 'hidden', [
-                'label'    => 'oro.imap.configuration.imap_host.label',
                 'required' => true,
                 'data' => GmailImap::DEFAULT_GMAIL_HOST
             ])
@@ -91,6 +94,29 @@ class ConfigurationGmailType extends AbstractType
                 'required'    => false,
                 'data' => 'ssl'
             ]);
+
+        $builder->get('accessTokenExpiresAt')
+            ->addModelTransformer(new CallbackTransformer(
+                function ($originalDescription) {
+
+                    if ($originalDescription === null){
+                        return '';
+                    }
+
+                    return $originalDescription->format('c');
+                },
+                function ($submittedDescription) {
+
+                    if ($submittedDescription instanceof \DateTime) {
+                        return $submittedDescription;
+                    }
+
+                    $utcTimeZone = new \DateTimeZone('UTC');
+                    $newExpireDate = new \DateTime('+' . $submittedDescription . ' seconds', $utcTimeZone);
+
+                    return $newExpireDate;
+                }
+            ));
 
         $this->initEvents($builder);
     }
@@ -204,6 +230,43 @@ class ConfigurationGmailType extends AbstractType
                     $event->setData($data);
                 }
             }
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function addNewOriginCreateEventListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = (array) $event->getData();
+                /** @var UserEmailOrigin|null $entity */
+                $entity = $event->getForm()->getData();
+                $filtered = array_filter(
+                    $data,
+                    function ($item) {
+                        return !empty($item);
+                    }
+                );
+                if (count($filtered) > 0) {
+                    if ($entity instanceof UserEmailOrigin
+                        && $entity->getImapHost() !== null
+                        && array_key_exists('imapHost', $data) && $data['imapHost'] !== null
+                        && array_key_exists('user', $data) && $data['user'] !== null
+                        && ($entity->getImapHost() !== $data['imapHost']
+                            || $entity->getUser() !== $data['user'])
+                    ) {
+                        $newConfiguration = new UserEmailOrigin();
+                        $event->getForm()->setData($newConfiguration);
+                    }
+                } elseif ($entity instanceof UserEmailOrigin) {
+                    $event->getForm()->setData(null);
+                }
+            },
+            3
         );
     }
 }

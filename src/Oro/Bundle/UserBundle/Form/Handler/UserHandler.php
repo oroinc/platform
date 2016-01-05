@@ -119,6 +119,7 @@ class UserHandler extends AbstractUserHandler
      */
     protected function onSuccess(User $user)
     {
+        $user->setImapAccountType($user->getImapAccountType());
         $this->manager->updateUser($user);
 
         if ($this->form->has('inviteUser')

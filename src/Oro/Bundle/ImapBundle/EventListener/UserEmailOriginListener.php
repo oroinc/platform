@@ -72,6 +72,27 @@ class UserEmailOriginListener
     }
 
     /**
+     * Update refreshToken of UserEmailOrigins
+     *
+     * @param LifecycleEventArgs $event
+     */
+    public function postFlush(LifecycleEventArgs $event)
+    {
+        $origin = $event->getObject();
+
+        if ($origin instanceof UserEmailOrigin) {
+            if ($origin->getAccessToken() && $origin->getRefreshToken() === null) {
+                $response = $this->imapEmailGoogleOauth2Manager->getAccessTokenByAuthCode($origin->getGoogleAuthCode());
+                $origin->setRefreshToken($response['refresh_token']);
+
+                $manager = $this->doctrine->getManager();
+                $manager->persist($origin);
+                $manager->flush();
+            }
+        }
+    }
+
+    /**
      * @param ArrayCollection|EmailFolder[] $folders
      * @param ImapEmailFolderManager $manager
      */

@@ -16,7 +16,11 @@ define(function(require) {
 
         token: '',
 
+        expiredAt: '',
+
         email: '',
+
+        googleAuthCode: '',
 
         /**
          * @constructor
@@ -29,6 +33,8 @@ define(function(require) {
             this.$el.html(this.html);
             this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][accessToken]"]').val(this.token);
             this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][user]"]').val(this.email);
+            this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][accessTokenExpiresAt]"]').val(this.expiredAt);
+            this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][googleAuthCode]"]').val(this.googleAuthCode);
             this._deferredRender();
             this.initLayout().done(_.bind(this._resolveDeferredRender, this));
         },
@@ -60,7 +66,12 @@ define(function(require) {
                 user: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][user]"]').val(),
                 imapPort: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapPort]"]').val(),
                 imapHost: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapHost]"]').val(),
-                imapEncryption: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapEncryption]"]').val()
+                imapEncryption: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapEncryption]"]').val(),
+                smtpPort: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][smtpPort]"]').val(),
+                smtpHost: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][smtpHost]"]').val(),
+                smtpEncryption: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][smtpEncryption]"]').val(),
+                accessTokenExpiresAt: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][accessTokenExpiresAt]"]').val(),
+                googleAuthCode: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][googleAuthCode]"]').val()
             };
         },
 
@@ -70,6 +81,14 @@ define(function(require) {
 
         setEmail: function(value) {
             this.email = value;
+        },
+
+        setExpiredAt: function(value) {
+            this.expiredAt = value;
+        },
+
+        setGoogleAuthCode: function(value) {
+            this.googleAuthCode = value;
         }
     });
 
