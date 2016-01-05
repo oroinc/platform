@@ -45,22 +45,17 @@ define(function(require) {
         },
 
         requestToken: function() {
-            var data = this.view.getData();
-            gapi.auth.authorize(
-                {
-                    'client_id': data.clientId,
-                    'scope': this.scopes.join(' '),
-                    'immediate': false
-                }, _.bind(this.checkAuthorization, this));
+            this.requestGoogleAuthCode();
+
+            //var data = this.view.getData();
+            //gapi.auth.authorize(
+            //    {
+            //        'client_id': data.clientId,
+            //        'scope': this.scopes.join(' '),
+            //        'immediate': false
+            //    }, _.bind(this.checkAuthorization, this));
 
             //this.checkAuthorization({access_token:"11111", expires_at: "1451920751"});
-        },
-
-        checkAuthorization: function(result) {
-            this.view.setToken(result.access_token);
-            this.view.setExpiredAt(result.expires_at);
-
-            this.requestGoogleAuthCode();
         },
 
         requestGoogleAuthCode: function() {
@@ -81,9 +76,29 @@ define(function(require) {
 
         handleResponseGoogleAuthCode: function(response) {
             this.view.setGoogleAuthCode(response.code);
-            gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
+
+            this.requestToken2();
 
             //this.requestProfile();
+        },
+
+        requestToken2: function() {
+            var data = this.view.getData();
+            gapi.auth.authorize(
+                {
+                    'client_id': data.clientId,
+                    'scope': this.scopes.join(' '),
+                    'immediate': false
+                }, _.bind(this.checkAuthorization, this));
+
+            //this.checkAuthorization({access_token:"11111", expires_at: "1451920751"});
+        },
+
+        checkAuthorization: function(result) {
+            this.view.setToken(result.access_token);
+            this.view.setExpiredAt(result.expires_at);
+
+            gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
         },
 
         requestProfile: function() {
