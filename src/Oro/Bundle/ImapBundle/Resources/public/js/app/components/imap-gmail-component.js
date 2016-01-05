@@ -4,6 +4,7 @@ define(function(require) {
     var IMapGmailComponent;
     var $ = require('jquery');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     var BaseComponent = require('oroui/js/app/components/base/component');
@@ -46,52 +47,39 @@ define(function(require) {
 
         requestToken: function() {
             this.requestGoogleAuthCode();
-
-            //var data = this.view.getData();
-            //gapi.auth.authorize(
-            //    {
-            //        'client_id': data.clientId,
-            //        'scope': this.scopes.join(' '),
-            //        'immediate': false
-            //    }, _.bind(this.checkAuthorization, this));
-
-            //this.checkAuthorization({access_token:"11111", expires_at: "1451920751"});
         },
 
         requestGoogleAuthCode: function() {
             var data = this.view.getData();
 
-            gapi.auth.authorize(
-                {
-                    'client_id': data.clientId,
-                    'scope': this.scopes.join(' '),
-                    'immediate': false,
-                    'access_type': 'offline',
-                    'response_type': 'code',
-                    'approval_prompt': 'force'
-                }, _.bind(this.handleResponseGoogleAuthCode, this));
-
-            //this.handleResponseGoogleAuthCode({code: '1111'});
+            if (data.clientId.length === 0) {
+                mediator.execute('showErrorMessage', __('oro.imap.connection.google.oauth.error.emptyClientId'));
+            } else {
+                gapi.auth.authorize(
+                    {
+                        'client_id': data.clientId,
+                        'scope': this.scopes.join(' '),
+                        'immediate': false,
+                        'access_type': 'offline',
+                        'response_type': 'code',
+                        'approval_prompt': 'force'
+                    }, _.bind(this.handleResponseGoogleAuthCode, this));
+            }
         },
 
         handleResponseGoogleAuthCode: function(response) {
             this.view.setGoogleAuthCode(response.code);
 
-            this.requestToken2();
-
-            //this.requestProfile();
+            this.requestAccessToken();
         },
 
-        requestToken2: function() {
+        requestAccessToken: function() {
             var data = this.view.getData();
-            gapi.auth.authorize(
-                {
+            gapi.auth.authorize({
                     'client_id': data.clientId,
                     'scope': this.scopes.join(' '),
                     'immediate': false
-                }, _.bind(this.checkAuthorization, this));
-
-            //this.checkAuthorization({access_token:"11111", expires_at: "1451920751"});
+            }, _.bind(this.checkAuthorization, this));
         },
 
         checkAuthorization: function(result) {
@@ -107,9 +95,6 @@ define(function(require) {
             });
 
             request.execute(_.bind(this.responseProfile, this));
-
-            //this.responseProfile({emailAddress: "test@test.com"});
-            //this.responseProfile({emailAddress: "test1@test.com"});
         },
 
         responseProfile: function(request) {

@@ -11,7 +11,11 @@ define(function(require) {
 
         $successMessage: null,
 
+        $googleErrorMessage: null,
+
         token: null,
+
+        googleErrorMessage: '',
 
         canShowMessage: false,
 
@@ -26,9 +30,12 @@ define(function(require) {
         initialize: function(options) {
             this.$errorMessage = this.$el.find(options.errorMessage);
             this.$successMessage = this.$el.find(options.successMessage);
+            this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
         },
 
         render: function() {
+            this.$googleErrorMessage.html(this.googleErrorMessage);
+
             if (this.canShowMessage) {
                 this.showMessage();
             } else {
@@ -45,10 +52,29 @@ define(function(require) {
         },
 
         /**
+         * Set error message from google API
+         * @params {string} message
+         */
+        setGoogleErrorMessage: function(message) {
+            this.googleErrorMessage = message;
+        },
+
+        /**
+         * Reset error message from google API
+         * @params {string} message
+         */
+        resetGoogleErrorMessage: function() {
+            this.googleErrorMessage = '';
+        },
+
+        /**
          * Handler event change for checkbox
          * @param e
          */
         onChangeCheckBox: function(e) {
+            this.resetGoogleErrorMessage();
+            this.render();
+
             if ($(e.target).is(':checked')) {
                 this.canShowMessage = true;
                 this.trigger('requestToken');
@@ -64,7 +90,9 @@ define(function(require) {
         showMessage: function() {
             this.hideMessages();
 
-            if (this.token && !this.token.error) {
+            if (this.googleErrorMessage.length > 0) {
+                this.showGoogleError();
+            } else if (this.token && !this.token.error) {
                 this.showSuccess();
             } else {
                 this.showError();
@@ -77,6 +105,7 @@ define(function(require) {
         hideMessages: function() {
             this.$errorMessage.hide();
             this.$successMessage.hide();
+            this.$googleErrorMessage.hide();
         },
 
         /**
@@ -91,6 +120,13 @@ define(function(require) {
          */
         showError: function() {
             this.$errorMessage.show();
+        },
+
+        /**
+         * show error message from google API
+         */
+        showGoogleError: function() {
+            this.$googleErrorMessage.show();
         }
     });
 

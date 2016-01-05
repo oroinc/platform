@@ -105,11 +105,15 @@
 {% block oro_config_google_imap_sync_checkbox_widget %}
     {% set options = {
         errorMessage: '.alert-error',
-        successMessage: '.alert-success'
+        successMessage: '.alert-success',
+        googleErrorMessage: '.google-alert'
     } %}
     <div data-page-component-module="oroimap/js/app/components/google-sync-checkbox-component"
         data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">
-        <input type="{{ type|default('checkbox') }}" {{ block('widget_attributes') }} />
+        {{ block('checkbox_widget') }}
+        <div class="google-alert connection-status alert alert-error" style="display: none">
+
+        </div>
         <div class="connection-status alert alert-error" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.error.label'|trans }}
         </div>

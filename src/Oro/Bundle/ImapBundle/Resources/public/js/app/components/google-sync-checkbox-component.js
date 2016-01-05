@@ -40,8 +40,24 @@ define(function(require) {
 
         checkAuthorization: function(result) {
             this.view.setToken(result);
+            gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
+        },
+
+        requestProfile: function() {
+            var request = gapi.client.gmail.users.getProfile({
+                'userId': 'me'
+            });
+
+            request.execute(_.bind(this.responseProfile, this));
+        },
+
+        responseProfile: function(response) {
+            if (response.code === 403) {
+                this.view.setGoogleErrorMessage(response.message);
+            }
+
             this.view.render();
-        }
+        },
     });
 
     return GoogleSyncCheckbox;
