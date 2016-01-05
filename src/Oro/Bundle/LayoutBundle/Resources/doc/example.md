@@ -230,7 +230,7 @@ and modify template based on the existence of another block or any of its proper
     <!DOCTYPE {{ doctype|default('html') }}>
     <html{{ block('block_attributes') }}>
     {{ block_widget(block) }}
-    {% if block.sidebar is defined and block.sidebar.children|length > 0 %}
+    {% if blocks.sidebar is defined and blocks.sidebar.children|length > 0 %}
         <script type="text/javascript">
             //do something
         </script>
