@@ -21,7 +21,8 @@ define(function(require) {
             this.view = new GoogleSyncCheckboxView({
                 el: options._sourceElement,
                 errorMessage: options.errorMessage,
-                successMessage: options.successMessage
+                successMessage: options.successMessage,
+                googleErrorMessage: options.googleErrorMessage
             });
 
             require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
