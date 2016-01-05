@@ -146,6 +146,13 @@ class EmailUser
      */
     protected $email;
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="integer", options={"default"=0})
+     */
+    protected $unsyncedFlagCount = 0;
+
     public function __construct()
     {
         $this->folders = new ArrayCollection();
@@ -384,6 +391,34 @@ class EmailUser
     public function setOrigin(EmailOrigin $origin)
     {
         $this->origin = $origin;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUnsyncedFlagCount()
+    {
+        return $this->unsyncedFlagCount;
+    }
+
+    /**
+     * @return $this
+     */
+    public function incrementUnsyncedFlagCount()
+    {
+        $this->unsyncedFlagCount++;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function decrementUnsyncedFlagCount()
+    {
+        $this->unsyncedFlagCount--;
 
         return $this;
     }
