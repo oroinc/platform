@@ -12,6 +12,8 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 {
     private $eventDispatcher;
+
+    /** @var GridViewsExtension */
     private $gridViewsExtension;
 
     public function setUp()
@@ -29,16 +31,41 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->will($this->returnValue(true));
 
-        $this->gridViewsExtension = new GridViewsExtension($this->eventDispatcher, $securityFacade, $translator);
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repo->expects($this->any())
+            ->method('findDefaultGridView')
+            ->willReturn(null);
+
+        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repo);
+
+        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->gridViewsExtension = new GridViewsExtension(
+            $this->eventDispatcher,
+            $securityFacade,
+            $translator,
+            $registry,
+            $aclHelper
+        );
     }
 
     public function testVisitMetadataShouldAddGridViewsFromEvent()
     {
         $this->gridViewsExtension->setParameters(new ParameterBag());
-        $data = MetadataObject::create([]);
-        $config = DatagridConfiguration::create([
-            DatagridConfiguration::NAME_KEY => 'grid',
-        ]);
+        $data   = MetadataObject::create([]);
+        $config = DatagridConfiguration::create(
+            [
+                DatagridConfiguration::NAME_KEY => 'grid',
+            ]
+        );
 
         $this->eventDispatcher
             ->expects($this->once())
@@ -64,16 +91,67 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(GridViewsLoadEvent::EVENT_NAME)
-            ->will($this->returnCallback(function ($eventName, GridViewsLoadEvent $event) use ($expectedViews) {
-                $event->setGridViews($expectedViews);
+            ->will(
+                $this->returnCallback(
+                    function ($eventName, GridViewsLoadEvent $event) use ($expectedViews) {
+                        $event->setGridViews($expectedViews);
 
-                return $event;
-            }));
+                        return $event;
+                    }
+                )
+            );
 
         $this->assertFalse($data->offsetExists('gridViews'));
         $this->gridViewsExtension->visitMetadata($config, $data);
         $this->assertTrue($data->offsetExists('gridViews'));
         $this->assertEquals($expectedViews, $data->offsetGet('gridViews'));
+    }
+
+
+    /**
+     * @param array $input
+     * @param bool  $expected
+     *
+     * @dataProvider isApplicableDataProvider
+     */
+    public function testIsApplicable($input, $expected)
+    {
+        $this->gridViewsExtension->setParameters(new ParameterBag($input));
+        $config = DatagridConfiguration::create(
+            [
+                DatagridConfiguration::NAME_KEY => 'grid',
+            ]
+        );
+        $this->assertEquals($expected, $this->gridViewsExtension->isApplicable($config));
+    }
+
+    /**
+     * @return array
+     */
+    public function isApplicableDataProvider()
+    {
+        return [
+            'Default'            => [
+                'input'    => [],
+                'expected' => true,
+            ],
+            'Extension disabled' => [
+                'input'    => [
+                    '_grid_view' => [
+                        '_disabled' => true
+                    ]
+                ],
+                'expected' => false,
+            ],
+            'Extension enabled'  => [
+                'input'    => [
+                    '_grid_view' => [
+                        '_disabled' => false
+                    ]
+                ],
+                'expected' => true,
+            ],
+        ];
     }
 
     /**

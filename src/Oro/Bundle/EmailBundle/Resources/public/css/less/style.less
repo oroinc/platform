@@ -433,6 +433,7 @@ span.icon.grid .icon-paperclip {
     .responsive-cell {
       padding-left: 0;
       padding-right: 15px;
+      margin-bottom: 0 !important; /* overrides activity list widget styles */
     }
     .responsive-cell:only-child,
     .responsive-cell:last-child {
@@ -443,6 +444,18 @@ span.icon.grid .icon-paperclip {
     .responsive-cell {
       padding-right: 0;
     }
+  }
+  &.responsive-small {
+    .email-content {
+      .responsive-cell:not(:last-child) {
+        margin-bottom: 20px !important; /* overrides activity list widget styles */
+      }
+    }
+  }
+}
+.accordion-body .email-info {
+  &:last-child .email-content {
+    padding-bottom: 0;
   }
 }
 
