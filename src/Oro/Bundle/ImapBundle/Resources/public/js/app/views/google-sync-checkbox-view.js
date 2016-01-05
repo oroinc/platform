@@ -91,10 +91,12 @@ define(function(require) {
             this.hideMessages();
 
             if (this.googleErrorMessage.length > 0) {
+                this.unCheck();
                 this.showGoogleError();
             } else if (this.token && !this.token.error) {
                 this.showSuccess();
             } else {
+                this.unCheck();
                 this.showError();
             }
         },
@@ -127,6 +129,13 @@ define(function(require) {
          */
         showGoogleError: function() {
             this.$googleErrorMessage.show();
+        },
+
+        /**
+         * Remove check status for checkbox
+         */
+        unCheck: function() {
+            this.$el.find('input').removeAttr('checked');
         }
     });
 
