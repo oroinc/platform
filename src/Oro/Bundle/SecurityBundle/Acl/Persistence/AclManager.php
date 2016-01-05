@@ -87,8 +87,8 @@ class AclManager extends AbstractAclManager
     /**
      * Get access levels list for object.
      *
-     * @param object      $object
-     * @param string|null $permissionName
+     * @param object|string $object
+     * @param string|null   $permissionName
      *
      * @return array
      */

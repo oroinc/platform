@@ -26,6 +26,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
  */
 class EntityAclExtension extends AbstractAclExtension
 {
+    const EXTENSION_KEY = 'entity';
     /**
      * @var ObjectIdAccessor
      */
@@ -205,7 +206,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getExtensionKey()
     {
-        return 'entity';
+        return self::EXTENSION_KEY;
     }
 
     /**
