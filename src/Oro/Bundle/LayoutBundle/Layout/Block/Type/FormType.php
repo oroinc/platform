@@ -123,8 +123,8 @@ class FormType extends AbstractFormType
                 $this->checkExistingFieldView($view, $view[$blockId], $formFieldPath);
                 continue;
             }
-            if (isset($view->layoutViews[$blockId])) {
-                $this->checkExistingFieldView($view, $view->layoutViews[$blockId], $formFieldPath);
+            if (isset($view->blocks[$blockId])) {
+                $this->checkExistingFieldView($view, $view->blocks[$blockId], $formFieldPath);
                 continue;
             }
 

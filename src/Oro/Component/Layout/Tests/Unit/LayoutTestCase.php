@@ -137,17 +137,17 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
      * @param bool $root
      * @return array
      */
-    protected function setLayoutViews($addViews, $root = true)
+    protected function setLayoutBlocks($addViews, $root = true)
     {
         $views = $addViews;
         foreach ($views as $view) {
-            $views = array_merge($views, $this->setLayoutViews($view->children, false));
+            $views = array_merge($views, $this->setLayoutBlocks($view->children, false));
         }
 
         if ($root) {
             $viewsCollection = new ArrayCollection($views);
             foreach ($views as $view) {
-                $view->layoutViews = $viewsCollection;
+                $view->blocks = $viewsCollection;
             }
         }
 

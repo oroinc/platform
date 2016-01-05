@@ -224,7 +224,7 @@ class FormTypeTest extends BlockTypeTestCase
         $view->children['block2']         = new BlockView($view);
         $rootView->children['block4']->vars['form'] = new FormView();
 
-        $this->setLayoutViews(['root' => $rootView]);
+        $this->setLayoutBlocks(['root' => $rootView]);
 
         $context->set('form', $formAccessor);
 
@@ -278,7 +278,7 @@ class FormTypeTest extends BlockTypeTestCase
         $view->children['block3']     = new BlockView($view);
         $view->children['block3']->vars['form'] = $field3View['field31'];
 
-        $this->setLayoutViews(['root' => $view]);
+        $this->setLayoutBlocks(['root' => $view]);
 
         $context->set('form', $formAccessor);
 

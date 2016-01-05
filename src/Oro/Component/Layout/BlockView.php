@@ -11,11 +11,11 @@ use Symfony\Component\Form\FormView;
 class BlockView extends FormView
 {
     /**
-     * All layout views.
+     * All layout block views.
      *
      * @var BlockView[]
      */
-    public $layoutViews = [];
+    public $blocks = [];
 
     /**
      * @param BlockView $parent

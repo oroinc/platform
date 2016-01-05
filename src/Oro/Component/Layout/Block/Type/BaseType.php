@@ -99,7 +99,7 @@ class BaseType extends AbstractType
             $view->vars['label_attr']['for'] = $view->vars['attr']['id'];
         }
 
-        $view->vars['blocks'] = $view->layoutViews;
+        $view->vars['blocks'] = $view->blocks;
     }
 
     /**

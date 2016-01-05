@@ -108,7 +108,7 @@ class LayoutTest extends LayoutTestCase
 
         $childView                  = new BlockView($view);
         $view->children['child_id'] = $childView;
-        $this->setLayoutViews(['root' => $view]);
+        $this->setLayoutBlocks(['root' => $view]);
 
         $this->renderer->expects($this->once())
             ->method('setBlockTheme')
