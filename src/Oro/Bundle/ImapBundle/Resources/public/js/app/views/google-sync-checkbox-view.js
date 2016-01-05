@@ -61,10 +61,16 @@ define(function(require) {
 
         /**
          * Reset error message from google API
-         * @params {string} message
          */
         resetGoogleErrorMessage: function() {
             this.googleErrorMessage = '';
+        },
+
+        /**
+         * Reset property token
+         */
+        resetToken: function() {
+            this.token = null;
         },
 
         /**
@@ -73,6 +79,7 @@ define(function(require) {
          */
         onChangeCheckBox: function(e) {
             this.resetGoogleErrorMessage();
+            this.resetToken();
             this.render();
 
             if ($(e.target).is(':checked')) {
