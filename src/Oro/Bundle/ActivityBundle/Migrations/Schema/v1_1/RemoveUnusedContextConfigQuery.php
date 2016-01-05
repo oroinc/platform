@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\ActivityBundle\Migrations\Schema\v1_1;
 
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class UpdateActivityButtonConfigQuery extends ParametrizedMigrationQuery
+class RemoveUnusedContextConfigQuery extends ParametrizedMigrationQuery
 {
     /**
      * {@inheritdoc}
@@ -15,7 +15,7 @@ class UpdateActivityButtonConfigQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $this->migrateConfigs($logger, true);
+        $this->removeContextConfigs($logger, true);
 
         return $logger->getMessages();
     }
@@ -25,22 +25,21 @@ class UpdateActivityButtonConfigQuery extends ParametrizedMigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
-        $this->migrateConfigs($logger);
+        $this->removeContextConfigs($logger);
     }
 
     /**
      * @param LoggerInterface $logger
      * @param bool            $dryRun
      */
-    protected function migrateConfigs(LoggerInterface $logger, $dryRun = false)
+    protected function removeContextConfigs(LoggerInterface $logger, $dryRun = false)
     {
         $configs = $this->loadConfigs($logger);
         foreach ($configs as $id => $data) {
-            if (!isset($data['activity']['action_widget'])) {
+            if (!isset($data['entity']['context-grid'])) {
                 continue;
             }
-            $data['activity']['action_button_widget'] = $data['activity']['action_widget'];
-            unset($data['activity']['action_widget']);
+            unset($data['entity']['context-grid']);
 
             $query  = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
             $params = ['data' => $data, 'id' => $id];

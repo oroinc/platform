@@ -54,6 +54,10 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "form"={
  *              "form_type"="oro_user_select",
  *              "grid_name"="users-select-grid"
+ *          },
+ *          "grid"={
+ *              "default"="users-grid",
+ *              "context"="users-for-context-grid"
  *          }
  *      }
  * )
