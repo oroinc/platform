@@ -178,13 +178,19 @@ class ChoiceAccountType extends AbstractType
         $accountTypeModel =  new AccountTypeModel();
         $accountTypeModel->setAccountType($data['accountType']);
 
+        $newExpireDate = $data['imapGmailConfiguration']['accessTokenExpiresAt'];
+        if (!$data['imapGmailConfiguration']['accessTokenExpiresAt'] instanceof \Datetime) {
+            $utcTimeZone = new \DateTimeZone('UTC');
+            $newExpireDate = new \DateTime('+' . $data['imapGmailConfiguration']['accessTokenExpiresAt'] . ' seconds', $utcTimeZone);
+        }
+
         $userEmailOrigin = new UserEmailOrigin();
         $userEmailOrigin->setImapHost($data['imapGmailConfiguration']['imapHost']);
         $userEmailOrigin->setImapPort($data['imapGmailConfiguration']['imapPort']);
         $userEmailOrigin->setImapEncryption($data['imapGmailConfiguration']['imapEncryption']);
         $userEmailOrigin->setUser($data['imapGmailConfiguration']['user']);
         $userEmailOrigin->setGoogleAuthCode($data['imapGmailConfiguration']['googleAuthCode']);
-        $userEmailOrigin->setAccessTokenExpiresAt($data['imapGmailConfiguration']['accessTokenExpiresAt'] );
+        $userEmailOrigin->setAccessTokenExpiresAt($newExpireDate);
         $accountTypeModel->setImapGmailConfiguration($userEmailOrigin);
 
         return $accountTypeModel;
