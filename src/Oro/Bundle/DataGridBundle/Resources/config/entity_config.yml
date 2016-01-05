@@ -2,5 +2,7 @@ oro_entity_config:
     grid:
         entity:
             items:
-                # indicates default grid for the entity
+                # default grid name for the entity
                 default: # string
+                    options:
+                        auditable:          false
