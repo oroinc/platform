@@ -1,7 +1,7 @@
 <script type="text/template" id="multiselect-origin-folder-template">
     <div class="filter-item oro-drop">
         <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %>: <% } %><span class="filter-item-hint"></span>
+            <% if (showLabel) { %><%= label %><% } %><span class="filter-item-hint"></span>
             <select multiple>
                 <% _.each(options, function (item, key) { %>
                     <optgroup label="<%- key %>">
