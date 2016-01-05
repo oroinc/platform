@@ -24,6 +24,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
  */
 class EntityAclExtension extends AbstractAclExtension
 {
+    const EXTENSION_KEY = 'entity';
     /**
      * @var ObjectIdAccessor
      */
@@ -190,7 +191,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getExtensionKey()
     {
-        return 'entity';
+        return self::EXTENSION_KEY;
     }
 
     /**

@@ -8,7 +8,10 @@ use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
+
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 
 /**
  * The ACL extensions based permission granting strategy to apply to the access control list.
@@ -260,13 +263,19 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     protected function isAceApplicable($requiredMask, EntryInterface $ace, AclInterface $acl)
     {
         $extension = $this->getContext()->getAclExtension();
-        $aceMask = $ace->getMask();
+        $aceMask   = $ace->getMask();
+
         if ($acl->getObjectIdentity()->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            if ($acl->getObjectIdentity()->getIdentifier() !== $extension->getExtensionKey()) {
+            $isFieldExtension = FieldAclExtension::EXTENSION_KEY == $extension->getExtensionKey();
+            $isEntityIdentity = EntityAclExtension::EXTENSION_KEY == $acl->getObjectIdentity()->getIdentifier();
+            $isFieldFallback = $isFieldExtension && $isEntityIdentity;
+
+            if ($acl->getObjectIdentity()->getIdentifier() !== $extension->getExtensionKey() && !$isFieldFallback) {
                 return false;
             }
             $aceMask = $extension->adaptRootMask($aceMask, $this->getContext()->getObject());
         }
+
         if ($extension->getServiceBits($requiredMask) !== $extension->getServiceBits($aceMask)) {
             return false;
         }

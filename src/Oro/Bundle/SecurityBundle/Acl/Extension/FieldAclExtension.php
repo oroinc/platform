@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 
 class FieldAclExtension extends EntityAclExtension
 {
@@ -118,7 +119,7 @@ class FieldAclExtension extends EntityAclExtension
 
         if ('CREATE' == $permissionName) {
             // only system and none levels are applicable to new entities
-            $levelNames = [$levelNames[0], $levelNames[count($levelNames) - 1]];
+            $levelNames = AccessLevel::getAccessLevelNames(AccessLevel::SYSTEM_LEVEL);
         }
 
         return $levelNames;
