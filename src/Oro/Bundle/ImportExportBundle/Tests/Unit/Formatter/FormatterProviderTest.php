@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
 class FormatterProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +31,7 @@ class FormatterProviderTest extends \PHPUnit_Framework_TestCase
         $this->formatter = new FormatterProvider($this->container, $this->formatters, $this->typeFormatters);
     }
 
-    public function testGetFormatter()
+    public function testGetFormatterByAlias()
     {
         $testTypeFormatter = new \stdClass();
         $this->setContainerMock('exist_formatter', $testTypeFormatter);
@@ -38,10 +40,14 @@ class FormatterProviderTest extends \PHPUnit_Framework_TestCase
 
         //test already created formatter will be stored in provider
         $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterByAlias('exist_alias'));
-        $this->setExpectedException(
-            'Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException',
-            'The formatter is not found by "non_exist_alias" alias.'
-        );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The formatter is not found by "non_exist_alias" alias.
+     */
+    public function testGetFormatterByAliasWithNotExistsAlias()
+    {
         $this->formatter->getFormatterByAlias('non_exist_alias');
     }
 
@@ -54,11 +60,8 @@ class FormatterProviderTest extends \PHPUnit_Framework_TestCase
         // test already created formatter will be stored in provider
         $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterFor('test_format_type', 'test_type'));
 
-        $this->setExpectedException(
-            'Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException',
-            'No available formatters for "non_exist_type" format_type and "test_type" data_type.'
-        );
-        $this->formatter->getFormatterFor('non_exist_type', 'test_type');
+        // test not exists formatter
+        $this->assertNull($this->formatter->getFormatterFor('non_exist_type', 'test_type'));
     }
 
     protected function setContainerMock($id, \stdClass $testTypeFormatter)

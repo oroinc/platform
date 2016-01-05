@@ -42,9 +42,14 @@ and will put response to console after completion
 
 
 * [ApiAccessor](#module_ApiAccessor) ⇐ <code>[BaseClass](./base-class.md)</code>
-  * [.initialize(Options)](#module_ApiAccessor#initialize)
+  * [.initialize(options)](#module_ApiAccessor#initialize)
+  * [.isCacheAllowed()](#module_ApiAccessor#isCacheAllowed) ⇒ <code>boolean</code>
+  * [.clearCache()](#module_ApiAccessor#clearCache)
   * [.validateUrlParameters(urlParameters)](#module_ApiAccessor#validateUrlParameters) ⇒ <code>boolean</code>
   * [.send(urlParameters, body, headers, options)](#module_ApiAccessor#send) ⇒ <code>$.Promise</code>
+  * [._makeAjaxRequest(options)](#module_ApiAccessor#_makeAjaxRequest)
+  * [.hashCode(url)](#module_ApiAccessor#hashCode) ⇒ <code>string</code>
+  * [.isCacheExistsFor(urlParameters)](#module_ApiAccessor#isCacheExistsFor)
   * [.getHeaders(headers)](#module_ApiAccessor#getHeaders) ⇒ <code>Object</code>
   * [.prepareUrlParameters(urlParameters)](#module_ApiAccessor#prepareUrlParameters) ⇒ <code>Object</code>
   * [.getUrl(urlParameters)](#module_ApiAccessor#getUrl) ⇒ <code>string</code>
@@ -52,13 +57,23 @@ and will put response to console after completion
   * [.formatResult(response)](#module_ApiAccessor#formatResult) ⇒ <code>Object</code>
 
 <a name="module_ApiAccessor#initialize"></a>
-### apiAccessor.initialize(Options)
+### apiAccessor.initialize(options)
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| Options | <code>Object</code> | passed to the constructor |
+| options | <code>Object</code> | passed to the constructor |
 
+<a name="module_ApiAccessor#isCacheAllowed"></a>
+### apiAccessor.isCacheAllowed() ⇒ <code>boolean</code>
+Returns true if selected HTTP_METHOD allows caching
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+<a name="module_ApiAccessor#clearCache"></a>
+### apiAccessor.clearCache()
+Clears response cache
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 <a name="module_ApiAccessor#validateUrlParameters"></a>
 ### apiAccessor.validateUrlParameters(urlParameters) ⇒ <code>boolean</code>
 Validates url parameters
@@ -85,6 +100,38 @@ Sends request to the server and returns $.Promise instance with abort() support
 | options | <code>Object</code> | Additional options |
 | options.processingMessage | <code>string</code> | Shows notification message while request is going |
 | options.preventWindowUnload | <code>boolean</code> &#124; <code>string</code> | Prevent window from being unloaded without user                          confirmation until request is finished.                          If true provided - page unload will be prevented with default message.                          If string provided - please describe change in it. This string will be added to                              list on changes.                          Default message will be like:                            Server is being updated and the following changes might be lost:                            {messages list, each on new line} |
+
+<a name="module_ApiAccessor#_makeAjaxRequest"></a>
+### apiAccessor._makeAjaxRequest(options)
+Makes Ajax request or returns result from cache
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Access:** protected  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | options to pass to ajax call |
+
+<a name="module_ApiAccessor#hashCode"></a>
+### apiAccessor.hashCode(url) ⇒ <code>string</code>
+Returns hash code of url
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+
+| Param | Type |
+| --- | --- |
+| url | <code>string</code> | 
+
+<a name="module_ApiAccessor#isCacheExistsFor"></a>
+### apiAccessor.isCacheExistsFor(urlParameters)
+Returns true if data is cached for concrete urlParameters
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Access:** protected  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| urlParameters | <code>Object</code> | url parameters to check |
 
 <a name="module_ApiAccessor#getHeaders"></a>
 ### apiAccessor.getHeaders(headers) ⇒ <code>Object</code>

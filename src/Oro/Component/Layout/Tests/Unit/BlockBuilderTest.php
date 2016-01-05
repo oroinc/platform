@@ -6,6 +6,7 @@ use Oro\Component\Layout\BlockBuilder;
 use Oro\Component\Layout\BlockTypeHelperInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\RawLayout;
 
 class BlockBuilderTest extends \PHPUnit_Framework_TestCase
@@ -25,12 +26,17 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var BlockBuilder */
     protected $blockBuilder;
 
+    /** @var LayoutRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
+
     protected function setUp()
     {
         $this->rawLayout         = new RawLayout();
         $this->typeHelper        = $this->getMock('Oro\Component\Layout\BlockTypeHelperInterface');
         $this->context           = new LayoutContext();
         $this->layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $this->registry          = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
+
         $this->blockBuilder      = new BlockBuilder(
             $this->layoutManipulator,
             $this->rawLayout,

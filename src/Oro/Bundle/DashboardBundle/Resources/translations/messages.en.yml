@@ -77,6 +77,8 @@ oro:
                 actions: Actions
             actions:
                 move_column.label: Move column
+                move_column_up.label: Move column up
+                move_column_down.label: Move column down
                 add.label: Add
                 add_all.label: Add all
                 delete.label: Delete column

@@ -24,7 +24,7 @@ parameters:
     oro_datagrid.event_listener.grid_views_load.class:            Oro\Bundle\DataGridBundle\EventListener\GridViewsLoadListener
     oro_datagrid.form.type.grid_view_type.class:                  Oro\Bundle\DataGridBundle\Form\Type\GridViewType
     oro_datagrid.form.type.sorting_type.class:                    Oro\Bundle\DataGridBundle\Form\Type\GridSortingType
-    oro_datagrid.grid_view.manager.api.class:                     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_datagrid.grid_view.manager.api.class:                     Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
     oro_datagrid.columns.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ColumnsHelper
@@ -149,12 +149,19 @@ services:
         tags:
             - { name: form.type, alias: oro_datagrid_sorting }
 
+    oro_datagrid.grid_view.manager:
+        class: Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager
+        arguments:
+            - @oro_security.acl_helper
+            - @doctrine
+
     oro_datagrid.grid_view.manager.api:
         class: %oro_datagrid.grid_view.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_datagrid.grid_view.entity.class%
             - @doctrine.orm.entity_manager
+            - @oro_datagrid.grid_view.manager
 
     oro_datagrid.form.grid_view.api:
         class:                        Symfony\Component\Form\Form
@@ -170,6 +177,8 @@ services:
             - @oro_datagrid.form.grid_view.api
             - @request
             - @doctrine
+            - @oro_datagrid.grid_view.manager
+            - @security.token_storage
         scope: request
 
     oro_datagrid.datagrid.inline_edit_column_options_guesser:
@@ -217,3 +226,8 @@ services:
 
     oro_datagrid.columns.helper:
         class: %oro_datagrid.columns.helper.class%
+
+    oro_datagrid.grid_configuration.helper:
+        class: Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper
+        arguments:
+            - @oro_entity.orm.entity_class_resolver

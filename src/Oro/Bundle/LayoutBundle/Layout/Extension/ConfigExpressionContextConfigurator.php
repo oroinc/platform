@@ -13,11 +13,17 @@ class ConfigExpressionContextConfigurator implements ContextConfiguratorInterfac
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()
-            ->setDefaults(['expressions_evaluate' => true])
+            ->setDefaults(
+                [
+                    'expressions_evaluate' => true,
+                    'expressions_evaluate_deferred' => false
+                ]
+            )
             ->setOptional(['expressions_encoding'])
             ->setAllowedTypes(
                 [
                     'expressions_evaluate' => 'bool',
+                    'expressions_evaluate_deferred' => 'bool',
                     'expressions_encoding' => ['string', 'null']
                 ]
             );

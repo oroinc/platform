@@ -29,6 +29,10 @@ use Oro\Bundle\CalendarBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
 /**
  * @RouteResource("calendarevent")
  * @NamePrefix("oro_api_")
@@ -100,10 +104,10 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function cgetAction()
     {
-        $calendarId  = (int)$this->getRequest()->get('calendar');
-        $subordinate = (true == $this->getRequest()->get('subordinate'));
-
-        $qb = null;
+        $calendarId   = (int)$this->getRequest()->get('calendar');
+        $subordinate  = (true == $this->getRequest()->get('subordinate'));
+        $extendFields = $this->getExtendFieldNames('Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+        $qb           = null;
         if ($this->getRequest()->get('start') && $this->getRequest()->get('end')) {
             $result = $this->get('oro_calendar.calendar_manager')->getCalendarEvents(
                 $this->get('oro_security.security_facade')->getOrganization()->getId(),
@@ -111,7 +115,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
                 $calendarId,
                 new \DateTime($this->getRequest()->get('start')),
                 new \DateTime($this->getRequest()->get('end')),
-                $subordinate
+                $subordinate,
+                $extendFields
             );
         } elseif ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
             $dateParamFilter  = new HttpDateTimeParameterFilter();
@@ -120,7 +125,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
 
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();
-            $qb    = $repo->getUserEventListQueryBuilder($filterCriteria);
+            $qb    = $repo->getUserEventListQueryBuilder($filterCriteria, $extendFields);
             $page  = (int)$this->getRequest()->get('page', 1);
             $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
             $qb
@@ -163,14 +168,18 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $entity = $this->getManager()->find($id);
 
         $result = null;
-        $code = Codes::HTTP_NOT_FOUND;
+        $code   = Codes::HTTP_NOT_FOUND;
         if ($entity) {
             $result = $this->get('oro_calendar.calendar_event_normalizer.user')
-                ->getCalendarEvent($entity);
+                ->getCalendarEvent(
+                    $entity,
+                    null,
+                    $this->getExtendFieldNames('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
+                );
             $code   = Codes::HTTP_OK;
         }
 
-        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
+        return $this->buildResponse($result ? : '', self::ACTION_READ, ['result' => $result], $code);
     }
 
     /**
@@ -197,14 +206,14 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $entity = $this->getManager()->find($eventId);
 
         $result = null;
-        $code = Codes::HTTP_NOT_FOUND;
+        $code   = Codes::HTTP_NOT_FOUND;
         if ($entity) {
             $result = $this->get('oro_calendar.calendar_event_normalizer.user')
                 ->getCalendarEvent($entity, (int)$id);
             $code   = Codes::HTTP_OK;
         }
 
-        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
+        return $this->buildResponse($result ? : '', self::ACTION_READ, ['result' => $result], $code);
     }
 
     /**
@@ -355,7 +364,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
         try {
             $entity = $this->processForm($entity);
             if ($entity) {
-                $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
+                $view        = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
                 $isProcessed = true;
             } else {
                 $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
@@ -373,5 +382,32 @@ class CalendarEventController extends RestController implements ClassResourceInt
     protected function getDeleteHandler()
     {
         return $this->get('oro_calendar.calendar_event.handler.delete');
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return array
+     */
+    protected function getExtendFieldNames($class)
+    {
+        $configProvider = $this->get('oro_entity_config.provider.extend');
+        $configs        = $configProvider->filter(
+            function (ConfigInterface $extendConfig) {
+                return
+                    $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM) &&
+                    ExtendHelper::isFieldAccessible($extendConfig) &&
+                    !$extendConfig->has('target_entity') &&
+                    !$extendConfig->is('is_serialized');
+            },
+            $class
+        );
+
+        return array_map(
+            function (ConfigInterface $config) {
+                return $config->getId()->getFieldName();
+            },
+            $configs
+        );
     }
 }

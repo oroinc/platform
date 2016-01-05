@@ -62,7 +62,7 @@ h1, h2, h3, h4, h5, h6 {
 .dropdown-menu {
   margin-top:-1px;
   .border-radius(3px);
-  z-index: 900;
+  z-index: @oroZindexDropdown;
   li.dropdown {
     position: relative;
     & > a{
@@ -292,6 +292,9 @@ i.color {
     max-width: 100%;
     .controls {
       margin-left: 240px;
+      div.control-label {
+        text-align: left;
+      }
     }
     div.control-label,
     label.control-label {
@@ -869,14 +872,17 @@ footer {
     cursor: move;
   }
 }
-.ui-dialog:not(.ui-dialog-buttons) .ui-dialog-content{
-  height: calc(~"100% - 32px") !important;
-  border-radius: 0 0 3px 3px;
+.ui-dialog:not(.ui-dialog-buttons){
+  .ui-dialog-content{
+    border-radius: 0 0 3px 3px;
+  }
 }
-.ui-dialog.ui-resizable:not(.ui-dialog-buttons) .ui-dialog-content{
-  height: calc(~"100% - 50px") !important;
-  border-radius: 0 0 3px 3px;
-  border-bottom: 1px solid #e5e5e5;
+.ui-dialog.ui-resizable:not(.ui-dialog-buttons) {
+  .ui-dialog-content{
+    height: calc(~"100% - 50px") !important;
+    border-radius: 0 0 3px 3px;
+    border-bottom: 1px solid #e5e5e5;
+  }
 }
 .ui-dialog .widget-actions-section {
   .btn, .action {
@@ -2237,11 +2243,10 @@ select {
   line-height: 26px;
 }
 div.selector {
-  line-height: 28px;
+  line-height: 30px;
   height: 30px;
   position: relative;
   width: 235px;
-  font-size: 12px;
   border: 1px solid #ddd;
   #gradient > .vertical(#ffffff, #f3f3f3);
   -webkit-border-radius: 3px;
@@ -2251,19 +2256,19 @@ div.selector {
 }
 
 div.selector span {
-  height: 28px;
+  height: 30px;
   display: block;
-  line-height: 28px;
+  line-height: 30px;
   .box-sizing(border-box);
-  padding: 0 5px;
+  padding: 0 5px 0 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
   &:after {
-    margin:2px 2px 0 0;
+    margin: 3px 2px 0 0;
     display:inline-block;
-    font:15px 'FontAwesome';
+    font:16px 'FontAwesome';
     content: "\f0dd";
     position: absolute;
     right: 5px;
@@ -2619,7 +2624,7 @@ label.radio.error {
   float: left;
   background: none;
   margin: 0;
-  padding: 6px 15px 0 20px;
+  padding: 6px 15px 6px 20px;
 }
 .breadcrumb > li.active,
 .breadcrumb > li {
