@@ -68,14 +68,6 @@ datagrid:
                 label:        oro.grid.action.delete
                 icon:         trash
                 link:         delete_link
-        mass_actions:
-            delete:
-                type: delete
-                entity_name: %oro_email.autoresponserule.entity.class%
-                data_identifier: r.id
-                acl_resource: oro_email_autoresponserule_update
-                label: oro.grid.action.delete
-                icon: trash
         options:
             toolbarOptions:
                 hide: true

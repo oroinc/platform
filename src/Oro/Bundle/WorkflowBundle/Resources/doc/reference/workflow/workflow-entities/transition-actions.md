@@ -85,7 +85,7 @@ Assign Value
 
 **Parameters:**
  - attribute / 0 - attribute where value should be set;
- - value / 1 - value that should be set.
+ - value / 1 - value that should be set;
 
 **Configuration Example**
 ```
@@ -167,10 +167,10 @@ Create Object
 **Description:** Creates object with specified class and data, and sets it as attribute value.
 
 **Parameters:**
- - class - class name of created object;
- - arguments - array of object constructor arguments;
- - attribute - attribute that will contain entity instance;
- - data - array of data that should be set to entity.
+ - class - fully qualified class name of object to be created;
+ - arguments - (optional) array of object constructor arguments;
+ - attribute - attribute that will contain the created object instance;
+ - data - (optional) array of data that should be set to object;
 
 **Configuration Example**
 ```
@@ -199,11 +199,11 @@ Create Entity
 **Description:** Creates entity with specified class and data, and sets it as attribute value.
 
 **Parameters:**
- - class - fully qualified class name of created entity;
- - attribute - attribute that will contain entity instance;
- - flush - when flush in DB should be performed.
+ - class - fully qualified class name of entity to be created;
+ - attribute - attribute that will contain the created entity instance;
+ - flush - (optional) when flush in DB should be performed.
            Immediately after entity creation if ``true`` or later if ``false`` (default value: false);
- - data - array of data that should be set to entity.
+ - data - (optional) array of data that should be set to entity.
 
 **Configuration Example**
 ```
@@ -293,15 +293,15 @@ Find Entity
 
 **Alias:** find_entity|request_entity
 
-**Description:** Finds entity by identifier value or "where" condition and saves reference or entity to path.
+**Description:** Finds entity by parameter value and saves reference or entity to path. You must define at least one of 3 optional parameters: `identifier`, `where` or `order_by`.
 
 **Parameters:**
  - class - fully qualified class name of requested entity;
  - attribute - target path where result of action will be saved;
- - identifier - value of identifier of entity to find;
- - where - array of conditions to find entity, key is field name, value is scalar value or path;
- - order_by - array of fields used to sort values, key is field name, value is direction (asc or desc);
- - case_insensitive - boolean flag used to find entity using case insensitive search, default value is false.
+ - identifier - (optional) value of identifier of entity to find;
+ - where - (optional) array of conditions to find entity, key is field name, value is scalar value or path;
+ - order_by - (optional) array of fields used to sort values, key is field name, value is direction (asc or desc);
+ - case_insensitive - (optional) boolean flag used to find entity using case insensitive search, default value is false;
 
 **Configuration Example**
 ```
@@ -386,9 +386,11 @@ Call Method
 **Description:** Triggers call of object method with parameters.
 
 **Parameters:**
- - object - path to callee object
- - method - name of method to call
- - method_parameters - list of parameters that will be passed to method call.
+ - attribute - (optional) target path where result of action will be saved;
+ - object - fully qualified class name of object to be referenced;
+ - method - method name of referenced object to be called;
+ - method_parameters - (optional) list of parameters that will be passed to method call;
+
 
 **Configuration Example**
 ```
@@ -396,6 +398,7 @@ Call Method
     conditions:
         # optional condition configuration
     parameters:
+        attribute: $.result.addressResult
         object: $lead.contact
         method: addAddress
         method_parameters: [$.result.address]
@@ -403,6 +406,7 @@ Call Method
 OR
 
 - @call_method: # add Address to Contact
+    attribute: $.result.addressResult
     object: $lead.contact
     method: addAddress
     method_parameters: [$.result.address]
@@ -434,7 +438,7 @@ OR
             # optional condition configuration
     parameters:
         attribute: $sales_funnel_start_date
-        date: 2014-04-01
+        date: '2014-04-01' # must use quotes because date parameter requires string value
 ```
 
 Create Date Time
@@ -463,7 +467,7 @@ OR
             # optional condition configuration
     parameters:
         attribute: $sales_funnel_start_date
-        time: 2014-04-01 12:12:00
+        time: '2014-04-01 12:12:00' # must use quotes because time parameter requires string value
         timezone: Europe/Kiev
 ```
 
@@ -477,10 +481,10 @@ Start Workflow
 **Description:** Triggers start of workflow with configured data. As a result a new WorkflowItem will be produced.
 
 **Parameters:**
- - name - name of Workflow to start
- - attribute - path where result WorkflowItem will be saved
- - entity - path to entity that plays role of managed entity in started Workflow (optional)
- - transition - name of start transition (optional)
+ - name - name of Workflow to start;
+ - attribute - path where result WorkflowItem will be saved;
+ - entity - (optional) path to entity that plays role of managed entity in started Workflow;
+ - transition - (optional) name of start transition;
 
 **Configuration Example**
 ```
@@ -513,9 +517,9 @@ Transit Workflow
 **Description:** Performs transition for workflow on a specific entity. Workflow must be already started. 
 
 **Parameters:**
- - entity (or first parameter) - path to entity used for transition operation
- - transition (or second parameter) - name of the transition
- - data (or third parameter) - additional data passed to workflow item before transition (optional)
+ - entity (or first parameter) - path to entity used for transition operation;
+ - transition (or second parameter) - name of the transition;
+ - data (or third parameter) - (optional) additional data passed to workflow item before transition;
  
 **Configuration Example**
 ```
@@ -555,9 +559,9 @@ Redirect
 **Description:** Redirects unset to some route
 
 **Parameters:**
- - url - URL where user should be redirected
- - route - name of the route, if set than url parameter will be ignored
- - route_parameters - parameters of route
+ - url - URL where user should be redirected;
+ - route - (optional) name of the route, if set than url parameter will be ignored;
+ - route_parameters - (optional) parameters of route;
 
 **Configuration Example**
 ```
@@ -680,13 +684,13 @@ Flash Message
 
 **Alias:** flash_message
 
-**Parameters:**
- - message - message itself, will be passed to translator. Required.
- - message_parameters - message parameters, that will be passed to translator as second argument. Optional.
- - type - message type applicable for Flash Bag. Optional, info by default.
-
 **Description:** Add flash message to session flash bag. Provides ability to show flash messages on frontend.
 Messages are passed through translator.
+
+**Parameters:**
+ - message - message itself, will be passed to translator;
+ - message_parameters - (optional) message parameters, that will be passed to translator as second argument;
+ - type - (optional) message type applicable for Flash Bag. Set to info by default;
 
 **Configuration Example**
 ```

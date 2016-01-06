@@ -72,7 +72,7 @@ class BusinessUnitGridListener
                     $organization->getId()
                 );
             }
-            if ($resultBuIds) {
+            if (count($resultBuIds)) {
                 $where = array_merge(
                     $where,
                     ['u.id in (' . implode(', ', $resultBuIds) . ')']

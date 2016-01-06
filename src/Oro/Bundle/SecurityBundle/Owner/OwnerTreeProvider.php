@@ -106,7 +106,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
 
         foreach ($businessUnits as $businessUnit) {
             if (!empty($businessUnit['organization'])) {
-                $tree->addLocalEntity($businessUnit['id'], $businessUnit['organization']);
+                $tree->addLocalEntity($businessUnit['id'], (int)$businessUnit['organization']);
                 if ($businessUnit['owner']) {
                     $tree->addDeepEntity($businessUnit['id'], $businessUnit['owner']);
                 }

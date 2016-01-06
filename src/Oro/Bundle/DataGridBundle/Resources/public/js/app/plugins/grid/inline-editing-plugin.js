@@ -234,6 +234,7 @@ define(function(require) {
                     this.hidePopover(); // before adding backdrop
                     this.backdropId = backdropManager.hold();
                     $(document).on('keydown', this.onKeyDown);
+                    this.main.trigger('holdInlineEditingBackdrop');
                 }
             }
             this.editModeEnabled = true;
@@ -388,6 +389,7 @@ define(function(require) {
             if (releaseBackdrop !== false) {
                 backdropManager.release(this.backdropId);
                 $(document).off('keydown', this.onKeyDown);
+                this.main.trigger('releaseInlineEditingBackdrop');
             }
             delete this.editorComponent;
         },
