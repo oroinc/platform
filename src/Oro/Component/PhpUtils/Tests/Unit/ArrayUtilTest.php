@@ -540,6 +540,139 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $array
+     * @param mixed $columnKey
+     * @param mixed $indexKey
+     * @param array $expected
+     *
+     * @dataProvider arrayColumnProvider
+     */
+    public function testArrayColumn(array $array, $columnKey, $indexKey, array $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ArrayUtil::arrayColumn($array, $columnKey, $indexKey)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function arrayColumnProvider()
+    {
+        return [
+            'empty'        => [[], 'value', 'value', []],
+            'no_index'     => [
+                [
+                    [
+                        'id'    => 'id1',
+                        'value' => 'value2'
+                    ]
+                ],
+                'value',
+                null,
+                ['value2']
+            ],
+            'index'        => [
+                [
+                    [
+                        'id'    => 'id1',
+                        'value' => 'value2'
+                    ]
+                ],
+                'value',
+                'id',
+                ['id1' => 'value2']
+            ],
+            'wrong_index'  => [
+                [
+                    ['value' => 'value2']
+                ],
+                'value',
+                'id',
+                []
+            ],
+            'wrong_column' => [
+                [
+                    ['value' => 'value2']
+                ],
+                'id',
+                null,
+                []
+            ],
+
+        ];
+    }
+
+    /**
+     * @param array  $array
+     * @param mixed  $columnKey
+     * @param mixed  $indexKey
+     * @param string $expectedMessage
+     *
+     * @dataProvider arrayColumnInputData
+     */
+    public function testArrayColumnInputData(array $array, $columnKey, $indexKey, $expectedMessage)
+    {
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            $expectedMessage
+        );
+
+        ArrayUtil::arrayColumn($array, $columnKey, $indexKey);
+    }
+
+    /**
+     * @return array
+     */
+    public function arrayColumnInputData()
+    {
+        return [
+            'empty_column_key' => [
+                [
+                    ['id' => 'value']
+                ],
+                null,
+                null,
+                'Column key is empty'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider mergeDataProvider
+     *
+     * @param array $expected
+     * @param array $first
+     * @param array $second
+     */
+    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
+    {
+        $this->assertEquals($expected, ArrayUtil::arrayMergeRecursiveDistinct($first, $second));
+    }
+
+    /**
+     * @return array
+     */
+    public function mergeDataProvider()
+    {
+        return [
+            [
+                [
+                    'a',
+                    'b',
+                    'c' => [
+                        'd' => 'd2',
+                        'e' => 'e1'
+                    ]
+                ],
+                ['a', 'c' => ['d' => 'd1', 'e' => 'e1']],
+                ['b', 'c' => ['d' => 'd2']]
+            ]
+        ];
+    }
+
+    /**
      * @param object $obj
      *
      * @return mixed
