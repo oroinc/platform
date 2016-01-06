@@ -258,6 +258,7 @@ oro:
             seen.label:               Seen
             folders.label:            Folders
             origin.label:             Email Origin
+            unsynced_flag_count.label: Unsynced Flag Count
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes
