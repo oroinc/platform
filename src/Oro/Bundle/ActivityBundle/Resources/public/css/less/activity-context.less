@@ -24,7 +24,7 @@
   white-space: nowrap;
 }
 
-.context-item:hover, .context-item.active {
+.context-item.active {
   background-color: #ebebeb;
 }
 
@@ -53,8 +53,13 @@
 }
 
 .context-items-dropdown {
-  top: 35px;
-  left: 15px;
+  top: 38px;
+  left: 14px;
+  border-color: #d3d3d3;
+  .context-item {
+    padding: 2px 8px;
+    font-size: 13px;
+  }
 }
 
 .activity-context-current-block {
@@ -64,6 +69,9 @@
   outline: none;
   margin: 10px 10px 15px 10px;
   box-shadow: none;
+  .btn-group.open & {
+    box-shadow: none;
+  }
 }
 
 .activity-context-current-item {

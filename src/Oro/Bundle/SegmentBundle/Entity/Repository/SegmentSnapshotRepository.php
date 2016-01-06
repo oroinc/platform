@@ -134,7 +134,7 @@ class SegmentSnapshotRepository extends EntityRepository
         $returnQueryBuilder = false;
 
         foreach ($deleteParams as $params) {
-            if (empty($params['segmentIds'])) {
+            if (empty($params['segmentIds']) || empty($params['entityIds'])) {
                 continue;
             }
 
