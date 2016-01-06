@@ -160,6 +160,24 @@ class MailboxType extends AbstractType
             $processType = $processEntity->getType();
         }
         FormUtils::replaceField($form, 'processType', ['data' => $processType]);
+        
+        $imapAccountType = $data->getImapAccountType();
+        if ($imapAccountType) {
+            $showDisconnectButton = false;
+            if ($data->getId() && $imapAccountType->getAccountType()) {
+                $showDisconnectButton = true;
+            }
+            $form->remove('imapAccountType');
+
+            $form->add(
+                'imapAccountType',
+                'oro_imap_choice_account_type',
+                [
+                    'label' => 'oro.user.imap_configuration.label',
+                    'showDisconnectButton' => $showDisconnectButton
+                ]
+            );
+        }
 
         /*
          * Add appropriate field for selected process type to form.

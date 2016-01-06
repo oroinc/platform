@@ -401,7 +401,7 @@ class UserEmailOrigin extends EmailOrigin
      *
      * @return UserEmailOrigin
      */
-    public function setAccessTokenExpiresAt(\DateTime $datetime)
+    public function setAccessTokenExpiresAt(\DateTime $datetime = null)
     {
         $this->accessTokenExpiresAt = $datetime;
 

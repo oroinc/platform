@@ -85,10 +85,12 @@ class ChoiceAccountType extends AbstractType
             $data = $formEvent->getData();
 
             if ($data) {
-                $utcTimeZone = new \DateTimeZone('UTC');
-                $newExpireDate = new \DateTime('+' . $data['imapGmailConfiguration']['accessTokenExpiresAt'] . ' seconds', $utcTimeZone);
+                if (isset($data['imapGmailConfiguration']['accessTokenExpiresAt'])) {
+                    $utcTimeZone = new \DateTimeZone('UTC');
+                    $newExpireDate = new \DateTime('+' . $data['imapGmailConfiguration']['accessTokenExpiresAt'] . ' seconds', $utcTimeZone);
 
-                $data['imapGmailConfiguration']['accessTokenExpiresAt'] = $newExpireDate;
+                    $data['imapGmailConfiguration']['accessTokenExpiresAt'] = $newExpireDate;
+                }
                 $accountTypeModel = $this->createAccountTypeModelFromData($data);
 
                 $form->remove('disconnect');
@@ -178,19 +180,27 @@ class ChoiceAccountType extends AbstractType
         $accountTypeModel =  new AccountTypeModel();
         $accountTypeModel->setAccountType($data['accountType']);
 
-        $newExpireDate = $data['imapGmailConfiguration']['accessTokenExpiresAt'];
-        if (!$data['imapGmailConfiguration']['accessTokenExpiresAt'] instanceof \Datetime) {
-            $utcTimeZone = new \DateTimeZone('UTC');
-            $newExpireDate = new \DateTime('+' . $data['imapGmailConfiguration']['accessTokenExpiresAt'] . ' seconds', $utcTimeZone);
-        }
-
         $userEmailOrigin = new UserEmailOrigin();
         $userEmailOrigin->setImapHost($data['imapGmailConfiguration']['imapHost']);
         $userEmailOrigin->setImapPort($data['imapGmailConfiguration']['imapPort']);
         $userEmailOrigin->setImapEncryption($data['imapGmailConfiguration']['imapEncryption']);
+
         $userEmailOrigin->setUser($data['imapGmailConfiguration']['user']);
-        $userEmailOrigin->setGoogleAuthCode($data['imapGmailConfiguration']['googleAuthCode']);
-        $userEmailOrigin->setAccessTokenExpiresAt($newExpireDate);
+
+        if (isset($data['imapGmailConfiguration']['accessTokenExpiresAt'])) {
+            $newExpireDate = $data['imapGmailConfiguration']['accessTokenExpiresAt'];
+            if (!$data['imapGmailConfiguration']['accessTokenExpiresAt'] instanceof \Datetime) {
+                $utcTimeZone = new \DateTimeZone('UTC');
+                $newExpireDate = new \DateTime('+' . $data['imapGmailConfiguration']['accessTokenExpiresAt'] . ' seconds', $utcTimeZone);
+            }
+
+            $userEmailOrigin->setAccessTokenExpiresAt($newExpireDate);
+        }
+
+        if (isset($data['imapGmailConfiguration']['googleAuthCode'])) {
+            $userEmailOrigin->setGoogleAuthCode($data['imapGmailConfiguration']['googleAuthCode']);
+        }
+
         $accountTypeModel->setImapGmailConfiguration($userEmailOrigin);
 
         return $accountTypeModel;
