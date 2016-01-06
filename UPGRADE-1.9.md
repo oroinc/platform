@@ -85,7 +85,7 @@ grid-name:
 - `oro_entity.entity_hierarchy_provider` service was marked as private.
 - `oro_entity.entity_hierarchy_provider.class` parameter was removed.
 - `oro_entity.entity_hierarchy_provider.all` service was added. It can be used if you need a hierarchy of all entities but not only configurable ones.
-- Class `Oro\Bundle\EntityBundle\Provider\EntityContextProvider` was moved to `Oro\Bundle\ActivityBundle\Provider\ContextGridProvider`.
+- Class `Oro\Bundle\EntityBundle\Provider\EntityContextProvider` was moved to `Oro\Bundle\ActivityBundle\Provider\ContextGridProvider` and `oro_entity.entity_context_provider` service was moved to `oro_activity.provider.context_grid`. 
 
 ####EntityConfigBundle
 - Removed `optionSet` field type deprecated since v1.4. Existing options sets are converted to `Select` or `Multi-Select` automatically during the Platform update.
