@@ -121,14 +121,16 @@ define([
             AbstractFilter.__super__.initialize.apply(this, arguments);
 
             var hintView = new FilterHint({
-                templateTheme: this.templateTheme,
-                label: this.label,
-                hint: this._getCriteriaHint()
+                filter: this
             });
 
             this.subview('hint', hintView);
 
             this.listenTo(hintView, 'reset', this.reset);
+        },
+
+        rendered: function() {
+            this.subview('hint').render();
         },
 
         /**

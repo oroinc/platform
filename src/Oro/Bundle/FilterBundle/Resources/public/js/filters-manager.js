@@ -312,7 +312,7 @@ define(function(require) {
                     filter.hide();
                 }
                 $filterItems.append(filter.$el);
-                filter.subview('hint').render(filter.$el);
+                filter.rendered();
             }, this);
 
             this.trigger('rendered');
