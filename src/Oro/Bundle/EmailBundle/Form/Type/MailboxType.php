@@ -68,7 +68,18 @@ class MailboxType extends AbstractType
                 new Email(),
             ],
         ]);
-        $builder->add('origin', 'oro_imap_configuration');
+
+//        $builder->add('origin', 'oro_imap_configuration');
+
+        $builder->add(
+            'imapAccountType',
+            'oro_imap_choice_account_type',
+            [
+                'label' => 'oro.user.imap_configuration.label',
+
+            ]
+        );
+
         $builder->add('processType', 'choice', [
             'label'       => 'oro.email.mailbox.process.type.label',
             'choices'     => $this->storage->getProcessTypeChoiceList(),

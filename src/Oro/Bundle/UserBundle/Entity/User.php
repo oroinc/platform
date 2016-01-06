@@ -1026,7 +1026,6 @@ class User extends ExtendUser implements
         return $this->imapAccountType;
     }
 
-
     /**
      * Delete email origin
      *

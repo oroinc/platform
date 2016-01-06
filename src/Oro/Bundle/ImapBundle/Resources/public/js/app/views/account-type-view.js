@@ -8,13 +8,11 @@ define(function(require) {
 
     accountTypeView =  BaseView.extend({
 
-        url: '',
-
         html: '',
 
         events: {
-            'change select[name="oro_user_user_form[imapAccountType][accountType]"]': 'onChangeAccountType',
-            'click button[name="oro_user_user_form[imapAccountType][disconnect]"]': 'onClickDisconnect'
+            'change select[name$="[accountType]"]': 'onChangeAccountType',
+            'click button[name$="[disconnect]"]': 'onClickDisconnect'
         },
 
         /**

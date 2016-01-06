@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
@@ -162,6 +164,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $updatedAt;
 
     /**
+     * @var AccountTypeModel
+     */
+    protected $imapAccountType;
+
+    /**
      * Mailbox constructor.
      */
     public function __construct()
@@ -281,11 +288,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param EmailOrigin|null $origin
+     * @param UserEmailOrigin|null $origin
      *
      * @return $this
      */
-    public function setOrigin(EmailOrigin $origin = null)
+    public function setOrigin(UserEmailOrigin $origin = null)
     {
         $currentOrigin = $this->getOrigin();
         if ($currentOrigin && ($origin === null || $currentOrigin !== $origin)) {
@@ -480,6 +487,45 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function getAutoResponseRules()
     {
         return $this->autoResponseRules;
+    }
+
+    /**
+     * @param AccountTypeModel|null $accountTypeModel
+     */
+    public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
+    {
+        $this->imapAccountType = $accountTypeModel;
+        if ($accountTypeModel instanceof AccountTypeModel) {
+            $this->setOrigin($accountTypeModel->getImapGmailConfiguration());
+        }
+    }
+
+    /**
+     * @return AccountTypeModel
+     */
+    public function getImapAccountType()
+    {
+        if ($this->imapAccountType === null) {
+            /** @var UserEmailOrigin $imapConfiguration */
+            $imapConfiguration = $this->getOrigin();
+            $accountTypeModel = null;
+            if ($imapConfiguration) {
+                $accountTypeModel = new AccountTypeModel();
+                if ($imapConfiguration->getAccessToken() && $imapConfiguration->getAccessToken() !== '') {
+                    $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_GMAIL);
+                    $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
+                } else {
+                    $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_OTHER);
+                    $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
+                }
+            }
+
+            if ($accountTypeModel) {
+                return $accountTypeModel;
+            }
+        }
+
+        return $this->imapAccountType;
     }
 
     /**
