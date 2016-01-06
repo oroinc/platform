@@ -91,10 +91,24 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
         $columnExpr,
         $columnAlias,
         $filterName,
-        array $filterData
+        array $filterData,
+        $functionExpr = null
     ) {
         $filter = [
-            'column'     => $this->getFilterByExpr($entityClassName, $tableAlias, $fieldName, $columnExpr),
+            'column'     => $this->getFilterByExpr(
+                $entityClassName,
+                $tableAlias,
+                $fieldName,
+                $functionExpr
+                ? $this->prepareFunctionExpression(
+                    $functionExpr,
+                    $tableAlias,
+                    $fieldName,
+                    $columnExpr,
+                    $columnAlias
+                )
+                : $columnExpr
+            ),
             'filter'     => $filterName,
             'filterData' => $filterData
         ];
