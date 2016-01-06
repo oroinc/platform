@@ -6,11 +6,15 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
 
-    ImapGmailView =  BaseView.extend({
+    ImapGmailView = BaseView.extend({
         events: {
             'click button[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][check]"]': 'onClickConnect',
             'click button[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][checkFolder]"]': 'onCheckFolder'
         },
+
+        $googleErrorMessage: null,
+
+        errorMessage: '',
 
         html: '',
 
@@ -27,30 +31,72 @@ define(function(require) {
          *
          * @param {Object} options
          */
-        initialize: function(options) {},
+        initialize: function(options) {
+            this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
+        },
 
         render: function() {
-            this.$el.html(this.html);
+            if (this.html.length > 0) {
+                this.$el.html(this.html);
+            }
+
             this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][accessToken]"]').val(this.token);
             this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][user]"]').val(this.email);
             this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][accessTokenExpiresAt]"]').val(this.expiredAt);
             this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][googleAuthCode]"]').val(this.googleAuthCode);
+
+            if (this.errorMessage.length > 0) {
+                this.showErrorMessage();
+            } else {
+                this.hideErrorMessage();
+            }
+
             this._deferredRender();
             this.initLayout().done(_.bind(this._resolveDeferredRender, this));
         },
 
+        /**
+         * Set error message
+         * @param {string} message
+         */
+        setErrorMessage: function (message) {
+            this.errorMessage = message;
+        },
+
+        /**
+         * Clear error message
+         */
+        resetErrorMessage: function() {
+            this.errorMessage = '';
+        },
+
+        /**
+         * Set html template
+         * @param {string} html
+         */
         setHtml: function(html) {
             this.html = html;
         },
 
+        /**
+         * Handler event of click on the button Connection
+         * @param e
+         */
         onClickConnect: function(e) {
-            this.trigger('imapGmailConnectionSetToken', this.getData());
+            this.trigger('checkConnection', this.getData());
         },
 
+        /**
+         * Handler event of click on the button Retrieve Folders
+         */
         onCheckFolder: function() {
-            this.trigger('imapGmailConnectionGetFolders', this.getData());
+            this.trigger('getFolders', this.getData());
         },
 
+        /**
+         * Return values from types of form
+         * @returns {{type: string, accessToken: *, clientId: *, user: *, imapPort: *, imapHost: *, imapEncryption: *, smtpPort: *, smtpHost: *, smtpEncryption: *, accessTokenExpiresAt: *, googleAuthCode: *}}
+         */
         getData: function() {
             var token = this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][accessToken]"]').val();
 
@@ -62,7 +108,6 @@ define(function(require) {
                 type : 'Gmail',
                 accessToken : token,
                 clientId : this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][clientId]"]').val(),
-                mailboxName: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][mailboxName]"]').val(),
                 user: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][user]"]').val(),
                 imapPort: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapPort]"]').val(),
                 imapHost: this.$el.find('input[name="oro_user_user_form[imapAccountType][imapGmailConfiguration][imapHost]"]').val(),
@@ -75,20 +120,51 @@ define(function(require) {
             };
         },
 
+        /**
+         * Set token
+         * @param {string} value
+         */
         setToken: function(value) {
             this.token = value;
         },
 
+        /**
+         * Set email
+         * @param {string} value
+         */
         setEmail: function(value) {
             this.email = value;
         },
 
+        /**
+         * Set expiredAt
+         * @param {string} value
+         */
         setExpiredAt: function(value) {
             this.expiredAt = value;
         },
 
+        /**
+         * set googleAuthCode
+         * @param {string} value
+         */
         setGoogleAuthCode: function(value) {
             this.googleAuthCode = value;
+        },
+
+        /**
+         * Change style for block with error message to show
+         */
+        showErrorMessage: function() {
+            this.$googleErrorMessage.html(this.errorMessage);
+            this.$googleErrorMessage.show();
+        },
+
+        /**
+         * Change style for block with error message to hide
+         */
+        hideErrorMessage: function() {
+            this.$googleErrorMessage.hide();
         }
     });
 
