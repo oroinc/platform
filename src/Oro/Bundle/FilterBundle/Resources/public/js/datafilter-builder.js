@@ -39,10 +39,11 @@ define([
                 return;
             }
 
+            var filtersList;
             var options = methods.combineOptions.call(this);
             options.collection = this.collection;
-            options.prependTo = this.$el;
-            var filtersList = new FiltersManager(options);
+            options.el = $('<div/>').prependTo(this.$el);
+            filtersList = new FiltersManager(options);
             filtersList.render();
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];

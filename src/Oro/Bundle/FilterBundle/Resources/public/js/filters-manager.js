@@ -98,13 +98,6 @@ define(function(require) {
          */
         dropdownContainer: 'body',
 
-        /**
-         * Selector, jQuery object or HTML element that will be target for prepend view element
-         *
-         * @property
-         */
-        prependTo: null,
-
         /** @property */
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
@@ -126,7 +119,7 @@ define(function(require) {
 
             this.filters = {};
 
-            _.extend(this, _.pick(options, ['addButtonHint', 'prependTo']));
+            _.extend(this, _.pick(options, ['addButtonHint']));
 
             if (options.filters) {
                 _.extend(this.filters, options.filters);
@@ -318,9 +311,6 @@ define(function(require) {
                 this.template({filters: this.filters})
             );
             this.dropdownContainer = this.$el.find('.filter-container');
-            if (this.prependTo) {
-                this.prependTo.prepend(this.$el);
-            }
 
             var fragment = document.createDocumentFragment();
 
