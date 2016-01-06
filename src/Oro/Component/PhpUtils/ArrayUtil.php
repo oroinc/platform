@@ -192,4 +192,41 @@ class ArrayUtil
             return $order[$a] - $order[$b];
         };
     }
+
+    /**
+     * Return true if callback on any element returns truthy value, false otherwise
+     *
+     * @param callable $callback
+     * @param array $array
+     *
+     * @return boolean
+     */
+    public static function some(callable $callback, array $array)
+    {
+        foreach ($array as $item) {
+            if (call_user_func($callback, $item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Return copy of the array starting with item for which callback returns falsity value
+     *
+     * @param callable $callback
+     *
+     * @param array $array
+     */
+    public static function dropWhile(callable $callback, array $array)
+    {
+        foreach ($array as $key => $value) {
+            if (!call_user_func($callback, $value)) {
+                return array_slice($array, $key);
+            }
+        }
+
+        return [];
+    }
 }

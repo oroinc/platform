@@ -1,0 +1,15 @@
+{% set aggregatedFieldConditionOptions = {
+    fieldChoice: {
+        select2: {
+            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
+        },
+        fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]'
+    }
+} %}
+
+<li class="option" data-criteria="aggregated-condition-item"
+    data-module="oroquerydesigner/js/aggregated-field-condition"
+    data-widget="aggregatedFieldCondition"
+    data-options="{{ aggregatedFieldConditionOptions|json_encode }}">
+    {{ 'oro.query_designer.condition_builder.criteria.aggregated_field_condition'|trans }}
+</li>
