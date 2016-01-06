@@ -54,6 +54,7 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.action.share_grid_view": "Share With Others"
 "oro.datagrid.action.unshare_grid_view": "Unshare"
 "oro.datagrid.action.delete_grid_view": "Delete"
+"oro.datagrid.action.use_as_default_grid_view": "Use as default"
 "oro.datagrid.gridView.all": "All"
 "oro.datagrid.gridView.default": "Default"
 "oro.datagrid.gridView.created": "View has been successfully created"
@@ -63,6 +64,7 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.gridView.actions": "Options"
 "oro.datagrid.gridView.data_edited": "Edited"
 "oro.datagrid.gridView.save_name": "Save"
+"oro.datagrid.gridView.error.not_found": "View not found"
 "Unexpected format": Unexpected format
 oro:
     datagrid:
