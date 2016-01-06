@@ -418,7 +418,7 @@ class EmailUser
      */
     public function decrementUnsyncedFlagCount()
     {
-        $this->unsyncedFlagCount--;
+        $this->unsyncedFlagCount = max([0, $this->unsyncedFlagCount - 1]);
 
         return $this;
     }
