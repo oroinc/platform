@@ -34,6 +34,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
+ *          },
+ *          "grid"={
+ *              "default"="business-unit-grid"
  *          }
  *      }
  * )
