@@ -60,6 +60,13 @@ services:
         tags:
             - { name: oro_activity.activity_widget_provider }
 
+    oro_activity.provider.context_grid:
+        class: Oro\Bundle\ActivityBundle\Provider\ContextGridProvider
+        arguments:
+            - @oro_entity.routing_helper
+            - @oro_entity.entity_provider
+            - @oro_entity_config.provider.grid
+
     oro_activity.widget_provider.actions:
         class: %oro_activity.widget_provider.actions.class%
         arguments:
