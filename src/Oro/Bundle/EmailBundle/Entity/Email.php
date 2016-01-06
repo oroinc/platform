@@ -31,7 +31,8 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-envelope"
+ *              "icon"="icon-envelope",
+ *              "context-grid"="email-for-context-grid"
  *          },
  *          "grouping"={
  *              "groups"={"activity"}

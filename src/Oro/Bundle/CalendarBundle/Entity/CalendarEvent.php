@@ -30,7 +30,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *      routeView="oro_calendar_event_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-time"
+ *              "icon"="icon-time",
+ *              "context-grid"="calendar-event-for-context-grid"
  *          },
  *          "dataaudit"={
  *              "auditable"=true
