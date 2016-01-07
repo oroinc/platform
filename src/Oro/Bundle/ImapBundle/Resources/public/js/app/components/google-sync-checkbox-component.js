@@ -1,3 +1,4 @@
+/*global Google */
 define(function(require) {
     'use strict';
 

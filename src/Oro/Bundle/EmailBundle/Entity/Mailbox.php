@@ -6,10 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -512,10 +511,10 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
             if ($userEmailOrigin) {
                 $accountTypeModel = new AccountTypeModel();
                 if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
-                    $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_GMAIL);
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
                     $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
                 } else {
-                    $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_OTHER);
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
                     $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
                 }
             }

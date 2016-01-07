@@ -1,3 +1,4 @@
+/*global Google */
 define(function(require) {
     'use strict';
 
@@ -5,7 +6,6 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
     var ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
@@ -186,7 +186,9 @@ define(function(require) {
             };
 
             for (var i in values) {
-                data.oro_imap_configuration_gmail[i] = values[i];
+                if (values.hasOwnProperty(i)) {
+                    data.oro_imap_configuration_gmail[i] = values[i];
+                }
             }
 
             return data;

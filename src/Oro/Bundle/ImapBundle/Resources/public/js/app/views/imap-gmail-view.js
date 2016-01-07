@@ -3,7 +3,6 @@ define(function(require) {
 
     var ImapGmailView;
     var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ImapGmailView = BaseView.extend({

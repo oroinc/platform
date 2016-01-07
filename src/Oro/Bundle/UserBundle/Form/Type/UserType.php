@@ -153,12 +153,7 @@ class UserType extends AbstractType
                     'prototype'      => true,
                     'prototype_name' => 'tag__name__'
                 ]
-            )
-
-
-
-            ->add('change_password', ChangePasswordType::NAME)
-            ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
+            );
 
         if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
             $builder->add(
@@ -178,6 +173,9 @@ class UserType extends AbstractType
                 ]
             );
         }
+
+        $builder->add('change_password', ChangePasswordType::NAME)
+            ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
 
         $this->addInviteUserField($builder);
