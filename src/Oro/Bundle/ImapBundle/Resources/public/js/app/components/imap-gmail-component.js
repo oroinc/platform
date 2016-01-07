@@ -63,15 +63,14 @@ define(function(require) {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.emptyClientId'));
                 this.view.render();
             } else {
-                gapi.auth.authorize(
-                    {
-                        'client_id': data.clientId,
-                        'scope': this.scopes.join(' '),
-                        'immediate': false,
-                        'access_type': 'offline',
-                        'response_type': 'code',
-                        'approval_prompt': 'force'
-                    }, _.bind(this.handleResponseGoogleAuthCode, this));
+                gapi.auth.authorize({
+                    'client_id': data.clientId,
+                    'scope': this.scopes.join(' '),
+                    'immediate': false,
+                    'access_type': 'offline',
+                    'response_type': 'code',
+                    'approval_prompt': 'force'
+                }, _.bind(this.handleResponseGoogleAuthCode, this));
             }
         },
 
@@ -90,9 +89,9 @@ define(function(require) {
         requestAccessToken: function() {
             var data = this.view.getData();
             gapi.auth.authorize({
-                    'client_id': data.clientId,
-                    'scope': this.scopes.join(' '),
-                    'immediate': false
+                'client_id': data.clientId,
+                'scope': this.scopes.join(' '),
+                'immediate': false
             }, _.bind(this.checkAuthorization, this));
         },
 
@@ -136,8 +135,8 @@ define(function(require) {
          */
         requestFormGetFolder: function() {
             $.ajax({
-                url : this.url,
-                method: "GET",
+                url: this.url,
+                method: 'GET',
                 data: this.view.getData(),
                 success: _.bind(this.renderFormGetFolder, this)
             });
@@ -160,8 +159,8 @@ define(function(require) {
             delete value.type;
             var data = this.prepareDataForForm(value);
             $.ajax({
-                url : this.urlGetFolders,
-                method: "POST",
+                url: this.urlGetFolders,
+                method: 'POST',
                 data: data,
                 success: _.bind(this.handlerGetFolders, this)
             });
@@ -183,7 +182,7 @@ define(function(require) {
          */
         prepareDataForForm: function(values) {
             var data = {
-                oro_imap_configuration_gmail : {}
+                oro_imap_configuration_gmail: {}
             };
 
             for (var i in values) {

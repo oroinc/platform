@@ -447,7 +447,7 @@ class Imap extends \Zend\Mail\Storage\Imap
             } else {
                 if (preg_match('/^NO /i', $response) || preg_match('/^BAD /i', $response)) {
                     throw new BaseException\RuntimeException('cannot login with XOAuth2, user or token wrong');
-                } else if (preg_match("/^OK /i", $response)) {
+                } elseif (preg_match("/^OK /i", $response)) {
                     return;
                 }
             }

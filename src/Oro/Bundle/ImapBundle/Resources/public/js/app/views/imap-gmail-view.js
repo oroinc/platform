@@ -61,7 +61,7 @@ define(function(require) {
          * Set error message
          * @param {string} message
          */
-        setErrorMessage: function (message) {
+        setErrorMessage: function(message) {
             this.errorMessage = message;
         },
 
@@ -84,7 +84,7 @@ define(function(require) {
          * Handler event of click on the button Connection
          * @param e
          */
-        onClickConnect: function(e) {
+        onClickConnect: function() {
             this.trigger('checkConnection', this.getData());
         },
 
@@ -107,9 +107,9 @@ define(function(require) {
             }
 
             return {
-                type : this.type,
-                accessToken : token,
-                clientId : this.$el.find('input[name$="[userEmailOrigin][clientId]"]').val(),
+                type: this.type,
+                accessToken: token,
+                clientId: this.$el.find('input[name$="[userEmailOrigin][clientId]"]').val(),
                 user: this.$el.find('input[name$="[userEmailOrigin][user]"]').val(),
                 imapPort: this.$el.find('input[name$="[userEmailOrigin][imapPort]"]').val(),
                 imapHost: this.$el.find('input[name$="[userEmailOrigin][imapHost]"]').val(),

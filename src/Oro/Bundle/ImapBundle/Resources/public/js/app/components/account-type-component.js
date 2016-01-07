@@ -48,8 +48,8 @@ define(function(require) {
             mediator.trigger('change:systemMailBox:email');
             mediator.execute('showLoading');
             $.ajax({
-                url : this.url,
-                method: "GET",
+                url: this.url,
+                method: 'GET',
                 data: {
                     'type': value,
                     'formParentName': this.formParentName
@@ -64,8 +64,8 @@ define(function(require) {
         onDisconnect: function() {
             mediator.execute('showLoading');
             $.ajax({
-                url : this.url,
-                method: "GET",
+                url: this.url,
+                method: 'GET',
                 data: {
                     'formParentName': this.formParentName
                 },
@@ -76,8 +76,8 @@ define(function(require) {
         onIMapGotToken: function(value) {
             mediator.execute('showLoading');
             $.ajax({
-                url : this.url,
-                method: "GET",
+                url: this.url,
+                method: 'GET',
                 data: {
                     'type': value.type,
                     'token': value.token

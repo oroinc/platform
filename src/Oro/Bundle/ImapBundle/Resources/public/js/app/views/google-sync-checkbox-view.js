@@ -20,7 +20,7 @@ define(function(require) {
         canShowMessage: false,
 
         events: {
-            'change input[type=checkbox]' : 'onChangeCheckBox'
+            'change input[type=checkbox]': 'onChangeCheckBox'
         },
 
         listen: {

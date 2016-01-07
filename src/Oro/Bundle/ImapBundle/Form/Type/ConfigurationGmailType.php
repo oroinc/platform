@@ -97,22 +97,22 @@ class ConfigurationGmailType extends AbstractType
 
         $builder->get('accessTokenExpiresAt')
             ->addModelTransformer(new CallbackTransformer(
-                function ($originalDescription) {
+                function ($originalAccessTokenExpiresAt) {
 
-                    if ($originalDescription === null){
+                    if ($originalAccessTokenExpiresAt === null) {
                         return '';
                     }
 
-                    return $originalDescription->format('c');
+                    return $originalAccessTokenExpiresAt->format('c');
                 },
-                function ($submittedDescription) {
+                function ($submittedAccessTokenExpiresAt) {
 
-                    if ($submittedDescription instanceof \DateTime) {
-                        return $submittedDescription;
+                    if ($submittedAccessTokenExpiresAt instanceof \DateTime) {
+                        return $submittedAccessTokenExpiresAt;
                     }
 
                     $utcTimeZone = new \DateTimeZone('UTC');
-                    $newExpireDate = new \DateTime('+' . $submittedDescription . ' seconds', $utcTimeZone);
+                    $newExpireDate = new \DateTime('+' . $submittedAccessTokenExpiresAt . ' seconds', $utcTimeZone);
 
                     return $newExpireDate;
                 }
@@ -191,7 +191,7 @@ class ConfigurationGmailType extends AbstractType
      */
     protected function updateForm(FormInterface $form, UserEmailOrigin $emailOrigin)
     {
-        if ($emailOrigin->getAccessToken() && $emailOrigin->getAccessToken() !== '' ) {
+        if ($emailOrigin->getAccessToken() && $emailOrigin->getAccessToken() !== '') {
             $form->add('checkFolder', 'button', [
                 'label' => $this->translator->trans('oro.email.retrieve_folders.label'),
                 'attr' => ['class' => 'btn btn-primary']

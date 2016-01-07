@@ -124,14 +124,14 @@ class ConnectionControllerManager
         $accountTypeModel->setUserEmailOrigin($oauthEmailOrigin);
 
         $form = null;
-        switch($formParentName) {
+        switch ($formParentName) {
             case 'oro_user_user_form':
                 $data = $user = new User();
                 $data->setImapAccountType($accountTypeModel);
                 $this->formUser->setData($data);
                 $form = $this->formUser;
                 break;
-            case 'oro_email_mailbox';
+            case 'oro_email_mailbox':
                 $formAlias = 'oro_email_mailbox';
                 $data = $user = new Mailbox();
                 $data->setImapAccountType($accountTypeModel);

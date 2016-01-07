@@ -170,8 +170,13 @@ class UserType extends AbstractType
                 ]
             );
         } else {
-            $builder->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label']);
-
+            $builder->add(
+                'imapConfiguration',
+                'oro_imap_configuration',
+                [
+                    'label' => 'oro.user.imap_configuration.label'
+                ]
+            );
         }
 
 
