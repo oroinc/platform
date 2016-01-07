@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var IMapGmailComponent;
+    var ImapGmailComponent;
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -9,7 +9,7 @@ define(function(require) {
     var ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
-    IMapGmailComponent = BaseComponent.extend({
+    ImapGmailComponent = BaseComponent.extend({
         ViewType: ImapGmailView,
 
         scopes: ['https://mail.google.com/'],
@@ -25,11 +25,10 @@ define(function(require) {
             var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
 
-            this.listenTo(this.view, 'imapGmailConnectionSetToken', this.requestToken);
-            this.listenTo(this.view, 'imapGmailConnectionGetFolders', this.onGetFolders);
+            this.listenTo(this.view, 'getFolders', this.onGetFolders);
 
             require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
-                this.listenTo(this.view, 'requestToken', this.requestToken);
+                this.listenTo(this.view, 'checkConnection', this.onCheckConnection);
             }, this));
         },
 
@@ -41,19 +40,28 @@ define(function(require) {
          */
         prepareViewOptions: function(options) {
             return {
-                el: options._sourceElement
+                el: options._sourceElement,
+                googleErrorMessage: options.googleErrorMessage
             };
         },
 
-        requestToken: function() {
+        /**
+         * Handler event checkConnection
+         */
+        onCheckConnection: function() {
+            this.view.resetErrorMessage();
             this.requestGoogleAuthCode();
         },
 
+        /**
+         * Request to google API to get google auth code
+         */
         requestGoogleAuthCode: function() {
             var data = this.view.getData();
 
             if (data.clientId.length === 0) {
-                mediator.execute('showErrorMessage', __('oro.imap.connection.google.oauth.error.emptyClientId'));
+                this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.emptyClientId'));
+                this.view.render();
             } else {
                 gapi.auth.authorize(
                     {
@@ -67,12 +75,18 @@ define(function(require) {
             }
         },
 
+        /**
+         * Handler response from google API  for request to get google auth code
+         */
         handleResponseGoogleAuthCode: function(response) {
             this.view.setGoogleAuthCode(response.code);
 
             this.requestAccessToken();
         },
 
+        /**
+         * Request to google API to get token
+         */
         requestAccessToken: function() {
             var data = this.view.getData();
             gapi.auth.authorize({
@@ -82,13 +96,19 @@ define(function(require) {
             }, _.bind(this.checkAuthorization, this));
         },
 
-        checkAuthorization: function(response) {
-            this.view.setToken(response.access_token);
-            this.view.setExpiredAt(response.expires_at);
+        /**
+         * Handler response from google API  for request to get token
+         */
+        checkAuthorization: function(result) {
+            this.view.setToken(result.access_token);
+            this.view.setExpiredAt(result.expires_at);
 
             gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
         },
 
+        /**
+         * Request to google API to get user profile
+         */
         requestProfile: function() {
             var request = gapi.client.gmail.users.getProfile({
                 'userId': 'me'
@@ -97,15 +117,23 @@ define(function(require) {
             request.execute(_.bind(this.responseProfile, this));
         },
 
-        responseProfile: function(response) {
-            if (response) {
-                this.view.setEmail(response.emailAddress);
-                mediator.trigger('change:systemMailBox:email', {email: response.emailAddress});
+        /**
+         * Handler response from google API  for request to get user profile
+         */
+        responseProfile: function(request) {
+            if (request.code === 403) {
+                this.view.setErrorMessage(request.message);
+                this.view.render();
+            } else if (request) {
+                this.view.setEmail(request.emailAddress);
+                this.view.render();
+                this.requestFormGetFolder();
             }
-            this.view.render();
-            this.requestFormGetFolder();
         },
 
+        /**
+         * Request to server to get template with button Retrieve Folders
+         */
         requestFormGetFolder: function() {
             $.ajax({
                 url : this.url,
@@ -115,11 +143,19 @@ define(function(require) {
             });
         },
 
+        /**
+         * Hendler response from server for request to get template with button Retrieve Folders
+         * @param response
+         */
         renderFormGetFolder: function(response) {
             this.view.setHtml(response.html);
             this.view.render();
         },
 
+        /**
+         * Handler event getFolders
+         * @param value
+         */
         onGetFolders: function(value) {
             delete value.type;
             var data = this.prepareDataForForm(value);
@@ -131,6 +167,20 @@ define(function(require) {
             });
         },
 
+        /**
+         * Handler response from server to get folders
+         * @param response
+         */
+        handlerGetFolders: function(response) {
+            this.view.setHtml(response.html);
+            this.view.render();
+        },
+
+        /**
+         * Wrap data from view in form oro_imap_configuration_gmail for request to server
+         * @param values
+         * @returns {{oro_imap_configuration_gmail: {}}}
+         */
         prepareDataForForm: function(values) {
             var data = {
                 oro_imap_configuration_gmail : {}
@@ -141,13 +191,8 @@ define(function(require) {
             }
 
             return data;
-        },
-
-        handlerGetFolders: function(response) {
-            this.view.setHtml(response.html);
-            this.view.render();
         }
     });
 
-    return IMapGmailComponent;
+    return ImapGmailComponent;
 });

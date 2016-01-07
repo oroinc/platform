@@ -71,7 +71,8 @@
     {% set options = {
         'url' :  path("oro_imap_change_account_type"),
         'urlGetFolders': path("oro_imap_gmail_connection_check"),
-        'formSelector': '#'~formSelector|default(form.vars.id)
+        'formSelector': '#'~formSelector|default(form.vars.id),
+        'googleErrorMessage': '.google-alert'
     } %}
 
     <div class="container-imap-gmail-container"
@@ -89,6 +90,12 @@
                     </div>
                 </div>
             {% endif %}
+
+            <div class="control-group">
+                <div class="controls">
+                    <div class="google-alert connection-status alert alert-error" style="display: none"></div>
+                </div>
+            </div>
 
             {% if form.checkFolder is defined %}
                 <div class="control-group">
