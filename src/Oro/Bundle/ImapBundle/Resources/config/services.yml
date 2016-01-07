@@ -147,7 +147,7 @@ services:
             - @doctrine
 
     oro_imap.manager.controller.connection:
-        class: Oro\Bundle\ImapBundle\Manager\ConnectionManager
+        class: Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager
         scope: request
         arguments:
             - @oro_user.form.user

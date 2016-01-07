@@ -17,7 +17,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -994,7 +993,7 @@ class User extends ExtendUser implements
     {
         $this->imapAccountType = $accountTypeModel;
         if ($accountTypeModel instanceof AccountTypeModel) {
-            $this->setImapConfiguration($accountTypeModel->getImapGmailConfiguration());
+            $this->setImapConfiguration($accountTypeModel->getUserEmailOrigin());
         }
     }
 
@@ -1004,17 +1003,17 @@ class User extends ExtendUser implements
     public function getImapAccountType()
     {
         if ($this->imapAccountType === null) {
-            /** @var UserEmailOrigin $imapConfiguration */
-            $imapConfiguration = $this->getImapConfiguration();
+            /** @var UserEmailOrigin $userEmailOrigin */
+            $userEmailOrigin = $this->getImapConfiguration();
             $accountTypeModel = null;
-            if ($imapConfiguration) {
+            if ($userEmailOrigin) {
                 $accountTypeModel = new AccountTypeModel();
-                if ($imapConfiguration->getAccessToken() && $imapConfiguration->getAccessToken() !== '') {
-                    $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_GMAIL);
-                    $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
+                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
                 } else {
-                    $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_OTHER);
-                    $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
                 }
             }
 

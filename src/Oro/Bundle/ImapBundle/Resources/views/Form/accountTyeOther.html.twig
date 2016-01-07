@@ -7,7 +7,7 @@
         {{ form_widget(form.imapAccountType.imapConfiguration) }}
     {% endif %}
 
-    {% if form.imapAccountType.imapGmailConfiguration is defined %}
-        {{ form_widget(form.imapAccountType.imapGmailConfiguration) }}
+    {% if form.imapAccountType.userEmailOrigin is defined %}
+        {{ form_widget(form.imapAccountType.userEmailOrigin) }}
     {% endif %}
 </fieldset>

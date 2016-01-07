@@ -95,7 +95,7 @@ class MailboxHandler implements FormAwareInterface
     {
         /** @var Mailbox $mailbox */
         $mailbox = $this->form->getData();
-        $mailbox->setOrigin($mailbox->getImapAccountType()->getImapGmailConfiguration());
+        $mailbox->setOrigin($mailbox->getImapAccountType()->getUserEmailOrigin());
         $this->getEntityManager()->persist($mailbox);
         $this->getEntityManager()->flush();
 

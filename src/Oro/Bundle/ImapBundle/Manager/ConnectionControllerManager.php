@@ -8,8 +8,8 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
-use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -22,7 +22,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *
  * @package Oro\Bundle\ImapBundle\Manager
  */
-class ConnectionManager
+class ConnectionControllerManager
 {
     /** @var FormInterface */
     protected $formUser;
@@ -92,8 +92,8 @@ class ConnectionManager
         $origin->setFolders($emailFolders);
 
         $aacountType = new AccountTypeModel();
-        $aacountType->setAccountType('Gmail');
-        $aacountType->setImapGmailConfiguration($origin);
+        $aacountType->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
+        $aacountType->setUserEmailOrigin($origin);
 
         $user = new User();
         $user->setImapAccountType($aacountType);
@@ -105,28 +105,41 @@ class ConnectionManager
     /**
      * @param string $type
      * @param string|null $accessToken
+     * @param string $formParentName
      *
      * @return FormInterface
      */
-    public function getFormGmailConnect($type, $accessToken)
+    public function getImapConnectionForm($type, $accessToken, $formParentName)
     {
         $oauthEmailOrigin = new UserEmailOrigin();
         $oauthEmailOrigin->setAccessToken($accessToken);
 
-        if ($type === ChoiceAccountType::ACCOUNT_TYPE_GMAIL) {
+        if ($type === AccountTypeModel::ACCOUNT_TYPE_GMAIL) {
             $oauthEmailOrigin->setImapHost(GmailImap::DEFAULT_GMAIL_HOST);
             $oauthEmailOrigin->setImapPort(GmailImap::DEFAULT_GMAIL_PORT);
         }
 
         $accountTypeModel = new AccountTypeModel();
         $accountTypeModel->setAccountType($type);
-        $accountTypeModel->setImapGmailConfiguration($oauthEmailOrigin);
+        $accountTypeModel->setUserEmailOrigin($oauthEmailOrigin);
 
-        $user = new User();
-        $user->setImapAccountType($accountTypeModel);
+        $form = null;
+        switch($formParentName) {
+            case 'oro_user_user_form':
+                $data = $user = new User();
+                $data->setImapAccountType($accountTypeModel);
+                $this->formUser->setData($data);
+                $form = $this->formUser;
+                break;
+            case 'oro_email_mailbox';
+                $formAlias = 'oro_email_mailbox';
+                $data = $user = new Mailbox();
+                $data->setImapAccountType($accountTypeModel);
+                $form = $this->FormFactory->create($formAlias, null, ['csrf_protection' => false]);
+                $form->setData($data);
+                break;
+        }
 
-        $this->formUser->setData($user);
-
-        return $this->formUser;
+        return $form;
     }
 }

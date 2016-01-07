@@ -17,9 +17,11 @@ define(function(require) {
          */
         initialize: function(options) {
             this.url = _.result(options, 'url') || '';
+            this.formParentName = _.result(options, 'formParentName') || '';
 
             var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
+
             this.listenTo(this.view, 'imapConnectionChangeType', this.onChangeAccountType);
             this.listenTo(this.view, 'imapConnectionDisconnect', this.onDisconnect);
             this.listenTo(mediator, 'imapGmailConnectionSetToken', this.onIMapGotToken);
@@ -43,12 +45,14 @@ define(function(require) {
          * @param value - values of the form IMAP connection
          */
         onChangeAccountType: function(value) {
+            mediator.trigger('change:systemMailBox:email');
             mediator.execute('showLoading');
             $.ajax({
                 url : this.url,
                 method: "GET",
                 data: {
-                    'type': value
+                    'type': value,
+                    'formParentName': this.formParentName
                 },
                 success: _.bind(this.templateLoaded, this)
             });
@@ -63,7 +67,7 @@ define(function(require) {
                 url : this.url,
                 method: "GET",
                 data: {
-
+                    'formParentName': this.formParentName
                 },
                 success: _.bind(this.templateLoaded, this)
             });

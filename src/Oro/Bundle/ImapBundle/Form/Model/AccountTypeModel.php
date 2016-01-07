@@ -6,11 +6,15 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 class AccountTypeModel
 {
+    const ACCOUNT_TYPE_GMAIL = 'Gmail';
+    const ACCOUNT_TYPE_OTHER = 'Other';
+    const ACCOUNT_TYPE_NO_SELECT = 'Select Type';
+
     /** @var string|null */
     protected $accountType;
 
     /** @var UserEmailOrigin */
-    protected $imapGmailConfiguration;
+    protected $userEmailOrigin;
 
     /**
      * @return null|string
@@ -31,16 +35,16 @@ class AccountTypeModel
     /**
      * @return UserEmailOrigin
      */
-    public function getImapGmailConfiguration()
+    public function getUserEmailOrigin()
     {
-        return $this->imapGmailConfiguration;
+        return $this->userEmailOrigin;
     }
 
     /**
      * @param UserEmailOrigin $value
      */
-    public function setImapGmailConfiguration(UserEmailOrigin $value)
+    public function setUserEmailOrigin(UserEmailOrigin $value)
     {
-        $this->imapGmailConfiguration = $value;
+        $this->userEmailOrigin = $value;
     }
 }

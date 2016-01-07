@@ -134,17 +134,18 @@ class ConnectionController extends Controller
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $type = $request->get('type');
         $token = $request->get('accessToken');
+        $formParentName = $request->get('formParentName');
 
-        $connectionManager = $this->container->get('oro_imap.manager.controller.connection');
-        $userForm = $connectionManager->getFormGmailConnect($type, $token);
+        $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
+        $form = $connectionControllerManager->getImapConnectionForm($type, $token, $formParentName);
 
         if ($token) {
             $html = $this->renderView('OroImapBundle:Form:accountTypeGmail.html.twig', [
-                'form' => $userForm->createView(),
+                'form' => $form->createView(),
             ]);
         } else {
             $html = $this->renderView('OroImapBundle:Form:accountTyeOther.html.twig', [
-                'form' => $userForm->createView(),
+                'form' => $form->createView(),
             ]);
         }
 

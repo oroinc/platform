@@ -82,9 +82,9 @@ define(function(require) {
             }, _.bind(this.checkAuthorization, this));
         },
 
-        checkAuthorization: function(result) {
-            this.view.setToken(result.access_token);
-            this.view.setExpiredAt(result.expires_at);
+        checkAuthorization: function(response) {
+            this.view.setToken(response.access_token);
+            this.view.setExpiredAt(response.expires_at);
 
             gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
         },
@@ -97,9 +97,10 @@ define(function(require) {
             request.execute(_.bind(this.responseProfile, this));
         },
 
-        responseProfile: function(request) {
-            if (request) {
-                this.view.setEmail(request.emailAddress);
+        responseProfile: function(response) {
+            if (response) {
+                this.view.setEmail(response.emailAddress);
+                mediator.trigger('change:systemMailBox:email', {email: response.emailAddress});
             }
             this.view.render();
             this.requestFormGetFolder();

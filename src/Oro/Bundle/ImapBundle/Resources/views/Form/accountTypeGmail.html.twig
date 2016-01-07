@@ -1,27 +1,27 @@
 <fieldset class="form-horizontal">
-    {% if form.imapAccountType.imapGmailConfiguration is defined %}
+    {% if form.imapAccountType.userEmailOrigin is defined %}
         <div {{ block('widget_container_attributes') }}>
-            {%- if form.imapAccountType.imapGmailConfiguration.parent is empty -%}
-                {{ form_errors(form.imapAccountType.imapGmailConfiguration) }}
+            {%- if form.imapAccountType.userEmailOrigin.parent is empty -%}
+                {{ form_errors(form.imapAccountType.userEmailOrigin) }}
             {%- endif -%}
 
-            {% if form.imapAccountType.imapGmailConfiguration.check is defined %}
+            {% if form.imapAccountType.userEmailOrigin.check is defined %}
                 <div class="control-group">
                     <div class="controls">
-                        {{ form_widget(form.imapAccountType.imapGmailConfiguration.check) }}
+                        {{ form_widget(form.imapAccountType.userEmailOrigin.check) }}
                     </div>
                 </div>
             {% endif %}
 
-            {% if form.imapAccountType.imapGmailConfiguration.checkFolder is defined %}
+            {% if form.imapAccountType.userEmailOrigin.checkFolder is defined %}
                 <div class="control-group">
                     <div class="controls">
-                        {{ form_widget(form.imapAccountType.imapGmailConfiguration.checkFolder) }}
+                        {{ form_widget(form.imapAccountType.userEmailOrigin.checkFolder) }}
                     </div>
                 </div>
             {% endif %}
 
-            {{- form_rest(form.imapAccountType.imapGmailConfiguration) -}}
+            {{- form_rest(form.imapAccountType.userEmailOrigin) -}}
         </div>
     {% endif %}
 </fieldset>

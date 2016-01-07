@@ -15,10 +15,6 @@ use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 
 class ChoiceAccountType extends AbstractType
 {
-    const ACCOUNT_TYPE_GMAIL = 'Gmail';
-    const ACCOUNT_TYPE_OTHER = 'Other';
-    const ACCOUNT_TYPE_NO_SELECT = 'Select Type';
-
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -55,9 +51,9 @@ class ChoiceAccountType extends AbstractType
             $builder->add('accountType', 'choice', [
                 'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
                 'choices' => [
-                    'Select' => self::ACCOUNT_TYPE_NO_SELECT,
-                    'Gmail' => self::ACCOUNT_TYPE_GMAIL,
-                    'Other' => self::ACCOUNT_TYPE_OTHER
+                    'Select' => AccountTypeModel::ACCOUNT_TYPE_NO_SELECT,
+                    'Gmail' => AccountTypeModel::ACCOUNT_TYPE_GMAIL,
+                    'Other' => AccountTypeModel::ACCOUNT_TYPE_OTHER
                 ],
             ]);
         }
@@ -85,11 +81,12 @@ class ChoiceAccountType extends AbstractType
             $data = $formEvent->getData();
 
             if ($data) {
-                if (isset($data['imapGmailConfiguration']['accessTokenExpiresAt'])) {
+                if (isset($data['userEmailOrigin']['accessTokenExpiresAt'])) {
                     $utcTimeZone = new \DateTimeZone('UTC');
-                    $newExpireDate = new \DateTime('+' . $data['imapGmailConfiguration']['accessTokenExpiresAt'] . ' seconds', $utcTimeZone);
+                    $accessTokenExpiresAt = $data['userEmailOrigin']['accessTokenExpiresAt'];
+                    $newExpireDate = new \DateTime('+' . $accessTokenExpiresAt . ' seconds', $utcTimeZone);
 
-                    $data['imapGmailConfiguration']['accessTokenExpiresAt'] = $newExpireDate;
+                    $data['userEmailOrigin']['accessTokenExpiresAt'] = $newExpireDate;
                 }
                 $accountTypeModel = $this->createAccountTypeModelFromData($data);
 
@@ -97,9 +94,9 @@ class ChoiceAccountType extends AbstractType
                 $form->add('accountType', 'choice', [
                     'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
                     'choices' => [
-                        'Select' => self::ACCOUNT_TYPE_NO_SELECT,
-                        'Gmail' => self::ACCOUNT_TYPE_GMAIL,
-                        'Other' => self::ACCOUNT_TYPE_OTHER
+                        'Select' => AccountTypeModel::ACCOUNT_TYPE_NO_SELECT,
+                        'Gmail' => AccountTypeModel::ACCOUNT_TYPE_GMAIL,
+                        'Other' => AccountTypeModel::ACCOUNT_TYPE_OTHER
                     ],
                 ]);
 
@@ -119,10 +116,6 @@ class ChoiceAccountType extends AbstractType
     {
         $accountTypeModel = $formEvent->getData();
         $form = $formEvent->getForm();
-
-        if (null === $accountTypeModel) {
-            return;
-        }
 
         if ($accountTypeModel instanceof AccountTypeModel) {
             $this->updateForm($form, $accountTypeModel);
@@ -158,12 +151,12 @@ class ChoiceAccountType extends AbstractType
     protected function updateForm(FormInterface $form, AccountTypeModel $accountTypeModel)
     {
         if ($accountTypeModel instanceof AccountTypeModel) {
-            if ($accountTypeModel->getAccountType() === self::ACCOUNT_TYPE_OTHER) {
-                $form->add('imapGmailConfiguration', 'oro_imap_configuration');
+            if ($accountTypeModel->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_OTHER) {
+                $form->add('userEmailOrigin', 'oro_imap_configuration');
             }
 
-            if ($accountTypeModel->getAccountType() === self::ACCOUNT_TYPE_GMAIL) {
-                $form->add('imapGmailConfiguration', 'oro_imap_configuration_gmail');
+            if ($accountTypeModel->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_GMAIL) {
+                $form->add('userEmailOrigin', 'oro_imap_configuration_gmail');
             }
         }
     }
@@ -180,28 +173,30 @@ class ChoiceAccountType extends AbstractType
         $accountTypeModel =  new AccountTypeModel();
         $accountTypeModel->setAccountType($data['accountType']);
 
+        $imapGmailConfiguration = $data['userEmailOrigin'];
         $userEmailOrigin = new UserEmailOrigin();
-        $userEmailOrigin->setImapHost($data['imapGmailConfiguration']['imapHost']);
-        $userEmailOrigin->setImapPort($data['imapGmailConfiguration']['imapPort']);
-        $userEmailOrigin->setImapEncryption($data['imapGmailConfiguration']['imapEncryption']);
+        $userEmailOrigin->setImapHost($imapGmailConfiguration['imapHost']);
+        $userEmailOrigin->setImapPort($imapGmailConfiguration['imapPort']);
+        $userEmailOrigin->setImapEncryption($imapGmailConfiguration['imapEncryption']);
 
-        $userEmailOrigin->setUser($data['imapGmailConfiguration']['user']);
+        $userEmailOrigin->setUser($imapGmailConfiguration['user']);
 
-        if (isset($data['imapGmailConfiguration']['accessTokenExpiresAt'])) {
-            $newExpireDate = $data['imapGmailConfiguration']['accessTokenExpiresAt'];
-            if (!$data['imapGmailConfiguration']['accessTokenExpiresAt'] instanceof \Datetime) {
+        if (isset($imapGmailConfiguration['accessTokenExpiresAt'])) {
+            $newExpireDate = $imapGmailConfiguration['accessTokenExpiresAt'];
+            if (!$imapGmailConfiguration['accessTokenExpiresAt'] instanceof \Datetime) {
                 $utcTimeZone = new \DateTimeZone('UTC');
-                $newExpireDate = new \DateTime('+' . $data['imapGmailConfiguration']['accessTokenExpiresAt'] . ' seconds', $utcTimeZone);
+                $accessTokenExpiresAt = $imapGmailConfiguration['accessTokenExpiresAt'];
+                $newExpireDate = new \DateTime('+' . $accessTokenExpiresAt . ' seconds', $utcTimeZone);
             }
 
             $userEmailOrigin->setAccessTokenExpiresAt($newExpireDate);
         }
 
-        if (isset($data['imapGmailConfiguration']['googleAuthCode'])) {
-            $userEmailOrigin->setGoogleAuthCode($data['imapGmailConfiguration']['googleAuthCode']);
+        if (isset($imapGmailConfiguration['googleAuthCode'])) {
+            $userEmailOrigin->setGoogleAuthCode($imapGmailConfiguration['googleAuthCode']);
         }
 
-        $accountTypeModel->setImapGmailConfiguration($userEmailOrigin);
+        $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
 
         return $accountTypeModel;
     }

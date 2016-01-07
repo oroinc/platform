@@ -496,7 +496,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     {
         $this->imapAccountType = $accountTypeModel;
         if ($accountTypeModel instanceof AccountTypeModel) {
-            $this->setOrigin($accountTypeModel->getImapGmailConfiguration());
+            $this->setOrigin($accountTypeModel->getUserEmailOrigin());
         }
     }
 
@@ -506,17 +506,17 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function getImapAccountType()
     {
         if ($this->imapAccountType === null) {
-            /** @var UserEmailOrigin $imapConfiguration */
-            $imapConfiguration = $this->getOrigin();
+            /** @var UserEmailOrigin $userEmailOrigin */
+            $userEmailOrigin = $this->getOrigin();
             $accountTypeModel = null;
-            if ($imapConfiguration) {
+            if ($userEmailOrigin) {
                 $accountTypeModel = new AccountTypeModel();
-                if ($imapConfiguration->getAccessToken() && $imapConfiguration->getAccessToken() !== '') {
+                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
                     $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_GMAIL);
-                    $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
                 } else {
                     $accountTypeModel->setAccountType(ChoiceAccountType::ACCOUNT_TYPE_OTHER);
-                    $accountTypeModel->setImapGmailConfiguration($imapConfiguration);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
                 }
             }
 

@@ -18,10 +18,10 @@ class GmailConnectionController extends Controller
     public function checkAction()
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
-        $connectionManager = $this->container->get('oro_imap.manager.controller.connection');
+        $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
 
         try {
-            $form = $connectionManager->getFormCheckGmailConnection($request);
+            $form = $connectionControllerManager->getFormCheckGmailConnection($request);
 
             $response = [
                 'html' => $this->renderView('OroImapBundle:Connection:checkGmail.html.twig', [
