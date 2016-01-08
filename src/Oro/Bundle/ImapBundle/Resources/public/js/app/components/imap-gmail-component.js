@@ -164,6 +164,7 @@ define(function(require) {
         onGetFolders: function(value) {
             delete value.type;
             var data = this.prepareDataForForm(value);
+            mediator.execute('showLoading');
 
             $.ajax({
                 url: this.urlGetFolders,
@@ -178,6 +179,7 @@ define(function(require) {
          * @param response
          */
         handlerGetFolders: function(response) {
+            mediator.execute('hideLoading');
             this.view.setHtml(response.html);
             this.view.render();
         },
