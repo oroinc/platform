@@ -148,6 +148,18 @@ define([
 
         isDefined: function(value) {
             return !_.isUndefined(value);
+        },
+
+        getLink: function(parameters) {
+            if (this.requestType === 'DELETE') {
+                var actionParameters = this.getActionParameters();
+                if (_.isUndefined(parameters)) {
+                    parameters = {};
+                }
+                parameters = _.extend(actionParameters, parameters);
+            }
+
+            return DeleteMassAction.__super__.getLink.call(this, parameters);
         }
     });
 
