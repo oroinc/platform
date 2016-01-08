@@ -295,7 +295,13 @@
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% set imapAccountType = form_widget(form.children.imapAccountType) %}
+    {% if  form.children.imapAccountType is defined %}
+        {% set imapAccountType = form_widget(form.children.imapAccountType) %}
+    {% endif %}
+    {% if  form.children.origin is defined %}
+        {% set imapAccountType = form_widget(form.children.origin) %}
+    {% endif %}
+
     {% set process = form_row(form.children.processType) ~
         form_widget(form.children.processSettings) %}
     {% set access = form_row(form.children.authorizedUsers) ~

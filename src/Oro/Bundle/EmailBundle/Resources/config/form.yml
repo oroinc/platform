@@ -209,6 +209,7 @@ services:
         arguments:
             - @oro_email.mailbox.process_storage
             - @oro_security.encoder.mcrypt
+            - @oro_config.user
         tags:
             - { name: form.type, alias: oro_email_mailbox }
 

@@ -84,15 +84,15 @@ class ConfigurationGmailType extends AbstractType
             ])
             ->add('smtpHost', 'hidden', [
                 'required' => false,
-                'data' => 'smtp.gmail.com'
+                'data' => GmailImap::DEFAULT_GMAIL_SMTP_HOST
             ])
             ->add('smtpPort', 'hidden', [
                 'required' => false,
-                'data' => 465
+                'data' => GmailImap::DEFAULT_GMAIL_SMTP_PORT
             ])
             ->add('smtpEncryption', 'hidden', [
                 'required'    => false,
-                'data' => 'ssl'
+                'data' => GmailImap::DEFAULT_GMAIL_SMTP_SSL
             ]);
 
         $builder->get('accessTokenExpiresAt')
