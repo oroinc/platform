@@ -202,7 +202,7 @@ class AssociationManager
                 ->select(
                     sprintf(
                         'e.id AS id, target.%s AS entityId, \'%s\' AS entityClass, '
-                        . ($nameExpr ?: '\'\'') . ' AS entityTitle',
+                        . (sprintf('CAST(%s as text)', $nameExpr) ?: '\'\'') . ' AS entityTitle',
                         $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass),
                         str_replace('\'', '\'\'', $entityClass)
                     )
