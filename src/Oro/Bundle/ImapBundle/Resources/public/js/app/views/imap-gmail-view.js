@@ -37,7 +37,7 @@ define(function(require) {
         },
 
         render: function() {
-            if (this.html.length > 0) {
+            if (this.html && this.html.length > 0) {
                 this.$el.html(this.html);
             }
 
