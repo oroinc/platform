@@ -1,4 +1,4 @@
-/*global Google */
+/*global gapi */
 define(function(require) {
     'use strict';
 
