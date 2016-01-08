@@ -279,6 +279,13 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
 
+    oro_email.listener.context_grid:
+        class: %oro_email.listener.datagrid.context.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter }
+
     oro_email.manager.autoresponserule.api:
         class: %oro_email.manager.autoresponserule.api.class%
         parent: oro_soap.manager.entity_manager.abstract

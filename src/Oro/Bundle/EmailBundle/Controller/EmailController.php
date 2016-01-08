@@ -413,11 +413,15 @@ class EmailController extends Controller
      */
     public function contextGridAction($activityId, $entityClass = null)
     {
-        $gridName = $this->get('oro_entity.entity_context_provider')->getContextGridByEntity($entityClass);
+        $gridName    = $this->get('oro_entity.entity_context_provider')->getContextGridByEntity($entityClass);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         return [
             'gridName' => $gridName,
             'multiselect' => false,
-            'params' => ['activityId' => $activityId],
+            'params' => [
+                'activityId' => $activityId,
+                'class_name' => $entityClass,
+            ],
             'renderParams' => []
         ];
     }
