@@ -31,20 +31,33 @@
     margin-left: 0;
   }
   .oro-subtitle {
-    white-space: nowrap;
+    text-align: left;
+    white-space: normal;
   }
   .grid-views {
     margin-left: 0;
-    .views-group>.dropdown-toggle {
-      height: auto;
+    .views-group {
+      margin-right: 25px;
+      vertical-align: baseline;
+      & > .dropdown-toggle {
+        height: auto;
+        vertical-align: baseline;
+      }
+      &.open .btn.dropdown-toggle .caret, .caret {
+        margin: 0 -13px 0 5px;
+        vertical-align: baseline;
+        display: inline;
+        line-height: initial;
+        font-size: 4px;
+      }
     }
     .actions-group {
-      line-height: @fontSizeLarge * 2;
+      margin-left: 0;
+      vertical-align: baseline;
     }
-    .actions-group+.edited-label,
+    .edited-label,
     .actions-group .dropdown-toggle {
-      line-height: @fontSizeLarge * 2;
-      vertical-align: top;
+      vertical-align: baseline;
       &:after {
         content: '';
         font-size: 20px;
