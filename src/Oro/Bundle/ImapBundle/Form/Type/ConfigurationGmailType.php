@@ -103,7 +103,7 @@ class ConfigurationGmailType extends AbstractType
                         return '';
                     }
 
-                    return $originalAccessTokenExpiresAt->format('c');
+                    return $originalAccessTokenExpiresAt->format('U');
                 },
                 function ($submittedAccessTokenExpiresAt) {
 
@@ -111,8 +111,8 @@ class ConfigurationGmailType extends AbstractType
                         return $submittedAccessTokenExpiresAt;
                     }
 
-                    $utcTimeZone = new \DateTimeZone('UTC');
-                    $newExpireDate = new \DateTime('+' . $submittedAccessTokenExpiresAt . ' seconds', $utcTimeZone);
+                    $newExpireDate = new \DateTime();
+                    $newExpireDate->setTimestamp($submittedAccessTokenExpiresAt);
 
                     return $newExpireDate;
                 }
