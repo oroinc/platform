@@ -21,6 +21,7 @@ define(function(require) {
         initialize: function(options) {
             this.url = _.result(options, 'url') || '';
             this.urlGetFolders = _.result(options, 'urlGetFolders') || '';
+            this.formParentName = _.result(options, 'formParentName') || '';
 
             var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
@@ -134,10 +135,13 @@ define(function(require) {
          * Request to server to get template with button Retrieve Folders
          */
         requestFormGetFolder: function() {
+            var data = this.view.getData();
+            data.formParentName = this.formParentName;
+
             $.ajax({
                 url: this.url,
-                method: 'GET',
-                data: this.view.getData(),
+                method: 'POST',
+                data: data,
                 success: _.bind(this.renderFormGetFolder, this)
             });
         },

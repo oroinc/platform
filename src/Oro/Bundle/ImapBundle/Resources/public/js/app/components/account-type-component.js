@@ -49,7 +49,7 @@ define(function(require) {
             mediator.execute('showLoading');
             $.ajax({
                 url: this.url,
-                method: 'GET',
+                method: 'POST',
                 data: {
                     'type': value,
                     'formParentName': this.formParentName
@@ -65,7 +65,7 @@ define(function(require) {
             mediator.execute('showLoading');
             $.ajax({
                 url: this.url,
-                method: 'GET',
+                method: 'POST',
                 data: {
                     'formParentName': this.formParentName
                 },
@@ -77,7 +77,7 @@ define(function(require) {
             mediator.execute('showLoading');
             $.ajax({
                 url: this.url,
-                method: 'GET',
+                method: 'POST',
                 data: {
                     'type': value.type,
                     'token': value.token

@@ -13,15 +13,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class GmailConnectionController extends Controller
 {
     /**
-     * @Route("/connection/check", name="oro_imap_gmail_connection_check", methods={"GET", "POST"})
+     * @Route("/connection/check", name="oro_imap_gmail_connection_check", methods={"POST"})
      */
     public function checkAction()
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
+        $formParentName = $request->get('formParentName');
 
         try {
-            $form = $connectionControllerManager->getFormCheckGmailConnection($request);
+            $form = $connectionControllerManager->getFormCheckGmailConnection($request, $formParentName);
 
             $response = [
                 'html' => $this->renderView('OroImapBundle:Connection:checkGmail.html.twig', [

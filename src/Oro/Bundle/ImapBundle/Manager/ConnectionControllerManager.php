@@ -55,10 +55,10 @@ class ConnectionControllerManager
 
     /**
      * @param $request
-     *
+     * $param sting $formParentName
      * @return FormInterface
      */
-    public function getFormCheckGmailConnection($request)
+    public function getFormCheckGmailConnection($request, $formParentName)
     {
         $form = $this->FormFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
         $form->submit($request);
@@ -91,15 +91,29 @@ class ConnectionControllerManager
         $emailFolders = $manager->getFolders();
         $origin->setFolders($emailFolders);
 
-        $aacountType = new AccountTypeModel();
-        $aacountType->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
-        $aacountType->setUserEmailOrigin($origin);
+        $accountTypeModel = new AccountTypeModel();
+        $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
+        $accountTypeModel->setUserEmailOrigin($origin);
 
-        $user = new User();
-        $user->setImapAccountType($aacountType);
-        $this->formUser->setData($user);
 
-        return $this->formUser;
+        $form = null;
+        switch ($formParentName) {
+            case 'oro_user_user_form':
+                $data = $user = new User();
+                $data->setImapAccountType($accountTypeModel);
+                $this->formUser->setData($data);
+                $form = $this->formUser;
+                break;
+            case 'oro_email_mailbox':
+                $formAlias = 'oro_email_mailbox';
+                $data = $user = new Mailbox();
+                $data->setImapAccountType($accountTypeModel);
+                $form = $this->FormFactory->create($formAlias, null, ['csrf_protection' => false]);
+                $form->setData($data);
+                break;
+        }
+
+        return $form;
     }
 
     /**

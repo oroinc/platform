@@ -72,7 +72,8 @@
         'url' :  path("oro_imap_change_account_type"),
         'urlGetFolders': path("oro_imap_gmail_connection_check"),
         'formSelector': '#'~formSelector|default(form.vars.id),
-        'googleErrorMessage': '.google-alert'
+        'googleErrorMessage': '.google-alert',
+        'formParentName' : form.parent.parent.vars.name
     } %}
 
     <div class="container-imap-gmail-container"

@@ -127,7 +127,7 @@ class ConnectionController extends Controller
     }
 
     /**
-     * @Route("imap/connection/account/change", name="oro_imap_change_account_type", methods={"GET"})
+     * @Route("imap/connection/account/change", name="oro_imap_change_account_type", methods={"POST"})
      */
     public function getFormAction()
     {
