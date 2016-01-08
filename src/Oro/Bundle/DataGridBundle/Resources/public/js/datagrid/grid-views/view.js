@@ -10,6 +10,7 @@ define(function(require) {
     var ViewNameModal = require('./view-name-modal');
     var mediator = require('oroui/js/mediator');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var routing = require('routing');
 
     /**
      * Datagrid views widget
@@ -32,7 +33,8 @@ define(function(require) {
             'click a.unshare': 'onUnshare',
             'click a.delete': 'onDelete',
             'click a.rename': 'onRename',
-            'click a.discard_changes': 'onDiscardChanges'
+            'click a.discard_changes': 'onDiscardChanges',
+            'click a.use_as_default': 'onUseAsDefault'
         },
 
         /** @property */
@@ -230,6 +232,7 @@ define(function(require) {
             modal.on('ok', function(e) {
                 var model = self._createViewModel({
                     label: this.$('input[name=name]').val(),
+                    is_default: this.$('input[name=is_default]').is(':checked'),
                     type: 'private',
                     grid_name: self.gridName,
                     filters: self.collection.state.filters,
@@ -250,6 +253,10 @@ define(function(require) {
                         self._updateTitle();
                         self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                         mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
+
+                        if (model.get('is_default')) {
+                            self._getCurrentDefaultViewModel().set({is_default: false});
+                        }
                     },
                     error: function(model, response, options) {
                         modal.open();
@@ -327,14 +334,21 @@ define(function(require) {
             var self = this;
 
             var modal = new ViewNameModal({
-                defaultValue: model.get('label')
+                defaultValue: model.get('label'),
+                defaultChecked: model.get('is_default'),
             });
             modal.on('ok', function() {
                 model.save({
-                    label: this.$('input[name=name]').val()
+                    label: this.$('input[name=name]').val(),
+                    is_default: this.$('input[name=is_default]').is(':checked')
                 }, {
                     wait: true,
                     success: function() {
+                        if (model.get('is_default')) {
+                            self._getCurrentDefaultViewModel().set({is_default: false});
+                        } else {
+                            self._getDefaultSystemViewModel().set({is_default: true});
+                        }
                         self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                     },
                     error: function(model, response, options) {
@@ -376,6 +390,42 @@ define(function(require) {
         },
 
         /**
+         * @param {Event} e
+         */
+        onUseAsDefault: function(e) {
+            var self = this;
+            var isDefault = 1;
+            var defaultModel = this._getCurrentDefaultViewModel();
+            var currentViewModel = this._getCurrentViewModel();
+            var id = currentViewModel.id;
+            if (this._isCurrentViewSystem()) {
+                // in this case we need to set default to false on current default view
+                isDefault = 0;
+                id = defaultModel.id;
+            }
+            return $.post(
+                routing.generate('oro_datagrid_api_rest_gridview_default', {
+                    id: id,
+                    default: isDefault
+                }),
+                {},
+                function(response) {
+                    defaultModel.set({is_default: false});
+                    currentViewModel.set({is_default: true});
+                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                }
+            ).fail(
+                function(response) {
+                    if (response.status === 404) {
+                        self._showFlashMessage('error', __('oro.datagrid.gridView.error.not_found'));
+                    } else {
+                        self._showFlashMessage('error', __('oro.ui.unexpected_error'));
+                    }
+                }
+            );
+        },
+
+        /**
          * @private
          *
          * @param {GridViewModel} model
@@ -396,6 +446,11 @@ define(function(require) {
             if (model.id === viewId) {
                 this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
                 this.viewDirty = !this._isCurrentStateSynchronized();
+            }
+
+            if (model.get('is_default')) {
+                var systemModel = this._getDefaultSystemViewModel();
+                systemModel.set({is_default: true});
             }
 
             this.render();
@@ -539,6 +594,11 @@ define(function(require) {
                     name: 'delete',
                     enabled: typeof currentView !== 'undefined' &&
                             currentView.get('deletable')
+                },
+                {
+                    label: __('oro.datagrid.action.use_as_default_grid_view'),
+                    name: 'use_as_default',
+                    enabled: typeof currentView !== 'undefined' && !currentView.get('is_default')
                 }
             ];
         },
@@ -565,6 +625,41 @@ define(function(require) {
 
             return this.viewsCollection.findWhere({
                 name: this._getCurrentView().value
+            });
+        },
+
+        /**
+         * @private
+         *
+         * @returns {undefined|GridViewModel}
+         */
+        _getCurrentDefaultViewModel: function() {
+            if (!this._hasActiveView()) {
+                return;
+            }
+
+            return this.viewsCollection.findWhere({
+                is_default: true
+            });
+        },
+
+        /**
+         * @private
+         *
+         * @returns {boolean}
+         */
+        _isCurrentViewSystem: function() {
+            return this._getCurrentView().value === this.DEFAULT_GRID_VIEW_ID;
+        },
+
+        /**
+         * @private
+         *
+         * @returns {undefined|GridViewModel}
+         */
+        _getDefaultSystemViewModel: function() {
+            return this.viewsCollection.findWhere({
+                name: this.DEFAULT_GRID_VIEW_ID
             });
         },
 

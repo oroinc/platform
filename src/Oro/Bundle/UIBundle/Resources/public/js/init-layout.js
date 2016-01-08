@@ -264,7 +264,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 $main.width(realWidth($topPage) - realWidth($leftPanel) - realWidth($rightPanel));
                 layout.updateResponsiveLayout();
 
-                var debugBarHeight = layout.getDevToolbarHeight();
+                var debugBarHeight = $('.sf-toolbarreset').height();
                 var anchorTop = anchor.position().top;
                 var footerHeight = $('#footer:visible').height() || 0;
                 var fixContent = 1;

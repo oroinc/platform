@@ -44,6 +44,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             options.collection.on('remove', this._onModelDeleted, this);
             options.collection.on('change', this._onModelChanged, this);
             options.collection.on('reset', this._onResetCollection, this);
+            options.collection.on('sort', this._renderCollection, this);
 
             this._initSorting();
             this._onResetCollection();
@@ -85,32 +86,16 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _sortCollection: function() {
-            var collectionChanged = false;
             var collection = this.options.collection;
-
-            _.each(this.element.find('tr'), function(el, index) {
-                var cid = $(el).data('cid');
-                var model = collection.at(index);
-                if (cid === model.cid) {
-                    return;
-                }
-                var anotherModel = collection.get(cid);
-                var anotherIndex = collection.indexOf(anotherModel);
-                collection.remove(model, {silent: true});
-                collection.remove(anotherModel, {silent: true});
-                if (index < anotherIndex) {
-                    collection.add(anotherModel, {silent: true, at: index});
-                    collection.add(model, {silent: true, at: anotherIndex});
-                } else {
-                    collection.add(model, {silent: true, at: anotherIndex});
-                    collection.add(anotherModel, {silent: true, at: index});
-                }
-                collectionChanged = true;
+            var positions = {};
+            this.element.find('tr').each(function(index) {
+                positions[$(this).data('cid')] = index;
             });
-
-            if (collectionChanged) {
-                collection.trigger('sort');
-            }
+            collection.models.sort(function(left, right) {
+                var diff = positions[left.cid] - positions[right.cid];
+                return diff > 0 ? 1 : (diff < 0 ? -1 : 0);
+            });
+            collection.trigger('sort');
         },
 
         _onModelAdded: function(model) {
@@ -150,8 +135,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _onResetCollection: function() {
-            this.element.empty();
-            this.options.collection.each(this._onModelAdded, this);
+            this._renderCollection();
 
             mediator.trigger(
                 'items-manager:table:reset:' + this._getIdentifier(),
@@ -160,8 +144,19 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             );
         },
 
+        _renderCollection: function() {
+            this.element.empty();
+            this.options.collection.each(this._onModelAdded, this);
+        },
+
         _renderModel: function(model) {
-            var data = _.extend({cid: model.cid}, model.toJSON());
+            var collection = this.options.collection;
+            var index = collection.indexOf(model);
+            var data = _.extend({
+                cid: model.cid,
+                isFirst: index === 0,
+                isLast: index === collection.length - 1
+            }, model.toJSON());
             return this._itemRender(this.itemTemplate, data);
         },
 
