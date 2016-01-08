@@ -5,9 +5,11 @@ namespace Oro\Bundle\ActivityListBundle\Placeholder;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 
 class PlaceholderFilter
@@ -24,22 +26,28 @@ class PlaceholderFilter
     /** @var ConfigProvider */
     protected $configProvider;
 
+    /** @var ActivityManager */
+    protected $activityManager;
+
     /**
      * @param ActivityListChainProvider $activityListChainProvider
      * @param ManagerRegistry           $doctrine
      * @param DoctrineHelper            $doctrineHelper
      * @param ConfigProvider            $configProvider
+     * @param ActivityManager           $activityManager
      */
     public function __construct(
         ActivityListChainProvider $activityListChainProvider,
         ManagerRegistry $doctrine,
         DoctrineHelper $doctrineHelper,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        ActivityManager $activityManager
     ) {
         $this->activityListProvider = $activityListChainProvider;
         $this->doctrine             = $doctrine;
         $this->doctrineHelper       = $doctrineHelper;
         $this->configProvider       = $configProvider;
+        $this->activityManager      = $activityManager;
     }
 
     /**
@@ -52,33 +60,60 @@ class PlaceholderFilter
     public function isApplicable($entity = null, $pageType = null)
     {
         if ($pageType === null || !is_object($entity) || !$this->doctrineHelper->isManageableEntity($entity) ||
-            $this->doctrineHelper->isNewEntity($entity)) {
+            $this->doctrineHelper->isNewEntity($entity)
+        ) {
+            return false;
+        }
+
+        $entityClass = $this->doctrineHelper->getEntityClass($entity);
+        if (!$this->configProvider->hasConfig($entityClass)) {
+            return false;
+        }
+
+        $hasAppliedActivityAssociation = false;
+        $activityAssociations          = $this->activityManager->getActivityAssociations($entityClass);
+        foreach ($activityAssociations as $activityAssociation) {
+            $isAssociationAccessible = ExtendHelper::isFieldAccessible(
+                $this->configProvider->getConfig(
+                    $activityAssociation['className'],
+                    $activityAssociation['associationName']
+                )
+            );
+            if ($isAssociationAccessible) {
+                $hasAppliedActivityAssociation = true;
+                break;
+            }
+        }
+
+        /**
+         * If at least one activity is accessible we can continue otherwise no.
+         */
+        if (!$hasAppliedActivityAssociation) {
             return false;
         }
 
         $pageType         = (int) $pageType;
         $id               = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        $entityClass      = $this->doctrineHelper->getEntityClass($entity);
         $activityListRepo = $this->doctrine->getRepository('OroActivityListBundle:ActivityList');
 
-        return $this->isAllowedOnPage($entity, $pageType) && (
+        return $this->isAllowedOnPage($entityClass, $pageType) && (
             in_array($entityClass, $this->activityListProvider->getTargetEntityClasses())
             || (bool)$activityListRepo->getRecordsCountForTargetClassAndId($entityClass, $id)
         );
     }
 
     /**
-     * @param object $entity
+     * @param string $entityClass
      * @param int    $pageType
      * @return bool
      */
-    protected function isAllowedOnPage($entity, $pageType)
+    protected function isAllowedOnPage($entityClass, $pageType)
     {
-        if (!$this->configProvider->hasConfig($entity)) {
+        if (!$this->configProvider->hasConfig($entityClass)) {
             return false;
         }
 
-        $config = $this->configProvider->getConfig($entity);
+        $config = $this->configProvider->getConfig($entityClass);
         if (!$config->has(ActivityScope::SHOW_ON_PAGE)) {
             return false;
         }
@@ -101,7 +136,10 @@ class PlaceholderFilter
         $entity   = $event->getEntity();
         $pageType = $event->getPageType();
 
-        if ($pageType === null || !is_object($entity) || !$this->isAllowedOnPage($entity, $pageType)) {
+        if ($pageType === null
+            || !is_object($entity)
+            || !$this->isAllowedOnPage($this->doctrineHelper->getEntityClass($entity), $pageType)
+        ) {
             // Clear allowed widgets
             $event->setWidgets([]);
         }
