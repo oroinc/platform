@@ -44,6 +44,9 @@ define([
         /** @property {Boolean} */
         allowOk: true,
 
+        /** @property {Boolean} */
+        doDelete: false,
+
         /**
          * As in this action we need to send POST request to get data for confirm message
          * we set this.confirmation = false at initialization to prevent opening confirm window.
@@ -54,6 +57,7 @@ define([
             DeleteMassAction.__super__.initialize.apply(this, arguments);
             this.confirmMessage = __(this.defaultMessages.confirm_content);
             this.confirmation = false;
+            this.requestType = 'POST';
         },
 
         /**
@@ -86,8 +90,8 @@ define([
          *
          */
         _onAjaxSuccess: function(data, textStatus, jqXHR) {
-            if (this.requestType === 'POST') {
-                this.requestType = 'DELETE';
+            if (!this.doDelete) {
+                this.doDelete = true;
                 this.setConfirmMessage(data);
                 if (this.reloadData) {
                     this.datagrid.hideLoading();
@@ -105,7 +109,7 @@ define([
          * Sets this.confirmModal = null to rebuild confirm window after each request.
          */
         execute: function() {
-            this.requestType = 'POST';
+            this.doDelete = false;
             this.confirmModal = null;
             if (this.checkSelectionState()) {
                 DeleteMassAction.__super__.executeConfiguredAction.call(this);
@@ -144,6 +148,13 @@ define([
                 }
 
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        getActionParameters: function() {
+            return _.extend({doDelete: this.doDelete}, DeleteMassAction.__super__.getActionParameters.call(this));
         },
 
         isDefined: function(value) {

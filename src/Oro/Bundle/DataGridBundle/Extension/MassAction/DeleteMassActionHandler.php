@@ -66,14 +66,13 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     public function handle(MassActionHandlerArgs $args)
     {
         $limitResult = $this->limiter->getLimitResult($args);
-        $method      = $this->requestStack->getMasterRequest()->getMethod();
-        if ($method === 'POST') {
-            $result = $this->getPostResponse($limitResult);
-        } elseif ($method === 'DELETE') {
+        $data = $args->getData();
+        $doDelete = isset($data['doDelete']) ? filter_var($data['doDelete'], FILTER_VALIDATE_BOOLEAN) : false;
+        if ($doDelete) {
             $this->limiter->limitQuery($limitResult, $args);
             $result = $this->doDelete($args);
         } else {
-            $result = $this->getNotSupportedResponse($method);
+            $result = $this->getPostResponse($limitResult);
         }
 
         return $result;
@@ -130,19 +129,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                 'deletable' => $limitResult->getDeletable(),
                 'max_limit' => $limitResult->getMaxLimit()
             ]
-        );
-    }
-
-    /**
-     * @param $method
-     *
-     * @return MassActionResponse
-     */
-    protected function getNotSupportedResponse($method)
-    {
-        return new MassActionResponse(
-            false,
-            sprintf('Method "%s" is not supported', $method)
         );
     }
 
