@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class SortByExtension extends \Twig_Extension
 {
@@ -52,7 +52,7 @@ class SortByExtension extends \Twig_Extension
 
         }
 
-        ArrayUtils::sortBy(
+        ArrayUtil::sortBy(
             $array,
             self::getOption($options, 'reverse', false),
             self::getOption($options, 'property', 'priority'),

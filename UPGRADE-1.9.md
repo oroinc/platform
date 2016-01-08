@@ -273,6 +273,7 @@ after:
 - `Oro\Bundle\UIBundle\EventListener\ContentProviderListener` added to the class cache and constructor have container as performance improvement
 - Services with tag `oro_ui.content_provider` was marked as private
 - Services with tag `oro_formatter` was marked as private
+- Class `Oro\Bundle\UIBundle\Tools\ArrayUtils` marked as deprecated. Use `Oro\Component\PhpUtils\ArrayUtil` instead.
 
 ####UserBundle
 - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
