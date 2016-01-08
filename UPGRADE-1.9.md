@@ -34,6 +34,57 @@ UPGRADE FROM 1.8 to 1.9
 - `audit-grid` and `audit-history-grid` based on `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` now. Make join to get your entity on grid
 
 ####DataGridBundle
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_PATH`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_TYPE_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::getAclResource`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_ACL_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::getAclResource`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::BASE_DATAGRID_CLASS_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::BASE_DATAGRID_CLASS_PATH`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_ACL_CHECK` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::isDatasourceSkipAclApply`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH`.
+- Option "acl_resource" moved from option "source" too root node of datagrid configuration:
+
+Before
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        source:
+            acl_resource: 'acme_demo_entity_view'
+            ... # some configuration
+```
+
+Now
+
+```
+datagrid:
+    acme-demo-grid:
+        acl_resource: 'acme_demo_entity_view'
+        ... # some configuration
+```
+
+- Option of datagrid "skip_acl_check" is deprecated, use option "skip_acl_apply" instead. Logic of this option was also changed. Before this option caused ignorance of option "acl_resource". Now it is responsible only for indication whether or not ACL should be applied to source query of the grid. See [advanced_grid_configuration.md](.src/Oro/Bundle/DataGridBundle/Resources/doc/backend/advanced_grid_configuration.md) for use cases. 
+
+Before
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        options:
+            skip_acl_check: true
+```
+
+Now
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        source:
+            skip_acl_apply: true
+            ... # some configuration
+```
+
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
 - JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
 - Grid merge uses distinct policy
@@ -223,6 +274,7 @@ after:
 - `Oro\Bundle\UIBundle\EventListener\ContentProviderListener` added to the class cache and constructor have container as performance improvement
 - Services with tag `oro_ui.content_provider` was marked as private
 - Services with tag `oro_formatter` was marked as private
+- Class `Oro\Bundle\UIBundle\Tools\ArrayUtils` marked as deprecated. Use `Oro\Component\PhpUtils\ArrayUtil` instead.
 
 ####UserBundle
 - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
