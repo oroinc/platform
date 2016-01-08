@@ -6,6 +6,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
     var ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
@@ -125,6 +126,7 @@ define(function(require) {
                 this.view.setErrorMessage(request.message);
                 this.view.render();
             } else if (request) {
+                mediator.trigger('change:systemMailBox:email', {email: request.emailAddress});
                 this.view.setEmail(request.emailAddress);
                 this.view.render();
                 this.requestFormGetFolder();
@@ -162,6 +164,7 @@ define(function(require) {
         onGetFolders: function(value) {
             delete value.type;
             var data = this.prepareDataForForm(value);
+
             $.ajax({
                 url: this.urlGetFolders,
                 method: 'POST',
@@ -186,7 +189,8 @@ define(function(require) {
          */
         prepareDataForForm: function(values) {
             var data = {
-                oro_imap_configuration_gmail: {}
+                oro_imap_configuration_gmail: {},
+                formParentName: this.formParentName
             };
 
             for (var i in values) {
