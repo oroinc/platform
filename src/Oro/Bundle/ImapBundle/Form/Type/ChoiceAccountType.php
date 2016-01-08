@@ -40,7 +40,6 @@ class ChoiceAccountType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         if ($options['showDisconnectButton']) {
             $builder->add('disconnect', 'button', [
                 'attr' => [

@@ -69,8 +69,6 @@ class MailboxType extends AbstractType
             ],
         ]);
 
-//        $builder->add('origin', 'oro_imap_configuration');
-
         $builder->add(
             'imapAccountType',
             'oro_imap_choice_account_type',

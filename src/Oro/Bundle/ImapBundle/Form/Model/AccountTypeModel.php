@@ -25,7 +25,7 @@ class AccountTypeModel
     }
 
     /**
-     * @param $value
+     * @param string $value
      */
     public function setAccountType($value)
     {
