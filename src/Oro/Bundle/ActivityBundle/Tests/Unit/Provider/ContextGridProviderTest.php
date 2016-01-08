@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\ActivityBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityBundle\Provider\EntityContextProvider;
+use Oro\Bundle\ActivityBundle\Provider\ContextGridProvider;
 
-class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
+class ContextGridProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -27,7 +27,7 @@ class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
     protected $mockEntity;
 
     /**
-     * @var EntityContextProvider
+     * @var ContextGridProvider
      */
     protected $provider;
 
@@ -78,7 +78,7 @@ class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
         $this->configProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
-            ->setMethods(['getConfig', 'get'])
+            ->setMethods(['getConfig', 'has', 'get'])
             ->getMock();
 
         $this->configProvider->expects($this->any())
@@ -87,11 +87,16 @@ class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->configProvider));
 
         $this->configProvider->expects($this->any())
+            ->method('has')
+            ->with('context')
+            ->willReturn(true);
+
+        $this->configProvider->expects($this->any())
             ->method('get')
-            ->with('context-grid')
+            ->with('context')
             ->will($this->returnValue($this->expectedGridName));
 
-        $this->provider = new EntityContextProvider(
+        $this->provider = new ContextGridProvider(
             $this->routingHelper,
             $this->entityProvider,
             $this->configProvider
