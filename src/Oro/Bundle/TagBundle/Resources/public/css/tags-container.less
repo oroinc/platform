@@ -1,24 +1,26 @@
 .tags-container {
-  line-height: 27px;
+  line-height: 24px;
 }
 
 .table td.tags-container {
-  line-height: 27px;
-  padding-top: 1px;
-  padding-bottom: 1px;
+  line-height: 24px;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 .tags-container__tag-entry {
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 3px;
+  color: @tagItemColor;
+  background-color: @tagItemBackground;
+  border-radius: 10px;
   margin-right: 0px;
-  font-size: 13px;
+  font-size: 11px;
   line-height: 20px;
-  padding: 1px 6px 0;
+  padding: 1px 8px;
   display: inline-block;
   vertical-align: baseline;
+  &:hover {
+    color: @tagItemColor;
+  }
 }
 .tags-container__tag-entry_is-my {
-  border-color: #bbbbee;
-  background: #fafaff;
+  background-color: @tagItemBackground;
 }
