@@ -469,6 +469,7 @@ datagrid:
 
     calendar-event-for-context-grid:
         extended_entity_name: %oro_calendar.calendar_event.entity.class%
+        acl_resource: oro_calendar_event_view
         options:
             entityHint: calendar_events
             entity_pagination: true
@@ -478,7 +479,6 @@ datagrid:
             routerEnabled: false
         source:
             type: orm
-            acl_resource: oro_calendar_event_view
             query:
                 select:
                     - event.id
