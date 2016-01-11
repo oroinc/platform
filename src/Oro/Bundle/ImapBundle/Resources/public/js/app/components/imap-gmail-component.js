@@ -102,7 +102,7 @@ define(function(require) {
          */
         checkAuthorization: function(result) {
             this.view.setToken(result.access_token);
-            this.view.setExpiredAt(result.expires_at);
+            this.view.setExpiredAt(result.expires_in);
 
             gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
         },

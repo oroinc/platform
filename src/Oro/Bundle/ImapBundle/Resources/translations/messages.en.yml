@@ -10,7 +10,11 @@ oro.imap:
                 success.label: Authorization was successfull
 
     configuration:
-        account_type.label: Account Type
+        account_type:
+            label: Account Type
+            selectType: Select Type
+            gmail: Gmail
+            other: Other
         imap_host.label: IMAP Host
         imap_port.label: IMAP Port
         imap_encryption.label: Encryption

@@ -6,9 +6,9 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 class AccountTypeModel
 {
-    const ACCOUNT_TYPE_GMAIL = 'Gmail';
-    const ACCOUNT_TYPE_OTHER = 'Other';
-    const ACCOUNT_TYPE_NO_SELECT = 'Select Type';
+    const ACCOUNT_TYPE_GMAIL = 'gmail';
+    const ACCOUNT_TYPE_OTHER = 'other';
+    const ACCOUNT_TYPE_NO_SELECT = 'selectType';
 
     /** @var string|null */
     protected $accountType;

@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
@@ -50,9 +51,15 @@ class ChoiceAccountType extends AbstractType
             $builder->add('accountType', 'choice', [
                 'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
                 'choices' => [
-                    'Select' => AccountTypeModel::ACCOUNT_TYPE_NO_SELECT,
-                    'Gmail' => AccountTypeModel::ACCOUNT_TYPE_GMAIL,
-                    'Other' => AccountTypeModel::ACCOUNT_TYPE_OTHER
+                    '' => $this->translator->trans(
+                        'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
+                    ),
+                    AccountTypeModel::ACCOUNT_TYPE_GMAIL => $this->translator->trans(
+                        'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_GMAIL
+                    ),
+                    AccountTypeModel::ACCOUNT_TYPE_OTHER => $this->translator->trans(
+                        'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
+                    )
                 ],
             ]);
         }
@@ -93,9 +100,15 @@ class ChoiceAccountType extends AbstractType
                 $form->add('accountType', 'choice', [
                     'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
                     'choices' => [
-                        'Select' => AccountTypeModel::ACCOUNT_TYPE_NO_SELECT,
-                        'Gmail' => AccountTypeModel::ACCOUNT_TYPE_GMAIL,
-                        'Other' => AccountTypeModel::ACCOUNT_TYPE_OTHER
+                        '' => $this->translator->trans(
+                            'oro.imap.configuration.ac1count_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
+                        ),
+                        AccountTypeModel::ACCOUNT_TYPE_GMAIL => $this->translator->trans(
+                            'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_GMAIL
+                        ),
+                        AccountTypeModel::ACCOUNT_TYPE_OTHER => $this->translator->trans(
+                            'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
+                        )
                     ],
                 ]);
 
@@ -180,7 +193,7 @@ class ChoiceAccountType extends AbstractType
 
         $userEmailOrigin->setUser($imapGmailConfiguration['user']);
 
-        if (isset($imapGmailConfiguration['accessTokenExpiresAt'])) {
+        if (!empty($imapGmailConfiguration['accessTokenExpiresAt'])) {
             $newExpireDate = $imapGmailConfiguration['accessTokenExpiresAt'];
             if (!$imapGmailConfiguration['accessTokenExpiresAt'] instanceof \Datetime) {
                 $utcTimeZone = new \DateTimeZone('UTC');
