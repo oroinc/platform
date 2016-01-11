@@ -255,6 +255,9 @@ define(function(require) {
                 rowActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
+            // mass actions
+            massActions = this.buildMassActionsOptions(metadata.massActions);
+
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);
             } else {
@@ -273,10 +276,8 @@ define(function(require) {
                 name: this.gridName,
                 columns: columns,
                 rowActions: rowActions,
-                massActions: this.buildMassActionsOptions(metadata.massActions),
-                massActionsOptionsBuilder: function(massActions) {
-                    return self.buildMassActionsOptions(massActions);
-                },
+                massActions: massActions,
+                massActionsOptionsBuilder: _.bind(this.buildMassActionsOptions, this),
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
