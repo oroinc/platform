@@ -5,7 +5,6 @@
 #}
 {% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
 
-{#{% import 'OroUIBundle::macros.html.twig' as UI %}#}
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
 {% set iconType = 'envelope' %}
@@ -21,7 +20,3 @@
     {'title': 'oro.email.to.label'|trans, 'value': EA.recipient_email_addresses(entity.recipients('to'))},
     {'title': 'oro.email.emailuser.owner.label'|trans, 'value': EA.entityOwnerLink(entity, false)},
 ] %}
-
-{#
-    {'title': 'oro.email.emailuser.owner.label'|trans, 'value': UI.entityOwnerLink(entity, false)},
-#}
