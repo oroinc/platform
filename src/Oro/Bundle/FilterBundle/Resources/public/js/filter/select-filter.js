@@ -201,6 +201,7 @@ define([
          * @protected
          */
         _initializeSelectWidget: function() {
+            var $dropdownContainer = this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer;
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
@@ -213,7 +214,7 @@ define([
                         at: 'left bottom',
                         of: this.$(this.containerSelector),
                         collision: 'fit none',
-                        within: this.dropdownContainer
+                        within: $dropdownContainer
                     },
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
@@ -221,6 +222,7 @@ define([
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
+                        this.selectWidget.updateDropdownPosition();
                     }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
