@@ -485,7 +485,7 @@ define(function(require) {
                 xhr.always = function() {
                     always.apply(this, arguments);
                     if (!self.disposed) {
-                        self._afterRequest();
+                        self._afterRequest(this);
                     }
                 };
             });
@@ -676,7 +676,13 @@ define(function(require) {
          *
          * @private
          */
-        _afterRequest: function() {
+        _afterRequest: function(jqXHR) {
+
+            var json = jqXHR.responseJSON || {};
+            if (json.metadata) {
+                this._processLoadedMetadata(json.metadata);
+            }
+
             this.requestsCount -= 1;
             if (this.requestsCount === 0) {
                 this.hideLoading();
@@ -687,6 +693,23 @@ define(function(require) {
                 mediator.trigger('grid_load:complete', this.collection, this.$el);
                 this.initLayout();
                 this.trigger('content:update');
+            }
+        },
+
+        /**
+         * @param {Object} metadata
+         * @private
+         */
+        _processLoadedMetadata: function(metadata) {
+            var meta = _.defaults(metadata, {
+                massActions: {}
+            });
+
+            if (metadata.massActions) {
+                this.massActions = this.massActionsOptionsBuilder(meta.massActions);
+                this.metadata.massActions = meta.massActions;
+
+                this.trigger('metadata-change', meta);
             }
         },
 

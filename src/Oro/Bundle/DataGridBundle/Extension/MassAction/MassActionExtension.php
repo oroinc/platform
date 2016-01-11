@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
@@ -22,6 +23,18 @@ class MassActionExtension extends ActionExtension
     {
         // Applicable due to the possibility of dynamically add mass action
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
+    {
+        $metadata = [
+            static::METADATA_ACTION_KEY => $this->getActionsMetadata($config)
+        ];
+
+        $result->offsetAddToArray('metadata', $metadata);
     }
 
     /**

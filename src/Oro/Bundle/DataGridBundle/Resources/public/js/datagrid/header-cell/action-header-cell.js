@@ -44,6 +44,7 @@ define([
             datagrid = this.column.get('datagrid');
             this.listenTo(datagrid, 'enable', this.enable);
             this.listenTo(datagrid, 'disable', this.disable);
+            this.listenTo(datagrid, 'metadata-change', this.rebuildAndRender);
         },
 
         /**
@@ -58,7 +59,7 @@ define([
             ActionHeaderCell.__super__.dispose.apply(this, arguments);
         },
 
-        createActionsPanel: function() {
+        buildActionsPanel: function() {
             var actions = [];
             var datagrid = this.column.get('datagrid');
 
@@ -71,7 +72,10 @@ define([
 
             this.actionsPanel = new ActionsPanel();
             this.actionsPanel.setActions(actions);
+        },
 
+        createActionsPanel: function() {
+            this.buildActionsPanel();
             this.subviews.push(this.actionsPanel);
         },
 
@@ -85,6 +89,14 @@ define([
                 panel.$el.children().wrap('<li/>');
             }
             return this;
+        },
+
+        rebuildAndRender: function() {
+            var datagrid = this.column.get('datagrid');
+            this.column.set('massActions', datagrid.massActions);
+
+            this.buildActionsPanel();
+            this.render();
         },
 
         enable: function() {

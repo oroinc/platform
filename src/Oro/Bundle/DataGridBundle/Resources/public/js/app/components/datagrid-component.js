@@ -255,11 +255,6 @@ define(function(require) {
                 rowActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
-            // mass actions
-            _.each(metadata.massActions, function(options, action) {
-                massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
-            });
-
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);
             } else {
@@ -272,11 +267,16 @@ define(function(require) {
                 plugins.push(ColumnManagerPlugin);
             }
 
+            var self = this;
+
             return {
                 name: this.gridName,
                 columns: columns,
                 rowActions: rowActions,
-                massActions: massActions,
+                massActions: this.buildMassActionsOptions(metadata.massActions),
+                massActionsOptionsBuilder: function(massActions) {
+                    return self.buildMassActionsOptions(massActions);
+                },
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
@@ -286,6 +286,18 @@ define(function(require) {
                 metadata: this.metadata,
                 plugins: plugins
             };
+        },
+
+        buildMassActionsOptions: function (actions) {
+            var modules = this.modules;
+
+            var massActions = {};
+
+            _.each(actions, function(options, action) {
+                massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
+            });
+
+            return massActions;
         },
 
         fixStates: function(options) {
