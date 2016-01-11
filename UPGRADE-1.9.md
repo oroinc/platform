@@ -215,6 +215,8 @@ after:
 - Added `Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter` as default formatter for the date, time and datetime types in `Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer`. This types exported/imported depends on the application locale and timezone and recognized as dates in Microsoft Excel.
 - `Oro\Bundle\ImportExportBundle\Field\DatabaseHelper::getRegistry` is deprecated. Use class methods instead of disposed registry
 - Services with tag `oro_importexport.normalizer` was marked as private
+- Allow to omit empty identity fields. To use this feature set `Use As Identity Field` option to `Only when not empty
+` (-1 or `Oro\Bundle\ImportExportBundle\Field\FieldHelper::IDENTITY_ONLY_WHEN_NOT_EMPTY` in a code)
 
 ####InstallerBundle
 - `Oro\Bundle\InstallerBundle\EventListener\RequestListener` added to the class cache as performance improvement
