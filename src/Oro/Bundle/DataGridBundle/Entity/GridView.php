@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Validator\Constraints as Assert;
@@ -39,12 +40,12 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 class GridView
 {
     const TYPE_PRIVATE = 'private';
-    const TYPE_PUBLIC = 'public';
+    const TYPE_PUBLIC  = 'public';
 
     /** @var array */
     protected static $types = [
         self::TYPE_PRIVATE => self::TYPE_PRIVATE,
-        self::TYPE_PUBLIC => self::TYPE_PUBLIC,
+        self::TYPE_PUBLIC  => self::TYPE_PUBLIC,
     ];
 
     /**
@@ -81,14 +82,16 @@ class GridView
     protected $filtersData = [];
 
     /**
-     * @var array
+     * @var array of ['column name' => -1|1, ... ].
+     * Contains information about sorters ('-1' for 'ASC', '1' for 'DESC').
      *
      * @ORM\Column(type="array")
      */
     protected $sortersData = [];
 
     /**
-     * @var array
+     * @var array of ['column name' => ['renderable' => true|false, 'order' = int(0)], ... ].
+     * Contains information about columns orders in the grid.
      *
      * @ORM\Column(type="array", nullable=true)
      */
@@ -118,6 +121,29 @@ class GridView
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * Collection of users who have chosen this grid view as default.
+     *
+     * @var ArrayCollection|User[]
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\UserBundle\Entity\User"
+     * )
+     * @ORM\JoinTable(name="oro_grid_view_user",
+     *     joinColumns={@ORM\JoinColumn(name="grid_view_id", referencedColumnName="id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     * )
+     */
+    protected $users;
+
+    /**
+     * GridView constructor.
+     */
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -178,7 +204,7 @@ class GridView
     /**
      * @param int $id
      *
-     * @return this
+     * @return $this
      */
     public function setId($id)
     {
@@ -190,7 +216,7 @@ class GridView
     /**
      * @param string $name
      *
-     * @return this
+     * @return $this
      */
     public function setName($name)
     {
@@ -202,7 +228,7 @@ class GridView
     /**
      * @param string $type
      *
-     * @return this
+     * @return $this
      */
     public function setType($type)
     {
@@ -214,7 +240,7 @@ class GridView
     /**
      * @param array $filtersData
      *
-     * @return this
+     * @return $this
      */
     public function setFiltersData(array $filtersData = [])
     {
@@ -226,7 +252,7 @@ class GridView
     /**
      * @param array $sortersData
      *
-     * @return this
+     * @return $this
      */
     public function setSortersData(array $sortersData = [])
     {
@@ -258,7 +284,7 @@ class GridView
     /**
      * @param string $gridName
      *
-     * @return this
+     * @return $this
      */
     public function setGridName($gridName)
     {
@@ -270,7 +296,7 @@ class GridView
     /**
      * @param User $owner
      *
-     * @return this
+     * @return $this
      */
     public function setOwner(User $owner = null)
     {
@@ -302,6 +328,7 @@ class GridView
      * Set organization
      *
      * @param OrganizationInterface $organization
+     *
      * @return User
      */
     public function setOrganization(OrganizationInterface $organization = null)
@@ -319,5 +346,35 @@ class GridView
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @return ArrayCollection|User[]
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function addUser(User $user)
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function removeUser(User $user)
+    {
+        $this->users->removeElement($user);
     }
 }

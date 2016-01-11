@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class Config
 {
@@ -149,7 +149,7 @@ class Config
                 $reflection = new \ReflectionClass($bundle);
                 if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/requirejs.yml')) {
                     $requirejs = Yaml::parse(realpath($file));
-                    $config = ArrayUtils::arrayMergeRecursiveDistinct($config, $requirejs);
+                    $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $requirejs);
                 }
             }
 
