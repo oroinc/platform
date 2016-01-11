@@ -12,14 +12,13 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class MailboxGridListener
 {
-    const GRID_NAME = 'base-mailboxes-grid';
     const REDIRECT_DATA_KEY = 'redirectData';
 
-    const PATH_NAME = '[name]';
     const PATH_UPDATE_LINK_DIRECT_PARAMS = '[properties][update_link][direct_params]';
 
     /** @var Registry */
     protected $doctrine;
+
     /** @var AclHelper */
     protected $aclHelper;
 
@@ -38,14 +37,12 @@ class MailboxGridListener
      */
     public function onPreBuild(PreBuild $event)
     {
-        $config = $event->getConfig();
         $parameters = $event->getParameters();
-        if ($config->offsetGetByPath(static::PATH_NAME) !== static::GRID_NAME ||
-            !$parameters->has(static::REDIRECT_DATA_KEY)
-        ) {
+        if (!$parameters->has(static::REDIRECT_DATA_KEY)) {
             return;
         }
 
+        $config = $event->getConfig();
         $config->offsetSetByPath(
             static::PATH_UPDATE_LINK_DIRECT_PARAMS,
             array_merge(

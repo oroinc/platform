@@ -19,11 +19,15 @@ define(function(require) {
             }, 400);
             $overlayContent.data('interval', interval);
             if (options.backdrop) {
-                $overlayContent.data('backdrop', backdropManager.hold());
+                var backdropId = backdropManager.hold();
+                $overlayContent.data('backdrop', backdropId);
             }
             return {
                 remove: function() {
                     clearInterval(interval);
+                    if (backdropId) {
+                        backdropManager.release(backdropId);
+                    }
                     overlayTool.removeOverlay($overlayContent);
                 }
             };
@@ -39,6 +43,7 @@ define(function(require) {
                     old = _new || ($overlayContent.css('top') + '.' + $overlayContent.css('left'));
                     $overlayContent.position(options.position);
                     _new = $overlayContent.css('top') + '.' + $overlayContent.css('left');
+                    $overlayContent.trigger('updatePosition');
                     iterations--;
                 } while (old !== _new && iterations > 0);
             }

@@ -147,17 +147,26 @@ define(function(require) {
          * Build grid
          */
         build: function() {
+            var collectionModels;
             var collectionOptions;
             var grid;
 
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
+
+            collectionModels = {};
+            if (this.data && this.data.data) {
+                collectionModels = this.data.data;
+            }
+
+            collectionOptions = this.combineCollectionOptions();
+            if (this.data && this.data.options) {
+                _.extend(collectionOptions, this.data.options);
+            }
+
             if (!collection) {
                 // otherwise, create collection from metadata
-                collectionOptions = this.combineCollectionOptions();
-                collection = new PageableCollection(this.data, collectionOptions);
-            } else if (this.data) {
-                collection.reset(this.data, {parse: true});
+                collection = new PageableCollection(collectionModels, collectionOptions);
             }
 
             // create grid
@@ -169,7 +178,7 @@ define(function(require) {
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
-            mediator.trigger('datagrid:rendered');
+            mediator.trigger('datagrid:rendered', grid);
 
             if (options.routerEnabled !== false) {
                 // trace collection changes
@@ -193,7 +202,11 @@ define(function(require) {
          */
         combineCollectionOptions: function() {
             var options = _.extend({
-                inputName: this.inputName,
+                /*
+                 * gridName contains extended information "inputName + scopeName"
+                 * (allows to differentiate grid instances)
+                 */
+                inputName: this.gridName,
                 parse: true,
                 url: '\/user\/json',
                 state: _.extend({
@@ -201,7 +214,8 @@ define(function(require) {
                     sorters: {},
                     columns: {}
                 }, this.metadata.state),
-                initialState: this.metadata.initialState
+                initialState: this.metadata.initialState,
+                mode: this.metadata.mode || 'server'
             }, this.metadata.options);
             return options;
         },

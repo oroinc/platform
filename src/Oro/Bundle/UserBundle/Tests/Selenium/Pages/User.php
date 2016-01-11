@@ -254,17 +254,22 @@ class User extends AbstractPageEntity
                 if ($condition != '') {
                     $condition .= ' or ';
                 }
-                $condition .= "normalize-space(text()) = '{$role}'";
+                $condition .= "contains(., '{$role}')";
             }
             $element = $this->roles->element(
-                $this->test->using('xpath')->value("div[label[{$condition}]]/input")
+                $this->test->using('xpath')->value(
+                    "//div[@data-ftid='oro_user_user_form_roles']/div[label[{$condition}]]/input"
+                )
             );
             $this->test->moveto($element);
             $element->click();
         } else {
             foreach ($roles as $role) {
                 $element = $this->roles->element(
-                    $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
+                    $this->test->using('xpath')->value(
+                        "//div[@data-ftid='oro_user_user_form_roles']".
+                        "/div[label[contains(normalize-space(text()), '{$role}')]]/input"
+                    )
                 );
                 $this->test->moveto($element);
                 $element->click();
@@ -424,6 +429,25 @@ class User extends AbstractPageEntity
                 'args' => [],
             ]
         );
+
+        return $this;
+    }
+
+    /**
+     * Method changes password using actions menu form user view page
+     * @param $newPassword
+     * @return $this
+     */
+    public function changePassword($newPassword)
+    {
+        $passwordField = "//*[@data-ftid='oro_set_password_form_password']";
+        $this->runActionInGroup('Change password');
+        $this->waitForAjax();
+        $this->test->byXPath($passwordField)->clear();
+        $this->test->byXPath($passwordField)->value($newPassword);
+        $this->test->byXPath("//div[@class='widget-actions-section']//button[@type='submit']")->click();
+        $this->waitForAjax();
+        $this->assertMessage('The password has been changed');
 
         return $this;
     }

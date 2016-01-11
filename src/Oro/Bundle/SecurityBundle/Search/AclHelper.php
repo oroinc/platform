@@ -62,7 +62,7 @@ class AclHelper
                 if ($className) {
                     $ownerField = sprintf('%s_owner', $entityAlias);
                     $condition  = $this->ownershipDataBuilder->getAclConditionData($className, $permission);
-                    if ($condition !== null) {
+                    if (count($condition) === 0 || !($condition[0] === null && $condition[3] === null)) {
                         $allowedAliases[] = $entityAlias;
 
                         // in case if we should not limit data for entity

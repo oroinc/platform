@@ -13,25 +13,12 @@ use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
-use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
-use Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
-    /** @var array of [{frontend_type} => {data_type}] */
-    protected static $formatFrontendTypesMap = [
-        PropertyInterface::TYPE_DATE     => DateTimeTypeFormatter::TYPE_DATE,
-        PropertyInterface::TYPE_DATETIME => DateTimeTypeFormatter::TYPE_DATETIME,
-        PropertyInterface::TYPE_TIME     => DateTimeTypeFormatter::TYPE_TIME,
-        PropertyInterface::TYPE_DECIMAL  => NumberTypeFormatter::TYPE_DECIMAL,
-        PropertyInterface::TYPE_INTEGER  => NumberTypeFormatter::TYPE_INTEGER,
-        PropertyInterface::TYPE_PERCENT  => NumberTypeFormatter::TYPE_PERCENT,
-        PropertyInterface::TYPE_CURRENCY => NumberTypeFormatter::TYPE_CURRENCY,
-    ];
-
     /**
      * @var ServiceLink
      */
@@ -137,23 +124,24 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     {
         if (null !== $val) {
             $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
-            switch ($frontendType) {
-                case array_key_exists($frontendType, self::$formatFrontendTypesMap):
-                    $type      = self::$formatFrontendTypesMap[$frontendType];
-                    $formatter = $this->getFormatterForType($type);
-                    $val       = $formatter->formatType($val, $type);
-                    break;
-                case PropertyInterface::TYPE_SELECT:
-                    if (isset($options['choices'][$val])) {
-                        $val = $this->translator->trans($options['choices'][$val]);
-                    }
-                    break;
-                case PropertyInterface::TYPE_HTML:
-                    $val = $this->formatHtmlFrontendType(
-                        $val,
-                        isset($options['export_type']) ? $options['export_type'] : null
-                    );
-                    break;
+
+            $formatter = $this->getFormatterForType($frontendType);
+            if ($formatter) {
+                $val = $formatter->formatType($val, $frontendType);
+            } else {
+                switch ($frontendType) {
+                    case PropertyInterface::TYPE_SELECT:
+                        if (isset($options['choices'][$val])) {
+                            $val = $this->translator->trans($options['choices'][$val]);
+                        }
+                        break;
+                    case PropertyInterface::TYPE_HTML:
+                        $val = $this->formatHtmlFrontendType(
+                            $val,
+                            isset($options['export_type']) ? $options['export_type'] : null
+                        );
+                        break;
+                }
             }
         }
 

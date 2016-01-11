@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
+use Oro\Bundle\OrganizationBundle\Model\ExtendBusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -20,6 +21,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
  * @Config(
+ *      routeName="oro_business_unit_index",
+ *      routeView="oro_business_unit_view",
+ *      routeCreate="oro_business_unit_create",
  *      defaultValues={
  *          "grouping"={
  *              "groups"={"dictionary"}
@@ -41,13 +45,15 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"="",
- *              "share_grid"="share-with-business-units-datagrid"
+ *              "group_name"=""
  *          }
  *      }
  * )
  */
-class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, BusinessUnitInterface
+class BusinessUnit extends ExtendBusinessUnit implements
+    NotificationEmailInterface,
+    EmailHolderInterface,
+    BusinessUnitInterface
 {
     /**
      * @var integer
@@ -142,11 +148,6 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
     protected $updatedAt;
 
     /**
-     * @var ArrayCollection $tags
-     */
-    protected $tags;
-
-    /**
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="businessUnits")
      */
     protected $users;
@@ -172,6 +173,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
      * Set name
      *
      * @param string $name
+     *
      * @return BusinessUnit
      */
     public function setName($name)
@@ -195,6 +197,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
      * Set organization
      *
      * @param Organization $organization
+     *
      * @return BusinessUnit
      */
     public function setOrganization($organization)
@@ -218,6 +221,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
      * Set phone
      *
      * @param string $phone
+     *
      * @return BusinessUnit
      */
     public function setPhone($phone)
@@ -241,6 +245,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
      * Set website
      *
      * @param string $website
+     *
      * @return BusinessUnit
      */
     public function setWebsite($website)
@@ -264,6 +269,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
      * Set email
      *
      * @param string $email
+     *
      * @return BusinessUnit
      */
     public function setEmail($email)
@@ -287,6 +293,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
      * Set fax
      *
      * @param string $fax
+     *
      * @return BusinessUnit
      */
     public function setFax($fax)
@@ -352,7 +359,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
      */
     public function __toString()
     {
-        return (string) $this->getName();
+        return (string)$this->getName();
     }
 
     /**
@@ -367,6 +374,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
 
     /**
      * @param ArrayCollection $users
+     *
      * @return BusinessUnit
      */
     public function setUsers($users)
@@ -378,6 +386,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
 
     /**
      * @param  User $user
+     *
      * @return BusinessUnit
      */
     public function addUser(User $user)
@@ -391,6 +400,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
 
     /**
      * @param  User $user
+     *
      * @return BusinessUnit
      */
     public function removeUser(User $user)
@@ -412,6 +422,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
 
     /**
      * @param BusinessUnit $owningBusinessUnit
+     *
      * @return BusinessUnit
      */
     public function setOwner($owningBusinessUnit)

@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
+use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 class ContextRegistry
 {
+    const DEFAULT_ALIAS = 'default';
+
     /**
      * @var array
      */
-    protected $contexts = array();
+    protected $contexts = [];
 
     /**
      * @param StepExecution $stepExecution
@@ -19,11 +22,20 @@ class ContextRegistry
     {
         $key = spl_object_hash($stepExecution);
 
-        if (empty($this->contexts[$key])) {
-            $this->contexts[$key] = $this->createByStepExecution($stepExecution);
+        $alias = self::DEFAULT_ALIAS;
+        $jobExecution = $stepExecution->getJobExecution();
+        if ($jobExecution) {
+            $jobInstance = $jobExecution->getJobInstance();
+            if ($jobInstance) {
+                $alias = $jobInstance->getAlias();
+            }
         }
 
-        return $this->contexts[$key];
+        if (empty($this->contexts[$alias][$key])) {
+            $this->contexts[$alias][$key] = $this->createByStepExecution($stepExecution);
+        }
+
+        return $this->contexts[$alias][$key];
     }
 
     /**
@@ -33,5 +45,18 @@ class ContextRegistry
     protected function createByStepExecution(StepExecution $stepExecution)
     {
         return new StepExecutionProxyContext($stepExecution);
+    }
+
+    /**
+     * @param JobInstance|null $jobInstance
+     */
+    public function clear(JobInstance $jobInstance = null)
+    {
+        $alias = self::DEFAULT_ALIAS;
+        if ($jobInstance) {
+            $alias = $jobInstance->getAlias();
+        }
+
+        unset($this->contexts[$alias]);
     }
 }

@@ -24,20 +24,15 @@
     <div class="widget-content">
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">
-                <!-- Activity contexts container -->
-                <div class="activity-context-activity" data-layout="separate">
-                    <div class="activity-context-activity-label">
-                        {{ 'oro.activity.contexts.label'|trans }}
-                    </div>
-                    <div class="activity-context-activity-items">
-                    </div>
-                </div>
-
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.title.label'|trans, '<%= formatter.string(title) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, '<%= formatter.text(description) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
+                <div class="activity-context-activity">
+                {{ UI.renderAttribute('oro.activity.contexts.label'|trans, '<div class="activity-context-activity-items"></div>') }}
+                </div>
+                {% placeholder calendar_event_widget_view_additional_properties %}
             </div>
             <div class="widget-actions form-actions" style="display: none;">
                 <% if (id != null && removable) { %>

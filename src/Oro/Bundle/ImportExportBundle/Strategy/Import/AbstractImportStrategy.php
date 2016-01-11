@@ -88,7 +88,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
      */
     protected function beforeProcessEntity($entity)
     {
-        $event = new StrategyEvent($this, $entity);
+        $event = new StrategyEvent($this, $entity, $this->context);
         $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_BEFORE, $event);
         return $event->getEntity();
     }
@@ -99,7 +99,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
      */
     protected function afterProcessEntity($entity)
     {
-        $event = new StrategyEvent($this, $entity);
+        $event = new StrategyEvent($this, $entity, $this->context);
         $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_AFTER, $event);
         return $event->getEntity();
     }

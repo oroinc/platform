@@ -68,14 +68,14 @@ class EmailActivityListProvider implements
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /** @var  ServiceLink */
+    /** @var ServiceLink */
     protected $securityContextLink;
 
     /** @var ServiceLink */
     protected $securityFacadeLink;
 
-    /** @var MailboxProcessStorage */
-    protected $mailboxProcessStorage;
+    /** @var ServiceLink */
+    protected $mailboxProcessStorageLink;
 
     /**
      * @param DoctrineHelper        $doctrineHelper
@@ -86,7 +86,7 @@ class EmailActivityListProvider implements
      * @param EmailThreadProvider   $emailThreadProvider
      * @param HtmlTagHelper         $htmlTagHelper
      * @param ServiceLink           $securityFacadeLink
-     * @param MailboxProcessStorage $mailboxProcessStorage
+     * @param ServiceLink           $mailboxProcessStorageLink
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -97,7 +97,7 @@ class EmailActivityListProvider implements
         EmailThreadProvider $emailThreadProvider,
         HtmlTagHelper $htmlTagHelper,
         ServiceLink $securityFacadeLink,
-        MailboxProcessStorage $mailboxProcessStorage
+        ServiceLink $mailboxProcessStorageLink
     ) {
         $this->doctrineHelper        = $doctrineHelper;
         $this->doctrineRegistryLink  = $doctrineRegistryLink;
@@ -107,7 +107,7 @@ class EmailActivityListProvider implements
         $this->emailThreadProvider   = $emailThreadProvider;
         $this->htmlTagHelper         = $htmlTagHelper;
         $this->securityFacadeLink    = $securityFacadeLink;
-        $this->mailboxProcessStorage = $mailboxProcessStorage;
+        $this->mailboxProcessStorageLink = $mailboxProcessStorageLink;
     }
 
     /**
@@ -240,7 +240,7 @@ class EmailActivityListProvider implements
             return $token->getOrganizationContext();
         }
 
-        $processes = $this->mailboxProcessStorage->getProcesses();
+        $processes = $this->mailboxProcessStorageLink->getService()->getProcesses();
         foreach ($processes as $process) {
             $settingsClass = $process->getSettingsEntityFQCN();
 

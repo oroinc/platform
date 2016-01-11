@@ -158,10 +158,10 @@ define([
                 if (!groupedMessages[message]) {
                     groupedMessages[message] = new MultiUseResourceManager({
                         listen: {
-                            'construct': function() {
+                            'constructResource': function() {
                                 this.alert = _this.notificationMessage(type, message, {flash: false});
                             },
-                            'dispose': function() {
+                            'disposeResource': function() {
                                 this.alert.close();
                                 groupedMessages[message].dispose();
                                 delete groupedMessages[message];

@@ -4,6 +4,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
+    var InlineEditingHelpPlugin = require('../app/plugins/grid/inline-editing-help-plugin');
 
     var gridViewsBuilder = {
         /**
@@ -29,6 +30,9 @@ define(function(require) {
                 options.gridPromise.done(function(grid) {
                     grid.pluginManager.create(options.metadata.inline_editing.plugin, options);
                     grid.pluginManager.enable(options.metadata.inline_editing.plugin);
+                    if (options.metadata.inline_editing.disable_help !== false) {
+                        grid.pluginManager.enable(InlineEditingHelpPlugin);
+                    }
                     deferred.resolve();
                 });
             });
@@ -73,8 +77,8 @@ define(function(require) {
                         promises.push(tools.loadModule(editor.component)
                             .then(function(realization) {
                                 editor.component = realization;
-                                if (_.isFunction(realization.processColumnMetadata)) {
-                                    return realization.processColumnMetadata(columnMeta);
+                                if (_.isFunction(realization.processMetadata)) {
+                                    return realization.processMetadata(columnMeta);
                                 }
                                 return realization;
                             }));
@@ -83,8 +87,8 @@ define(function(require) {
                         promises.push(tools.loadModule(editor.view)
                             .then(function(realization) {
                                 editor.view = realization;
-                                if (_.isFunction(realization.processColumnMetadata)) {
-                                    return realization.processColumnMetadata(columnMeta);
+                                if (_.isFunction(realization.processMetadata)) {
+                                    return realization.processMetadata(columnMeta);
                                 }
                                 return realization;
                             }));

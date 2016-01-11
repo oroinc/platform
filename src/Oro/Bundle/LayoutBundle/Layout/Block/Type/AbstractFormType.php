@@ -18,7 +18,12 @@ abstract class AbstractFormType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver
-            ->setDefaults(['form_name' => 'form'])
+            ->setDefaults(
+                [
+                    'form' => null,
+                    'form_name' => 'form',
+                ]
+            )
             ->setAllowedTypes(['form_name' => 'string']);
     }
 
@@ -36,13 +41,24 @@ abstract class AbstractFormType extends AbstractType
     protected function getFormAccessor(ContextInterface $context, array $options)
     {
         /** @var FormAccessorInterface $formAccessor */
-        $formAccessor = $context->get($options['form_name']);
-        if (!$formAccessor instanceof FormAccessorInterface) {
-            throw new UnexpectedTypeException(
-                $formAccessor,
-                'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface',
-                sprintf('context[%s]', $options['form_name'])
-            );
+        if (isset($options['form'])) {
+            $formAccessor = $options['form'];
+            if (!$formAccessor instanceof FormAccessorInterface) {
+                throw new UnexpectedTypeException(
+                    $formAccessor,
+                    'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface',
+                    'options[form]'
+                );
+            }
+        } else {
+            $formAccessor = $context->get($options['form_name']);
+            if (!$formAccessor instanceof FormAccessorInterface) {
+                throw new UnexpectedTypeException(
+                    $formAccessor,
+                    'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface',
+                    sprintf('context[%s]', $options['form_name'])
+                );
+            }
         }
 
         return $formAccessor;
