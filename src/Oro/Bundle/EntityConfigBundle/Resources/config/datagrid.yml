@@ -6,8 +6,8 @@ datagrid:
             toolbarOptions:
                 pageSize:
                     default_per_page: 100
+        acl_resource: oro_entityconfig_manage
         source:
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:
@@ -69,9 +69,9 @@ datagrid:
             toolbarOptions:
                 pageSize:
                     default_per_page: 50
+        # TODO: check oro_entityconfig_view acl (403) right now
+        acl_resource: oro_entityconfig_manage
         source:
-            # TODO: check oro_entityconfig_view acl (403) right now
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:
@@ -126,8 +126,8 @@ datagrid:
     entity-audit-grid:
         options:
             entityHint: history
+        acl_resource: oro_entityconfig_manage
         source:
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:

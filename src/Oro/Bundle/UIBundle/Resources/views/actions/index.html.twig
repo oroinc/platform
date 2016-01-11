@@ -35,12 +35,12 @@
             {% if gridScope is defined %}
                 {% set gridName = oro_datagrid_build_fullname(gridName, gridScope) %}
             {% endif %}
-            {% set renderParams = renderParams|default({})|merge({
+            {% set renderParams = {
                 'enableFullScreenLayout': true,
                 'enableViews': true,
                 'showViewsInNavbar': true,
-            }) %}
-
+            }
+            |merge(renderParams|default({})) %}
             {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
 
             {# Only grids on index pages will be tagged #}

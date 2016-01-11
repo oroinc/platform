@@ -9,8 +9,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class OroDashboardExtension extends Extension
 {
@@ -69,7 +68,7 @@ class OroDashboardExtension extends Extension
      */
     protected function sortItemsByPosition(array &$items)
     {
-        ArrayUtils::sortBy($items, false, 'position');
+        ArrayUtil::sortBy($items, false, 'position');
 
         foreach ($items as &$item) {
             unset($item['position']);

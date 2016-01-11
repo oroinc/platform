@@ -12,6 +12,9 @@
   th.renderable, td.renderable {
     display: table-cell;
   }
+  .loader-mask {
+    z-index: @oroZindexDropdown - 1;// to show under grid's filter
+  }
 }
 
 .grid-toolbar .pagination ul li input {
