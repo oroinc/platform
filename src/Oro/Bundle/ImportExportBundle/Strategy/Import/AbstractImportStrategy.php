@@ -124,9 +124,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
         if (!$existingEntity
             && (!$searchContext || $this->databaseHelper->getIdentifier(current($searchContext)))
         ) {
-            $identityValues = $searchContext;
-            $identityValues += $this->fieldHelper->getIdentityValues($entity);
-            $existingEntity = $this->findEntityByIdentityValues($entityName, $identityValues);
+            $existingEntity = $this->findExistingEntityByIdentityFields($entity, $searchContext);
         }
 
         if ($existingEntity && !$identifier) {
@@ -136,6 +134,31 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
         }
 
         return $existingEntity;
+    }
+
+    /**
+     * @param object $entity
+     * @param array $searchContext
+     *
+     * @return object|null
+     */
+    protected function findExistingEntityByIdentityFields($entity, array $searchContext = [])
+    {
+        $entityName = ClassUtils::getClass($entity);
+
+        $identityValues = $searchContext;
+        $identityValues += $this->fieldHelper->getIdentityValues($entity);
+        foreach ($identityValues as $fieldName => $value) {
+            if ($value !== null ||
+                $this->fieldHelper->isRequiredIdentityField($entityName, $fieldName)
+            ) {
+                continue;
+            }
+
+            unset($identityValues[$fieldName]);
+        }
+
+        return $this->findEntityByIdentityValues($entityName, $identityValues);
     }
 
     /**
