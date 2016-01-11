@@ -76,7 +76,7 @@ services:
 
     # Autocomplete
     oro_tag.autocomplete.tag.search_handler:
-        class: %oro_tag.autocomplete.tag.search_handler.class%
+        class: Oro\Bundle\TagBundle\Autocomplete\SearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
             - %oro_tag.tag.entity.class%
