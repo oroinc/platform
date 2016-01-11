@@ -270,8 +270,6 @@ define(function(require) {
                 plugins.push(ColumnManagerPlugin);
             }
 
-            var self = this;
-
             return {
                 name: this.gridName,
                 columns: columns,
@@ -289,6 +287,10 @@ define(function(require) {
             };
         },
 
+        /**
+         * @param {Object} actions
+         * @returns {Object}
+         */
         buildMassActionsOptions: function (actions) {
             var modules = this.modules;
 
