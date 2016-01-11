@@ -21,6 +21,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
  * @Config(
+ *      routeName="oro_business_unit_index",
+ *      routeView="oro_business_unit_view",
+ *      routeCreate="oro_business_unit_create",
  *      defaultValues={
  *          "grouping"={
  *              "groups"={"dictionary"}
