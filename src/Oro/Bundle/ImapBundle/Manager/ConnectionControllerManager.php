@@ -39,6 +39,13 @@ class ConnectionControllerManager
     /** @var ImapConnectorFactory */
     protected $imapConnectorFactory;
 
+    /**
+     * @param FormInterface $formUser
+     * @param FormFactory $FormFactory
+     * @param Mcrypt $mcrypt
+     * @param Registry $doctrineHelper
+     * @param ImapConnectorFactory $imapConnectorFactory
+     */
     public function __construct(
         FormInterface $formUser,
         FormFactory $FormFactory,
