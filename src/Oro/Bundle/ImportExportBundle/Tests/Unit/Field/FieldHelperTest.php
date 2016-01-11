@@ -434,18 +434,21 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->config['stdClass'] = array(
             'excludedField' => array('excluded' => true),
             'identityField' => array('identity' => true),
+            'onlyWhenNotEmptyIdentityField' => array('identity' => true),
             'regularField'  => array(),
         );
 
         $fields = array(
             array('name' => 'excludedField'),
             array('name' => 'identityField'),
+            array('name' => 'onlyWhenNotEmptyIdentityField'),
             array('name' => 'regularField'),
         );
 
         $entity = new \stdClass();
         $entity->excludedField = 'excludedValue';
         $entity->identityField = 'identityValue';
+        $entity->onlyWhenNotEmptyIdentityField = 'onlyWhenNotEmptyIdentityValue';
         $entity->regularField  = 'regularValue';
 
         $this->fieldProvider->expects($this->once())
@@ -454,8 +457,35 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($fields));
 
         $this->assertEquals(
-            array('identityField' => 'identityValue'),
+            array(
+                'identityField' => 'identityValue',
+                'onlyWhenNotEmptyIdentityField' => 'onlyWhenNotEmptyIdentityValue'
+            ),
             $this->helper->getIdentityValues($entity, $fields)
         );
+    }
+
+    /**
+     * @dataProvider isRequiredIdentityFieldProvider
+     */
+    public function testIsRequiredIdentityField($identityValue, $expectedResult)
+    {
+        $this->config['stdClass'] = [
+            'testField' => ['identity' => $identityValue]
+        ];
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->helper->isRequiredIdentityField('stdClass', 'testField')
+        );
+    }
+
+    public function isRequiredIdentityFieldProvider()
+    {
+        return [
+            [false, false],
+            [true, true],
+            [FieldHelper::IDENTITY_ONLY_WHEN_NOT_EMPTY, false],
+        ];
     }
 }
