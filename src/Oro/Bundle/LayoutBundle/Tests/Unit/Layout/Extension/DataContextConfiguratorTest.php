@@ -90,15 +90,12 @@ class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->contextConfigurator->configureContext($context);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The data item "test" must be an array, but "integer" given.
-     */
     public function testShouldThrowExceptionIfDataItemIsNotArray()
     {
         $context         = new LayoutContext();
         $context['data'] = ['test' => 123];
         $this->contextConfigurator->configureContext($context);
+        $context->resolve();
     }
 
     /**
