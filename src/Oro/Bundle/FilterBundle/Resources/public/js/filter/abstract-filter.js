@@ -106,9 +106,9 @@ define([
         /**
          * Element enclosing a criteria dropdown
          *
-         * @property {string|jQuery|HTMLElement}
+         * @property {Array.<string|jQuery|HTMLElement>}
          */
-        dropdownFitContainer: ['.ui-dialog-content', '#container:visible', 'body'],
+        dropdownFitContainers: ['.ui-dialog-content', '#container:visible', 'body'],
 
         /**
          * Initialize.
@@ -240,8 +240,8 @@ define([
         _findDropdownFitContainer: function(element) {
             element = element || this.$el;
             var $container = $();
-            for (var i = 0; i < this.dropdownFitContainer.length && $container.length === 0; i += 1) {
-                $container = $(element).closest(this.dropdownFitContainer[i]);
+            for (var i = 0; i < this.dropdownFitContainers.length && $container.length === 0; i += 1) {
+                $container = $(element).closest(this.dropdownFitContainers[i]);
             }
             return $container.length === 0 ? null : $container;
         },
