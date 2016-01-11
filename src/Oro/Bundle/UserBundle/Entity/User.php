@@ -38,7 +38,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeName="oro_user_index",
  *      routeView="oro_user_view",
  *      defaultValues={
- *          "entity"={"icon"="icon-user","context-grid"="users-for-context-grid"},
+ *          "entity"={"icon"="icon-user"},
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
@@ -54,6 +54,10 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "form"={
  *              "form_type"="oro_user_select",
  *              "grid_name"="users-select-grid"
+ *          },
+ *          "grid"={
+ *              "default"="users-grid",
+ *              "context"="users-for-context-grid"
  *          }
  *      }
  * )

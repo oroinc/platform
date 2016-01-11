@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\ActivityBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -14,6 +14,6 @@ class OroActivityBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(new UpdateActivityButtonConfigQuery());
+        $queries->addQuery(new RemoveUnusedContextConfigQuery());
     }
 }
