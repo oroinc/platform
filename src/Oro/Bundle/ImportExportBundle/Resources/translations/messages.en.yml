@@ -14,7 +14,9 @@ oro:
             full.label:     "Export Fields"
             header.label:   "Column Name"
             identity.label: "Use as Identity Field"
-            identity_when_empty.label: "Use as Identity Field even if empty"
+            identity.only_when_not_empty: "Only when not empty"
+            identity.always: "Always"
+            identity.tooltip: "If set to \"Only when not empty\", the field may be omitted in the identity when it has no value."
             order.label:    "Column Position"
             
         import:

@@ -14,6 +14,8 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 class FieldHelper
 {
+    const IDENTITY_ONLY_WHEN_NOT_EMPTY = -1;
+
     /** @var ConfigProviderInterface */
     protected $configProvider;
 
@@ -253,6 +255,21 @@ class FieldHelper
         }
 
         return $identityValues;
+    }
+
+    /**
+     * Checks if a field should be used as an identity even if it has empty value
+     *
+     * @param string $entityName
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    public function isRequiredIdentityField($entityName, $fieldName)
+    {
+        $value = $this->getConfigValue($entityName, $fieldName, 'identity', false);
+
+        return $value && self::IDENTITY_ONLY_WHEN_NOT_EMPTY !== $value;
     }
 
     /**
