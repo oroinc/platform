@@ -93,7 +93,7 @@ define([
         rebuildAndRender: function(massActions) {
             this.column.set('massActions', massActions);
 
-            this.buildActionsPanel();
+            this.createActionsPanel();
             this.render();
         },
 
