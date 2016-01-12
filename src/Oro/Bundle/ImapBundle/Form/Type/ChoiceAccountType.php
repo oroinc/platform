@@ -81,8 +81,13 @@ class ChoiceAccountType extends AbstractType
             if (null === $data) {
                 return;
             }
-
             $accountTypeModel = $this->createAccountTypeModelFromData($data);
+
+            if ($accountTypeModel === null) {
+                //reset data for avoiding form extra parameters error
+                $formEvent->setData(null);
+                return;
+            }
         } else {
             $data = $formEvent->getData();
 
@@ -178,14 +183,18 @@ class ChoiceAccountType extends AbstractType
      *
      * @param array $data
      *
-     * @return AccountTypeModel
+     * @return AccountTypeModel|null
      */
     protected function createAccountTypeModelFromData($data)
     {
+        $imapGmailConfiguration = isset($data['userEmailOrigin']) ? $data['userEmailOrigin'] : [];
+
+        if (empty($imapGmailConfiguration['user']) && empty($imapGmailConfiguration['accessToken'])) {
+            return null;
+        }
         $accountTypeModel =  new AccountTypeModel();
         $accountTypeModel->setAccountType($data['accountType']);
 
-        $imapGmailConfiguration = $data['userEmailOrigin'];
         $userEmailOrigin = new UserEmailOrigin();
         $userEmailOrigin->setImapHost($imapGmailConfiguration['imapHost']);
         $userEmailOrigin->setImapPort($imapGmailConfiguration['imapPort']);

@@ -12,7 +12,7 @@ oro.imap:
     configuration:
         account_type:
             label: Account Type
-            selectType: Select Type
+            selectType: Not Selected
             gmail: Gmail
             other: Other
         imap_host.label: IMAP Host
@@ -25,6 +25,6 @@ oro.imap:
         use_smtp.label: Enable SMTP
         user.label: User
         password.label: Password
-        connect: Check connection
+        connect: Connect
         connect_and_retrieve_folders: Check connection/Retrieve folders
         tooltip: If the value is changed, new mailbox will be registered. All data from this mailbox will be lost
