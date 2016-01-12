@@ -48,11 +48,11 @@ class DatagridConfiguration extends Object
      */
     public function getAclResource()
     {
-        $result = $this->offsetGetByPath(self::ACL_RESOURCE_PATH);
-
-        if (!$result) {
+        if ($this->offsetExistByPath(self::ACL_RESOURCE_PATH)) {
+            $result = $this->offsetGetByPath(self::ACL_RESOURCE_PATH);
+        } else {
             // Support backward compatibility until 1.11 to get this option from deprecated path.
-            $result = $this->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
+            $result = $this->offsetGetByPath(Builder::DATASOURCE_ACL_PATH, false);
         }
 
         return $result;
@@ -65,9 +65,9 @@ class DatagridConfiguration extends Object
      */
     public function isDatasourceSkipAclApply()
     {
-        $result = $this->offsetGetByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH, false);
-
-        if (!$result) {
+        if ($this->offsetExistByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH)) {
+            $result = $this->offsetGetByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH);
+        } else {
             // Support backward compatibility until 1.11 to get this option from deprecated path.
             $result = $this->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
         }
