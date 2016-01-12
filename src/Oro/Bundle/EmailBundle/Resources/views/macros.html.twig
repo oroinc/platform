@@ -611,16 +611,3 @@
         </div>
     </div>
 {% endmacro %}
-
-{#
-    Render link to email owners
-    Parameters:
-        email - entity record
-        renderLabel - need render default label
-#}
-{% macro entityOwnerLink(email, renderLabel = true) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% for entity in email.emailUsers %}
-        {{ UI.entityOwnerLink(entity, false) }}
-    {% endfor %}
-{% endmacro %}

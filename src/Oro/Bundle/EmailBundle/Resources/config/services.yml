@@ -133,6 +133,8 @@ parameters:
     oro_email.workflow.action.strip_html_tags.class:    Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags
     oro_email.workflow.action.add_activity_target.class: Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget
 
+    oro_email.listener.before_map_object_search_listener.class: Oro\Bundle\EmailBundle\EventListener\BeforeMapObjectSearchListener
+
 services:
     oro_email.entity.cache.warmer:
         class: %oro_email.entity.cache.warmer.class%
@@ -948,3 +950,8 @@ services:
 
     oro_email.placeholder.send_email.filter:
         class: %oro_email.placeholder.send_email.filter.class%
+
+    oro_email.listener.before_map_object_search_listener:
+        class: %oro_email.listener.before_map_object_search_listener.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: addEntityMapTitleFieldEvent }
