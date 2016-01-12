@@ -1,12 +1,7 @@
-define(['backbone', 'underscore'], function(Backbone, _) {
+define(['backbone'], function(Backbone) {
     'use strict';
 
     var MetadataModel;
-    var helpers = {
-        actionType: function(type) {
-            return type + 'Action';
-        }
-    };
 
     /**
      * Datagrid metadata model
@@ -23,19 +18,6 @@ define(['backbone', 'underscore'], function(Backbone, _) {
             initialState: {},
             rowActions: {},
             massActions: {}
-        },
-
-        /**
-         * @returns {Object}
-         */
-        getMassActionsOptions: function(modules) {
-            var massActions = {};
-
-            _.each(this.get('massActions'), function(options, action) {
-                massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
-            });
-
-            return massActions;
         }
     });
 

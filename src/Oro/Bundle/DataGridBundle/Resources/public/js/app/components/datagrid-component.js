@@ -7,6 +7,7 @@ define(function(require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
+    var Backbone = require('backbone');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var Grid = require('orodatagrid/js/datagrid/grid');
@@ -113,12 +114,17 @@ define(function(require) {
                 rowActions: {},
                 massActions: {}
             });
+            this.metadataModel = new MetadataModel(this.metadata);
             this.modules = {};
 
             this.collectModules();
 
             // load all dependencies and build grid
             tools.loadModules(this.modules, this.build, this);
+
+            this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
+                this.grid.massActions.reset(this.buildMassActionsOptions(massActions).toArray());
+            }, this);
         },
 
         /**
@@ -256,14 +262,8 @@ define(function(require) {
                 rowActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
-            var metadataModel = new MetadataModel(this.metadata);
-
             // mass actions
-            massActions = metadataModel.getMassActionsOptions(modules);
-
-            this.listenTo(metadataModel, 'change:massActions', _.bind(function(model) {
-                this.grid.massActions = model.getMassActionsOptions(modules);
-            }, this), 100);
+            massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);
@@ -287,11 +287,29 @@ define(function(require) {
                 entityHint: metadata.options.entityHint,
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
-                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
+                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || massActions.length,
                 metadata: this.metadata,
-                metadataModel: metadataModel,
+                metadataModel: this.metadataModel,
                 plugins: plugins
             };
+        },
+
+        /**
+         * @param {Object} actions
+         * @returns {Object}
+         */
+        buildMassActionsOptions: function(actions) {
+            var modules = this.modules;
+            var massActions = [];
+
+            _.each(actions, function(options, action) {
+                massActions.push({
+                    action: action,
+                    module: modules[helpers.actionType(options.frontend_type)].extend(options)
+                });
+            });
+
+            return new Backbone.Collection(massActions);
         },
 
         fixStates: function(options) {
