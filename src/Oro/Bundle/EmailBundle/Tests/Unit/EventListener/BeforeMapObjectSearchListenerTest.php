@@ -15,7 +15,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener = new BeforeMapObjectSearchListener();
     }
 
-    public function testAddEntityMapTitleFieldEvent()
+    public function testAddEntityMapConfigEvent()
     {
         $emailUserConfig = [BeforeMapObjectSearchListener::EMAIL_USER_CLASS_NAME => [
             'title_fields' => ['email.subject'], 'alias' => '']
@@ -24,7 +24,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit_Framework_TestCase
         $expectedConfig[BeforeMapObjectSearchListener::EMAIL_CLASS_NAME] =
             ['title_fields' => ['subject'], 'alias' => ''];
         $event = new SearchMappingCollectEvent($emailUserConfig);
-        $this->listener->addEntityMapTitleFieldEvent($event);
+        $this->listener->addEntityMapConfigEvent($event);
         $this->assertEquals($expectedConfig, $event->getMappingConfig());
     }
 }

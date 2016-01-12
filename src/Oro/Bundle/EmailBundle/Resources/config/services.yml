@@ -104,7 +104,6 @@ parameters:
     oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
     oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
-    oro_email.acl.voter.email_user_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailUserVoter
 
     # Email DataGrid
     oro_email.datagrid.origin_folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
@@ -133,7 +132,8 @@ parameters:
     oro_email.workflow.action.strip_html_tags.class:    Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags
     oro_email.workflow.action.add_activity_target.class: Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget
 
-    oro_email.listener.before_map_object_search_listener.class: Oro\Bundle\EmailBundle\EventListener\BeforeMapObjectSearchListener
+    oro_email.listener.search_aliases_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchAliasListener
+    oro_email.listener.prepare_result_item_listener.class: Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener
 
 services:
     oro_email.entity.cache.warmer:
@@ -951,7 +951,14 @@ services:
     oro_email.placeholder.send_email.filter:
         class: %oro_email.placeholder.send_email.filter.class%
 
-    oro_email.listener.before_map_object_search_listener:
-        class: %oro_email.listener.before_map_object_search_listener.class%
+    oro_email.listener.search_aliases_listener:
+        class: %oro_email.listener.search_aliases_listener.class%
         tags:
-            - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: addEntityMapTitleFieldEvent }
+            - { name: kernel.event_listener, event: oro_activity.search_aliases, method: addEmailAliasEvent }
+
+    oro_email.listener.prepare_result_item_listener:
+        class: %oro_email.listener.prepare_result_item_listener.class%
+        arguments:
+            - @router
+        tags:
+            - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: prepareEmailItemDataEvent }
