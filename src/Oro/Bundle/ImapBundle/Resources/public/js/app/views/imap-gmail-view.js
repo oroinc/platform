@@ -15,7 +15,7 @@ define(function(require) {
 
         errorMessage: '',
 
-        type: 'Gmail',
+        type: '',
 
         html: '',
 
@@ -34,6 +34,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
+            this.type = options.type;
         },
 
         render: function() {

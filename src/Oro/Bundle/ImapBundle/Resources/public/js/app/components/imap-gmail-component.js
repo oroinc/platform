@@ -43,7 +43,8 @@ define(function(require) {
         prepareViewOptions: function(options) {
             return {
                 el: options._sourceElement,
-                googleErrorMessage: options.googleErrorMessage
+                googleErrorMessage: options.googleErrorMessage,
+                type: options.type
             };
         },
 

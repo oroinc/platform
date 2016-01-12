@@ -73,7 +73,8 @@
         'urlGetFolders': path("oro_imap_gmail_connection_check"),
         'formSelector': '#'~formSelector|default(form.vars.id),
         'googleErrorMessage': '.google-alert',
-        'formParentName' : form.parent.parent.vars.name
+        'formParentName' : form.parent.parent.vars.name,
+        'type': constant('Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel::ACCOUNT_TYPE_GMAIL')
     } %}
 
     <div class="container-imap-gmail-container"
