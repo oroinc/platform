@@ -235,7 +235,6 @@ define(function(require) {
         combineGridOptions: function() {
             var columns;
             var rowActions = {};
-            var massActions = {};
             var defaultOptions = {
                 sortable: false
             };
@@ -263,7 +262,7 @@ define(function(require) {
             });
 
             // mass actions
-            massActions = this.buildMassActionsOptions(this.metadata.massActions);
+            var massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);

@@ -4,6 +4,7 @@ define(function(require) {
     var Grid;
     var $ = require('jquery');
     var _ = require('underscore');
+    var Backbone = require('backbone');
     var Backgrid = require('backgrid');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
@@ -112,7 +113,7 @@ define(function(require) {
             rowClickAction:         undefined,
             multipleSorting:        true,
             rowActions:             [],
-            massActions:            [],
+            massActions:            new Backbone.Collection(),
             enableFullScreenLayout: false
         },
 
@@ -133,7 +134,7 @@ define(function(require) {
          * @param {Object} [options.toolbarOptions] Options for toolbar
          * @param {Object} [options.exportOptions] Options for export
          * @param {Array<oro.datagrid.action.AbstractAction>} [options.rowActions] Array of row actions prototypes
-         * @param {Array<oro.datagrid.action.AbstractAction>} [options.massActions] Array of mass actions prototypes
+         * @param {Backbone.Collection<oro.datagrid.action.AbstractAction>} [options.massActions] Collection of mass actions prototypes
          * @param {Boolean} [options.multiSelectRowEnabled] Option for enabling multi select row
          * @param {oro.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for
          *  action that handles row click
