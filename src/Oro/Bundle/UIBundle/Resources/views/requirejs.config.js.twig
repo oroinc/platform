@@ -2,9 +2,10 @@
 {%- if app.user -%}
     {%- set userName = app.user.username -%}
 {%- endif -%}
-{%- if  assets_version -%}
+{%- set baseAssetParts = asset('bundles')|split('?', 2) -%}
+{%- if baseAssetParts[1] is defined -%}
 require({
-    urlArgs: 'version={{ assets_version|escape('url') }}'
+    urlArgs: '{{ baseAssetParts[1] }}'
 });
 {%- endif -%}
 require({
