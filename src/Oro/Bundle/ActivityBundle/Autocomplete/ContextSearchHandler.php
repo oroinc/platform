@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityBundle\Autocomplete;
 
-use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -20,6 +19,7 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;

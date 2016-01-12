@@ -132,7 +132,7 @@ parameters:
     oro_email.workflow.action.strip_html_tags.class:    Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags
     oro_email.workflow.action.add_activity_target.class: Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget
 
-    oro_email.listener.search_aliases_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchAliasListener
+    oro_email.listener.search_aliases_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchAliasesListener
     oro_email.listener.prepare_result_item_listener.class: Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener
 
 services:

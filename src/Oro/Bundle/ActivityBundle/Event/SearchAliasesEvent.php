@@ -54,6 +54,6 @@ class SearchAliasesEvent extends Event
      */
     public function getTargetClasses()
     {
-        return $this->aliases;
+        return $this->targetClasses;
     }
 }
