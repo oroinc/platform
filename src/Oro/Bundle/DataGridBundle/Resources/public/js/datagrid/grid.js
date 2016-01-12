@@ -22,7 +22,6 @@ define(function(require) {
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
-    var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
 
     /**
      * Basic grid class.
@@ -87,7 +86,7 @@ define(function(require) {
         toolbar: Toolbar,
 
         /** @property {orodatagrid.datagrid.MetadataModel} */
-        metadataModel: MetadataModel,
+        metadataModel: null,
 
         /** @property {LoadingMaskView|null} */
         loadingMask: null,
@@ -165,6 +164,10 @@ define(function(require) {
 
             if (opts.columns.length === 0) {
                 this.noColumnsFlag = true;
+            }
+
+            if (!opts.metadataModel) {
+                throw new TypeError('"metadataModel" is required');
             }
 
             // Init properties values based on options and defaults
@@ -705,8 +708,8 @@ define(function(require) {
          * @private
          */
         _processLoadedMetadata: function(metadata) {
-            this.metadata = _.defaults(metadata, this.metadata);
-            this.metadataModel.set(this.metadata);
+            _.extend(this.metadata, metadata)
+            this.metadataModel.set(metadata);
         },
 
         /**

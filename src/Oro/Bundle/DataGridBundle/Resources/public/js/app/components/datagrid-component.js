@@ -123,7 +123,7 @@ define(function(require) {
             tools.loadModules(this.modules, this.build, this);
 
             this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
-                this.grid.massActions.reset(this.buildMassActionsOptions(massActions).toArray());
+                this.grid.massActions.reset(this.buildMassActionsOptions(massActions));
             }, this);
         },
 
@@ -280,7 +280,7 @@ define(function(require) {
                 name: this.gridName,
                 columns: columns,
                 rowActions: rowActions,
-                massActions: massActions,
+                massActions: new Backbone.Collection(massActions),
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
@@ -295,7 +295,7 @@ define(function(require) {
 
         /**
          * @param {Object} actions
-         * @returns {Object}
+         * @returns {Array}
          */
         buildMassActionsOptions: function(actions) {
             var modules = this.modules;
@@ -308,7 +308,7 @@ define(function(require) {
                 });
             });
 
-            return new Backbone.Collection(massActions);
+            return massActions;
         },
 
         fixStates: function(options) {

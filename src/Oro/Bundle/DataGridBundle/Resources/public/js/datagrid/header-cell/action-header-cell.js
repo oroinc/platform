@@ -75,11 +75,11 @@ define([
 
             this.actionsPanel = new ActionsPanel();
             this.actionsPanel.setActions(actions);
+            this.subviews.push(this.actionsPanel);
         },
 
         createActionsPanel: function() {
             this.buildActionsPanel();
-            this.subviews.push(this.actionsPanel);
         },
 
         render: function() {
