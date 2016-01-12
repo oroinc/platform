@@ -59,7 +59,7 @@ define([
             ActionHeaderCell.__super__.dispose.apply(this, arguments);
         },
 
-        buildActionsPanel: function() {
+        createActionsPanel: function() {
             var actions = [];
             var datagrid = this.column.get('datagrid');
 
@@ -76,10 +76,6 @@ define([
             this.actionsPanel = new ActionsPanel();
             this.actionsPanel.setActions(actions);
             this.subviews.push(this.actionsPanel);
-        },
-
-        createActionsPanel: function() {
-            this.buildActionsPanel();
         },
 
         render: function() {
