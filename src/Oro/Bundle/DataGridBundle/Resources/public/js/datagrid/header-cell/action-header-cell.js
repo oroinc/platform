@@ -44,7 +44,7 @@ define([
             datagrid = this.column.get('datagrid');
             this.listenTo(datagrid, 'enable', this.enable);
             this.listenTo(datagrid, 'disable', this.disable);
-            this.listenTo(datagrid, 'metadata-change', this.rebuildAndRender);
+            this.listenTo(datagrid.metadataModel, 'change:massActions', this.rebuildAndRender);
         },
 
         /**

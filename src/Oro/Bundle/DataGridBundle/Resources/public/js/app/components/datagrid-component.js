@@ -291,9 +291,8 @@ define(function(require) {
          * @param {Object} actions
          * @returns {Object}
          */
-        buildMassActionsOptions: function (actions) {
+        buildMassActionsOptions: function(actions) {
             var modules = this.modules;
-
             var massActions = {};
 
             _.each(actions, function(options, action) {

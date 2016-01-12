@@ -21,6 +21,7 @@ define(function(require) {
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
 
     /**
      * Basic grid class.
@@ -83,6 +84,9 @@ define(function(require) {
 
         /** @property {orodatagrid.datagrid.Toolbar} */
         toolbar: Toolbar,
+
+        /** @property {orodatagrid.datagrid.MetadataModel} */
+        metadataModel: MetadataModel,
 
         /** @property {LoadingMaskView|null} */
         loadingMask: null,
@@ -178,6 +182,7 @@ define(function(require) {
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
+            this.metadataModel = new MetadataModel(this.metadata);
             this._initColumns(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
@@ -677,7 +682,6 @@ define(function(require) {
          * @private
          */
         _afterRequest: function(jqXHR) {
-
             var json = jqXHR.responseJSON || {};
             if (json.metadata) {
                 this._processLoadedMetadata(json.metadata);
@@ -701,16 +705,12 @@ define(function(require) {
          * @private
          */
         _processLoadedMetadata: function(metadata) {
-            var meta = _.defaults(metadata, {
-                massActions: {}
-            });
-
             if (metadata.massActions) {
-                this.massActions = this.massActionsOptionsBuilder(meta.massActions);
-                this.metadata.massActions = meta.massActions;
-
-                this.trigger('metadata-change', meta);
+                this.massActions = this.massActionsOptionsBuilder(metadata.massActions);
             }
+
+            this.metadata = _.defaults(metadata, this.metadata);
+            this.metadataModel.set(this.metadata);
         },
 
         /**

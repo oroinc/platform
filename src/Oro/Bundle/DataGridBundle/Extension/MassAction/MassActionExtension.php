@@ -30,11 +30,12 @@ class MassActionExtension extends ActionExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $metadata = [
-            static::METADATA_ACTION_KEY => $this->getActionsMetadata($config)
-        ];
-
-        $result->offsetAddToArray('metadata', $metadata);
+        $result->offsetAddToArray(
+            'metadata',
+            [
+                static::METADATA_ACTION_KEY => $this->getActionsMetadata($config)
+            ]
+        );
     }
 
     /**
