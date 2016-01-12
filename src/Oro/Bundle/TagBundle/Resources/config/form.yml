@@ -81,6 +81,7 @@ services:
         arguments:
             - %oro_tag.tag.entity.class%
             - ["name"]
+            - @oro_security.security_facade
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }
 
