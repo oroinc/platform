@@ -182,7 +182,6 @@ define(function(require) {
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
-            this.metadataModel = new MetadataModel(this.metadata);
             this._initColumns(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
@@ -705,10 +704,6 @@ define(function(require) {
          * @private
          */
         _processLoadedMetadata: function(metadata) {
-            if (metadata.massActions) {
-                this.massActions = this.massActionsOptionsBuilder(metadata.massActions);
-            }
-
             this.metadata = _.defaults(metadata, this.metadata);
             this.metadataModel.set(this.metadata);
         },

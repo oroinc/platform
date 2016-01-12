@@ -16,6 +16,7 @@ define(function(require) {
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
+    var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
 
     helpers = {
         cellType: function(type) {
@@ -255,8 +256,14 @@ define(function(require) {
                 rowActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
+            var metadataModel = new MetadataModel(this.metadata);
+
             // mass actions
-            massActions = this.buildMassActionsOptions(metadata.massActions);
+            massActions = metadataModel.getMassActionsOptions(modules);
+
+            this.listenTo(metadataModel, 'change:massActions', _.bind(function(model) {
+                this.grid.massActions = model.getMassActionsOptions(modules);
+            }, this), 100);
 
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);
@@ -275,7 +282,6 @@ define(function(require) {
                 columns: columns,
                 rowActions: rowActions,
                 massActions: massActions,
-                massActionsOptionsBuilder: _.bind(this.buildMassActionsOptions, this),
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
@@ -283,23 +289,9 @@ define(function(require) {
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
                 metadata: this.metadata,
+                metadataModel: metadataModel,
                 plugins: plugins
             };
-        },
-
-        /**
-         * @param {Object} actions
-         * @returns {Object}
-         */
-        buildMassActionsOptions: function(actions) {
-            var modules = this.modules;
-            var massActions = {};
-
-            _.each(actions, function(options, action) {
-                massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
-            });
-
-            return massActions;
         },
 
         fixStates: function(options) {
