@@ -708,7 +708,7 @@ define(function(require) {
          * @private
          */
         _processLoadedMetadata: function(metadata) {
-            _.extend(this.metadata, metadata)
+            _.extend(this.metadata, metadata);
             this.metadataModel.set(metadata);
         },
 
