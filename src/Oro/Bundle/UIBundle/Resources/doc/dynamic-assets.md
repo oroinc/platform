@@ -46,7 +46,7 @@ class AcmeSomeBundle extends Bundle
 
 That's all, the configuration is finished.
 
-Now you need to take care about updating of a version of package when your assets are changed. The following code shows how to update the version:
+Now you need to take care about updating of the package version when your assets are changed. The following code shows how to update the version:
 
 ```php
 <?php
@@ -70,14 +70,14 @@ class SomeController extends Controller
 }
 ```
 
-The using of you assets are the same as other assets, for example by the well-known `asset()` Twig function:
+The usage of your assets is the same as other assets, for example by the well-known `asset()` Twig function:
 
 ```twig
 {{ asset('test.js', 'acme') }}
 {# the result may be something like this: test.js?version=123-2 #}
 {# where #}
 {# '123' is the static asset version specified in %assets_version% parameter #}
-{# '2' is the dynamic asset version, this number is increased each time you call $assetVersionManager->updateAssetVersion('acme') #}
+{# '2' is the dynamic asset version; this number is increased each time you call $assetVersionManager->updateAssetVersion('acme') #}
 ```
 
-Please pay attention that the package name should be passed to the `asset()` function. This tells Symfony that the asset belongs your asset package and the dynamic versioning strategy should be applied.
+Please pay attention that the package name should be passed to the `asset()` function. This tells Symfony that the asset belongs your package and the dynamic versioning strategy should be applied.
