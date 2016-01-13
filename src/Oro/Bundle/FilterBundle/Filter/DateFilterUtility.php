@@ -159,6 +159,8 @@ class DateFilterUtility
     }
 
     /**
+     * Allow to modify sql field if present 'this day without year' variable or date without year
+     *
      * @param array $data
      * @param string $originalKey
      * @param string $field
@@ -194,6 +196,8 @@ class DateFilterUtility
     }
 
     /**
+     * Correcting time zone in case if it not equals UTC
+     *
      * @param string $fieldName
      * @return string
      */

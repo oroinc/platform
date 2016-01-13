@@ -15,6 +15,9 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class DateFilterSubscriber implements EventSubscriberInterface
 {
     /** @var Compiler */
@@ -45,7 +48,9 @@ class DateFilterSubscriber implements EventSubscriberInterface
      * Parses date expressions
      * If date part given, then replace value fields by choice fields with specific to that value choices
      *
+     * @param FormEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity) many cases in switch - have no sense to refactor this.
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function preSubmit(FormEvent $event)
     {

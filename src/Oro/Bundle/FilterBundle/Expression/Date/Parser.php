@@ -22,7 +22,7 @@ class Parser
      * @param array $tokens
      * @param bool $returnRawToken
      * @return mixed
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function parse($tokens, $returnRawToken = false)
     {

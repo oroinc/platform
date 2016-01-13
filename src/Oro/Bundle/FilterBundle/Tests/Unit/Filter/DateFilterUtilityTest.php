@@ -243,7 +243,9 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                     'date_end_original' => 6,
                     'type'       => DateRangeFilterType::TYPE_EQUAL,
                     'part'       => DateModifierInterface::PART_VALUE,
-                    'field'      => "MONTH(CONVERT_TZ(field, '+00:00', '+04:00')) * 100 + DAY(CONVERT_TZ(field, '+00:00', '+04:00'))",
+                    'field'      =>
+                        "MONTH(CONVERT_TZ(field, '+00:00', '+04:00')) * 100 + ".
+                        "DAY(CONVERT_TZ(field, '+00:00', '+04:00'))",
                 ]
             ],
         ];

@@ -11,6 +11,7 @@ use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
 class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -150,6 +151,54 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
                 ['part' => DateModifierInterface::PART_DOY, 'value' => ['start' => 23]],
                 ['start' => 'start subform'],
                 ['start' => null]
+            ],
+            'should process date start of the year value with equals'  => [
+                [
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_EQUAL,
+                    'value' => ['start' => '{{'.DateModifierInterface::VAR_SOY.'}}']
+                ],
+                [
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_BETWEEN,
+                    'value' => ['start' => '{{'.DateModifierInterface::VAR_SOY.'}}', 'end' => date('Y').'-01-01 23:59']
+                ]
+            ],
+            'should process date start of the year value with not equals'  => [
+                [
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_NOT_EQUAL,
+                    'value' => ['end' => '{{'.DateModifierInterface::VAR_SOY.'}}']
+                ],
+                [
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_NOT_BETWEEN,
+                    'value' => ['end' => date('Y').'-01-01 23:59', 'start' => '{{'.DateModifierInterface::VAR_SOY.'}}']
+                ]
+            ],
+            'should change part to "value" with "this day without year" variable'  => [
+                [
+                    'part' => DateModifierInterface::PART_MONTH,
+                    'type' => AbstractDateFilterType::TYPE_EQUAL,
+                    'value' => ['start' => '{{'.DateModifierInterface::VAR_THIS_DAY_W_Y.'}}']
+                ],
+                [
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_EQUAL,
+                    'value' => ['start' => '{{'.DateModifierInterface::VAR_THIS_DAY_W_Y.'}}']
+                ]
+            ],
+            'should change part to "month" with "march" variable'  => [
+                [
+                    'part' => DateModifierInterface::PART_QUARTER,
+                    'type' => AbstractDateFilterType::TYPE_EQUAL,
+                    'value' => ['start' => '{{'.DateModifierInterface::VAR_MARCH.'}}']
+                ],
+                [
+                    'part' => DateModifierInterface::PART_MONTH,
+                    'type' => AbstractDateFilterType::TYPE_EQUAL,
+                    'value' => ['start' => '{{'.DateModifierInterface::VAR_MARCH.'}}']
+                ]
             ]
         ];
     }

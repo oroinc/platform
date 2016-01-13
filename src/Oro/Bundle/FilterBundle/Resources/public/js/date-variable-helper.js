@@ -76,7 +76,7 @@ define(function(require) {
             value = value.replace(/([\-+]+(\d+)?)/, '');
 
             result = _.some(this.index, function(displayValue, index) {
-                var regexpVariable = new RegExp('^'+value+'$', 'i');
+                var regexpVariable = new RegExp('^' + value + '$', 'i');
                 var isShortMonth =
                         !/\s+/.test(displayValue) &&
                         regexpVariable.test(displayValue.substr(0, 3)) &&
