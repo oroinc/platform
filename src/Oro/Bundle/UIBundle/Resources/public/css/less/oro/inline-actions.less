@@ -1,34 +1,38 @@
-.contact-element {
+.inline-actions-element {
   position: relative;
   top: -4px;
   left: -2px;
-  padding: 0 0 0 2px;
   line-height: 19px;
   display: inline-block;
-  .contact-element-actions {
+  margin-bottom: -3px;
+  .inline-actions-element_actions {
     visibility: hidden;
   }
   &:hover {
     background: @rowSelectedBackground;
-    outline: solid 2px @rowSelectedBackground;
-    .contact-element-actions {
+    .inline-actions-element-outline(@rowSelectedBackground);
+    .inline-actions-element_actions {
       visibility: visible;
     }
   }
-  &.contact-element-no-actions:hover {
+  &.inline-actions-element_no-actions:hover {
     background: transparent;
     outline: none;
   }
-  .contact-element-wrapper {
+  .inline-actions-element_wrapper {
     word-break: break-all;
     padding: 5px 0 3px;
     line-height: 23px;
-    margin-right: 5px;
+    margin-right: 2px;
+    position: relative;
+    z-index: 1;// to get over inline-actions-element-outline
   }
 }
-.contact-element-actions {
+.inline-actions-element_actions {
   display: inline-block;
   vertical-align: top;
+  position: relative;
+  z-index: 1;// to get over inline-actions-element-outline
   .btn {
     font: 0/0 a;
     color: transparent;

@@ -164,3 +164,17 @@
     margin-top: -6px;
   }
 }
+
+.inline-actions-element-outline(@color) {
+  &:before {
+    /* replacement for outline, that renders lines with artifact in FF */
+    content: '';
+    background: transparent;
+    position: absolute;
+    border: 2px solid @color;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+  }
+}

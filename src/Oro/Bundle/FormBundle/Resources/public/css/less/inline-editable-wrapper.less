@@ -1,68 +1,33 @@
-.inline-editable-wrapper__start-editing-button {
-  display: none !important;
-  position: absolute;
-  top: 1px;
-  right: -2px;
-  width: 25px;
-  height: 25px;
-  line-height: 35px !important;
-  background-color: #fff !important;
-  text-align: center;
-  border: solid 1px #ddd !important;
-  border-radius: 4px;
-  padding-left: 2px;
-  &:hover {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
-}
-.mobile-version .inline-editable-wrapper:not(.loading) .inline-editable-wrapper__start-editing-button {
-  display: block !important;
-  background-color: #f7f7f7;
-  background-image: -moz-linear-gradient(top,#fdfdfd,#efefef);
-  background-image: -webkit-gradient(linear,0 0,0 100%,from(#fdfdfd),to(#efefef));
-  background-image: -webkit-linear-gradient(top,#fdfdfd,#efefef);
-  background-image: -o-linear-gradient(top,#fdfdfd,#efefef);
-  background-image: linear-gradient(to bottom,#fdfdfd,#efefef);
-  background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffdfdfd', endColorstr='#ffefefef', GradientType=0);
-}
 .inline-editable-wrapper {
-  &.save-success .inline-editable-container{
+  &.save-success .inline-actions-element {
     background: #F4FEE2;
+    .inline-actions-element-outline(#F4FEE2);
+    .inline-actions-element_actions {
+      visibility: visible;
+    }
   }
-  &.save-success .inline-editable-container{
-    background: #F4FEE2;
-  }
-  &.save-fail .inline-editable-container{
+  &.save-fail .inline-actions-element {
     background: #FFEEEE;
+    .inline-actions-element-outline(#FFEEEE);
+    .inline-actions-element_actions {
+      visibility: visible;
+    }
   }
-
-  &.loading .inline-editable-container {
+  &.loading .inline-actions-element {
     background: #f5f5f5;
-    :before {
+    .inline-actions-element-outline(#f5f5f5);
+    &:after {
       background: url('../../../../bundles/oroui/img/loader-16.gif') no-repeat center center rgba(245,245,245,0.7);
       display: block !important;
       content: "";
       position: absolute;
       top: 0;
       right: 1px;
-      width: 27px;
-      height: 27px;
+      width: 24px;
+      height: 24px;
     }
-    &:hover .inline-editable-wrapper__start-editing-button {
-      display: none !important;
-    }
-  }
-  .inline-editable-container {
-    position: relative;
-    display: inline-block;
-    padding-right: 30px;
-    &:hover {
-      background: #f4efd4;
-      outline: 2px #f4efd4 solid;
-      .inline-editable-wrapper__start-editing-button {
-        display: block !important;
-      }
+    &:hover .inline-actions-element_actions {
+      visibility: hidden !important;
     }
   }
 }
