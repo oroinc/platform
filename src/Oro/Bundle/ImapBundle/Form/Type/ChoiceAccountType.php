@@ -50,6 +50,8 @@ class ChoiceAccountType extends AbstractType
         } else {
             $builder->add('accountType', 'choice', [
                 'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
+                'tooltip'  => 'oro.imap.configuration.tooltip',
+                'required' => false,
                 'choices' => [
                     '' => $this->translator->trans(
                         'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
@@ -111,6 +113,8 @@ class ChoiceAccountType extends AbstractType
                 $form->remove('disconnect');
                 $form->add('accountType', 'choice', [
                     'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
+                    'tooltip'  => 'oro.imap.configuration.tooltip',
+                    'required' => false,
                     'choices' => [
                         '' => $this->translator->trans(
                             'oro.imap.configuration.ac1count_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT

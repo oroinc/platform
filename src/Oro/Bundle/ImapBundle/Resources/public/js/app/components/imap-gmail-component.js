@@ -52,6 +52,7 @@ define(function(require) {
          * Handler event checkConnection
          */
         onCheckConnection: function() {
+            mediator.execute('showLoading');
             this.view.resetErrorMessage();
             this.requestGoogleAuthCode();
         },
@@ -156,6 +157,7 @@ define(function(require) {
         renderFormGetFolder: function(response) {
             this.view.setHtml(response.html);
             this.view.render();
+            this.view.autoRetrieveFolders();
         },
 
         /**

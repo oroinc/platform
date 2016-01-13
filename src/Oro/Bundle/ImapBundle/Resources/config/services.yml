@@ -136,6 +136,9 @@ services:
 
     oro_imap.form.type.google_sync_checkbox:
         class: %oro_imap.form.type.google_sync_checkbox.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_imap.imap_email_google_oauth2_manager
         tags:
             - { name: form.type, alias: oro_config_google_imap_sync_checkbox }
 

@@ -167,6 +167,15 @@ define(function(require) {
          */
         hideErrorMessage: function() {
             this.$googleErrorMessage.hide();
+        },
+
+        /**
+         * Try to load folders tree if it is not loaded
+         */
+        autoRetrieveFolders: function() {
+            if (!this.$el.find('input.folder-tree').length) {
+                this.trigger('getFolders', this.getData());
+            }
         }
     });
 

@@ -12,6 +12,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
  *
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository")
  */
 class UserEmailOrigin extends EmailOrigin
 {

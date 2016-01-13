@@ -41,9 +41,9 @@ class AccountTypeModel
     }
 
     /**
-     * @param UserEmailOrigin $value
+     * @param UserEmailOrigin|null $value
      */
-    public function setUserEmailOrigin(UserEmailOrigin $value)
+    public function setUserEmailOrigin($value)
     {
         $this->userEmailOrigin = $value;
     }
