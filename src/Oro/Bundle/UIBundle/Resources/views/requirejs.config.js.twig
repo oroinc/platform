@@ -2,12 +2,6 @@
 {%- if app.user -%}
     {%- set userName = app.user.username -%}
 {%- endif -%}
-{%- set baseAssetParts = asset('bundles')|split('?', 2) -%}
-{%- if baseAssetParts[1] is defined -%}
-require({
-    urlArgs: '{{ baseAssetParts[1] }}'
-});
-{%- endif -%}
 require({
     config: {
         'oroui/js/app': {
