@@ -80,8 +80,8 @@ class ActivityListRepository extends EntityRepository
                 ->setParameter('entityIds', $entityIds);
         } else {
             $queryBuilder
-                ->where('r.id = :entityIds')
-                ->setParameter('entityIds', reset($entityIds));
+                ->where('r.id = :entityId')
+                ->setParameter('entityId', reset($entityIds));
         }
         $queryBuilder
             ->orderBy('activity.' . $orderField, $orderDirection)

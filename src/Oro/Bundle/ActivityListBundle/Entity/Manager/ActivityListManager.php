@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
+use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;

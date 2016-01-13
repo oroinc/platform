@@ -32,10 +32,10 @@ class ActivityListPreQueryBuildListener
             $email = $this->doctrineHelper->getEntity(Email::ENTITY_CLASS, $event->getTargetId());
             if ($email->getThread()) {
                 $emailIds = array_map(
-                    function ($email) {
-                        return $email->getId();
+                    function ($emailEntity) {
+                        return $emailEntity->getId();
                     },
-                    $email->getThread()->getEmails()
+                    $email->getThread()->getEmails()->toArray()
                 );
                 $event->setTargetIds($emailIds);
             }
