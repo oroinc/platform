@@ -50,6 +50,7 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_activity_list.helper.acl_criteria
             - @oro_activity_list.helper.activity_inheritance_targets
+            - @event_dispatcher
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%

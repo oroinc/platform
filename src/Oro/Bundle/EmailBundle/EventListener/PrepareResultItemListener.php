@@ -14,8 +14,6 @@ class PrepareResultItemListener
     protected $router;
 
     /**
-     * Constructor
-     *
      * @param Router $router
      */
     public function __construct(Router $router)

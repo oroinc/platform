@@ -6,6 +6,8 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
@@ -55,6 +57,9 @@ class ActivityListManager
     /** @var ActivityInheritanceTargetsHelper */
     protected $activityInheritanceTargetsHelper;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * @param SecurityFacade                $securityFacade
      * @param EntityNameResolver            $entityNameResolver
@@ -66,6 +71,7 @@ class ActivityListManager
      * @param DoctrineHelper                $doctrineHelper
      * @param ActivityListAclCriteriaHelper $aclHelper
      * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
+     * @param EventDispatcherInterface      $eventDispatcher
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -79,7 +85,8 @@ class ActivityListManager
         CommentApiManager $commentManager,
         DoctrineHelper $doctrineHelper,
         ActivityListAclCriteriaHelper $aclHelper,
-        ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
+        ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->securityFacade           = $securityFacade;
         $this->entityNameResolver       = $entityNameResolver;
@@ -91,6 +98,7 @@ class ActivityListManager
         $this->doctrineHelper           = $doctrineHelper;
         $this->activityListAclHelper    = $aclHelper;
         $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -260,15 +268,18 @@ class ActivityListManager
 
     /**
      * @param string $entityClass
-     * @param string $entityId
+     * @param int $entityId
      *
      * @return QueryBuilder
      */
     protected function getBaseQB($entityClass, $entityId)
     {
+        $event = new ActivityListPreQueryBuildEvent($entityClass, $entityId);
+        $this->eventDispatcher->dispatch(ActivityListPreQueryBuildEvent::EVENT_NAME, $event);
+        $entityIds = $event->getTargetIds();
         return $this->getRepository()->getBaseActivityListQueryBuilder(
             $entityClass,
-            $entityId,
+            $entityIds,
             $this->config->get('oro_activity_list.sorting_field'),
             $this->config->get('oro_activity_list.sorting_direction'),
             $this->config->get('oro_activity_list.grouping')
