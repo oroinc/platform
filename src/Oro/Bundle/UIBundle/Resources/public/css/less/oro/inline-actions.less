@@ -24,24 +24,23 @@
     padding: 5px 0 3px;
     line-height: 23px;
     margin-right: 2px;
-    position: relative;
-    z-index: 1;// to get over inline-actions-element-outline
   }
 }
 .inline-actions-element_actions {
   display: inline-block;
   vertical-align: top;
-  position: relative;
-  z-index: 1;// to get over inline-actions-element-outline
   .btn {
     font: 0/0 a;
-    color: transparent;
-    text-shadow: none;
-    border-color: transparent;
-    background: transparent none;
     width: 23px;
     height: 23px;
     padding: 0;
+    &, &:focus, &:active, &:hover {
+      color: transparent;
+      text-shadow: none;
+      border-color: transparent;
+      background: transparent none;
+      box-shadow: none;
+    }
     [class^="icon-"], [class*=" icon-"] {
       width: 14px;
       height: 20px;

@@ -165,16 +165,6 @@
   }
 }
 
-.inline-actions-element-outline(@color) {
-  &:before {
-    /* replacement for outline, that renders lines with artifact in FF */
-    content: '';
-    background: transparent;
-    position: absolute;
-    border: 2px solid @color;
-    top: -2px;
-    right: -2px;
-    bottom: -2px;
-    left: -2px;
-  }
+.inline-actions-element-outline(@color, @width: 2px) {
+  box-shadow: 0 0 0 @width @color;
 }
