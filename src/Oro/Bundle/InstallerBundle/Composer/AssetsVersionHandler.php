@@ -42,8 +42,8 @@ class AssetsVersionHandler
         }
 
         $hasChanges = false;
-        if (!$assetsVersionExists || !self::isEnvironmentVariable($options, self::ASSETS_VERSION)) {
-            $assetsVersion = self::generateAssetsVersion($assetsVersionStrategy, $assetsVersion);
+        if (!$assetsVersionExists || !$this->isEnvironmentVariable($options, self::ASSETS_VERSION)) {
+            $assetsVersion = $this->generateAssetsVersion($assetsVersionStrategy, $assetsVersion);
             if (!$assetsVersionExists || null !== $assetsVersion) {
                 $hasChanges = true;
                 $this->io->write(
@@ -83,7 +83,7 @@ class AssetsVersionHandler
      */
     protected function isEnvironmentVariable($options, $variableName)
     {
-        $envMap = self::getEnvironmentVariablesMap($options);
+        $envMap = $this->getEnvironmentVariablesMap($options);
 
         return array_key_exists($variableName, $envMap);
     }
@@ -100,7 +100,7 @@ class AssetsVersionHandler
             return substr(md5(date('c')), 0, 8);
         }
         if ('incremental' === $strategy) {
-            return self::incrementVersion(null !== $currentVersion ? $currentVersion : '0');
+            return $this->incrementVersion(null !== $currentVersion ? $currentVersion : '0');
         }
 
         return null;
