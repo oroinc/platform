@@ -42,6 +42,7 @@ class DateModifierProvider implements DateModifierInterface
                 self::VAR_NOW,
                 self::VAR_TODAY,
                 self::VAR_THIS_DAY_W_Y,
+                self::VAR_THIS_MONTH,
                 self::VAR_SOW,
                 self::VAR_SOM,
                 self::VAR_SOQ,

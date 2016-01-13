@@ -166,8 +166,8 @@ abstract class AbstractDateFilter extends AbstractFilter
      * Apply expression using one condition (equal or not equal)
      *
      * @param FilterDatasourceAdapterInterface $ds
-     * @param                                  $dateValue
-     * @param                                  $dateParameterName
+     * @param string                           $dateValue
+     * @param string                           $dateParameterName
      * @param string                           $fieldName
      * @param bool                             $isEqual
      */
