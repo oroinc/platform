@@ -230,10 +230,8 @@
     <div class="folder-tree-widget">
         <input id="check-all" type="checkbox"/><label class="folder-label">All</label>
         <div id="folder-list">
-            {% for child in form.children %}
-                {% if child.vars.value.parentFolder is null and child.vars.value.outdatedAt is null %}
-                    {{ form_row(child) }}
-                {% endif %}
+            {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
+                {{ _self.renderFolder(key, folder, form.vars.full_name) }}
             {% endfor %}
         </div>
     </div>
@@ -353,4 +351,23 @@
     <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane{% if (app.request.locale == locale) %} active{% endif %}">
         {{ form_widget(form) }}
     </div>
+{% endmacro %}
+
+{% macro renderFolder(key, folder, namePrefix, maxDepth = 10) %}
+    {% if maxDepth %}
+        <div>
+            <input type="checkbox" name="{{ namePrefix }}[{{ key }}][syncEnabled]"{% if folder.syncEnabled %}checked="checked"{% endif %}>
+            <label class="folder-label">{{ folder.name }}</label>
+            <input type="hidden" name="{{ namePrefix }}[{{ key }}][fullName]" value="{{ folder.fullName }}">
+            <input type="hidden" name="{{ namePrefix }}[{{ key }}][name]" value="{{ folder.name }}">
+            <input type="hidden" name="{{ namePrefix }}[{{ key }}][type]" value="{{ folder.type }}">
+            {% if maxDepth > 1 and folder.subFolders|length > 0 %}
+                <div class="folder-sub-folders">
+                    {% for subKey, subFolder in folder.subFolders %}
+                        {{ _self.renderFolder(subKey, subFolder, namePrefix ~ '[' ~ key ~ '][subFolders]', maxDepth - 1) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endmacro %}
