@@ -84,6 +84,13 @@ define([
         },
 
         /**
+         * Selector, jQuery object or HTML element that will be target for append multiselect dropdown menu
+         *
+         * @property
+         */
+        dropdownContainer: 'body',
+
+        /**
          * Select widget menu opened flag
          *
          * @property
@@ -114,7 +121,7 @@ define([
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'choices');
+            var opts = _.pick(options || {}, ['choices', 'dropdownContainer']);
             _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
@@ -179,11 +186,22 @@ define([
         },
 
         /**
+         * Set dropdownContainer for dropdown element
+         *
+         * @param {(jQuery|Element|String)} container
+         * @protected
+         */
+        setDropdownContainer: function(container) {
+            this.dropdownContainer = $(container);
+        },
+
+        /**
          * Initialize multiselect widget
          *
          * @protected
          */
         _initializeSelectWidget: function() {
+            var $dropdownContainer = this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer;
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
@@ -194,7 +212,9 @@ define([
                     position: {
                         my: 'left top+7',
                         at: 'left bottom',
-                        of: this.$(this.containerSelector)
+                        of: this.$(this.containerSelector),
+                        collision: 'fit none',
+                        within: $dropdownContainer
                     },
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
@@ -202,13 +222,17 @@ define([
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
+                        this.selectWidget.updateDropdownPosition();
                     }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
                         setTimeout(_.bind(function() {
-                            this.selectDropdownOpened = false;
+                            if (!this.disposed) {
+                                this.selectDropdownOpened = false;
+                            }
                         }, this), 100);
-                    }, this)
+                    }, this),
+                    appendTo: this.dropdownContainer
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
             });

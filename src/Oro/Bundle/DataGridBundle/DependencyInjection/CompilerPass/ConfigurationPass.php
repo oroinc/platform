@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -48,7 +49,7 @@ class ConfigurationPass implements CompilerPassInterface
             $resources    = $configLoader->load($container);
             foreach ($resources as $resource) {
                 if (isset($resource->data[self::ROOT_PARAMETER]) && is_array($resource->data[self::ROOT_PARAMETER])) {
-                    $config = array_merge_recursive($config, $resource->data[self::ROOT_PARAMETER]);
+                    $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $resource->data[self::ROOT_PARAMETER]);
                 }
             }
 
@@ -65,7 +66,7 @@ class ConfigurationPass implements CompilerPassInterface
     protected function registerConfigProviders(ContainerBuilder $container)
     {
         if ($container->hasDefinition(self::CHAIN_PROVIDER_SERVICE_ID)) {
-            $providers = array();
+            $providers = [];
             foreach ($container->findTaggedServiceIds(self::PROVIDER_TAG_NAME) as $id => $attributes) {
                 $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
                 $providers[$priority][] = new Reference($id);

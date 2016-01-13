@@ -1,8 +1,9 @@
 define([
     'jquery',
+    'underscore',
     'oroui/js/tools/scroll-helper',
     'bootstrap'
-], function($, scrollHelper) {
+], function($, _, scrollHelper) {
     'use strict';
 
     /**
@@ -24,6 +25,25 @@ define([
     }
 
     Dropdown.prototype = $.fn.dropdown.Constructor.prototype;
+
+    $(document).off('click.dropdown.data-api', '[data-toggle=dropdown]', Dropdown.prototype.toggle);
+    Dropdown.prototype.toggle = _.wrap(Dropdown.prototype.toggle, function(func, event) {
+        var result = func.apply(this, _.rest(arguments));
+        var href = $(this).attr('href');
+        var selector = $(this).attr('data-target') || /#/.test(href) && href;
+        var $parent = selector ? $(selector) : null;
+
+        if (!$parent || $parent.length === 0) {
+            $parent = $(this).parent();
+        }
+        if ($parent.hasClass('open')) {
+            $parent.find('.dropdown-menu').trigger('shown.bs.dropdown');
+        }
+
+        return result;
+    });
+    $(document).on('click.dropdown.data-api', '[data-toggle=dropdown]', Dropdown.prototype.toggle);
+
     Dropdown.prototype.destroy = function() {
         var globalHandlers = this.data('globalHandlers');
         $('html').off(globalHandlers);

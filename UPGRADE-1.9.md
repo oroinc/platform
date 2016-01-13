@@ -13,6 +13,7 @@ UPGRADE FROM 1.8 to 1.9
 
 ####AddressBundle
 - `oro_address.address.manager` service was marked as private
+- Validation `AbstractAddress::isRegionValid` was moved to `Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion` constraint
 
 ####CalendarBundle
 - `oro_calendar.calendar_provider.user` service was marked as private
@@ -29,11 +30,92 @@ UPGRADE FROM 1.8 to 1.9
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
+- `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` has `@InheritanceType("SINGLE_TABLE")`
+- `audit-grid` and `audit-history-grid` based on `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` now. Make join to get your entity on grid
 
 ####DataGridBundle
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_PATH`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_TYPE_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::getAclResource`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_ACL_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::getAclResource`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::BASE_DATAGRID_CLASS_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::BASE_DATAGRID_CLASS_PATH`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_ACL_CHECK` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::isDatasourceSkipAclApply`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH`.
+- Option "acl_resource" moved from option "source" too root node of datagrid configuration:
+
+Before
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        source:
+            acl_resource: 'acme_demo_entity_view'
+            ... # some configuration
+```
+
+Now
+
+```
+datagrid:
+    acme-demo-grid:
+        acl_resource: 'acme_demo_entity_view'
+        ... # some configuration
+```
+
+- Option of datagrid "skip_acl_check" is deprecated, use option "skip_acl_apply" instead. Logic of this option was also changed. Before this option caused ignorance of option "acl_resource". Now it is responsible only for indication whether or not ACL should be applied to source query of the grid. See [advanced_grid_configuration.md](.src/Oro/Bundle/DataGridBundle/Resources/doc/backend/advanced_grid_configuration.md) for use cases. 
+
+Before
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        options:
+            skip_acl_check: true
+```
+
+Now
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        source:
+            skip_acl_apply: true
+            ... # some configuration
+```
+
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
 - JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
- 
+- Grid merge uses distinct policy
+
+```
+grid-name:
+    source:
+        value: 1
+grid-name:
+    source:
+        value: 2
+```
+
+will result
+
+```
+grid-name:
+    source:
+        value: 2
+```
+
+instead of
+
+```
+grid-name:
+    source:
+        value:
+            - 1
+            - 2
+```
+
 ####DistributionBundle:
 - Fix `priority` attribute handling for `routing.options_resolver` tag to be conform Symfony standards. New behaviour: the higher the priority, the sooner the resolver gets executed.
 
@@ -54,6 +136,7 @@ UPGRADE FROM 1.8 to 1.9
 - `oro_entity.entity_hierarchy_provider` service was marked as private.
 - `oro_entity.entity_hierarchy_provider.class` parameter was removed.
 - `oro_entity.entity_hierarchy_provider.all` service was added. It can be used if you need a hierarchy of all entities but not only configurable ones.
+- Class `Oro\Bundle\EntityBundle\Provider\EntityContextProvider` was moved to `Oro\Bundle\ActivityBundle\Provider\ContextGridProvider` and `oro_entity.entity_context_provider` service was moved to `oro_activity.provider.context_grid`. 
 
 ####EntityConfigBundle
 - Removed `optionSet` field type deprecated since v1.4. Existing options sets are converted to `Select` or `Multi-Select` automatically during the Platform update.
@@ -133,12 +216,16 @@ after:
 - Added `Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter` as default formatter for the date, time and datetime types in `Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer`. This types exported/imported depends on the application locale and timezone and recognized as dates in Microsoft Excel.
 - `Oro\Bundle\ImportExportBundle\Field\DatabaseHelper::getRegistry` is deprecated. Use class methods instead of disposed registry
 - Services with tag `oro_importexport.normalizer` was marked as private
+- Allow to omit empty identity fields. To use this feature set `Use As Identity Field` option to `Only when not empty
+` (-1 or `Oro\Bundle\ImportExportBundle\Field\FieldHelper::IDENTITY_ONLY_WHEN_NOT_EMPTY` in a code)
 
 ####InstallerBundle
 - `Oro\Bundle\InstallerBundle\EventListener\RequestListener` added to the class cache as performance improvement
 
 ####LayoutBundle
 - `Oro\Bundle\LayoutBundle\EventListener\ThemeListener` added to the class cache as performance improvement
+- The theme definition should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
+- Deprecated method: placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`
 
 ####LocaleBundle
 - `Oro\Bundle\LocaleBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
@@ -189,6 +276,7 @@ after:
 - `Oro\Bundle\UIBundle\EventListener\ContentProviderListener` added to the class cache and constructor have container as performance improvement
 - Services with tag `oro_ui.content_provider` was marked as private
 - Services with tag `oro_formatter` was marked as private
+- Class `Oro\Bundle\UIBundle\Tools\ArrayUtils` marked as deprecated. Use `Oro\Component\PhpUtils\ArrayUtil` instead.
 
 ####UserBundle
 - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)

@@ -501,4 +501,25 @@ abstract class AbstractPageGrid extends AbstractPage
 
         return $this;
     }
+
+    /**
+     * Method checks if "No data message" is present and displayed
+     *
+     * @param string $message Grid message to verify
+     *
+     * @return $this
+     * @throws  \PHPUnit_Framework_AssertionFailedError
+     */
+    public function assertNoDataMessageAndDisplayed($message)
+    {
+        $this->assertNoDataMessage($message);
+        $noDataMessage = $this->test->byXPath("//div[@class='no-data']/span[contains(., '{$message}')]");
+        if (!$noDataMessage->displayed()) {
+            PHPUnit_Framework_Assert::fail(
+                "//div[@class='no-data']/span[contains(., '{$message}')] is not displayed"
+            );
+        }
+
+        return $this;
+    }
 }

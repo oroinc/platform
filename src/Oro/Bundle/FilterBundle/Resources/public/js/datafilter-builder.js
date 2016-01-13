@@ -39,10 +39,12 @@ define([
                 return;
             }
 
+            var filtersList;
             var options = methods.combineOptions.call(this);
             options.collection = this.collection;
-            var filtersList = new FiltersManager(options);
-            this.$el.prepend(filtersList.render().$el);
+            options.el = $('<div/>').prependTo(this.$el);
+            filtersList = new FiltersManager(options);
+            filtersList.render();
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
@@ -74,7 +76,9 @@ define([
                     filters[options.name] = new Filter();
                 }
             });
-            return {filters: filters};
+            return {
+                filters: filters
+            };
         }
     };
 

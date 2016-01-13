@@ -69,7 +69,7 @@
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
     display: none;
-    z-index: @zindexPopover;
+    z-index: @oroZindexDropdown;
     margin-top: 7px;
     top: auto;
 }
@@ -115,11 +115,14 @@
     margin-bottom: 0;
 }
 .filter-select .select-filter-widget {
-    font-weight: bold;
-    color: #333333;
-    padding: 0 0 2px 0;
-    background: none;
-    border: none;
+    &, &.ui-multiselect {
+      font-weight: bold;
+      color: #333333;
+      padding: 0 0 2px 0;
+      background: none;
+      border: none;
+      margin-left: 0;
+    }
 }
 
 .filter-select .select-filter-widget .ui-icon {
@@ -200,7 +203,8 @@
     margin: 0 6px 5px 5px;
 }
 
-.ui-multiselect.filter-list {
+.ui-multiselect.filter-list, .ui-multiselect.select-filter-widget {
+
     background: none;
     border: none;
     font-size: 13px;
@@ -209,15 +213,15 @@
     line-height: 1em;
 }
 
-.ui-multiselect.filter-list:hover .add-filter-button span.caret {
+.ui-multiselect.select-filter-widget:hover .add-filter-button span.caret {
     border-top-color: #005099; /* @linkColorHover; */
 }
 
-.ui-multiselect.filter-list:hover a {
+.ui-multiselect.select-filter-widget:hover a {
     color: #005099; /* @linkColorHover; */
 }
 
-.ui-multiselect.filter-list.select-filter-widget span.caret {
+.ui-multiselect.select-filter-widget span.caret {
     margin-top: 5px;
 }
 
@@ -384,9 +388,9 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
         margin-top: 0;
         margin-left: -18px;
       }
-      label{
+      label {
         padding-left: 20px;
-        .search-result {
+        &.search-result {
           color: #000000;
           font-weight: bold;
         }

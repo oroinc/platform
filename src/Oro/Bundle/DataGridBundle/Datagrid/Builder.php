@@ -15,13 +15,40 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 class Builder
 {
+    /**
+     * @deprecated Since 1.9, will be removed after 1.11.
+     * @see DatagridConfiguration::DATASOURCE_PATH
+     */
     const DATASOURCE_PATH           = '[source]';
+
+    /**
+     * @deprecated Since 1.9, will be removed after 1.11.
+     * @see DatagridConfiguration::DATASOURCE_TYPE_PATH, DatagridConfiguration::getDatasourceType
+     */
     const DATASOURCE_TYPE_PATH      = '[source][type]';
+
+    /**
+     * @deprecated Since 1.9, will be removed after 1.11.
+     * @see DatagridConfiguration::ACL_RESOURCE_PATH, DatagridConfiguration::getAclResource
+     */
     const DATASOURCE_ACL_PATH       = '[source][acl_resource]';
+
+    /**
+     * @deprecated Since 1.9, will be removed after 1.11.
+     * @see DatagridConfiguration::BASE_DATAGRID_CLASS_PATH
+     */
     const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
+
+    /**
+     * @deprecated Since 1.9, will be removed after 1.11.
+     * @see DatagridConfiguration::DATASOURCE_SKIP_ACL_APPLY_PATH, DatagridConfiguration::isDatasourceSkipAclApply
+     */
     const DATASOURCE_SKIP_ACL_CHECK = '[options][skip_acl_check]';
 
-    // Use this option as workaround for http://www.doctrine-project.org/jira/browse/DDC-2794
+    /**
+     * @deprecated Since 1.9, will be removed after 1.11.
+     * @see DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH
+     */
     const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
 
     /** @var string */
@@ -79,7 +106,7 @@ class Builder
         $event = new PreBuild($config, $parameters);
         $this->eventDispatcher->dispatch(PreBuild::NAME, $event);
 
-        $class = $config->offsetGetByPath(self::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
+        $class = $config->offsetGetByPath(DatagridConfiguration::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
 
         /** @var DatagridInterface $datagrid */
@@ -170,7 +197,7 @@ class Builder
      */
     protected function buildDataSource(DatagridInterface $grid, DatagridConfiguration $config)
     {
-        $sourceType = $config->offsetGetByPath(self::DATASOURCE_TYPE_PATH, false);
+        $sourceType = $config->offsetGetByPath(DatagridConfiguration::DATASOURCE_TYPE_PATH, false);
         if (!$sourceType) {
             throw new RuntimeException('Datagrid source does not configured');
         }
@@ -179,6 +206,9 @@ class Builder
             throw new RuntimeException(sprintf('Datagrid source "%s" does not exist', $sourceType));
         }
 
-        $this->dataSources[$sourceType]->process($grid, $config->offsetGetByPath(self::DATASOURCE_PATH, []));
+        $this->dataSources[$sourceType]->process(
+            $grid,
+            $config->offsetGetByPath(DatagridConfiguration::DATASOURCE_PATH, [])
+        );
     }
 }
