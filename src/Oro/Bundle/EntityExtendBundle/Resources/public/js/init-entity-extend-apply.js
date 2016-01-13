@@ -33,12 +33,10 @@ require([
                 progress.show();
 
                 $.post(url, function() {
-                    mediator.once('page:beforeChange', function() {
-                        modal.close();
-                    });
-                    mediator.once('page:afterChange', function() {
-                        mediator.execute('showFlashMessage', 'success', __('oro.entity_extend.schema_updated'));
-                    });
+                    modal.close();
+                    mediator.execute('showFlashMessage', 'success', __('oro.entity_extend.schema_updated'));
+                    mediator.execute('showMessage', 'info', __('Please wait until page will be reloaded...'));
+                    mediator.execute('showLoading');
                     // force reload of the application to make sure 'js/routes' is reloaded
                     window.location.href = routing.generate('oro_entityconfig_index');
                 }).fail(function() {
