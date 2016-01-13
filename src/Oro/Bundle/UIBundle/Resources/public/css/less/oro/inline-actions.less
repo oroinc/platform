@@ -9,8 +9,8 @@
     visibility: hidden;
   }
   &:hover {
-    background: @rowSelectedBackground;
-    .inline-actions-element-outline(@rowSelectedBackground);
+    background: @inlineActionBackground;
+    .inline-actions-element-outline(@inlineActionBackground);
     .inline-actions-element_actions {
       visibility: visible;
     }
@@ -37,16 +37,17 @@
     font: 0/0 a;
     color: transparent;
     text-shadow: none;
-    background-color: transparent;
+    border-color: transparent;
+    background: transparent none;
     width: 23px;
     height: 23px;
     padding: 0;
     [class^="icon-"], [class*=" icon-"] {
       width: 14px;
       height: 20px;
-      font: @baseFontSize/26px 'FontAwesome';
-      color: @btnTextColor;
       &:before {
+        font: @baseFontSize/26px 'FontAwesome';
+        color: @inlineActionColor;
         font-size: 15px;
         line-height: 22px;
         height: 22px;
@@ -54,9 +55,6 @@
       &.hide-text {
         .hide-text();
       }
-    }
-    &:hover{
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
   }
 }
