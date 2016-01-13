@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -91,7 +93,7 @@ class ActivityListPreQueryBuildListenerTest extends \PHPUnit_Framework_TestCase
 
         $thread->expects($this->once())
             ->method('getEmails')
-            ->willReturn([$email1, $email2]);
+            ->willReturn(new ArrayCollection([$email1, $email2]));
 
         $event = new ActivityListPreQueryBuildEvent($targetClass, $targetId);
         $this->listener->prepareIdsForEmailThreadEvent($event);
