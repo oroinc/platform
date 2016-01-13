@@ -134,6 +134,7 @@ parameters:
 
     oro_email.listener.search_aliases_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchAliasesListener
     oro_email.listener.prepare_result_item_listener.class: Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener
+    oro_email.listener.prepare_context_title_listener.class: Oro\Bundle\EmailBundle\EventListener\PrepareContextTitleListener
 
 services:
     oro_email.entity.cache.warmer:
@@ -962,3 +963,11 @@ services:
             - @router
         tags:
             - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: prepareEmailItemDataEvent }
+
+    oro_email.listener.prepare_context_title_listener:
+        class: %oro_email.listener.prepare_context_title_listener.class%
+        arguments:
+            - @router
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: kernel.event_listener, event: oro_activity.context_title, method: prepareEmailContextTitleEvent }

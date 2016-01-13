@@ -25,6 +25,8 @@ class PrepareResultItemListener
     }
 
     /**
+     * Change search results view for Email entity
+     *
      * @param PrepareResultItemEvent $event
      */
     public function prepareEmailItemDataEvent(PrepareResultItemEvent $event)
