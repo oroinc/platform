@@ -50,7 +50,6 @@ services:
 
     oro_ui.dynamic_asset_version_manager:
         class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager
-        public: false
         arguments:
             - @oro_ui.dynamic_asset_version.cache
 
