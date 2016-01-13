@@ -92,6 +92,7 @@ define([
 
         rebuildAndRender: function(massActions) {
             this.column.set('massActions', massActions);
+            this.subviews = _.without(this.subviews, this.actionsPanel);
 
             this.createActionsPanel();
             this.render();
