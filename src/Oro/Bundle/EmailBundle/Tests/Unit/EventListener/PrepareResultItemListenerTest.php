@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Component\Routing\Router;
 
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -55,7 +56,7 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->item->expects($this->once())
             ->method('getEntityName')
-            ->willReturn(PrepareResultItemListener::EMAIL_USER_CLASS_NAME);
+            ->willReturn(EmailUser::ENTITY_CLASS);
         $this->item->expects($this->once())
             ->method('getEntity')
             ->willReturn($entity);

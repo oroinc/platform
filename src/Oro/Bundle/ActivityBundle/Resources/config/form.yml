@@ -7,6 +7,7 @@ services:
             - @translator
             - @oro_search.mapper
             - @security.token_storage
+            - @event_dispatcher
         tags:
             - { name: form.type, alias: oro_activity_contexts_select }
 

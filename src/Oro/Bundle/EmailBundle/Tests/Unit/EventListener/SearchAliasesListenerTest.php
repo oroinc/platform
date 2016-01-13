@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\EventListener\SearchAliasesListener;
 
 class SearchAliasesListenerTest extends \PHPUnit_Framework_TestCase
@@ -28,7 +29,7 @@ class SearchAliasesListenerTest extends \PHPUnit_Framework_TestCase
     public function testAddEmailAliasEvent()
     {
         $expectedAliases = ['oro_email'];
-        $targetClasses = [SearchAliasesListener::EMAIL_CLASS_NAME];
+        $targetClasses = [Email::ENTITY_CLASS];
         $aliases = [];
         $event = new SearchAliasesEvent($aliases, $targetClasses);
         $this->listener->addEmailAliasEvent($event);
