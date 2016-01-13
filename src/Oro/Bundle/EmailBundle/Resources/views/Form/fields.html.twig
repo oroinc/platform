@@ -204,22 +204,6 @@
     </script>
 {% endblock %}
 
-{% block oro_email_email_folder_row %}
-    {% if form.vars.value is not null and form.vars.value.outdatedAt is null %}
-        <div>
-            {{ form_widget(form.syncEnabled) }}<label class="folder-label">{{ form.vars.value.name }}</label>
-            {{ form_widget(form.fullName) }}
-            {{ form_widget(form.name) }}
-            {{ form_widget(form.type) }}
-            {% if form.vars.value.subFolders|length > 0 %}
-                <div class="folder-sub-folders">
-                    {{ form_widget(form.subFolders) }}
-                </div>
-            {% endif %}
-        </div>
-    {% endif %}
-{% endblock %}
-
 {% block oro_email_email_folder_tree_row %}
     {% if form.vars.value is not null and form.vars.value|length > 0 %}
         {{ form_row(form) }}
