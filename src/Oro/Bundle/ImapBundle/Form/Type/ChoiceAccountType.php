@@ -92,14 +92,21 @@ class ChoiceAccountType extends AbstractType
             $data = $formEvent->getData();
 
             if ($data) {
-                if (isset($data['userEmailOrigin']['accessTokenExpiresAt'])) {
+                if (!empty($data['userEmailOrigin']['accessTokenExpiresAt'])) {
                     $utcTimeZone = new \DateTimeZone('UTC');
                     $accessTokenExpiresAt = $data['userEmailOrigin']['accessTokenExpiresAt'];
                     $newExpireDate = new \DateTime('+' . $accessTokenExpiresAt . ' seconds', $utcTimeZone);
 
                     $data['userEmailOrigin']['accessTokenExpiresAt'] = $newExpireDate;
                 }
+
                 $accountTypeModel = $this->createAccountTypeModelFromData($data);
+
+                if ($accountTypeModel === null) {
+                    //reset data for avoiding form extra parameters error
+                    $formEvent->setData(null);
+                    return;
+                }
 
                 $form->remove('disconnect');
                 $form->add('accountType', 'choice', [
@@ -189,7 +196,7 @@ class ChoiceAccountType extends AbstractType
     {
         $imapGmailConfiguration = isset($data['userEmailOrigin']) ? $data['userEmailOrigin'] : [];
 
-        if (empty($imapGmailConfiguration['user']) && empty($imapGmailConfiguration['accessToken'])) {
+        if (empty($imapGmailConfiguration['user'])) {
             return null;
         }
         $accountTypeModel =  new AccountTypeModel();

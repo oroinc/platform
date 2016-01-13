@@ -951,7 +951,7 @@ class User extends ExtendUser implements
     {
         $currentImapConfiguration = $this->getImapConfiguration();
         if ($currentImapConfiguration &&
-            (null === $imapConfiguration || $currentImapConfiguration !== $imapConfiguration)
+            (null === $imapConfiguration || $currentImapConfiguration->getId() !== $imapConfiguration->getId())
         ) {
             // deactivate current IMAP configuration and remove a reference to it
             $currentImapConfiguration->setActive(false);
