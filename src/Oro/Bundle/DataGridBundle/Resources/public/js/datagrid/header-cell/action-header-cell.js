@@ -44,6 +44,7 @@ define([
             datagrid = this.column.get('datagrid');
             this.listenTo(datagrid, 'enable', this.enable);
             this.listenTo(datagrid, 'disable', this.disable);
+            this.listenTo(datagrid.massActions, 'reset', this.rebuildAndRender);
         },
 
         /**
@@ -62,16 +63,18 @@ define([
             var actions = [];
             var datagrid = this.column.get('datagrid');
 
-            _.each(this.column.get('massActions'), function(Action) {
-                var action = new Action({
-                    datagrid: datagrid
-                });
-                actions.push(action);
+            this.column.get('massActions').each(function(Action) {
+                var ActionModule = Action.get('module');
+
+                actions.push(
+                    new ActionModule({
+                        datagrid: datagrid
+                    })
+                );
             });
 
             this.actionsPanel = new ActionsPanel();
             this.actionsPanel.setActions(actions);
-
             this.subviews.push(this.actionsPanel);
         },
 
@@ -85,6 +88,13 @@ define([
                 panel.$el.children().wrap('<li/>');
             }
             return this;
+        },
+
+        rebuildAndRender: function(massActions) {
+            this.column.set('massActions', massActions);
+
+            this.createActionsPanel();
+            this.render();
         },
 
         enable: function() {
