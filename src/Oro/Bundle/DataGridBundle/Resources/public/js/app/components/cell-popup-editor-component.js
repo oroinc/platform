@@ -47,8 +47,17 @@ define(function(require) {
                 }
             });
             this.resizeToCell(viewInstance, options.cell);
-            this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+            var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             viewInstance.trigger('change:visibility');
+
+            viewInstance.on('dispose', function() {
+                overlay.remove();
+            });
+
+            viewInstance.on('change', function() {
+                viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
+            });
+
             return viewInstance;
         },
 
@@ -66,19 +75,6 @@ define(function(require) {
          */
         getWidthIncrement: function() {
             return 64;
-        },
-
-        removeView: function() {
-            this.view.dispose();
-            this.overlay.remove();
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            this.removeView();
-            CellPopupEditorComponent.__super__.dispose.call(this);
         }
     });
 

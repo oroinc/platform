@@ -270,6 +270,7 @@ define(function(require) {
             } else {
                 this.$('[type=submit]').removeAttr('disabled');
             }
+            this.trigger('change');
         },
 
         /**
