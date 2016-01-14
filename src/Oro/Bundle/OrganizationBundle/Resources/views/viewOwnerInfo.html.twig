@@ -1,0 +1,4 @@
+{% set userOwnerOwningBusinessUnit = oro_get_user_owner_owning_business_unit(entity) %}
+{% if userOwnerOwningBusinessUnit is not null %}
+    ({{ userOwnerOwningBusinessUnit.name }})
+{% endif %}

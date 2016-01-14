@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\OrganizationBundle\Twig;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Symfony\Component\Security\Core\Util\ClassUtils;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
 class OwnerTypeExtension extends \Twig_Extension
 {
@@ -20,7 +22,8 @@ class OwnerTypeExtension extends \Twig_Extension
     protected $ownerAccessor;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider      $configProvider
+     * @param EntityOwnerAccessor $entityOwnerAccessor
      */
     public function __construct(ConfigProvider $configProvider, EntityOwnerAccessor $entityOwnerAccessor)
     {
@@ -35,7 +38,11 @@ class OwnerTypeExtension extends \Twig_Extension
     {
         return [
             'oro_get_owner_type' => new \Twig_Function_Method($this, 'getOwnerType'),
-            'oro_get_entity_owner' => new \Twig_Function_Method($this, 'getEntityOwner')
+            'oro_get_entity_owner' => new \Twig_Function_Method($this, 'getEntityOwner'),
+            'oro_get_user_owner_owning_business_unit' => new \Twig_SimpleFunction(
+                'oro_get_user_owner_owning_business_unit',
+                [$this, 'getUserOwnerOwningBusinessUnit']
+            ),
         ];
     }
 
@@ -65,9 +72,32 @@ class OwnerTypeExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the name of the extension.
+     * Gets entity owner business unit if ownership type of this entity is 'USER'
      *
-     * @return string The extension name
+     * @param object $entity
+     *
+     * @return BusinessUnit|null
+     */
+    public function getUserOwnerOwningBusinessUnit($entity)
+    {
+        $ownerClassName = ClassUtils::getRealClass($entity);
+        if (!$this->configProvider->hasConfig($ownerClassName)) {
+            return null;
+        }
+        $config = $this->configProvider->getConfig($ownerClassName);
+        if ($config->get('owner_type') !== 'USER') {
+            return null;
+        }
+        $propertyAccessor = new PropertyAccessor();
+        $user = $propertyAccessor->getValue($entity, $config->get('owner_field_name'));
+
+        $owner = $this->ownerAccessor->getOwner($user);
+
+        return $owner;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getName()
     {

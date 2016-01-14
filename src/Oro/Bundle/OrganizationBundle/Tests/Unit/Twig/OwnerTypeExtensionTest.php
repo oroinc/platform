@@ -55,33 +55,21 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetOwnerType()
     {
         $entity = new BusinessUnit();
-        $className = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigIdInterface $configId */
-        $configId = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
-        $config = new Config($configId);
-        $config->setValues(['owner_type' => 'test_type']);
-
-        $this->configProvider->expects($this->once())->method('hasConfig')->with($this->equalTo($className))
-            ->will($this->returnValue(true));
-        $this->configProvider->expects($this->once())->method('getConfig')->with($this->equalTo($className))
-            ->will($this->returnValue($config));
+        $this->prepareConfigProvider(
+            ['owner_type' => 'test_type'],
+            'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
+        );
         $this->assertEquals('test_type', $this->extension->getOwnerType($entity));
     }
 
     public function testWithoutOwnerType()
     {
         $entity = new BusinessUnit();
-        $className = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigIdInterface $configId */
-        $configId = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
-        $config = new Config($configId);
-        $config->setValues(['another_owner_type' => 'test_type']);
+        $this->prepareConfigProvider(
+            ['another_owner_type' => 'test_type'],
+            'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
+        );
 
-        $this->configProvider->expects($this->once())->method('hasConfig')->with($this->equalTo($className))
-            ->will($this->returnValue(true));
-        $this->configProvider->expects($this->once())->method('getConfig')->with($this->equalTo($className))
-            ->will($this->returnValue($config));
         $this->assertNull($this->extension->getOwnerType($entity));
     }
 
@@ -97,5 +85,46 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $entity = new Entity();
         $entity->setOwner($owner);
         $this->assertSame($owner, $this->extension->getEntityOwner($entity));
+    }
+
+    public function testGetUserOwnerOwningBusinessUnit()
+    {
+        $entity = new Entity();
+        $owner  = new User();
+        $businessUnit = new BusinessUnit();
+        $owner->setOwner($businessUnit);
+        $entity->setOwner($owner);
+        $this->prepareConfigProvider(
+            ['owner_type' => 'USER', 'owner_field_name' => 'owner'],
+            'Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity'
+        );
+
+        $this->assertEquals($businessUnit, $this->extension->getUserOwnerOwningBusinessUnit($entity));
+    }
+
+    public function testGetUserOwnerOwningBusinessUnitNotUserOwner()
+    {
+        $entity = new Entity();
+        $owner  = new Entity();
+        $entity->setOwner($owner);
+        $this->prepareConfigProvider(
+            ['owner_type' => 'another_owner_type'],
+            'Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity'
+        );
+
+        $this->assertNull($this->extension->getUserOwnerOwningBusinessUnit($entity));
+    }
+
+    protected function prepareConfigProvider(array $configValues, $className)
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigIdInterface $configId */
+        $configId = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
+        $entityConfig = new Config($configId);
+        $entityConfig->setValues($configValues);
+        $this->configProvider->expects($this->once())->method('hasConfig')->with($this->equalTo($className))
+            ->will($this->returnValue(true));
+
+        $this->configProvider->expects($this->once())->method('getConfig')->with($this->equalTo($className))
+            ->will($this->returnValue($entityConfig));
     }
 }
