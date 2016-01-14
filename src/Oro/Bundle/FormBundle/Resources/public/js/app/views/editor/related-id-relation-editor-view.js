@@ -184,6 +184,7 @@ define(function(require) {
             return data;
         }
     }, {
+        DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
         processMetadata: AbstractRelationEditorView.processMetadata
     });
 
