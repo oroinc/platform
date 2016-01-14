@@ -52,6 +52,11 @@ define(function(require) {
         ARROW_RIGHT_KEY_CODE: 39,
         ARROW_BOTTOM_KEY_CODE: 40,
 
+        /**
+         * Help message for cells
+         */
+        helpMessage: __('oro.form.inlineEditing.helpMessage'),
+
         constructor: function() {
             this.onKeyDown = _.bind(this.onKeyDown, this);
             InlineEditingPlugin.__super__.constructor.apply(this, arguments);
@@ -60,11 +65,9 @@ define(function(require) {
         enable: function() {
             this.main.$el.addClass('grid-editable');
             this.listenTo(this.main, {
-                afterMakeCell: this.onAfterMakeCell,
-                shown: this.onGridShown
+                afterMakeCell: this.onAfterMakeCell
             });
             this.listenTo(mediator, 'page:beforeChange', function() {
-                this.hidePopover();
                 if (this.editModeEnabled) {
                     this.exitEditMode(true);
                 }
@@ -85,7 +88,6 @@ define(function(require) {
             }
             this.main.$el.removeClass('grid-editable');
             this.main.body.refresh();
-            this.destroyPopover();
             InlineEditingPlugin.__super__.disable.call(this);
         },
 
@@ -106,6 +108,7 @@ define(function(require) {
                 if (_this.isEditable(cell)) {
                     cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
                     cell.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    cell.$el.attr('title', _this.helpMessage);
                     cell.events = _.extend(Object.create(cell.events), {
                         'dblclick': enterEditModeIfNeeded,
                         'mousedown .icon-edit': enterEditModeIfNeeded,
@@ -116,35 +119,6 @@ define(function(require) {
                 cell.events = originalEvents;
                 return cell;
             };
-        },
-
-        onGridShown: function() {
-            this.initPopover();
-        },
-
-        initPopover: function() {
-            this.main.$el.popover({
-                content: __('oro.form.inlineEditing.helpMessage'),
-                container: this.main.$el,
-                selector: 'td.editable',
-                placement: 'bottom',
-                delay: {show: 1400, hide: 0},
-                trigger: 'hover',
-                animation: false
-            });
-        },
-
-        hidePopover: function() {
-            if (this.main.$el.data('popover')) {
-                this.main.$el.popover('hide');
-            }
-        },
-
-        destroyPopover: function() {
-            if (this.main.$el.data('popover')) {
-                this.hidePopover();
-                this.main.$el.popover('destroy');
-            }
         },
 
         isEditable: function(cell) {
