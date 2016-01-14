@@ -222,7 +222,7 @@ define(function(require) {
                 return cell;
             }
             cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
-                _this.enterEditMode(cell, fromPreviousCell);
+                _this.options.plugin.enterEditMode(cell, fromPreviousCell);
                 _this.lockUserActions = false;
             }).fail(function() {
                 mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));

@@ -175,7 +175,6 @@ define(function(require) {
         },
 
         enterEditMode: function(cell, fromPreviousCell) {
-            this.currentCell = cell;
             this.main.ensureCellIsVisible(cell);
             cell.$el.parent('tr:first').addClass('row-edit-mode');
             cell.$el.removeClass('view-mode');
