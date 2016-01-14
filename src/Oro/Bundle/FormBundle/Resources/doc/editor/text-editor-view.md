@@ -53,7 +53,6 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
 | options.fieldName | <code>string</code> | Field name to edit in model |
-| options.metadata | <code>string</code> | Editor metadata |
 | options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
 | options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |

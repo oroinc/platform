@@ -53,7 +53,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
@@ -76,7 +75,12 @@ define(function(require) {
         events: {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
-            'click [data-action]': 'rethrowAction'
+            'click [data-action]': 'rethrowAction',
+            'keydown': 'rethrowEvent',
+            'keypress': 'rethrowEvent',
+            'keyup': 'rethrowEvent',
+            'focus': 'rethrowEvent',
+            'blur': 'rethrowEvent'
         },
 
         TAB_KEY_CODE: 9,
@@ -104,7 +108,6 @@ define(function(require) {
         initialize: function(options) {
             this.options = options;
             this.fieldName = options.fieldName;
-            this.metadata = options.metadata || {};
             this.placeholder = options.placeholder;
             this.placeholderRaw = options.placeholder_raw;
             this.validationRules = options.validationRules || {};
@@ -234,6 +237,13 @@ define(function(require) {
         },
 
         /**
+         * Generic handler for DOM events. Used on form to allow processing that events outside view.
+         */
+        rethrowEvent: function(e) {
+            this.trigger(e.type, e, this);
+        },
+
+        /**
          * Returns true if the user has changed the value
          *
          * @returns {boolean}
@@ -260,6 +270,7 @@ define(function(require) {
             } else {
                 this.$('[type=submit]').removeAttr('disabled');
             }
+            this.trigger('change');
         },
 
         /**

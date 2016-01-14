@@ -9,7 +9,6 @@ define(function(require) {
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var CellIterator = require('../../../datagrid/cell-iterator');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
-    var backdropManager = require('oroui/js/tools/backdrop-manager');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
@@ -203,12 +202,6 @@ define(function(require) {
         enterEditMode: function(cell, fromPreviousCell) {
             if (this.editModeEnabled) {
                 this.exitEditMode(false);
-            } else {
-                if (backdropManager.isReleased(this.backdropId)) {
-                    this.backdropId = backdropManager.hold();
-                    $(document).on('keydown', this.onKeyDown);
-                    this.main.trigger('holdInlineEditingBackdrop');
-                }
             }
             this.editModeEnabled = true;
             this.currentCell = cell;
@@ -238,6 +231,7 @@ define(function(require) {
             }));
 
             editorComponent.view.focus(!!fromPreviousCell);
+            editorComponent.view.on('keydown', this.onKeyDown);
 
             this.editorComponent = editorComponent;
 
@@ -346,7 +340,7 @@ define(function(require) {
             model.set(updateData);
         },
 
-        exitEditMode: function(releaseBackdrop) {
+        exitEditMode: function() {
             if (!this.editModeEnabled) {
                 throw Error('Edit mode disabled');
             }
@@ -359,11 +353,6 @@ define(function(require) {
             }
             this.stopListening(this.editorComponent);
             this.editorComponent.dispose();
-            if (releaseBackdrop !== false) {
-                backdropManager.release(this.backdropId);
-                $(document).off('keydown', this.onKeyDown);
-                this.main.trigger('releaseInlineEditingBackdrop');
-            }
             delete this.editorComponent;
         },
 

@@ -84,10 +84,13 @@
 .inline-editor-wrapper {
   position: absolute;
   padding: 3px;
-  background-color: white;
-  border-radius: 3px;
-  border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  &.show-overlay {
+    background-color: white;
+    border-radius: 3px;
+    border: 1px solid rgba(0,0,0,0.2);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  }
+  border: 1px solid transparent;
   .input-append {
     margin: 0;
     width: 100%;
@@ -155,6 +158,8 @@
       max-height: 40vh;
       min-width: 130px;
       overflow: auto;
+      background: white;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
       .select2-search-choice {
         font-size: 11px;
         line-height: 12px;
