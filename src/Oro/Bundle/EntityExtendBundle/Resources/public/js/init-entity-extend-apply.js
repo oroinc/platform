@@ -34,7 +34,12 @@ require([
 
                 $.post(url, function() {
                     modal.close();
-                    mediator.execute('showFlashMessage', 'success', __('oro.entity_extend.schema_updated'), {afterReload: true});
+                    mediator.execute(
+                        'showFlashMessage',
+                        'success',
+                        __('oro.entity_extend.schema_updated'),
+                        {afterReload: true}
+                    );
                     mediator.execute('showMessage', 'info', __('Please wait until page will be reloaded...'));
                     mediator.execute('showLoading');
                     // force reload of the application to make sure 'js/routes' is reloaded
