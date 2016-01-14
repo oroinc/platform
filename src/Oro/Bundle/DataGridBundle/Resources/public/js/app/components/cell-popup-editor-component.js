@@ -41,6 +41,7 @@ define(function(require) {
             viewInstance.$el.addClass('inline-editor-wrapper');
 
             var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
+                insertInto: options.cell.$el,
                 position: {
                     of: options.cell.$el
                 }
