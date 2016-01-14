@@ -99,7 +99,7 @@
 {% block oro_acl_permission_collection_widget %}
     {% for field in privileges_config['permissions'] %}
         <tr {% if form.parent.vars.value.identity.name == "(default)" %}class="default-field"{% endif %}>
-            <td>
+            <td class="span8">
                 {% if privileges_config.view_type == 'grid' %}{{ field|trans }}{% endif %}
             </td>
             <td>
