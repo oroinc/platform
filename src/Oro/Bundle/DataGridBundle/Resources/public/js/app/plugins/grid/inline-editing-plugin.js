@@ -38,13 +38,25 @@ define(function(require) {
          */
         helpMessage: __('oro.form.inlineEditing.helpMessage'),
 
+        /**
+         * Active editors set
+         */
+        activeEditors: null,
+
+        initialize: function() {
+            this.activeEditorComponents = [];
+            InlineEditingPlugin.__super__.initialize.apply(this, arguments);
+        },
+
         enable: function() {
             this.main.$el.addClass('grid-editable');
             this.listenTo(this.main, {
                 afterMakeCell: this.onAfterMakeCell
             });
             this.listenTo(mediator, 'page:beforeChange', function() {
-                // TODO: remove all editors on dispose
+                for (var i = 0; i < this.activeEditorComponents.length; i++) {
+                    this.activeEditorComponents[i].dispose();
+                }
             });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
@@ -174,7 +186,18 @@ define(function(require) {
             return editor;
         },
 
+        getOpenedEditor: function(cell) {
+            return _.find(this.activeEditorComponents, function(editor) {
+                return editor.options.cell === cell;
+            });
+        },
+
         enterEditMode: function(cell, fromPreviousCell) {
+            var existingEditor = this.getOpenedEditor(cell);
+            if (existingEditor) {
+                existingEditor.view.focus(!!fromPreviousCell);
+                return;
+            }
             this.main.ensureCellIsVisible(cell);
             cell.$el.parent('tr:first').addClass('row-edit-mode');
             cell.$el.removeClass('view-mode');
@@ -202,7 +225,14 @@ define(function(require) {
 
             editorComponent.view.focus(!!fromPreviousCell);
 
-            this.editorComponent = editorComponent;
+            this.activeEditorComponents.push(editorComponent);
+
+            editorComponent.on('dispose', function() {
+                var index = this.activeEditorComponents.indexOf(editorComponent);
+                if (index !== -1) {
+                    this.activeEditorComponents.splice(index, 1);
+                }
+            }, this);
         },
 
         buildClassNames: function(editor, cell) {
