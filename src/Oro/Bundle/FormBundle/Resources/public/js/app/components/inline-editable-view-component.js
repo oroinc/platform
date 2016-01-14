@@ -75,10 +75,9 @@ define(function(require) {
         OVERLAY_TOOL_DEFAULTS: {
             position: {
                 my: 'left top',
-                at: 'left-10 top-6',
+                at: 'left-11 top-11',
                 collision: 'flipfit'
-            },
-            backdrop: true
+            }
         },
 
         METADATA_DEFAULTS: {
@@ -279,7 +278,7 @@ define(function(require) {
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.view.disposed && this.view.$el) {
-                this.view.$el.addClassTemporarily('save-fail', 2000);
+                this.view.$el.addClass('save-fail');
             }
             if (!this.model.disposed) {
                 this.model.set(this.oldState);
