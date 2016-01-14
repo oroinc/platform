@@ -81,11 +81,12 @@ define(function(require) {
                 var originalEvents = cell.events;
                 if (_this.isEditable(cell)) {
                     cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    cell.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    cell.$el.append('<i data-role="edit" class="icon-pencil hide-text inline-editor__edit-action"' +
+                        'title="' + __('Edit') + '">' + __('Edit') + '</i>');
                     cell.$el.attr('title', _this.helpMessage);
                     cell.events = _.extend(Object.create(cell.events), {
                         'dblclick': enterEditModeIfNeeded,
-                        'mousedown .icon-edit': enterEditModeIfNeeded,
+                        'mousedown [data-role=edit]': enterEditModeIfNeeded,
                         'click': _.noop
                     });
                 }
@@ -222,10 +223,6 @@ define(function(require) {
                 classNames.push(cell.column.get('metadata').type + '-frontend-type-editor');
             }
             return classNames;
-        },
-
-        _onRequireJsError: function() {
-            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.loadingError'));
         }
     });
 

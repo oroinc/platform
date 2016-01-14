@@ -25,7 +25,7 @@ define(function(require) {
         OVERLAY_TOOL_DEFAULTS: {
             position: {
                 my: 'left top',
-                at: 'left-1 top-4',
+                at: 'left-4 top-4',
                 collision: 'flipfit'
             }
         },
@@ -104,7 +104,7 @@ define(function(require) {
          * @returns {number}
          */
         getWidthIncrement: function() {
-            return 64;
+            return 67;
         },
 
         saveCurrentCell: function(exit) {
