@@ -76,7 +76,12 @@ define(function(require) {
         events: {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
-            'click [data-action]': 'rethrowAction'
+            'click [data-action]': 'rethrowAction',
+            'keydown': 'rethrowEvent',
+            'keypress': 'rethrowEvent',
+            'keyup': 'rethrowEvent',
+            'focus': 'rethrowEvent',
+            'blur': 'rethrowEvent'
         },
 
         TAB_KEY_CODE: 9,
@@ -231,6 +236,13 @@ define(function(require) {
             e.preventDefault();
             e.stopImmediatePropagation();
             this.trigger($(e.currentTarget).attr('data-action') + 'Action');
+        },
+
+        /**
+         * Generic handler for DOM events. Used on form to allow processing that events outside view.
+         */
+        rethrowEvent: function(e) {
+            this.trigger(e.type, e, this);
         },
 
         /**

@@ -5,9 +5,17 @@ define(function(require) {
     var overlayTool = {
 
         createOverlay: function($overlayContent, options) {
-            $(document.body).append($overlayContent);
+            var $wrapper = $('<div></div>');
+            $wrapper.on('click dblclick keydown keypress keyup mousemove mouseup mousedown focus blur', function(e) {
+                e.stopPropagation();
+            });
+            $wrapper.append($overlayContent);
+            if (!options.insertInto) {
+                options.insertInto = $(document.body);
+            }
+            options.insertInto.append($wrapper);
             $overlayContent.css({
-                zIndex: 10000
+                zIndex: 700
             });
             this.updatePosition($overlayContent, options);
             var interval = setInterval(function() {
