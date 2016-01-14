@@ -30,22 +30,29 @@ define(function(require) {
             }
         },
 
+        listen: {
+            saveAction: 'saveCurrentCell',
+            cancelAction: 'cancelEditing',
+            saveAndExitAction: 'saveCurrentCell',
+            saveAndEditNextAction: 'saveCurrentCellAndEditNext',
+            cancelAndEditNextAction: 'editNextCell',
+            saveAndEditPrevAction: 'saveCurrentCellAndEditPrev',
+            cancelAndEditPrevAction: 'editPrevCell',
+            saveAndEditNextRowAction: 'saveCurrentCellAndEditNextRow',
+            cancelAndEditNextRowAction: 'editNextRowCell',
+            saveAndEditPrevRowAction: 'saveCurrentCellAndEditPrevRow',
+            cancelAndEditPrevRowAction: 'editPrevRowCell'
+        },
+
         initialize: function(options) {
             this.options = options || {};
-
-            this.view = this.createView(options);
-
-            // rethrow view events on component
-            this.listenTo(this.view, 'all', function() {
-                this.trigger.apply(this, arguments);
-            }, this);
-
             CellPopupEditorComponent.__super__.initialize.apply(this, arguments);
+            this.enterEditMode();
         },
 
         createView: function() {
             var View = this.options.view;
-            var viewInstance = new View(_.extend({}, this.options.viewOptions, {
+            var viewInstance = this.view = new View(_.extend({}, this.options.viewOptions, {
                 autoRender: true,
                 model: this.options.cell.model,
                 fieldName: this.options.cell.column.get('name'),
@@ -64,31 +71,14 @@ define(function(require) {
             var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             viewInstance.trigger('change:visibility');
 
-            viewInstance.on('dispose', function() {
+            this.listenTo(viewInstance, 'dispose', function() {
                 overlay.remove();
             });
-
             viewInstance.on('change', function() {
                 viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
             });
 
             viewInstance.on('keydown', this.onKeyDown, this);
-
-            this.on('saveAction', this.saveCurrentCell);
-            this.on('saveAndExitAction', this.saveCurrentCellAndExit);
-            this.on('cancelAction', _.bind(this.exitEditMode, this, true));
-            this.on('saveAndEditNextAction', this.saveCurrentCellAndEditNext);
-            this.on('cancelAndEditNextAction', this.editNextCell);
-            this.on('saveAndEditPrevAction', this.saveCurrentCellAndEditPrev);
-            this.on('cancelAndEditPrevAction', this.editPrevCell);
-            this.on('saveAndEditNextRowAction', this.saveCurrentCellAndEditNextRow);
-            this.on('cancelAndEditNextRowAction', this.editNextRowCell);
-            this.on('saveAndEditPrevRowAction', this.saveCurrentCellAndEditPrevRow);
-            this.on('cancelAndEditPrevRowAction', this.editPrevRowCell);
-
-            this.toggleHeaderCellHighlight(this.options.cell, true);
-
-            return viewInstance;
         },
 
         /**
@@ -107,14 +97,21 @@ define(function(require) {
             return 67;
         },
 
-        saveCurrentCell: function(exit) {
+        /**
+         * Saves current cell and returns flag if was saved successfully or promise object
+         *
+         * @return {boolean|Promise}
+         */
+        saveCurrentCell: function() {
             if (!this.view.isChanged()) {
+                this.exitEditMode(true);
                 return true;
             }
             if (!this.view.isValid()) {
                 this.view.focus();
                 return false;
             }
+
             var cell = this.options.cell;
             var serverUpdateData = this.view.getServerUpdateData();
             var modelUpdateData = this.view.getModelUpdateData();
@@ -146,11 +143,9 @@ define(function(require) {
                 .always(function() {
                     cell.$el.removeClass('loading');
                 });
-            // TODO: specify exit conditions
-            if (exit !== false) {
-                this.exitEditMode(cell);
-            }
-            return true;
+
+            this.exitEditMode();
+            return savePromise;
         },
 
         updateModel: function(model, updateData) {
@@ -166,15 +161,48 @@ define(function(require) {
             model.set(updateData);
         },
 
-        exitEditMode: function() {
+        /**
+         * Shows editor view (create first if it did not exist)
+         */
+        enterEditMode: function() {
+            if (!this.view) {
+                this.createView(this.options);
+                // rethrow view events on component
+                this.listenTo(this.view, 'all', function() {
+                    this.trigger.apply(this, arguments);
+                }, this);
+            }
+
+            if (this.options.cell.$el) {
+                this.toggleHeaderCellHighlight(this.options.cell, true);
+                this.options.cell.$el.parent('tr:first').addClass('row-edit-mode');
+                this.options.cell.$el.removeClass('view-mode');
+                this.options.cell.$el.addClass('edit-mode');
+            }
+        },
+
+        /**
+         * Hides editor view and removes listeners
+         *
+         * @param {boolean=} withDispose if passed true disposes the component
+         */
+        exitEditMode: function(withDispose) {
+            if (this.view) {
+                this.view.dispose();
+                this.stopListening(this.view);
+                delete this.view;
+            }
+
             if (this.options.cell.$el) {
                 this.toggleHeaderCellHighlight(this.options.cell, false);
                 this.options.cell.$el.parent('tr:first').removeClass('row-edit-mode');
                 this.options.cell.$el.addClass('view-mode');
                 this.options.cell.$el.removeClass('edit-mode');
             }
-            this.stopListening(this);
-            this.dispose();
+
+            if (withDispose) {
+                this.dispose();
+            }
         },
 
         toggleHeaderCellHighlight: function(cell, state) {
@@ -185,10 +213,16 @@ define(function(require) {
             }
         },
 
-        saveCurrentCellAndExit: function() {
-            if (this.saveCurrentCell(false)) {
-                this.exitEditMode(true);
+        revertChanges: function() {
+            if (!this.options.cell.disposed && this.oldState) {
+                this.options.cell.model.set(this.oldState);
+                this.options.grid.trigger('content:update');
             }
+        },
+
+        cancelEditing: function() {
+            this.revertChanges();
+            this.exitEditMode(true);
         },
 
         editNextCell: function() {
@@ -226,28 +260,29 @@ define(function(require) {
                 _this.lockUserActions = false;
             }).fail(function() {
                 mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
-                _this.exitEditMode();
+                _this.revertChanges();
+                _this.exitEditMode(true);
                 _this.lockUserActions = false;
             });
         },
 
         saveCurrentCellAndEditNext: function() {
-            this.saveCurrentCell(false);
+            this.saveCurrentCell();
             this.editNextCell();
         },
 
         saveCurrentCellAndEditPrev: function() {
-            this.saveCurrentCell(false);
+            this.saveCurrentCell();
             this.editPrevCell();
         },
 
         saveCurrentCellAndEditNextRow: function() {
-            this.saveCurrentCell(false);
+            this.saveCurrentCell();
             this.editNextRowCell();
         },
 
         saveCurrentCellAndEditPrevRow: function() {
-            this.saveCurrentCell(false);
+            this.saveCurrentCell();
             this.editPrevRowCell();
         },
 
@@ -271,10 +306,8 @@ define(function(require) {
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (!this.lockUserActions) {
-                    if (this.saveCurrentCell(false)) {
-                        if (e.ctrlKey) {
-                            this.exitEditMode(true);
-                        } else {
+                    if (this.saveCurrentCell()) {
+                        if (!e.ctrlKey) {
                             if (e.shiftKey) {
                                 this.editPrevRowCell();
                             } else {
@@ -295,7 +328,7 @@ define(function(require) {
         onGenericTabKeydown: function(e) {
             if (e.keyCode === this.TAB_KEY_CODE) {
                 if (!this.lockUserActions) {
-                    if (this.saveCurrentCell(false)) {
+                    if (this.saveCurrentCell()) {
                         if (e.shiftKey) {
                             this.editPrevCell();
                         } else {
@@ -315,6 +348,7 @@ define(function(require) {
         onGenericEscapeKeydown: function(e) {
             if (e.keyCode === this.ESCAPE_KEY_CODE) {
                 if (!this.lockUserActions) {
+                    this.revertChanges();
                     this.exitEditMode(true);
                 }
                 e.preventDefault();
@@ -330,25 +364,25 @@ define(function(require) {
             if (e.altKey) {
                 switch (e.keyCode) {
                     case this.ARROW_LEFT_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
+                        if (!this.lockUserActions && this.saveCurrentCell()) {
                             this.editPrevCell();
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_RIGHT_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
+                        if (!this.lockUserActions && this.saveCurrentCell()) {
                             this.editNextCell();
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_TOP_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
+                        if (!this.lockUserActions && this.saveCurrentCell()) {
                             this.editPrevRowCell();
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_BOTTOM_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
+                        if (!this.lockUserActions && this.saveCurrentCell()) {
                             this.editNextRowCell();
                         }
                         e.preventDefault();
@@ -372,24 +406,20 @@ define(function(require) {
                 this.options.cell.$el.addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
+            delete this.oldState;
+            this.exitEditMode(true);
         },
 
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
-            if (!this.options.cell.disposed && this.options.cell.$el) {
-                this.options.cell.$el.addClassTemporarily('save-fail', 2000);
-            }
-            this.options.cell.model.set(this.oldState);
-            this.options.grid.trigger('content:update');
-
             var errors = [];
             switch (errorCode) {
                 case 400:
-                    var jqXHRerrors = jqXHR.responseJSON.errors.children;
-                    for (var i in jqXHRerrors) {
-                        if (jqXHRerrors.hasOwnProperty(i) && jqXHRerrors[i].errors) {
-                            errors.push.apply(errors, _.values(jqXHRerrors[i].errors));
-                        }
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
+                        this.enterEditMode();
+                        this.view.$el.toggleClass('show-overlay', true);
+                        this.view.showBackendErrors(jqXHR.responseJSON.errors);
+                        return;
                     }
                     break;
                 case 403:
@@ -410,6 +440,12 @@ define(function(require) {
             _.each(errors, function(value) {
                 mediator.execute('showFlashMessage', 'error', value);
             });
+
+            if (!this.options.cell.disposed && this.options.cell.$el) {
+                this.options.cell.$el.addClassTemporarily('save-fail', 2000);
+            }
+            this.revertChanges();
+            this.exitEditMode(true);
         }
 
     });
