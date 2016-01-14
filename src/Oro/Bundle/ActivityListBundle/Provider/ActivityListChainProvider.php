@@ -388,8 +388,6 @@ class ActivityListChainProvider
      * @param string $className
      *
      * @return ActivityListProviderInterface
-     *
-     * @deprecated since 1.9.
      */
     public function getProviderByClass($className)
     {
