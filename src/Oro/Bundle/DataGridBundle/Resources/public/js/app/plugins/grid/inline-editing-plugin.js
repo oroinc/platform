@@ -107,11 +107,12 @@ define(function(require) {
                 var originalEvents = cell.events;
                 if (_this.isEditable(cell)) {
                     cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    cell.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    cell.$el.append('<i data-role="edit" class="icon-pencil hide-text inline-editor__edit-action"' +
+                        'title="' + __('Edit') + '">' + __('Edit') + '</i>');
                     cell.$el.attr('title', _this.helpMessage);
                     cell.events = _.extend(Object.create(cell.events), {
                         'dblclick': enterEditModeIfNeeded,
-                        'mousedown .icon-edit': enterEditModeIfNeeded,
+                        'mousedown [data-role=edit]': enterEditModeIfNeeded,
                         'click': _.noop
                     });
                 }
@@ -550,7 +551,7 @@ define(function(require) {
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.cell.disposed && this.cell.$el) {
-                this.cell.$el.addClassTemporarily('save-fail', 2000);
+                this.cell.$el.addClass('save-fail');
             }
             this.cell.model.set(this.oldState);
             this.main.trigger('content:update');
