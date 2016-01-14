@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActivityBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType as BaseMultipleAssociationChoiceType;
@@ -13,20 +13,24 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        parent::setDefaultOptions($resolver);
+        parent::finishView($view, $form, $options);
 
-        $resolver->setDefaults(
-            [
-                'empty_value' => false,
-                'choices'     => function (Options $options) {
-                    return $this->getChoices($options);
-                },
-                'multiple'    => true,
-                'expanded'    => true
-            ]
-        );
+        /** @var EntityConfigId $configId */
+        $configId  = $options['config_id'];
+        $targetClassName = $configId->getClassName();
+
+        /** @var FormView $choiceView */
+        foreach ($view->children as $choiceView) {
+            // disable activity with same class as target entity
+            if ((isset($view->vars['disabled']) && $view->vars['disabled'])
+                || ($choiceView->vars['value'] === $targetClassName)
+            ) {
+                $choiceView->vars['disabled'] = true;
+            }
+        }
+
     }
 
     /**
@@ -43,29 +47,5 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
     public function getParent()
     {
         return 'oro_entity_extend_multiple_association_choice';
-    }
-
-    /**
-     * @param Options $options
-     *
-     * @return array
-     */
-    protected function getChoices($options)
-    {
-        $groupName = $options['association_class'];
-        /** @var EntityConfigId $configId */
-        $configId  = $options['config_id'];
-        $targetClassName = $configId->getClassName();
-
-        $choices = [];
-        $entityConfigProvider = $this->configManager->getProvider('entity');
-        $owningSideEntities = $this->typeHelper->getOwningSideEntities($groupName);
-        foreach ($owningSideEntities as $className) {
-            if ($targetClassName !== $className) {
-                $choices[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
-            }
-        }
-
-        return $choices;
     }
 }
