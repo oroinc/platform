@@ -30,9 +30,17 @@
 @headerTextColor:                 #cad2da;
 @inlineActionColor:               #94b4c9;
 @inlineActionBackground:          #edf5fb;
-@rowHighlightBackground:          #fffeea;
-@rowSelectedBackground:           @inlineActionBackground;
+@cellSelectedBackground:          @inlineActionBackground;
 @cellSelectedBorder:              @inlineActionColor;
+@rowSelectedBackground:           @cellSelectedBackground;
+@rowHighlightBackground:          lighten(@rowSelectedBackground, 2%);
+@cellSuccessBackground:           #f1f8dc;
+@cellSuccessBorder:               #d8dec6;
+@cellSuccessColor:                #96b76d;
+@cellErrorBackground:             #fcd4d3;
+@cellErrorBorder:                 #eea19f;
+@cellLoadingBackground:           #f5f5f5;
+@cellLoadingBorder:               darken(@cellLoadingBackground, 5%);
 @sideBarClosedWidth:              33px;
 @sideBarOpenedWidth:              200px;
 
