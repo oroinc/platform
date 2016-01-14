@@ -80,11 +80,11 @@ class OwnerTypeExtension extends \Twig_Extension
      */
     public function getUserOwnerOwningBusinessUnit($entity)
     {
-        $ownerClassName = ClassUtils::getRealClass($entity);
-        if (!$this->configProvider->hasConfig($ownerClassName)) {
+        $entityClassName = ClassUtils::getRealClass($entity);
+        if (!$this->configProvider->hasConfig($entityClassName)) {
             return null;
         }
-        $config = $this->configProvider->getConfig($ownerClassName);
+        $config = $this->configProvider->getConfig($entityClassName);
         if ($config->get('owner_type') !== 'USER') {
             return null;
         }
