@@ -170,3 +170,4 @@ services:
             - @oro_search.mapper
             - @translator
             - @oro_entity.doctrine_helper
+            - @event_dispatcher
