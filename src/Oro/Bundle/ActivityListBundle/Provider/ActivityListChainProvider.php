@@ -20,8 +20,6 @@ use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
- * Class ActivityListChainProvider
- * @package Oro\Bundle\ActivityListBundle\Provider
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -90,9 +88,9 @@ class ActivityListChainProvider
     }
 
     /**
-     * Get array providers
+     * Get all registered providers
      *
-     * @return \Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface[]
+     * @return ActivityListProviderInterface[] [activity class => provider, ...]
      */
     public function getProviders()
     {
@@ -133,19 +131,16 @@ class ActivityListChainProvider
      */
     public function isApplicableTarget($targetClassName, $activityClassName)
     {
-        /** @var ConfigIdInterface[] $configIds */
-        $configIds = $this->configManager->getIds('entity', null, false);
-        foreach ($configIds as $configId) {
-            if (array_key_exists($activityClassName, $this->providers)) {
-                $provider = $this->getProviderByClass($activityClassName);
-                if ($provider->isApplicableTarget($configId, $this->configManager)
-                    && $configId->getClassName() === $targetClassName) {
-                    return true;
-                }
-            }
+        if (!isset($this->providers[$activityClassName])
+            || !$this->configManager->hasConfig($targetClassName)
+        ) {
+            return false;
         }
 
-        return false;
+        return $this->providers[$activityClassName]->isApplicableTarget(
+            $this->configManager->getId('entity', $targetClassName),
+            $this->configManager
+        );
     }
 
     /**
