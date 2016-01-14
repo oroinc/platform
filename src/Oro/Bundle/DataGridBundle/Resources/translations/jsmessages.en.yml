@@ -86,6 +86,10 @@ oro:
             empty_list: "No columns found"
         not_number: Not a number
         inline_editing:
+            message:
+                save_field:
+                    permission_denied: You do not have permission to change {{ fieldName }} field.
+        inline_editing:
             help: |
                 <ul style="margin-bottom: 0px;">
                     <li><span style="font-family: monospace">Enter</span>, <span style="font-family: monospace">Shift + Enter</span> - Save and edit next/previous cell in column</li>
