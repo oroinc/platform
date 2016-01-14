@@ -1,3 +1,4 @@
+/* global console */
 define(function(require) {
     'use strict';
 
@@ -35,6 +36,14 @@ define(function(require) {
                     }
                     deferred.resolve();
                 });
+            }).fail(function(e) {
+                if (console && console.error) {
+                    console.log(e);
+                    console.error('Inline editing loading failed. Reason: ' + e.message);
+                } else {
+                    throw e;
+                }
+                deferred.resolve();
             });
         },
 
