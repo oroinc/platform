@@ -43,7 +43,7 @@ define(function(require) {
          */
         activeEditors: null,
 
-        initialize: function() {
+        initialize: function(main, options) {
             this.activeEditorComponents = [];
             InlineEditingPlugin.__super__.initialize.apply(this, arguments);
         },
@@ -54,9 +54,7 @@ define(function(require) {
                 afterMakeCell: this.onAfterMakeCell
             });
             this.listenTo(mediator, 'page:beforeChange', function() {
-                for (var i = 0; i < this.activeEditorComponents.length; i++) {
-                    this.activeEditorComponents[i].dispose();
-                }
+                this.removeActiveEditorComponents();
             });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
@@ -69,9 +67,7 @@ define(function(require) {
         },
 
         disable: function() {
-            if (this.editModeEnabled) {
-                this.exitEditMode(true);
-            }
+            this.removeActiveEditorComponents();
             this.main.$el.removeClass('grid-editable');
             this.main.body.refresh();
             InlineEditingPlugin.__super__.disable.call(this);
@@ -252,6 +248,13 @@ define(function(require) {
                 classNames.push(cell.column.get('metadata').type + '-frontend-type-editor');
             }
             return classNames;
+        },
+
+        removeActiveEditorComponents: function() {
+            for (var i = 0; i < this.activeEditorComponents.length; i++) {
+                this.activeEditorComponents[i].dispose();
+            }
+            this.activeEditorComponents = [];
         }
     });
 
