@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\PlatformBundle;
 
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -32,6 +33,7 @@ class OroPlatformBundle extends Bundle
                 'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
             )
         );
+        $container->addCompilerPass(new UpdateDoctrineConfigurationPass());
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new UpdateDoctrineEventHandlersPass());
             $container->moveCompilerPassBefore(
