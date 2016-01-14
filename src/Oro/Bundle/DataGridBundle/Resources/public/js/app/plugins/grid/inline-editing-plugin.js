@@ -7,19 +7,11 @@ define(function(require) {
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var CellIterator = require('../../../datagrid/cell-iterator');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
     InlineEditingPlugin = BasePlugin.extend({
-        /**
-         * true if any cell is in edit mode
-         *
-         * @type {boolean}
-         */
-        editModeEnabled: false,
-
         /**
          * This component is used by default for inline editing
          */
@@ -42,25 +34,9 @@ define(function(require) {
         lockUserActions: false,
 
         /**
-         * Key codes
-         */
-        TAB_KEY_CODE: 9,
-        ENTER_KEY_CODE: 13,
-        ESCAPE_KEY_CODE: 27,
-        ARROW_LEFT_KEY_CODE: 37,
-        ARROW_TOP_KEY_CODE: 38,
-        ARROW_RIGHT_KEY_CODE: 39,
-        ARROW_BOTTOM_KEY_CODE: 40,
-
-        /**
          * Help message for cells
          */
         helpMessage: __('oro.form.inlineEditing.helpMessage'),
-
-        constructor: function() {
-            this.onKeyDown = _.bind(this.onKeyDown, this);
-            InlineEditingPlugin.__super__.constructor.apply(this, arguments);
-        },
 
         enable: function() {
             this.main.$el.addClass('grid-editable');
@@ -68,9 +44,7 @@ define(function(require) {
                 afterMakeCell: this.onAfterMakeCell
             });
             this.listenTo(mediator, 'page:beforeChange', function() {
-                if (this.editModeEnabled) {
-                    this.exitEditMode(true);
-                }
+                // TODO: remove all editors on dispose
             });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
@@ -200,18 +174,11 @@ define(function(require) {
         },
 
         enterEditMode: function(cell, fromPreviousCell) {
-            if (this.editModeEnabled) {
-                this.exitEditMode(false);
-            }
-            this.editModeEnabled = true;
             this.currentCell = cell;
-            this.cellIterator = new CellIterator(this.main, this.currentCell);
             this.main.ensureCellIsVisible(cell);
             cell.$el.parent('tr:first').addClass('row-edit-mode');
             cell.$el.removeClass('view-mode');
             cell.$el.addClass('edit-mode');
-
-            this.toggleHeaderCellHighlight(cell, true);
 
             var editor = this.getCellEditorOptions(cell);
             this.editor = editor;
@@ -227,33 +194,15 @@ define(function(require) {
                 cell: cell,
                 view: CellEditorView,
                 viewOptions: editor.viewOptions,
-                fromPreviousCell: fromPreviousCell
+                fromPreviousCell: fromPreviousCell,
+                save_api_accessor: this.editor.save_api_accessor,
+                grid: this.main,
+                plugin: this
             }));
 
             editorComponent.view.focus(!!fromPreviousCell);
-            editorComponent.view.on('keydown', this.onKeyDown);
 
             this.editorComponent = editorComponent;
-
-            this.listenTo(editorComponent, 'saveAction', this.saveCurrentCell);
-            this.listenTo(editorComponent, 'saveAndExitAction', this.saveCurrentCellAndExit);
-            this.listenTo(editorComponent, 'cancelAction', this.exitEditMode, true);
-            this.listenTo(editorComponent, 'saveAndEditNextAction', this.saveCurrentCellAndEditNext);
-            this.listenTo(editorComponent, 'cancelAndEditNextAction', this.editNextCell);
-            this.listenTo(editorComponent, 'saveAndEditPrevAction', this.saveCurrentCellAndEditPrev);
-            this.listenTo(editorComponent, 'cancelAndEditPrevAction', this.editPrevCell);
-            this.listenTo(editorComponent, 'saveAndEditNextRowAction', this.saveCurrentCellAndEditNextRow);
-            this.listenTo(editorComponent, 'cancelAndEditNextRowAction', this.editNextRowCell);
-            this.listenTo(editorComponent, 'saveAndEditPrevRowAction', this.saveCurrentCellAndEditPrevRow);
-            this.listenTo(editorComponent, 'cancelAndEditPrevRowAction', this.editPrevRowCell);
-        },
-
-        toggleHeaderCellHighlight: function(cell, state) {
-            var columnIndex = this.main.columns.indexOf(cell.column);
-            var headerCell = this.main.findHeaderCellByIndex(columnIndex);
-            if (headerCell) {
-                headerCell.$el.toggleClass('header-cell-highlight', state);
-            }
         },
 
         buildClassNames: function(editor, cell) {
@@ -275,313 +224,8 @@ define(function(require) {
             return classNames;
         },
 
-        saveCurrentCell: function(exit) {
-            if (!this.editModeEnabled) {
-                throw Error('Edit mode disabled');
-            }
-            if (!this.editorComponent.view.isChanged()) {
-                return true;
-            }
-            if (!this.editorComponent.view.isValid()) {
-                this.editorComponent.view.focus();
-                return false;
-            }
-            var cell = this.currentCell;
-            var serverUpdateData = this.editorComponent.view.getServerUpdateData();
-            var modelUpdateData = this.editorComponent.view.getModelUpdateData();
-            cell.$el.addClass('loading');
-            var ctx = {
-                main: this.main,
-                cell: cell,
-                oldState: _.pick(cell.model.toJSON(), _.keys(modelUpdateData))
-            };
-            this.updateModel(cell.model, this.editorComponent, modelUpdateData);
-            this.main.trigger('content:update');
-            if (this.editor.save_api_accessor.initialOptions.field_name) {
-                var keys = _.keys(serverUpdateData);
-                if (keys.length > 1) {
-                    throw new Error('Only single field editors are supported with field_name option');
-                }
-                var newData = {};
-                newData[this.editor.save_api_accessor.initialOptions.field_name] = serverUpdateData[keys[0]];
-                serverUpdateData = newData;
-            }
-            var savePromise = this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
-                processingMessage: __('oro.form.inlineEditing.saving_progress'),
-                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
-            });
-            if (this.editor.component.processSavePromise) {
-                savePromise = this.editor.component.processSavePromise(savePromise, cell.column.get('metadata'));
-            }
-            if (this.editor.view.processSavePromise) {
-                savePromise = this.editor.view.processSavePromise(savePromise, cell.column.get('metadata'));
-            }
-            savePromise.done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
-                .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
-                .always(function() {
-                    cell.$el.removeClass('loading');
-                });
-            if (exit !== false) {
-                this.exitEditMode(cell);
-            }
-            return true;
-        },
-
-        updateModel: function(model, editorComponent, updateData) {
-            // assume "undefined" as delete value request
-            for (var key in updateData) {
-                if (updateData.hasOwnProperty(key)) {
-                    if (updateData[key] === editorComponent.view.UNSET_FIELD_VALUE) {
-                        model.unset(key);
-                        delete updateData[key];
-                    }
-                }
-            }
-            model.set(updateData);
-        },
-
-        exitEditMode: function() {
-            if (!this.editModeEnabled) {
-                throw Error('Edit mode disabled');
-            }
-            this.editModeEnabled = false;
-            if (this.currentCell.$el) {
-                this.toggleHeaderCellHighlight(this.currentCell, false);
-                this.currentCell.$el.parent('tr:first').removeClass('row-edit-mode');
-                this.currentCell.$el.addClass('view-mode');
-                this.currentCell.$el.removeClass('edit-mode');
-            }
-            this.stopListening(this.editorComponent);
-            this.editorComponent.dispose();
-            delete this.editorComponent;
-        },
-
-        saveCurrentCellAndExit: function() {
-            if (this.saveCurrentCell(false)) {
-                this.exitEditMode(true);
-            }
-        },
-
-        editNextCell: function() {
-            this.editCellByIteratorMethod('next', false);
-        },
-
-        editNextRowCell: function() {
-            this.editCellByIteratorMethod('nextRow', false);
-        },
-
-        editPrevCell: function() {
-            this.editCellByIteratorMethod('prev', true);
-        },
-
-        editPrevRowCell: function() {
-            this.editCellByIteratorMethod('prevRow', false);
-        },
-
-        editCellByIteratorMethod: function(iteratorMethod, fromPreviousCell) {
-            var _this = this;
-            this.lockUserActions = true;
-            function checkEditable(cell) {
-                if (!_this.isEditable(cell)) {
-                    return _this.cellIterator[iteratorMethod]().then(checkEditable);
-                }
-                return cell;
-            }
-            this.exitEditMode(false);
-            this.cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
-                _this.enterEditMode(cell, fromPreviousCell);
-                _this.lockUserActions = false;
-            }).fail(function() {
-                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
-                _this.exitEditMode();
-                _this.lockUserActions = false;
-            });
-        },
-
-        saveCurrentCellAndEditNext: function() {
-            this.saveCurrentCell(false);
-            this.editNextCell();
-        },
-
-        saveCurrentCellAndEditPrev: function() {
-            this.saveCurrentCell(false);
-            this.editPrevCell();
-        },
-
-        saveCurrentCellAndEditNextRow: function() {
-            this.saveCurrentCell(false);
-            this.editNextRowCell();
-        },
-
-        saveCurrentCellAndEditPrevRow: function() {
-            this.saveCurrentCell(false);
-            this.editPrevRowCell();
-        },
-
         _onRequireJsError: function() {
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.loadingError'));
-        },
-
-        /**
-         * Keydown handler for the entire document
-         *
-         * @param {$.Event} e
-         */
-        onKeyDown: function(e) {
-            if (this.editModeEnabled) {
-                this.onGenericTabKeydown(e);
-                this.onGenericEnterKeydown(e);
-                this.onGenericEscapeKeydown(e);
-                this.onGenericArrowKeydown(e);
-            }
-        },
-
-        /**
-         * Generic keydown handler, which handles ENTER
-         *
-         * @param {$.Event} e
-         */
-        onGenericEnterKeydown: function(e) {
-            if (e.keyCode === this.ENTER_KEY_CODE) {
-                if (!this.lockUserActions) {
-                    if (this.saveCurrentCell(false)) {
-                        if (e.ctrlKey) {
-                            this.exitEditMode(true);
-                        } else {
-                            if (e.shiftKey) {
-                                this.editPrevRowCell();
-                            } else {
-                                this.editNextRowCell();
-                            }
-                        }
-                    }
-                }
-                e.preventDefault();
-            }
-        },
-
-        /**
-         * Generic keydown handler, which handles TAB
-         *
-         * @param {$.Event} e
-         */
-        onGenericTabKeydown: function(e) {
-            if (e.keyCode === this.TAB_KEY_CODE) {
-                if (!this.lockUserActions) {
-                    if (this.saveCurrentCell(false)) {
-                        if (e.shiftKey) {
-                            this.editPrevCell();
-                        } else {
-                            this.editNextCell();
-                        }
-                    }
-                }
-                e.preventDefault();
-            }
-        },
-
-        /**
-         * Generic keydown handler, which handles ESCAPE
-         *
-         * @param {$.Event} e
-         */
-        onGenericEscapeKeydown: function(e) {
-            if (e.keyCode === this.ESCAPE_KEY_CODE) {
-                if (!this.lockUserActions) {
-                    this.exitEditMode(true);
-                }
-                e.preventDefault();
-            }
-        },
-
-        /**
-         * Generic keydown handler, which handles ARROWS
-         *
-         * @param {$.Event} e
-         */
-        onGenericArrowKeydown: function(e) {
-            if (e.altKey) {
-                switch (e.keyCode) {
-                    case this.ARROW_LEFT_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
-                            this.editPrevCell();
-                        }
-                        e.preventDefault();
-                        break;
-                    case this.ARROW_RIGHT_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
-                            this.editNextCell();
-                        }
-                        e.preventDefault();
-                        break;
-                    case this.ARROW_TOP_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
-                            this.editPrevRowCell();
-                        }
-                        e.preventDefault();
-                        break;
-                    case this.ARROW_BOTTOM_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
-                            this.editNextRowCell();
-                        }
-                        e.preventDefault();
-                        break;
-                }
-            }
-        }
-    }, {
-        onSaveSuccess: function(response) {
-            if (!this.cell.disposed && this.cell.$el) {
-                if (response) {
-                    var routeParametersRenameMap = _.invert(this.cell.column.get('metadata').inline_editing.
-                        save_api_accessor.routeParametersRenameMap);
-                    _.each(response, function(item, i) {
-                        var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
-                        if (this.cell.model.has(propName)) {
-                            this.cell.model.set(propName, item);
-                        }
-                    }, this);
-                }
-                this.cell.$el.addClassTemporarily('save-success', 2000);
-            }
-            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
-        },
-
-        onSaveError: function(jqXHR) {
-            var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
-            if (!this.cell.disposed && this.cell.$el) {
-                this.cell.$el.addClassTemporarily('save-fail', 2000);
-            }
-            this.cell.model.set(this.oldState);
-            this.main.trigger('content:update');
-
-            var errors = [];
-            switch (errorCode) {
-                case 400:
-                    var jqXHRerrors = jqXHR.responseJSON.errors.children;
-                    for (var i in jqXHRerrors) {
-                        if (jqXHRerrors.hasOwnProperty(i) && jqXHRerrors[i].errors) {
-                            errors.push.apply(errors, _.values(jqXHRerrors[i].errors));
-                        }
-                    }
-                    break;
-                case 403:
-                    errors.push(__('You do not have permission to perform this action.'));
-                    break;
-                case 500:
-                    if (jqXHR.responseJSON.message) {
-                        errors.push(__(jqXHR.responseJSON.message));
-                    } else {
-                        errors.push(__('oro.ui.unexpected_error'));
-                    }
-                    break;
-                default:
-                    errors.push(__('oro.ui.unexpected_error'));
-            }
-
-            _.each(errors, function(value) {
-                mediator.execute('showFlashMessage', 'error', value);
-            });
         }
     });
 
