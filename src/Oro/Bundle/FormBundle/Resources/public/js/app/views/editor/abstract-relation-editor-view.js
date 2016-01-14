@@ -22,7 +22,6 @@ define(function(require) {
      * @param {Object} options.model - Current row model
      * @param {Object} options.input_delay - Delay before user finished input and request sent to server
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder for an empty element
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.autocomplete_api_accessor - Autocomplete API specification.
@@ -43,8 +42,7 @@ define(function(require) {
         DEFAULT_PER_PAGE: 20,
         initialize: function(options) {
             AbstractRelationEditorView.__super__.initialize.apply(this, arguments);
-            var apiSpec = this.metadata.inline_editing.autocomplete_api_accessor;
-            this.autocompleteApiAccessor = apiSpec.instance;
+            this.autocompleteApiAccessor = options.autocomplete_api_accessor.instance;
             this.perPage = options.per_page || this.DEFAULT_PER_PAGE;
             if (options.input_delay) {
                 this.input_delay = options.input_delay;
@@ -123,6 +121,10 @@ define(function(require) {
                 }
                 var AutocompleteApiAccessor = apiSpec['class'];
                 apiSpec.instance = new AutocompleteApiAccessor(apiSpec);
+                if (!columnMetadata.inline_editing.editor.view_options) {
+                    columnMetadata.inline_editing.editor.view_options = {};
+                }
+                columnMetadata.inline_editing.editor.view_options.autocomplete_api_accessor = apiSpec;
             });
         }
     });

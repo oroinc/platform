@@ -53,7 +53,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
@@ -104,7 +103,6 @@ define(function(require) {
         initialize: function(options) {
             this.options = options;
             this.fieldName = options.fieldName;
-            this.metadata = options.metadata || {};
             this.placeholder = options.placeholder;
             this.placeholderRaw = options.placeholder_raw;
             this.validationRules = options.validationRules || {};
