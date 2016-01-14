@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
 class EntityAliasResolver implements WarmableInterface
 {
@@ -296,11 +297,9 @@ class EntityAliasResolver implements WarmableInterface
      */
     protected function getAllEntityClasses()
     {
-        $metadataFactory = $this->doctrine->getManager()->getMetadataFactory();
-
         $metadata = array_filter(
-            $metadataFactory->getAllMetadata(),
-            function (ClassMetadata $metadata) use ($metadataFactory) {
+            SafeDatabaseChecker::getAllMetadata($this->doctrine->getManager()),
+            function (ClassMetadata $metadata) {
                 return !$metadata->isMappedSuperclass;
             }
         );
