@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Component\Routing\Router;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
