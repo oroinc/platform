@@ -1,4 +1,3 @@
-/* global console */
 define(function(require) {
     'use strict';
 
@@ -6,6 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var InlineEditingHelpPlugin = require('../app/plugins/grid/inline-editing-help-plugin');
+    var console = window.console;
 
     var gridViewsBuilder = {
         /**
