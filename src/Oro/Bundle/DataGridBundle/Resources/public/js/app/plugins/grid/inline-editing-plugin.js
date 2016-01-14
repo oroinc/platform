@@ -193,9 +193,9 @@ define(function(require) {
         },
 
         enterEditMode: function(cell, fromPreviousCell) {
-            var existingEditor = this.getOpenedEditor(cell);
-            if (existingEditor) {
-                existingEditor.view.focus(!!fromPreviousCell);
+            var existingEditorComponent = this.getOpenedEditor(cell);
+            if (existingEditorComponent) {
+                existingEditorComponent.view.focus(!!fromPreviousCell);
                 return;
             }
             this.main.ensureCellIsVisible(cell);
