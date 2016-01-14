@@ -54,7 +54,6 @@ define(function(require) {
      * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
      * @param {*} options.value - value to edit
      * @param {string} options.fieldName - field name to use when sending value to server
-     * @param {Object} options.metadata - Editor metadata
      * @param {Object} options.metadata.inline_editing - inline-editing configuration
      *
      * @augments BaseComponent
@@ -150,8 +149,7 @@ define(function(require) {
                 className: 'inline-view-editor',
                 autoRender: true,
                 model: this.model,
-                fieldName: this.fieldName,
-                metadata: this.metadata
+                fieldName: this.fieldName
             }));
 
             this.editorView = viewInstance;

@@ -52,7 +52,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
@@ -64,6 +63,7 @@ define(function(require) {
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
     var $ = require('jquery');
+    var _ = require('underscore');
     require('jquery.select2');
 
     SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
@@ -84,7 +84,7 @@ define(function(require) {
         },
 
         getAvailableOptions: function(options) {
-            var choices = this.metadata.choices;
+            var choices = this.options.choices;
             var result = [];
             for (var id in choices) {
                 if (choices.hasOwnProperty(id)) {
@@ -188,6 +188,16 @@ define(function(require) {
             // current value is always string
             // btw model value could be an number
             return this.getValue() !== String(this.getModelValue());
+        }
+    }, {
+        processMetadata: function(columnMetadata) {
+            if (_.isUndefined(columnMetadata.choices)) {
+                throw new Error('`choices` is required option');
+            }
+            if (!columnMetadata.inline_editing.editor.view_options) {
+                columnMetadata.inline_editing.editor.view_options = {};
+            }
+            columnMetadata.inline_editing.editor.view_options.choices = columnMetadata.choices;
         }
     });
 

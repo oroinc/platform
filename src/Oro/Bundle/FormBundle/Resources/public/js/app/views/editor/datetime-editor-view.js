@@ -53,7 +53,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.dateInputAttrs - Attributes for date HTML input element
      * @param {Object} options.datePickerOptions - See [documentation here](http://goo.gl/pddxZU)
