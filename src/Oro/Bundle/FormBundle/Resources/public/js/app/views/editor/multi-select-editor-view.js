@@ -84,8 +84,14 @@ define(function(require) {
             return options;
         },
 
-        getFormattedValue: function() {
-            return this.getModelValue().join(',');
+        formatRawValue: function(value) {
+            if (_.isString(value)) {
+                value = JSON.parse(value);
+            }
+            if (_.isNull(value) || value === void 0) {
+                value = [];
+            }
+            return value.join(',');
         },
 
         getModelValue: function() {

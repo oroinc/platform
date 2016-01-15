@@ -180,10 +180,15 @@ define(function(require) {
             }
         },
 
-        getFormattedValue: function() {
-            var value = this.getModelValue();
-            if (value === null) {
-                return '';
+        formatRawValue: function(value) {
+            try {
+                value = datetimeFormatter.getMomentForBackendDate(value);
+            } catch (e) {
+                try {
+                    value = datetimeFormatter.getMomentForBackendDateTime(value);
+                } catch (e2) {
+                    return '';
+                }
             }
             return value.format(this.format);
         },
