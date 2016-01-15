@@ -56,9 +56,8 @@ define(function(require) {
     PercentEditorView = NumberEditorView.extend(/** @exports PercentEditorView.prototype */{
         className: 'number-editor',
 
-        getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
-            return parseFloat(raw) * 100;
+        parseRawValue: function(value) {
+            return parseFloat(value) * 100;
         },
 
         getModelUpdateData: function() {
@@ -68,7 +67,7 @@ define(function(require) {
         },
 
         formatRawValue: function(value) {
-            var raw = parseFloat(value) * 100;
+            var raw = this.parseRawValue(value);
             if (isNaN(raw)) {
                 return '';
             }

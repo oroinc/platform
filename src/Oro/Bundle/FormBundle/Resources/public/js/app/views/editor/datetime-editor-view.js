@@ -147,11 +147,10 @@ define(function(require) {
             }
         },
 
-        getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
+        parseRawValue: function(value) {
             var parsed;
             try {
-                parsed = datetimeFormatter.getMomentForBackendDateTime(raw);
+                parsed = datetimeFormatter.getMomentForBackendDateTime(value);
             } catch (e) {
                 return null;
             }

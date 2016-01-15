@@ -98,9 +98,7 @@ define(function(require) {
         },
 
         formatRawValue: function(value) {
-            if (_.isString(value)) {
-                value = JSON.parse(value);
-            }
+            value = this.parseRawValue(value);
             if (value !== null && value && value.data) {
                 value = value.data;
             } else {
@@ -125,8 +123,7 @@ define(function(require) {
             return options;
         },
 
-        getModelValue: function() {
-            var value = this.model.get(this.fieldName);
+        parseRawValue: function(value) {
             if (_.isString(value)) {
                 value = JSON.parse(value);
             }
