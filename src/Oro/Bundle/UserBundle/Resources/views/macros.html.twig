@@ -18,3 +18,14 @@
         </div>
     </div>
 {% endmacro %}
+
+{% macro user_business_unit_name(user, addBrackets = true) %}
+    {% set businessUnit = oro_get_entity_owner(user) %}
+    {% if businessUnit is not null and resource_granted('VIEW', businessUnit) %}
+        {% if addBrackets %}
+            ({{ businessUnit.name }})
+        {% else %}
+            {{ businessUnit.name }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}

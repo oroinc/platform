@@ -2,7 +2,7 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-
+{% import 'OroUserBundle::macros.html.twig' as U %}
 {% oro_title_set({params : {"%entity.name%": entity.name|default('N/A') }}) %}
 
 {% block navButtons %}
@@ -57,6 +57,7 @@
                 {% else %}
                     {{ entity.owner|oro_format_name|escape }}
                 {% endif %}
+                {{ U.user_business_unit_name(entity.owner) }}
             {%- endif -%}
             {%- endset -%}
             {{ UI.renderHtmlProperty('oro.tracking.trackingwebsite.owner.label'|trans, ownerData) }}

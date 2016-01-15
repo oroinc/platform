@@ -4,18 +4,14 @@ namespace Oro\Bundle\OrganizationBundle\Twig;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
 class OwnerTypeExtension extends \Twig_Extension
 {
     const EXTENSION_NAME = 'oro_owner_type';
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /** @var EntityOwnerAccessor */
@@ -38,11 +34,7 @@ class OwnerTypeExtension extends \Twig_Extension
     {
         return [
             'oro_get_owner_type' => new \Twig_Function_Method($this, 'getOwnerType'),
-            'oro_get_entity_owner' => new \Twig_Function_Method($this, 'getEntityOwner'),
-            'oro_get_user_owner_owning_business_unit' => new \Twig_SimpleFunction(
-                'oro_get_user_owner_owning_business_unit',
-                [$this, 'getUserOwnerOwningBusinessUnit']
-            ),
+            'oro_get_entity_owner' => new \Twig_Function_Method($this, 'getEntityOwner')
         ];
     }
 
@@ -69,31 +61,6 @@ class OwnerTypeExtension extends \Twig_Extension
     public function getEntityOwner($entity)
     {
         return $this->ownerAccessor->getOwner($entity);
-    }
-
-    /**
-     * Gets entity owner business unit if ownership type of this entity is 'USER'
-     *
-     * @param object $entity
-     *
-     * @return BusinessUnit|null
-     */
-    public function getUserOwnerOwningBusinessUnit($entity)
-    {
-        $entityClassName = ClassUtils::getRealClass($entity);
-        if (!$this->configProvider->hasConfig($entityClassName)) {
-            return null;
-        }
-        $config = $this->configProvider->getConfig($entityClassName);
-        if ($config->get('owner_type') !== 'USER') {
-            return null;
-        }
-        $propertyAccessor = new PropertyAccessor();
-        $user = $propertyAccessor->getValue($entity, $config->get('owner_field_name'));
-
-        $owner = $this->ownerAccessor->getOwner($user);
-
-        return $owner;
     }
 
     /**
