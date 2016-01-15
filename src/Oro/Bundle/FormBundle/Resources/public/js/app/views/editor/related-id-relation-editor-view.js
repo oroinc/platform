@@ -163,8 +163,12 @@ define(function(require) {
             };
         },
 
-        getModelValue: function() {
-            return this.model.get(this.valueFieldName) || '';
+        getRawModelValue: function() {
+            return this.model.get(this.valueFieldName);
+        },
+
+        parseRawValue: function(value) {
+            return value || '';
         },
 
         getChoiceLabel: function() {

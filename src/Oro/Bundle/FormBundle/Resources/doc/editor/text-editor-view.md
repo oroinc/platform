@@ -63,7 +63,9 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
   * [.getPlaceholder()](#module_TextEditorView#getPlaceholder) ⇒ <code>string</code>
   * [.focus(atEnd)](#module_TextEditorView#focus)
   * [.getValidationRules()](#module_TextEditorView#getValidationRules) ⇒ <code>Object</code>
+  * [.getRawModelValue()](#module_TextEditorView#getRawModelValue) ⇒ <code>*</code>
   * [.formatRawValue()](#module_TextEditorView#formatRawValue) ⇒ <code>string</code>
+  * [.parseRawValue()](#module_TextEditorView#parseRawValue) ⇒ <code>*</code>
   * [.getModelValue()](#module_TextEditorView#getModelValue) ⇒ <code>string</code>
   * [.getValue()](#module_TextEditorView#getValue) ⇒ <code>string</code>
   * [.rethrowAction()](#module_TextEditorView#rethrowAction) ⇒ <code>string</code>
@@ -102,9 +104,19 @@ Places focus on the editor
 Prepares validation rules for usage
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
+<a name="module_TextEditorView#getRawModelValue"></a>
+### textEditorView.getRawModelValue() ⇒ <code>*</code>
+Reads proper model's field value
+
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#formatRawValue"></a>
 ### textEditorView.formatRawValue() ⇒ <code>string</code>
 Converts model value to the format that can be passed to a template as field value
+
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
+<a name="module_TextEditorView#parseRawValue"></a>
+### textEditorView.parseRawValue() ⇒ <code>*</code>
+Parses value that is stored in model
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getModelValue"></a>

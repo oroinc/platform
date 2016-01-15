@@ -276,12 +276,12 @@ define(function(require) {
             return _.isString(term) && term.length > 0;
         },
 
-        getModelValue: function() {
-            return this.model.get(this.fieldName) || [];
+        parseRawValue: function(value) {
+            return value || [];
         },
 
         formatRawValue: function(value) {
-            return (value || []).map(function(item) {
+            return this.parseRawValue(value).map(function(item) {
                 return item.id;
             }).join(',');
         },

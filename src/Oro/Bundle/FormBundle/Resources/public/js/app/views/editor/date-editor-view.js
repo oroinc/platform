@@ -167,13 +167,12 @@ define(function(require) {
             this.$('input.hasDatepicker').setCursorToEnd().focus();
         },
 
-        getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
+        parseRawValue: function(value) {
             try {
-                return datetimeFormatter.getMomentForBackendDate(raw);
+                return datetimeFormatter.getMomentForBackendDate(value);
             } catch (e) {
                 try {
-                    return datetimeFormatter.getMomentForBackendDateTime(raw);
+                    return datetimeFormatter.getMomentForBackendDateTime(value);
                 } catch (e2) {
                     return null;
                 }
@@ -181,14 +180,9 @@ define(function(require) {
         },
 
         formatRawValue: function(value) {
-            try {
-                value = datetimeFormatter.getMomentForBackendDate(value);
-            } catch (e) {
-                try {
-                    value = datetimeFormatter.getMomentForBackendDateTime(value);
-                } catch (e2) {
-                    return '';
-                }
+            value = this.parseRawValue(value);
+            if (value === null) {
+                return '';
             }
             return value.format(this.format);
         },

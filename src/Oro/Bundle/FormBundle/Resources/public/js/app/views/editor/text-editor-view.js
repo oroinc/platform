@@ -93,8 +93,6 @@ define(function(require) {
         ARROW_RIGHT_KEY_CODE: 39,
         ARROW_BOTTOM_KEY_CODE: 40,
 
-        UNSET_FIELD_VALUE: {'#unset': true},
-
         constructor: function(options) {
             // className adjustment cannot be done in initialize()
             if (options.className) {
@@ -140,7 +138,7 @@ define(function(require) {
             if ('value' in this.options) {
                 data.value = this.formatRawValue(this.options.value);
             } else {
-                data.value = this.formatRawValue(this.model.get(this.fieldName));
+                data.value = this.formatRawValue(this.getRawModelValue());
             }
             data.placeholder = this.getPlaceholder();
             return data;
@@ -197,12 +195,31 @@ define(function(require) {
         },
 
         /**
+         * Reads proper model's field value
+         *
+         * @return {*}
+         */
+        getRawModelValue: function() {
+            return this.model.get(this.fieldName);
+        },
+
+        /**
          * Converts model value to the format that can be passed to a template as field value
          *
          * @param {*} value
          * @return {string}
          */
         formatRawValue: function(value) {
+            return this.parseRawValue(value);
+        },
+
+        /**
+         * Parses value that is stored in model
+         *
+         * @param {*} value
+         * @return {*}
+         */
+        parseRawValue: function(value) {
             return value ? value : '';
         },
 
@@ -212,8 +229,7 @@ define(function(require) {
          * @returns {string}
          */
         getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
-            return raw ? raw : '';
+            return this.parseRawValue(this.getRawModelValue());
         },
 
         /**

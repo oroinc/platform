@@ -85,17 +85,10 @@ define(function(require) {
         },
 
         formatRawValue: function(value) {
-            if (_.isString(value)) {
-                value = JSON.parse(value);
-            }
-            if (_.isNull(value) || value === void 0) {
-                value = [];
-            }
-            return value.join(',');
+            return this.parseRawValue(value).join(',');
         },
 
-        getModelValue: function() {
-            var value = this.model.get(this.fieldName);
+        parseRawValue: function(value) {
             if (_.isString(value)) {
                 value = JSON.parse(value);
             }

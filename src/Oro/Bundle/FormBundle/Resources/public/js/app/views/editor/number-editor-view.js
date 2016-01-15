@@ -76,16 +76,15 @@ define(function(require) {
         },
 
         formatRawValue: function(value) {
-            value = parseFloat(value);
+            value = this.parseRawValue(value);
             if (isNaN(value)) {
                 return '';
             }
             return this.formatter.fromRaw(value);
         },
 
-        getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
-            return parseFloat(raw);
+        parseRawValue: function(value) {
+            return parseFloat(value);
         },
 
         isChanged: function() {
