@@ -202,9 +202,11 @@ define(function(require) {
             }, this));
 
             this.$('.timepicker-input').on('hideTimepicker', _.bind(function() {
-                this.$('.timepicker-input').one('blur', _.bind(function() {
-                    this.$('.datepicker-focusser').focus();
-                }, this));
+                if (document.activeElement === this.$('.timepicker-input').get(0)) {
+                    this.$('.timepicker-input').one('blur', _.bind(function() {
+                        this.$('.datepicker-focusser').focus();
+                    }, this));
+                }
             }, this));
             var checkBlur = _.bind(function() {
                 if (!_isFocused) {
