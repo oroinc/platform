@@ -186,6 +186,7 @@ define(function(require) {
             if (!isFocused) {
                 // trigger custom focus event as select2 doesn't trigger 'select2-focus' when focused manually
                 this.trigger('focus');
+                this._isFocused = true;
             }
         },
 
@@ -196,17 +197,32 @@ define(function(require) {
         },
 
         /**
+         * Internal focus tracking variable
+         * @protected
+         */
+        _isFocused: false,
+
+        /**
          * Attaches focus tracking
          */
         attachFocusTracking: function() {
             var _this = this;
+            this._isFocused = this.isFocused();
             this.$('input[name=value]').on('select2-focus', function() {
-                _this.trigger('focus');
+                if (!_this._isFocused) {
+                    _this._isFocused = true;
+                    _this.trigger('focus');
+                }
             });
             this.$('input[name=value]').on('select2-blur', function() {
                 // let select2 time to work due to bugs
                 _.defer(function() {
-                    _this.trigger('blur');
+                    if (!_this.isFocused()) {
+                        if (_this._isFocused) {
+                            _this._isFocused = false;
+                            _this.trigger('blur');
+                        }
+                    }
                 });
             });
         },
