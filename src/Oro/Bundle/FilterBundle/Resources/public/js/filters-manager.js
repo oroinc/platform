@@ -172,6 +172,7 @@ define(function(require) {
          * @protected
          */
         _onFilterUpdated: function(filter) {
+            this._resetHintContainer();
             this.trigger('updateFilter', filter);
         },
 
@@ -334,6 +335,22 @@ define(function(require) {
             }
 
             return this;
+        },
+
+        _resetHintContainer: function() {
+            var $container = this.dropdownContainer.find('.filter-items-hint');
+            var show = false;
+            $container.children('span').each(function() {
+                if (this.style.display !== 'none') {
+                    show = true;
+                    return false;
+                }
+            });
+            if (show) {
+                $container.show();
+            } else {
+                $container.hide();
+            }
         },
 
         /**
