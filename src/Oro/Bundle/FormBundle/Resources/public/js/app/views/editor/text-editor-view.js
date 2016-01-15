@@ -416,7 +416,7 @@ define(function(require) {
         /**
          * Returns true if element is focused
          *
-         * @returns {Object}
+         * @returns {boolean}
          */
         isFocused: function() {
             return document.activeElement === this.$('input[name=value]').get(0);

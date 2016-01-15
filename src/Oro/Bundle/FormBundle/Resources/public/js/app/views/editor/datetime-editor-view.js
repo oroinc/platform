@@ -240,7 +240,7 @@ define(function(require) {
         /**
          * Returns true if element is focused
          *
-         * @returns {Object}
+         * @returns {boolean}
          */
         isFocused: function() {
             return DatetimeEditorView.__super__.isFocused.call(this) ||
