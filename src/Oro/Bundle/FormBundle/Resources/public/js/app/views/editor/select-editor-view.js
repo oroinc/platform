@@ -217,7 +217,7 @@ define(function(require) {
             this.$('input[name=value]').on('select2-blur', function() {
                 // let select2 time to work due to bugs
                 _.defer(function() {
-                    if (!_this.isFocused()) {
+                    if (_this.$el && !_this.isFocused()) {
                         if (_this._isFocused) {
                             _this._isFocused = false;
                             _this.trigger('blur');
