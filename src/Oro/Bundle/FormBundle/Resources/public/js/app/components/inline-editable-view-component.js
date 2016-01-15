@@ -89,6 +89,8 @@ define(function(require) {
             }
         },
 
+        ESCAPE_KEY_CODE: 27,
+
         WIDTH_INCREMENT: 15,
 
         /**
