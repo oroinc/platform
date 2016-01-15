@@ -7,6 +7,7 @@ define(function(require) {
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    var CellIterator = require('../../../datagrid/cell-iterator');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
@@ -26,12 +27,6 @@ define(function(require) {
          * This view is used by default for editing
          */
         DEFAULT_COLUMN_TYPE: 'string',
-
-        /**
-         * If true interface should not respond to user actions.
-         * Usefull for grid page switching support
-         */
-        lockUserActions: false,
 
         /**
          * Help message for cells
@@ -198,8 +193,6 @@ define(function(require) {
             this.main.ensureCellIsVisible(cell);
 
             var editor = this.getCellEditorOptions(cell);
-            this.editor = editor;
-
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 
@@ -211,8 +204,7 @@ define(function(require) {
                 cell: cell,
                 view: CellEditorView,
                 viewOptions: editor.viewOptions,
-                fromPreviousCell: fromPreviousCell,
-                save_api_accessor: this.editor.save_api_accessor,
+                save_api_accessor: editor.save_api_accessor,
                 grid: this.main,
                 plugin: this
             }));
@@ -246,6 +238,42 @@ define(function(require) {
                 classNames.push(cell.column.get('metadata').type + '-frontend-type-editor');
             }
             return classNames;
+        },
+
+        editNextCell: function(cell) {
+            this.editCellByIteratorMethod('next', cell);
+        },
+
+        editNextRowCell: function(cell) {
+            this.editCellByIteratorMethod('nextRow', cell);
+        },
+
+        editPrevCell: function(cell) {
+            this.editCellByIteratorMethod('prev', cell);
+        },
+
+        editPrevRowCell: function(cell) {
+            this.editCellByIteratorMethod('prevRow', cell);
+        },
+
+        editCellByIteratorMethod: function(iteratorMethod, cell) {
+            var _this = this;
+            var fromPreviousCell = ['prev'].indexOf(iteratorMethod) === -1;
+            this.trigger('lockUserActions', true);
+            var cellIterator = new CellIterator(this.main, cell);
+            function checkEditable(cell) {
+                if (!_this.isEditable(cell)) {
+                    return cellIterator[iteratorMethod]().then(checkEditable);
+                }
+                return cell;
+            }
+            cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
+                _this.enterEditMode(cell, fromPreviousCell);
+                _this.trigger('lockUserActions', false);
+            }).fail(function() {
+                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+                _this.trigger('lockUserActions', false);
+            });
         },
 
         removeActiveEditorComponents: function() {
