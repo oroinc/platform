@@ -30,6 +30,10 @@ define(function(require) {
             }
         },
 
+        listen: {
+            'inlineEditor:focus mediator': 'onInlineEditorFocus'
+        },
+
         initialize: function(options) {
             this.options = options || {};
 
@@ -73,6 +77,14 @@ define(function(require) {
             });
 
             viewInstance.on('keydown', this.onKeyDown, this);
+            viewInstance.on('focus', function() {
+                mediator.trigger('inlineEditor:focus', viewInstance);
+            });
+            viewInstance.on('blur', function() {
+                if (viewInstance.isChanged()) {
+                    this.saveCurrentCellAndExit();
+                }
+            }, this);
 
             this.on('saveAction', this.saveCurrentCell);
             this.on('saveAndExitAction', this.saveCurrentCellAndExit);
@@ -91,6 +103,15 @@ define(function(require) {
             return viewInstance;
         },
 
+        onInlineEditorFocus: function(view) {
+            if (view === this.view) {
+                return;
+            }
+            if (!this.view.isChanged()) {
+                this.exitEditMode();
+            }
+        },
+
         /**
          * Resizes editor to cell width
          */
@@ -107,12 +128,11 @@ define(function(require) {
             return 67;
         },
 
-        saveCurrentCell: function(exit) {
+        saveCurrentCell: function() {
             if (!this.view.isChanged()) {
                 return true;
             }
             if (!this.view.isValid()) {
-                this.view.focus();
                 return false;
             }
             var cell = this.options.cell;
@@ -146,10 +166,6 @@ define(function(require) {
                 .always(function() {
                     cell.$el.removeClass('loading');
                 });
-            // TODO: specify exit conditions
-            if (exit !== false) {
-                this.exitEditMode(cell);
-            }
             return true;
         },
 
@@ -223,11 +239,15 @@ define(function(require) {
             }
             cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
                 _this.options.plugin.enterEditMode(cell, fromPreviousCell);
-                _this.lockUserActions = false;
+                if (!_this.disposed) {
+                    _this.lockUserActions = false;
+                }
             }).fail(function() {
                 mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
                 _this.exitEditMode();
-                _this.lockUserActions = false;
+                if (!_this.disposed) {
+                    _this.lockUserActions = false;
+                }
             });
         },
 
