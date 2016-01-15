@@ -118,6 +118,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
 
             $item          = [];
             $config        = $entityProvider->getConfig($targetClass);
+            $metadata      = $this->configManager->getEntityMetadata($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
 
             $link = null;
