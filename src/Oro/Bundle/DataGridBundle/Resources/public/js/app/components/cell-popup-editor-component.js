@@ -216,7 +216,7 @@ define(function(require) {
          */
         enterEditMode: function() {
             if (!this.view) {
-                this.options.cell.$el.removeClass('view-mode');
+                this.options.cell.$el.removeClass('view-mode save-error');
                 this.options.cell.$el.addClass('edit-mode');
                 this.createView(this.options);
                 // rethrow view events on component
@@ -481,7 +481,7 @@ define(function(require) {
             });
 
             if (!this.options.cell.disposed && this.options.cell.$el) {
-                this.options.cell.$el.addClassTemporarily('save-fail', 2000);
+                this.options.cell.$el.addClass('save-fail');
             }
             this.exitEditMode(true);
         }
