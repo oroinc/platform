@@ -15,6 +15,7 @@ config:
 
         'oroemail/js/app/views/mailbox-update-view': 'bundles/oroemail/js/app/views/mailbox-update-view.js'
 
+        'oroemail/js/app/components/email-editor-component': 'bundles/oroemail/js/app/components/email-editor-component.js'
         'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'
         'oroemail/js/app/components/email-attachment-component': 'bundles/oroemail/js/app/components/email-attachment-component.js'
         'oroemail/js/app/components/email-notification-component': 'bundles/oroemail/js/app/components/email-notification-component.js'

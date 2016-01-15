@@ -7,31 +7,39 @@ use LogicException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class CopyTagging extends AbstractAction
 {
-    const PATH_SOURCE = 'source';
-    const PATH_DESTINATION = 'destination';
+    const PATH_SOURCE       = 'source';
+    const PATH_DESTINATION  = 'destination';
     const PATH_ORGANIZATION = 'organization';
 
     /** @var TagManager */
     protected $tagManager;
+
+    /** @var TaggableHelper */
+    protected $taggableHelper;
 
     /** @var array */
     protected $options = [];
 
     /**
      * @param ContextAccessor $contextAccessor
-     * @param TagManager $tagManager
+     * @param TagManager      $tagManager
+     * @param TaggableHelper  $taggableHelper
      */
-    public function __construct(ContextAccessor $contextAccessor, TagManager $tagManager)
-    {
+    public function __construct(
+        ContextAccessor $contextAccessor,
+        TagManager $tagManager,
+        TaggableHelper $taggableHelper
+    ) {
         parent::__construct($contextAccessor);
-        $this->tagManager = $tagManager;
+        $this->tagManager     = $tagManager;
+        $this->taggableHelper = $taggableHelper;
     }
 
     /**
@@ -59,18 +67,18 @@ class CopyTagging extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $source = $this->getTaggable($context, static::PATH_SOURCE);
-        $destination = $this->getTaggable($context, static::PATH_DESTINATION);
+        $source       = $this->getTaggable($context, static::PATH_SOURCE);
+        $destination  = $this->getTaggable($context, static::PATH_DESTINATION);
         $organization = $this->getOrganization($context);
 
         $this->tagManager->loadTagging($source, $organization);
-        $tags = $source->getTags();
+        $tags         = $this->tagManager->getTags($source);
         $preparedTags = [
             'all'   => $tags->toArray(),
             'owner' => $tags->toArray(),
         ];
 
-        $destination->setTags($preparedTags);
+        $this->tagManager->setTags($destination, $preparedTags);
         $this->tagManager->saveTagging($destination, true, $organization);
     }
 
@@ -91,27 +99,29 @@ class CopyTagging extends AbstractAction
     }
 
     /**
-     * @param mixed $context
+     * @param mixed  $context
      * @param string $path
      *
-     * @return Taggable
+     * @return object
      */
     protected function getTaggable($context, $path)
     {
         $object = $this->getObject($context, $path);
-        if (!$object instanceof Taggable) {
-            throw new LogicException(sprintf(
-                'Object in path "%s" in "copy_tagging" action have to implement
-                "Oro\Bundle\TagBundle\Entity\TagManager" interface',
-                $path
-            ));
+
+        if (!$this->taggableHelper->isTaggable($object)) {
+            throw new LogicException(
+                sprintf(
+                    'Object in path "%s" in "copy_tagging" action should be taggable.',
+                    $path
+                )
+            );
         }
 
         return $object;
     }
 
     /**
-     * @param mixed $context
+     * @param mixed  $context
      * @param string $path
      *
      * @return object|null

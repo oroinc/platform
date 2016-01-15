@@ -1,26 +1,40 @@
 {% macro renderView(entity) %}
     {% set tagCloudElId = 'tags-' ~ random() %}
-    <div id="{{ tagCloudElId }}">
-        <div class="tag-view">
-            {% import _self as _ %}
-            {{ _.tagSortActions() }}
-
-            <div class="tags-holder"></div>
-        </div>
-    </div>
-
-    <script type="text/javascript">
-        require(['jquery', 'orotag/js/view'],
-        function($, TagView){
-            $(function() {
-                /** @type oro.tag.View */
-                var tagView = new TagView({
-                    el: '#{{ tagCloudElId }}'
-                });
-                tagView.getCollection().reset({{ oro_tag_get_list(entity)|json_encode|raw }});
-            });
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'oroform/js/app/components/inline-editable-view-component',
+        options: {
+            frontend_type: 'tags',
+            value: oro_tag_get_list(entity),
+            fieldName: 'tags',
+            metadata: {
+                inline_editing: {
+                    enable: resource_granted('oro_tag_assign_unassign'),
+                    save_api_accessor: {
+                        route: 'oro_api_post_taggable',
+                        http_method: 'POST',
+                        default_route_parameters: {
+                            entity: oro_class_name(entity, true),
+                            entityId: entity.id
+                        }
+                    },
+                    autocomplete_api_accessor: {
+                        class: 'oroui/js/tools/search-api-accessor',
+                        search_handler_name: 'tags',
+                        label_field_name: 'name'
+                    },
+                    editor: {
+                        view_options: {
+                            permissions: {
+                                oro_tag_create: resource_granted('oro_tag_create'),
+                                oro_tag_unassign_global: resource_granted('oro_tag_unassign_global')
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }) }}></div>
 {% endmacro %}
 
 {#

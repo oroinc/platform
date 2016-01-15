@@ -6,8 +6,9 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
  * This is the class that validates and merges configuration from your app/config files
@@ -218,7 +219,7 @@ class Configuration implements ConfigurationInterface
      */
     protected function sortItems($items)
     {
-        ArrayUtils::sortBy($items, false, 'order');
+        ArrayUtil::sortBy($items, false, 'order');
 
         return array_keys($items);
     }

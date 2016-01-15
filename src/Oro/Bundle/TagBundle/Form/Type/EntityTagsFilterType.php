@@ -10,6 +10,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType as BaseFilterType;
 
 class EntityTagsFilterType extends AbstractType
 {
+    const NAME = 'oro_type_tag_filter';
+
     /**
      * {@inheritdoc}
      */
@@ -33,7 +35,7 @@ class EntityTagsFilterType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_type_tag_filter';
+        return self::NAME;
     }
 
     /**

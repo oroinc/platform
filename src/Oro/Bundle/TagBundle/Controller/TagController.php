@@ -77,17 +77,16 @@ class TagController extends Controller
         // path to datagrid subrequest
         $from = $request->get('from');
 
-        /** @var \Oro\Bundle\TagBundle\Provider\SearchProvider $provider */
-        $provider = $this->get('oro_tag.provider.search_provider');
-        $groupedResults = $provider->getGroupedResults($entity->getId());
+        $provider       = $this->get('oro_tag.provider.statistic');
+        $groupedResults = $provider->getTagEntitiesStatistic($entity);
         $selectedResult = null;
 
         foreach ($groupedResults as $alias => $type) {
-            if ($alias == $from) {
+            if ($alias === $from) {
                 $selectedResult = $type;
+                break;
             }
         }
-
 
         return array(
             'tag'            => $entity,

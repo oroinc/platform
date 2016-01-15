@@ -2,6 +2,9 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class SimpleEntitySerializerTest extends EntitySerializerTestCase
 {
     public function testReuseExistingJoin()

@@ -15,7 +15,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 /**
  * Tag
  *
- * @ORM\Table(name="oro_tag_tag")
+ * @ORM\Table(
+ *     name="oro_tag_tag",
+ *    indexes={
+ *        @ORM\Index(name="name_organization_idx", columns={"name", "organization_id"})
+ *    }
+ * )
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="Oro\Bundle\TagBundle\Entity\Repository\TagRepository")
  * @Config(
@@ -29,6 +34,14 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "owner_column_name"="user_owner_id",
  *              "organization_field_name"="organization",
  *              "organization_column_name"="organization_id"
+ *          },
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "virtual_fields"={"id"},
+ *              "search_fields"={"name"},
+ *              "representation_field"="name",
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -44,6 +57,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "immutable"=true
  *          },
  *          "attachment"={
+ *              "immutable"=true
+ *          },
+ *          "tag"={
  *              "immutable"=true
  *          }
  *      }
@@ -214,6 +230,16 @@ class Tag extends ExtendTag
     public function getTagging()
     {
         return $this->tagging;
+    }
+
+    /**
+     * @param Tagging $tagging
+     */
+    public function addTagging(Tagging $tagging)
+    {
+        if (!$this->tagging->contains($tagging)) {
+            $this->tagging->add($tagging);
+        }
     }
 
     /**
