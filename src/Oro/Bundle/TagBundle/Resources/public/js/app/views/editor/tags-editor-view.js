@@ -280,8 +280,8 @@ define(function(require) {
             return this.model.get(this.fieldName) || [];
         },
 
-        getFormattedValue: function() {
-            return this.getModelValue().map(function(item) {
+        formatRawValue: function(value) {
+            return (value || []).map(function(item) {
                 return item.id;
             }).join(',');
         },

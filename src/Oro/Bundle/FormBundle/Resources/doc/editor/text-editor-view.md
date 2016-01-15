@@ -63,7 +63,7 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
   * [.getPlaceholder()](#module_TextEditorView#getPlaceholder) ⇒ <code>string</code>
   * [.focus(atEnd)](#module_TextEditorView#focus)
   * [.getValidationRules()](#module_TextEditorView#getValidationRules) ⇒ <code>Object</code>
-  * [.getFormattedValue()](#module_TextEditorView#getFormattedValue) ⇒ <code>string</code>
+  * [.formatRawValue()](#module_TextEditorView#formatRawValue) ⇒ <code>string</code>
   * [.getModelValue()](#module_TextEditorView#getModelValue) ⇒ <code>string</code>
   * [.getValue()](#module_TextEditorView#getValue) ⇒ <code>string</code>
   * [.rethrowAction()](#module_TextEditorView#rethrowAction) ⇒ <code>string</code>
@@ -102,9 +102,9 @@ Places focus on the editor
 Prepares validation rules for usage
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
-<a name="module_TextEditorView#getFormattedValue"></a>
-### textEditorView.getFormattedValue() ⇒ <code>string</code>
-Formats and returns the model value before it is rendered
+<a name="module_TextEditorView#formatRawValue"></a>
+### textEditorView.formatRawValue() ⇒ <code>string</code>
+Converts model value to the format that can be passed to a template as field value
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getModelValue"></a>

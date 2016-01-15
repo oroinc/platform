@@ -105,10 +105,10 @@ define(function(require) {
 
         initialize: function(options) {
             this.options = options;
-            this.fieldName = options.fieldName;
-            this.placeholder = options.placeholder;
-            this.placeholderRaw = options.placeholder_raw;
-            this.validationRules = options.validationRules || {};
+            _.extend(this, _.pick(options, ['fieldName', 'placeholder', 'placeholder_raw', 'validationRules']));
+            _.defaults(this, {
+                validationRules: {}
+            });
             TextEditorView.__super__.initialize.apply(this, arguments);
         },
 
@@ -137,7 +137,11 @@ define(function(require) {
             data.inputType = this.inputType;
             data.data = this.model.toJSON();
             data.fieldName = this.fieldName;
-            data.value = this.getFormattedValue();
+            if ('value' in this.options) {
+                data.value = this.formatRawValue(this.options.value);
+            } else {
+                data.value = this.formatRawValue(this.model.get(this.fieldName));
+            }
             data.placeholder = this.getPlaceholder();
             return data;
         },
@@ -193,12 +197,13 @@ define(function(require) {
         },
 
         /**
-         * Formats and returns the model value before it is rendered
+         * Converts model value to the format that can be passed to a template as field value
          *
-         * @returns {string}
+         * @param {*} value
+         * @return {string}
          */
-        getFormattedValue: function() {
-            return this.getModelValue();
+        formatRawValue: function(value) {
+            return value ? value : '';
         },
 
         /**

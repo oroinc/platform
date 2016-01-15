@@ -243,7 +243,7 @@ define(function(require) {
             // assume "undefined" as delete value request
             for (var key in updateData) {
                 if (updateData.hasOwnProperty(key)) {
-                    if (updateData[key] === editorView.UNSET_FIELD_VALUE) {
+                    if (updateData[key] === void 0) {
                         model.unset(key);
                         delete updateData[key];
                     }
