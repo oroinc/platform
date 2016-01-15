@@ -89,7 +89,8 @@ define(function(require) {
                 var originalEvents = cell.events;
                 if (_this.isEditable(cell)) {
                     cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    cell.$el.append('<i data-role="edit" class="icon-pencil hide-text inline-editor__edit-action"' +
+                    cell.$el.append('<i data-role="edit" ' +
+                        'class="icon-pencil skip-row-click hide-text inline-editor__edit-action"' +
                         'title="' + __('Edit') + '">' + __('Edit') + '</i>');
                     cell.$el.attr('title', _this.helpMessage);
                     cell.events = _.extend(Object.create(cell.events), {
@@ -229,7 +230,7 @@ define(function(require) {
         },
 
         buildClassNames: function(editor, cell) {
-            var classNames = [];
+            var classNames = ['skip-row-click'];
             if (editor.view_options && editor.view_options.css_class_name) {
                 classNames.push(editor.view_options.css_class_name);
             }
