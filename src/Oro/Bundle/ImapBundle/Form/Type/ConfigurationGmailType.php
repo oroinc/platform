@@ -103,16 +103,16 @@ class ConfigurationGmailType extends AbstractType
                         return '';
                     }
 
-                    return $originalAccessTokenExpiresAt->format('U');
+                    $now = new \DateTime('now', new \DateTimeZone('UTC'));
+                    return $originalAccessTokenExpiresAt->format('U') - $now->format('U');
                 },
                 function ($submittedAccessTokenExpiresAt) {
-
                     if ($submittedAccessTokenExpiresAt instanceof \DateTime) {
                         return $submittedAccessTokenExpiresAt;
                     }
 
-                    $newExpireDate = new \DateTime();
-                    $newExpireDate->setTimestamp($submittedAccessTokenExpiresAt);
+                    $utcTimeZone = new \DateTimeZone('UTC');
+                    $newExpireDate = new \DateTime('+' . (int)$submittedAccessTokenExpiresAt . ' seconds', $utcTimeZone);
 
                     return $newExpireDate;
                 }
@@ -129,7 +129,7 @@ class ConfigurationGmailType extends AbstractType
         $form = $formEvent->getForm();
         $emailOrigin = $form->getData();
 
-        if (null === $emailOrigin) {
+        if (null === $emailOrigin || null === $emailOrigin->getAccessToken()) {
             $data = $formEvent->getData();
 
             if (null == $data) {

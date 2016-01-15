@@ -49,14 +49,6 @@
                 {{ form_row(form.accountType) }}
             {% endif %}
 
-            {% if (form.disconnect is defined) %}
-                <div class="control-group">
-                    <div class="controls">
-                        {{ form_row(form.disconnect) }}
-                    </div>
-                </div>
-            {% endif %}
-
             {% if form.userEmailOrigin is defined %}
                 {{ form_widget(form.userEmailOrigin) }}
             {% endif %}
@@ -116,11 +108,15 @@
     {% set options = {
         errorMessage: '.default-alert',
         successMessage: '.alert-success',
-        googleErrorMessage: '.google-alert'
+        googleErrorMessage: '.google-alert',
+        googleWarningMessage: '.alert-warning'
     } %}
     <div data-page-component-module="oroimap/js/app/components/google-sync-checkbox-component"
         data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">
         {{ block('checkbox_widget') }}
+        <div class="alert connection-status alert-warning" style="display: none">
+            {{ 'oro.imap.system_configuration.fields.enable_google_imap.warning.label'|trans }}
+        </div>
         <div class="google-alert connection-status alert alert-error" style="display: none">
 
         </div>

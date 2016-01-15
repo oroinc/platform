@@ -41,30 +41,22 @@ class ChoiceAccountType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['showDisconnectButton']) {
-            $builder->add('disconnect', 'button', [
-                'attr' => [
-                    'class'=>'btn btn-danger'
-                ]
-            ]);
-        } else {
-            $builder->add('accountType', 'choice', [
-                'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
-                'tooltip'  => 'oro.imap.configuration.tooltip',
-                'required' => false,
-                'choices' => [
-                    '' => $this->translator->trans(
-                        'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
-                    ),
-                    AccountTypeModel::ACCOUNT_TYPE_GMAIL => $this->translator->trans(
-                        'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_GMAIL
-                    ),
-                    AccountTypeModel::ACCOUNT_TYPE_OTHER => $this->translator->trans(
-                        'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
-                    )
-                ],
-            ]);
-        }
+        $builder->add('accountType', 'choice', [
+            'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
+            'tooltip'  => 'oro.imap.configuration.tooltip',
+            'required' => false,
+            'choices' => [
+                '' => $this->translator->trans(
+                    'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
+                ),
+                AccountTypeModel::ACCOUNT_TYPE_GMAIL => $this->translator->trans(
+                    'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_GMAIL
+                ),
+                AccountTypeModel::ACCOUNT_TYPE_OTHER => $this->translator->trans(
+                    'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
+                )
+            ],
+        ]);
 
         $this->initEvents($builder);
     }
@@ -75,61 +67,17 @@ class ChoiceAccountType extends AbstractType
     public function preSubmit(FormEvent $formEvent)
     {
         $form = $formEvent->getForm();
-        $accountTypeModel = $form->getData();
+        $data = $formEvent->getData();
 
-        if (null === $accountTypeModel) {
-            $data = $formEvent->getData();
+        if (null === $data) {
+            return;
+        }
+        $accountTypeModel = $this->createAccountTypeModelFromData($data);
 
-            if (null === $data) {
-                return;
-            }
-            $accountTypeModel = $this->createAccountTypeModelFromData($data);
-
-            if ($accountTypeModel === null) {
-                //reset data for avoiding form extra parameters error
-                $formEvent->setData(null);
-                return;
-            }
-        } else {
-            $data = $formEvent->getData();
-
-            if ($data) {
-                if (!empty($data['userEmailOrigin']['accessTokenExpiresAt'])) {
-                    $utcTimeZone = new \DateTimeZone('UTC');
-                    $accessTokenExpiresAt = $data['userEmailOrigin']['accessTokenExpiresAt'];
-                    $newExpireDate = new \DateTime('+' . $accessTokenExpiresAt . ' seconds', $utcTimeZone);
-
-                    $data['userEmailOrigin']['accessTokenExpiresAt'] = $newExpireDate;
-                }
-
-                $accountTypeModel = $this->createAccountTypeModelFromData($data);
-
-                if ($accountTypeModel === null) {
-                    //reset data for avoiding form extra parameters error
-                    $formEvent->setData(null);
-                    return;
-                }
-
-                $form->remove('disconnect');
-                $form->add('accountType', 'choice', [
-                    'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
-                    'tooltip'  => 'oro.imap.configuration.tooltip',
-                    'required' => false,
-                    'choices' => [
-                        '' => $this->translator->trans(
-                            'oro.imap.configuration.ac1count_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
-                        ),
-                        AccountTypeModel::ACCOUNT_TYPE_GMAIL => $this->translator->trans(
-                            'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_GMAIL
-                        ),
-                        AccountTypeModel::ACCOUNT_TYPE_OTHER => $this->translator->trans(
-                            'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
-                        )
-                    ],
-                ]);
-
-                $formEvent->setData($data);
-            }
+        if ($accountTypeModel === null) {
+            //reset data for avoiding form extra parameters error
+            $formEvent->setData(null);
+            return;
         }
 
         if ($accountTypeModel instanceof AccountTypeModel) {
@@ -155,10 +103,7 @@ class ChoiceAccountType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'data_class' => 'Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel',
-            'showDisconnectButton' => false
-        ]);
+        $resolver->setDefaults(['data_class' => 'Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel']);
     }
 
     /**
@@ -215,7 +160,7 @@ class ChoiceAccountType extends AbstractType
 
         if (!empty($imapGmailConfiguration['accessTokenExpiresAt'])) {
             $newExpireDate = $imapGmailConfiguration['accessTokenExpiresAt'];
-            if (!$imapGmailConfiguration['accessTokenExpiresAt'] instanceof \Datetime) {
+            if (!$newExpireDate instanceof \Datetime) {
                 $utcTimeZone = new \DateTimeZone('UTC');
                 $accessTokenExpiresAt = $imapGmailConfiguration['accessTokenExpiresAt'];
                 $newExpireDate = new \DateTime('+' . $accessTokenExpiresAt . ' seconds', $utcTimeZone);

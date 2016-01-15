@@ -957,7 +957,7 @@ class User extends ExtendUser implements
             $currentImapConfiguration->setActive(false);
             $this->removeEmailOrigin($currentImapConfiguration);
         }
-        if (null !== $imapConfiguration) {
+        if (null !== $imapConfiguration && null !== $imapConfiguration->getUser()) {
             $this->addEmailOrigin($imapConfiguration);
         }
 

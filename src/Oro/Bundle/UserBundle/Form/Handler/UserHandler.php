@@ -119,18 +119,6 @@ class UserHandler extends AbstractUserHandler
      */
     protected function onSuccess(User $user)
     {
-        //remove origin if Account Type is not selected
-        if ($this->form->get('imapAccountType')->getData()->getUserEmailOrigin()
-            && empty($this->form->get('imapAccountType')->getData()->getUserEmailOrigin()->getUser())
-        ) {
-            $origin = $user->getImapConfiguration();
-            if ($origin) {
-                $origin->setActive(false);
-                $user->removeEmailOrigin($origin);
-            }
-        } else {
-            $user->setImapAccountType($user->getImapAccountType());
-        }
         $this->manager->updateUser($user);
 
         if ($this->form->has('inviteUser')

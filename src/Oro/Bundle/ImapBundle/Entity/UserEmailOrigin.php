@@ -317,7 +317,7 @@ class UserEmailOrigin extends EmailOrigin
         $password = $this->getPassword();
         $token = $this->getAccessToken();
 
-        if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && (!empty($password) |!empty($token))) {
+        if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && (!empty($password) || !empty($token))) {
             return true;
         }
 

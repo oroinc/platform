@@ -23,7 +23,8 @@ define(function(require) {
                 el: options._sourceElement,
                 errorMessage: options.errorMessage,
                 successMessage: options.successMessage,
-                googleErrorMessage: options.googleErrorMessage
+                googleErrorMessage: options.googleErrorMessage,
+                googleWarningMessage: options.googleWarningMessage
             });
 
             require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {

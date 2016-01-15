@@ -11,8 +11,7 @@ define(function(require) {
         html: '',
 
         events: {
-            'change select[name$="[accountType]"]': 'onChangeAccountType',
-            'click button[name$="[disconnect]"]': 'onClickDisconnect'
+            'change select[name$="[accountType]"]': 'onChangeAccountType'
         },
 
         /**
@@ -34,13 +33,6 @@ define(function(require) {
          */
         onChangeAccountType: function(e) {
             this.trigger('imapConnectionChangeType', $(e.target).val());
-        },
-
-        /**
-         * handler event click button Disconnect
-         */
-        onClickDisconnect: function() {
-            this.trigger('imapConnectionDisconnect');
         },
 
         /**

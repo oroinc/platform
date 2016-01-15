@@ -71,7 +71,6 @@ class MailboxController extends Controller
 
         $handler = $this->get('oro_email.form.handler.mailbox');
 
-        $mailbox->setImapAccountType($mailbox->getImapAccountType());
         if ($handler->process($mailbox)) {
             $this->get('session')->getFlashBag()->add(
                 'success',

@@ -23,7 +23,6 @@ define(function(require) {
             this.view = new this.ViewType(viewConfig);
 
             this.listenTo(this.view, 'imapConnectionChangeType', this.onChangeAccountType);
-            this.listenTo(this.view, 'imapConnectionDisconnect', this.onDisconnect);
             this.listenTo(mediator, 'imapGmailConnectionSetToken', this.onIMapGotToken);
         },
 
@@ -52,21 +51,6 @@ define(function(require) {
                 method: 'POST',
                 data: {
                     'type': value,
-                    'formParentName': this.formParentName
-                },
-                success: _.bind(this.templateLoaded, this)
-            });
-        },
-
-        /**
-         * Makes the request to get a form template if user clicks to button "Disconnect"
-         */
-        onDisconnect: function() {
-            mediator.execute('showLoading');
-            $.ajax({
-                url: this.url,
-                method: 'POST',
-                data: {
                     'formParentName': this.formParentName
                 },
                 success: _.bind(this.templateLoaded, this)

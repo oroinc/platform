@@ -12,6 +12,8 @@ define(function(require) {
 
         $googleErrorMessage: null,
 
+        $googleWarningMessage: null,
+
         token: null,
 
         googleErrorMessage: '',
@@ -30,6 +32,7 @@ define(function(require) {
             this.$errorMessage = this.$el.find(options.errorMessage);
             this.$successMessage = this.$el.find(options.successMessage);
             this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
+            this.$googleWarningMessage = this.$el.find(options.googleWarningMessage);
         },
 
         render: function() {
@@ -84,9 +87,11 @@ define(function(require) {
             if ($(e.target).is(':checked')) {
                 this.canShowMessage = true;
                 this.trigger('requestToken');
+                this.$googleWarningMessage.hide();
             } else {
                 this.canShowMessage = false;
                 this.trigger('change:canShowMessage');
+                this.$googleWarningMessage.show();
             }
         },
 

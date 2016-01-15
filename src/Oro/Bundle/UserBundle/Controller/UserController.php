@@ -51,7 +51,6 @@ class UserController extends Controller
     public function updateProfileAction()
     {
         $entity = $this->getUser();
-        $entity->setImapAccountType($entity->getImapAccountType());
         return $this->update(
             $entity,
             'oro_user_profile_update',
@@ -112,7 +111,6 @@ class UserController extends Controller
      */
     public function updateAction(User $entity)
     {
-        $entity->setImapAccountType($entity->getImapAccountType());
         return $this->update($entity);
     }
 
