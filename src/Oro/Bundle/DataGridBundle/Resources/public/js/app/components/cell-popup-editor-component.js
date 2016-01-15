@@ -55,6 +55,15 @@ define(function(require) {
             if (!this.options.plugin) {
                 throw new Error('Option "plugin" is required');
             }
+            if (!this.options.cell) {
+                throw new Error('Option "cell" is required');
+            }
+            if (!this.options.view) {
+                throw new Error('Option "view" is required');
+            }
+            if (!this.options.save_api_accessor) {
+                throw new Error('Option "save_api_accessor" is required');
+            }
             this.listenTo(this.options.plugin, 'lockUserActions', function(value) {
                 this.lockUserActions = value;
             });
@@ -146,7 +155,7 @@ define(function(require) {
             cell.$el.addClass('loading');
             this.oldState = _.pick(cell.model.toJSON(), _.keys(modelUpdateData));
             this.updateModel(cell.model, modelUpdateData);
-            this.options.grid.trigger('content:update');
+            this.options.plugin.main.trigger('content:update');
             if (this.options.save_api_accessor.initialOptions.field_name) {
                 var keys = _.keys(serverUpdateData);
                 if (keys.length > 1) {
@@ -234,8 +243,8 @@ define(function(require) {
         },
 
         toggleHeaderCellHighlight: function(cell, state) {
-            var columnIndex = this.options.grid.columns.indexOf(cell.column);
-            var headerCell = this.options.grid.findHeaderCellByIndex(columnIndex);
+            var columnIndex = this.options.plugin.main.columns.indexOf(cell.column);
+            var headerCell = this.options.plugin.main.findHeaderCellByIndex(columnIndex);
             if (headerCell) {
                 headerCell.$el.toggleClass('header-cell-highlight', state);
             }
@@ -244,7 +253,7 @@ define(function(require) {
         revertChanges: function() {
             if (!this.options.cell.disposed && this.oldState) {
                 this.options.cell.model.set(this.oldState);
-                this.options.grid.trigger('content:update');
+                this.options.plugin.main.trigger('content:update');
             }
         },
 
