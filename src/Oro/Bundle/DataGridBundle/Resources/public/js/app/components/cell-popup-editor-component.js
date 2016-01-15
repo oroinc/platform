@@ -452,7 +452,7 @@ define(function(require) {
                     break;
                 case 403:
                     errors.push(__('oro.datagrid.inline_editing.message.save_field.permission_denied',
-                        {fieldName: this.cell.column.get('label')}));
+                        {fieldName: this.options.cell.column.get('label')}));
                     break;
                 case 500:
                     if (jqXHR.responseJSON.message) {
