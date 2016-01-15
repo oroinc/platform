@@ -115,7 +115,7 @@ define(function(require) {
                 _this.prestine = false;
                 switch (e.keyCode) {
                     case _this.ENTER_KEY_CODE:
-                        if (prestine  && !_this.getModelValue()) {
+                        if (prestine) {
                             e.stopImmediatePropagation();
                             e.preventDefault();
                             _this.$('input[name=value]').select2('close');
