@@ -102,11 +102,13 @@ define(function(require) {
                 keydown: this.onKeyDown,
                 focus: function() {
                     mediator.trigger('inlineEditor:focus', viewInstance);
+                    overlay.focus();
                 },
                 blur: function() {
                     if (viewInstance.isChanged()) {
                         this.saveCurrentCell();
                     }
+                    overlay.blur();
                 }
             });
         },
