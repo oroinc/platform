@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -80,13 +81,10 @@ class ConfigModelManager
             return true;
         }
 
-        $this->dbCheck = false;
-        try {
-            $conn = $this->getEntityManager()->getConnection();
-            $conn->connect();
-            $this->dbCheck = $conn->getSchemaManager()->tablesExist($this->requiredTables);
-        } catch (\PDOException $e) {
-        }
+        $this->dbCheck = SafeDatabaseChecker::tablesExist(
+            $this->getEntityManager()->getConnection(),
+            $this->requiredTables
+        );
 
         return $this->dbCheck;
     }
