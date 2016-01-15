@@ -184,6 +184,8 @@ define(function(require) {
                 }
             });
 
+            viewInstance.focus();
+
             this.listenTo(viewInstance, 'saveAction', this.saveCurrentCell);
             this.listenTo(viewInstance, 'saveAndExitAction', this.saveCurrentCellAndExit);
             this.listenTo(viewInstance, 'cancelAction', this.exitEditMode, true);
