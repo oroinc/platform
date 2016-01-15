@@ -195,9 +195,6 @@ define(function(require) {
                 return;
             }
             this.main.ensureCellIsVisible(cell);
-            cell.$el.parent('tr:first').addClass('row-edit-mode');
-            cell.$el.removeClass('view-mode');
-            cell.$el.addClass('edit-mode');
 
             var editor = this.getCellEditorOptions(cell);
             this.editor = editor;

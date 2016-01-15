@@ -163,6 +163,16 @@ define(function(require) {
             this.attachFocusTracking();
         },
 
+        showBackendErrors: function(backendErrors) {
+            var errors = {};
+            _.each(backendErrors.children, function(item, fieldName) {
+                if (this.fieldName === fieldName && _.isArray(item.errors)) {
+                    errors.value = item.errors[0];
+                }
+            }, this);
+            this.validator.showErrors(errors);
+        },
+
         /**
          * Places focus on the editor
          *
