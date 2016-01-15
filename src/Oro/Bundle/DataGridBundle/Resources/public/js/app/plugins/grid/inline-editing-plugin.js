@@ -48,6 +48,9 @@ define(function(require) {
             this.listenTo(this.main, {
                 afterMakeCell: this.onAfterMakeCell
             });
+            this.listenTo(this.main.columns, {
+                'change:renderable': this.onColumnStateChange
+            });
             this.listenTo(mediator, 'page:beforeChange', function() {
                 this.removeActiveEditorComponents();
             });
@@ -59,6 +62,16 @@ define(function(require) {
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             this.main.body.refresh();
             InlineEditingPlugin.__super__.enable.call(this);
+        },
+
+        onColumnStateChange: function() {
+            for (var i = 0; i < this.activeEditorComponents.length; i++) {
+                var editorComponent = this.activeEditorComponents[i];
+                if (!editorComponent.options.cell.column || !editorComponent.options.cell.column.get('renderable')) {
+                    editorComponent.dispose();
+                    i--;
+                }
+            }
         },
 
         disable: function() {
