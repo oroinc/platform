@@ -203,18 +203,13 @@ define(function(require) {
          */
         enterEditMode: function() {
             if (!this.view) {
+                this.options.cell.$el.removeClass('view-mode');
+                this.options.cell.$el.addClass('edit-mode');
                 this.createView(this.options);
                 // rethrow view events on component
                 this.listenTo(this.view, 'all', function() {
                     this.trigger.apply(this, arguments);
                 }, this);
-            }
-
-            if (this.options.cell.$el) {
-                this.toggleHeaderCellHighlight(this.options.cell, true);
-                this.options.cell.$el.parent('tr:first').addClass('row-edit-mode');
-                this.options.cell.$el.removeClass('view-mode');
-                this.options.cell.$el.addClass('edit-mode');
             }
         },
 
@@ -225,16 +220,11 @@ define(function(require) {
          */
         exitEditMode: function(withDispose) {
             if (this.view) {
+                this.options.cell.$el.removeClass('edit-mode');
+                this.options.cell.$el.addClass('view-mode');
                 this.view.dispose();
                 this.stopListening(this.view);
                 delete this.view;
-            }
-
-            if (this.options.cell.$el) {
-                this.toggleHeaderCellHighlight(this.options.cell, false);
-                this.options.cell.$el.parent('tr:first').removeClass('row-edit-mode');
-                this.options.cell.$el.addClass('view-mode');
-                this.options.cell.$el.removeClass('edit-mode');
             }
 
             if (withDispose) {

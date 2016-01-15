@@ -209,6 +209,13 @@ define(function(require) {
                 plugin: this
             }));
 
+            editorComponent.view.on('focus', function() {
+                this.highlightCell(cell, true);
+            }, this);
+
+            editorComponent.view.on('blur', function() {
+                this.highlightCell(cell, false);
+            }, this);
             editorComponent.view.focus(!!fromPreviousCell);
 
             this.activeEditorComponents.push(editorComponent);
@@ -281,6 +288,37 @@ define(function(require) {
                 this.activeEditorComponents[i].dispose();
             }
             this.activeEditorComponents = [];
+        },
+
+        lastHighlightedCell: null,
+
+        highlightCell: function(cell, highlight) {
+            highlight = highlight !== false;
+            if (this.lastHighlightedCell === cell && highlight) {
+                return;
+            }
+            if (this.lastHighlightedCell !== cell && !highlight) {
+                return;
+            }
+            if (this.lastHighlightedCell && highlight) {
+                this.highlightCell(this.lastHighlightedCell, false);
+            }
+            this.toggleHeaderCellHighlight(cell, highlight);
+            if (highlight) {
+                cell.$el.parent('tr:first').addClass('row-edit-mode');
+                this.lastHighlightedCell = cell;
+            } else {
+                cell.$el.parent('tr:first').removeClass('row-edit-mode');
+                this.lastHighlightedCell = null;
+            }
+        },
+
+        toggleHeaderCellHighlight: function(cell, state) {
+            var columnIndex = this.main.columns.indexOf(cell.column);
+            var headerCell = this.main.findHeaderCellByIndex(columnIndex);
+            if (headerCell) {
+                headerCell.$el.toggleClass('header-cell-highlight', state);
+            }
         }
     });
 
