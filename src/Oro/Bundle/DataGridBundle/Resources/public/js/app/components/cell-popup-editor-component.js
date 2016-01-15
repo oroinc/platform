@@ -92,22 +92,23 @@ define(function(require) {
             var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             viewInstance.trigger('change:visibility');
 
-            this.listenTo(viewInstance, 'dispose', function() {
-                overlay.remove();
-            });
-            viewInstance.on('change', function() {
-                viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
-            });
-
-            viewInstance.on('keydown', this.onKeyDown, this);
-            viewInstance.on('focus', function() {
-                mediator.trigger('inlineEditor:focus', viewInstance);
-            });
-            viewInstance.on('blur', function() {
-                if (viewInstance.isChanged()) {
-                    this.saveCurrentCellAndExit();
+            this.listenTo(viewInstance, {
+                dispose: function() {
+                    overlay.remove();
+                },
+                change: function() {
+                    viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
+                },
+                keydown: this.onKeyDown,
+                focus: function() {
+                    mediator.trigger('inlineEditor:focus', viewInstance);
+                },
+                blur: function() {
+                    if (viewInstance.isChanged()) {
+                        this.saveCurrentCell();
+                    }
                 }
-            }, this);
+            });
         },
 
         onInlineEditorFocus: function(view) {
