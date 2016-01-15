@@ -331,13 +331,11 @@ define(function(require) {
             var cell = this.options.cell;
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (!this.lockUserActions) {
-                    if (this.saveCurrentCell()) {
-                        if (!e.ctrlKey) {
-                            if (e.shiftKey) {
-                                plugin.editPrevRowCell(cell);
-                            } else {
-                                plugin.editNextRowCell(cell);
-                            }
+                    if (!e.ctrlKey) {
+                        if (e.shiftKey) {
+                            plugin.editPrevRowCell(cell);
+                        } else {
+                            plugin.editNextRowCell(cell);
                         }
                     }
                 }
@@ -358,12 +356,10 @@ define(function(require) {
             var cell = this.options.cell;
             if (e.keyCode === this.TAB_KEY_CODE) {
                 if (!this.lockUserActions) {
-                    if (this.saveCurrentCell()) {
-                        if (e.shiftKey) {
-                            plugin.editPrevCell(cell);
-                        } else {
-                            plugin.editNextCell(cell);
-                        }
+                    if (e.shiftKey) {
+                        plugin.editPrevCell(cell);
+                    } else {
+                        plugin.editNextCell(cell);
                     }
                 }
                 e.preventDefault();
@@ -399,25 +395,25 @@ define(function(require) {
             if (e.altKey) {
                 switch (e.keyCode) {
                     case this.ARROW_LEFT_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell()) {
+                        if (!this.lockUserActions) {
                             plugin.editPrevCell(cell);
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_RIGHT_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell()) {
+                        if (!this.lockUserActions) {
                             plugin.editNextCell(cell);
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_TOP_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell()) {
+                        if (!this.lockUserActions) {
                             plugin.editPrevRowCell(cell);
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_BOTTOM_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell()) {
+                        if (!this.lockUserActions) {
                             plugin.editNextRowCell(cell);
                         }
                         e.preventDefault();
