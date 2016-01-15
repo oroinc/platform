@@ -1,4 +1,10 @@
+{% if bracket_parts is not defined %}
+    {% set bracket_parts = [] %}
+{% endif %}
 {% set userOwnerOwningBusinessUnit = oro_get_user_owner_owning_business_unit(entity) %}
 {% if userOwnerOwningBusinessUnit is not null %}
-    ({{ userOwnerOwningBusinessUnit.name }})
+    {% set bracket_parts = [userOwnerOwningBusinessUnit.name]|merge(bracket_parts) %}
+{% endif %}
+{% if bracket_parts is not empty %}
+    ({{bracket_parts|join(', ') }})
 {% endif %}
