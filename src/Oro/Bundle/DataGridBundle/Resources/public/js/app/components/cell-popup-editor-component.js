@@ -7,7 +7,6 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var CellIterator = require('../../datagrid/cell-iterator');
     var overlayTool = require('oroui/js/tools/overlay');
 
     CellPopupEditorComponent = BaseComponent.extend({
@@ -21,6 +20,12 @@ define(function(require) {
         ARROW_TOP_KEY_CODE: 38,
         ARROW_RIGHT_KEY_CODE: 39,
         ARROW_BOTTOM_KEY_CODE: 40,
+
+        /**
+         * If true interface should not respond to user actions.
+         * Useful for grid page switching support
+         */
+        lockUserActions: false,
 
         OVERLAY_TOOL_DEFAULTS: {
             position: {
@@ -47,6 +52,12 @@ define(function(require) {
 
         initialize: function(options) {
             this.options = options || {};
+            if (!this.options.plugin) {
+                throw new Error('Option "plugin" is required');
+            }
+            this.listenTo(this.options.plugin, 'lockUserActions', function(value) {
+                this.lockUserActions = value;
+            });
             CellPopupEditorComponent.__super__.initialize.apply(this, arguments);
             this.enterEditMode();
         },
@@ -91,7 +102,7 @@ define(function(require) {
         },
 
         onInlineEditorFocus: function(view) {
-            if (view === this.view) {
+            if (!this.view || view === this.view) {
                 return;
             }
             if (!this.view.isChanged()) {
@@ -243,65 +254,49 @@ define(function(require) {
         },
 
         editNextCell: function() {
-            this.editCellByIteratorMethod('next', false);
+            this.exitAndNavigate('editNextCell');
         },
 
         editNextRowCell: function() {
-            this.editCellByIteratorMethod('nextRow', false);
+            this.exitAndNavigate('editNextRowCell');
         },
 
         editPrevCell: function() {
-            this.editCellByIteratorMethod('prev', true);
+            this.exitAndNavigate('editPrevCell');
         },
 
         editPrevRowCell: function() {
-            this.editCellByIteratorMethod('prevRow', false);
+            this.exitAndNavigate('editPrevRowCell');
         },
 
-        createCellIterator: function() {
-            return new CellIterator(this.options.grid, this.options.cell);
-        },
-
-        editCellByIteratorMethod: function(iteratorMethod, fromPreviousCell) {
-            var _this = this;
-            var cellIterator = this.createCellIterator();
-            this.lockUserActions = true;
-            function checkEditable(cell) {
-                if (!_this.options.plugin.isEditable(cell)) {
-                    return cellIterator[iteratorMethod]().then(checkEditable);
-                }
-                return cell;
-            }
-            cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
-                _this.options.plugin.enterEditMode(cell, fromPreviousCell);
-                if (!_this.disposed) {
-                    _this.lockUserActions = false;
-                }
-            }).fail(function() {
-                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
-                _this.revertChanges();
-                _this.exitEditMode(true);
-            });
+        exitAndNavigate: function(method) {
+            var plugin = this.options.plugin;
+            var cell = this.options.cell;
+            this.exitEditMode(true);
+            plugin[method](cell);
         },
 
         saveCurrentCellAndEditNext: function() {
-            this.saveCurrentCell();
-            this.editNextCell();
+            this.saveAndNavigate('editNextCell');
         },
 
         saveCurrentCellAndEditPrev: function() {
-            this.saveCurrentCell();
-            this.editPrevCell();
+            this.saveAndNavigate('editPrevCell');
         },
 
         saveCurrentCellAndEditNextRow: function() {
-            this.saveCurrentCell();
-            this.editNextRowCell();
+            this.saveAndNavigate('editNextRowCell');
         },
 
         saveCurrentCellAndEditPrevRow: function() {
+            this.saveAndNavigate('editPrevRowCell');
+        },
+
+        saveAndNavigate: function(method) {
+            var plugin = this.options.plugin;
+            var cell = this.options.cell;
             this.saveCurrentCell();
-            this.editPrevRowCell();
+            plugin[method](cell);
         },
 
         /**
@@ -322,14 +317,19 @@ define(function(require) {
          * @param {$.Event} e
          */
         onGenericEnterKeydown: function(e) {
+            if (this.disposed) {
+                return;
+            }
+            var plugin = this.options.plugin;
+            var cell = this.options.cell;
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (!this.lockUserActions) {
                     if (this.saveCurrentCell()) {
                         if (!e.ctrlKey) {
                             if (e.shiftKey) {
-                                this.editPrevRowCell();
+                                plugin.editPrevRowCell(cell);
                             } else {
-                                this.editNextRowCell();
+                                plugin.editNextRowCell(cell);
                             }
                         }
                     }
@@ -344,13 +344,18 @@ define(function(require) {
          * @param {$.Event} e
          */
         onGenericTabKeydown: function(e) {
+            if (this.disposed) {
+                return;
+            }
+            var plugin = this.options.plugin;
+            var cell = this.options.cell;
             if (e.keyCode === this.TAB_KEY_CODE) {
                 if (!this.lockUserActions) {
                     if (this.saveCurrentCell()) {
                         if (e.shiftKey) {
-                            this.editPrevCell();
+                            plugin.editPrevCell(cell);
                         } else {
-                            this.editNextCell();
+                            plugin.editNextCell(cell);
                         }
                     }
                 }
@@ -379,29 +384,34 @@ define(function(require) {
          * @param {$.Event} e
          */
         onGenericArrowKeydown: function(e) {
+            if (this.disposed) {
+                return;
+            }
+            var plugin = this.options.plugin;
+            var cell = this.options.cell;
             if (e.altKey) {
                 switch (e.keyCode) {
                     case this.ARROW_LEFT_KEY_CODE:
                         if (!this.lockUserActions && this.saveCurrentCell()) {
-                            this.editPrevCell();
+                            plugin.editPrevCell(cell);
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_RIGHT_KEY_CODE:
                         if (!this.lockUserActions && this.saveCurrentCell()) {
-                            this.editNextCell();
+                            plugin.editNextCell(cell);
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_TOP_KEY_CODE:
                         if (!this.lockUserActions && this.saveCurrentCell()) {
-                            this.editPrevRowCell();
+                            plugin.editPrevRowCell(cell);
                         }
                         e.preventDefault();
                         break;
                     case this.ARROW_BOTTOM_KEY_CODE:
                         if (!this.lockUserActions && this.saveCurrentCell()) {
-                            this.editNextRowCell();
+                            plugin.editNextRowCell(cell);
                         }
                         e.preventDefault();
                         break;
