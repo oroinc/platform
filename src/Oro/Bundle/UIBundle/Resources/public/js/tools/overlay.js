@@ -5,15 +5,10 @@ define(function(require) {
     var overlayTool = {
 
         createOverlay: function($overlayContent, options) {
-            var $wrapper = $('<div></div>');
-            $wrapper.on('click dblclick keydown keypress keyup mousemove mouseup mousedown focus blur', function(e) {
-                e.stopPropagation();
-            });
-            $wrapper.append($overlayContent);
             if (!options.insertInto) {
                 options.insertInto = $(document.body);
             }
-            options.insertInto.append($wrapper);
+            options.insertInto.append($overlayContent);
             $overlayContent.css({
                 zIndex: 700
             });
