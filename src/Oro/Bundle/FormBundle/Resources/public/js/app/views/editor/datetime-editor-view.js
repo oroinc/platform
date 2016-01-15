@@ -207,7 +207,7 @@ define(function(require) {
                             if (!this.disposed && document.activeElement !== this.$('.hasDatepicker').get(0)) {
                                 this.$('.datepicker-focusser').focus();
                             }
-                        }));
+                        }, this));
                     }, this));
                 }
             }, this));
