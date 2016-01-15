@@ -144,7 +144,7 @@ class ConnectionController extends Controller
                 'form' => $form->createView(),
             ]);
         } else {
-            $html = $this->renderView('OroImapBundle:Form:accountTyeOther.html.twig', [
+            $html = $this->renderView('OroImapBundle:Form:accountTypeOther.html.twig', [
                 'form' => $form->createView(),
             ]);
         }

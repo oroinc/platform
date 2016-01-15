@@ -1,6 +1,6 @@
 {% block oro_imap_configuration_check_widget %}
     {% set data = form.parent.parent.vars.value %}
-    {% if data and data.username is defined %}
+    {% if data and 'oro_user_user_form' in form.parent.parent.vars.full_name %}
         {% set forEntity = 'user' %}
     {% else %}
         {% set forEntity = 'mailbox' %}
