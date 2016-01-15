@@ -202,11 +202,13 @@ define(function(require) {
 
             this.$('.timepicker-input').on('hideTimepicker', _.bind(function() {
                 if (document.activeElement === this.$('.timepicker-input').get(0)) {
-                    this.$('.timepicker-input').one('blur', _.defer(_.bind(function() {
-                        if (!this.disposed && document.activeElement !== this.$('.hasDatepicker').get(0)) {
-                            this.$('.datepicker-focusser').focus();
-                        }
-                    }, this)));
+                    this.$('.timepicker-input').one('blur', _.bind(function() {
+                        _.defer(_.bind(function() {
+                            if (!this.disposed && document.activeElement !== this.$('.hasDatepicker').get(0)) {
+                                this.$('.datepicker-focusser').focus();
+                            }
+                        }));
+                    }, this));
                 }
             }, this));
             var checkBlur = _.bind(function() {
