@@ -221,7 +221,7 @@ define(function(require) {
             var _isFocused = this.isFocused();
             this.$('.hasDatepicker').off('.attachFocusTracking');
             if (this.$('.datepicker-focusser').length === 0) {
-                this.$el.append('<input class="datepicker-focusser"/>');
+                this.$el.append('<input class="datepicker-focusser" tabindex="-1"/>');
             }
 
             this.$('.hasDatepicker').on('change', _.bind(function() {
