@@ -118,23 +118,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
 
             $item          = [];
             $config        = $entityProvider->getConfig($targetClass);
-            $metadata      = $this->configManager->getEntityMetadata($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
-
-            $link = null;
-            if ($metadata) {
-                $link = $this->router->generate($metadata->getRoute(), ['id' => $targetId]);
-            } elseif ($link === null && ExtendHelper::isCustomEntity($targetClass)) {
-                // Generate view link for the custom entity
-                $link = $this->router->generate(
-                    'oro_entity_view',
-                    [
-                        'id'         => $targetId,
-                        'entityName' => $safeClassName
-
-                    ]
-                );
-            }
 
             if (!array_key_exists('title', $item) || !$item['title']) {
                 if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
