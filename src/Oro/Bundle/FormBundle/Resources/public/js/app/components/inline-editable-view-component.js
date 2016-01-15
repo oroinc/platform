@@ -161,7 +161,26 @@ define(function(require) {
                 }
             });
             this.resizeTo(viewInstance, this.wrapper);
-            this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+
+            var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+
+            this.listenTo(viewInstance, {
+                dispose: function() {
+                    overlay.remove();
+                },
+                change: function() {
+                    viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
+                },
+                keydown: this.onGenericEscapeKeydown,
+                focus: function() {
+                    mediator.trigger('inlineEditor:focus', viewInstance);
+                },
+                blur: function() {
+                    if (viewInstance.isChanged()) {
+                        this.saveCurrentCell();
+                    }
+                }
+            });
 
             this.listenTo(viewInstance, 'saveAction', this.saveCurrentCell);
             this.listenTo(viewInstance, 'saveAndExitAction', this.saveCurrentCellAndExit);
@@ -174,12 +193,21 @@ define(function(require) {
             this.listenTo(viewInstance, 'cancelAndEditNextRowAction', this.exitEditMode);
             this.listenTo(viewInstance, 'saveAndEditPrevRowAction', this.saveCurrentCellAndExit);
             this.listenTo(viewInstance, 'cancelAndEditPrevRowAction', this.exitEditMode);
+            this.listenTo(mediator, 'inlineEditor:focus', this.onInlineEditorFocus);
 
             return viewInstance;
         },
 
+        onInlineEditorFocus: function(view) {
+            if (!this.editorView || view === this.editorView) {
+                return;
+            }
+            if (!this.editorView.isChanged()) {
+                this.exitEditMode();
+            }
+        },
+
         exitEditMode: function() {
-            this.overlay.remove();
             this.editorView.dispose();
             delete this.editorView;
         },
@@ -259,6 +287,21 @@ define(function(require) {
             view.$el.css({
                 width: baseView.$el.outerWidth() + this.WIDTH_INCREMENT
             });
+        },
+
+        /**
+         * Generic keydown handler, which handles ESCAPE
+         *
+         * @param {$.Event} e
+         */
+        onGenericEscapeKeydown: function(e) {
+            if (e.keyCode === this.ESCAPE_KEY_CODE) {
+                if (!this.lockUserActions) {
+                    this.revertChanges();
+                    this.exitEditMode(true);
+                }
+                e.preventDefault();
+            }
         }
     }, {
         onSaveSuccess: function(response) {
