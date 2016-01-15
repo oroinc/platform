@@ -102,7 +102,7 @@ define(function(require) {
 
         isEditable: function(cell) {
             var columnMetadata = cell.column.get('metadata');
-            if (!columnMetadata) {
+            if (!columnMetadata || !cell.column.get('renderable')) {
                 return false;
             }
             var editable;
