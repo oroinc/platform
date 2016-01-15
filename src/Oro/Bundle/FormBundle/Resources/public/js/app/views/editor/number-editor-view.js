@@ -75,13 +75,12 @@ define(function(require) {
             return rules;
         },
 
-        getFormattedValue: function() {
-            var raw = this.getModelValue();
-            if (isNaN(raw)) {
+        formatRawValue: function(value) {
+            value = parseFloat(value);
+            if (isNaN(value)) {
                 return '';
             }
-
-            return this.formatter.fromRaw(raw);
+            return this.formatter.fromRaw(value);
         },
 
         getModelValue: function() {
@@ -104,7 +103,7 @@ define(function(require) {
 
         getModelUpdateData: function() {
             var data = {};
-            data[this.fieldName] = isNaN(this.getValue()) ? this.UNSET_FIELD_VALUE : this.getValue();
+            data[this.fieldName] = isNaN(this.getValue()) ? void 0 : this.getValue();
             return data;
         }
     });

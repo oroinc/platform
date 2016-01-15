@@ -67,15 +67,13 @@ define(function(require) {
             return data;
         },
 
-        getFormattedValue: function() {
-
-            var raw = this.getModelValue();
+        formatRawValue: function(value) {
+            var raw = parseFloat(value) * 100;
             if (isNaN(raw)) {
                 return '';
             }
             return String(raw);
         }
-
     });
 
     return PercentEditorView;

@@ -97,10 +97,16 @@ define(function(require) {
             }
         },
 
-        getFormattedValue: function() {
-            return this.getInitialResultItem()
-                .map(function(item) {return item.id;})
-                .join(',');
+        formatRawValue: function(value) {
+            if (_.isString(value)) {
+                value = JSON.parse(value);
+            }
+            if (value !== null && value && value.data) {
+                value = value.data;
+            } else {
+                value = [];
+            }
+            return value.map(function(item) {return item.id;}).join(',');
         },
 
         filterInitialResultItem: function(choices) {

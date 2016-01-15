@@ -89,6 +89,8 @@ define(function(require) {
             }
         },
 
+        ESCAPE_KEY_CODE: 27,
+
         WIDTH_INCREMENT: 15,
 
         /**
@@ -161,7 +163,28 @@ define(function(require) {
                 }
             });
             this.resizeTo(viewInstance, this.wrapper);
-            this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+
+            var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+
+            this.listenTo(viewInstance, {
+                dispose: function() {
+                    overlay.remove();
+                },
+                change: function() {
+                    viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
+                },
+                keydown: this.onGenericEscapeKeydown,
+                focus: function() {
+                    mediator.trigger('inlineEditor:focus', viewInstance);
+                },
+                blur: function() {
+                    if (viewInstance.isChanged()) {
+                        this.saveCurrentCell();
+                    }
+                }
+            });
+
+            viewInstance.focus();
 
             this.listenTo(viewInstance, 'saveAction', this.saveCurrentCell);
             this.listenTo(viewInstance, 'saveAndExitAction', this.saveCurrentCellAndExit);
@@ -174,12 +197,21 @@ define(function(require) {
             this.listenTo(viewInstance, 'cancelAndEditNextRowAction', this.exitEditMode);
             this.listenTo(viewInstance, 'saveAndEditPrevRowAction', this.saveCurrentCellAndExit);
             this.listenTo(viewInstance, 'cancelAndEditPrevRowAction', this.exitEditMode);
+            this.listenTo(mediator, 'inlineEditor:focus', this.onInlineEditorFocus);
 
             return viewInstance;
         },
 
+        onInlineEditorFocus: function(view) {
+            if (!this.editorView || view === this.editorView) {
+                return;
+            }
+            if (!this.editorView.isChanged()) {
+                this.exitEditMode();
+            }
+        },
+
         exitEditMode: function() {
-            this.overlay.remove();
             this.editorView.dispose();
             delete this.editorView;
         },
@@ -243,7 +275,7 @@ define(function(require) {
             // assume "undefined" as delete value request
             for (var key in updateData) {
                 if (updateData.hasOwnProperty(key)) {
-                    if (updateData[key] === editorView.UNSET_FIELD_VALUE) {
+                    if (updateData[key] === void 0) {
                         model.unset(key);
                         delete updateData[key];
                     }
@@ -259,6 +291,18 @@ define(function(require) {
             view.$el.css({
                 width: baseView.$el.outerWidth() + this.WIDTH_INCREMENT
             });
+        },
+
+        /**
+         * Generic keydown handler, which handles ESCAPE
+         *
+         * @param {$.Event} e
+         */
+        onGenericEscapeKeydown: function(e) {
+            if (e.keyCode === this.ESCAPE_KEY_CODE) {
+                this.exitEditMode(true);
+                e.preventDefault();
+            }
         }
     }, {
         onSaveSuccess: function(response) {

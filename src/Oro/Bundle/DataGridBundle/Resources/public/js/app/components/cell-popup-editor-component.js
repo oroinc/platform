@@ -79,12 +79,16 @@ define(function(require) {
 
         createView: function() {
             var View = this.options.view;
-            var viewInstance = this.view = new View(_.extend({}, this.options.viewOptions, {
+            var viewOptions = _.extend({}, this.options.viewOptions, {
                 autoRender: true,
                 model: this.options.cell.model,
                 fieldName: this.options.cell.column.get('name'),
                 metadata: this.options.cell.column.get('metadata')
-            }));
+            });
+            if (this.newState && viewOptions.fieldName in this.newState) {
+                viewOptions.value = this.newState[viewOptions.fieldName];
+            }
+            var viewInstance = this.view = new View(viewOptions);
 
             viewInstance.$el.addClass('inline-editor-wrapper');
 
@@ -109,11 +113,13 @@ define(function(require) {
                 keydown: this.onKeyDown,
                 focus: function() {
                     mediator.trigger('inlineEditor:focus', viewInstance);
+                    overlay.focus();
                 },
                 blur: function() {
                     if (viewInstance.isChanged()) {
                         this.saveCurrentCell();
                     }
+                    overlay.blur();
                 }
             });
         },
@@ -123,7 +129,7 @@ define(function(require) {
                 return;
             }
             if (!this.view.isChanged()) {
-                this.exitEditMode();
+                this.exitEditMode(true);
             }
         },
 
@@ -159,10 +165,10 @@ define(function(require) {
 
             var cell = this.options.cell;
             var serverUpdateData = this.view.getServerUpdateData();
-            var modelUpdateData = this.view.getModelUpdateData();
+            var modelUpdateData = this.newState = this.view.getModelUpdateData();
             cell.$el.addClass('loading');
             this.oldState = _.pick(cell.model.toJSON(), _.keys(modelUpdateData));
-            this.exitEditMode();
+            this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
             this.updateModel(cell.model, modelUpdateData);
             this.options.plugin.main.trigger('content:update');
             if (this.options.save_api_accessor.initialOptions.field_name) {
@@ -196,7 +202,7 @@ define(function(require) {
             // assume "undefined" as delete value request
             for (var key in updateData) {
                 if (updateData.hasOwnProperty(key)) {
-                    if (updateData[key] === this.view.UNSET_FIELD_VALUE) {
+                    if (updateData[key] === void 0) {
                         model.unset(key);
                         delete updateData[key];
                     }
@@ -250,6 +256,7 @@ define(function(require) {
         revertChanges: function() {
             if (!this.options.cell.disposed && this.oldState) {
                 this.options.cell.model.set(this.oldState);
+                delete this.oldState;
                 this.options.plugin.main.trigger('content:update');
             }
         },
@@ -437,12 +444,14 @@ define(function(require) {
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
             delete this.oldState;
+            delete this.newState;
             this.exitEditMode(true);
         },
 
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             var errors = [];
+            this.revertChanges();
             switch (errorCode) {
                 case 400:
                     if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
@@ -474,7 +483,6 @@ define(function(require) {
             if (!this.options.cell.disposed && this.options.cell.$el) {
                 this.options.cell.$el.addClass('save-fail');
             }
-            this.revertChanges();
             this.exitEditMode(true);
         }
 
