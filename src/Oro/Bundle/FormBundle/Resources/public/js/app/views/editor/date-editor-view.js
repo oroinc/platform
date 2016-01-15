@@ -224,8 +224,11 @@ define(function(require) {
             if (this.$('.datepicker-focusser').length === 0) {
                 this.$el.append('<input class="datepicker-focusser"/>');
             }
-            this.$('.hasDatepicker').datepicker('option', 'onSelect', _.bind(function() {
-                this.$('.datepicker-focusser').focus();
+
+            this.$('.hasDatepicker').on('change', _.bind(function() {
+                if (document.activeElement !== this.$('.hasDatepicker').get(0)) {
+                    this.$('.datepicker-focusser').focus();
+                }
             }, this));
 
             var checkBlur = _.bind(function() {
