@@ -41,7 +41,8 @@ define(function(require) {
             saveAndEditNextRowAction: 'saveCurrentCellAndEditNextRow',
             cancelAndEditNextRowAction: 'editNextRowCell',
             saveAndEditPrevRowAction: 'saveCurrentCellAndEditPrevRow',
-            cancelAndEditPrevRowAction: 'editPrevRowCell'
+            cancelAndEditPrevRowAction: 'editPrevRowCell',
+            'inlineEditor:focus mediator': 'onInlineEditorFocus'
         },
 
         initialize: function(options) {
@@ -79,6 +80,23 @@ define(function(require) {
             });
 
             viewInstance.on('keydown', this.onKeyDown, this);
+            viewInstance.on('focus', function() {
+                mediator.trigger('inlineEditor:focus', viewInstance);
+            });
+            viewInstance.on('blur', function() {
+                if (viewInstance.isChanged()) {
+                    this.saveCurrentCellAndExit();
+                }
+            }, this);
+        },
+
+        onInlineEditorFocus: function(view) {
+            if (view === this.view) {
+                return;
+            }
+            if (!this.view.isChanged()) {
+                this.exitEditMode();
+            }
         },
 
         /**
@@ -108,7 +126,6 @@ define(function(require) {
                 return true;
             }
             if (!this.view.isValid()) {
-                this.view.focus();
                 return false;
             }
 
@@ -257,12 +274,13 @@ define(function(require) {
             }
             cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
                 _this.options.plugin.enterEditMode(cell, fromPreviousCell);
-                _this.lockUserActions = false;
+                if (!_this.disposed) {
+                    _this.lockUserActions = false;
+                }
             }).fail(function() {
                 mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
                 _this.revertChanges();
                 _this.exitEditMode(true);
-                _this.lockUserActions = false;
             });
         },
 

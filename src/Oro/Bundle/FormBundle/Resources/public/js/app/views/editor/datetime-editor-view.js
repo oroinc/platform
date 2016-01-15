@@ -99,6 +99,8 @@ define(function(require) {
         events: {
             'keydown .hasDatepicker': 'onDateEditorKeydown',
             'keydown .timepicker-input': 'onTimeEditorKeydown',
+            'change .hasDatepicker': 'onDateEditorKeydown',
+            'change .timepicker-input': 'onTimeEditorKeydown',
             'showTimepicker .ui-timepicker-input': 'onTimepickerShow',
             'hideTimepicker .ui-timepicker-input': 'onTimepickerHide'
         },
@@ -117,6 +119,8 @@ define(function(require) {
             });
             // fix arrows behaviour
             this.$('.timepicker-input').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
+
+            this.attachFocusTracking();
             return this;
         },
 
@@ -177,6 +181,59 @@ define(function(require) {
         onTimepickerShow: function(e) {
             var isBelow = !$(e.currentTarget).data('timepicker-list').hasClass('ui-timepicker-positioned-top');
             this.toggleDropdownBelowClass(isBelow);
+        },
+
+        /**
+         * Attaches focus tracking
+         */
+        attachFocusTracking: function() {
+            var blurTestIntervalId = -1;
+            var _isFocused = this.isFocused();
+            this.$('.hasDatepicker').off('.attachFocusTracking');
+            if (this.$('.datepicker-focusser').length === 0) {
+                this.$el.append('<input class="datepicker-focusser"/>');
+            }
+            this.$('.hasDatepicker').datepicker('option', 'onSelect', _.bind(function() {
+                this.$('.datepicker-focusser').focus();
+            }, this));
+
+            var checkBlur = _.bind(function() {
+                if (!_isFocused) {
+                    return;
+                }
+                clearInterval(blurTestIntervalId);
+                blurTestIntervalId = setInterval(_.bind(function() {
+                    if (this.disposed || !this.isFocused()) {
+                        if (!this.disposed) {
+                            this.trigger('blur');
+                        }
+                        _isFocused = false;
+                        clearInterval(blurTestIntervalId);
+                    }
+                }, this), 25);
+            }, this);
+            this.$('.hasDatepicker').datepicker('option', 'onClose', checkBlur);
+            this.$('.hasDatepicker, .datepicker-focusser, .timepicker-input').on('blur.attachFocusTracking', checkBlur);
+
+            this.$('.timepicker-input').on('focus.attachFocusTracking', _.bind(function() {
+                this.$('.hasDatepicker').datepicker('hide');
+            }, this));
+            this.$('.hasDatepicker, .timepicker-input').on('focus.attachFocusTracking', _.bind(function() {
+                if (!_isFocused) {
+                    this.trigger('focus');
+                    _isFocused = true;
+                }
+            }, this));
+        },
+
+        /**
+         * Returns true if element is focused
+         *
+         * @returns {Object}
+         */
+        isFocused: function() {
+            return DatetimeEditorView.__super__.isFocused.call(this) ||
+                document.activeElement === this.$('.timepicker-input').get(0);
         }
     });
 

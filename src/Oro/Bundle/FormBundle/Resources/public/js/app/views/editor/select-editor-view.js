@@ -181,13 +181,43 @@ define(function(require) {
         },
 
         focus: function() {
+            var isFocused = this.isFocused();
             this.$('input[name=value]').select2('open');
+            if (!isFocused) {
+                // trigger custom focus event as select2 doesn't trigger 'select2-focus' when focused manually
+                this.trigger('focus');
+            }
         },
 
         isChanged: function() {
             // current value is always string
             // btw model value could be an number
             return this.getValue() !== String(this.getModelValue());
+        },
+
+        /**
+         * Attaches focus tracking
+         */
+        attachFocusTracking: function() {
+            var _this = this;
+            this.$('input[name=value]').on('select2-focus', function() {
+                _this.trigger('focus');
+            });
+            this.$('input[name=value]').on('select2-blur', function() {
+                // let select2 time to work due to bugs
+                _.defer(function() {
+                    _this.trigger('blur');
+                });
+            });
+        },
+
+        /**
+         * Returns true if element is focused
+         *
+         * @returns {Object}
+         */
+        isFocused: function() {
+            return this.$('.select2-container-active').length;
         }
     }, {
         processMetadata: function(columnMetadata) {

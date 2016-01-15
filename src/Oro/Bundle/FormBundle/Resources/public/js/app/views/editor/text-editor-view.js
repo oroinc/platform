@@ -78,9 +78,7 @@ define(function(require) {
             'click [data-action]': 'rethrowAction',
             'keydown': 'rethrowEvent',
             'keypress': 'rethrowEvent',
-            'keyup': 'rethrowEvent',
-            'focus': 'rethrowEvent',
-            'blur': 'rethrowEvent'
+            'keyup': 'rethrowEvent'
         },
 
         TAB_KEY_CODE: 9,
@@ -162,6 +160,7 @@ define(function(require) {
                 }
             });
             this.onChange();
+            this.attachFocusTracking();
         },
 
         showBackendErrors: function(backendErrors) {
@@ -400,6 +399,27 @@ define(function(require) {
          */
         getModelUpdateData: function() {
             return this.getServerUpdateData();
+        },
+
+        /**
+         * Attaches focus tracking
+         */
+        attachFocusTracking: function() {
+            this.$('input[name=value]').on('focus', _.bind(function() {
+                this.trigger('focus');
+            }, this));
+            this.$('input[name=value]').on('blur', _.bind(function() {
+                this.trigger('blur');
+            }, this));
+        },
+
+        /**
+         * Returns true if element is focused
+         *
+         * @returns {Object}
+         */
+        isFocused: function() {
+            return document.activeElement === this.$('input[name=value]').get(0);
         }
     });
 
