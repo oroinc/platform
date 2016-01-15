@@ -30,8 +30,14 @@ define(function(require) {
         OVERLAY_TOOL_DEFAULTS: {
             position: {
                 my: 'left top',
-                at: 'left-4 top-4',
-                collision: 'flipfit'
+                at: 'left top',
+                collision: 'flip',
+                using: function(position, information) {
+                    information.element.element.css({
+                        left: position.left === 0 ? -4 : position.left + 4,
+                        top: position.top - 4
+                    });
+                }
             }
         },
 
@@ -85,7 +91,8 @@ define(function(require) {
             var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
                 insertInto: this.options.cell.$el,
                 position: {
-                    of: this.options.cell.$el
+                    of: this.options.cell.$el,
+                    within: this.options.cell.$el.closest('tbody')
                 }
             });
             this.resizeToCell(viewInstance, this.options.cell);
