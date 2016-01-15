@@ -12,7 +12,7 @@ Sample:
 
 ```twig
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-<div class="tags-view-form-container" {{ UI.renderPageComponentAttributes({
+<div {{ UI.renderPageComponentAttributes({
    module: 'oroform/js/app/components/inline-editable-view-component',
    options: {
        frontend_type: 'tags',

@@ -74,3 +74,11 @@ oro_entity_config:
                 action_link_widget: # string
                     options:
                         auditable:          false
+
+    grid:
+        entity:
+            items:
+                # grid name that used for rendering entity context
+                context: # string
+                    options:
+                        auditable:          false

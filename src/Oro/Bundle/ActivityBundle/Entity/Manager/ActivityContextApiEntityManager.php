@@ -118,7 +118,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
 
             $item          = [];
             $config        = $entityProvider->getConfig($targetClass);
-            $metadata      = $this->configManager->getEntityMetadata($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
 
             $link = null;
@@ -155,7 +154,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $item['targetClassName'] = $safeClassName;
 
             $item['icon'] = $config->get('icon');
-            $item['link'] = $link;
+            $item['link'] = $this->getContextLink($targetClass, $targetId);
 
             $event = new PrepareContextTitleEvent($item, $targetClass);
             $this->dispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
@@ -165,5 +164,39 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $targetClass The FQCN of the activity target entity
+     * @param int    $targetId    The identifier of the activity target entity
+     *
+     * @return string|null
+     */
+    protected function getContextLink($targetClass, $targetId)
+    {
+        $metadata = $this->configManager->getEntityMetadata($targetClass);
+        $link     = null;
+        if ($metadata) {
+            try {
+                $route = $metadata->getRoute('view', true);
+            } catch (\LogicException $exception) {
+                // Need for cases when entity does not have route.
+                return null;
+            }
+            $link = $this->router->generate($route, ['id' => $targetId]);
+        } elseif (ExtendHelper::isCustomEntity($targetClass)) {
+            $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
+            // Generate view link for the custom entity
+            $link = $this->router->generate(
+                'oro_entity_view',
+                [
+                    'id'         => $targetId,
+                    'entityName' => $safeClassName
+
+                ]
+            );
+        }
+
+        return $link;
     }
 }
