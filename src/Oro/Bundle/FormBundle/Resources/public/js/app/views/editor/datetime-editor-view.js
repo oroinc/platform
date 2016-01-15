@@ -191,7 +191,7 @@ define(function(require) {
             var _isFocused = this.isFocused();
             this.$('.hasDatepicker').off('.attachFocusTracking');
             if (this.$('.datepicker-focusser').length === 0) {
-                this.$el.append('<input class="datepicker-focusser"/>');
+                this.$el.append('<input class="datepicker-focusser" tabindex="-1"/>');
             }
 
             this.$('.hasDatepicker').on('change', _.bind(function() {
@@ -203,9 +203,11 @@ define(function(require) {
 
             this.$('.timepicker-input').on('hideTimepicker', _.bind(function() {
                 if (document.activeElement === this.$('.timepicker-input').get(0)) {
-                    this.$('.timepicker-input').one('blur', _.bind(function() {
-                        this.$('.datepicker-focusser').focus();
-                    }, this));
+                    this.$('.timepicker-input').one('blur', _.defer(_.bind(function() {
+                        if (!this.disposed && document.activeElement !== this.$('.hasDatepicker').get(0)) {
+                            this.$('.datepicker-focusser').focus();
+                        }
+                    }, this)));
                 }
             }, this));
             var checkBlur = _.bind(function() {

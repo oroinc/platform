@@ -265,7 +265,7 @@ define(function(require) {
 
         editCellByIteratorMethod: function(iteratorMethod, cell) {
             var _this = this;
-            var fromPreviousCell = ['prev'].indexOf(iteratorMethod) === -1;
+            var fromPreviousCell = iteratorMethod === 'prev';
             this.trigger('lockUserActions', true);
             var cellIterator = new CellIterator(this.main, cell);
             function checkEditable(cell) {
