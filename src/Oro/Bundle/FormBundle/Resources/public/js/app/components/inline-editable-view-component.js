@@ -298,10 +298,7 @@ define(function(require) {
          */
         onGenericEscapeKeydown: function(e) {
             if (e.keyCode === this.ESCAPE_KEY_CODE) {
-                if (!this.lockUserActions) {
-                    this.revertChanges();
-                    this.exitEditMode(true);
-                }
+                this.exitEditMode(true);
                 e.preventDefault();
             }
         }
