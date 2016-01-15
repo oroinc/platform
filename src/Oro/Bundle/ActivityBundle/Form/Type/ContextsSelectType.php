@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -36,25 +37,31 @@ class ContextsSelectType extends AbstractType
     /* @var TokenStorageInterface */
     protected $securityTokenStorage;
 
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
     /**
      * @param EntityManager         $entityManager
      * @param ConfigManager         $configManager
      * @param TranslatorInterface   $translator
      * @param ObjectMapper          $mapper
      * @param TokenStorageInterface $securityTokenStorage
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigManager $configManager,
         TranslatorInterface $translator,
         ObjectMapper $mapper,
-        TokenStorageInterface $securityTokenStorage
+        TokenStorageInterface $securityTokenStorage,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->entityManager        = $entityManager;
         $this->configManager        = $configManager;
         $this->translator           = $translator;
         $this->mapper               = $mapper;
         $this->securityTokenStorage = $securityTokenStorage;
+        $this->dispatcher           = $dispatcher;
     }
 
     /**
@@ -69,7 +76,8 @@ class ContextsSelectType extends AbstractType
                 $this->configManager,
                 $this->translator,
                 $this->mapper,
-                $this->securityTokenStorage
+                $this->securityTokenStorage,
+                $this->dispatcher
             )
         );
     }
