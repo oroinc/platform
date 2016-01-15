@@ -230,7 +230,7 @@ define(function(require) {
         /**
          * Returns true if element is focused
          *
-         * @returns {Object}
+         * @returns {boolean}
          */
         isFocused: function() {
             return this.$('.select2-container-active').length;

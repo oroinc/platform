@@ -260,7 +260,7 @@ define(function(require) {
         /**
          * Returns true if element is focused
          *
-         * @returns {Object}
+         * @returns {boolean}
          */
         isFocused: function() {
             return document.activeElement === this.$('.hasDatepicker').get(0) ||
