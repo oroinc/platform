@@ -13,6 +13,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 
@@ -392,6 +393,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                         $email->getId()->getUid()
                     )
                 );
+
+                $this->removeStaleFolders($email, $imapEmail->getEmail(), $folder);
             } catch (\Exception $e) {
                 $this->logger->warning(
                     sprintf(
@@ -420,6 +423,51 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->em->flush();
 
         $this->cleanUp();
+    }
+
+    /**
+     * @param Email $email
+     * @param EmailEntity $emailEntity
+     * @param EmailFolder $currentFolder
+     */
+    protected function removeStaleFolders(Email $email, EmailEntity $emailEntity, EmailFolder $currentFolder)
+    {
+        $labels = $email->getHeader('X-GM-LABELS', 'array');
+        if (!$labels || !$emailEntity->getId()) {
+            return;
+        }
+
+        $labels[] = $currentFolder->getName();
+
+        $staleFolders = $currentFolder->getOrigin()->getFolders()->filter(function (EmailFolder $folder) use ($labels) {
+            return !in_array($folder->getName(), $labels);
+        });
+        if ($staleFolders->isEmpty()) {
+            return;
+        }
+
+        $subQb = $this->em->getRepository('OroImapBundle:ImapEmailFolder')
+            ->createQueryBuilder('ief');
+        $subQb
+            ->select('ief.id')
+            ->where($subQb->expr()->in('ief.folder', ':folders'));
+
+        $qb = $this->em->getRepository('OroImapBundle:ImapEmail')
+            ->createQueryBuilder('ie');
+        $qb
+            ->delete()
+            ->where('ie.email = :email')
+            ->andWhere($qb->expr()->in('ie.imapFolder', $subQb->getDQL()))
+            ->setParameter('email', $emailEntity->getId())
+            ->setParameter('folders', $staleFolders)
+            ->getQuery()
+            ->execute();
+
+        $emailEntity->getEmailUsers()->map(function (EmailUser $emailUser) use ($staleFolders) {
+            $staleFolders->map(function (EmailFolder $folder) use ($emailUser) {
+                $emailUser->removeFolder($folder);
+            });
+        });
     }
 
     /**

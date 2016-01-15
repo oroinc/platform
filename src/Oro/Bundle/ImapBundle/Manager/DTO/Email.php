@@ -117,6 +117,17 @@ class Email extends EmailHeader
     }
 
     /**
+     * @param string $name
+     * @param string $format Can be 'string' or 'array'
+     *
+     * @return mixed
+     */
+    public function getHeader($name, $format = null)
+    {
+        return $this->message->getHeader($name, $format);
+    }
+
+    /**
      * Check exists flag
      *
      * @param string $flag
