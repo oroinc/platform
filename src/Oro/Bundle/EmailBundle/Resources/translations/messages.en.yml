@@ -241,6 +241,7 @@ oro:
         reply:                    Reply
         reply_all:                Reply All
         forward:                  Forward
+        view:                     View email
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
         load_more_emails:         "%quantity% older messages"
