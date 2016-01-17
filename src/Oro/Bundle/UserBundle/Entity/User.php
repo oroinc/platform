@@ -38,8 +38,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeView="oro_user_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-user",
- *              "context-grid"="users-for-context-grid"
+ *              "icon"="icon-user"
  *          },
  *          "grouping"={
  *              "groups"={"dictionary"}
@@ -65,6 +64,10 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "form"={
  *              "form_type"="oro_user_select",
  *              "grid_name"="users-select-grid"
+ *          },
+ *          "grid"={
+ *              "default"="users-grid",
+ *              "context"="users-for-context-grid"
  *          },
  *          "tag"={
  *              "enabled"=true

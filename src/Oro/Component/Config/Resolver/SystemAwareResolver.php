@@ -8,6 +8,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
 {
     const PARENT_NODE = 'parent_node';
