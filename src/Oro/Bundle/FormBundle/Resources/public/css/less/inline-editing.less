@@ -36,6 +36,19 @@
         display: none !important;
       }
     }
+    &.view-mode.has-error{
+      position: relative;
+      background: #fff5f5;
+      &:before{
+        content: '';
+        display: inline-block;
+        border-right: 6px solid transparent;
+        border-top: 6px solid red;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
     &.view-mode:hover {
       background: @cellSelectedBackground;
       box-shadow: inset 0 0 0 1px @cellSelectedBorder;

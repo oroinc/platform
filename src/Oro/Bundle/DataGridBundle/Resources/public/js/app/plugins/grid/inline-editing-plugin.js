@@ -200,6 +200,7 @@ define(function(require) {
         enterEditMode: function(cell, fromPreviousCell) {
             var existingEditorComponent = this.getOpenedEditor(cell);
             if (existingEditorComponent) {
+                existingEditorComponent.enterEditMode();
                 existingEditorComponent.view.focus(!!fromPreviousCell);
                 return;
             }
