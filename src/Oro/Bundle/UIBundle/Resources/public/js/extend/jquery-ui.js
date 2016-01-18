@@ -39,6 +39,9 @@ define(['jquery', 'jquery-ui'], function($) {
             var $input = $(this);
 
             var inst = $.datepicker._getInst(input);
+            if (!inst) {
+                return;
+            }
 
             if (!$.datepicker._pos) { // position below input
                 pos = $.datepicker._findPos(input);
