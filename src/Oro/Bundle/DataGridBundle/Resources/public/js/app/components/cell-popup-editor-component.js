@@ -77,15 +77,28 @@ define(function(require) {
             this.enterEditMode();
         },
 
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            if (this.options && this.options.cell && this.options.cell.$el) {
+                this.options.cell.$el.removeClass('has-error');
+            }
+            CellPopupEditorComponent.__super__.dispose.apply(this, arguments);
+        },
+
         createView: function() {
             var View = this.options.view;
+            var cell = this.options.cell;
             var viewOptions = _.extend({}, this.options.viewOptions, {
                 autoRender: true,
-                model: this.options.cell.model,
-                fieldName: this.options.cell.column.get('name'),
-                metadata: this.options.cell.column.get('metadata')
+                model: cell.model,
+                fieldName: cell.column.get('name'),
+                metadata: cell.column.get('metadata')
             });
             if (this.newState && viewOptions.fieldName in this.newState) {
+                this.updateModel(cell.model, this.oldState);
+                this.options.plugin.main.trigger('content:update');
                 viewOptions.value = this.newState[viewOptions.fieldName];
             }
             var viewInstance = this.view = new View(viewOptions);
@@ -93,13 +106,13 @@ define(function(require) {
             viewInstance.$el.addClass('inline-editor-wrapper');
 
             var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
-                insertInto: this.options.cell.$el,
+                insertInto: cell.$el,
                 position: {
-                    of: this.options.cell.$el,
-                    within: this.options.cell.$el.closest('tbody')
+                    of: cell.$el,
+                    within: cell.$el.closest('tbody')
                 }
             });
-            this.resizeToCell(viewInstance, this.options.cell);
+            this.resizeToCell(viewInstance, cell);
             var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             viewInstance.trigger('change:visibility');
 
@@ -109,6 +122,7 @@ define(function(require) {
                 },
                 change: function() {
                     viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
+                    cell.$el.toggleClass('has-error', !viewInstance.isValid());
                 },
                 keydown: this.onKeyDown,
                 focus: function() {
@@ -116,12 +130,18 @@ define(function(require) {
                     overlay.focus();
                 },
                 blur: function() {
-                    if (viewInstance.isChanged()) {
+                    if (viewInstance.isValid() && viewInstance.isChanged()) {
                         this.saveCurrentCell();
                     }
                     overlay.blur();
                 }
             });
+            viewInstance.trigger('change');
+
+            if (this.backendErrors) {
+                this.view.$el.toggleClass('show-overlay', true);
+                this.view.showBackendErrors(this.backendErrors);
+            }
         },
 
         onInlineEditorFocus: function(view) {
@@ -130,6 +150,13 @@ define(function(require) {
             }
             if (!this.view.isChanged()) {
                 this.exitEditMode(true);
+            } else {
+                this.options.cell.$el.toggleClass('has-error', !this.view.isValid());
+                this.newState = this.view.getModelUpdateData();
+                this.oldState = _.pick(this.options.cell.model.toJSON(), _.keys(this.newState));
+                this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
+                this.updateModel(this.options.cell.model, this.newState);
+                this.options.plugin.main.trigger('content:update');
             }
         },
 
@@ -169,6 +196,7 @@ define(function(require) {
             cell.$el.addClass('loading');
             this.oldState = _.pick(cell.model.toJSON(), _.keys(modelUpdateData));
             this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
+
             this.updateModel(cell.model, modelUpdateData);
             this.options.plugin.main.trigger('content:update');
             if (this.options.save_api_accessor.initialOptions.field_name) {
@@ -220,8 +248,10 @@ define(function(require) {
                 this.options.cell.$el.addClass('edit-mode');
                 this.createView(this.options);
                 // rethrow view events on component
-                this.listenTo(this.view, 'all', function() {
-                    this.trigger.apply(this, arguments);
+                this.listenTo(this.view, 'all', function(eventName) {
+                    if (eventName !== 'dispose') {
+                        this.trigger.apply(this, arguments);
+                    }
                 }, this);
             }
         },
@@ -444,30 +474,48 @@ define(function(require) {
                         }
                     }, this);
                 }
-                this.options.cell.$el.addClassTemporarily('save-success', 2000);
+                this.options.cell.$el
+                    .removeClass('save-fail')
+                    .addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
             delete this.oldState;
             delete this.newState;
+            delete this.backendErrors;
             this.exitEditMode(true);
         },
 
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             var errors = [];
-            this.revertChanges();
+            var fieldName;
+            var fieldLabel;
+
+            if (!this.options.cell.disposed && this.options.cell.$el) {
+                fieldName = this.options.cell.column.get('name');
+                fieldLabel = this.options.cell.column.get('label');
+                this.options.cell.$el.addClass('save-fail');
+            }
+
             switch (errorCode) {
                 case 400:
                     if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
-                        this.enterEditMode();
-                        this.view.$el.toggleClass('show-overlay', true);
-                        this.view.showBackendErrors(jqXHR.responseJSON.errors);
-                        return;
+                        var backendErrors = {};
+                        _.each(jqXHR.responseJSON.errors.children, function(item, name) {
+                            if (fieldName === name && _.isArray(item.errors)) {
+                                backendErrors.value = item.errors[0];
+                            }
+                        }, this);
+                        this.backendErrors = backendErrors;
+                        errors.push(__('oro.datagrid.inline_editing.message.save_field.validation_error',
+                            {fieldLabel: fieldLabel, error: backendErrors.value}));
                     }
                     break;
                 case 403:
                     errors.push(__('oro.datagrid.inline_editing.message.save_field.permission_denied',
-                        {fieldName: this.options.cell.column.get('label')}));
+                        {fieldLabel: fieldLabel}));
+                    this.revertChanges();
+                    this.exitEditMode(true);
                     break;
                 case 500:
                     if (jqXHR.responseJSON.message) {
@@ -475,19 +523,18 @@ define(function(require) {
                     } else {
                         errors.push(__('oro.ui.unexpected_error'));
                     }
+                    this.revertChanges();
+                    this.exitEditMode(true);
                     break;
                 default:
                     errors.push(__('oro.ui.unexpected_error'));
+                    this.revertChanges();
+                    this.exitEditMode(true);
             }
 
             _.each(errors, function(value) {
                 mediator.execute('showFlashMessage', 'error', value);
             });
-
-            if (!this.options.cell.disposed && this.options.cell.$el) {
-                this.options.cell.$el.addClass('save-fail');
-            }
-            this.exitEditMode(true);
         }
 
     });
