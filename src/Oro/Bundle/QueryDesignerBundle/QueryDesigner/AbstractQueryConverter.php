@@ -221,13 +221,14 @@ abstract class AbstractQueryConverter
     /**
      * Performs conversion of a single WHERE condition
      *
-     * @param string $entityClassName
-     * @param string $tableAlias
-     * @param string $fieldName
-     * @param string $columnExpr
-     * @param string $columnAlias
-     * @param string $filterName
-     * @param array  $filterData
+     * @param string      $entityClassName
+     * @param string      $tableAlias
+     * @param string      $fieldName
+     * @param string      $columnExpr
+     * @param string      $columnAlias
+     * @param string      $filterName
+     * @param array       $filterData
+     * @param string|null $functionExpr
      */
     abstract protected function addWhereCondition(
         $entityClassName,
@@ -236,7 +237,8 @@ abstract class AbstractQueryConverter
         $columnExpr,
         $columnAlias,
         $filterName,
-        array $filterData
+        array $filterData,
+        $functionExpr = null
     );
 
     /**
