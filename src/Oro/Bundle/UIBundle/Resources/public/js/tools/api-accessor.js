@@ -115,6 +115,14 @@ define(function(require) {
         },
 
         /**
+         * Clears response cache
+         */
+        clearCache: function() {
+            this.cache = {};
+            this.trigger('cache:clear');
+        },
+
+        /**
          * Validates url parameters
          *
          * @param {Object} urlParameters - Url parameters to compose the url

@@ -2,9 +2,9 @@ css:
     'timepicker':
         - 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.css'
     'oroui':
+        - 'bundles/jstree/themes/default/style.min.css'
         # libraries' styles
         - 'bundles/oroui/lib/bootstrap/bootstrap.less'
-        - 'bundles/oroui/lib/jstree/themes/default/style.css'
         - 'bundles/oroui/lib/font-awesome/css/font-awesome.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'

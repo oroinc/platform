@@ -1,9 +1,9 @@
 datagrid:
     website-grid:
         extended_entity_name: %oro_tracking.tracking_website.class%
+        acl_resource: oro_tracking_website_view
         source:
             type: orm
-            acl_resource: oro_tracking_website_view
             query:
                 select:
                     - website.id
@@ -124,9 +124,9 @@ datagrid:
 
     tracking-events-grid:
         extended_entity_name: %oro_tracking.tracking_event.class%
+        acl_resource: oro_tracking_website_view
         source:
             type: orm
-            acl_resource: oro_tracking_website_view
             query:
                 select:
                     - e.id

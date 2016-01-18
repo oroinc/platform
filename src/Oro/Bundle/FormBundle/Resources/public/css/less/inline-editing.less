@@ -1,5 +1,7 @@
-@import "./multi-checkbox-editor";
-.grid {
+.oro-datagrid.grid-editable .grid {
+  .number-cell, .integer-cell, .align-right, .editable {
+    padding-right: 28px;
+  }
   .row-edit-mode {
     background: #FFFCEC;
   }
@@ -58,10 +60,6 @@
       }
       &:hover:before {
         background-color: rgba(244, 239, 212, 0.7);;
-      }
-      &.number-cell:before, &.percent-cell:before {
-        right: auto;
-        left: 1px;
       }
     }
   }
@@ -158,9 +156,22 @@
       min-width: 130px;
       overflow: auto;
       .select2-search-choice {
-        font-size: 13px;
-        line-height: 13px;
-        padding: 4px 19px 3px 6px;
+        font-size: 11px;
+        line-height: 12px;
+        padding: 5px 20px 5px 8px;
+        color: @tagItemColor;
+        background: @tagItemBackground;
+        border: 0 none;
+        border-radius: 10px;
+        box-shadow: none;
+        margin-left: 4px;
+        margin-bottom: 0;
+        .select2-search-choice-close {
+          top: 6px;
+          &:before {
+            color: @tagItemColor;
+          }
+        }
         &.select2-locked {
           padding: 4px 5px 3px 6px !important;
         }

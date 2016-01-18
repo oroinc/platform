@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Config;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class BlockConfig implements FormConfigInterface
 {
@@ -235,6 +235,6 @@ class BlockConfig implements FormConfigInterface
 
     protected function sortSubBlocks()
     {
-        ArrayUtils::sortBy($this->subBlocks, true);
+        ArrayUtil::sortBy($this->subBlocks, true);
     }
 }

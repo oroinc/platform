@@ -13,6 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -68,6 +69,11 @@ class EmailModelBuilderHelper
     protected $templating;
 
     /**
+     * @var MailboxManager
+     */
+    protected $mailboxManager;
+
+    /**
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param EmailAddressHelper  $emailAddressHelper
      * @param EntityNameResolver  $entityNameResolver
@@ -76,6 +82,7 @@ class EmailModelBuilderHelper
      * @param EntityManager       $entityManager
      * @param EmailCacheManager   $emailCacheManager
      * @param EngineInterface     $engineInterface
+     * @param MailboxManager      $mailboxManager
      */
     public function __construct(
         EntityRoutingHelper $entityRoutingHelper,
@@ -85,7 +92,8 @@ class EmailModelBuilderHelper
         EmailAddressManager $emailAddressManager,
         EntityManager $entityManager,
         EmailCacheManager $emailCacheManager,
-        EngineInterface $engineInterface
+        EngineInterface $engineInterface,
+        MailboxManager $mailboxManager
     ) {
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->emailAddressHelper  = $emailAddressHelper;
@@ -95,6 +103,7 @@ class EmailModelBuilderHelper
         $this->entityManager       = $entityManager;
         $this->emailCacheManager   = $emailCacheManager;
         $this->templating          = $engineInterface;
+        $this->mailboxManager      = $mailboxManager;
     }
 
     /**
@@ -262,7 +271,7 @@ class EmailModelBuilderHelper
      */
     public function getMailboxes()
     {
-        $mailboxes = $this->entityManager->getRepository('OroEmailBundle:Mailbox')->findAvailableMailboxes(
+        $mailboxes = $this->mailboxManager->findAvailableMailboxes(
             $this->getUser(),
             $this->getOrganization()
         );

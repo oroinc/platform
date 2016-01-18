@@ -34,6 +34,11 @@ services:
         tags:
              - { name: layout.block_type, alias: style }
 
+    oro_layout.block_type.input:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\InputType
+        tags:
+             - { name: layout.block_type, alias: input }
+
     oro_layout.block_type.body:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\BodyType
         tags:

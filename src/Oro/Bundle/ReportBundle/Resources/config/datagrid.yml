@@ -1,8 +1,8 @@
 datagrid:
     reports-grid:
+        acl_resource: oro_report_view
         source:
             type:           orm
-            acl_resource:   oro_report_view
             query:
                 select:
                     - r.id
