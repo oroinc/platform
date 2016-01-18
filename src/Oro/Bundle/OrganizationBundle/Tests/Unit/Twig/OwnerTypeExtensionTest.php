@@ -87,34 +87,6 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($owner, $this->extension->getEntityOwner($entity));
     }
 
-    public function testGetUserOwnerOwningBusinessUnit()
-    {
-        $entity = new Entity();
-        $owner  = new User();
-        $businessUnit = new BusinessUnit();
-        $owner->setOwner($businessUnit);
-        $entity->setOwner($owner);
-        $this->prepareConfigProvider(
-            ['owner_type' => 'USER', 'owner_field_name' => 'owner'],
-            'Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity'
-        );
-
-        $this->assertEquals($businessUnit, $this->extension->getUserOwnerOwningBusinessUnit($entity));
-    }
-
-    public function testGetUserOwnerOwningBusinessUnitNotUserOwner()
-    {
-        $entity = new Entity();
-        $owner  = new Entity();
-        $entity->setOwner($owner);
-        $this->prepareConfigProvider(
-            ['owner_type' => 'another_owner_type'],
-            'Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity'
-        );
-
-        $this->assertNull($this->extension->getUserOwnerOwningBusinessUnit($entity));
-    }
-
     protected function prepareConfigProvider(array $configValues, $className)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigIdInterface $configId */
