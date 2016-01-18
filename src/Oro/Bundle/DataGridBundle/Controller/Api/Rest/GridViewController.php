@@ -6,6 +6,7 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -96,6 +97,50 @@ class GridViewController extends RestController
     public function deleteAction($id)
     {
         return $this->handleDeleteRequest($id);
+    }
+
+
+    /**
+     * Set/unset grid view as default for current user.
+     *
+     * @param int  $id
+     * @param bool $default
+     *
+     * @return Response
+     * @Post(
+     *     "/gridviews/{id}/default/{default}",
+     *     requirements={"id"="\d+", "default"="\d+"},
+     *     defaults={"default"=false}
+     *)
+     * @ApiDoc(
+     *      description="Set/unset grid view as default for current user",
+     *      resource=true,
+     *      requirements={
+     *          {"name"="id", "dataType"="integer"},
+     *          {"name"="default", "dataType"="boolean"},
+     *      },
+     *     defaults={"default"="false"}
+     * )
+     * @Acl(
+     *     id="oro_datagrid_gridview_view",
+     *     type="entity",
+     *     class="OroDataGridBundle:GridView",
+     *     permission="VIEW"
+     * )
+     */
+    public function defaultAction($id, $default = false)
+    {
+        /** @var GridView $gridView */
+        $manager  = $this->getManager();
+        $gridView = $manager->find($id);
+        if ($gridView) {
+            $manager->setDefaultGridView($this->getUser(), $gridView, $default);
+            $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+        } else {
+            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+        }
+
+        return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $gridView]);
     }
 
     /**

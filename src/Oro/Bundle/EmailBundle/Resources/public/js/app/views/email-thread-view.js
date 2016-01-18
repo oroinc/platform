@@ -15,7 +15,8 @@ define(function(require) {
 
         events: {
             'click .email-view-toggle-all': 'onToggleAllClick',
-            'click .email-load-more': 'onLoadMoreClick'
+            'click .email-load-more': 'onLoadMoreClick',
+            'shown.bs.dropdown .email-detailed-info-table.mobile .dropdown-menu': 'onDetailedInfoOpen'
         },
 
         selectors: {
@@ -105,6 +106,16 @@ define(function(require) {
                 return;
             }
             this.loadEmails();
+        },
+
+        onDetailedInfoOpen: function(e) {
+            var rect = e.currentTarget.getBoundingClientRect();
+            var parentRect = this.el.getBoundingClientRect();
+            var left = parseInt($(e.currentTarget).css('left'));
+            $(e.currentTarget).css({
+                'left': left + parentRect.left - rect.left + 'px',
+                'max-width': parentRect.width + 'px'
+            });
         },
 
         /**

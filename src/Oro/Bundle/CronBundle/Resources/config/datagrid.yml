@@ -1,8 +1,8 @@
 datagrid:
     jobs-grid:
+        acl_resource: oro_jobs
         source:
             type: orm
-            acl_resource: oro_jobs
             query:
                 select:
                     - partial j.{id, command, args, state, runtime, memoryUsageReal, priority, createdAt}
@@ -89,7 +89,7 @@ datagrid:
                 label:        oro.grid.action.view
                 link:         view_link
                 icon:         eye-open
-                acl_recource: oro_jobs
+                acl_resource: oro_jobs
                 rowAction:    true
         options:
             entityHint: job

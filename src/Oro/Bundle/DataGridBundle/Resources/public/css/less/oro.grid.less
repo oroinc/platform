@@ -12,6 +12,9 @@
   th.renderable, td.renderable {
     display: table-cell;
   }
+  .loader-mask {
+    z-index: @oroZindexDropdown - 1;// to show under grid's filter
+  }
 }
 
 .grid-toolbar .pagination ul li input {
@@ -327,6 +330,9 @@ td > .nowrap-ellipsis {
   .nav-pills {
     padding: 0;
   }
+}
+.select-all-header-cell {
+  width: 40px;
 }
 .action-cell .more-bar-holder .dropdown-toggle {
   margin-left: 5px;

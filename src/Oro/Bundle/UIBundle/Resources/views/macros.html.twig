@@ -929,10 +929,10 @@
             {%- placeholder phone_actions with {phone: phone, entity: entity} -%}
         {% endset -%}
         {% set actions = actions|trim %}
-        <span class="contact-element{% if actions is empty %} contact-element-no-actions{% endif %}">
-            <span class="contact-element-wrapper">{{ _self.renderPhone(phone) }}</span>
+        <span class="inline-actions-element{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
+            <span class="inline-actions-element_wrapper">{{ _self.renderPhone(phone) }}</span>
             {% if actions is not empty -%}
-                <span class="contact-element-actions phone-actions">{{ actions|raw }}</span>
+                <span class="inline-actions-element_actions phone-actions">{{ actions|raw }}</span>
             {%- endif %}
         </span>
     {% endif %}
