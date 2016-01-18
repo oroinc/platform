@@ -36,7 +36,7 @@ define(function(require) {
         /**
          * Active editors set
          */
-        activeEditors: null,
+        activeEditorComponents: null,
 
         initialize: function(main, options) {
             this.activeEditorComponents = [];

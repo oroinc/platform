@@ -34,8 +34,8 @@ define(function(require) {
                 collision: 'flip',
                 using: function(position, information) {
                     information.element.element.css({
-                        left: position.left === 0 ? -4 : position.left + 4,
-                        top: position.top - 4
+                        left: position.left >= 0 ? position.left - 4 : position.left + 4,
+                        top: position.top >= -1 ? position.top - 4 : position.top
                     });
                 }
             }
