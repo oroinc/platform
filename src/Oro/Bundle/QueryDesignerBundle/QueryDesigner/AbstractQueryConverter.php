@@ -1260,40 +1260,7 @@ abstract class AbstractQueryConverter
      */
     protected function replaceTableAliasesInVirtualColumnJoinConditions(&$joins)
     {
-        // replace alias with {{newAlias}} - this is required to prevent collisions
-        // between old and new aliases in case if some new alias has the same name as some old alias
-        foreach ($joins as &$join) {
-            if (isset($join['condition'])) {
-                $condition = $join['condition'];
-                foreach ($this->aliases as $alias => $newAlias) {
-                    $tryFind = true;
-                    while ($tryFind) {
-                        $tryFind = false;
-                        $pos     = $this->checkTableAliasInCondition($condition, $alias);
-                        if (false !== $pos) {
-                            $condition = sprintf(
-                                '%s{{%s}}%s',
-                                substr($condition, 0, $pos),
-                                $newAlias,
-                                substr($condition, $pos + strlen($alias))
-                            );
-                            $tryFind   = true;
-                        }
-                    }
-                }
-                $join['condition'] = $condition;
-            }
-        }
-        // replace {{newAlias}} with newAlias
-        foreach ($joins as &$join) {
-            if (isset($join['condition'])) {
-                $condition = $join['condition'];
-                foreach ($this->aliases as $newAlias) {
-                    $condition = str_replace(sprintf('{{%s}}', $newAlias), $newAlias, $condition);
-                }
-                $join['condition'] = $condition;
-            }
-        }
+        QueryUtils::replaceTableAliasesInJoinConditions($joins, $this->aliases);
     }
 
     /**
@@ -1305,108 +1272,7 @@ abstract class AbstractQueryConverter
      */
     protected function replaceTableAliasesInVirtualColumnSelect($selectExpr)
     {
-        // replace alias with {{newAlias}} - this is required to prevent collisions
-        // between old and new aliases in case if some new alias has the same name as some old alias
-        foreach ($this->aliases as $alias => $newAlias) {
-            $tryFind = true;
-            while ($tryFind) {
-                $tryFind = false;
-                $pos     = $this->checkTableAliasInSelect($selectExpr, $alias);
-                if (false !== $pos) {
-                    $selectExpr = sprintf(
-                        '%s{{%s}}%s',
-                        substr($selectExpr, 0, $pos),
-                        $newAlias,
-                        substr($selectExpr, $pos + strlen($alias))
-                    );
-                    $tryFind    = true;
-                }
-            }
-        }
-        // replace {{newAlias}} with newAlias
-        foreach ($this->aliases as $newAlias) {
-            $selectExpr = str_replace(sprintf('{{%s}}', $newAlias), $newAlias, $selectExpr);
-        }
-
-        return $selectExpr;
-    }
-
-    /**
-     * Checks if $selectExpr contains the given table alias
-     *
-     * @param string $selectExpr
-     * @param string $alias
-     *
-     * @return bool|int The position of $alias in selectExpr or FALSE if it was not found
-     */
-    protected function checkTableAliasInSelect($selectExpr, $alias)
-    {
-        $pos = strpos($selectExpr, $alias);
-        while (false !== $pos) {
-            if (0 === $pos) {
-                $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
-                if ('.' === $nextChar) {
-                    return $pos;
-                }
-            } elseif (strlen($selectExpr) !== $pos + strlen($alias) + 1) {
-                $prevChar = substr($selectExpr, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '(', ','], true)) {
-                    $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
-                    if ('.' === $nextChar) {
-                        return $pos;
-                    }
-                }
-            }
-            $pos = strpos($selectExpr, $alias, $pos + strlen($alias));
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if $condition contains the given table alias
-     *
-     * @param string $condition
-     * @param string $alias
-     * @param int    $offset
-     *
-     * @return bool|int The position of $alias in $condition or FALSE if it was not found
-     */
-    protected function checkTableAliasInCondition($condition, $alias, $offset = 0)
-    {
-        $pos = strpos($condition, $alias, $offset);
-        if (false !== $pos) {
-            if (0 === $pos) {
-                // handle case "ALIAS.", "ALIAS.field"
-                $nextChar = substr($condition, $pos + strlen($alias), 1);
-                if (in_array($nextChar, ['.', ' ', '='], true)) {
-                    return $pos;
-                }
-
-                // handle case "ALIASWord.entity = ALIAS"
-                return $this->checkTableAliasInCondition($condition, $alias, ++$pos);
-            } elseif (strlen($condition) === $pos + strlen($alias)) {
-                // handle case "t2.someField = ALIAS"
-                $prevChar = substr($condition, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '='], true)) {
-                    return $pos;
-                }
-            } else {
-                // handle case "t2.someField = ALIAS.id"
-                $prevChar = substr($condition, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '=', '('], true)) {
-                    $nextChar = substr($condition, $pos + strlen($alias), 1);
-                    if (in_array($nextChar, ['.', ' ', '=', ')'], true)) {
-                        return $pos;
-                    }
-                }
-
-                // handle case "t2.ALIAS = ALIAS AND"
-                return $this->checkTableAliasInCondition($condition, $alias, ++$pos);
-            }
-        }
-
-        return false;
+        return QueryUtils::replaceTableAliasesInSelectExpr($selectExpr, $this->aliases);
     }
 
     /**
