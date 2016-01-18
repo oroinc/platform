@@ -1348,7 +1348,7 @@ abstract class AbstractQueryConverter
      *
      * @param string $joinId
      *
-     * @return null|string NULL for autodetect, or a string represents the join type, for example 'INNER' or 'LEFT'
+     * @return null|string NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
      */
     protected function getJoinType($joinId)
     {
