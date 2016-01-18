@@ -148,4 +148,42 @@ class MixinConfigurationHelperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+
+    /**
+     * @dataProvider mergeDataProvider
+     *
+     * @param array $expected
+     * @param array $first
+     * @param array $second
+     */
+    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
+    {
+        $this->assertEquals($expected, MixinConfigurationHelper::arrayMergeRecursiveAppendDistinct($first, $second));
+    }
+
+    /**
+     * @return array
+     */
+    public function mergeDataProvider()
+    {
+        return [
+            [
+                [
+                    'a',
+                    'f',
+                    'c' => [
+                        'd' => 'd1',
+                        'e' => 'e1'
+                    ],
+                    ['q'],
+                    'b',
+                    'g',
+                    ['w']
+                ],
+                ['a', 'f', 'c' => ['d' => 'd1', 'e' => 'e1'], ['q']],
+                ['b', 'c' => ['d' => 'd2'], 'g', ['w']]
+            ]
+        ];
+    }
 }

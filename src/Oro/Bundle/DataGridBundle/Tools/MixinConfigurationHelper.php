@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tools;
 
-use Oro\Component\PhpUtils\ArrayUtil;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
@@ -62,11 +60,45 @@ class MixinConfigurationHelper
 
             $configuration->offsetSetByPath(
                 $path,
-                ArrayUtil::arrayMergeRecursiveDistinct($baseParams, $additionalParams)
+                self::arrayMergeRecursiveAppendDistinct($baseParams, $additionalParams)
             );
         }
 
         return $configuration;
+    }
+
+    /**
+     * Recursively merge arrays.
+     *
+     * Merge two arrays as array_merge_recursive do, but instead of converting values to arrays when keys are same
+     * keeps value from the first array unchangeable.
+     *
+     * @param array $first
+     * @param array $second
+     *
+     * @return array
+     */
+    public static function arrayMergeRecursiveAppendDistinct(array $first, array $second)
+    {
+        foreach ($second as $idx => $value) {
+            if (is_integer($idx)) {
+                if (is_array($value)) {
+                    $first[] = $value;
+                } elseif (!in_array($value, $first, true)) { // Checks if value already exists in array
+                    $first[] = $value;
+                }
+            } else {
+                if (!array_key_exists($idx, $first)) {
+                    $first[$idx] = $value;
+                } else {
+                    if (is_array($value)) {
+                        $first[$idx] = self::arrayMergeRecursiveAppendDistinct($first[$idx], $value);
+                    }
+                }
+            }
+        }
+
+        return $first;
     }
 
     /**
