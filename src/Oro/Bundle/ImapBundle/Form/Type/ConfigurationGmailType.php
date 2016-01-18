@@ -112,7 +112,8 @@ class ConfigurationGmailType extends AbstractType
                     }
 
                     $utcTimeZone = new \DateTimeZone('UTC');
-                    $newExpireDate = new \DateTime('+' . (int)$submittedAccessTokenExpiresAt . ' seconds', $utcTimeZone);
+                    $newExpireDate =
+                        new \DateTime('+' . (int)$submittedAccessTokenExpiresAt . ' seconds', $utcTimeZone);
 
                     return $newExpireDate;
                 }
