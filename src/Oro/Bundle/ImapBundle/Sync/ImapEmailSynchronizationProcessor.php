@@ -13,6 +13,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 
@@ -124,53 +125,28 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $folder = $imapFolder->getFolder();
             $this->manager->selectFolder($folder->getFullName());
 
-            $qb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
-            $staleImapEmails = $qb
-                ->select('ie.id, e.id AS email, f.id AS folder')
-                ->andWhere($qb->expr()->notIn('ie.uid', ':uids'))
-                ->andWhere('ie.imapFolder = :imap_folder')
-                ->setParameter('imap_folder', $imapFolder)
-                ->setParameter('uids', $this->manager->getEmailUIDs())
-                ->join('ie.imapFolder', 'if')
-                ->join('if.folder', 'f')
-                ->join('ie.email', 'e')
-                ->getQuery()
-                ->getResult();
+            $this->em->transactional(function () use ($imapFolder, $folder) {
+                $staleImapEmailsQb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
+                $staleImapEmails = $staleImapEmailsQb
+                    ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
+                    ->andWhere('ie.imapFolder = :imap_folder')
+                    ->setParameter('imap_folder', $imapFolder)
+                    ->setParameter('uids', $this->manager->getEmailUIDs())
+                    ->getQuery()
+                    ->getResult();
 
-            if (!$staleImapEmails) {
-                continue;
-            }
-
-            $queryParts = [];
-            $params = [];
-            foreach ($staleImapEmails as $index => $row) {
-                $emailParam = sprintf('email%d', $index);
-                $folderParam = sprintf('folder%d', $index);
-                $queryParts[] = sprintf('(eu.email_id = :%s AND euf.folder_id = :%s)', $emailParam, $folderParam);
-                $params[$emailParam] = $row['email'];
-                $params[$folderParam] = $row['folder'];
-            }
-
-            // remove using ORM
-            $where = 'WHERE ' . implode(' OR ', $queryParts);
-            $this->em->getConnection()->executeQuery(<<<SQL
-DELETE euf
-FROM oro_email_user_folders euf
-INNER JOIN oro_email_user eu ON euf.email_user_id = eu.id
-$where
-SQL
-            , $params);
-
-            // remove using orm
-            $dqb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
-            $dqb
-                ->delete()
-                ->where($dqb->expr()->in('ie.id', ':ids'))
-                ->setParameter('ids', array_map(function ($row) { return $row['id']; }, $staleImapEmails))
-                ->getQuery()
-                ->execute();
-
-            // delete email users
+                /* @var $staleImapEmails ImapEmail[] */
+                foreach ($staleImapEmails as $imapEmail) {
+                    $email = $imapEmail->getEmail();
+                    $email->getEmailUsers()->forAll(function ($key, EmailUser $emailUser) use ($folder) {
+                        $emailUser->removeFolder($folder);
+                        if (!$emailUser->getFolders()->count()) {
+                            $this->em->remove($emailUser);
+                        }
+                    });
+                    $this->em->remove($imapEmail);
+                }
+            });
         }
     }
 
