@@ -40,6 +40,11 @@ define(function(require) {
         /**
          * @property {String}
          */
+        onRootSelectRoute: '',
+
+        /**
+         * @property {String}
+         */
         onMoveRoute: '',
 
         /**
@@ -55,6 +60,7 @@ define(function(require) {
             this.reloadWidget = options.reloadWidget;
             this.onSelectRoute = options.onSelectRoute;
             this.onMoveRoute = options.onMoveRoute;
+            this.onRootSelectRoute = options.onRootSelectRoute;
 
             this.$tree.on('select_node.jstree', _.bind(this.onSelect, this));
             this.$tree.on('move_node.jstree', _.bind(this.onMove, this));
@@ -86,8 +92,12 @@ define(function(require) {
             if (this.initialization || !this.updateAllowed) {
                 return;
             }
-
-            var url = routing.generate(this.onSelectRoute, {id: selected.node.id});
+            var url;
+            if (this.onRootSelectRoute) {
+                url = routing.generate(this.onRootSelectRoute, {id: selected.node.id});
+            } else {
+                url = routing.generate(this.onSelectRoute, {id: selected.node.id});
+            }
             mediator.execute('redirectTo', {url: url});
         },
 
