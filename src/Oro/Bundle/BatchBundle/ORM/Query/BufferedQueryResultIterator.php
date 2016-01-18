@@ -116,6 +116,11 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     private $reverse = false;
 
     /**
+     * @var callable|null
+     */
+    protected $pageCallback;
+
+    /**
      * Constructor
      *
      * @param Query|QueryBuilder $source
@@ -155,6 +160,16 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
         $this->requestedBufferSize = (int)$bufferSize;
 
         return $this;
+    }
+
+    /**
+     * Sets callback to be called after page iteration was finished
+     *
+     * @param callable $callback
+     */
+    public function setPageCallback(callable $callback = null)
+    {
+        $this->pageCallback = $callback;
     }
 
     /**
@@ -205,6 +220,9 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
         } else {
             $this->current  = $this->rows[$this->offset];
             $this->position = $this->offset + $this->getQuery()->getMaxResults() * $this->page;
+            if ($this->pageCallback && $this->offset === count($this->rows) - 1) {
+                call_user_func($this->pageCallback);
+            }
         }
     }
 
