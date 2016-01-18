@@ -314,7 +314,15 @@ define(function(require) {
                 if (e.ctrlKey) {
                     this.trigger('saveAndExitAction');
                 } else {
-                    this.trigger('save' + postfix + 'Action');
+                    if (this.isChanged()) {
+                        if (this.validator.form()) {
+                            this.trigger('save' + postfix + 'Action');
+                        } else {
+                            this.focus();
+                        }
+                    } else {
+                        this.trigger('cancel' + postfix + 'Action');
+                    }
                 }
                 e.stopImmediatePropagation();
                 e.preventDefault();
@@ -329,7 +337,15 @@ define(function(require) {
         onGenericTabKeydown: function(e) {
             if (e.keyCode === this.TAB_KEY_CODE) {
                 var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
-                this.trigger('save' + postfix + 'Action');
+                if (this.isChanged()) {
+                    if (this.isValid()) {
+                        this.trigger('save' + postfix + 'Action');
+                    } else {
+                        this.focus();
+                    }
+                } else {
+                    this.trigger('cancel' + postfix + 'Action');
+                }
                 e.stopImmediatePropagation();
                 e.preventDefault();
             }
@@ -371,7 +387,15 @@ define(function(require) {
                         break;
                 }
                 if (postfix) {
-                    this.trigger('save' + postfix + 'Action');
+                    if (this.isChanged()) {
+                        if (this.isValid()) {
+                            this.trigger('save' + postfix + 'Action');
+                        } else {
+                            this.focus();
+                        }
+                    } else {
+                        this.trigger('cancel' + postfix + 'Action');
+                    }
                     e.stopPropagation();
                     e.preventDefault();
                 }
