@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'oroui/js/tools/scroll-helper',
+    'oroui/js/mediator',
     'bootstrap'
-], function($, _, scrollHelper) {
+], function($, _, scrollHelper, mediator) {
     'use strict';
 
     /**
@@ -15,6 +16,8 @@ define([
      */
     function Dropdown(element) {
         var $el = $(element).on('click.dropdown.data-api', this.toggle);
+        console.log($el[0])
+        $el.parent().removeC
         var globalHandlers = {
             'click.dropdown.data-api': function() {
                 $el.parent().removeClass('open');
@@ -32,12 +35,21 @@ define([
         var href = $(this).attr('href');
         var selector = $(this).attr('data-target') || /#/.test(href) && href;
         var $parent = selector ? $(selector) : null;
-
         if (!$parent || $parent.length === 0) {
             $parent = $(this).parent();
         }
+        if ('onSideMenuShow' in this) {
+            mediator.off('side_menu:open', this.onSideMenuShow);
+            delete this.onSideMenuShow;
+        }
         if ($parent.hasClass('open')) {
             $parent.find('.dropdown-menu').trigger('shown.bs.dropdown');
+            this.onSideMenuShow = _.bind(function () {
+                $parent.removeClass('open');
+                mediator.off('side_menu:open', this.onSideMenuShow);
+                delete this.onSideMenuShow;
+            }, this);
+            mediator.on('side_menu:open', this.onSideMenuShow);
         }
 
         return result;
