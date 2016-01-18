@@ -58,7 +58,7 @@ class EmailOriginHelper
     public function findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin)
     {
         if ($emailOwner instanceof User) {
-            $origin = $this->getPreferedOrigin($emailOwner, $organization, $enableUseUserEmailOrigin);
+            $origin = $this->getPreferredOrigin($emailOwner, $organization, $enableUseUserEmailOrigin);
         } elseif ($emailOwner instanceof Mailbox) {
             $origin = $emailOwner->getOrigin();
         } else {
@@ -69,7 +69,7 @@ class EmailOriginHelper
 
         if ($this->isEmptyOrigin($origin)) {
             $user   = $this->emailModel->getCampaignOwner();
-            $origin = $this->getPreferedOrigin($user, $organization, $enableUseUserEmailOrigin);
+            $origin = $this->getPreferredOrigin($user, $organization, $enableUseUserEmailOrigin);
         }
 
         return $origin;
@@ -96,7 +96,7 @@ class EmailOriginHelper
      *
      * @return InternalEmailOrigin|null|mixed
      */
-    protected function getPreferedOrigin(User $user, $organization, $enableUseUserEmailOrigin)
+    protected function getPreferredOrigin(User $user, $organization, $enableUseUserEmailOrigin)
     {
         $origins = new ArrayCollection();
 
