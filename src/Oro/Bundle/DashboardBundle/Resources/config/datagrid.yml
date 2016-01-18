@@ -1,8 +1,8 @@
 datagrid:
     dashboards-grid:
+        acl_resource: oro_dashboard_view
         source:
             type: orm
-            acl_resource: oro_dashboard_view
             query:
                 select:
                     - dashboard.id

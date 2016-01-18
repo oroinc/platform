@@ -49,13 +49,6 @@ define([
         criteriaSelector: '.filter-criteria',
 
         /**
-         * Element enclosing a criteria dropdown
-         *
-         * @property {string|jQuery|HTMLElement}
-         */
-        limitCriteriaTo: '#container:visible, body',
-
-        /**
          * Selectors for filter criteria elements
          *
          * @property {Object}
@@ -219,11 +212,21 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            var $container = $(this.limitCriteriaTo);
-            var $criteria = this.$(this.criteriaSelector);
-            var shift = $container.prop('clientWidth') + $container.offset().left -
-                this.$el.offset().left - $criteria.outerWidth();
-            $criteria.css('margin-left', shift < 0 ? shift : 0);
+            var $container = this._findDropdownFitContainer();
+            if ($container === null) {
+                return;
+            }
+            var $dropdown = this.$(this.criteriaSelector);
+            var rect = $dropdown.get(0).getBoundingClientRect();
+            var containerRect = $container.get(0).getBoundingClientRect();
+            var shift = rect.right - (containerRect.left + $container.prop('clientWidth'));
+            if (shift > 0) {
+                /**
+                 * reduce shift to avoid overlaping left edge of container
+                 */
+                shift -= Math.max(0, containerRect.left - (rect.left - shift));
+                $dropdown.css('margin-left', -shift);
+            }
         },
 
         /**

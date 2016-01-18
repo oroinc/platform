@@ -97,6 +97,13 @@ define([
         nullLink: '#',
 
         /**
+         * Element enclosing a criteria dropdown
+         *
+         * @property {Array.<string|jQuery|HTMLElement>}
+         */
+        dropdownFitContainers: ['.ui-dialog-content', '#container:visible', 'body'],
+
+        /**
          * Initialize.
          *
          * @param {Object} options
@@ -227,6 +234,21 @@ define([
                 this._onValueUpdated(this.value, oldValue);
             }
             return this;
+        },
+
+        /**
+         * Find element that dropdown of filter should fit to
+         *
+         * @param {string|jQuery|HTMLElement} element
+         * @return {*}
+         */
+        _findDropdownFitContainer: function(element) {
+            element = element || this.$el;
+            var $container = $();
+            for (var i = 0; i < this.dropdownFitContainers.length && $container.length === 0; i += 1) {
+                $container = $(element).closest(this.dropdownFitContainers[i]);
+            }
+            return $container.length === 0 ? null : $container;
         },
 
         /**
