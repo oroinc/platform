@@ -235,6 +235,10 @@ define(function(require) {
             this.activeEditorComponents.push(editorComponent);
 
             editorComponent.on('dispose', function() {
+                if (this.disposed) {
+                    // @TODO dix it. Rear case, for some reason inline inline-editing-plugin is already disposed
+                    return;
+                }
                 var index = this.activeEditorComponents.indexOf(editorComponent);
                 if (index !== -1) {
                     this.activeEditorComponents.splice(index, 1);
