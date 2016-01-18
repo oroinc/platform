@@ -66,29 +66,11 @@ class PlaceholderFilter
         }
 
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        if (!$this->configProvider->hasConfig($entityClass)) {
-            return false;
-        }
-
-        $hasAppliedActivityAssociation = false;
-        $activityAssociations          = $this->activityManager->getActivityAssociations($entityClass);
-        foreach ($activityAssociations as $activityAssociation) {
-            $isAssociationAccessible = ExtendHelper::isFieldAccessible(
-                $this->configProvider->getConfig(
-                    $activityAssociation['className'],
-                    $activityAssociation['associationName']
-                )
-            );
-            if ($isAssociationAccessible) {
-                $hasAppliedActivityAssociation = true;
-                break;
-            }
-        }
 
         /**
          * If at least one activity is accessible we can continue otherwise no.
          */
-        if (!$hasAppliedActivityAssociation) {
+        if (!$this->hasApplicableActivityAssociations($entityClass)) {
             return false;
         }
 
@@ -100,6 +82,36 @@ class PlaceholderFilter
             in_array($entityClass, $this->activityListProvider->getTargetEntityClasses())
             || (bool)$activityListRepo->getRecordsCountForTargetClassAndId($entityClass, $id)
         );
+    }
+
+    /**
+     * @param string $entityClass
+     * @return bool
+     */
+    protected function hasApplicableActivityAssociations($entityClass)
+    {
+        if (!$this->configProvider->hasConfig($entityClass)) {
+            return false;
+        }
+        $supportedActivities = $this->activityListProvider->getSupportedActivities();
+        foreach ($supportedActivities as $supportedActivity) {
+            if ($this->activityListProvider->isApplicableTarget($entityClass, $supportedActivity)) {
+                return true;
+            }
+        }
+        $activityAssociations = $this->activityManager->getActivityAssociations($entityClass);
+        foreach ($activityAssociations as $activityAssociation) {
+            $isAssociationAccessible = ExtendHelper::isFieldAccessible(
+                $this->configProvider->getConfig(
+                    $activityAssociation['className'],
+                    $activityAssociation['associationName']
+                )
+            );
+            if ($isAssociationAccessible) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

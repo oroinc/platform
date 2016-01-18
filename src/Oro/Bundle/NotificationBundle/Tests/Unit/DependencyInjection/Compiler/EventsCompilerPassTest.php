@@ -89,16 +89,13 @@ class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $connection->expects($this->once())
             ->method('connect');
-        $connection->expects($this->once())
-            ->method('isConnected')
-            ->will($this->returnValue(true));
 
         $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\MySqlSchemaManager')
             ->disableOriginalConstructor()
             ->getMock();
         $schemaManager->expects($this->once())
             ->method('tablesExist')
-            ->with([EventsCompilerPass::EVENT_TABLE_NAME])
+            ->with(EventsCompilerPass::EVENT_TABLE_NAME)
             ->will($this->returnValue(true));
 
         $connection->expects($this->once())

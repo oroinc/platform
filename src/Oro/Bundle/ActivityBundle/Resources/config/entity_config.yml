@@ -8,7 +8,7 @@ oro_entity_config:
                         require_schema_update: true
                         priority:           250
                     form:
-                        type:               oro_entity_extend_multiple_association_choice
+                        type:               oro_activity_multiple_association_choice
                         options:
                             block:          associations
                             required:       false

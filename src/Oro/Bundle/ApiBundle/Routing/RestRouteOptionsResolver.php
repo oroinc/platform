@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Routing;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
@@ -13,6 +11,7 @@ use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 
@@ -101,8 +100,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         $entities       = [];
         $entityManagers = $this->entityManagerBag->getEntityManagers();
         foreach ($entityManagers as $em) {
-            /** @var ClassMetadata[] $allMetadata */
-            $allMetadata = $em->getMetadataFactory()->getAllMetadata();
+            $allMetadata = SafeDatabaseChecker::getAllMetadata($em);
             foreach ($allMetadata as $metadata) {
                 if ($metadata->isMappedSuperclass) {
                     continue;
