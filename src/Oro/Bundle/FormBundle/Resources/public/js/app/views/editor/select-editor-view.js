@@ -62,7 +62,6 @@ define(function(require) {
      */
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
-    var $ = require('jquery');
     var _ = require('underscore');
     require('jquery.select2');
 
