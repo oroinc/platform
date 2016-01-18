@@ -55,6 +55,7 @@ class ConfigurationGmailType extends AbstractType
     {
         $this->addOwnerOrganizationEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);
+        $this->addSetOriginToFoldersListener($builder);
 
         $builder
             ->add('check', 'button', [
@@ -268,6 +269,25 @@ class ConfigurationGmailType extends AbstractType
                 }
             },
             3
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addSetOriginToFoldersListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $data = $event->getData();
+                if ($data !== null && $data instanceof UserEmailOrigin) {
+                    foreach ($data->getFolders() as $folder) {
+                        $folder->setOrigin($data);
+                    }
+                    $event->setData($data);
+                }
+            }
         );
     }
 }

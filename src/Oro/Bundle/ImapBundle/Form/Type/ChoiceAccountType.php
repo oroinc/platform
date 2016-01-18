@@ -78,6 +78,9 @@ class ChoiceAccountType extends AbstractType
             //reset data for avoiding form extra parameters error
             $formEvent->setData(null);
             return;
+        } elseif ($form->getData() && $form->getData()->getAccountType() !== $data['accountType']) {
+            //set data here, for renew viewData of the form
+            $form->setData($accountTypeModel);
         }
 
         if ($accountTypeModel instanceof AccountTypeModel) {
