@@ -137,6 +137,11 @@ define(function(require) {
                 }
             });
             viewInstance.trigger('change');
+
+            if (this.backendErrors) {
+                this.view.$el.toggleClass('show-overlay', true);
+                this.view.showBackendErrors(this.backendErrors);
+            }
         },
 
         onInlineEditorFocus: function(view) {
@@ -469,30 +474,48 @@ define(function(require) {
                         }
                     }, this);
                 }
-                this.options.cell.$el.addClassTemporarily('save-success', 2000);
+                this.options.cell.$el
+                    .removeClass('save-fail')
+                    .addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
             delete this.oldState;
             delete this.newState;
+            delete this.backendErrors;
             this.exitEditMode(true);
         },
 
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             var errors = [];
-            this.revertChanges();
+            var fieldName;
+            var fieldLabel;
+
+            if (!this.options.cell.disposed && this.options.cell.$el) {
+                fieldName = this.options.cell.column.get('name');
+                fieldLabel = this.options.cell.column.get('label');
+                this.options.cell.$el.addClass('save-fail');
+            }
+
             switch (errorCode) {
                 case 400:
                     if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
-                        this.enterEditMode();
-                        this.view.$el.toggleClass('show-overlay', true);
-                        this.view.showBackendErrors(jqXHR.responseJSON.errors);
-                        return;
+                        var backendErrors = {};
+                        _.each(jqXHR.responseJSON.errors.children, function(item, name) {
+                            if (fieldName === name && _.isArray(item.errors)) {
+                                backendErrors.value = item.errors[0];
+                            }
+                        }, this);
+                        this.backendErrors = backendErrors;
+                        errors.push(__('oro.datagrid.inline_editing.message.save_field.validation_error',
+                            {fieldLabel: fieldLabel, error: backendErrors.value}));
                     }
                     break;
                 case 403:
                     errors.push(__('oro.datagrid.inline_editing.message.save_field.permission_denied',
-                        {fieldName: this.options.cell.column.get('label')}));
+                        {fieldLabel: fieldLabel}));
+                    this.revertChanges();
+                    this.exitEditMode(true);
                     break;
                 case 500:
                     if (jqXHR.responseJSON.message) {
@@ -500,19 +523,18 @@ define(function(require) {
                     } else {
                         errors.push(__('oro.ui.unexpected_error'));
                     }
+                    this.revertChanges();
+                    this.exitEditMode(true);
                     break;
                 default:
                     errors.push(__('oro.ui.unexpected_error'));
+                    this.revertChanges();
+                    this.exitEditMode(true);
             }
 
             _.each(errors, function(value) {
                 mediator.execute('showFlashMessage', 'error', value);
             });
-
-            if (!this.options.cell.disposed && this.options.cell.$el) {
-                this.options.cell.$el.addClass('save-fail');
-            }
-            this.exitEditMode(true);
         }
 
     });

@@ -166,13 +166,7 @@ define(function(require) {
         },
 
         showBackendErrors: function(backendErrors) {
-            var errors = {};
-            _.each(backendErrors.children, function(item, fieldName) {
-                if (this.fieldName === fieldName && _.isArray(item.errors)) {
-                    errors.value = item.errors[0];
-                }
-            }, this);
-            this.validator.showErrors(errors);
+            this.validator.showErrors(backendErrors);
         },
 
         /**
