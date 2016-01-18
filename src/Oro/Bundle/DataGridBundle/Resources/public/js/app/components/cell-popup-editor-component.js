@@ -475,7 +475,7 @@ define(function(require) {
                     }, this);
                 }
                 this.options.cell.$el
-                    .removeClass('save-fail')
+                    .removeClass('save-fail has-error')
                     .addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
@@ -488,34 +488,22 @@ define(function(require) {
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             var errors = [];
-            var fieldName;
             var fieldLabel;
 
-            if (!this.options.cell.disposed && this.options.cell.$el) {
-                fieldName = this.options.cell.column.get('name');
+            if (errorCode === 400) {
+                this.onValidationError(jqXHR);
+                return;
+            }
+
+            if (!this.options.cell.disposed) {
                 fieldLabel = this.options.cell.column.get('label');
                 this.options.cell.$el.addClass('save-fail');
             }
 
             switch (errorCode) {
-                case 400:
-                    if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
-                        var backendErrors = {};
-                        _.each(jqXHR.responseJSON.errors.children, function(item, name) {
-                            if (fieldName === name && _.isArray(item.errors)) {
-                                backendErrors.value = item.errors[0];
-                            }
-                        }, this);
-                        this.backendErrors = backendErrors;
-                        errors.push(__('oro.datagrid.inline_editing.message.save_field.validation_error',
-                            {fieldLabel: fieldLabel, error: backendErrors.value}));
-                    }
-                    break;
                 case 403:
                     errors.push(__('oro.datagrid.inline_editing.message.save_field.permission_denied',
                         {fieldLabel: fieldLabel}));
-                    this.revertChanges();
-                    this.exitEditMode(true);
                     break;
                 case 500:
                     if (jqXHR.responseJSON.message) {
@@ -523,20 +511,42 @@ define(function(require) {
                     } else {
                         errors.push(__('oro.ui.unexpected_error'));
                     }
-                    this.revertChanges();
-                    this.exitEditMode(true);
                     break;
                 default:
                     errors.push(__('oro.ui.unexpected_error'));
-                    this.revertChanges();
-                    this.exitEditMode(true);
             }
 
-            _.each(errors, function(value) {
-                mediator.execute('showFlashMessage', 'error', value);
-            });
-        }
+            this.revertChanges();
+            this.exitEditMode(true);
 
+            _.each(errors, function(value) {
+                mediator.execute('showMessage', 'error', value);
+            });
+        },
+
+        onValidationError: function(jqXHR) {
+            var message;
+            var fieldName;
+            var fieldLabel;
+
+            if (!this.options.cell.disposed) {
+                fieldName = this.options.cell.column.get('name');
+                fieldLabel = this.options.cell.column.get('label');
+                this.options.cell.$el.addClass('has-error');
+            }
+            if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
+                var backendErrors = {};
+                _.each(jqXHR.responseJSON.errors.children, function(item, name) {
+                    if (fieldName === name && _.isArray(item.errors)) {
+                        backendErrors.value = item.errors[0];
+                    }
+                }, this);
+                this.backendErrors = backendErrors;
+                message = __('oro.datagrid.inline_editing.message.save_field.validation_error',
+                    {fieldLabel: fieldLabel, error: backendErrors.value});
+                mediator.execute('showFlashMessage', 'error', message);
+            }
+        }
     });
 
     return CellPopupEditorComponent;
