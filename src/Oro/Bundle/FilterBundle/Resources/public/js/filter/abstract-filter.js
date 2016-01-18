@@ -260,8 +260,8 @@ define([
          * @protected
          */
         _onValueUpdated: function(newValue, oldValue) {
-            this._triggerUpdate(newValue, oldValue);
             this._updateCriteriaHint();
+            this._triggerUpdate(newValue, oldValue);
         },
 
         /**

@@ -15,7 +15,8 @@ define([
             filters: '.filter-container',
             itemHint: '.filter-item-hint',
             itemsHint: '.filter-items-hint',
-            hint: '.filter-criteria-hint'
+            hint: '.filter-criteria-hint',
+            reset: '.reset-filter-button'
         }
     }, config);
 
@@ -83,7 +84,8 @@ define([
             if (this.inline) {
                 this.filter.$el.find(this.selectors.itemHint).append(this.$el);
             } else {
-                this.filter.$el.closest(this.selectors.filters).find(this.selectors.itemsHint).append(this.$el);
+                this.filter.$el.closest(this.selectors.filters).find(this.selectors.itemsHint)
+                    .find(this.selectors.reset).before(this.$el);
             }
 
             this.update(this.hint);
