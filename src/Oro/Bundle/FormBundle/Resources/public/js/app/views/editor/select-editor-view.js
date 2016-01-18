@@ -174,9 +174,7 @@ define(function(require) {
             }
             this.$('.select2-focusser').off(this.eventNamespace());
             this.$('input.select2-input').off(this.eventNamespace());
-            this.$('input[name=value]').select2('destroy');
-            // due to bug in select2
-            $('body > .select2-drop-mask, body > .select2-drop').remove();
+            this.$('input[name=value]').select2('close').select2('destroy');
             SelectEditorView.__super__.dispose.call(this);
         },
 
