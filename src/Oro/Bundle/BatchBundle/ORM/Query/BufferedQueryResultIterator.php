@@ -170,6 +170,8 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     public function setPageCallback(callable $callback = null)
     {
         $this->pageCallback = $callback;
+
+        return $this;
     }
 
     /**
@@ -220,9 +222,6 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
         } else {
             $this->current  = $this->rows[$this->offset];
             $this->position = $this->offset + $this->getQuery()->getMaxResults() * $this->page;
-            if ($this->pageCallback && $this->offset === count($this->rows) - 1) {
-                call_user_func($this->pageCallback);
-            }
         }
     }
 
@@ -347,6 +346,10 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      */
     protected function loadNextPage()
     {
+        if ($this->pageCallback && $this->page !== -1) {
+            call_user_func($this->pageCallback);
+        }
+
         $query = $this->getQuery();
 
         $totalPages = ceil($this->count() / $query->getMaxResults());

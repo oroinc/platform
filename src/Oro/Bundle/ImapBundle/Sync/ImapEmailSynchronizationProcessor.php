@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -16,7 +17,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
-
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
@@ -127,13 +127,17 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             $this->em->transactional(function () use ($imapFolder, $folder) {
                 $staleImapEmailsQb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
-                $staleImapEmails = $staleImapEmailsQb
+                $staleImapEmailsQb
                     ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
                     ->andWhere('ie.imapFolder = :imap_folder')
                     ->setParameter('imap_folder', $imapFolder)
-                    ->setParameter('uids', $this->manager->getEmailUIDs())
-                    ->getQuery()
-                    ->getResult();
+                    ->setParameter('uids', $this->manager->getEmailUIDs());
+
+                $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
+                    ->setPageCallback(function () {
+                        $this->em->flush();
+                        $this->em->clear();
+                    });
 
                 /* @var $staleImapEmails ImapEmail[] */
                 foreach ($staleImapEmails as $imapEmail) {
