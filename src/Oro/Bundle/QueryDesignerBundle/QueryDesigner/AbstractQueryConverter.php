@@ -799,15 +799,12 @@ abstract class AbstractQueryConverter
 
         if (isset($query['join'])) {
             $joins = $this->buildVirtualJoins($query, $mainEntityJoinId);
-            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
+            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins);
             foreach ($joins as $join) {
                 $this->registerVirtualColumnTableAlias($joins, $join, $mainEntityJoinId);
             }
         }
-        $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect(
-            $query['select']['expr'],
-            $this->aliases
-        );
+        $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect($query['select']['expr']);
         $this->virtualColumnExpressions[$columnName] = $columnExpr;
         $key = sprintf('%s::%s', $className, $fieldName);
         if (!isset($this->virtualColumnOptions[$key])) {
@@ -919,7 +916,7 @@ abstract class AbstractQueryConverter
              */
             $joins = $this->buildVirtualJoins($query, $mainEntityJoinId);
 
-            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
+            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins);
 
             /**
              * Store mainEntityJoinId to build columnJoinId after virtual relations joins build
@@ -1260,16 +1257,15 @@ abstract class AbstractQueryConverter
      * Replaces all table aliases declared in the virtual column query with unique aliases for built query
      *
      * @param array $joins
-     * @param array $aliases
      */
-    protected function replaceTableAliasesInVirtualColumnJoinConditions(&$joins, &$aliases)
+    protected function replaceTableAliasesInVirtualColumnJoinConditions(&$joins)
     {
         // replace alias with {{newAlias}} - this is required to prevent collisions
         // between old and new aliases in case if some new alias has the same name as some old alias
         foreach ($joins as &$join) {
             if (isset($join['condition'])) {
                 $condition = $join['condition'];
-                foreach ($aliases as $alias => $newAlias) {
+                foreach ($this->aliases as $alias => $newAlias) {
                     $tryFind = true;
                     while ($tryFind) {
                         $tryFind = false;
@@ -1292,7 +1288,7 @@ abstract class AbstractQueryConverter
         foreach ($joins as &$join) {
             if (isset($join['condition'])) {
                 $condition = $join['condition'];
-                foreach ($aliases as $newAlias) {
+                foreach ($this->aliases as $newAlias) {
                     $condition = str_replace(sprintf('{{%s}}', $newAlias), $newAlias, $condition);
                 }
                 $join['condition'] = $condition;
@@ -1304,15 +1300,14 @@ abstract class AbstractQueryConverter
      * Replaces all table aliases declared in the virtual column select expression with unique aliases for built query
      *
      * @param string $selectExpr
-     * @param array  $aliases
      *
      * @return string The corrected select expression
      */
-    protected function replaceTableAliasesInVirtualColumnSelect($selectExpr, &$aliases)
+    protected function replaceTableAliasesInVirtualColumnSelect($selectExpr)
     {
         // replace alias with {{newAlias}} - this is required to prevent collisions
         // between old and new aliases in case if some new alias has the same name as some old alias
-        foreach ($aliases as $alias => $newAlias) {
+        foreach ($this->aliases as $alias => $newAlias) {
             $tryFind = true;
             while ($tryFind) {
                 $tryFind = false;
@@ -1329,7 +1324,7 @@ abstract class AbstractQueryConverter
             }
         }
         // replace {{newAlias}} with newAlias
-        foreach ($aliases as $newAlias) {
+        foreach ($this->aliases as $newAlias) {
             $selectExpr = str_replace(sprintf('{{%s}}', $newAlias), $newAlias, $selectExpr);
         }
 
