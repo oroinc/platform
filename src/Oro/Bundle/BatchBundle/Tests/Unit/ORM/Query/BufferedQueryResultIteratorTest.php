@@ -586,8 +586,8 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             ->select('o')
             ->from('Stub:Entity', 'o');
 
-        $iterator = new BufferedQueryResultIterator($source);
-        $iterator->setBufferSize($bufferSize);
+        $iterator = (new BufferedQueryResultIterator($source))
+            ->setBufferSize($bufferSize);
         $pages = 0;
         $iterator->setPageCallback(function () use (&$pages) {
             $pages++;
@@ -607,6 +607,13 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         ];
 
         return [
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => 0]]),
+                ],
+                $bufferSize = 1,
+                $pages = 0,
+            ],
             [
                 $statements = [
                     $this->createFetchStatementMock([['sclr_0' => count($records)]]),
