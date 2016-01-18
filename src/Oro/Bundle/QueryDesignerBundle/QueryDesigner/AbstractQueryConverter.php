@@ -1350,7 +1350,7 @@ abstract class AbstractQueryConverter
                 }
             } elseif (strlen($selectExpr) !== $pos + strlen($alias) + 1) {
                 $prevChar = substr($selectExpr, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '(', ','])) {
+                if (in_array($prevChar, [' ', '(', ','], true)) {
                     $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
                     if ('.' === $nextChar) {
                         return $pos;
@@ -1379,7 +1379,7 @@ abstract class AbstractQueryConverter
             if (0 === $pos) {
                 // handle case "ALIAS.", "ALIAS.field"
                 $nextChar = substr($condition, $pos + strlen($alias), 1);
-                if (in_array($nextChar, ['.', ' ', '='])) {
+                if (in_array($nextChar, ['.', ' ', '='], true)) {
                     return $pos;
                 }
 
@@ -1388,15 +1388,15 @@ abstract class AbstractQueryConverter
             } elseif (strlen($condition) === $pos + strlen($alias)) {
                 // handle case "t2.someField = ALIAS"
                 $prevChar = substr($condition, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '='])) {
+                if (in_array($prevChar, [' ', '='], true)) {
                     return $pos;
                 }
             } else {
                 // handle case "t2.someField = ALIAS.id"
                 $prevChar = substr($condition, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '=', '('])) {
+                if (in_array($prevChar, [' ', '=', '('], true)) {
                     $nextChar = substr($condition, $pos + strlen($alias), 1);
-                    if (in_array($nextChar, ['.', ' ', '=', ')'])) {
+                    if (in_array($nextChar, ['.', ' ', '=', ')'], true)) {
                         return $pos;
                     }
                 }
