@@ -4,8 +4,8 @@ datagrid:
         options:
             entityHint: user
             entity_pagination: true
+        acl_resource: oro_user_user_view
         source:
-            acl_resource: oro_user_user_view
             type: orm
             query:
                 select:
@@ -135,8 +135,8 @@ datagrid:
         options:
             entityHint: group
             entity_pagination: true
+        acl_resource: oro_user_group_view
         source:
-            acl_resource: oro_user_group_view
             type: orm
             query:
                 select:
@@ -195,9 +195,10 @@ datagrid:
         options:
             entityHint: role
             entity_pagination: true
+        acl_resource: oro_user_role_view
         source:
-            acl_resource: oro_user_role_view
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - r
@@ -293,8 +294,8 @@ datagrid:
 
     role-users-grid:
         extends: user-relation-grid
+        acl_resource: oro_user_role_update
         source:
-            acl_resource: oro_user_role_update
             query:
                 select:
                     - >
@@ -373,8 +374,8 @@ datagrid:
 
     group-users-grid:
         extends: user-relation-grid
+
         source:
-            acl_resource: oro_user_group_update
             query:
                 select:
                     - >
@@ -454,8 +455,8 @@ datagrid:
         extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
+        acl_resource: oro_user_user_view
         source:
-            acl_resource: oro_user_user_view
             type: orm
             query:
                 select:
@@ -526,10 +527,9 @@ datagrid:
         extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
-            skip_acl_check: true
         source:
-            acl_resource: oro_user_user_view
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - u.id
@@ -614,9 +614,8 @@ datagrid:
                 pageSize:
                     default_per_page: 10
             routerEnabled: false
-
+        acl_resource: oro_user_user_view
         source:
-            acl_resource: oro_user_user_view
             type: orm
             query:
                 select:

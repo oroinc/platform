@@ -1,9 +1,9 @@
 datagrid:
     audit-grid:
+        acl_resource: oro_dataaudit_history
         options:
             entityHint: audit
         source:
-            acl_resource: oro_dataaudit_history
             type: orm
             query:
                 select:
@@ -122,8 +122,8 @@ datagrid:
                     enabled: false
 
     audit-history-grid:
+        acl_resource: oro_dataaudit_history
         source:
-            acl_resource: oro_dataaudit_history
             type: orm
             query:
                 select:

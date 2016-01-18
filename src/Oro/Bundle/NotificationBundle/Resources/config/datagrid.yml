@@ -3,8 +3,8 @@ datagrid:
         options:
             entityHint: transactional email
             entity_pagination: true
+        acl_resource: oro_notification_emailnotification_view
         source:
-            acl_resource: oro_notification_emailnotification_view
             type: orm
             query:
                 select:

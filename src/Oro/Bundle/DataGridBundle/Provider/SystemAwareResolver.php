@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Provider;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class SystemAwareResolver implements ContainerAwareInterface
 {
@@ -51,7 +51,7 @@ class SystemAwareResolver implements ContainerAwareInterface
                     ->getConfigurationForGrid($val);
 
                 // merge them and remove extend directive
-                $datagridDefinition = ArrayUtils::arrayMergeRecursiveDistinct(
+                $datagridDefinition = ArrayUtil::arrayMergeRecursiveDistinct(
                     $definition->toArray(),
                     $datagridDefinition
                 );

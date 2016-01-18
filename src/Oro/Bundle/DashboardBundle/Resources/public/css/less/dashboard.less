@@ -579,8 +579,17 @@
   margin-bottom: 10px;
   .controls {
     width: 445px;
-    .mobile-version & {
+  }
+  .mobile-version & {
+    .controls {
       width: initial;
+    }
+    .action-column {
+      width: 116px;
+      text-align: center;
+    }
+    .action-cell .btn {
+      padding: 0 4px;
     }
   }
 }
