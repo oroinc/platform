@@ -70,11 +70,11 @@ define(function(require) {
                 gapi.auth.authorize({
                     'client_id': data.clientId,
                     'scope': this.scopes.join(' '),
-                    'immediate': true,
+                    'immediate': false,
                     'login_hint': emailAddress,
                     'access_type': 'offline',
                     'response_type': 'code',
-                    'approval_prompt': 'auto'
+                    'approval_prompt': 'force'
                 }, _.bind(this.handleResponseGoogleAuthCode, this));
             }
         },
@@ -83,9 +83,8 @@ define(function(require) {
          * Handler response from google API  for request to get google auth code
          */
         handleResponseGoogleAuthCode: function(response) {
+            debugger;
             this.view.setGoogleAuthCode(response.code);
-
-            //this.requestAccessToken();
         },
 
         /**
@@ -97,7 +96,7 @@ define(function(require) {
                 'client_id': data.clientId,
                 'scope': this.scopes.join(' '),
                 'immediate': false,
-                'approval_prompt': 'force'
+                'authuser': -1
             }, _.bind(this.checkAuthorization, this));
         },
 
