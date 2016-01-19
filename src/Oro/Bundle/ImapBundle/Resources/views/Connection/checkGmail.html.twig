@@ -1,3 +1,17 @@
+{% if form.imapAccountType.userEmailOrigin.user.vars.value|length %}
+    <div class="control-group">
+        <div class="control-label wrap">
+            {{ 'oro.imap.configuration.reset_email.label'|trans }}
+        </div>
+        <div class="controls oro-item-collection">
+            <div style="margin-top: 6px">
+                <strong>{{ form.imapAccountType.userEmailOrigin.user.vars.value }}</strong>
+                <button class="removeRow btn-action btn-link" type="button" style="vertical-align: baseline">×</button>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 <div class="control-group">
     <div class="controls">
         {{ form_row(form.imapAccountType.userEmailOrigin.checkFolder) }}
