@@ -91,7 +91,7 @@ class CalendarPropertyProvider
         $result = $qb->getQuery()->getArrayResult();
 
         // normalize integer foreign keys due Doctrine IDENTITY function always returns a string
-        if (!empty($intCasts)) {
+        if ($intCasts) {
             foreach ($result as &$item) {
                 foreach ($intCasts as $fieldName) {
                     if (isset($item[$fieldName]) && is_string($item[$fieldName])) {
