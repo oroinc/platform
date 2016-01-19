@@ -15,13 +15,16 @@ parameters:
 
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
     oro_imap.form.type.check_button.class:           Oro\Bundle\ImapBundle\Form\Type\CheckButtonType
-    oro_imap.listener.user_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
-
     oro_imap.form.type.google_sync_checkbox.class:   Oro\Bundle\ImapBundle\Form\Type\GoogleSyncConfigCheckbox
+    oro_imap.form.type.choice_account.class:         Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType
+    oro_imap.form.configuration_gmail_type.class:    Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType
+
+    oro_imap.listener.user_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
 
     oro_imap.imap_email_google_oauth2_manager.class: Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager
 
-    oro_imap.form.type.choice_account.class:          Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType
+    oro_imap.manager.connection_controller_manager.class: Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager
+
 services:
     oro_imap.connector.factory:
         class: %oro_imap.connector.factory.class%
@@ -100,8 +103,8 @@ services:
         tags:
              - { name: form.type, alias: oro_imap_choice_account_type }
 
-    oro_imap.form.type.configuration.gmail:
-        class: Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType
+    oro_imap.form.configuration_gmail_type:
+        class: %oro_imap.form.configuration_gmail_type.class%
         arguments:
              - @translator
              - @oro_config.user
@@ -150,7 +153,7 @@ services:
             - @doctrine
 
     oro_imap.manager.controller.connection:
-        class: Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager
+        class: %oro_imap.manager.connection_controller_manager.class%
         scope: request
         arguments:
             - @oro_user.form.user
