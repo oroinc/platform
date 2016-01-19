@@ -68,7 +68,7 @@ class ConnectionControllerManager
      * $param sting $formParentName
      * @return FormInterface
      */
-    public function getFormCheckGmailConnection($request, $formParentName)
+    public function getCheckGmailConnectionForm($request, $formParentName)
     {
         $form = $this->formFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
         $form->submit($request);

@@ -22,7 +22,7 @@ class GmailConnectionController extends Controller
         $formParentName = $request->get('formParentName');
 
         try {
-            $form = $connectionControllerManager->getFormCheckGmailConnection($request, $formParentName);
+            $form = $connectionControllerManager->getCheckGmailConnectionForm($request, $formParentName);
 
             $response = [
                 'html' => $this->renderView('OroImapBundle:Connection:checkGmail.html.twig', [
