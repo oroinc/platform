@@ -4,6 +4,7 @@ define(function(require) {
     var ImapGmailView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
 
     ImapGmailView = BaseView.extend({
         events: {
@@ -83,7 +84,6 @@ define(function(require) {
 
         /**
          * Handler event of click on the button Connection
-         * @param e
          */
         onClickConnect: function() {
             this.trigger('checkConnection', this.getData());
