@@ -6,8 +6,8 @@
 {% if ownerType == 'USER' %}
     {% set userOwner = oro_get_entity_owner(entity) %}
     {% set businessUnitName = U.user_business_unit_name(userOwner, false) %}
-    {% if businessUnitName|trim|length > 0 %}
-        {% set bracket_parts = [businessUnitName|trim]|merge(bracket_parts) %}
+    {% if businessUnitName is not empty %}
+        {% set bracket_parts = [businessUnitName]|merge(bracket_parts) %}
     {% endif %}
 {% endif %}
 {% if bracket_parts is not empty %}
