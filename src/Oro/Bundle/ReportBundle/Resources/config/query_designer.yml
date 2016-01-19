@@ -19,3 +19,10 @@ query_designer:
                 - { name: Min,   expr: MIN($column) }
                 - { name: Max,   expr: MAX($column) }
             query_type: [report]
+        date:
+            applicable: [{type: date}, {type: datetime}]
+            functions:
+                - { name: Count, expr: COUNT($column), return_type: integer }
+                - { name: Min,   expr: MIN($column) }
+                - { name: Max,   expr: MAX($column) }
+            query_type: [report]

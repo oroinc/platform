@@ -50,14 +50,19 @@
     padding-right: @contentPadding;
   }
 }
+.scrollspy.container-fluid, .page-title + [data-bound-component="orodatagrid/js/app/components/datagrid-component"]  {
+  margin-top: -10px;
+}
 .layout-content .responsive-section{
   padding: 0;
   .form-horizontal {
     padding: @contentPadding 0;
   }
 }
-.container-fluid > .responsive-section .responsive-cell {
-  padding: 0 @contentPadding;
+.container-fluid > .responsive-section {
+  .responsive-cell, .responsive-cell:only-child {
+    padding: 0 @contentPadding;
+  }
 }
 .responsive-cell .box-type1{
   .filter-box {
@@ -122,8 +127,8 @@
     }
     .container-fluid,
     .grid-toolbar{
-      padding-left: 10px;
-      padding-right: 10px;
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 }

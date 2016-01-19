@@ -24,7 +24,7 @@ define([
 
             this.template = _.template($('#activity-context-activity-list').html());
             this.$containerContextTargets = $(options.el).find('.activity-context-activity-items');
-            this.collection = new ActivityContextActivityCollection('oro_api_delete_activity_relation');
+            this.collection = new ActivityContextActivityCollection();
             this.editable = options.editable;
             this.initEvents();
 
@@ -74,11 +74,7 @@ define([
         },
 
         render: function() {
-            if (this.collection.length === 0) {
-                this.$el.hide();
-            } else {
-                this.$el.show();
-            }
+            this.$el.toggle(this.collection.length > 0);
         },
 
         initEvents: function() {
@@ -99,6 +95,7 @@ define([
                 self.$containerContextTargets.append($view);
 
                 $view.find('i.icon-remove').click(function() {
+                    $view.fadeOut();
                     model.destroy({
                         success: function(model, response) {
                             messenger.notificationFlashMessage('success', __('oro.activity.contexts.removed'));
@@ -112,6 +109,7 @@ define([
                             }
                         },
                         error: function(model, response) {
+                            $view.show();
                             messenger.showErrorMessage(__('oro.ui.item_delete_error'), response.responseJSON || {});
                         }
                     });

@@ -20,4 +20,11 @@ interface LayoutRendererInterface
      * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
      */
     public function setBlockTheme(BlockView $view, $themes);
+
+    /**
+     * Sets the theme(s) to be used for rendering forms
+     *
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     */
+    public function setFormTheme($themes);
 }

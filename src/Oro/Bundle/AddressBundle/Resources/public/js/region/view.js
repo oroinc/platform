@@ -32,6 +32,7 @@ define([
             this.$simpleEl.attr('type', 'text');
 
             this.showSelect = options.showSelect;
+            this.regionRequired = options.regionRequired;
 
             this.template = _.template($('#region-chooser-template').html());
 
@@ -50,11 +51,15 @@ define([
          */
         displaySelect2: function(display) {
             if (display) {
-                this.addRequiredFlag(this.$simpleEl);
+                if (this.regionRequired) {
+                    this.addRequiredFlag(this.$simpleEl);
+                }
                 this.target.select2('container').show();
             } else {
                 this.target.select2('container').hide();
-                this.removeRequiredFlag(this.$simpleEl);
+                if (this.regionRequired) {
+                    this.removeRequiredFlag(this.$simpleEl);
+                }
                 this.target.validate().hideElementErrors(this.target);
             }
         },

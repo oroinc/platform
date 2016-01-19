@@ -1,4 +1,3 @@
-@import "./inline-editing";
 .table {
   th, td {
     /* should center content in cell right */
@@ -12,6 +11,9 @@
   }
   th.renderable, td.renderable {
     display: table-cell;
+  }
+  .loader-mask {
+    z-index: @oroZindexDropdown - 1;// to show under grid's filter
   }
 }
 
@@ -200,6 +202,13 @@ table.grid {
   .select-row-cell input[type=checkbox] {
       margin-top: -3px;
   }
+  .tags-cell {
+    .tags-item {
+      border: 1px solid #CCCCCC;
+      border-radius: 4px;
+      padding: 2px 4px;
+    }
+  }
 }
 
 .other-scroll-container .table-bordered{
@@ -321,6 +330,9 @@ td > .nowrap-ellipsis {
   .nav-pills {
     padding: 0;
   }
+}
+.select-all-header-cell {
+  width: 40px;
 }
 .action-cell .more-bar-holder .dropdown-toggle {
   margin-left: 5px;

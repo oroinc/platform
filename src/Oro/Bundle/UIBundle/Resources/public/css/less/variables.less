@@ -28,8 +28,11 @@
 @headerIconButtonColorEnd:        #454f58;
 @headerIconButtonTextColor:       #2a313a;
 @headerTextColor:                 #cad2da;
+@inlineActionColor:               #94b4c9;
+@inlineActionBackground:          #edf5fb;
 @rowHighlightBackground:          #fffeea;
-@rowSelectedBackground:           #f4efd4;
+@rowSelectedBackground:           @inlineActionBackground;
+@cellSelectedBorder:              @inlineActionColor;
 @sideBarClosedWidth:              33px;
 @sideBarOpenedWidth:              200px;
 
@@ -73,6 +76,10 @@
 @infoBorder:                      #bce8f1;
 @infoClose:                       #b6d0dc;
 
+@tagItemColor:                    #fff;
+@tagItemBackground:               #aaa;
+@tagMyItemBackground:             #ccc;
+
 // Links
 @linkColor:                       #006acc;
 @linkColorHover:                  darken(@linkColor, 10%);
@@ -86,3 +93,6 @@
 // Screen sizes
 @sideBarClosedWidth:              33px;
 @sideBarOpenedWidth:              200px;
+
+// Z-indexs
+@oroZindexDropdown:                     900;

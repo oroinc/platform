@@ -292,9 +292,6 @@ define([
          */
         add: function() {
             var path;
-            if (current.path[0] !== '/') {
-                current.path = '/' + current.path;
-            }
             path = current.path;
             pagesCache[path] = current;
         },
@@ -327,7 +324,7 @@ define([
          * @param {string=} hash
          */
         saveState: function(key, value, hash) {
-            if (value !== null) {
+            if (value !== null && value !== void 0) {
                 current.state[key] = value;
             } else {
                 delete current.state[key];
@@ -408,7 +405,7 @@ define([
         checkState: function(key, hash) {
             var query;
             query = Chaplin.utils.queryParams.parse(current.query);
-            return query[key] === hash;
+            return query[key] === hash || query[key] === void 0 && hash === null;
         },
 
         /**
