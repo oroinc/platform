@@ -4,6 +4,7 @@ define(function(require) {
     var ImapGmailView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
 
     ImapGmailView = BaseView.extend({
         events: {
