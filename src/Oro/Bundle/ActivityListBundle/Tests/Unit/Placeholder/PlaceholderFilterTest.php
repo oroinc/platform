@@ -5,14 +5,15 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonActiveTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonManagedTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 
 class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
@@ -20,13 +21,16 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ActivityListChainProvider */
     protected $activityListProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActivityManager */
+    protected $activityManager;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
     protected $doctrine;
 
     /** @var PlaceholderFilter */
     protected $filter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var ConfigProviderMock */
     protected $configProvider;
 
     /** @var array */
@@ -39,6 +43,11 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     {
         $this->activityListProvider = $this
             ->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->activityManager = $this
+            ->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -73,26 +82,77 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
                 return !$entity instanceof TestNonManagedTarget;
             });
 
-        $this->configureConfigProvider();
+        /** @var ConfigManager $configManager */
+        $configManager        = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configProvider = new ConfigProviderMock($configManager, 'activity');
 
         $this->filter = new PlaceholderFilter(
             $this->activityListProvider,
             $this->doctrine,
             $this->doctrineHelper,
-            $this->configProvider
+            $this->configProvider,
+            $this->activityManager
         );
     }
 
     public function testIsApplicable()
     {
         $testTarget = new TestTarget(1);
-        $this->setConfigProviderEntitySupport(
-            $testTarget,
-            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE'
+
+        $entityClass = get_class($testTarget);
+        $this->configProvider->addEntityConfig(
+            $entityClass,
+            [ActivityScope::SHOW_ON_PAGE => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE']
         );
+        $this->configProvider->addFieldConfig($entityClass, 'associationField');
+
+        $this->activityListProvider->expects($this->once())
+            ->method('getSupportedActivities')
+            ->willReturn([]);
+
+        $this->activityManager
+            ->expects($this->once())
+            ->method('getActivityAssociations')
+            ->with($entityClass)
+            ->willReturn(
+                [
+                    ['className' => $entityClass, 'associationName' => 'associationField']
+                ]
+            );
 
         $this->assertTrue($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
         $this->assertFalse($this->filter->isApplicable(null, ActivityScope::VIEW_PAGE));
+    }
+
+    public function testIsApplicableWithSupportedActivityList()
+    {
+        $testTarget = new TestTarget(1);
+
+        $entityClass = get_class($testTarget);
+        $this->configProvider->addEntityConfig(
+            $entityClass,
+            [ActivityScope::SHOW_ON_PAGE => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE']
+        );
+
+        $supportedActivity = 'Class/Name';
+        $this->activityListProvider->expects($this->once())
+            ->method('getSupportedActivities')
+            ->willReturn([$supportedActivity]);
+
+        $this->activityListProvider->expects($this->exactly(1))
+            ->method('isApplicableTarget')
+            ->with($entityClass, $supportedActivity)
+            ->willReturn(true);
+
+        $this->activityManager
+            ->expects($this->never())
+            ->method('getActivityAssociations')
+            ->with($entityClass)
+            ->willReturn([]);
+
+        $this->assertTrue($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
     }
 
     public function testIsApplicableWithNonManagedEntity()
@@ -105,15 +165,29 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new TestTarget(1);
 
-        $this->setConfigProviderEntitySupport(
-            $entity,
-            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE'
+        $entityClass = get_class($entity);
+        $this->configProvider->addEntityConfig(
+            $entityClass,
+            [ActivityScope::SHOW_ON_PAGE => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE']
         );
+
+        $this->activityListProvider->expects($this->exactly(2))
+            ->method('getSupportedActivities')
+            ->willReturn([]);
+
+        $this->configProvider->addFieldConfig($entityClass, 'associationField');
+        $this->activityManager->expects($this->exactly(2))
+            ->method('getActivityAssociations')
+            ->with($entityClass)
+            ->willReturn([
+                ['className' => $entityClass, 'associationName' => 'associationField']
+            ]);
+
         $this->assertFalse($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
 
-        $this->setConfigProviderEntitySupport(
-            $entity,
-            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_UPDATE_PAGES'
+        $this->configProvider->addEntityConfig(
+            $entityClass,
+            [ActivityScope::SHOW_ON_PAGE => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_UPDATE_PAGES']
         );
         $this->assertTrue($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
     }
@@ -133,10 +207,27 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $entity = new TestNonActiveTarget(123);
-        $this->setConfigProviderEntitySupport(
-            $entity,
-            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE'
+
+        $entityClass = get_class($entity);
+        $this->configProvider->addEntityConfig(
+            $entityClass,
+            [ActivityScope::SHOW_ON_PAGE => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE']
         );
+        $this->configProvider->addFieldConfig($entityClass, 'associationField');
+
+        $this->activityListProvider->expects($this->once())
+            ->method('getSupportedActivities')
+            ->willReturn([]);
+
+        $this->activityManager
+            ->expects($this->once())
+            ->method('getActivityAssociations')
+            ->with($entityClass)
+            ->willReturn(
+                [
+                    ['className' => $entityClass, 'associationName' => 'associationField']
+                ]
+            );
 
         $this->assertTrue($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
     }
@@ -147,13 +238,19 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     public function testIsAllowedButtonWithUnknownPageConstant()
     {
         $entity = new TestTarget(1);
-        $this->setConfigProviderEntitySupport($entity, 'UNKNOWN_ORO_CONSTANT');
+
+        $this->configProvider->addEntityConfig(
+            get_class($entity),
+            [ActivityScope::SHOW_ON_PAGE => 'UNKNOWN_ORO_CONSTANT']
+        );
+
         $event = new BeforeGroupingChainWidgetEvent(ActivityScope::SHOW_ON_PAGE, [], $entity);
         $this->filter->isAllowedButton($event);
     }
 
     /**
-     * @dataProvider isAllowedButtonProvider
+     * @dataProvider   isAllowedButtonProvider
+     *
      * @param int      $pageType
      * @param array    $widgets
      * @param object   $entity
@@ -163,7 +260,10 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     public function testIsAllowedButton($pageType, $widgets, $entity, $configProviderSetting, $expected)
     {
         if ($configProviderSetting !== null) {
-            $this->setConfigProviderEntitySupport($entity, $configProviderSetting);
+            $this->configProvider->addEntityConfig(
+                get_class($entity),
+                [ActivityScope::SHOW_ON_PAGE => $configProviderSetting]
+            );
         }
         $event = new BeforeGroupingChainWidgetEvent($pageType, $widgets, $entity);
         $this->filter->isAllowedButton($event);
@@ -200,55 +300,5 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
                 'expected'              => $widgets
             ],
         ];
-    }
-
-    /**
-     * @param $entity
-     * @param $value
-     */
-    protected function setConfigProviderEntitySupport($entity, $value)
-    {
-        $entityHash                  = spl_object_hash($entity);
-        $this->entities[$entityHash] = $value;
-    }
-
-    protected function configureConfigProvider()
-    {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configProvider->expects($this->any())
-            ->method('hasConfig')
-            ->willReturnCallback(function ($entity) {
-                $entityHash = spl_object_hash($entity);
-                return array_key_exists($entityHash, $this->entities);
-            });
-
-        $this->configProvider->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(function ($entity) {
-                $entityHash = spl_object_hash($entity);
-
-                if (!array_key_exists($entityHash, $this->entities)) {
-                    throw new RuntimeException();
-                }
-
-                $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-                    ->disableOriginalConstructor()
-                    ->getMock();
-
-                $config->expects($this->any())
-                    ->method('get')
-                    ->with($this->equalTo(ActivityScope::SHOW_ON_PAGE))
-                    ->willReturn($this->entities[$entityHash]);
-
-                $config->expects($this->any())
-                    ->method('has')
-                    ->with($this->equalTo(ActivityScope::SHOW_ON_PAGE))
-                    ->willReturn(array_key_exists($entityHash, $this->entities));
-
-                return $config;
-            });
     }
 }

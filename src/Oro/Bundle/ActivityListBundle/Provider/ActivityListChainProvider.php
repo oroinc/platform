@@ -19,8 +19,6 @@ use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
- * Class ActivityListChainProvider
- * @package Oro\Bundle\ActivityListBundle\Provider
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -89,9 +87,9 @@ class ActivityListChainProvider
     }
 
     /**
-     * Get array providers
+     * Get all registered providers
      *
-     * @return \Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface[]
+     * @return ActivityListProviderInterface[] [activity class => provider, ...]
      */
     public function getProviders()
     {
@@ -122,6 +120,26 @@ class ActivityListChainProvider
         }
 
         return $this->targetClasses;
+    }
+
+    /**
+     * @param string $targetClassName
+     * @param string $activityClassName
+     *
+     * @return bool
+     */
+    public function isApplicableTarget($targetClassName, $activityClassName)
+    {
+        if (!isset($this->providers[$activityClassName])
+            || !$this->configManager->hasConfig($targetClassName)
+        ) {
+            return false;
+        }
+
+        return $this->providers[$activityClassName]->isApplicableTarget(
+            $this->configManager->getId('entity', $targetClassName),
+            $this->configManager
+        );
     }
 
     /**

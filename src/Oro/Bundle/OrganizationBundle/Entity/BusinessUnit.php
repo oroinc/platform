@@ -20,6 +20,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
  * @Config(
+ *      routeName="oro_business_unit_index",
+ *      routeView="oro_business_unit_view",
+ *      routeCreate="oro_business_unit_create",
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-building"
@@ -34,6 +37,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
+ *          },
+ *          "grid"={
+ *              "default"="business-unit-grid"
  *          }
  *      }
  * )

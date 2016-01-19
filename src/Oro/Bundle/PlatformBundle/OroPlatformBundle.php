@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineConfigurationPass;
 
 class OroPlatformBundle extends Bundle
 {
@@ -21,5 +22,6 @@ class OroPlatformBundle extends Bundle
     {
         $container->addCompilerPass(new LazyServicesCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new OptionalListenersCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new UpdateDoctrineConfigurationPass());
     }
 }

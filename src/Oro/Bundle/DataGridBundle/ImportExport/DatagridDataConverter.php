@@ -113,13 +113,15 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
             switch ($frontendType) {
                 case PropertyInterface::TYPE_DATE:
-                    $val = $this->dateTimeFormatter->formatDate($val);
+                    // Date data does not contain time and timezone information.
+                    $val = $this->dateTimeFormatter->formatDate($val, null, null, 'UTC');
                     break;
                 case PropertyInterface::TYPE_DATETIME:
                     $val = $this->dateTimeFormatter->format($val);
                     break;
                 case PropertyInterface::TYPE_TIME:
-                    $val = $this->dateTimeFormatter->formatTime($val);
+                    // Date data does not contain time and timezone information.
+                    $val = $this->dateTimeFormatter->formatDate($val, null, null, 'UTC');
                     break;
                 case PropertyInterface::TYPE_DECIMAL:
                     $val = $this->numberFormatter->formatDecimal($val);
