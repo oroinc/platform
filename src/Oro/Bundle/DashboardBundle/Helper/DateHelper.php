@@ -94,8 +94,9 @@ class DateHelper
 
         // Adjust time intervals to match
         if (count($currentItems) != count($items)) {
-            $interval = new \DateInterval('P1D');
-            While (count($items) != count($currentItems)) {
+            $config     = self::getFormatStrings($from, $to);
+            $interval   = new \DateInterval($config['intervalString']);
+            while (count($items) != count($currentItems)) {
                 if (count($items) > count($currentItems)) {
                     $from->add($interval);
                     $items = $this->getDatePeriod($from, $to);
@@ -108,7 +109,7 @@ class DateHelper
 
         foreach ($data as $row) {
             $key                   = $this->getKey($from, $to, $row);
-            if (isset ($items[$key])) {
+            if (isset($items[$key])) {
                 $items[$key][$dataKey] = $row[$rowKey];
             }
         }
