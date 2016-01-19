@@ -7,17 +7,18 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
+use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
+use Oro\Bundle\ImapBundle\Form\EventListener\GmailOAuthSubscriber;
+use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ConfigurationGmailType extends AbstractType
@@ -55,7 +56,8 @@ class ConfigurationGmailType extends AbstractType
     {
         $this->addOwnerOrganizationEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);
-        $this->addSetOriginToFoldersListener($builder);
+        $builder->addEventSubscriber(new OriginFolderSubscriber());
+        $builder->addEventSubscriber(new ApplySyncSubscriber());
 
         $builder
             ->add('check', 'button', [
@@ -120,44 +122,7 @@ class ConfigurationGmailType extends AbstractType
                 }
             ));
 
-        $this->initEvents($builder);
-    }
-
-    /**
-     * @param FormEvent $formEvent
-     */
-    public function preSubmit(FormEvent $formEvent)
-    {
-        $form = $formEvent->getForm();
-        $emailOrigin = $form->getData();
-
-        if (null === $emailOrigin || null === $emailOrigin->getAccessToken()) {
-            $data = $formEvent->getData();
-
-            if (null == $data) {
-                return;
-            }
-
-            $emailOrigin = new UserEmailOrigin();
-            $emailOrigin->setAccessToken($data['accessToken']);
-        }
-
-        if ($emailOrigin instanceof UserEmailOrigin) {
-            $this->updateForm($form, $emailOrigin);
-        }
-    }
-
-    /**
-     * @param FormEvent $formEvent
-     */
-    public function preSetData(FormEvent $formEvent)
-    {
-        $form = $formEvent->getForm();
-        $emailOrigin = $formEvent->getData();
-
-        if ($emailOrigin instanceof UserEmailOrigin) {
-            $this->updateForm($form, $emailOrigin);
-        }
+        $builder->addEventSubscriber(new GmailOAuthSubscriber($this->translator));
     }
 
     /**
@@ -176,36 +141,6 @@ class ConfigurationGmailType extends AbstractType
     public function getName()
     {
         return self::NAME;
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function initEvents(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
-    }
-
-    /**
-     * @param FormInterface $form
-     * @param UserEmailOrigin $emailOrigin
-     */
-    protected function updateForm(FormInterface $form, UserEmailOrigin $emailOrigin)
-    {
-        if ($emailOrigin->getAccessToken() && $emailOrigin->getAccessToken() !== '') {
-            $form->add('checkFolder', 'button', [
-                'label' => $this->translator->trans('oro.email.retrieve_folders.label'),
-                'attr' => ['class' => 'btn btn-primary']
-            ])
-            ->add('folders', 'oro_email_email_folder_tree', [
-                'label' => $this->translator->trans('oro.email.folders.label'),
-                'attr' => ['class' => 'folder-tree'],
-                'tooltip' => $this->translator->trans('oro.email.folders.tooltip'),
-            ]);
-
-            $form->remove('check');
-        }
     }
 
     /**
@@ -269,25 +204,6 @@ class ConfigurationGmailType extends AbstractType
                 }
             },
             3
-        );
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addSetOriginToFoldersListener(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                if ($data !== null && $data instanceof UserEmailOrigin) {
-                    foreach ($data->getFolders() as $folder) {
-                        $folder->setOrigin($data);
-                    }
-                    $event->setData($data);
-                }
-            }
         );
     }
 }

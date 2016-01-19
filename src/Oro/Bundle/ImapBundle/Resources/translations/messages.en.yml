@@ -1,7 +1,7 @@
 oro.imap:
     system_configuration:
         groups:
-            google_imap_settings.title: IMAP Sync
+            google_imap_settings.title: OAuth 2.0 for email sync
         fields:
             enable_google_imap:
                 label: Enable
