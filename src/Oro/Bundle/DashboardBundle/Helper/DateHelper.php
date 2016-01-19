@@ -94,7 +94,8 @@ class DateHelper
 
         // Adjust time intervals to match
         if (count($currentItems) != count($items)) {
-            $interval = new \DateInterval('P1D');
+            $config     = self::getFormatStrings($from, $to);
+            $interval   = new \DateInterval($config['intervalString']);
             While (count($items) != count($currentItems)) {
                 if (count($items) > count($currentItems)) {
                     $from->add($interval);

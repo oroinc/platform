@@ -369,4 +369,36 @@ class DateHelperTest extends OrmTestCase
 
         $this->assertEquals($expectedData, $actualData);
     }
+
+    public function testCombinePreviousDataWithCurrentPeriodLongPeriodFirstDaysOfMonth()
+    {
+        $previousFrom = new DateTime('2015-03-02 22:00:00');
+        $previousTo = new DateTime('2015-08-01 00:00:00');
+
+        $data = [
+            [
+                'yearCreated'  => '2015',
+                'monthCreated' => '07',
+                'dayCreated'   => '12',
+                'cnt'          => 5,
+            ]
+        ];
+        $expectedData = [
+            ['date' => '2015-08-01'],
+            ['date' => '2015-09-01'],
+            ['date' => '2015-10-01'],
+            ['date' => '2015-11-01', 'count' => 5],
+            ['date' => '2015-12-01'],
+        ];
+
+        $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(
+            $previousFrom,
+            $previousTo,
+            $data,
+            'cnt',
+            'count'
+        );
+
+        $this->assertEquals($expectedData, $actualData);
+    }
 }
