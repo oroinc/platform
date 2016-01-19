@@ -55,7 +55,6 @@ define(function(require) {
             mediator.execute('showLoading');
             this.view.resetErrorMessage();
             this.requestAccessToken();
-            //this.requestGoogleAuthCode();
         },
 
         /**
@@ -98,8 +97,6 @@ define(function(require) {
                 'client_id': data.clientId,
                 'scope': this.scopes.join(' '),
                 'immediate': false,
-                //'login_hint': 'test1@sichevoy.com',
-                //'authuser': -1,
                 'approval_prompt': 'force'
             }, _.bind(this.checkAuthorization, this));
         },
