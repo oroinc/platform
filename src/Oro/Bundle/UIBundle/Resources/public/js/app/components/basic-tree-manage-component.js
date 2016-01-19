@@ -85,15 +85,15 @@ define(function(require) {
         /**
          * Triggers after node selection in tree
          *
-         * @param {Object} node
+         * @param {Event} e
          * @param {Object} selected
          */
-        onSelect: function(node, selected) {
+        onSelect: function(e, selected) {
             if (this.initialization || !this.updateAllowed) {
                 return;
             }
             var url;
-            if (this.onRootSelectRoute) {
+            if (this.onRootSelectRoute && selected.node.parent === '#') {
                 url = routing.generate(this.onRootSelectRoute, {id: selected.node.id});
             } else {
                 url = routing.generate(this.onSelectRoute, {id: selected.node.id});
