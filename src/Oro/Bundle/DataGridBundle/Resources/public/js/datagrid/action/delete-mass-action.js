@@ -22,7 +22,7 @@ define([
         /** @property {Object} */
         defaultMessages: {
             confirm_title: 'Delete Confirmation',
-            confirm_content: 'Are you sure you want to do remove these items?',
+            confirm_content: 'Are you sure you want to remove these items?',
             confirm_ok: 'Yes, Delete',
             confirm_cancel: 'Cancel',
             success: 'Selected items were removed.',
