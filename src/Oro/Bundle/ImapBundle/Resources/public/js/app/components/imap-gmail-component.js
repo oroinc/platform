@@ -54,13 +54,14 @@ define(function(require) {
         onCheckConnection: function() {
             mediator.execute('showLoading');
             this.view.resetErrorMessage();
-            this.requestGoogleAuthCode();
+            this.requestAccessToken();
+            //this.requestGoogleAuthCode();
         },
 
         /**
          * Request to google API to get google auth code
          */
-        requestGoogleAuthCode: function() {
+        requestGoogleAuthCode: function(emailAddress) {
             var data = this.view.getData();
 
             if (data.clientId.length === 0) {
@@ -70,10 +71,11 @@ define(function(require) {
                 gapi.auth.authorize({
                     'client_id': data.clientId,
                     'scope': this.scopes.join(' '),
-                    'immediate': false,
+                    'immediate': true,
+                    'login_hint': emailAddress,
                     'access_type': 'offline',
                     'response_type': 'code',
-                    'approval_prompt': 'force'
+                    'approval_prompt': 'auto'
                 }, _.bind(this.handleResponseGoogleAuthCode, this));
             }
         },
@@ -84,7 +86,7 @@ define(function(require) {
         handleResponseGoogleAuthCode: function(response) {
             this.view.setGoogleAuthCode(response.code);
 
-            this.requestAccessToken();
+            //this.requestAccessToken();
         },
 
         /**
@@ -95,7 +97,10 @@ define(function(require) {
             gapi.auth.authorize({
                 'client_id': data.clientId,
                 'scope': this.scopes.join(' '),
-                'immediate': false
+                'immediate': false,
+                //'login_hint': 'test1@sichevoy.com',
+                //'authuser': -1,
+                'approval_prompt': 'force'
             }, _.bind(this.checkAuthorization, this));
         },
 
@@ -123,13 +128,14 @@ define(function(require) {
         /**
          * Handler response from google API  for request to get user profile
          */
-        responseProfile: function(request) {
-            if (request.code === 403) {
-                this.view.setErrorMessage(request.message);
+        responseProfile: function(response) {
+            if (response.code === 403) {
+                this.view.setErrorMessage(response.message);
                 this.view.render();
-            } else if (request) {
-                mediator.trigger('change:systemMailBox:email', {email: request.emailAddress});
-                this.view.setEmail(request.emailAddress);
+            } else if (response) {
+                mediator.trigger('change:systemMailBox:email', {email: response.emailAddress});
+                this.view.setEmail(response.emailAddress);
+                this.requestGoogleAuthCode(response.emailAddress);
                 this.view.render();
                 this.requestFormGetFolder();
             }
