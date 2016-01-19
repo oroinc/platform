@@ -39,6 +39,7 @@ class EnumFilterTypeTest extends TypeTestCase
         $enumCode,
         $class,
         $nullValue,
+        $values,
         $fieldOptions,
         $expectedOptions
     ) {
@@ -49,8 +50,6 @@ class EnumFilterTypeTest extends TypeTestCase
             // So we have to load it manually
             $fileName = ExtendHelper::getShortClassName($enumValueClassName) . '.php';
             require_once(realpath(__DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $fileName));
-
-            $values = ['val1' => 'Value1'];
 
             $this->provider->expects($this->once())
                 ->method('getEnumChoices')
@@ -95,6 +94,7 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => 'test_enum',
                 'class'           => null,
                 'nullValue'       => null,
+                'values'          => ['val1' => 'Value1'],
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => 'test_enum',
@@ -112,6 +112,7 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => 'test_enum',
                 'class'           => null,
                 'nullValue'       => ':empty:',
+                'values'          => ['val1' => 'Value1'],
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => 'test_enum',
@@ -130,6 +131,7 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => null,
                 'class'           => 'Extend\Entity\EV_Test_Enum',
                 'nullValue'       => null,
+                'values'          => ['val1' => 'Value1'],
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => null,
@@ -147,6 +149,7 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => null,
                 'class'           => 'Extend\Entity\EV_Test_Enum',
                 'nullValue'       => ':empty:',
+                'values'          => ['val1' => 'Value1'],
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => null,
@@ -165,6 +168,7 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => null,
                 'class'           => 'Extend\Entity\EV_Test_Enum',
                 'nullValue'       => null,
+                'values'          => ['val1' => 'Value1'],
                 'fieldOptions'    => [
                     'multiple' => false
                 ],
@@ -176,6 +180,27 @@ class EnumFilterTypeTest extends TypeTestCase
                         'multiple' => false,
                         'choices'  => [
                             'val1' => 'Value1'
+                        ]
+                    ]
+                ]
+            ],
+            'numeric choice keys' => [
+                'enumCode'        => null,
+                'class'           => 'Extend\Entity\EV_Test_Enum',
+                'nullValue'       => ':empty:',
+                'values'          => [1 => 'Value1'],
+                'fieldOptions'    => [
+                    'multiple' => false
+                ],
+                'expectedOptions' => [
+                    'enum_code'     => null,
+                    'class'         => 'Extend\Entity\EV_Test_Enum',
+                    'null_value'    => ':empty:',
+                    'field_options' => [
+                        'multiple' => false,
+                        'choices'  => [
+                            ':empty:' => 'None',
+                            1 => 'Value1'
                         ]
                     ]
                 ]
