@@ -83,7 +83,16 @@ define(function(require) {
          * Handler response from google API  for request to get google auth code
          */
         handleResponseGoogleAuthCode: function(response) {
-            this.view.setGoogleAuthCode(response.code);
+            if (response.error == 'access_denied') {
+                this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.access_deny'));
+                this.view.render();
+                mediator.execute('hideLoading');
+            } else {
+                this.view.setGoogleAuthCode(response.code);
+                mediator.trigger('change:systemMailBox:email', {email: response.emailAddress});
+                this.view.render();
+                this.requestFormGetFolder();
+            }
         },
 
         /**
@@ -128,11 +137,8 @@ define(function(require) {
                 this.view.setErrorMessage(response.message);
                 this.view.render();
             } else if (response) {
-                mediator.trigger('change:systemMailBox:email', {email: response.emailAddress});
                 this.view.setEmail(response.emailAddress);
                 this.requestGoogleAuthCode(response.emailAddress);
-                this.view.render();
-                this.requestFormGetFolder();
             }
         },
 
