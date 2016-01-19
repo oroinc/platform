@@ -96,7 +96,7 @@ class DateHelper
         if (count($currentItems) != count($items)) {
             $config     = self::getFormatStrings($from, $to);
             $interval   = new \DateInterval($config['intervalString']);
-            While (count($items) != count($currentItems)) {
+            while (count($items) != count($currentItems)) {
                 if (count($items) > count($currentItems)) {
                     $from->add($interval);
                     $items = $this->getDatePeriod($from, $to);
@@ -109,7 +109,7 @@ class DateHelper
 
         foreach ($data as $row) {
             $key                   = $this->getKey($from, $to, $row);
-            if (isset ($items[$key])) {
+            if (isset($items[$key])) {
                 $items[$key][$dataKey] = $row[$rowKey];
             }
         }
