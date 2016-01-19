@@ -83,7 +83,6 @@ define(function(require) {
          * Handler response from google API  for request to get google auth code
          */
         handleResponseGoogleAuthCode: function(response) {
-            debugger;
             this.view.setGoogleAuthCode(response.code);
         },
 
