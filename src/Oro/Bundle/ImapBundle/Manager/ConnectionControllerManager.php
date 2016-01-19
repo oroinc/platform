@@ -24,6 +24,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ConnectionControllerManager
 {
+    const ORO_USER_USER_FORM = 'oro_user_user_form';
+    const ORO_EMAIL_MAILBOX = 'oro_email_mailbox';
+
     /** @var FormInterface */
     protected $formUser;
 
@@ -98,29 +101,9 @@ class ConnectionControllerManager
         $emailFolders = $manager->getFolders();
         $origin->setFolders($emailFolders);
 
-        $accountTypeModel = new AccountTypeModel();
-        $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
-        $accountTypeModel->setUserEmailOrigin($origin);
+        $accountTypeModel = $this->createAccountModel(AccountTypeModel::ACCOUNT_TYPE_GMAIL, $origin);
 
-
-        $form = null;
-        switch ($formParentName) {
-            case 'oro_user_user_form':
-                $data = $user = new User();
-                $data->setImapAccountType($accountTypeModel);
-                $this->formUser->setData($data);
-                $form = $this->formUser;
-                break;
-            case 'oro_email_mailbox':
-                $formAlias = 'oro_email_mailbox';
-                $data = $user = new Mailbox();
-                $data->setImapAccountType($accountTypeModel);
-                $form = $this->FormFactory->create($formAlias, null, ['csrf_protection' => false]);
-                $form->setData($data);
-                break;
-        }
-
-        return $form;
+        return $this->prepareForm($formParentName, $accountTypeModel);
     }
 
     /**
@@ -140,27 +123,45 @@ class ConnectionControllerManager
             $oauthEmailOrigin->setImapPort(GmailImap::DEFAULT_GMAIL_PORT);
         }
 
+        $accountTypeModel = $this->createAccountModel($type, $oauthEmailOrigin);
+
+        return $this->prepareForm($formParentName, $accountTypeModel);
+    }
+
+    /**
+     * @param $formParentName
+     * @param $accountTypeModel
+     * @return null|\Symfony\Component\Form\Form|FormInterface
+     */
+    protected function prepareForm($formParentName, $accountTypeModel)
+    {
+        $form = null;
+        if ($formParentName === self::ORO_USER_USER_FORM) {
+            $data = $user = new User();
+            $data->setImapAccountType($accountTypeModel);
+            $this->formUser->setData($data);
+            $form = $this->formUser;
+        } elseif ($formParentName === self::ORO_EMAIL_MAILBOX) {
+            $data = $user = new Mailbox();
+            $data->setImapAccountType($accountTypeModel);
+            $form = $this->FormFactory->create(self::ORO_EMAIL_MAILBOX, null, ['csrf_protection' => false]);
+            $form->setData($data);
+        }
+
+        return $form;
+    }
+
+    /**
+     * @param $type
+     * @param $oauthEmailOrigin
+     * @return AccountTypeModel
+     */
+    protected function createAccountModel($type, $oauthEmailOrigin)
+    {
         $accountTypeModel = new AccountTypeModel();
         $accountTypeModel->setAccountType($type);
         $accountTypeModel->setUserEmailOrigin($oauthEmailOrigin);
 
-        $form = null;
-        switch ($formParentName) {
-            case 'oro_user_user_form':
-                $data = $user = new User();
-                $data->setImapAccountType($accountTypeModel);
-                $this->formUser->setData($data);
-                $form = $this->formUser;
-                break;
-            case 'oro_email_mailbox':
-                $formAlias = 'oro_email_mailbox';
-                $data = $user = new Mailbox();
-                $data->setImapAccountType($accountTypeModel);
-                $form = $this->FormFactory->create($formAlias, null, ['csrf_protection' => false]);
-                $form->setData($data);
-                break;
-        }
-
-        return $form;
+        return $accountTypeModel;
     }
 }
