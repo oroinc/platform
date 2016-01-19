@@ -26,7 +26,7 @@
     <div class="container-config-group"
          data-page-component-module="oroimap/js/app/components/check-config-settings"
          data-page-component-options="">
-    </div>`
+    </div>
 {% endblock %}
 
 {% block oro_imap_choice_account_type_widget %}
@@ -76,6 +76,21 @@
             {%- if form.parent is empty -%}
                 {{ form_errors(form) }}
             {%- endif -%}
+
+
+            {% if form.parent.userEmailOrigin.user.vars.value is not empty %}
+                <div class="control-group">
+                    <div class="control-label wrap">
+                        {{ 'oro.imap.configuration.reset_email.label'|trans }}
+                    </div>
+                    <div class="controls oro-item-collection">
+                        <div style="margin-top: 6px">
+                            <strong>{{ form.parent.userEmailOrigin.user.vars.value }}</strong>
+                            <button class="removeRow btn-action btn-link" type="button" style="vertical-align: baseline">×</button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
 
             {% if form.check is defined %}
                 <div class="control-group">
