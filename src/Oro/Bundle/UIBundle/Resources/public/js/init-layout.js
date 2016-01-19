@@ -428,6 +428,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(document).on('click', '.add-list-item', function(e) {
         e.preventDefault();
+        if ($(this).is(':disabled')) {
+            return;
+        }
         var containerSelector = $(this).data('container') || '.collection-fields-list';
         var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
         var rowCountAdd = $(containerSelector).data('row-count-add') || 1;
