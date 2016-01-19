@@ -84,7 +84,6 @@ define(function(require) {
 
         /**
          * Handler event of click on the button Connection
-         * @param e
          */
         onClickConnect: function() {
             this.trigger('checkConnection', this.getData());
