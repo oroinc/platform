@@ -42,6 +42,10 @@ define([
                         .data('disabled', value)
                         .trigger(value ? 'disable' : 'enable');
 
+                    if (value && $(el).hasClass('select2')) {
+                        $(el).select2('val', null, true);
+                    }
+
                     if (!_.isUndefined($.uniform) && _.contains($.uniform.elements, el)) {
                         $(el).uniform('update');
                     }
