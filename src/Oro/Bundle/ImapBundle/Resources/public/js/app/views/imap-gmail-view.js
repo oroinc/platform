@@ -8,7 +8,8 @@ define(function(require) {
     ImapGmailView = BaseView.extend({
         events: {
             'click button[name$="[userEmailOrigin][check]"]': 'onClickConnect',
-            'click button[name$="[userEmailOrigin][checkFolder]"]': 'onCheckFolder'
+            'click button[name$="[userEmailOrigin][checkFolder]"]': 'onCheckFolder',
+            'click button.removeRow': 'onResetEmail'
         },
 
         $googleErrorMessage: null,
@@ -93,6 +94,13 @@ define(function(require) {
          */
         onCheckFolder: function() {
             this.trigger('getFolders', this.getData());
+        },
+
+        /**
+         * Handler event of click 'x' button
+         */
+        onResetEmail: function() {
+            $('select[name$="[accountType]"]').val('').trigger('change');
         },
 
         /**
