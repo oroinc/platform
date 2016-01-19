@@ -189,9 +189,9 @@ define(function(require) {
          * @param response
          */
         handlerGetFolders: function(response) {
-            mediator.execute('hideLoading');
             this.view.setHtml(response.html);
             this.view.render();
+            mediator.execute('hideLoading');
         },
 
         /**
