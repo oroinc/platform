@@ -5,6 +5,62 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 class QueryUtils
 {
     /**
+     * Replaces all table aliases declared in the join expression part of a query with given aliases
+     *
+     * @param array $joins
+     * @param array $aliases
+     */
+    public static function replaceTableAliasesInJoinAlias(&$joins, $aliases)
+    {
+        foreach ($joins as &$join) {
+            $alias = $join['alias'];
+            if (isset($aliases[$alias])) {
+                $join['alias'] = $aliases[$alias];
+            }
+        }
+    }
+
+    /**
+     * Replaces all table aliases declared in the join expression part of a query with given aliases
+     *
+     * @param array $joins
+     * @param array $aliases
+     */
+    public static function replaceTableAliasesInJoinExpr(&$joins, $aliases)
+    {
+        // replace alias with {{newAlias}} - this is required to prevent collisions
+        // between old and new aliases in case if some new alias has the same name as some old alias
+        foreach ($joins as &$join) {
+            $joinExpr = $join['join'];
+            foreach ($aliases as $alias => $newAlias) {
+                $tryFind = true;
+                while ($tryFind) {
+                    $tryFind = false;
+                    $pos     = self::findTableAliasInJoinExpr($joinExpr, $alias);
+                    if (false !== $pos) {
+                        $joinExpr = sprintf(
+                            '%s{{%s}}%s',
+                            substr($joinExpr, 0, $pos),
+                            $newAlias,
+                            substr($joinExpr, $pos + strlen($alias))
+                        );
+                        $tryFind   = true;
+                    }
+                }
+            }
+            $join['join'] = $joinExpr;
+        }
+        // replace {{newAlias}} with newAlias
+        foreach ($joins as &$join) {
+            $joinExpr = $join['join'];
+            foreach ($aliases as $newAlias) {
+                $joinExpr = str_replace(sprintf('{{%s}}', $newAlias), $newAlias, $joinExpr);
+            }
+            $join['join'] = $joinExpr;
+        }
+    }
+
+    /**
      * Replaces all table aliases declared in the join part of a query with given aliases
      *
      * @param array $joins
@@ -82,6 +138,38 @@ class QueryUtils
         }
 
         return $selectExpr;
+    }
+
+    /**
+     * Checks if $joinExpr contains the given table alias
+     *
+     * @param string $joinExpr
+     * @param string $alias
+     *
+     * @return bool|int The position of $alias in $joinExpr or FALSE if it was not found
+     */
+    protected static function findTableAliasInJoinExpr($joinExpr, $alias)
+    {
+        $pos = strpos($joinExpr, $alias);
+        while (false !== $pos) {
+            if (0 === $pos) {
+                $nextChar = substr($joinExpr, $pos + strlen($alias), 1);
+                if ('.' === $nextChar) {
+                    return $pos;
+                }
+            } elseif (strlen($joinExpr) !== $pos + strlen($alias) + 1) {
+                $prevChar = substr($joinExpr, $pos - 1, 1);
+                if (in_array($prevChar, [' ', '(', ','], true)) {
+                    $nextChar = substr($joinExpr, $pos + strlen($alias), 1);
+                    if ('.' === $nextChar) {
+                        return $pos;
+                    }
+                }
+            }
+            $pos = strpos($joinExpr, $alias, $pos + strlen($alias));
+        }
+
+        return false;
     }
 
     /**
