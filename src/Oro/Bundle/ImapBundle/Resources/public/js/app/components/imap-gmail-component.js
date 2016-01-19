@@ -83,7 +83,7 @@ define(function(require) {
          * Handler response from google API  for request to get google auth code
          */
         handleResponseGoogleAuthCode: function(response) {
-            if (response.error == 'access_denied') {
+            if (response.error === 'access_denied') {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.access_deny'));
                 this.view.render();
                 mediator.execute('hideLoading');
