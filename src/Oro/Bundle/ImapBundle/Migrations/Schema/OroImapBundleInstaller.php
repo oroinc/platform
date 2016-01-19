@@ -29,7 +29,7 @@ class OroImapBundleInstaller implements Installation
         $this->createOroEmailFolderImapTable($schema);
         $this->createOroEmailImapTable($schema);
         v13::addSmtpFieldsToOroEmailOriginTable($schema);
-        v14::addAccessTokenFieldToOroEmailOriginTable($schema);
+        v14::addAccessTokenFieldsToOroEmailOriginTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroEmailFolderImapForeignKeys($schema);

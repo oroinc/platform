@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
-    var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var GoogleSyncCheckboxView;
 
@@ -11,12 +10,18 @@ define(function(require) {
 
         $successMessage: null,
 
+        $googleErrorMessage: null,
+
+        $googleWarningMessage: null,
+
         token: null,
+
+        googleErrorMessage: '',
 
         canShowMessage: false,
 
         events: {
-            'change input[type=checkbox]' : 'onChangeCheckBox'
+            'change input[type=checkbox]': 'onChangeCheckBox'
         },
 
         listen: {
@@ -26,9 +31,13 @@ define(function(require) {
         initialize: function(options) {
             this.$errorMessage = this.$el.find(options.errorMessage);
             this.$successMessage = this.$el.find(options.successMessage);
+            this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
+            this.$googleWarningMessage = this.$el.find(options.googleWarningMessage);
         },
 
         render: function() {
+            this.$googleErrorMessage.html(this.googleErrorMessage);
+
             if (this.canShowMessage) {
                 this.showMessage();
             } else {
@@ -45,16 +54,44 @@ define(function(require) {
         },
 
         /**
+         * Set error message from google API
+         * @params {string} message
+         */
+        setGoogleErrorMessage: function(message) {
+            this.googleErrorMessage = message;
+        },
+
+        /**
+         * Reset error message from google API
+         */
+        resetGoogleErrorMessage: function() {
+            this.googleErrorMessage = '';
+        },
+
+        /**
+         * Reset property token
+         */
+        resetToken: function() {
+            this.token = null;
+        },
+
+        /**
          * Handler event change for checkbox
          * @param e
          */
         onChangeCheckBox: function(e) {
+            this.resetGoogleErrorMessage();
+            this.resetToken();
+            this.render();
+
             if ($(e.target).is(':checked')) {
                 this.canShowMessage = true;
                 this.trigger('requestToken');
+                this.$googleWarningMessage.hide();
             } else {
                 this.canShowMessage = false;
                 this.trigger('change:canShowMessage');
+                this.$googleWarningMessage.show();
             }
         },
 
@@ -64,9 +101,13 @@ define(function(require) {
         showMessage: function() {
             this.hideMessages();
 
-            if (this.token && !this.token.error) {
+            if (this.googleErrorMessage.length > 0) {
+                this.unCheck();
+                this.showGoogleError();
+            } else if (this.token && !this.token.error) {
                 this.showSuccess();
             } else {
+                this.unCheck();
                 this.showError();
             }
         },
@@ -77,6 +118,7 @@ define(function(require) {
         hideMessages: function() {
             this.$errorMessage.hide();
             this.$successMessage.hide();
+            this.$googleErrorMessage.hide();
         },
 
         /**
@@ -91,6 +133,20 @@ define(function(require) {
          */
         showError: function() {
             this.$errorMessage.show();
+        },
+
+        /**
+         * show error message from google API
+         */
+        showGoogleError: function() {
+            this.$googleErrorMessage.show();
+        },
+
+        /**
+         * Remove check status for checkbox
+         */
+        unCheck: function() {
+            this.$el.find('input').removeAttr('checked');
         }
     });
 

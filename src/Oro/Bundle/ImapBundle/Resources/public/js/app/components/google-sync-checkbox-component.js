@@ -1,7 +1,7 @@
+/*global gapi */
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var GoogleSyncCheckboxView = require('oroimap/js/app/views/google-sync-checkbox-view');
@@ -12,7 +12,7 @@ define(function(require) {
 
         $clientIdElement: null,
 
-        scopes: ['https://www.googleapis.com/auth/gmail.readonly'],
+        scopes: ['https://mail.google.com/'],
 
         initialize: function(options) {
             this.$clientIdElement = options._sourceElement
@@ -22,7 +22,9 @@ define(function(require) {
             this.view = new GoogleSyncCheckboxView({
                 el: options._sourceElement,
                 errorMessage: options.errorMessage,
-                successMessage: options.successMessage
+                successMessage: options.successMessage,
+                googleErrorMessage: options.googleErrorMessage,
+                googleWarningMessage: options.googleWarningMessage
             });
 
             require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
@@ -41,8 +43,24 @@ define(function(require) {
 
         checkAuthorization: function(result) {
             this.view.setToken(result);
+            gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
+        },
+
+        requestProfile: function() {
+            var request = gapi.client.gmail.users.getProfile({
+                'userId': 'me'
+            });
+
+            request.execute(_.bind(this.responseProfile, this));
+        },
+
+        responseProfile: function(response) {
+            if (response.code === 403) {
+                this.view.setGoogleErrorMessage(response.message);
+            }
+
             this.view.render();
-        }
+        },
     });
 
     return GoogleSyncCheckbox;

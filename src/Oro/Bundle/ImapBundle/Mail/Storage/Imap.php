@@ -109,8 +109,10 @@ class Imap extends \Zend\Mail\Storage\Imap
         $this->protocol = new ProtocolImap();
         $this->protocol->connect($host, $port, $ssl);
 
-        if ($params->accessToken === null && !$this->protocol->login($params->user, $password)) {
-            throw new BaseException\RuntimeException('cannot login, user or password wrong');
+        if ($params->accessToken === null) {
+            if (!$this->protocol->login($params->user, $password)) {
+                throw new BaseException\RuntimeException('cannot login, user or password wrong');
+            }
         } else {
             $this->oauth2Authenticate($params->user, $params->accessToken);
         }
@@ -445,7 +447,7 @@ class Imap extends \Zend\Mail\Storage\Imap
             } else {
                 if (preg_match('/^NO /i', $response) || preg_match('/^BAD /i', $response)) {
                     throw new BaseException\RuntimeException('cannot login with XOAuth2, user or token wrong');
-                } else if (preg_match("/^OK /i", $response)) {
+                } elseif (preg_match("/^OK /i", $response)) {
                     return;
                 }
             }

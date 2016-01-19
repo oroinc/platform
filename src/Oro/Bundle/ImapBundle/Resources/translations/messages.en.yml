@@ -8,8 +8,14 @@ oro.imap:
                 tooltip: Enables using IMAP sync using OAuth 2.0. Please, make sure that Gmail API is enabled in <a href="https://console.developers.google.com/" target="_blank">Google Developers Console</a>.
                 error.label: Error during Authorizing
                 success.label: Authorization was successfull
+                warning.label: If you disable this option, all users' mailboxes, configured with Gmail OAuth 2.0, will be unavailable for synchronization.
 
     configuration:
+        account_type:
+            label: Account Type
+            selectType: Not Selected
+            gmail: Gmail
+            other: Other
         imap_host.label: IMAP Host
         imap_port.label: IMAP Port
         imap_encryption.label: Encryption
@@ -20,5 +26,6 @@ oro.imap:
         use_smtp.label: Enable SMTP
         user.label: User
         password.label: Password
+        connect: Connect
         connect_and_retrieve_folders: Check connection/Retrieve folders
         tooltip: If the value is changed, new mailbox will be registered. All data from this mailbox will be lost
