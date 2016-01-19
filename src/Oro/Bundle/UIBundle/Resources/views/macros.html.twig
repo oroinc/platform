@@ -889,7 +889,7 @@
                         }}:
                     {% endif %}
                     {% if ownerPath is defined and resource_granted('VIEW', entity.owner) %}
-                        <a href="{{ ownerPath }}">{{ ownerName }}</a>
+                        {{ _self.renderUrl(ownerPath, ownerName) }}
                     {% else %}
                         {{ ownerName }}
                     {% endif %}

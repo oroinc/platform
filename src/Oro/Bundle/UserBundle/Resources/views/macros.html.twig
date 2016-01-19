@@ -37,3 +37,13 @@
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
+
+{% macro render_user_name(user) %}
+    {% set userName = user|oro_format_name|escape %}
+    {% if resource_granted('VIEW', user) %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {{ UI.renderUrl(path('oro_user_view', {'id': user.id}), userName) }}
+    {% else %}
+        {{ userName }}
+    {% endif %}
+{% endmacro %}
