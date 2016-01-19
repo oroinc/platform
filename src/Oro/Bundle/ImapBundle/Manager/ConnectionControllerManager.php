@@ -31,7 +31,7 @@ class ConnectionControllerManager
     protected $formUser;
 
     /** @var FormFactory */
-    protected $FormFactory;
+    protected $formFactory;
 
     /** @var Mcrypt */
     protected $mcrypt;
@@ -44,20 +44,20 @@ class ConnectionControllerManager
 
     /**
      * @param FormInterface $formUser
-     * @param FormFactory $FormFactory
+     * @param FormFactory $formFactory
      * @param Mcrypt $mcrypt
      * @param Registry $doctrineHelper
      * @param ImapConnectorFactory $imapConnectorFactory
      */
     public function __construct(
         FormInterface $formUser,
-        FormFactory $FormFactory,
+        FormFactory $formFactory,
         Mcrypt $mcrypt,
         Registry $doctrineHelper,
         ImapConnectorFactory $imapConnectorFactory
     ) {
         $this->formUser = $formUser;
-        $this->FormFactory = $FormFactory;
+        $this->formFactory = $formFactory;
         $this->mcrypt = $mcrypt;
         $this->doctrine = $doctrineHelper;
         $this->imapConnectorFactory = $imapConnectorFactory;
@@ -70,7 +70,7 @@ class ConnectionControllerManager
      */
     public function getFormCheckGmailConnection($request, $formParentName)
     {
-        $form = $this->FormFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
+        $form = $this->formFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
         $form->submit($request);
 
         if (!$form->isValid()) {
@@ -144,7 +144,7 @@ class ConnectionControllerManager
         } elseif ($formParentName === self::ORO_EMAIL_MAILBOX) {
             $data = $user = new Mailbox();
             $data->setImapAccountType($accountTypeModel);
-            $form = $this->FormFactory->create(self::ORO_EMAIL_MAILBOX, null, ['csrf_protection' => false]);
+            $form = $this->formFactory->create(self::ORO_EMAIL_MAILBOX, null, ['csrf_protection' => false]);
             $form->setData($data);
         }
 
