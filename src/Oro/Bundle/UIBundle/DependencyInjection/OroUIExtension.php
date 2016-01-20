@@ -34,7 +34,6 @@ class OroUIExtension extends Extension
         $loader->load('services.yml');
         $loader->load('twig.yml');
         $loader->load('content_providers.yml');
-        $loader->load('layouts.yml');
 
         $container->setParameter(
             'oro_ui.placeholders',

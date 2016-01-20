@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\ConfigExpression;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\ConfigExpression;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -8,7 +8,7 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Bundle\UIBundle\Layout\ConfigExpression\Asset;
+use Oro\Bundle\LayoutBundle\ConfigExpression\Asset;
 
 class AssetTest extends \PHPUnit_Framework_TestCase
 {

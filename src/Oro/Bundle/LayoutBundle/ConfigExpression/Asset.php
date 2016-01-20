@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Layout\ConfigExpression;
+namespace Oro\Bundle\LayoutBundle\ConfigExpression;
 
 use Symfony\Component\Asset\Packages;
 
