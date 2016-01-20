@@ -170,6 +170,8 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        folders.tooltip:          If a folder is uncheked, all the data saved in it will be deleted
+        retrieve_folders.label:   Retrieve Folders
         message_type:
             label:                Message type
         folder_type:
