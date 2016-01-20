@@ -362,7 +362,7 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('addSelect')
-            ->with($relAlias . '.' . $targetFieldName . ' as ' . self::FIELD_NAME)
+            ->with(sprintf('IDENTITY(%s.%s) as %s', $alias, self::FIELD_NAME, self::FIELD_NAME))
             ->will($this->returnSelf());
 
         $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
