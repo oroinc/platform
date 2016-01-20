@@ -1254,7 +1254,6 @@ abstract class AbstractQueryConverter
         );
 
         if (isset($query['join'])) {
-            $mainEntityJoinAlias = $this->tableAliases[$mainEntityJoinId];
             $joinMap = $this->getJoinMapForVirtualColumnQuery($query);
             $finished = false;
             while (!$finished) {
@@ -1268,15 +1267,7 @@ abstract class AbstractQueryConverter
                     }
                     $joinType     = $mapItem['type'];
                     $join         = $query['join'][$joinType][$mapItem['key']];
-                    $parentAlias  = $this->getParentTableAliasForVirtualColumnJoin($join['join']);
-                    $parentJoinId = null;
-                    if (null === $parentAlias) {
-                        $parentJoinId = self::ROOT_ALIAS_KEY;
-                    } elseif ($mainEntityJoinAlias === $parentAlias) {
-                        $parentJoinId = $mainEntityJoinId;
-                    } elseif (isset($joinMap[$parentAlias]['processed'])) {
-                        $parentJoinId = $joinMap[$parentAlias]['joinId'];
-                    }
+                    $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin($join['join'], $mainEntityJoinId);
                     if (null !== $parentJoinId) {
                         $alias    = $join['alias'];
                         $joinId   = $this->buildJoinIdentifier($join, $parentJoinId, $joinType);
@@ -1289,17 +1280,9 @@ abstract class AbstractQueryConverter
                 if (!$newAlias) {
                     foreach ($joinMap as $alias => $mapItem) {
                         if (!isset($mapItem['processed'])) {
-                            $joinType    = $mapItem['type'];
-                            $join        = $query['join'][$joinType][$mapItem['key']];
-                            $parentAlias = $this->getParentTableAliasForVirtualColumnJoin($join['join']);
-                            $parentJoinId = null;
-                            if (null === $parentAlias) {
-                                $parentJoinId = self::ROOT_ALIAS_KEY;
-                            } elseif ($mainEntityJoinAlias === $parentAlias) {
-                                $parentJoinId = $mainEntityJoinId;
-                            } elseif (isset($joinMap[$parentAlias]['processed'])) {
-                                $parentJoinId = $joinMap[$parentAlias]['joinId'];
-                            }
+                            $joinType     = $mapItem['type'];
+                            $join         = $query['join'][$joinType][$mapItem['key']];
+                            $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin($join['join'], $mainEntityJoinId);
                             if (null !== $parentJoinId) {
                                 $alias    = $join['alias'];
                                 $newAlias = $this->generateTableAlias();
@@ -1352,16 +1335,28 @@ abstract class AbstractQueryConverter
 
     /**
      * @param string $joinExpr
+     * @param string $mainEntityJoinId
      *
      * @return string|null
      */
-    protected function getParentTableAliasForVirtualColumnJoin($joinExpr)
+    protected function getParentJoinIdForVirtualColumnJoin($joinExpr, $mainEntityJoinId)
     {
         $parts = explode('.', $joinExpr, 2);
 
-        return count($parts) === 2
+        $parentAlias = count($parts) === 2
             ? $parts[0]
             : null;
+
+        $parentJoinId = null;
+        if (null === $parentAlias) {
+            $parentJoinId = self::ROOT_ALIAS_KEY;
+        } elseif ($this->tableAliases[$mainEntityJoinId] === $parentAlias) {
+            $parentJoinId = $mainEntityJoinId;
+        } elseif (isset($joinMap[$parentAlias]['processed'])) {
+            $parentJoinId = $joinMap[$parentAlias]['joinId'];
+        }
+
+        return $parentJoinId;
     }
 
     /**
