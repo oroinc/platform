@@ -29,6 +29,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider testGetPatternProvider
+     *
      * @param int    $timeType
      * @param string $locale
      * @param string $result
@@ -36,6 +37,19 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
     public function testGetPattern($timeType, $locale, $result)
     {
         $this->assertEquals($result, $this->formatter->getPattern(1, $timeType, $locale));
+    }
+
+    /**
+     * @dataProvider testGetPatternWithValueProvider
+     *
+     * @param int    $timeType
+     * @param string $locale
+     * @param        $value
+     * @param string $result
+     */
+    public function testGetPatternWithValue($timeType, $locale, $value, $result)
+    {
+        $this->assertEquals($result, $this->formatter->getPattern(1, $timeType, $locale, $value));
     }
 
     /**
@@ -54,6 +68,17 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
             'locale "en" without time'    => [\IntlDateFormatter::NONE, 'en', 'MM/dd/y'],
             'locale "en_US" with time'    => [null, 'en_US', 'MM/dd/y HH:mm:ss'],
             'locale "en_US" without time' => [\IntlDateFormatter::NONE, 'en_US', 'MM/dd/y']
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function testGetPatternWithValueProvider()
+    {
+        return [
+            'with seconds'    => [null, 'en', '20.01.1999 12:00:00', 'MM/dd/y HH:mm:ss'],
+            'without seconds' => [null, 'en', '20.01.1999 12:00', 'MM/dd/y HH:mm'],
         ];
     }
 }
