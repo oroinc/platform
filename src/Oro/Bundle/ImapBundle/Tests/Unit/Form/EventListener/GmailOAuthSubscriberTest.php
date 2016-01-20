@@ -41,4 +41,25 @@ class GmailOAuthSubscriberTest extends \PHPUnit_Framework_TestCase
         $formEvent = new FormEvent($form, $userEmailOrigin);
         $this->listener->extendForm($formEvent);
     }
+
+    public function testExtendFormWithEmptyOrigin()
+    {
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $form->expects($this->never())
+            ->method('add')
+            ->will($this->returnSelf());
+        $form->expects($this->never())
+            ->method('remove')
+            ->will($this->returnSelf());
+
+        //test without origin
+        $formEvent = new FormEvent($form, null);
+        $this->listener->extendForm($formEvent);
+
+        //test with empty origin
+        $formEvent = new FormEvent($form, new UserEmailOrigin());
+        $this->listener->extendForm($formEvent);
+    }
 }
