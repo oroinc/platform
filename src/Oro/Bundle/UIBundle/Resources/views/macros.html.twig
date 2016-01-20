@@ -863,41 +863,43 @@
         entity - entity record
         renderLabel - need render default label
 #}
-{% macro entityOwnerLink(entity, renderLabel = true) %}
-    {%- if entity %}
-        {% set ownerType = oro_get_owner_type(entity) %}
-        {%- if ownerType %}
-            {% set owner = oro_get_entity_owner(entity) %}
-            {% if owner %}
-                {% if (ownerType == 'USER') %}
-                    {% set ownerPath = path('oro_user_view', {'id': owner.id}) %}
-                    {% set ownerName = owner|oro_format_name %}
-                {% elseif (ownerType == 'BUSINESS_UNIT') %}
-                    {% set ownerPath = path('oro_business_unit_view', {'id': owner.id}) %}
-                    {% set ownerName = owner.name %}
-                {% elseif (ownerType == 'ORGANIZATION') %}
-                    {% set ownerName = owner.name %}
-                {% endif %}
-                {% if ownerName is defined %}
-                    {% if renderLabel %}
-                        {% set entityClassName = oro_class_name(entity) %}
-                        {{ oro_field_config_value(
-                                entityClassName,
-                                oro_entity_config_value(entityClassName, 'owner_field_name', 'ownership'),
-                                'label'
-                            )|trans
-                        }}:
+{%- macro entityOwnerLink(entity, renderLabel = true) -%}
+    {% spaceless %}
+        {%- if entity %}
+            {% set ownerType = oro_get_owner_type(entity) %}
+            {%- if ownerType %}
+                {% set owner = oro_get_entity_owner(entity) %}
+                {% if owner %}
+                    {% if (ownerType == 'USER') %}
+                        {% set ownerPath = path('oro_user_view', {'id': owner.id}) %}
+                        {% set ownerName = owner|oro_format_name %}
+                    {% elseif (ownerType == 'BUSINESS_UNIT') %}
+                        {% set ownerPath = path('oro_business_unit_view', {'id': owner.id}) %}
+                        {% set ownerName = owner.name %}
+                    {% elseif (ownerType == 'ORGANIZATION') %}
+                        {% set ownerName = owner.name %}
                     {% endif %}
-                    {% if ownerPath is defined and resource_granted('VIEW', entity.owner) %}
-                        {{ _self.renderUrl(ownerPath, ownerName) }}
-                    {% else %}
-                        {{ ownerName }}
+                    {% if ownerName is defined %}
+                        {% if renderLabel %}
+                            {% set entityClassName = oro_class_name(entity) %}
+                            {{ oro_field_config_value(
+                                    entityClassName,
+                                    oro_entity_config_value(entityClassName, 'owner_field_name', 'ownership'),
+                                    'label'
+                                )|trans
+                            }}:
+                        {% endif %}
+                        {% if ownerPath is defined and resource_granted('VIEW', entity.owner) %}
+                            {{ _self.renderUrl(ownerPath, ownerName) }}
+                        {% else %}
+                            {{ ownerName }}
+                        {% endif %}
                     {% endif %}
                 {% endif %}
-            {% endif %}
+            {% endif -%}
         {% endif -%}
-    {% endif -%}
-{% endmacro %}
+    {% endspaceless %}
+{%- endmacro -%}
 
 {%- macro renderUrl(url, title, class) -%}
     {% spaceless %}
