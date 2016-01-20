@@ -51,6 +51,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $inheritanceHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
+
     public function setUp()
     {
         $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
@@ -78,6 +81,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->inheritanceHelper = $this
             ->getMockBuilder('Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper')
             ->disableOriginalConstructor()->getMock();
+        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->activityListManager = new ActivityListManager(
             $this->securityFacade,
@@ -89,7 +95,8 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->commentManager,
             $this->doctrineHelper,
             $this->aclHelper,
-            $this->inheritanceHelper
+            $this->inheritanceHelper,
+            $this->eventDispatcher
         );
     }
 

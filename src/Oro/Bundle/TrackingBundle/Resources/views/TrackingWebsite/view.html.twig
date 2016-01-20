@@ -36,7 +36,7 @@
 
 {% block content_data %}
     {%- set generalInformation -%}
-    <div class="row-fluid form-horizontal">
+    <div class="row-fluid">
         <div class="responsive-block">
             {{ UI.renderProperty('oro.tracking.trackingwebsite.name.label'|trans, entity.name) }}
             {{ UI.renderProperty('oro.tracking.trackingwebsite.identifier.label'|trans, entity.identifier) }}
@@ -67,7 +67,7 @@
     </div>
     {%- endset -%}
     {%- set trackingCode -%}
-    <div class="row-fluid form-horizontal">
+    <div class="row-fluid">
         <div class="responsive-block">
             <p>{{ 'oro.tracking.help.event_tooltip'|trans }}</p>
             {% if not app.request.secure %}

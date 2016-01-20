@@ -213,6 +213,7 @@ define(function(require) {
             this.activityTypeFilter.render();
             this.activityTypeFilter.on('update', this.onFilterStateChange, this);
             $el.find('.activity-type-filter').append(this.activityTypeFilter.$el);
+            this.activityTypeFilter.rendered();
 
             /*
              * Render "Date Range" filter
@@ -228,6 +229,7 @@ define(function(require) {
             this.dateRangeFilter.render();
             this.dateRangeFilter.on('update', this.onFilterStateChange, this);
             $el.find('.date-range-filter').append(this.dateRangeFilter.$el);
+            this.dateRangeFilter.rendered();
         },
 
         registerWidget: function() {

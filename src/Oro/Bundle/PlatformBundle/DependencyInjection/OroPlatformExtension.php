@@ -11,8 +11,9 @@ use Symfony\Component\DependencyInjection\Loader;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 class OroPlatformExtension extends Extension implements PrependExtensionInterface
 {
@@ -111,7 +112,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             $originalConfig[] = array();
         }
 
-        $mergedConfig = ArrayUtils::arrayMergeRecursiveDistinct($originalConfig[0], $config);
+        $mergedConfig = ArrayUtil::arrayMergeRecursiveDistinct($originalConfig[0], $config);
         $originalConfig[0] = $mergedConfig;
 
         $container->setExtensionConfig($name, $originalConfig);
