@@ -719,7 +719,7 @@ abstract class AbstractQueryConverter
      */
     protected function addTableAliasForRootEntity()
     {
-        $this->addTableAliasesForJoinIdentifiers([self::ROOT_ALIAS_KEY]);
+        $this->registerTableAlias(self::ROOT_ALIAS_KEY);
     }
 
     /**
@@ -742,19 +742,8 @@ abstract class AbstractQueryConverter
      */
     protected function addTableAliasesForColumn($columnName)
     {
-        /**
-         * joinIds - array of joins with parent definition but without select field join definition(last one)
-         *
-         * For `rootEntityField+Class\Name::joinedEntityRelation+Relation\Class::fieldToSelect` column name will be
-         *
-         * - `Root\Class::rootEntityField`
-         * - `Root\Class::rootEntityField+Class\Name::joinedEntityRelation`
-         */
-        $joinIds = $this->addTableAliasesForJoinIdentifiers(
-            $this->joinIdHelper->explodeColumnName($columnName)
-        );
-        $this->addColumnAliasesForVirtualRelation($columnName, $joinIds);
-        $this->addTableAliasesForVirtualColumn($columnName);
+        $this->addTableAliasesForVirtualRelation($columnName);
+        $this->addTableAliasesForVirtualField($columnName);
     }
 
     /**
@@ -776,20 +765,21 @@ abstract class AbstractQueryConverter
     }
 
     /**
-     * Checks if the given column is the virtual one and if so, generates and saves table aliases for it
+     * Checks if the given column is a virtual field and if so, generates and saves table aliases for it
      *
      * @param string $columnName
      */
-    protected function addTableAliasesForVirtualColumn($columnName)
+    protected function addTableAliasesForVirtualField($columnName)
     {
         if (isset($this->virtualColumnExpressions[$columnName])) {
-            // already added
+            // already processed
             return;
         }
+
         $className = $this->getEntityClassName($columnName);
         $fieldName = $this->getFieldName($columnName);
         if (!$className || !$this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
-            // non virtual column
+            // not a virtual field
             return;
         }
 
@@ -1031,14 +1021,20 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * Checks if the given column is a virtual relation and if so, generates and saves table aliases for it
+     *
      * @param string $columnName
-     * @param array $joinIds
      */
-    protected function addColumnAliasesForVirtualRelation($columnName, array $joinIds)
+    protected function addTableAliasesForVirtualRelation($columnName)
     {
         if (!empty($this->virtualColumnExpressions[$columnName])) {
+            // already processed
             return;
         }
+
+        $joinIds = $this->addTableAliasesForJoinIdentifiers(
+            $this->joinIdHelper->explodeColumnName($columnName)
+        );
 
         if (!$this->virtualRelationsJoins) {
             return;
