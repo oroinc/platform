@@ -89,7 +89,6 @@ define(function(require) {
                 mediator.execute('hideLoading');
             } else {
                 this.view.setGoogleAuthCode(response.code);
-                mediator.trigger('change:systemMailBox:email', {email: response.emailAddress});
                 this.view.render();
                 this.requestFormGetFolder();
             }
@@ -138,6 +137,7 @@ define(function(require) {
                 this.view.render();
             } else if (response) {
                 this.view.setEmail(response.emailAddress);
+                mediator.trigger('change:systemMailBox:email', {email: response.emailAddress});
                 this.requestGoogleAuthCode(response.emailAddress);
             }
         },

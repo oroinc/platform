@@ -58,6 +58,7 @@ class ConfigurationGmailType extends AbstractType
         $this->addNewOriginCreateEventListener($builder);
         $builder->addEventSubscriber(new OriginFolderSubscriber());
         $builder->addEventSubscriber(new ApplySyncSubscriber());
+//        $this->finalDataCleaner($builder);
 
         $builder
             ->add('check', 'button', [
@@ -206,4 +207,31 @@ class ConfigurationGmailType extends AbstractType
             3
         );
     }
+
+//    /**
+//     * @param FormBuilderInterface $builder
+//     */
+//    protected function finalDataCleaner(FormBuilderInterface $builder)
+//    {
+//        $builder->addEventListener(
+//            FormEvents::PRE_SUBMIT,
+//            function (FormEvent $event) {
+//                $data = (array)$event->getData();
+//                $filtered = array_filter(
+//                    $data,
+//                    function ($item) {
+//                        return !empty($item);
+//                    }
+//                );
+//
+//                if (!count($filtered)) {
+//                    $event->getForm()->remove('useImap');
+//                    $event->getForm()->remove('useSmtp');
+//                    $event->getForm()->setData(null);
+//                }
+//            },
+//            1
+//        );
+//    }
+
 }
