@@ -43,8 +43,8 @@ define([
                         .attr('disabled', value)
                         .trigger(value ? 'disable' : 'enable');
 
-                    if (value && $(el).hasClass('select2')) {
-                        $(el).select2('val', null, true);
+                    if ($(el).hasClass('select2')) {
+                        $(el).select2('val', value ? null : $(el).data('selected-data'), true);
                     }
 
                     if (!_.isUndefined($.uniform) && _.contains($.uniform.elements, el)) {
