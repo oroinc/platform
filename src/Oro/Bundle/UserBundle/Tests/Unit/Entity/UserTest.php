@@ -258,6 +258,9 @@ class UserTest extends AbstractUserTest
         $imapConfiguration->expects($this->exactly(2))
             ->method('isActive')
             ->willReturn(true);
+        $imapConfiguration->expects($this->once())
+            ->method('getUser')
+            ->willReturn($entity);
 
         $this->assertCount(0, $entity->getEmailOrigins());
         $this->assertNull($entity->getImapConfiguration());

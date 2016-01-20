@@ -8,3 +8,7 @@ oro.imap:
         smtp:
             success: SMTP connection established successfully
             error:   Could not establish SMTP connection
+        google.oauth:
+            error:
+                emptyClientId: Parameter Client id is empty in Google Integration Settings. You need configure google settings in Configuration.
+                access_deny: Access deny
