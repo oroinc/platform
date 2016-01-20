@@ -188,6 +188,8 @@ services:
         arguments:
             - %oro_email.entity.cache_namespace%
             - %oro_email.entity.proxy_name_template%
+        calls:
+            - [setEntityManager, [@=service('doctrine').getManagerForClass('OroEmailBundle:EmailAddress')]]
 
     oro_email.email.owner.provider.storage:
         public: false

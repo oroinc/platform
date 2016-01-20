@@ -8,15 +8,14 @@ use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 
 class EmailAddressManager
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $entityCacheNamespace;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $entityProxyNameTemplate;
+
+    /** @var EntityManager|null */
+    private $em;
 
     /**
      * Constructor
@@ -45,12 +44,14 @@ class EmailAddressManager
     /**
      * Get a repository for EmailAddress entity
      *
-     * @param EntityManager $em
+     * @param EntityManager|null $em Manager have to be provided via "setEntityManager" method if null
      * @return EntityRepository
      */
-    public function getEmailAddressRepository(EntityManager $em)
+    public function getEmailAddressRepository(EntityManager $em = null)
     {
-        return $em->getRepository($this->getEmailAddressProxyClass());
+        $manager = $em ?: $this->em;
+
+        return $manager->getRepository($this->getEmailAddressProxyClass());
     }
 
     /**
@@ -61,5 +62,25 @@ class EmailAddressManager
     public function getEmailAddressProxyClass()
     {
         return sprintf('%s\%s', $this->entityCacheNamespace, sprintf($this->entityProxyNameTemplate, 'EmailAddress'));
+    }
+
+    /**
+     * @param EntityManager $em
+     *
+     * @return $this
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        $this->em = $em;
+
+        return $this;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    public function getEntityManager()
+    {
+        return $this->em;
     }
 }

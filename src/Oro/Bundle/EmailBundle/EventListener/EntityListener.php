@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
@@ -9,8 +11,8 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 
 class EntityListener
@@ -56,8 +58,16 @@ class EntityListener
      */
     public function onFlush(OnFlushEventArgs $event)
     {
-        $uow = $event->getEntityManager()->getUnitOfWork();
-        $this->emailOwnerManager->handleOnFlush($event);
+        $em = $event->getEntityManager();
+        $uow = $em->getUnitOfWork();
+
+        $emailAddressData = $this->emailOwnerManager->createEmailAddressData($uow);
+        $updatedEmailAddresses = $this->emailOwnerManager->handleChangedAddresses($emailAddressData);
+        foreach ($updatedEmailAddresses as $emailAddress) {
+             $this->computeEntityChangeSet($em, $emailAddress);
+        }
+
+        return;
         $this->emailThreadManager->handleOnFlush($event);
         $this->emailActivityManager->handleOnFlush($event);
 
@@ -69,6 +79,7 @@ class EntityListener
      */
     public function postFlush(PostFlushEventArgs $event)
     {
+        return;
         $this->emailThreadManager->handlePostFlush($event);
         $this->emailActivityManager->handlePostFlush($event);
         $this->addAssociationWithEmailActivity($event);
@@ -130,5 +141,17 @@ class EntityListener
                 $this->emailsToRemove[] = $email;
             }
         }
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param mixed         $entity
+     */
+    protected function computeEntityChangeSet(EntityManager $em, $entity)
+    {
+        $entityClass   = ClassUtils::getClass($entity);
+        $classMetadata = $em->getClassMetadata($entityClass);
+        $unitOfWork    = $em->getUnitOfWork();
+        $unitOfWork->computeChangeSet($classMetadata, $entity);
     }
 }
