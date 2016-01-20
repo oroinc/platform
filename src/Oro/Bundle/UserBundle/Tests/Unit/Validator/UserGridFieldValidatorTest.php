@@ -10,9 +10,7 @@ class UserGridFieldValidatorTest extends \PHPUnit_Framework_TestCase
     /** @var UserGridFieldValidator */
     protected $validator;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
     protected function setUp()
@@ -27,8 +25,13 @@ class UserGridFieldValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider hasAccessEditFiledDataProvider
+     *
+     * @param int $currentUserId
+     * @param int $userId
+     * @param string $fieldName
+     * @param bool $result
      */
-    public function testHasAccessEditFiled($currentUserId, $userId, $fieldName, $result)
+    public function testHasAccessEditField($currentUserId, $userId, $fieldName, $result)
     {
         $currentUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->setMethods(['getId'])
@@ -43,7 +46,7 @@ class UserGridFieldValidatorTest extends \PHPUnit_Framework_TestCase
         $entity->setId($userId);
 
         self::assertEquals(
-            $this->validator->hasAccessEditFiled($entity, $fieldName),
+            $this->validator->hasAccessEditField($entity, $fieldName),
             $result
         );
     }

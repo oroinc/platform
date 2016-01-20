@@ -97,7 +97,7 @@ class EntityFieldValidator
         $customValidator = $this->getCustomValidator($entity);
 
         foreach ($fieldList as $field) {
-            $isValid = $customValidator->hasAccessEditFiled($entity, $field);
+            $isValid = $customValidator->hasAccessEditField($entity, $field);
 
             if (false === $isValid) {
                 throw new FieldUpdateAccessException(

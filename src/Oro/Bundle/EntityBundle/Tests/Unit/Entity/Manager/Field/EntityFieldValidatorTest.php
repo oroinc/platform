@@ -161,7 +161,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->getMock('Oro\Bundle\EntityBundle\Entity\Manager\Field\CustomGridFieldValidatorInterface');
         $customGridFieldValidator
             ->expects(self::once())
-            ->method('hasAccessEditFiled')
+            ->method('hasAccessEditField')
             ->willReturn(true);
 
         $this->validator->addValidator($customGridFieldValidator, 'stdClass');
@@ -209,7 +209,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->getMock('Oro\Bundle\EntityBundle\Entity\Manager\Field\CustomGridFieldValidatorInterface');
         $customGridFieldValidator
             ->expects(self::once())
-            ->method('hasAccessEditFiled')
+            ->method('hasAccessEditField')
             ->willReturn(false);
 
         $this->validator->addValidator($customGridFieldValidator, 'stdClass');

@@ -36,7 +36,7 @@ class UserGridFieldValidator implements CustomGridFieldValidatorInterface
      *
      * {@inheritdoc}
      */
-    public function hasAccessEditFiled($entity, $fieldName)
+    public function hasAccessEditField($entity, $fieldName)
     {
         if (!$entity instanceof User) {
             $className = ClassUtils::getClass($entity);

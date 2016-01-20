@@ -14,7 +14,7 @@ interface CustomGridFieldValidatorInterface
      *
      * @throws IncorrectEntityException
      */
-    public function hasAccessEditFiled($entity, $fieldName);
+    public function hasAccessEditField($entity, $fieldName);
 
     /**
      * @param Object $entity
