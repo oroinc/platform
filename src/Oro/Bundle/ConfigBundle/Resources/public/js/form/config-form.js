@@ -57,7 +57,11 @@ define([
                     var data = $elem.data('selected-data');
                     $elem.select2('val', data, true);
                 });
-                $checkboxes.trigger('change');
+                this.$el.find('.removeRow').trigger('click');
+                $checkboxes
+                    .prop('checked', true)
+                    .attr('checked', true)
+                    .trigger('change');
             }, this));
 
             confirm.open();
