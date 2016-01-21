@@ -60,15 +60,8 @@ class ActivityEntityApiHandler extends ApiFormHandler
      */
     public function process($entity)
     {
-        $entity = $this->prepareFormData($entity);
-
-        if ($this->securityFacade->isGranted('EDIT', $entity)
-            && in_array($this->request->getMethod(), ['POST', 'PUT'], true)
-        ) {
-            $this->form->submit($this->request);
-            if ($this->form->isValid()) {
-                return $this->onSuccess($entity) ?: $entity;
-            }
+        if ($this->securityFacade->isGranted('EDIT', $entity)) {
+            return parent::process($entity);
         }
 
         return null;
