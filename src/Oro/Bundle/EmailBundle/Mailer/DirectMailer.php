@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
+use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
@@ -16,19 +16,13 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
  */
 class DirectMailer extends \Swift_Mailer
 {
-    /**
-     * @var \Swift_Mailer
-     */
+    /** @var \Swift_Mailer */
     protected $baseMailer;
 
-    /**
-     * @var \Swift_SmtpTransport
-     */
+    /** @var \Swift_SmtpTransport */
     protected $smtpTransport;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     /** @var ImapEmailGoogleOauth2Manager */
@@ -202,7 +196,7 @@ class DirectMailer extends \Swift_Mailer
     }
 
     /**
-     * @param \Swift_Transport $transport
+     * @param \Swift_Transport_EsmtpTransport $transport
      *
      * @return DirectMailer
      */
