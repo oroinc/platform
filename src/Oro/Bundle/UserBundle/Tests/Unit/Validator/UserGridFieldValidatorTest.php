@@ -26,10 +26,10 @@ class UserGridFieldValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider hasAccessEditFiledDataProvider
      *
-     * @param int $currentUserId
-     * @param int $userId
+     * @param int    $currentUserId
+     * @param int    $userId
      * @param string $fieldName
-     * @param bool $result
+     * @param bool   $result
      */
     public function testHasAccessEditField($currentUserId, $userId, $fieldName, $result)
     {
@@ -38,7 +38,9 @@ class UserGridFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $currentUser->expects(self::once())->method('getId')->willReturn($currentUserId);
+        if ('enabled' === $fieldName) {
+            $currentUser->expects(self::once())->method('getId')->willReturn($currentUserId);
+        }
 
         $this->securityFacade->expects(self::once())->method('getLoggedUser')->willReturn($currentUser);
 
@@ -67,7 +69,7 @@ class UserGridFieldValidatorTest extends \PHPUnit_Framework_TestCase
                 'currentUserId' => 1,
                 'userId'        => 2,
                 'fieldName'     => 'enabled',
-                'result'        => false
+                'result'        => true
             ],
             'field is not in black list user is current user' => [
                 'currentUserId' => 1,
