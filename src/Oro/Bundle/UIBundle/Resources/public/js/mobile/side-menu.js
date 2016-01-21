@@ -38,7 +38,6 @@ define(['../side-menu', '../mediator'], function($, mediator) {
             this.$toggle.addClass('open');
             $('.dropdown-menu').parent('.open').removeClass('open');
             $('#main-menu').show();
-            mediator.trigger('side_menu:open', this);
             $(document).on('click shown.bs.dropdown', this._onOutsideClick);
         },
 
