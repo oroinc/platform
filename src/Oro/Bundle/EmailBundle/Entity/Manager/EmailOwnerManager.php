@@ -126,7 +126,7 @@ class EmailOwnerManager
     {
         if ($entity instanceof EmailOwnerInterface) {
             return [
-                'emailFields' => $entity->getEmailFields(),
+                'emailFields' => $entity->getEmailFields() ?: [],
                 'owner' => $entity,
             ];
         }
