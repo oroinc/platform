@@ -72,7 +72,7 @@
 
                                 loader = setInterval(function() { dotsLoader() }, 500);
                             },
-                            success: function () {
+                            success: function (response) {
                                 clearInterval(loader);
 
                                 button.html('{{ actionSync|raw }}');
@@ -80,10 +80,14 @@
 
                                 mediator.trigger('datagrid:doRefresh:{{ gridName }}');
 
-                                messenger.notificationFlashMessage(
-                                    'success',
-                                    {{ 'oro.email.action.message.success'|trans|json_encode|raw }}
-                                );
+                                if (response.error !== undefined) {
+                                    messenger.notificationFlashMessage('error', response.error);
+                                } else {
+                                    messenger.notificationFlashMessage(
+                                            'success',
+                                            {{ 'oro.email.action.message.success'|trans|json_encode|raw }}
+                                    );
+                                }
                             },
                             error: function () {
                                 clearInterval(loader);
