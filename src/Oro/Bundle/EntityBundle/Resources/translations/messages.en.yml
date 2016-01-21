@@ -37,7 +37,9 @@ oro:
             datagrid:
                 field:
                     items:
-                        is_visible: Show on grid
+                        is_visible:
+                            label: Show on grid
+                            hidden: Hidden
                         show_filter: Show grid filter
             form:
                 field:

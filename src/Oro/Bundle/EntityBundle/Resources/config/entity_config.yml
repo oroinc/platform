@@ -137,10 +137,13 @@ oro_entity_config:
                     form:
                         type:               oro_entity_extend_choice
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                false: 'No'
+                                -1:     oro.entity.entity_config.datagrid.field.items.is_visible.hidden
+                                true:  'Yes'
                             empty_value:    false
                             block:          other
-                            label:          oro.entity.entity_config.datagrid.field.items.is_visible
+                            label:          oro.entity.entity_config.datagrid.field.items.is_visible.label
 
                 show_filter:
                     options:

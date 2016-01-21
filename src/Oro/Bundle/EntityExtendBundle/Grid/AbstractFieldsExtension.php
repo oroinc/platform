@@ -175,7 +175,8 @@ abstract class AbstractFieldsExtension extends AbstractExtension
 
         $columnOptions = [
             DatagridGuesser::FORMATTER => [
-                'label' => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName
+                'label' => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName,
+                'renderable' => $this->getFieldConfig('datagrid', $field)->get('is_visible') === 1
             ],
             DatagridGuesser::SORTER    => [
                 'data_name' => $fieldName
