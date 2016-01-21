@@ -230,4 +230,22 @@ abstract class MaskBuilder
     {
         return constant('static::' . $name);
     }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function hasMask($name)
+    {
+        return self::hasConst($name);
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function getMask($name)
+    {
+        return self::getConst($name);
+    }
 }
