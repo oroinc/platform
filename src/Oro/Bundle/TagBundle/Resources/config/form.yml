@@ -76,11 +76,12 @@ services:
 
     # Autocomplete
     oro_tag.autocomplete.tag.search_handler:
-        class: %oro_tag.autocomplete.tag.search_handler.class%
+        class: Oro\Bundle\TagBundle\Autocomplete\SearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
             - %oro_tag.tag.entity.class%
             - ["name"]
+            - @oro_security.security_facade
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }
 

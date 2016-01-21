@@ -512,7 +512,13 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-container a.select2-choice .select2-chosen {
-  padding: 8px 30px 0 8px;
+  padding: 8px 30px 7px 8px;
+  & > i[class^=icon-] {
+    height: 16px;
+    margin-top: -3px;
+    vertical-align: middle;
+    float: left;
+  }
 }
 
 .select2-search-choice-close {

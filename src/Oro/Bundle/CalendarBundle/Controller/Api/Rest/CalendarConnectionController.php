@@ -138,11 +138,13 @@ class CalendarConnectionController extends RestController implements ClassResour
     {
         parent::fixFormData($data, $entity);
 
-        unset($data['calendarName']);
-        unset($data['removable']);
-        unset($data['canAddEvent']);
-        unset($data['canEditEvent']);
-        unset($data['canDeleteEvent']);
+        unset(
+            $data['calendarName'],
+            $data['removable'],
+            $data['canAddEvent'],
+            $data['canEditEvent'],
+            $data['canDeleteEvent']
+        );
 
         return true;
     }
