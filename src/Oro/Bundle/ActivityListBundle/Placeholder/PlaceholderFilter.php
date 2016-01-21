@@ -8,7 +8,6 @@ use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 
 class PlaceholderFilter
@@ -98,41 +97,12 @@ class PlaceholderFilter
     {
         $supportedActivities = $this->activityListProvider->getSupportedActivities();
         foreach ($supportedActivities as $supportedActivity) {
-            if ($this->activityListProvider->isApplicableTarget($entityClass, $supportedActivity)
-                && $this->isActivityAssociationEnabled($entityClass, $supportedActivity)
-            ) {
+            if ($this->activityListProvider->isApplicableTarget($entityClass, $supportedActivity)) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    /**
-     * Checks whether a given activity is enabled for a given target entity
-     *
-     * @param string $entityClass
-     * @param string $activityClassName
-     *
-     * @return bool
-     */
-    protected function isActivityAssociationEnabled($entityClass, $activityClassName)
-    {
-        $activities = $this->configManager
-            ->getEntityConfig('activity', $entityClass)
-            ->get('activities', false, []);
-        if (!in_array($activityClassName, $activities, true)) {
-            return false;
-        }
-
-        $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
-        if (!$this->configManager->hasConfig($activityClassName, $associationName)) {
-            return false;
-        }
-
-        return ExtendHelper::isFieldAccessible(
-            $this->configManager->getFieldConfig('extend', $activityClassName, $associationName)
-        );
     }
 
     /**

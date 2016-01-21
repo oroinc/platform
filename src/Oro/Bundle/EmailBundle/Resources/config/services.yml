@@ -641,6 +641,8 @@ services:
            - @oro_ui.html_tag_helper
            - @oro_security.security_facade.link
            - @oro_email.mailbox.process_storage.link
+           - @oro_activity.association_helper
+           - @oro_comment.association_helper
         calls:
            - [ setSecurityContextLink, [@security.context.link] ]
         tags:
@@ -712,7 +714,7 @@ services:
             - @kernel
             - @oro_security.security_facade.link
             - @oro_attachment.validator.file_config_validator
-            - @oro_attachment.config
+            - @oro_attachment.association_helper
 
     oro_email.listener.email_body_add_listener:
         class: %oro_email.listener.email_body_add_listener.class%
