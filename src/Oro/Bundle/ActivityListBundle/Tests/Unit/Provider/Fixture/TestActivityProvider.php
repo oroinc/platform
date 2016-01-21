@@ -20,9 +20,9 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     /**
      * {@inheritdoc}
      */
-    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
+    public function isApplicableTarget($entityClass, $accessible = true)
     {
-        if ($configId->getClassName() === self::SUPPORTED_TARGET_CLASS_NAME) {
+        if ($entityClass === self::SUPPORTED_TARGET_CLASS_NAME) {
             return true;
         }
 
@@ -123,7 +123,7 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     /**
      * {@inheritdoc}
      */
-    public function hasComments(ConfigManager $configManager, $entity)
+    public function isCommentsEnabled($entityClass)
     {
         return true;
     }

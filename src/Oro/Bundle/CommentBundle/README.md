@@ -56,10 +56,11 @@ class AcmeActivityListProvider implements ActivityListProviderInterface, Comment
 /**
  * {@inheritdoc}
  */
-public function hasComments(ConfigManager $configManager, $entity)
+public function isCommentsEnabled($entityClass)
 {
-    $config = $configManager->getProvider('comment')->getConfig($entity);
-    return $config->is('enabled');
+    return
+        $this->configManager->hasConfig($entityClass)
+        && $this->configManager->getEntityConfig('comment', $entityClass)->is('enabled');
 }
 ...
 ```
