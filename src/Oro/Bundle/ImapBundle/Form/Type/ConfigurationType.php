@@ -253,7 +253,7 @@ class ConfigurationType extends AbstractType
     {
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function(FormEvent $event) {
+            function (FormEvent $event) {
                 $data = $event->getData();
                 if (!$data || !is_array($data) || !array_key_exists('folders', $data)) {
                     return;
