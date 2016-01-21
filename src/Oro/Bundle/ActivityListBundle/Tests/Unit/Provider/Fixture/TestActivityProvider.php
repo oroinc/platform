@@ -17,6 +17,8 @@ class TestActivityProvider implements
     const ACTIVITY_CLASS_NAME = 'Test\Entity';
     const ACL_CLASS = 'Test\Entity';
 
+    const SUPPORTED_TARGET_CLASS_NAME = 'Acme\DemoBundle\Entity\CorrectEntity';
+
     protected $targets;
 
     /**
@@ -24,7 +26,7 @@ class TestActivityProvider implements
      */
     public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
     {
-        if ($configId->getClassName() === 'Acme\\DemoBundle\\Entity\\CorrectEntity') {
+        if ($configId->getClassName() === self::SUPPORTED_TARGET_CLASS_NAME) {
             return true;
         }
 

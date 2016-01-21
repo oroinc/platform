@@ -1,0 +1,13 @@
+<fieldset class="form-horizontal">
+    {% if form.imapAccountType.accountType is defined %}
+        {{ form_row(form.imapAccountType.accountType) }}
+    {% endif %}
+
+    {% if form.imapAccountType.imapConfiguration is defined %}
+        {{ form_widget(form.imapAccountType.imapConfiguration) }}
+    {% endif %}
+
+    {% if form.imapAccountType.userEmailOrigin is defined %}
+        {{ form_widget(form.imapAccountType.userEmailOrigin) }}
+    {% endif %}
+</fieldset>

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Datagrid;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -22,7 +21,7 @@ class EntityPaginationExtension extends AbstractExtension
             return false;
         }
 
-        return $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+        return $config->getDatasourceType() == OrmDatasource::TYPE;
     }
 
     /**
@@ -36,7 +35,6 @@ class EntityPaginationExtension extends AbstractExtension
             throw new \LogicException('Entity pagination is not boolean');
         }
 
-        $pagination = $pagination ? true : false;
-        $config->offsetSetByPath(self::ENTITY_PAGINATION_PATH, $pagination);
+        $config->offsetSetByPath(self::ENTITY_PAGINATION_PATH, (bool)$pagination);
     }
 }

@@ -9,7 +9,7 @@ define(['jquery', 'underscore'], function($, _) {
      */
     return function(options) {
         var $el = $(options._sourceElement);
-        var $parentContainer = $el.parent();
+        var $parentContainer = $el.parent().parent();
         var useImap = $parentContainer.find('.imap-config:checkbox');
         var useSmtp = $parentContainer.find('.smtp-config:checkbox');
         var imapFields = $parentContainer.find('input.imap-config,select.imap-config').not(':checkbox');
