@@ -596,6 +596,7 @@ services:
         class: %oro_email.email.thread.manager.class%
         arguments:
             - @oro_email.email.thread.provider
+            - @=service('doctrine').getManagerForClass('OroEmailBundle:EmailThread')
 
     oro_email.email.manager:
         class: %oro_email.email.manager.class%

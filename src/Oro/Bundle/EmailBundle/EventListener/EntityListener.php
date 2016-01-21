@@ -35,6 +35,12 @@ class EntityListener
     /** @var EmailOwnersProvider */
     protected $emailOwnersProvider;
 
+    /** @var Email[] */
+    protected $createdEmails = [];
+
+    /** @var Email[] */
+    protected $updatedEmails = [];
+
     /**
      * @param EmailOwnerManager $emailOwnerManager
      * @param EmailActivityManager $emailActivityManager
@@ -67,8 +73,22 @@ class EntityListener
              $this->computeEntityChangeSet($em, $emailAddress);
         }
 
-        return;
-        $this->emailThreadManager->handleOnFlush($event);
+        $this->createdEmails = array_merge(
+            $this->createdEmails,
+            array_filter(
+                $uow->getScheduledEntityInsertions(),
+                $this->getEmailFilter()
+            )
+        );
+
+        $this->updatedEmails = array_merge(
+            $this->updatedEmails,
+            array_filter(
+                $uow->getScheduledEntityUpdates(),
+                $this->getEmailFilter()
+            )
+        );
+
         $this->emailActivityManager->handleOnFlush($event);
 
         $this->addNewEntityOwnedByEmail($uow->getScheduledEntityInsertions());
@@ -79,8 +99,18 @@ class EntityListener
      */
     public function postFlush(PostFlushEventArgs $event)
     {
-        return;
-        $this->emailThreadManager->handlePostFlush($event);
+        $em = $event->getEntityManager();
+        if ($this->createdEmails) {
+            $this->emailThreadManager->updateThreads($this->createdEmails);
+            $this->createdEmails = [];
+            $em->flush();
+        }
+        if ($this->updatedEmails) {
+            $this->emailThreadManager->updateHeads($this->updatedEmails);
+            $this->updatedEmails = [];
+            $em->flush();
+        }
+
         $this->emailActivityManager->handlePostFlush($event);
         $this->addAssociationWithEmailActivity($event);
 
@@ -153,5 +183,15 @@ class EntityListener
         $classMetadata = $em->getClassMetadata($entityClass);
         $unitOfWork    = $em->getUnitOfWork();
         $unitOfWork->computeChangeSet($classMetadata, $entity);
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function getEmailFilter()
+    {
+        return function ($entity) {
+            return $entity instanceof Email;
+        };
     }
 }
