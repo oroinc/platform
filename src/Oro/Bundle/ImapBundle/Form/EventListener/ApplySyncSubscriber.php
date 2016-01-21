@@ -33,7 +33,7 @@ class ApplySyncSubscriber implements EventSubscriberInterface
         $data = $event->getData();
         $form = $event->getForm();
 
-        if (array_key_exists('folders', $data)) {
+        if ($data && array_key_exists('folders', $data)) {
             /** @var UserEmailOrigin $origin */
             $origin = $form->getData();
 

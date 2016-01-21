@@ -78,7 +78,9 @@ class GmailOAuthSubscriber implements EventSubscriberInterface
      */
     protected function updateForm(FormInterface $form, UserEmailOrigin $emailOrigin)
     {
-        if (!empty($emailOrigin->getAccessToken())) {
+        //for empty() function must be only variable for compatibility with PHP 5.4
+        $token = $emailOrigin->getAccessToken();
+        if (!empty($token)) {
             $form->add('checkFolder', 'button', [
                 'label' => $this->translator->trans('oro.email.retrieve_folders.label'),
                 'attr' => ['class' => 'btn btn-primary']
