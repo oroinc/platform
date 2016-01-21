@@ -107,7 +107,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $qb->leftJoin(sprintf('%s.%s', $alias, $fieldName), $joinAlias);
                     $columnDataName = $fieldName;
                     $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
-                    $selectExpr     = sprintf('%s as %s', $sorterDataName, $fieldName);
+                    $selectExpr     = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
                     break;
                 case 'multiEnum':
                     $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
