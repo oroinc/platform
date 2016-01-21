@@ -56,6 +56,11 @@ class DirectMailer extends \Swift_Mailer
                 $transport = \Swift_NullTransport::newInstance();
             }
         }
+
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+            $this->addXOAuth2Authenticator($transport);
+        }
+
         parent::__construct($transport);
     }
 
@@ -194,5 +199,35 @@ class DirectMailer extends \Swift_Mailer
         }
 
         return $realTransport;
+    }
+
+    /**
+     * @param \Swift_Transport $transport
+     *
+     * @return DirectMailer
+     */
+    protected function addXOAuth2Authenticator($transport)
+    {
+        $handlers = $transport->getExtensionHandlers();
+        $handlers = is_array($handlers) ? $handlers : [];
+
+        foreach ($handlers as $handler) {
+            if ($handler instanceof \Swift_Transport_Esmtp_AuthHandler) {
+                $authenticators = $handler->getAuthenticators();
+                $isOAuth2Exist = false;
+                foreach ($authenticators as $authenticator) {
+                    if ($authenticator instanceof \Swift_Transport_Esmtp_Auth_XOAuth2Authenticator) {
+                        $isOAuth2Exist = true;
+                    }
+                }
+
+                if (!$isOAuth2Exist) {
+                    $authenticators[] = new \Swift_Transport_Esmtp_Auth_XOAuth2Authenticator();
+                    $handler->setAuthenticators($authenticators);
+                }
+            }
+        }
+
+        return $this;
     }
 }
