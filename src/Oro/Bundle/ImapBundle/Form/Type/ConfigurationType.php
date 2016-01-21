@@ -52,6 +52,7 @@ class ConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->decodeData($builder);
         $this->modifySettingsFields($builder);
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);
@@ -242,6 +243,26 @@ class ConfigurationType extends AbstractType
                     $event->setData($data);
                 }
             }
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    public function decodeData(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function(FormEvent $event) {
+                $data = $event->getData();
+                if (!$data || !is_array($data)) {
+                    return;
+                }
+
+                $data['folders'] = json_decode($data['folders'], true);
+                $event->setData($data);
+            },
+            255
         );
     }
 
