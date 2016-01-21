@@ -52,11 +52,11 @@
       &:before{
         content: '';
         display: inline-block;
-        border-right: 8px solid transparent;
-        border-top: 8px solid @cellErrorBorder;
+        border-right: 6px solid transparent;
+        border-top: 6px solid @cellErrorBorder;
         position: absolute;
-        top: 0;
-        left: 0;
+        top: 1px;
+        left: 1px;
       }
     }
     &.view-mode:hover {
@@ -106,17 +106,6 @@
 
 .inline-editor-wrapper {
   position: absolute;
-  padding: 3px;
-  &.show-overlay {
-    background-color: white;
-    border-radius: 3px;
-    border: 1px solid rgba(0,0,0,0.2);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-    &.overlay-focused {
-      box-shadow: 0 3px 6px rgba(0,0,0,0.2)
-    }
-  }
-  border: 1px solid transparent;
   .btn[disabled=disabled] {
     #gradient > .vertical(#fefefe, #f4f4f4);
     color: #9c9c9c;

@@ -73,9 +73,10 @@ define(function(require) {
 
     InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
         OVERLAY_TOOL_DEFAULTS: {
+            zIndex: 1,
             position: {
                 my: 'left top',
-                at: 'left-11 top-11',
+                at: 'left-7 top-7',
                 collision: 'flipfit'
             }
         },
@@ -169,9 +170,6 @@ define(function(require) {
             this.listenTo(viewInstance, {
                 dispose: function() {
                     overlay.remove();
-                },
-                change: function() {
-                    viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
                 },
                 keydown: this.onGenericEscapeKeydown,
                 focus: function() {

@@ -28,16 +28,11 @@ define(function(require) {
         lockUserActions: false,
 
         OVERLAY_TOOL_DEFAULTS: {
+            zIndex: 1,
             position: {
                 my: 'left top',
-                at: 'left top',
-                collision: 'flip',
-                using: function(position, information) {
-                    information.element.element.css({
-                        left: position.left >= 0 ? position.left - 4 : position.left + 4,
-                        top: position.top >= -1 ? position.top - 4 : position.top
-                    });
-                }
+                at: 'left top+1',
+                collision: 'fit'
             }
         },
 
@@ -121,7 +116,6 @@ define(function(require) {
                     overlay.remove();
                 },
                 change: function() {
-                    viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
                     cell.$el.toggleClass('has-error', !viewInstance.isValid());
                 },
                 keydown: this.onKeyDown,
@@ -139,7 +133,6 @@ define(function(require) {
             viewInstance.trigger('change');
 
             if (this.backendErrors) {
-                this.view.$el.toggleClass('show-overlay', true);
                 this.view.showBackendErrors(this.backendErrors);
             }
         },
