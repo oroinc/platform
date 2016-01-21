@@ -11,26 +11,33 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActivityEntityApiHandler extends ApiFormHandler
 {
     /** @var ActivityManager */
     protected $activityManager;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param FormInterface   $form
      * @param Request         $request
      * @param ObjectManager   $entityManager
      * @param ActivityManager $activityManager
+     * @param SecurityFacade  $securityFacade
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         ObjectManager $entityManager,
-        ActivityManager $activityManager
+        ActivityManager $activityManager,
+        SecurityFacade $securityFacade
     ) {
         parent::__construct($form, $request, $entityManager);
         $this->activityManager = $activityManager;
+        $this->securityFacade  = $securityFacade;
     }
 
     /**
@@ -42,6 +49,29 @@ class ActivityEntityApiHandler extends ApiFormHandler
         $this->form->setData($relations);
 
         return ['activity' => $entity, 'relations' => $relations];
+    }
+
+    /**
+     * Process form
+     *
+     * @param mixed $entity
+     *
+     * @return mixed|null The instance of saved entity on successful processing; otherwise, null
+     */
+    public function process($entity)
+    {
+        $entity = $this->prepareFormData($entity);
+
+        if ($this->securityFacade->isGranted('EDIT', $entity)
+            && in_array($this->request->getMethod(), ['POST', 'PUT'], true)
+        ) {
+            $this->form->submit($this->request);
+            if ($this->form->isValid()) {
+                return $this->onSuccess($entity) ?: $entity;
+            }
+        }
+
+        return null;
     }
 
     /**
