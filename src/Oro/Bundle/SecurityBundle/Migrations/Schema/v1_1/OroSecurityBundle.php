@@ -1,22 +1,14 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Migrations\Schema;
+namespace Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
-use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroSecurityBundleInstaller implements Installation, ContainerAwareInterface
+class OroSecurityBundle implements Migration
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
     /**
      * {@inheritdoc}
      */
@@ -28,21 +20,12 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function up(Schema $schema, QueryBag $queries)
     {
-        // create symfony acl tables
-        $this->container->get('security.acl.dbal.schema')->addToSchema($schema);
-
         /** Tables generation **/
         $this->createOroSecurityPermissionDefinitionTable($schema);
+
+        /** Foreign keys generation **/
     }
 
     /**
@@ -59,4 +42,5 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'UNIQ_83424D0F5E237E06');
     }
+
 }
