@@ -4,25 +4,25 @@ namespace Oro\Bundle\ConfigBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormFieldType extends AbstractType
 {
     /**
-     * Pass target field options to field form type
-     *
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'target_field_options' => array(),
+            [
+                'target_field_options' => [],
                 'target_field_type'    => 'text',
                 'resettable'           => true,
                 'cascade_validation'   => true,
                 'parent_checkbox_label' => ''
-            )
+            ]
         );
     }
 
@@ -41,6 +41,17 @@ class FormFieldType extends AbstractType
 
         $builder->add('use_parent_scope_value', $useParentType, $useParentOptions);
         $builder->add('value', $options['target_field_type'], $options['target_field_options']);
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = $event->getData();
+                if (!empty($data['use_parent_scope_value']) && $event->getForm()->get('value')->count()) {
+                    $data['value'] = null;
+                    $event->setData($data);
+                }
+            }
+        );
     }
 
     /**
