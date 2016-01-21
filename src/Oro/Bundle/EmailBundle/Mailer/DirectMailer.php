@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
+use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
@@ -30,16 +31,23 @@ class DirectMailer extends \Swift_Mailer
      */
     protected $container;
 
+    /** @var ImapEmailGoogleOauth2Manager */
+    protected $imapEmailGoogleOauth2Manager;
+
     /**
      * Constructor
      *
      * @param \Swift_Mailer      $baseMailer
      * @param ContainerInterface $container
      */
-    public function __construct(\Swift_Mailer $baseMailer, ContainerInterface $container)
-    {
+    public function __construct(
+        \Swift_Mailer $baseMailer,
+        ContainerInterface $container,
+        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+    ) {
         $this->baseMailer = $baseMailer;
         $this->container  = $container;
+        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
 
         $transport = $this->baseMailer->getTransport();
         if ($transport instanceof \Swift_Transport_SpoolTransport) {
@@ -66,6 +74,7 @@ class DirectMailer extends \Swift_Mailer
             $host     = $userEmailOrigin->getSmtpHost();
             $port     = $userEmailOrigin->getSmtpPort();
             $security = $userEmailOrigin->getSmtpEncryption();
+            $accessToken = $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($userEmailOrigin);
 
             $transport = $this->getTransport();
             if ($transport instanceof \Swift_SmtpTransport
@@ -78,7 +87,14 @@ class DirectMailer extends \Swift_Mailer
             }
 
             $transport->setUsername($username);
-            $transport->setPassword($password);
+
+            if ($accessToken === null) {
+                $transport->setPassword($password);
+            } else {
+                $transport->setAuthMode('XOAUTH2');
+                $transport->setPassword($accessToken);
+            }
+
             $this->smtpTransport = $transport;
         }
     }
