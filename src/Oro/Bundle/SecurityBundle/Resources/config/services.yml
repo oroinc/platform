@@ -615,7 +615,6 @@ services:
     oro_security.configuration.provider.permission_config:
         class: %oro_security.configuration.provider.permission_config.class%
         arguments:
-            - %kernel.bundles%
             - @oro_security.configuration.config.permission_definition_list
 
     oro_security.configuration.builder.permission_configuration:

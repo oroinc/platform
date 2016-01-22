@@ -24,8 +24,6 @@ class OroSecurityBundle implements Migration
     {
         /** Tables generation **/
         $this->createOroSecurityPermissionDefinitionTable($schema);
-
-        /** Foreign keys generation **/
     }
 
     /**
@@ -35,7 +33,7 @@ class OroSecurityBundle implements Migration
      */
     protected function createOroSecurityPermissionDefinitionTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_security_permission_definition');
+        $table = $schema->createTable('oro_security_perm_definition');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('label', 'string', ['length' => 255]);

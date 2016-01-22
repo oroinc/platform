@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Table("oro_security_permission_definition")
+ * @ORM\Table("oro_security_perm_definition")
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
@@ -97,6 +97,18 @@ class PermissionDefinition
     public function setLabel($label)
     {
         $this->label = $label;
+
+        return $this;
+    }
+    /**
+     * @param PermissionDefinition $definition
+     * @return PermissionDefinition
+     */
+    public function import(PermissionDefinition $definition)
+    {
+        // enabled flag should not be imported
+        $this->setName($definition->getName())
+            ->setLabel($definition->getLabel());
 
         return $this;
     }

@@ -77,12 +77,6 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
         $this->setName('oro:permission:configuration:load')
             ->setDescription('Load permission configuration from configuration files to the database')
             ->addOption(
-                'directories',
-                null,
-                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Directories used to find configuration files'
-            )
-            ->addOption(
                 'definitions',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
@@ -95,16 +89,12 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $usedDirectories = $input->getOption('directories');
-        $usedDirectories = $usedDirectories ?: null;
-
         $usedDefinitions = $input->getOption('definitions');
         $usedDefinitions = $usedDefinitions ?: null;
 
         /** @var PermissionConfigurationProvider $configurationProvider */
         $configurationProvider = $this->getContainer()->get('oro_security.configuration.provider.permission_config');
         $permissionConfiguration = $configurationProvider->getPermissionConfiguration(
-            $usedDirectories,
             $usedDefinitions
         );
 
