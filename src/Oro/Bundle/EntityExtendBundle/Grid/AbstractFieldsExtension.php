@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfiguration;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -172,11 +173,16 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
     {
         $fieldName = $field->getFieldName();
+        // if field is visible as mandatory it is required in grid settings and rendered
+        // and not required and hidden by default otherwise.
+        $isMandatory = $this->getFieldConfig('datagrid', $field)
+                ->get('is_visible') === DatagridScope::IS_VISIBLE_MANDATORY;
 
         $columnOptions = [
             DatagridGuesser::FORMATTER => [
-                'label' => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName,
-                'renderable' => $this->getFieldConfig('datagrid', $field)->get('is_visible') === 1
+                'label'      => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName,
+                'renderable' => $isMandatory,
+                'required'   => $isMandatory
             ],
             DatagridGuesser::SORTER    => [
                 'data_name' => $fieldName
