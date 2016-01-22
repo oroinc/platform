@@ -55,7 +55,7 @@ class UpdateEmailOwnerEmailsCommand extends ContainerAwareCommand
             $this->getEmailEntityManager()->flush();
         }
 
-        $output->writeln(sprintf('<info>Associated %d emails with givne object.</info>', count($emails)));
+        $output->writeln(sprintf('<info>Associated %d emails with given object.</info>', count($emails)));
     }
 
     /**
