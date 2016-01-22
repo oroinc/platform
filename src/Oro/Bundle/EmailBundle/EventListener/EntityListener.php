@@ -8,6 +8,8 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -149,17 +151,30 @@ class EntityListener
      */
     protected function addAssociationWithEmailActivity(PostFlushEventArgs $event)
     {
-        if ($this->entitiesOwnedByEmail) {
-            $em = $event->getEntityManager();
-            foreach ($this->entitiesOwnedByEmail as $entity) {
-                $emails = $this->emailOwnersProvider->getEmailsByOwnerEntity($entity);
-                foreach ($emails as $email) {
-                    $this->getEmailActivityManager()->addAssociation($email, $entity);
-                }
-            }
-            $this->entitiesOwnedByEmail = [];
-            $em->flush();
+        if (!$this->entitiesOwnedByEmail) {
+            return;
         }
+
+        $em = $event->getEntityManager();
+        $jobs = array_map(
+            function ($entity) use ($em) {
+                $class = ClassUtils::getClass($entity);
+                $metadata = $em->getClassMetadata($class);
+
+                return new Job(
+                    'oro:email:update-email-owner-emails',
+                    [
+                        'class' => ClassUtils::getClass($entity),
+                        'id' => $metadata->getIdentifierValues($entity)[$metadata->getSingleIdentifierFieldName()],
+                    ]
+                );
+            },
+            $this->entitiesOwnedByEmail
+        );
+
+        array_map([$em, 'persist'], $jobs);
+        $this->entitiesOwnedByEmail = [];
+        $em->flush();
     }
 
     /**
