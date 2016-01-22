@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 
 class EmailAddressManager
@@ -14,8 +16,8 @@ class EmailAddressManager
     /** @var string */
     private $entityProxyNameTemplate;
 
-    /** @var EntityManager|null */
-    private $em;
+    /** @var ServiceLink|null */
+    private $emLink;
 
     /**
      * Constructor
@@ -49,7 +51,7 @@ class EmailAddressManager
      */
     public function getEmailAddressRepository(EntityManager $em = null)
     {
-        $manager = $em ?: $this->em;
+        $manager = $em ?: $this->getEntityManager();
 
         return $manager->getRepository($this->getEmailAddressProxyClass());
     }
@@ -65,22 +67,22 @@ class EmailAddressManager
     }
 
     /**
-     * @param EntityManager $em
+     * @param ServiceLink $emLink
      *
      * @return $this
      */
-    public function setEntityManager(EntityManager $em)
+    public function setEntityManagerLink(ServiceLink $emLink)
     {
-        $this->em = $em;
+        $this->emLink = $emLink;
 
         return $this;
     }
 
     /**
-     * @return EntityManager
+     * @return EntityManager|null
      */
     public function getEntityManager()
     {
-        return $this->em;
+        return $this->emLink ? $this->emLink->getService() : null;
     }
 }

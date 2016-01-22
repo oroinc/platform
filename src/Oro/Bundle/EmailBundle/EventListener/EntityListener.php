@@ -8,6 +8,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
@@ -20,11 +21,11 @@ class EntityListener
     /** @var EmailOwnerManager */
     protected $emailOwnerManager;
 
-    /** @var EmailActivityManager */
-    protected $emailActivityManager;
+    /** @var ServiceLink */
+    protected $emailActivityManagerLink;
 
-    /** @var EmailThreadManager */
-    protected $emailThreadManager;
+    /** @var ServiceLink */
+    protected $emailThreadManagerLink;
 
     /** @var Email[] */
     protected $emailsToRemove = [];
@@ -46,20 +47,20 @@ class EntityListener
 
     /**
      * @param EmailOwnerManager $emailOwnerManager
-     * @param EmailActivityManager $emailActivityManager
-     * @param EmailThreadManager $emailThreadManager
+     * @param ServiceLink $emailActivityManagerLink
+     * @param ServiceLink $emailThreadManagerLink
      * @param EmailOwnersProvider $emailOwnersProvider
      */
     public function __construct(
-        EmailOwnerManager    $emailOwnerManager,
-        EmailActivityManager $emailActivityManager,
-        EmailThreadManager   $emailThreadManager,
-        EmailOwnersProvider  $emailOwnersProvider
+        EmailOwnerManager   $emailOwnerManager,
+        ServiceLink         $emailActivityManagerLink,
+        ServiceLink         $emailThreadManagerLink,
+        EmailOwnersProvider $emailOwnersProvider
     ) {
-        $this->emailOwnerManager    = $emailOwnerManager;
-        $this->emailActivityManager = $emailActivityManager;
-        $this->emailThreadManager   = $emailThreadManager;
-        $this->emailOwnersProvider  = $emailOwnersProvider;
+        $this->emailOwnerManager        = $emailOwnerManager;
+        $this->emailActivityManagerLink = $emailActivityManagerLink;
+        $this->emailThreadManagerLink   = $emailThreadManagerLink;
+        $this->emailOwnersProvider      = $emailOwnersProvider;
     }
 
     /**
@@ -101,17 +102,17 @@ class EntityListener
     {
         $em = $event->getEntityManager();
         if ($this->createdEmails) {
-            $this->emailThreadManager->updateThreads($this->createdEmails);
+            $this->getEmailThreadManager()->updateThreads($this->createdEmails);
             $this->createdEmails = [];
             $em->flush();
         }
         if ($this->updatedEmails) {
-            $this->emailThreadManager->updateHeads($this->updatedEmails);
+            $this->getEmailThreadManager()->updateHeads($this->updatedEmails);
             $this->updatedEmails = [];
             $em->flush();
         }
         if ($this->activityManagerEmails) {
-            $this->emailActivityManager->updateActivities($this->activityManagerEmails);
+            $this->getEmailActivityManager()->updateActivities($this->activityManagerEmails);
             $this->activityManagerEmails = [];
             $em->flush();
         }
@@ -153,7 +154,7 @@ class EntityListener
             foreach ($this->entitiesOwnedByEmail as $entity) {
                 $emails = $this->emailOwnersProvider->getEmailsByOwnerEntity($entity);
                 foreach ($emails as $email) {
-                    $this->emailActivityManager->addAssociation($email, $entity);
+                    $this->getEmailActivityManager()->addAssociation($email, $entity);
                 }
             }
             $this->entitiesOwnedByEmail = [];
@@ -196,5 +197,21 @@ class EntityListener
         return function ($entity) {
             return $entity instanceof Email;
         };
+    }
+
+    /**
+     * @return EmailThreadManager
+     */
+    public function getEmailThreadManager()
+    {
+        return $this->emailThreadManagerLink->getService();
+    }
+
+    /**
+     * @return EmailActivityManager
+     */
+    protected function getEmailActivityManager()
+    {
+        return $this->emailActivityManagerLink->getService();
     }
 }
