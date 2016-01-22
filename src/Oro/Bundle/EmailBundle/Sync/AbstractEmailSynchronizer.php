@@ -89,6 +89,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * @param int $maxTasks             The maximum number of email origins which can be synchronized
      *                                  Set -1 to unlimited
      *                                  Defaults to 1
+     * @return int
+     *
      * @throws \Exception
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -100,7 +102,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         if (!$this->checkConfiguration()) {
-            $this->logger->notice('Exit because synchronization was not configured.');
+            $this->logger->notice('Exit because synchronization was not configured or disabled.');
+            return 0;
         }
 
         $startTime = $this->getCurrentUtcDateTime();
@@ -154,6 +157,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
                 )
             );
         }
+        
+        return 0;
     }
 
     /**

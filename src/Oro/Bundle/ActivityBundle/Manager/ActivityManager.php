@@ -410,11 +410,12 @@ class ActivityManager
     {
         $result = [];
 
-        $config = $this->activityConfigProvider->getConfig($entityClass);
-        $activityClassNames = $config->get('activities', false, []);
+        $activityClassNames = $this->activityConfigProvider
+            ->getConfig($entityClass)
+            ->get('activities', false, []);
         foreach ($activityClassNames as $activityClassName) {
             $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
-            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName, $associationName)) {
+            if (!$this->isActivityAssociationEnabled($activityClassName, $associationName)) {
                 continue;
             }
 
@@ -454,10 +455,12 @@ class ActivityManager
     {
         $result = [];
 
-        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+        $activityClassNames = $this->activityConfigProvider
+            ->getConfig($entityClass)
+            ->get('activities', false, []);
         foreach ($activityClassNames as $activityClassName) {
             $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
-            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName, $associationName)) {
+            if (!$this->isActivityAssociationEnabled($activityClassName, $associationName)) {
                 continue;
             }
 
@@ -562,23 +565,19 @@ class ActivityManager
     }
 
     /**
-     * @param string $entityClass
      * @param string $activityClassName
      * @param string $activityAssociationName
      *
      * @return bool
      */
-    protected function isActivityAssociationEnabled($entityClass, $activityClassName, $activityAssociationName)
+    protected function isActivityAssociationEnabled($activityClassName, $activityAssociationName)
     {
-        $extendConfig = $this->extendConfigProvider->getConfig($activityClassName);
-        $relations    = $extendConfig->get('relation', false, []);
-        $relationKey  = ExtendHelper::buildRelationKey(
-            $activityClassName,
-            $activityAssociationName,
-            RelationType::MANY_TO_MANY,
-            $entityClass
-        );
+        if (!$this->extendConfigProvider->hasConfig($activityClassName, $activityAssociationName)) {
+            return false;
+        }
 
-        return isset($relations[$relationKey]);
+        return ExtendHelper::isFieldAccessible(
+            $this->extendConfigProvider->getConfig($activityClassName, $activityAssociationName)
+        );
     }
 }

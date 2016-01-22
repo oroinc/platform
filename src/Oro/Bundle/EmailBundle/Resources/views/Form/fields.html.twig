@@ -211,16 +211,18 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_widget %}
-    <div class="folder-tree-widget">
+    <div id="{{ id }}" class="folder-tree-widget">
         <input id="check-all" type="checkbox"/><label class="folder-label">All</label>
         <div id="folder-list">
             {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
                 {{ _self.renderFolder(key, folder, form.vars.full_name) }}
             {% endfor %}
         </div>
+        <input name="{{ full_name }}" type="hidden">
     </div>
 
     <script type="text/javascript">
+        // check/uncheck all
         require(['jquery'], function($) {
             var $folderList = $('#folder-list');
             var $checkAll = $('#check-all');
@@ -233,6 +235,32 @@
 
             $folderList.find(':checkbox').each(function() {
                 $(this).css('margin', 0);
+            });
+        });
+        // send folders in 1 field to avoid "max_input_vars" error
+        require(['jquery'], function($) {
+            function inputData($input) {
+                var data = {};
+                $input.find('input[data-name]:not(input[type=checkbox]:not(:checked))').each(function() {
+                    var $input = $(this);
+                    data[$input.attr('data-name')] = $input.val();
+                });
+
+                return data;
+            }
+
+            function inputCollectionData($inputCollection) {
+                return $inputCollection.map(function() {
+                    return inputData($(this));
+                }).toArray();
+            }
+
+            var $tree = $('#{{ id }}');
+            var $dataInput = $tree.find('input[name="{{ full_name }}"]');
+
+            $tree.closest('form').on('submit', function() {
+                var folders = inputCollectionData($tree.find('#folder-list').children());
+                $dataInput.val(JSON.stringify(folders));
             });
         });
     </script>
@@ -277,7 +305,13 @@
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% set email_origin = form_widget(form.children.origin) %}
+    {% if  form.children.imapAccountType is defined %}
+        {% set imapAccountType = form_widget(form.children.imapAccountType) %}
+    {% endif %}
+    {% if  form.children.origin is defined %}
+        {% set imapAccountType = form_widget(form.children.origin) %}
+    {% endif %}
+
     {% set process = form_row(form.children.processType) ~
         form_widget(form.children.processSettings) %}
     {% set access = form_row(form.children.authorizedUsers) ~
@@ -294,7 +328,7 @@
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
             <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
-            {{ email_origin|raw }}
+            {{ imapAccountType|raw }}
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
             <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
@@ -340,11 +374,11 @@
 {% macro renderFolder(key, folder, namePrefix, maxDepth = 10) %}
     {% if maxDepth %}
         <div>
-            <input type="checkbox" name="{{ namePrefix }}[{{ key }}][syncEnabled]"{% if folder.syncEnabled %}checked="checked"{% endif %}>
+            <input type="checkbox" data-name="syncEnabled"{% if folder.syncEnabled %}checked="checked"{% endif %}>
             <label class="folder-label">{{ folder.name }}</label>
-            <input type="hidden" name="{{ namePrefix }}[{{ key }}][fullName]" value="{{ folder.fullName }}">
-            <input type="hidden" name="{{ namePrefix }}[{{ key }}][name]" value="{{ folder.name }}">
-            <input type="hidden" name="{{ namePrefix }}[{{ key }}][type]" value="{{ folder.type }}">
+            <input type="hidden" data-name="fullName" value="{{ folder.fullName }}">
+            <input type="hidden" data-name="name" value="{{ folder.name }}">
+            <input type="hidden" data-name="type" value="{{ folder.type }}">
             {% if maxDepth > 1 and folder.subFolders|length > 0 %}
                 <div class="folder-sub-folders">
                     {% for subKey, subFolder in folder.subFolders %}

@@ -46,7 +46,7 @@ class LayoutResource implements ResourceInterface
         $formulae = [];
         $themes = $this->themeManager->getAllThemes();
         foreach ($themes as $theme) {
-            $formulae += $this->collectThemeAssets($theme);
+            $formulae += $this->collectThemeFormulae($theme);
         }
         return $formulae;
     }
@@ -55,11 +55,14 @@ class LayoutResource implements ResourceInterface
      * @param Theme $theme
      * @return array
      */
-    protected function collectThemeAssets(Theme $theme)
+    protected function collectThemeFormulae(Theme $theme)
     {
         $formulae = [];
-        $assets = $theme->getDataByKey('assets', []);
+        $assets = $this->collectThemeAssets($theme);
         foreach ($assets as $assetKey => $asset) {
+            if (!isset($asset['output']) || empty($asset['inputs'])) {
+                continue;
+            }
             $name = self::RESOURCE_ALIAS . '_' . $theme->getName(). '_' . $assetKey;
             $formulae[$name] = [
                 $asset['inputs'],
@@ -71,5 +74,22 @@ class LayoutResource implements ResourceInterface
             ];
         }
         return $formulae;
+    }
+
+    /**
+     * @param Theme $theme
+     * @return array
+     */
+    protected function collectThemeAssets(Theme $theme)
+    {
+        $assets = $theme->getDataByKey('assets', []);
+
+        $parentTheme = $theme->getParentTheme();
+        if ($parentTheme) {
+            $parentTheme = $this->themeManager->getTheme($parentTheme);
+            $assets = array_merge_recursive($this->collectThemeAssets($parentTheme), $assets);
+        }
+
+        return $assets;
     }
 }

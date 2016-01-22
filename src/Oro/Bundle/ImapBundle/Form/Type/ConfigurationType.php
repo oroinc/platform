@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -12,13 +11,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ConfigurationType extends AbstractType
@@ -54,12 +52,13 @@ class ConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->decodeData($builder);
         $this->modifySettingsFields($builder);
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
-        $this->addApplySyncListener($builder);
-        $this->addSetOriginToFoldersListener($builder);
+        $builder->addEventSubscriber(new ApplySyncSubscriber());
+        $builder->addEventSubscriber(new OriginFolderSubscriber());
         $this->addEnableSMTPImapListener($builder);
         $this->finalDataCleaner($builder);
 
@@ -134,77 +133,6 @@ class ConfigurationType extends AbstractType
                 'attr'    => ['class' => 'folder-tree'],
                 'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',
             ]);
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addSetOriginToFoldersListener(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                if ($data !== null && $data instanceof UserEmailOrigin) {
-                    foreach ($data->getFolders() as $folder) {
-                        $folder->setOrigin($data);
-                    }
-                    $event->setData($data);
-                }
-            }
-        );
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addApplySyncListener(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                $form = $event->getForm();
-
-                if (array_key_exists('folders', $data)) {
-                    /** @var UserEmailOrigin $origin */
-                    $origin = $form->getData();
-
-                    if ($origin !== null && $origin->getId() !== null) {
-                        $this->applySyncEnabled($origin->getRootFolders(), $data['folders']);
-
-                        $form->remove('folders');
-                        unset($data['folders']);
-                    }
-                } else {
-                    $form->remove('folders');
-                }
-                $event->setData($data);
-            },
-            5
-        );
-    }
-
-    /**
-     * @param ArrayCollection $folders
-     * @param array $data
-     */
-    protected function applySyncEnabled($folders, $data)
-    {
-        /** @var EmailFolder $folder */
-        foreach ($folders as $folder) {
-            $f = array_filter($data, function ($item) use ($folder) {
-                return $folder->getFullName() === $item['fullName'];
-            });
-
-            $matched = reset($f);
-            $syncEnabled = array_key_exists('syncEnabled', $matched);
-            $folder->setSyncEnabled($syncEnabled);
-
-            if (array_key_exists('subFolders', $matched) && $folder->hasSubFolders()) {
-                $this->applySyncEnabled($folder->getSubFolders(), $matched['subFolders']);
-            }
-        }
     }
 
     /**
@@ -315,6 +243,26 @@ class ConfigurationType extends AbstractType
                     $event->setData($data);
                 }
             }
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    public function decodeData(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = $event->getData();
+                if (!$data || !is_array($data) || !array_key_exists('folders', $data)) {
+                    return;
+                }
+
+                $data['folders'] = json_decode($data['folders'], true);
+                $event->setData($data);
+            },
+            255
         );
     }
 

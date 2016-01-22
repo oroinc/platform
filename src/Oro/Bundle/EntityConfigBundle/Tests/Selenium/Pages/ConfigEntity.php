@@ -160,6 +160,7 @@ class ConfigEntity extends CustomEntity
     {
         $this->test->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title='Update schema']")->click();
         $this->test->byXPath("//div[@class='modal-footer']/a[contains(., 'Yes, Proceed')]")->click();
+        $this->waitForAjax();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;

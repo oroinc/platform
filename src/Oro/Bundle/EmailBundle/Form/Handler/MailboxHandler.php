@@ -95,7 +95,6 @@ class MailboxHandler implements FormAwareInterface
     {
         /** @var Mailbox $mailbox */
         $mailbox = $this->form->getData();
-
         $this->getEntityManager()->persist($mailbox);
         $this->getEntityManager()->flush();
 
