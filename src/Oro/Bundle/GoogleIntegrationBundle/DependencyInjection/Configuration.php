@@ -1,0 +1,39 @@
+<?php
+
+namespace Oro\Bundle\GoogleIntegrationBundle\DependencyInjection;
+
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+
+class Configuration implements ConfigurationInterface
+{
+    /**
+     * Bundle configuration structure
+     *
+     * {@inheritdoc}
+     */
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode    = $treeBuilder->root('oro_google_integration');
+
+        SettingsBuilder::append($rootNode, [
+            'domains'=> [
+                'value' => [],
+                'type' => 'array',
+            ],
+            'client_id' => [
+                'value' => null,
+                'type' => 'text',
+            ],
+            'client_secret' => [
+                'value' => null,
+                'type' => 'text',
+            ],
+        ]);
+
+        return $treeBuilder;
+    }
+}

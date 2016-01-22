@@ -22,6 +22,12 @@ services:
             - @oro_entity.entity_name_resolver
             - @oro_attachment.manager
 
+    oro_note.association_helper:
+        class: Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+
     oro_note.manager.api:
         class: %oro_note.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
@@ -32,8 +38,7 @@ services:
     oro_note.placeholder.filter:
         class: %oro_note.placeholder.filter.class%
         arguments:
-            - @oro_entity_config.provider.note
-            - @oro_entity_config.provider.entity
+            - @oro_note.association_helper
             - @oro_entity.doctrine_helper
 
     oro_note.entity_config_dumper.extension:
@@ -66,6 +71,8 @@ services:
         arguments:
            - @oro_entity.doctrine_helper
            - @oro_security.owner.entity_owner_accessor.link
+           - @oro_note.association_helper
+           - @oro_comment.association_helper
         tags:
            - {name: oro_activity_list.provider, priority: 40}
 

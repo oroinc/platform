@@ -122,7 +122,7 @@ class EnumFilterType extends AbstractMultiChoiceType
         }
 
         if (!empty($enumValueClassName)) {
-            $choices = array_merge($choices, $this->valueProvider->getEnumChoices($enumValueClassName));
+            $choices = $this->valueProvider->getEnumChoices($enumValueClassName) + $choices;
         }
 
         return $choices;
