@@ -588,6 +588,7 @@ services:
             - @oro_email.email.thread.provider
             - @security.token_storage
             - @oro_security.owner.entity_owner_accessor.link
+            - @=service('doctrine').getManagerForClass('OroEmailBundle:Email')
 
     oro_email.email.thread.provider:
         class: %oro_email.email.thread.provider.class%

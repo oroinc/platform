@@ -38,6 +38,9 @@ class EntityListener
     /** @var Email[] */
     protected $createdEmails = [];
 
+    /** @var Email = [] */
+    protected $activityManagerEmails = [];
+
     /** @var Email[] */
     protected $updatedEmails = [];
 
@@ -73,13 +76,12 @@ class EntityListener
              $this->computeEntityChangeSet($em, $emailAddress);
         }
 
-        $this->createdEmails = array_merge(
-            $this->createdEmails,
-            array_filter(
-                $uow->getScheduledEntityInsertions(),
-                $this->getEmailFilter()
-            )
+        $createdEmails = array_filter(
+            $uow->getScheduledEntityInsertions(),
+            $this->getEmailFilter()
         );
+        $this->createdEmails = array_merge($this->createdEmails, $createdEmails);
+        $this->activityManagerEmails = array_merge($this->activityManagerEmails, $createdEmails);
 
         $this->updatedEmails = array_merge(
             $this->updatedEmails,
@@ -88,8 +90,6 @@ class EntityListener
                 $this->getEmailFilter()
             )
         );
-
-        $this->emailActivityManager->handleOnFlush($event);
 
         $this->addNewEntityOwnedByEmail($uow->getScheduledEntityInsertions());
     }
@@ -110,8 +110,11 @@ class EntityListener
             $this->updatedEmails = [];
             $em->flush();
         }
-
-        $this->emailActivityManager->handlePostFlush($event);
+        if ($this->activityManagerEmails) {
+            $this->emailActivityManager->updateActivities($this->activityManagerEmails);
+            $this->activityManagerEmails = [];
+            $em->flush();
+        }
         $this->addAssociationWithEmailActivity($event);
 
         if ($this->emailsToRemove) {
