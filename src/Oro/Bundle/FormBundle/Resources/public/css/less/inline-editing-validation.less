@@ -1,0 +1,54 @@
+.editable {
+  span.validation-failed {
+    #floating-validation-message();
+    display: block;
+    white-space: nowrap;
+    position: absolute;
+    top: -31px;
+    bottom: auto;
+    &:after {
+      margin: 0;
+      border-width: 6px 4px 0;
+    }
+  }
+  &.error-message-below {
+    .validation-failed {
+      bottom: -31px;
+      top: auto;
+      &:after {
+        border-width: 0 4px 6px;
+        top: auto;
+        bottom: 100%;
+      }
+    }
+  }
+  &.error-message-right {
+    .validation-failed {
+      bottom: auto;
+      top: 2px;
+      left: 100%;
+      margin-left: 6px;
+      &:after {
+        border-width: 4px 6px 4px 0;
+        border-color: transparent #ec5959;
+        top: 8px;
+        left: -6px;
+      }
+    }
+  }
+  &.error-message-left {
+    .validation-failed {
+      bottom: auto;
+      top: 2px;
+      right: 100%;
+      margin-right: 6px;
+      &:after {
+        border-width: 4px 0 4px 6px;
+        border-color: transparent #ec5959;
+        top: 8px;
+        right: -6px;
+        left: auto;
+      }
+    }
+  }
+}

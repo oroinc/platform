@@ -33,7 +33,6 @@ define(['jquery', 'jquery-ui'], function($) {
             var pos;
             var isFixed;
             var offset;
-            var dialogIsBelow;
             // jshint -W040
             var input = this;
             var $input = $(this);
@@ -58,18 +57,21 @@ define(['jquery', 'jquery-ui'], function($) {
             offset = $.datepicker._checkOffset(inst, offset, isFixed);
             inst.dpDiv.css({left: offset.left + 'px', top: offset.top + 'px'});
 
-            dialogIsBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
+            var isBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
+            var isActualClass = $input.hasClass(dropdownClassName) === isBelow &&
+                $input.hasClass(dropupClassName) !== isBelow;
 
-            if ($input.hasClass(dateDialogClassName) !== dialogIsBelow) {
-                $input.trigger('datepicker:dialogReposition', dialogIsBelow ? 'below' : 'above');
-                $input.toggleClass(dateDialogClassName, dialogIsBelow);
+            if (!isActualClass) {
+                $input.toggleClass(dropdownClassName, isBelow);
+                $input.toggleClass(dropupClassName, !isBelow);
+                $input.trigger('datepicker:dialogReposition', isBelow ? 'below' : 'above');
             }
-
         }
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker;
         var _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
-        var dateDialogClassName = 'ui-datepicker-dialog-is-below';
+        var dropdownClassName = 'ui-datepicker-dialog-is-below';
+        var dropupClassName = 'ui-datepicker-dialog-is-above';
 
         /**
          * Bind update position method after datepicker is opened
@@ -84,16 +86,18 @@ define(['jquery', 'jquery-ui'], function($) {
             var input = elem.target || elem;
             var events = getEvents(input.id);
 
-            $(input).removeClass(dateDialogClassName).parents().add(window).each(function() {
-                $(this).on(events, $.proxy(updatePos, input));
-                // @TODO develop other approach than hide on scroll
-                // because on mobile devices it's impossible to open calendar without scrolling
-                /*$(this).on(events, function () {
-                    // just close datepicker
-                    $.datepicker._hideDatepicker();
-                    input.blur();
-                });*/
-            });
+            $(input)
+                .removeClass(dropdownClassName + ' ' + dropupClassName)
+                .parents().add(window).each(function() {
+                    $(this).on(events, $.proxy(updatePos, input));
+                    // @TODO develop other approach than hide on scroll
+                    // because on mobile devices it's impossible to open calendar without scrolling
+                    /*$(this).on(events, function () {
+                        // just close datepicker
+                        $.datepicker._hideDatepicker();
+                        input.blur();
+                    });*/
+                });
 
             updatePos.call(input);
         };
@@ -116,9 +120,11 @@ define(['jquery', 'jquery-ui'], function($) {
             }
             var events = getEvents(input.id);
 
-            $(input).parents().add(window).each(function() {
-                $(this).off(events);
-            });
+            $(input)
+                .removeClass(dropdownClassName + ' ' + dropupClassName)
+                .parents().add(window).each(function() {
+                    $(this).off(events);
+                });
 
             _hideDatepicker.apply(this, arguments);
         };

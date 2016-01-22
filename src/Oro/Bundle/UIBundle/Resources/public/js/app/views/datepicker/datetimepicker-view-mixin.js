@@ -9,6 +9,11 @@ define(function(require) {
     var localeSettings = require('orolocale/js/locale-settings');
     require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
+    var TIMEPICKER_DROPDOWN_CLASS_NAME = 'timepicker-dialog-is-below';
+    var TIMEPICKER_DROPUP_CLASS_NAME = 'timepicker-dialog-is-above';
+    var DATEPICKER_DROPDOWN_CLASS_NAME = 'ui-datepicker-dialog-is-below';
+    var DATEPICKER_DROPUP_CLASS_NAME = 'ui-datepicker-dialog-is-above';
+
     /**
      * Mixin with prototype of TimePickerView implementation
      * (is used to extend some DatePickerView with timepicker functionality)
@@ -83,7 +88,6 @@ define(function(require) {
          * @param {Object} options
          */
         createFrontField: function(options) {
-            var dialogBelowClass = 'datetimepicker-dialog-is-below';
             this._super().createFrontField.call(this, options);
             if (options.fieldsWrapper) {
                 this.$frontDateField
@@ -95,9 +99,11 @@ define(function(require) {
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
             this.$frontDateField.on('blur', function(e) {
-                $(this).parent().removeClass(dialogBelowClass);
+                $(this).parent().removeClass(DATEPICKER_DROPDOWN_CLASS_NAME + ' ' + DATEPICKER_DROPUP_CLASS_NAME);
             }).on('datepicker:dialogReposition', function(e, position) {
-                $(this).parent().toggleClass(dialogBelowClass, position === 'below');
+                $(this).parent()
+                    .toggleClass(DATEPICKER_DROPDOWN_CLASS_NAME, position === 'below')
+                    .toggleClass(DATEPICKER_DROPUP_CLASS_NAME, position !== 'below');
             });
             this.$frontDateField.after(this.$frontTimeField);
         },
@@ -112,11 +118,13 @@ define(function(require) {
             this.$frontTimeField.timepicker(widgetOptions);
             this.$frontTimeField.on('showTimepicker', function() {
                 var $el = $(this);
-                var needClass = !$el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
-                $el.parent().toggleClass('datetimepicker-dialog-is-below', needClass);
+                var isAbove = $el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+                $el.parent()
+                    .toggleClass(TIMEPICKER_DROPDOWN_CLASS_NAME, !isAbove)
+                    .toggleClass(TIMEPICKER_DROPUP_CLASS_NAME, isAbove);
             });
             this.$frontTimeField.on('hideTimepicker', function() {
-                $(this).parent().removeClass('datetimepicker-dialog-is-below');
+                $(this).parent().removeClass(TIMEPICKER_DROPDOWN_CLASS_NAME + ' ' + TIMEPICKER_DROPUP_CLASS_NAME);
             });
             this.$frontDateField.on('blur', function() {
                 if ($(this).hasClass('error')) {

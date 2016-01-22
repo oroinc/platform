@@ -7,6 +7,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var ErrorHolderView = require('../views/inline-editing/error-holder-view');
     var overlayTool = require('oroui/js/tools/overlay');
 
     CellPopupEditorComponent = BaseComponent.extend({
@@ -65,6 +66,13 @@ define(function(require) {
             if (!this.options.save_api_accessor) {
                 throw new Error('Option "save_api_accessor" is required');
             }
+            this.errorHolderView = new ErrorHolderView({
+                el: this.options.cell.$el[0],
+                within: this.options.plugin.main.$('.other-scroll-container')
+            });
+            this.listenTo(this.options.plugin.main, 'scroll', function() {
+                this.errorHolderView.updatePosition();
+            });
             this.listenTo(this.options.plugin, 'lockUserActions', function(value) {
                 this.lockUserActions = value;
             });
@@ -117,17 +125,20 @@ define(function(require) {
                 },
                 change: function() {
                     cell.$el.toggleClass('has-error', !viewInstance.isValid());
+                    this.errorHolderView.updatePosition();
                 },
                 keydown: this.onKeyDown,
                 focus: function() {
                     mediator.trigger('inlineEditor:focus', viewInstance);
                     overlay.focus();
+                    this.errorHolderView.updatePosition();
                 },
                 blur: function() {
                     if (viewInstance.isValid() && viewInstance.isChanged()) {
                         this.saveCurrentCell();
                     }
                     overlay.blur();
+                    this.errorHolderView.updatePosition();
                 }
             });
             viewInstance.trigger('change');

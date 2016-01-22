@@ -223,18 +223,8 @@ define(function(require) {
                 plugin: this
             }));
 
-            editorComponent.view.on('focus', function() {
-                this.highlightCell(cell, true);
-            }, this);
-
-            editorComponent.view.on('blur', function() {
-                this.highlightCell(cell, false);
-            }, this);
-            editorComponent.view.focus(!!fromPreviousCell);
-
             this.activeEditorComponents.push(editorComponent);
-
-            editorComponent.on('dispose', function() {
+            this.listenTo(editorComponent, 'dispose', function() {
                 if (this.disposed) {
                     // @TODO dix it. Rear case, for some reason inline inline-editing-plugin is already disposed
                     return;
@@ -243,7 +233,17 @@ define(function(require) {
                 if (index !== -1) {
                     this.activeEditorComponents.splice(index, 1);
                 }
-            }, this);
+            });
+
+            this.listenTo(editorComponent.view, {
+                focus: function() {
+                    this.highlightCell(cell, true);
+                },
+                blur: function() {
+                    this.highlightCell(cell, false);
+                }
+            });
+            editorComponent.view.focus(!!fromPreviousCell);
         },
 
         buildClassNames: function(editor, cell) {
