@@ -13,8 +13,6 @@ use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 
 class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
@@ -122,7 +120,6 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
         $entityClass = get_class($testTarget);
         $activityClass = 'Test\Activity';
-        $associationField = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
 
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
@@ -130,26 +127,14 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
         $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
         $config->set('activities', [$activityClass]);
 
-        $associationFieldConfig = new Config(
-            new FieldConfigId('extend', $activityClass, $associationField)
-        );
-
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->once())
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$activityClass, $associationField, true],
-                ]
-            );
-        $this->configManager->expects($this->exactly(2))
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('activity', $entityClass)
             ->willReturn($config);
-        $this->configManager->expects($this->once())
-            ->method('getFieldConfig')
-            ->with('extend', $activityClass)
-            ->willReturn($associationFieldConfig);
 
         $this->activityListProvider->expects($this->once())
             ->method('getSupportedActivities')
@@ -246,7 +231,6 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
         $entityClass = get_class($entity);
         $activityClass = 'Test\Activity';
-        $associationField = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
 
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
@@ -254,26 +238,14 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
         $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
         $config->set('activities', [$activityClass]);
 
-        $associationFieldConfig = new Config(
-            new FieldConfigId('extend', $activityClass, $associationField)
-        );
-
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->once())
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$activityClass, $associationField, true],
-                ]
-            );
-        $this->configManager->expects($this->exactly(2))
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('activity', $entityClass)
             ->willReturn($config);
-        $this->configManager->expects($this->once())
-            ->method('getFieldConfig')
-            ->with('extend', $activityClass)
-            ->willReturn($associationFieldConfig);
 
         $this->activityListProvider->expects($this->once())
             ->method('getSupportedActivities')
@@ -305,7 +277,6 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
         $entityClass = get_class($entity);
         $activityClass = 'Test\Activity';
-        $associationField = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
 
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
@@ -313,26 +284,14 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
         $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
         $config->set('activities', [$activityClass]);
 
-        $associationFieldConfig = new Config(
-            new FieldConfigId('extend', $activityClass, $associationField)
-        );
-
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->once())
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$activityClass, $associationField, true],
-                ]
-            );
-        $this->configManager->expects($this->exactly(2))
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('activity', $entityClass)
             ->willReturn($config);
-        $this->configManager->expects($this->once())
-            ->method('getFieldConfig')
-            ->with('extend', $activityClass)
-            ->willReturn($associationFieldConfig);
 
         $this->activityListProvider->expects($this->once())
             ->method('getSupportedActivities')
