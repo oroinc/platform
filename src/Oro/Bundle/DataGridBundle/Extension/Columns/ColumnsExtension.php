@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Columns;
 
-use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -17,7 +16,11 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ColumnsExtension extends AbstractExtension
 {
     /**
@@ -41,8 +44,8 @@ class ColumnsExtension extends AbstractExtension
     /** @var ColumnsHelper */
     protected $columnsHelper;
 
-    /** @var GridView|null */
-    protected $defaultGridView;
+    /** @var GridView|null|bool */
+    protected $defaultGridView = false;
 
     /**
      * @param Registry       $registry
@@ -291,7 +294,7 @@ class ColumnsExtension extends AbstractExtension
      */
     protected function getDefaultGridView($gridName)
     {
-        if ($this->defaultGridView === null) {
+        if ($this->defaultGridView === false) {
             $defaultGridView = $this->getGridViewRepository()->findDefaultGridView(
                 $this->aclHelper,
                 $this->getCurrentUser(),

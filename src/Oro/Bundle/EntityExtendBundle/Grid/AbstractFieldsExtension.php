@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Grid;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -51,7 +50,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+        return $config->getDatasourceType() == OrmDatasource::TYPE;
     }
 
     /**
@@ -108,7 +107,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $qb->leftJoin(sprintf('%s.%s', $alias, $fieldName), $joinAlias);
                     $columnDataName = $fieldName;
                     $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
-                    $selectExpr     = sprintf('%s as %s', $sorterDataName, $fieldName);
+                    $selectExpr     = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
                     break;
                 case 'multiEnum':
                     $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);

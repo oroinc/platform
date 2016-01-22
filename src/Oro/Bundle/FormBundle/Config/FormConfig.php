@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Config;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class FormConfig implements FormConfigInterface
 {
@@ -87,6 +87,6 @@ class FormConfig implements FormConfigInterface
 
     protected function sortBlocks()
     {
-        ArrayUtils::sortBy($this->blocks, true);
+        ArrayUtil::sortBy($this->blocks, true);
     }
 }
