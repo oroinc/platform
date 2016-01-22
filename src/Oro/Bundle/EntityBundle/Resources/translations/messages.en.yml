@@ -39,7 +39,7 @@ oro:
                     items:
                         is_visible: Add to grid settings
                         is_visible.mandatory: Yes as mandatory
-                        is_visible.tooltip: Controls the availability of a field in the Grid Settings. Yes makes it available (hidden by default) and Yes as mandatory adds it permanently to all grid views
+                        is_visible.tooltip: Controls the availability of a field in the Grid Settings. "Yes" makes it available (hidden by default) and "Yes as mandatory" adds it permanently to all grid views
                         show_filter: Show grid filter
             form:
                 field:
