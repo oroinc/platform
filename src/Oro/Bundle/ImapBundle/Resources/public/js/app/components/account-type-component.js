@@ -7,6 +7,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var accountTypeView = require('oroimap/js/app/views/account-type-view');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var routing = require('routing');
 
     AccountTypeComponent = BaseComponent.extend({
         ViewType: accountTypeView,
@@ -16,7 +17,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            this.url = _.result(options, 'url') || '';
+            this.route = _.result(options, 'route') || '';
             this.formParentName = _.result(options, 'formParentName') || '';
 
             var viewConfig = this.prepareViewOptions(options);
@@ -47,7 +48,7 @@ define(function(require) {
             mediator.trigger('change:systemMailBox:email');
             mediator.execute('showLoading');
             $.ajax({
-                url: this.url,
+                url: this.getUrl(),
                 method: 'POST',
                 data: {
                     'type': value,
@@ -60,7 +61,7 @@ define(function(require) {
         onIMapGotToken: function(value) {
             mediator.execute('showLoading');
             $.ajax({
-                url: this.url,
+                url: this.getUrl(),
                 method: 'POST',
                 data: {
                     'type': value.type,
@@ -77,6 +78,23 @@ define(function(require) {
         templateLoaded: function(response) {
             mediator.execute('hideLoading');
             this.view.setHtml(response.html).render();
+        },
+
+        /**
+         * Generate url for requests
+         * @returns {string|*}
+         */
+        getUrl: function() {
+            return routing.generate(this.route, this._getUrlParams());
+        },
+
+        /**
+         * Prepare parameters for routes
+         * @returns {{}}
+         * @private
+         */
+        _getUrlParams: function() {
+            return {};
         }
     });
 
