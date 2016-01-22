@@ -16,6 +16,7 @@ User interface layouts and controls.
 - [Loading Mask View](./Resources/doc/reference/client-side/loading-mask-view.md)
 - [Scroll Data Customization](./Resources/doc/reference/scroll-data-customization.md)
 - [formatters](./Resources/doc/reference/formatters.md)
+- [Dynamic Assets](./Resources/doc/dynamic-assets.md)
 
 ## Configuration Settings
 

@@ -19,6 +19,7 @@ oro:
         view_events:                Events
         add_to_calendar:            Add to %name%
         organization_calendar:      Organization Calendar
+        view:                       View event
 
         action:
             public_calendar_management: Manage system calendars

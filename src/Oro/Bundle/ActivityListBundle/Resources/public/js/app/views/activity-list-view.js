@@ -132,8 +132,14 @@ define(function(require) {
             } else {
                 this._toggleNext();
             }
+            if (this.collection.getPage() === 1) {
+                this._togglePrevious();
+            } else {
+                this._togglePrevious(true);
+            }
             $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
+            $('.activity-list-widget .pagination-current').val(this.collection.getPage());
 
             if (this.collection.getCount() === 0 && this.isFiltersEmpty) {
                 this.gridToolbar.hide();

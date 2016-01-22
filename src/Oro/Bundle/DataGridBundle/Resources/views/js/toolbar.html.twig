@@ -1,11 +1,11 @@
 <script type="text/html" id="template-datagrid-toolbar">
 {% if isDesktopVersion() %}
     <div class="grid-toolbar">
-        <div class="pull-left">
+        <div class="pull-left grid-toolbar-mass-actions">
             <div class="mass-actions-panel btn-group icons-holder"></div>
             <div class="extra-actions-panel"></div>
         </div>
-        <div class="pull-right">
+        <div class="pull-right grid-toolbar-tools">
             <div class="actions-panel pull-right form-horizontal"></div>
             <div class="page-size pull-right form-horizontal"></div>
         </div>
@@ -14,7 +14,7 @@
 {% else %}
     <div class="grid-toolbar">
         <div class="actions-panel pull-right"></div>
-        <div class="pull-left">
+        <div class="pull-left grid-toolbar-mass-actions">
             <div class="mass-actions-panel btn-group icons-holder"></div>
         </div>
         <div class="pagination-container">

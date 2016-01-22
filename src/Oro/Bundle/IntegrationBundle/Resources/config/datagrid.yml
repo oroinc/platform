@@ -1,8 +1,8 @@
 datagrid:
     oro-integration-grid:
+        acl_resource: oro_integration_view
         source:
             type: orm
-            acl_resource: oro_integration_view
             query:
                 select:
                     - c.id
@@ -97,9 +97,9 @@ datagrid:
             entityHint: channel
             entity_pagination: true
     oro-integration-status-grid:
+        acl_resource: oro_integration_view
         source:
             type: orm
-            acl_resource: oro_integration_view
             query:
                 select:
                     - s.code

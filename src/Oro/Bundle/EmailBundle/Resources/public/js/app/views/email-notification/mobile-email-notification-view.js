@@ -40,7 +40,7 @@ define(function(require) {
             if (count === 0) {
                 count = '';
             } else {
-                count = '(' + (count > 10 ? '10+' : count) + ')';
+                count = '(' + (count > 99 ? '99+' : count) + ')';
             }
             this.$counter.html(count);
             $('#user-menu .dropdown-toggle').toggleClass('has-new-emails', Boolean(this.countNewEmail));
