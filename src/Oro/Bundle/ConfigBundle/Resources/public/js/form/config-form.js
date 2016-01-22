@@ -53,9 +53,7 @@ define([
             confirm.on('ok', _.bind(function() {
                 this.$el.get(0).reset();
                 this.$el.find('.select2').each(function(key, elem) {
-                    var $elem = $(elem);
-                    var data = $elem.data('selected-data');
-                    $elem.select2('val', data, true);
+                    $(elem).select2('val', null, true);
                 });
                 this.$el.find('.removeRow').each(function() {
                     $(this).closest('*[data-content]')
