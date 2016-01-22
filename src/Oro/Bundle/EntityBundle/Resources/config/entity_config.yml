@@ -126,7 +126,7 @@ oro_entity_config:
                 is_visible:
                     options:
                         require_schema_update: true
-                        value_type:         boolean
+                        value_type:         integer
                         default_value:      true
                         allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
