@@ -4,8 +4,6 @@ namespace Oro\Bundle\ConfigBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormFieldType extends AbstractType
@@ -41,17 +39,6 @@ class FormFieldType extends AbstractType
 
         $builder->add('use_parent_scope_value', $useParentType, $useParentOptions);
         $builder->add('value', $options['target_field_type'], $options['target_field_options']);
-
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                if (!empty($data['use_parent_scope_value']) && $event->getForm()->get('value')->count()) {
-                    $data['value'] = [];
-                    $event->setData($data);
-                }
-            }
-        );
     }
 
     /**
