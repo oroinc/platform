@@ -85,23 +85,32 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnFlush()
     {
         $contactsArray = [new User(), new User(), new User()];
-        $emailsArray = [new Email(), new Email(), new Email()];
 
         $uow = new UnitOfWork();
         array_map([$uow, 'addInsertion'], $contactsArray);
 
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValue($metadata));
+        $em->expects($this->once())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+        $em
+            ->expects($this->once())
+            ->method('flush');
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
-            ->setMethods(['getEntityManager', 'getUnitOfWork', 'getScheduledEntityInsertions'])
             ->disableOriginalConstructor()
             ->getMock();
         $onFlushEventArgs
             ->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($onFlushEventArgs));
-        $onFlushEventArgs
-            ->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->will($this->returnValue($em));
 
         $this->emailOwnerManager->expects($this->once())
             ->method('createEmailAddressData')
@@ -113,42 +122,18 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
 
         $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
-            ->setMethods(['getEntityManager', 'flush'])
             ->disableOriginalConstructor()
             ->getMock();
         $postFlushEventArgs
             ->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($postFlushEventArgs));
+            ->will($this->returnValue($em));
 
-        $this->registry
-            ->expects($this->exactly(3))
-            ->method('getRepository')
-            ->will($this->returnValue($this->registry));
-        $this->registry
-            ->expects($this->exactly(3))
-            ->method('getEmailsByOwnerEntity')
-            ->will($this->returnValue($emailsArray));
         $this->emailOwnersProvider
             ->expects($this->exactly(3))
             ->method('supportOwnerProvider')
             ->will($this->returnValue(true));
-        $this->chainProvider
-            ->expects($this->exactly(3))
-            ->method('isSupportedTargetEntity')
-            ->will($this->returnValue(true));
-        $this->userEmailOwnerProvider
-            ->expects($this->exactly(3))
-            ->method('getEmailOwnerClass')
-            ->will($this->returnValue(ClassUtils::getClass(new User)));
 
-        $this->emailActivityManager
-            ->expects($this->exactly(9))
-            ->method('addAssociation');
-        $postFlushEventArgs
-            ->expects($this->once())
-            ->method('flush');
-        
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
     }
@@ -161,18 +146,25 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $uow = new UnitOfWork();
         array_map([$uow, 'addInsertion'], array_merge($contactsArray, $emailsArray));
 
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValue($metadata));
+        $em->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
-            ->setMethods(['getEntityManager', 'getUnitOfWork', 'getScheduledEntityInsertions'])
             ->disableOriginalConstructor()
             ->getMock();
         $onFlushEventArgs
             ->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($onFlushEventArgs));
-        $onFlushEventArgs
-            ->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->will($this->returnValue($em));
 
         $this->emailOwnerManager->expects($this->once())
             ->method('createEmailAddressData')
@@ -189,13 +181,12 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ]);
 
         $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
-            ->setMethods(['getEntityManager', 'flush'])
             ->disableOriginalConstructor()
             ->getMock();
         $postFlushEventArgs
             ->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($postFlushEventArgs));
+            ->will($this->returnValue($em));
 
         $this->registry
             ->expects($this->never())
@@ -209,10 +200,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->exactly(6))
             ->method('supportOwnerProvider')
             ->will($this->returnValue(true));
-        $this->chainProvider
-            ->expects($this->exactly(6))
-            ->method('isSupportedTargetEntity')
-            ->will($this->returnValue(false));
         $this->userEmailOwnerProvider
             ->expects($this->never())
             ->method('getEmailOwnerClass')
@@ -221,9 +208,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->emailActivityManager
             ->expects($this->never())
             ->method('addAssociation');
-        $postFlushEventArgs
-            ->expects($this->exactly(3))
-            ->method('flush');
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
