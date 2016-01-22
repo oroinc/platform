@@ -4,12 +4,13 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 use Oro\Bundle\EmailBundle\EventListener\EntityListener;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
-class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
+class EntityListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var EntityListener */
     private $listener;
@@ -85,6 +86,9 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
         $contactsArray = [new User(), new User(), new User()];
         $emailsArray = [new Email(), new Email(), new Email()];
 
+        $uow = new UnitOfWork();
+        array_map([$uow, 'addInsertion'], $contactsArray);
+
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->setMethods(['getEntityManager', 'getUnitOfWork', 'getScheduledEntityInsertions'])
             ->disableOriginalConstructor()
@@ -96,19 +100,17 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
         $onFlushEventArgs
             ->expects($this->once())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($onFlushEventArgs));
-        $onFlushEventArgs
-            ->expects($this->once())
-            ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue($contactsArray));
+            ->will($this->returnValue($uow));
 
         $this->emailOwnerManager->expects($this->once())
-            ->method('handleOnFlush')
-            ->with($this->identicalTo($onFlushEventArgs));
+            ->method('createEmailAddressData')
+            ->with($this->identicalTo($uow))
+            ->will($this->returnValue([]));
+        $this->emailOwnerManager->expects($this->once())
+            ->method('handleChangedAddresses')
+            ->with([])
+            ->will($this->returnValue([]));
         $this->emailActivityManager->expects($this->once())
-            ->method('handleOnFlush')
-            ->with($this->identicalTo($onFlushEventArgs));
-        $this->emailThreadManager->expects($this->once())
             ->method('handleOnFlush')
             ->with($this->identicalTo($onFlushEventArgs));
 
@@ -117,7 +119,7 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $postFlushEventArgs
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($postFlushEventArgs));
 
@@ -158,30 +160,29 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
         $contactsArray = [new User(), new User(), new User()];
         $emailsArray = [new Email(), new Email(), new Email()];
 
+        $uow = new UnitOfWork();
+        array_map([$uow, 'addInsertion'], $contactsArray);
+
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->setMethods(['getEntityManager', 'getUnitOfWork', 'getScheduledEntityInsertions'])
             ->disableOriginalConstructor()
             ->getMock();
         $onFlushEventArgs
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($onFlushEventArgs));
         $onFlushEventArgs
             ->expects($this->once())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($onFlushEventArgs));
-        $onFlushEventArgs
-            ->expects($this->once())
-            ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue($contactsArray));
+            ->will($this->returnValue($uow));
 
         $this->emailOwnerManager->expects($this->once())
-            ->method('handleOnFlush')
-            ->with($this->identicalTo($onFlushEventArgs));
+            ->method('createEmailAddressData')
+            ->will($this->returnValue([]));
+        $this->emailOwnerManager->expects($this->once())
+            ->method('handleChangedAddresses')
+            ->will($this->returnValue([]));
         $this->emailActivityManager->expects($this->once())
-            ->method('handleOnFlush')
-            ->with($this->identicalTo($onFlushEventArgs));
-        $this->emailThreadManager->expects($this->once())
             ->method('handleOnFlush')
             ->with($this->identicalTo($onFlushEventArgs));
 
@@ -190,7 +191,7 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $postFlushEventArgs
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($postFlushEventArgs));
 
