@@ -211,7 +211,7 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('isSupportedTargetEntity')
             ->will($this->returnValue(false));
         $this->userEmailOwnerProvider
-            ->expects($this->never())
+            ->expects($this->exactly(3))
             ->method('getEmailOwnerClass')
             ->will($this->returnValue(ClassUtils::getClass(new User)));
 
