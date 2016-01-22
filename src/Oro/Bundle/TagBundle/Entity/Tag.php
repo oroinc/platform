@@ -15,7 +15,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 /**
  * Tag
  *
- * @ORM\Table(name="oro_tag_tag")
+ * @ORM\Table(
+ *     name="oro_tag_tag",
+ *    indexes={
+ *        @ORM\Index(name="name_organization_idx", columns={"name", "organization_id"})
+ *    }
+ * )
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="Oro\Bundle\TagBundle\Entity\Repository\TagRepository")
  * @Config(

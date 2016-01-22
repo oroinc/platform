@@ -8,7 +8,7 @@ oro_entity_config:
                         require_schema_update: true
                         priority:           250
                     form:
-                        type:               oro_entity_extend_multiple_association_choice
+                        type:               oro_activity_multiple_association_choice
                         options:
                             block:          associations
                             required:       false
@@ -72,5 +72,13 @@ oro_entity_config:
                 # please note that an activity should provide both action_link_widget and action_link_widget,
                 # because actions can be rendered as a button as a dropdown menu
                 action_link_widget: # string
+                    options:
+                        auditable:          false
+
+    grid:
+        entity:
+            items:
+                # grid name that used for rendering entity context
+                context: # string
                     options:
                         auditable:          false

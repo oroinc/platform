@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Twig;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
@@ -85,15 +84,11 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
         $configuration = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\DatagridConfiguration')
             ->disableOriginalConstructor()
+            ->setMethods(['getAclResource'])
             ->getMock();
 
-        $configuration->expects($this->at(0))
-            ->method('offsetGetByPath')
-            ->with(Builder::DATASOURCE_ACL_PATH)
-            ->will($this->returnValue(null));
-        $configuration->expects($this->at(1))
-            ->method('offsetGetByPath')
-            ->with(Builder::DATASOURCE_SKIP_ACL_CHECK)
+        $configuration->expects($this->once())
+            ->method('getAclResource')
             ->will($this->returnValue(null));
 
         $this->manager->expects($this->once())
@@ -131,14 +126,9 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configuration->expects($this->at(0))
-            ->method('offsetGetByPath')
-            ->with(Builder::DATASOURCE_ACL_PATH)
+        $configuration->expects($this->once())
+            ->method('getAclResource')
             ->will($this->returnValue($acl));
-        $configuration->expects($this->at(1))
-            ->method('offsetGetByPath')
-            ->with(Builder::DATASOURCE_SKIP_ACL_CHECK)
-            ->will($this->returnValue(false));
 
         $this->manager->expects($this->once())
             ->method('getConfigurationForGrid')

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -50,7 +49,7 @@ class OrmPagerExtension extends AbstractExtension
         $disabled = $this->getOr(PagerInterface::DISABLED_PARAM, false)
             || $config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
 
-        return !$disabled && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+        return !$disabled && $config->getDatasourceType() == OrmDatasource::TYPE;
     }
 
     /**
@@ -62,11 +61,9 @@ class OrmPagerExtension extends AbstractExtension
 
         if ($datasource instanceof OrmDatasource) {
             $this->pager->setQueryBuilder($datasource->getQueryBuilder());
-            $this->pager->setSkipAclCheck(
-                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)
-            );
+            $this->pager->setSkipAclCheck($config->isDatasourceSkipAclApply());
             $this->pager->setSkipCountWalker(
-                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH)
+                $config->offsetGetByPath(DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH)
             );
         }
 

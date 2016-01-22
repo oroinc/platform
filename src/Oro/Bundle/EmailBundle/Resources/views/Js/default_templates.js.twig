@@ -1,8 +1,7 @@
 <script type="text/template" id="multiselect-origin-folder-template">
     <div class="filter-item oro-drop">
         <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %>: <% } %>
-            <strong class="select-filter-placeholder multiselect-filter-placeholder"><%= placeholder %></strong>
+            <% if (showLabel) { %><%= label %><% } %><span class="filter-item-hint"></span>
             <select multiple>
                 <% _.each(options, function (item, key) { %>
                     <optgroup label="<%- key %>">
@@ -17,8 +16,6 @@
                     </optgroup>
                 <% }); %>
             </select>
-            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
-            ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
         </div>
     </div>
 </script>
