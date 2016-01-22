@@ -643,7 +643,9 @@ class AclPrivilegeRepository
                 $mask = $extension->adaptRootMask($mask, $privilege->getIdentity()->getId());
             }
             if ($extension->removeServiceBits($mask) === 0) {
-                foreach ($extension->getPermissions($mask) as $permission) {
+                $supportedPermissions = array_intersect($permissions, $extension->getPermissions($mask));
+
+                foreach ($supportedPermissions as $permission) {
                     if (!$privilege->hasPermission($permission)) {
                         $privilege->addPermission(new AclPermission($permission, AccessLevel::NONE_LEVEL));
                     }
