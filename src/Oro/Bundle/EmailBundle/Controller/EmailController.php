@@ -390,7 +390,8 @@ class EmailController extends Controller
         } catch (\Exception $e) {
             return new JsonResponse(
                 ['error' => $this->get('translator')->trans('oro.email.action.message.error')],
-                Codes::HTTP_OK);
+                Codes::HTTP_OK
+            );
         }
 
         return new JsonResponse([], Codes::HTTP_OK);
