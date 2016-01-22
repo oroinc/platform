@@ -42,6 +42,9 @@ class WidgetConfigs
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var array */
+    protected $widgetOptionsById = [];
+
     /**
      * @param ConfigProvider           $configProvider
      * @param SecurityFacade           $securityFacade
@@ -110,6 +113,40 @@ class WidgetConfigs
                 $attrName .= ucfirst($keyPart);
             }
             $result[$attrName] = $val;
+        }
+
+        // get grid params, if exists, this line is required
+        // to not override params passed via request to controller
+        $gridParams = $this->request ? $this->request->get('params', []) : [];
+        if (!empty($gridParams)) {
+            $result['params'] = $this->addGridConfigParams($gridParams);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Add ability to pass widget instance configuration params as grid params
+     * so they could be used to bound them to Query parameters,
+     * which allows to filter grid by widget configuration values
+     *
+     * @param array $gridParams
+     *
+     * @return array
+     */
+    protected function addGridConfigParams(array $gridParams)
+    {
+        $result = [];
+        $widgetOptions = $this->getWidgetOptions();
+
+        // check if there are some parameter that marked as 'use_config_value'
+        foreach ($gridParams as $paramName => $paramValue) {
+            if ('use_config_value' !== $paramValue) {
+                continue;
+            }
+
+            // replace config param value (raw value) in grid parameters
+            $result[$paramName] = $widgetOptions->get($paramName);
         }
 
         return $result;
@@ -181,16 +218,13 @@ class WidgetConfigs
      */
     public function getWidgetOptions($widgetId = null)
     {
-        if (!$this->request) {
+        $widgetId = is_null($widgetId) && $this->request ? $this->request->query->get('_widgetId', null) : $widgetId;
+        if (!$widgetId) {
             return new WidgetOptionBag();
         }
 
-        if (!$widgetId) {
-            $widgetId = $this->request->query->get('_widgetId', null);
-        }
-
-        if (!$widgetId) {
-            return new WidgetOptionBag();
+        if (!empty($this->widgetOptionsById[$widgetId])) {
+            return new WidgetOptionBag($this->widgetOptionsById[$widgetId]);
         }
 
         $widget       = $this->findWidget($widgetId);
@@ -207,6 +241,8 @@ class WidgetConfigs
                 $options
             );
         }
+
+        $this->widgetOptionsById[$widgetId] = $options;
 
         return new WidgetOptionBag($options);
     }
