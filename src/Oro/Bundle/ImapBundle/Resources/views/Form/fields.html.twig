@@ -39,8 +39,8 @@
     {% set options = form.vars.options|default({})|merge({
         'route': "oro_imap_change_account_type",
         'formSelector': '#'~formSelector|default(form.vars.id),
-        'formParentName' : form.parent.vars.name,
-        organization: data and data.organization is defined and data.organization ? data.organization.id : null
+        'formParentName': form.parent.vars.name,
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
     }) %}
 
     <div class="container-change-account-type"
@@ -74,7 +74,7 @@
         'googleErrorMessage': '.google-alert',
         'formParentName' : form.parent.parent.vars.name,
         'type': constant('Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel::ACCOUNT_TYPE_GMAIL'),
-            organization: data and data.organization is defined and data.organization ? data.organization.id : null
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
     }) %}
 
     <div class="container-imap-gmail-container"
