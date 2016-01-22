@@ -5,6 +5,7 @@ UPGRADE FROM 1.8 to 1.9
 - Services with tag `oro_activity.activity_widget_provider` was marked as private
 
 ####ActivityListBundle
+- The signature of `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface::isApplicableTarget` changed. Before: `isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)`. After: `isApplicableTarget($entityClass, $accessible = true)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getDate` removed. Use `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getCreatedAt` and `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getUpdatedAt` instead
@@ -15,10 +16,16 @@ UPGRADE FROM 1.8 to 1.9
 - `oro_address.address.manager` service was marked as private
 - Validation `AbstractAddress::isRegionValid` was moved to `Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion` constraint
 
+####AttachmentBundle
+- Class `Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig` marked as deprecated. Use `Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper` instead.
+
 ####CalendarBundle
 - `oro_calendar.calendar_provider.user` service was marked as private
 - `oro_calendar.calendar_provider.system` service was marked as private
 - `oro_calendar.calendar_provider.public` service was marked as private
+
+####CommentBundle
+- The `Oro\Bundle\CommentBundle\Model\CommentProviderInterface` changed. The `hasComments` method removed. The `isCommentsEnabled` method added. The signature of the old method was `hasComments(ConfigManager $configManager, $entityName)`. The signature of the new method is `isCommentsEnabled($entityClass)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\CommentBundle\Model\CommentProviderInterface`.
 
 ####ConfigBundle
 - An implementation of scope managers has been changed to be simpler and performant. This can bring a `backward compatibility break` if you have own scope managers. See [add_new_config_scope.md](./src/Oro/Bundle/ConfigBundle/Resources/doc/add_new_config_scope.md) and the next items for more detailed info.
