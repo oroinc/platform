@@ -47,7 +47,7 @@ class FormFieldType extends AbstractType
             function (FormEvent $event) {
                 $data = $event->getData();
                 if (!empty($data['use_parent_scope_value']) && $event->getForm()->get('value')->count()) {
-                    $data['value'] = null;
+                    $data['value'] = [];
                     $event->setData($data);
                 }
             }
