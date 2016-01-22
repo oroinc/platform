@@ -117,7 +117,6 @@ services:
         arguments:
             - @oro_dashboard.config_provider
             - @form.factory
-            - @oro_form.validator.constraint_factory
 
     oro_dashboard.datetime.helper:
         class: %oro_dashboard.datetime.helper.class%
