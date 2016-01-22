@@ -87,7 +87,7 @@ class ImapEmailGoogleOauth2Manager
         $token = $origin->getAccessToken();
 
         //if token had been expired, the new one must be generated and saved to DB
-        if ($now > $expiresAt) {
+        if ($now > $expiresAt && $this->configManager->get('oro_imap.enable_google_imap')) {
             $parameters = [
                 'refresh_token' => $origin->getRefreshToken(),
                 'grant_type'    => 'refresh_token'

@@ -47,9 +47,15 @@ class UserGridFieldValidator implements CustomGridFieldValidatorInterface
 
         $currentUser = $this->securityFacade->getLoggedUser();
 
+        if ($this->hasField($entity, $fieldName)
+            && in_array($fieldName, $this->getCurrentUserFieldBlockList(), true)
+            && $currentUser->getId() !== $entity->getId()
+        ) {
+            return true;
+        }
+
         return $this->hasField($entity, $fieldName)
-        && $currentUser->getId() === $entity->getId()
-        && !in_array($fieldName, $this->getCurrentUserFieldBlockList(), true);
+            && !in_array($fieldName, $this->getCurrentUserFieldBlockList(), true);
     }
 
     /**
@@ -80,6 +86,9 @@ class UserGridFieldValidator implements CustomGridFieldValidatorInterface
         return $this->accessor;
     }
 
+    /**
+     * @return array
+     */
     protected function getCurrentUserFieldBlockList()
     {
         return [
