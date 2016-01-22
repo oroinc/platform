@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 use Oro\Bundle\EmailBundle\EventListener\EntityListener;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -75,8 +76,8 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener = new EntityListener(
             $this->emailOwnerManager,
-            $this->emailActivityManager,
-            $this->emailThreadManager,
+            new ServiceLink($this->emailActivityManager),
+            new ServiceLink($this->emailThreadManager),
             $this->emailOwnersProvider
         );
     }
@@ -110,9 +111,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('handleChangedAddresses')
             ->with([])
             ->will($this->returnValue([]));
-        $this->emailActivityManager->expects($this->once())
-            ->method('handleOnFlush')
-            ->with($this->identicalTo($onFlushEventArgs));
 
         $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
             ->setMethods(['getEntityManager', 'flush'])
@@ -161,7 +159,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $emailsArray = [new Email(), new Email(), new Email()];
 
         $uow = new UnitOfWork();
-        array_map([$uow, 'addInsertion'], $contactsArray);
+        array_map([$uow, 'addInsertion'], array_merge($contactsArray, $emailsArray));
 
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->setMethods(['getEntityManager', 'getUnitOfWork', 'getScheduledEntityInsertions'])
@@ -183,8 +181,12 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('handleChangedAddresses')
             ->will($this->returnValue([]));
         $this->emailActivityManager->expects($this->once())
-            ->method('handleOnFlush')
-            ->with($this->identicalTo($onFlushEventArgs));
+            ->method('updateActivities')
+            ->with([
+                spl_object_hash($emailsArray[0]) => $emailsArray[0],
+                spl_object_hash($emailsArray[1]) => $emailsArray[1],
+                spl_object_hash($emailsArray[2]) => $emailsArray[2],
+            ]);
 
         $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
             ->setMethods(['getEntityManager', 'flush'])
@@ -204,11 +206,11 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEmailsByOwnerEntity')
             ->will($this->returnValue($emailsArray));
         $this->emailOwnersProvider
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(6))
             ->method('supportOwnerProvider')
             ->will($this->returnValue(true));
         $this->chainProvider
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(6))
             ->method('isSupportedTargetEntity')
             ->will($this->returnValue(false));
         $this->userEmailOwnerProvider
@@ -220,7 +222,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('addAssociation');
         $postFlushEventArgs
-            ->expects($this->once())
+            ->expects($this->exactly(3))
             ->method('flush');
 
         $this->listener->onFlush($onFlushEventArgs);
