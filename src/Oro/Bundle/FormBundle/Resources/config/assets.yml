@@ -1,4 +1,3 @@
 css:
     'oroconfig':
-      - 'bundles/oroform/css/less/form.less'
-      - 'bundles/oroform/css/inline-editable-wrapper.less'
+      - 'bundles/oroform/css/less/main.less'

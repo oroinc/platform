@@ -163,7 +163,17 @@ class EmailTypeTest extends TypeTestCase
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $contextsSelectType = new ContextsSelectType($em, $configManager, $translator, $mapper, $securityTokenStorage);
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $contextsSelectType = new ContextsSelectType(
+            $em,
+            $configManager,
+            $translator,
+            $mapper,
+            $securityTokenStorage,
+            $eventDispatcher
+        );
 
         return [
             new PreloadedExtension(

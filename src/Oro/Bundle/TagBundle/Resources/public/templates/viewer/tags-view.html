@@ -1,4 +1,4 @@
-<div class="tags-container">
+<span class="tags-container">
     <% if (tags.length > 0) { %>
         <% _.each(tags , function(tag) { %>
         <a href="<%= tag.url %>"
@@ -9,4 +9,4 @@
     <% } else if (showDefault){ %>
         <%= _.__('N/A') %>
     <% } %>
-</div>
+</span>

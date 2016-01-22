@@ -13,7 +13,7 @@
 .ui-dialog {
   width: 100% !important;
   height: auto !important;
-  min-height: 100vh !important;
+  min-height: 100% !important;
   box-sizing: border-box;
   background: #fafafa;
   position: inherit !important;
@@ -24,6 +24,9 @@
   box-shadow: none !important;
   max-width: 100vw;
   min-width: initial !important;
+  &.ui-dialog-on-background {
+    display: none !important;
+  }
   &.ui-resizable:not(.ui-dialog-buttons) {
     &:after {
       display: none;

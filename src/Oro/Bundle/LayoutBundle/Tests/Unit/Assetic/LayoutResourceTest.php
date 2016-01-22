@@ -43,7 +43,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
         $asset = [
             'inputs' => ['styles.css'],
             'filters' => ['filters'],
-            'output' => ['output.css'],
+            'output' => 'output.css',
         ];
 
         return [
@@ -63,6 +63,21 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
                     'assets' => [
                         'first' => $asset,
                         'second' => $asset,
+                    ]
+                ],
+            ],
+            'with_parent' => [
+                'parent' => 'parent',
+                'data' => [
+                    'assets' => [
+                        'first' => $asset,
+                    ]
+                ],
+            ],
+            'parent' => [
+                'data' => [
+                    'assets' => [
+                        'first' => ['inputs' => ['parent_styles.css']],
                     ]
                 ],
             ],
@@ -89,7 +104,13 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
             }
 
             $assets = $theme['data']['assets'];
+            if (isset($theme['parent'])) {
+                $assets = array_merge_recursive($themes[$theme['parent']]['data']['assets'], $assets);
+            }
             foreach ($assets as $assetKey => $asset) {
+                if (!isset($asset['output']) || empty($asset['inputs'])) {
+                    continue;
+                }
                 $name = 'layout_' . $themeName . '_' . $assetKey;
                 $formulae[$name] = [
                     $asset['inputs'],

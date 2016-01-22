@@ -6,9 +6,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint;
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 class GroupingValidator extends ConstraintValidator
 {
@@ -55,11 +56,11 @@ class GroupingValidator extends ConstraintValidator
             $groupingColumns = $definition['grouping_columns'];
         }
 
-        $groupingColumnNames = ArrayUtils::arrayColumn($groupingColumns, 'name');
-        $columnNames         = ArrayUtils::arrayColumn($columns, 'name');
+        $groupingColumnNames = ArrayUtil::arrayColumn($groupingColumns, 'name');
+        $columnNames         = ArrayUtil::arrayColumn($columns, 'name');
         $columnNamesToCheck  = array_diff(
             $columnNames,
-            ArrayUtils::arrayColumn($aggregateColumns, 'name')
+            ArrayUtil::arrayColumn($aggregateColumns, 'name')
         );
         $columnsToGroup      = array_diff($columnNamesToCheck, $groupingColumnNames);
 

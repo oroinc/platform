@@ -9,7 +9,7 @@
 }
 &, #page, #top-page {
   height: auto;
-  min-height: 100vh;
+  min-height: 100%;
   overflow: visible;
 }
 
@@ -59,8 +59,10 @@
     padding: @contentPadding 0;
   }
 }
-.container-fluid > .responsive-section .responsive-cell {
-  padding: 0 @contentPadding;
+.container-fluid > .responsive-section {
+  .responsive-cell, .responsive-cell:only-child {
+    padding: 0 @contentPadding;
+  }
 }
 .responsive-cell .box-type1{
   .filter-box {
