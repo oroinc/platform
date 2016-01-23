@@ -98,6 +98,7 @@ oro_entity_config:
                         label:              oro.entity.entity_config.entity.field.items.label
                         required:           true
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
+                        sortable:           true
                     form:
                         type:               text
                         options:
