@@ -83,7 +83,8 @@ class ImapServicesFactory
             'port' => $config->getPort(),
             'ssl' => $config->getSsl(),
             'user' => $config->getUser(),
-            'password' => $config->getPassword()
+            'password' => $config->getPassword(),
+            'accessToken' => $config->getAccessToken()
         );
 
         $defaultImapStorageClass = $this->defaultImapServices[0];
