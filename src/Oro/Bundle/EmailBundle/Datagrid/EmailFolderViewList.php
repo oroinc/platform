@@ -32,13 +32,13 @@ class EmailFolderViewList extends AbstractViewsList
     {
         $views = [
             new View(
-                'oro.email.datagrid.emailfolder.view.inbox',
+                $this->translator->trans('oro.email.datagrid.emailfolder.view.inbox'),
                 [
                     'folder' => ['value' => [FolderType::INBOX]]
                 ]
             ),
             new View(
-                'oro.email.datagrid.emailfolder.view.sent',
+                $this->translator->trans('oro.email.datagrid.emailfolder.view.sent'),
                 [
                     'folder' => ['value' => [FolderType::SENT]]
                 ]

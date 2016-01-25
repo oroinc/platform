@@ -36,8 +36,9 @@ define(['../side-menu', '../mediator'], function($, mediator) {
          */
         _show: function() {
             this.$toggle.addClass('open');
+            $('.dropdown-menu').parent('.open').removeClass('open');
             $('#main-menu').show();
-            $(document).on('click', this._onOutsideClick);
+            $(document).on('click shown.bs.dropdown', this._onOutsideClick);
         },
 
         /**
@@ -48,7 +49,7 @@ define(['../side-menu', '../mediator'], function($, mediator) {
         _hide: function() {
             $('#main-menu').hide();
             this.$toggle.removeClass('open');
-            $(document).off('click', this._onOutsideClick);
+            $(document).off('click shown.bs.dropdown', this._onOutsideClick);
         },
 
         /**

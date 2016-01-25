@@ -42,6 +42,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailUser
 {
+    const ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
+
     /**
      * @var integer
      *
@@ -145,6 +147,13 @@ class EmailUser
      * @JMS\Exclude
      */
     protected $email;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="integer", options={"default"=0})
+     */
+    protected $unsyncedFlagCount = 0;
 
     public function __construct()
     {
@@ -384,6 +393,34 @@ class EmailUser
     public function setOrigin(EmailOrigin $origin)
     {
         $this->origin = $origin;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUnsyncedFlagCount()
+    {
+        return $this->unsyncedFlagCount;
+    }
+
+    /**
+     * @return $this
+     */
+    public function incrementUnsyncedFlagCount()
+    {
+        $this->unsyncedFlagCount++;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function decrementUnsyncedFlagCount()
+    {
+        $this->unsyncedFlagCount = max([0, $this->unsyncedFlagCount - 1]);
 
         return $this;
     }

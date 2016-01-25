@@ -137,6 +137,17 @@ class ProcessTrigger
     }
 
     /**
+     * @param int $id
+     * @return ProcessTrigger
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param string $event
      * @return ProcessTrigger
      */
