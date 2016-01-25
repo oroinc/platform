@@ -15,13 +15,19 @@ define([
             filters: '.filter-container',
             itemHint: '.filter-item-hint',
             itemsHint: '.filter-items-hint',
-            hint: '.filter-criteria-hint'
+            hint: '.filter-criteria-hint',
+            reset: '.reset-filter-button'
         }
     }, config);
 
     var FilterHint;
 
     FilterHint = BaseView.extend(_.extend({}, FilterTemplate, {
+        /**
+         * @property
+         */
+        filter: null,
+
         /**
          * @property {String}
          */
@@ -58,26 +64,28 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'label', 'hint', 'templateSelector', 'templateTheme', 'selectors');
+            var opts = _.pick(options || {}, 'filter');
             _.extend(this, opts);
+
+            this.templateTheme = this.filter.templateTheme;
+            this.label = this.filter.label;
+            this.hint = this.filter._getCriteriaHint();
 
             this._defineTemplate();
 
             FilterHint.__super__.initialize.apply(this, arguments);
         },
 
-        /**
-         * @param {jQuery} $filter
-         */
-        render: function($filter) {
+        render: function() {
             this.setElement(this.template({
                 label: this.inline ? null : this.label
             }));
 
             if (this.inline) {
-                $filter.find(this.selectors.itemHint).append(this.$el);
+                this.filter.$el.find(this.selectors.itemHint).append(this.$el);
             } else {
-                $filter.closest(this.selectors.filters).find(this.selectors.itemsHint).append(this.$el);
+                this.filter.$el.closest(this.selectors.filters).find(this.selectors.itemsHint)
+                    .find(this.selectors.reset).before(this.$el);
             }
 
             this.update(this.hint);

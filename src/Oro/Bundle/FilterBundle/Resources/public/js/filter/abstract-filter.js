@@ -97,6 +97,13 @@ define([
         nullLink: '#',
 
         /**
+         * Element enclosing a criteria dropdown
+         *
+         * @property {Array.<string|jQuery|HTMLElement>}
+         */
+        dropdownFitContainers: ['.ui-dialog-content', '#container:visible', 'body'],
+
+        /**
          * Initialize.
          *
          * @param {Object} options
@@ -121,14 +128,16 @@ define([
             AbstractFilter.__super__.initialize.apply(this, arguments);
 
             var hintView = new FilterHint({
-                templateTheme: this.templateTheme,
-                label: this.label,
-                hint: this._getCriteriaHint()
+                filter: this
             });
 
             this.subview('hint', hintView);
 
             this.listenTo(hintView, 'reset', this.reset);
+        },
+
+        rendered: function() {
+            this.subview('hint').render();
         },
 
         /**
@@ -228,6 +237,21 @@ define([
         },
 
         /**
+         * Find element that dropdown of filter should fit to
+         *
+         * @param {string|jQuery|HTMLElement} element
+         * @return {*}
+         */
+        _findDropdownFitContainer: function(element) {
+            element = element || this.$el;
+            var $container = $();
+            for (var i = 0; i < this.dropdownFitContainers.length && $container.length === 0; i += 1) {
+                $container = $(element).closest(this.dropdownFitContainers[i]);
+            }
+            return $container.length === 0 ? null : $container;
+        },
+
+        /**
          * Converts a display value to raw format, e.g. decimal value can be displayed as "5,000,000.00"
          * but raw value is 5000000.0
          *
@@ -258,8 +282,8 @@ define([
          * @protected
          */
         _onValueUpdated: function(newValue, oldValue) {
-            this._triggerUpdate(newValue, oldValue);
             this._updateCriteriaHint();
+            this._triggerUpdate(newValue, oldValue);
         },
 
         /**

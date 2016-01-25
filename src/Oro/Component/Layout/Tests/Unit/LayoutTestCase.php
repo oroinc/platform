@@ -22,7 +22,7 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         $collectViews($actual);
         $views = new ArrayCollection($views);
 
-        $this->completeView($expected, ['views' => $views]);
+        $this->completeView($expected, ['blocks' => $views]);
         $actualArray = $this->convertBlockViewToArray($actual, $ignoreAuxiliaryVariables);
 
         // compare hierarchy
@@ -130,5 +130,27 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
                 $this->buildViewHierarchy($result[$childId], $childView);
             }
         }
+    }
+
+    /**
+     * @param array $addViews
+     * @param bool $root
+     * @return array
+     */
+    protected function setLayoutBlocks($addViews, $root = true)
+    {
+        $views = $addViews;
+        foreach ($views as $view) {
+            $views = array_merge($views, $this->setLayoutBlocks($view->children, false));
+        }
+
+        if ($root) {
+            $viewsCollection = new ArrayCollection($views);
+            foreach ($views as $view) {
+                $view->blocks = $viewsCollection;
+            }
+        }
+
+        return $views;
     }
 }

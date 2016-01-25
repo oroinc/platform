@@ -42,8 +42,8 @@ class GridViewsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var GridView|null */
-    protected $defaultGridView;
+    /** @var GridView|null|bool */
+    protected $defaultGridView = false;
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
@@ -184,7 +184,7 @@ class GridViewsExtension extends AbstractExtension
      */
     protected function getDefaultView($gridName)
     {
-        if ($this->defaultGridView === null) {
+        if ($this->defaultGridView === false) {
             $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
             $defaultGridView = $repository->findDefaultGridView(
                 $this->aclHelper,
