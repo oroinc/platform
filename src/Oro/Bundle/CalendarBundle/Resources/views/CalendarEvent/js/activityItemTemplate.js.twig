@@ -20,9 +20,10 @@
 
 {% block activityActions %}
     {% set action %}
-        <% if (editable) { %>
+        {# Add button for add context in the activity list item #}
+        {% if resource_granted('oro_calendar_event_update') %}
             {{ AC.activity_context_link() }}
-        <% } %>
+        {% endif %}
     {% endset %}
     {% set actions = [action] %}
 
