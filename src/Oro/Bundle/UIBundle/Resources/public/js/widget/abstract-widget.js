@@ -623,13 +623,6 @@ define(function(require) {
                 this.loadContent();
             } else {
                 this._show();
-                if (this.deferredRender) {
-                    this.deferredRender.done(_.bind(function() {
-                        this.trigger('contentLoad', null, this);
-                    }, this));
-                } else {
-                    this.trigger('contentLoad', null, this);
-                }
             }
             this.firstRun = false;
         },
@@ -760,6 +753,7 @@ define(function(require) {
                         return;
                     }
                     this._afterLayoutInit();
+                    this.trigger('widgetReady', this);
                 }, this));
         },
 
