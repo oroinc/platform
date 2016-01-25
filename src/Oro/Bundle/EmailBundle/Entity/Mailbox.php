@@ -35,6 +35,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 {
