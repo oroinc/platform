@@ -29,7 +29,7 @@
                     }) }}
                 </div>
             </div>
-            <div class="pagination pagination-centered">
+            <div class="pagination">
                 <label class="dib">{{ 'oro.activitylist.pagination.page'|trans }}</label>
                 <ul class="icons-holder">
                     <li class="pagination-previous {% if pager.current == 1 %} disabled {% endif %}">
@@ -43,7 +43,7 @@
                     </li>
                 </ul>
                 <label class="dib">
-                    {{ 'oro.activitylist.pagination.total'|trans({
+                    {{ ('oro.activitylist.pagination.total'~(isMobileVersion() ? '_mobile' : ''))|trans({
                     '{{ pages }}': '<span class="pagination-total-num">#</span>',
                     '{{ records }}': '<span class="pagination-total-count">#</span>'
                     })|raw }}
