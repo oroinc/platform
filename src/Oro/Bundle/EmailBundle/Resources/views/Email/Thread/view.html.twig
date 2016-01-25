@@ -54,5 +54,12 @@
                 'contextsRendered': true
             }) }}
         </div>
+        <div class="widget-content email-activity-widget">
+            <h4 class="scrollspy-title">{{ 'oro.activity.sections.activities'|trans }}</h4>
+            <div class="scrollspy-nav-target"></div>
+            <div class="responsive-section">
+                {% placeholder view_content_data_activities with {entity: entity} %}
+            </div>
+        </div>
     </div>
 {% endblock content_data %}

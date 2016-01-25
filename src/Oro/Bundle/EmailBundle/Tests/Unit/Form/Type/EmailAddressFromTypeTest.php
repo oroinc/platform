@@ -14,6 +14,7 @@ class EmailAddressFromTypeTest extends TypeTestCase
 {
     protected $securityFacade;
     protected $relatedEmailsProvider;
+    protected $mailboxManager;
 
     public function setUp()
     {
@@ -24,6 +25,10 @@ class EmailAddressFromTypeTest extends TypeTestCase
             ->getMock();
 
         $this->relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -46,7 +51,11 @@ class EmailAddressFromTypeTest extends TypeTestCase
             ->method('getEmails')
             ->will($this->returnValue($relatedEmails));
 
-        $type = new EmailAddressFromType($this->securityFacade, $this->relatedEmailsProvider);
+        $this->mailboxManager->expects($this->once())
+            ->method('findAvailableMailboxEmails')
+            ->will($this->returnValue([]));
+
+        $type = new EmailAddressFromType($this->securityFacade, $this->relatedEmailsProvider, $this->mailboxManager);
         $form = $this->factory->create($type);
 
         $form->submit($formData);

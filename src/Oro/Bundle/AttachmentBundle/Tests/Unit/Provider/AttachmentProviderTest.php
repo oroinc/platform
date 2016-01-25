@@ -2,23 +2,16 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
-use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 
 class AttachmentProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    /**
-     * @var AttachmentConfig|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $attachmentConfig;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $attachmentAssociationHelper;
 
     /**
      * @var AttachmentProvider|\PHPUnit_Framework_MockObject_MockObject
@@ -31,20 +24,21 @@ class AttachmentProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->attachmentConfig = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig')
+        $this->attachmentAssociationHelper = $this
+            ->getMockBuilder('Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->attachmentProvider = new AttachmentProvider($this->em, $this->attachmentConfig);
+        $this->attachmentProvider = new AttachmentProvider($this->em, $this->attachmentAssociationHelper);
     }
 
     public function testGetEntityAttachments()
     {
         $entity = new TestClass();
 
-        $this->attachmentConfig->expects($this->once())
+        $this->attachmentAssociationHelper->expects($this->once())
             ->method('isAttachmentAssociationEnabled')
-            ->with($entity)
+            ->with(get_class($entity))
             ->willReturn(true);
 
         $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
@@ -98,9 +92,9 @@ class AttachmentProviderTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new TestClass();
 
-        $this->attachmentConfig->expects($this->once())
+        $this->attachmentAssociationHelper->expects($this->once())
             ->method('isAttachmentAssociationEnabled')
-            ->with($entity)
+            ->with(get_class($entity))
             ->willReturn(false);
 
         $result = $this->attachmentProvider->getEntityAttachments($entity);

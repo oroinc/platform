@@ -5,6 +5,7 @@ UPGRADE FROM 1.8 to 1.9
 - Services with tag `oro_activity.activity_widget_provider` was marked as private
 
 ####ActivityListBundle
+- The signature of `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface::isApplicableTarget` changed. Before: `isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)`. After: `isApplicableTarget($entityClass, $accessible = true)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getDate` removed. Use `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getCreatedAt` and `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getUpdatedAt` instead
@@ -15,10 +16,16 @@ UPGRADE FROM 1.8 to 1.9
 - `oro_address.address.manager` service was marked as private
 - Validation `AbstractAddress::isRegionValid` was moved to `Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion` constraint
 
+####AttachmentBundle
+- Class `Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig` marked as deprecated. Use `Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper` instead.
+
 ####CalendarBundle
 - `oro_calendar.calendar_provider.user` service was marked as private
 - `oro_calendar.calendar_provider.system` service was marked as private
 - `oro_calendar.calendar_provider.public` service was marked as private
+
+####CommentBundle
+- The `Oro\Bundle\CommentBundle\Model\CommentProviderInterface` changed. The `hasComments` method removed. The `isCommentsEnabled` method added. The signature of the old method was `hasComments(ConfigManager $configManager, $entityName)`. The signature of the new method is `isCommentsEnabled($entityClass)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\CommentBundle\Model\CommentProviderInterface`.
 
 ####ConfigBundle
 - An implementation of scope managers has been changed to be simpler and performant. This can bring a `backward compatibility break` if you have own scope managers. See [add_new_config_scope.md](./src/Oro/Bundle/ConfigBundle/Resources/doc/add_new_config_scope.md) and the next items for more detailed info.
@@ -40,7 +47,7 @@ UPGRADE FROM 1.8 to 1.9
 - `Oro\Bundle\DataGridBundle\Datagrid\Builder::BASE_DATAGRID_CLASS_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::BASE_DATAGRID_CLASS_PATH`.
 - `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_ACL_CHECK` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::isDatasourceSkipAclApply`.
 - `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH`.
-- Option "acl_resource" moved from option "source" too root node of datagrid configuration:
+- Option "acl_resource" moved from option "source" to root node of datagrid configuration:
 
 Before
 
@@ -136,6 +143,7 @@ grid-name:
 - `oro_entity.entity_hierarchy_provider` service was marked as private.
 - `oro_entity.entity_hierarchy_provider.class` parameter was removed.
 - `oro_entity.entity_hierarchy_provider.all` service was added. It can be used if you need a hierarchy of all entities but not only configurable ones.
+- Class `Oro\Bundle\EntityBundle\Provider\EntityContextProvider` was moved to `Oro\Bundle\ActivityBundle\Provider\ContextGridProvider` and `oro_entity.entity_context_provider` service was moved to `oro_activity.provider.context_grid`. 
 
 ####EntityConfigBundle
 - Removed `optionSet` field type deprecated since v1.4. Existing options sets are converted to `Select` or `Multi-Select` automatically during the Platform update.
@@ -215,6 +223,8 @@ after:
 - Added `Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter` as default formatter for the date, time and datetime types in `Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer`. This types exported/imported depends on the application locale and timezone and recognized as dates in Microsoft Excel.
 - `Oro\Bundle\ImportExportBundle\Field\DatabaseHelper::getRegistry` is deprecated. Use class methods instead of disposed registry
 - Services with tag `oro_importexport.normalizer` was marked as private
+- Allow to omit empty identity fields. To use this feature set `Use As Identity Field` option to `Only when not empty
+` (-1 or `Oro\Bundle\ImportExportBundle\Field\FieldHelper::IDENTITY_ONLY_WHEN_NOT_EMPTY` in a code)
 
 ####InstallerBundle
 - `Oro\Bundle\InstallerBundle\EventListener\RequestListener` added to the class cache as performance improvement
@@ -268,6 +278,11 @@ after:
 - `/Resources/translations/tooltips.*.yml` deprecated since 1.9.0. Will be removed in 1.11.0. Use `/Resources/translations/messages.*.yml` instead
 
 ####UiBundle
+- Added `assets_version_strategy` parameter which can be used to automatically update `assets_version` parameter. Possible values are:
+  - null        - the assets version stays unchanged
+  - time_hash   - a hash of the current time (default strategy)
+  - incremental - the next assets version is the previous version is incremented by one (e.g. 'ver1' -> 'ver2' or '1' -> '2')
+- Removed `assets_version` global variable from TWIG. Use `asset_version` or `asset` TWIG functions instead
 - Added possibility to group tabs in dropdown for tabs panel. Added options to tabPanel function. Example: `{{ tabPanel(tabs, {useDropdown: true}) }}`
 - Added possibility to set content for specific tab. Example: `{{ tabPanel([{label: 'Tab', content: 'Tab content'}]) }}`
 - `Oro\Bundle\UIBundle\EventListener\ContentProviderListener` added to the class cache and constructor have container as performance improvement
