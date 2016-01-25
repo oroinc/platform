@@ -321,6 +321,7 @@ services:
         arguments:
             - @mailer
             - @service_container
+            - @oro_imap.imap_email_google_oauth2_manager
 
     # Email template API
     oro_email.manager.emailtemplate.api:
@@ -641,6 +642,8 @@ services:
            - @oro_ui.html_tag_helper
            - @oro_security.security_facade.link
            - @oro_email.mailbox.process_storage.link
+           - @oro_activity.association_helper
+           - @oro_comment.association_helper
         calls:
            - [ setSecurityContextLink, [@security.context.link] ]
         tags:
@@ -712,7 +715,7 @@ services:
             - @kernel
             - @oro_security.security_facade.link
             - @oro_attachment.validator.file_config_validator
-            - @oro_attachment.config
+            - @oro_attachment.association_helper
 
     oro_email.listener.email_body_add_listener:
         class: %oro_email.listener.email_body_add_listener.class%
@@ -834,7 +837,7 @@ services:
     oro_email.mailbox_email_owner_provider:
         class: %oro_email.mailbox_email_owner_provider.class%
         tags:
-            - { name: oro_email.owner.provider, order: 1 }
+            - { name: oro_email.owner.provider, order: 2 }
 
     oro_email.mailbox_choice_list:
         class: %oro_email.mailbox_choice_list.class%

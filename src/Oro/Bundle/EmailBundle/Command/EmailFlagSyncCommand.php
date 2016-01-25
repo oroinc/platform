@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Command;
 
+use Exception;
+
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ObjectManager;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -62,16 +66,36 @@ class EmailFlagSyncCommand extends ContainerAwareCommand
                     }
                     $msg = sprintf('Email flag synced for email user - %s', $emailUser->getId());
                     $output->writeln('<info>' . $msg . '</info>');
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $warn = sprintf('Email flag cannot be synced for email user - %s', $emailUser->getId());
                     $output->writeln('<info>' . $warn . '</info>');
                     $logger->warning($warn);
                 }
+
+                $emailUser->decrementUnsyncedFlagCount();
             } else {
                 $warn = sprintf('Not found email user - %s', $emailUser->getId());
                 $output->writeln('<info>' . $warn . '</info>');
                 $logger->warning($warn);
             }
         }
+
+        $this->getEmailUserManager()->flush();
+    }
+
+    /**
+     * @return ObjectManager
+     */
+    protected function getEmailUserManager()
+    {
+        return $this->getRegistry()->getManagerForClass('OroEmailBundle:EmailUser');
+    }
+
+    /**
+     * @return Registry
+     */
+    protected function getRegistry()
+    {
+        return $this->getContainer()->get('doctrine');
     }
 }

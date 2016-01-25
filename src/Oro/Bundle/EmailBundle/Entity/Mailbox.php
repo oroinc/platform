@@ -35,6 +35,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 {
@@ -294,10 +295,15 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function setOrigin($origin = null)
     {
         $currentOrigin = $this->getOrigin();
-        if ($currentOrigin && ($origin === null || $currentOrigin !== $origin)) {
+        if ($currentOrigin && ($origin === null || $origin->getUser() === null
+                || $currentOrigin->getId() !== $origin->getId())) {
             $currentOrigin->setActive(false);
+            $this->origin = null;
         }
-        $this->origin = $origin;
+
+        if ($origin !== null && $origin->getUser() !== null) {
+            $this->origin = $origin;
+        }
 
         return $this;
     }

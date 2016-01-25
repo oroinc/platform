@@ -16,6 +16,8 @@ use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 
 class ChoiceAccountType extends AbstractType
 {
+    const NAME = 'oro_imap_choice_account_type';
+
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -33,7 +35,7 @@ class ChoiceAccountType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_imap_choice_account_type';
+        return self::NAME;
     }
 
     /**

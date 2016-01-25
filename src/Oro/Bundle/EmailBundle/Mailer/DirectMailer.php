@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
+use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
@@ -15,20 +16,17 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
  */
 class DirectMailer extends \Swift_Mailer
 {
-    /**
-     * @var \Swift_Mailer
-     */
+    /** @var \Swift_Mailer */
     protected $baseMailer;
 
-    /**
-     * @var \Swift_SmtpTransport
-     */
+    /** @var \Swift_SmtpTransport */
     protected $smtpTransport;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
+
+    /** @var ImapEmailGoogleOauth2Manager */
+    protected $imapEmailGoogleOauth2Manager;
 
     /**
      * Constructor
@@ -36,10 +34,14 @@ class DirectMailer extends \Swift_Mailer
      * @param \Swift_Mailer      $baseMailer
      * @param ContainerInterface $container
      */
-    public function __construct(\Swift_Mailer $baseMailer, ContainerInterface $container)
-    {
+    public function __construct(
+        \Swift_Mailer $baseMailer,
+        ContainerInterface $container,
+        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+    ) {
         $this->baseMailer = $baseMailer;
         $this->container  = $container;
+        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
 
         $transport = $this->baseMailer->getTransport();
         if ($transport instanceof \Swift_Transport_SpoolTransport) {
@@ -48,6 +50,11 @@ class DirectMailer extends \Swift_Mailer
                 $transport = \Swift_NullTransport::newInstance();
             }
         }
+
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+            $this->addXOAuth2Authenticator($transport);
+        }
+
         parent::__construct($transport);
     }
 
@@ -66,6 +73,7 @@ class DirectMailer extends \Swift_Mailer
             $host     = $userEmailOrigin->getSmtpHost();
             $port     = $userEmailOrigin->getSmtpPort();
             $security = $userEmailOrigin->getSmtpEncryption();
+            $accessToken = $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($userEmailOrigin);
 
             $transport = $this->getTransport();
             if ($transport instanceof \Swift_SmtpTransport
@@ -78,7 +86,14 @@ class DirectMailer extends \Swift_Mailer
             }
 
             $transport->setUsername($username);
-            $transport->setPassword($password);
+
+            if ($accessToken === null) {
+                $transport->setPassword($password);
+            } else {
+                $transport->setAuthMode('XOAUTH2');
+                $transport->setPassword($accessToken);
+            }
+
             $this->smtpTransport = $transport;
         }
     }
@@ -178,5 +193,35 @@ class DirectMailer extends \Swift_Mailer
         }
 
         return $realTransport;
+    }
+
+    /**
+     * @param \Swift_Transport_EsmtpTransport $transport
+     *
+     * @return DirectMailer
+     */
+    protected function addXOAuth2Authenticator($transport)
+    {
+        $handlers = $transport->getExtensionHandlers();
+        $handlers = is_array($handlers) ? $handlers : [];
+
+        foreach ($handlers as $handler) {
+            if ($handler instanceof \Swift_Transport_Esmtp_AuthHandler) {
+                $authenticators = $handler->getAuthenticators();
+                $isOAuth2Exist = false;
+                foreach ($authenticators as $authenticator) {
+                    if ($authenticator instanceof \Swift_Transport_Esmtp_Auth_XOAuth2Authenticator) {
+                        $isOAuth2Exist = true;
+                    }
+                }
+
+                if (!$isOAuth2Exist) {
+                    $authenticators[] = new \Swift_Transport_Esmtp_Auth_XOAuth2Authenticator();
+                    $handler->setAuthenticators($authenticators);
+                }
+            }
+        }
+
+        return $this;
     }
 }

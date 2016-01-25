@@ -46,9 +46,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
     /**
      * @param ObjectManager         $om
      * @param ActivityManager       $activityManager
@@ -59,7 +56,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
      * @param ObjectMapper          $objectMapper
      * @param TranslatorInterface   $translator
      * @param DoctrineHelper        $doctrineHelper
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         ObjectManager $om,
@@ -70,8 +66,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         EntityAliasResolver $entityAliasResolver,
         ObjectMapper $objectMapper,
         TranslatorInterface $translator,
-        DoctrineHelper $doctrineHelper,
-        EventDispatcherInterface $dispatcher
+        DoctrineHelper $doctrineHelper
     ) {
         parent::__construct(null, $om);
 
@@ -83,7 +78,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $this->mapper               = $objectMapper;
         $this->translator           = $translator;
         $this->doctrineHelper       = $doctrineHelper;
-        $this->dispatcher           = $dispatcher;
     }
 
     /**
@@ -120,17 +114,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $config        = $entityProvider->getConfig($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
 
-            if (!array_key_exists('title', $item) || !$item['title']) {
-                if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
-                    $text = [];
-                    foreach ($fields as $field) {
-                        $text[] = $this->mapper->getFieldValue($target, $field);
-                    }
-                    $item['title'] = implode(' ', $text);
-                } else {
-                    $item['title'] = $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
-                }
-            }
+            $item = $this->prepareItemTitle($item, $targetClass, $target, $targetId);
 
             $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);
             $item['entityId']           = $id;
@@ -141,9 +125,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $item['icon'] = $config->get('icon');
             $item['link'] = $this->getContextLink($targetClass, $targetId);
 
-            $event = new PrepareContextTitleEvent($item, $targetClass);
-            $this->dispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
-            $item = $event->getItem();
+            $item = $this->dispatchContextTitle($item, $targetClass);
 
             $result[] = $item;
         }
@@ -183,5 +165,47 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         }
 
         return $link;
+    }
+
+    /**
+     * @param $item
+     * @param $targetClass
+     * @return array
+     */
+    protected function dispatchContextTitle($item, $targetClass)
+    {
+        if ($this->eventDispatcher) {
+            $event = new PrepareContextTitleEvent($item, $targetClass);
+            $this->eventDispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
+            $item = $event->getItem();
+        }
+
+        return $item;
+    }
+
+    /**
+     * @param $item
+     * @param $targetClass
+     * @param $target
+     * @param $targetId
+     *
+     * @return mixed
+     */
+    protected function prepareItemTitle($item, $targetClass, $target, $targetId)
+    {
+        if (!array_key_exists('title', $item) || !$item['title']) {
+            if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
+                $text = [];
+                foreach ($fields as $field) {
+                    $text[] = $this->mapper->getFieldValue($target, $field);
+                }
+                $item['title'] = implode(' ', $text);
+                return $item;
+            } else {
+                $item['title'] = $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
+                return $item;
+            }
+        }
+        return $item;
     }
 }
