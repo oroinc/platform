@@ -3,11 +3,6 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Placeholder;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\NoteBundle\Tests\Unit\Fixtures\TestEntity;
 
@@ -15,11 +10,8 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_ENTITY_REFERENCE = 'Oro\Bundle\NoteBundle\Tests\Unit\Fixtures\TestEntity';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
-    protected $noteConfigProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
-    protected $entityConfigProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $noteAssociationHelper;
 
     /** @var PlaceholderFilter */
     protected $filter;
@@ -29,10 +21,8 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->noteConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->noteAssociationHelper = $this
+            ->getMockBuilder('Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -57,27 +47,30 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
             });
 
         $this->filter = new PlaceholderFilter(
-            $this->noteConfigProvider,
-            $this->entityConfigProvider,
+            $this->noteAssociationHelper,
             $this->doctrineHelper
         );
     }
 
     protected function tearDown()
     {
-        unset($this->noteConfigProvider, $this->entityConfigProvider, $this->doctrineHelper, $this->filter);
+        unset($this->noteAssociationHelper, $this->doctrineHelper, $this->filter);
     }
 
     public function testIsNoteAssociationEnabledWithNonManagedEntity()
     {
         $testEntity = new \stdClass();
+
+        $this->noteAssociationHelper->expects($this->never())
+            ->method('isNoteAssociationEnabled');
+
         $this->assertFalse($this->filter->isNoteAssociationEnabled($testEntity));
     }
 
     public function testIsNoteAssociationEnabledWithNull()
     {
-        $this->noteConfigProvider->expects($this->never())
-            ->method('hasConfig');
+        $this->noteAssociationHelper->expects($this->never())
+            ->method('isNoteAssociationEnabled');
 
         $this->assertFalse(
             $this->filter->isNoteAssociationEnabled(null)
@@ -86,45 +79,27 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNoteAssociationEnabledWithNotObject()
     {
-        $this->noteConfigProvider->expects($this->never())
-            ->method('hasConfig');
+        $this->noteAssociationHelper->expects($this->never())
+            ->method('isNoteAssociationEnabled');
 
         $this->assertFalse($this->filter->isNoteAssociationEnabled('test'));
     }
 
-    public function testIsNoteAssociationEnabledWithoutFilledId()
+    public function testIsNoteAssociationEnabledWithNewEntity()
     {
+        $this->noteAssociationHelper->expects($this->never())
+            ->method('isNoteAssociationEnabled');
+
         $this->assertFalse(
             $this->filter->isNoteAssociationEnabled(new TestEntity(null))
         );
     }
 
-    public function testIsNoteAssociationEnabledWithNotConfigurableEntity()
+    public function testIsNoteAssociationEnabledWithAssociationDisabled()
     {
-        $this->noteConfigProvider->expects($this->once())
-            ->method('hasConfig')
+        $this->noteAssociationHelper->expects($this->once())
+            ->method('isNoteAssociationEnabled')
             ->with(static::TEST_ENTITY_REFERENCE)
-            ->will($this->returnValue(false));
-
-        $this->assertFalse($this->filter->isNoteAssociationEnabled(new TestEntity(1)));
-    }
-
-    public function testIsNoteAssociationEnabledWithNotUpdatedSchema()
-    {
-        $config = new Config(new EntityConfigId('note', static::TEST_ENTITY_REFERENCE));
-        $config->set('enabled', true);
-
-        $this->noteConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with(static::TEST_ENTITY_REFERENCE)
-            ->will($this->returnValue(true));
-        $this->noteConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(static::TEST_ENTITY_REFERENCE)
-            ->will($this->returnValue($config));
-        $this->entityConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with(Note::ENTITY_NAME, ExtendHelper::buildAssociationName(static::TEST_ENTITY_REFERENCE))
             ->will($this->returnValue(false));
 
         $this->assertFalse(
@@ -134,20 +109,9 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNoteAssociationEnabled()
     {
-        $config = new Config(new EntityConfigId('note', static::TEST_ENTITY_REFERENCE));
-        $config->set('enabled', true);
-
-        $this->noteConfigProvider->expects($this->once())
-            ->method('hasConfig')
+        $this->noteAssociationHelper->expects($this->once())
+            ->method('isNoteAssociationEnabled')
             ->with(static::TEST_ENTITY_REFERENCE)
-            ->will($this->returnValue(true));
-        $this->noteConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(static::TEST_ENTITY_REFERENCE)
-            ->will($this->returnValue($config));
-        $this->entityConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with(Note::ENTITY_NAME, ExtendHelper::buildAssociationName(static::TEST_ENTITY_REFERENCE))
             ->will($this->returnValue(true));
 
         $this->assertTrue(
