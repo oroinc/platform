@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Layout\Extension;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Component\Layout\ContextConfiguratorInterface;
@@ -10,17 +10,17 @@ use Oro\Component\Layout\ContextInterface;
 
 class WidgetContextConfigurator implements ContextConfiguratorInterface
 {
-    /** @var Request|null */
-    protected $request;
+    /**
+     * @var RequestStack
+     */
+    protected $requestStack;
 
     /**
-     * Synchronized DI method call, sets current request for further usage
-     *
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function setRequest(Request $request = null)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -28,13 +28,15 @@ class WidgetContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         $context->getResolver()
             ->setDefaults(
                 [
-                    'widget_container' => function (Options $options, $value) {
-                        if (null === $value && $this->request) {
-                            $value = $this->request->query->get('_widgetContainer')
-                                ?: $this->request->request->get('_widgetContainer');
+                    'widget_container' => function (Options $options, $value) use ($request) {
+                        if (null === $value && $request) {
+                            $value = $request->query->get('_widgetContainer')
+                                ?: $request->request->get('_widgetContainer');
                         }
 
                         return $value;
@@ -46,12 +48,12 @@ class WidgetContextConfigurator implements ContextConfiguratorInterface
         $context->data()->setDefault(
             'widget_id',
             '$request._wid',
-            function () {
-                if (!$this->request) {
+            function () use ($request) {
+                if (!$request) {
                     throw new \BadMethodCallException('The request expected.');
                 }
 
-                return $this->request->query->get('_wid') ?: $this->request->request->get('_wid');
+                return $request->query->get('_wid') ?: $request->request->get('_wid');
             }
         );
     }
