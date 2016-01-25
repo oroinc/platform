@@ -9,6 +9,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var routing = require('routing');
 
     ImapGmailComponent = BaseComponent.extend({
         ViewType: ImapGmailView,
@@ -20,8 +21,8 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            this.url = _.result(options, 'url') || '';
-            this.urlGetFolders = _.result(options, 'urlGetFolders') || '';
+            this.route = _.result(options, 'route') || '';
+            this.routeGetFolders = _.result(options, 'routeGetFolders') || '';
             this.formParentName = _.result(options, 'formParentName') || '';
 
             var viewConfig = this.prepareViewOptions(options);
@@ -150,7 +151,7 @@ define(function(require) {
             data.formParentName = this.formParentName;
 
             $.ajax({
-                url: this.url,
+                url: this.getUrl(),
                 method: 'POST',
                 data: data,
                 success: _.bind(this.renderFormGetFolder, this)
@@ -177,7 +178,7 @@ define(function(require) {
             mediator.execute('showLoading');
 
             $.ajax({
-                url: this.urlGetFolders,
+                url: this.getUrlGetFolders(),
                 method: 'POST',
                 data: data,
                 success: _.bind(this.handlerGetFolders, this)
@@ -212,6 +213,31 @@ define(function(require) {
             }
 
             return data;
+        },
+
+        /**
+         * Generate url for request to server to get template with button Retrieve Folders
+         * @returns {string|*}
+         */
+        getUrl: function() {
+            return routing.generate(this.route, this._getUrlParams());
+        },
+
+        /**
+         * Generate url for request to get folders
+         * @returns {string|*}
+         */
+        getUrlGetFolders: function() {
+            return routing.generate(this.routeGetFolders, this._getUrlParams());
+        },
+
+        /**
+         * Prepare parameters for routes
+         * @returns {{}}
+         * @private
+         */
+        _getUrlParams: function() {
+            return {};
         }
     });
 
