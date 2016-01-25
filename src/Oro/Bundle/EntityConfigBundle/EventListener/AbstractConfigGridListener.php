@@ -11,19 +11,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
-
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 /**
- * Class AbstractConfigGridListener
- *
- * @package Oro\Bundle\EntityConfigBundle\EventListener
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractConfigGridListener implements EventSubscriberInterface
@@ -129,7 +123,6 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
      * @param string|null $alias
      * @param string|null $itemsType
      *
-     * @throws LogicException
      * @return array
      */
     protected function getDynamicFields($alias = null, $itemsType = null)
@@ -144,28 +137,11 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     continue;
                 }
 
-                $indexed = isset($item['options']['indexed']) && $item['options']['indexed'];
-                if ($indexed
-                    && isset($item['options']['indexed_type'])
-                    && $item['options']['indexed_type'] !== 'scalar'
-                    && ($item['grid']['type'] !== 'html' || !isset($item['grid']['template']))
-                ) {
-                    throw new LogicException(
-                        sprintf(
-                            'If the value of option "indexed_type" not "scalar" grid type should'
-                            . ' be set to "html" and grid template for rendering such value should be defined'
-                            . ' for property "%s" in scope "%s".',
-                            $code,
-                            $provider->getScope()
-                        )
-                    );
-                }
-
                 $fieldName    = $provider->getScope() . '_' . $code;
                 $item['grid'] = $this->mapEntityConfigTypes($item['grid']);
 
                 $attributes = ['field_name' => $fieldName];
-                if ($indexed) {
+                if (isset($item['options']['indexed']) && $item['options']['indexed']) {
                     $attributes['expression'] = $alias . $provider->getScope() . '_' . $code . '.value';
                 } else {
                     $attributes['data_name'] = '[data][' . $provider->getScope() . '][' . $code . ']';
@@ -182,25 +158,20 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             }
         }
 
+        // sort by priority and flatten
         ksort($fields);
+        $fields = call_user_func_array('array_merge', $fields);
 
-        $orderedFields = [];
-        // compile field list with pre-defined order
-        foreach ($fields as $field) {
-            $orderedFields = array_merge($orderedFields, $field);
-        }
-
-        return $orderedFields;
+        return $fields;
     }
 
     /**
-     * @param array  $orderedFields
-     * @param string $alias
+     * @param array $orderedFields
      *
      * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function getDynamicSortersAndFilters(array $orderedFields, $alias = '')
+    public function getDynamicSortersAndFilters(array $orderedFields)
     {
         $filters = $sorters = [];
 
@@ -208,7 +179,12 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
         foreach ($orderedFields as $fieldName => $field) {
             if (isset($field['sortable']) && $field['sortable']) {
                 $sorters['columns'][$fieldName] = [
-                    'data_name' => isset($field['expression']) ? $field['expression'] : $alias . $fieldName
+                    'data_name'      => isset($field['expression']) ? $field['expression'] : null,
+                    'apply_callback' => function (OrmDatasource $datasource, $sortKey, $direction) {
+                        if ($sortKey) {
+                            $datasource->getQueryBuilder()->addOrderBy($sortKey, $direction);
+                        }
+                    }
                 ];
             }
 
@@ -304,7 +280,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             $properties[strtolower($config['name']) . '_link'] = [
                 'type'   => 'url',
                 'route'  => $config['route'],
-                'params' => (isset($config['args']) ? $config['args'] : [])
+                'params' => isset($config['args']) ? $config['args'] : []
             ];
 
             if (isset($config['filter'])) {
@@ -402,7 +378,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     protected function mapEntityConfigTypes(array $gridConfig)
     {
         if (isset($gridConfig['type'])
-            && $gridConfig['type'] == self::TYPE_HTML
+            && $gridConfig['type'] === self::TYPE_HTML
             && isset($gridConfig['template'])
         ) {
             $gridConfig['type']          = self::TYPE_TWIG;

@@ -59,7 +59,7 @@ trait FilteredGridTrait
         foreach ($values as $value) {
             $this->test->byXPath(
                 "//div[@class='btn filter-select filter-criteria-selector filter-default-value']".
-                "[contains(., '{$filterName}')]//button"
+                "[contains(., '{$filterName}')]"
             )->click();
             $this->waitForAjax();
             $this->test->byXPath(

@@ -102,7 +102,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     protected function applyAdditionalData(&$items, $calendarId)
     {
         $parentEventIds = $this->getParentEventIds($items);
-        if (!empty($parentEventIds)) {
+        if ($parentEventIds) {
             /** @var CalendarEventRepository $repo */
             $repo     = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
             $invitees = $repo->getInvitedUsersByParentsQueryBuilder($parentEventIds)

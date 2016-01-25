@@ -50,6 +50,7 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_activity_list.helper.acl_criteria
             - @oro_activity_list.helper.activity_inheritance_targets
+            - @event_dispatcher
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
@@ -69,8 +70,7 @@ services:
             - @oro_activity_list.provider.chain
             - @doctrine
             - @oro_entity.doctrine_helper
-            - @oro_entity_config.provider.activity
-            - @oro_activity.manager
+            - @oro_entity_config.config_manager
         tags:
             - { name: kernel.event_listener, event: oro.ui.grouping_chain_widget.before, method: isAllowedButton }
 
@@ -162,7 +162,7 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
-            - @oro_activity.manager
+            - @oro_activity.association_helper
             - @oro_activity_list.provider.chain
             - @oro_activity_list.filter.helper
             - @oro_entity.routing_helper

@@ -36,13 +36,13 @@ class GoogleResourceOwnerTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(0))
             ->method('get')
-            ->with('oro_sso.google_sso_client_id')
+            ->with('oro_google_integration.client_id')
             ->will($this->returnValue('clientId'));
 
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with('oro_sso.google_sso_client_secret')
+            ->with('oro_google_integration.client_secret')
             ->will($this->returnValue('clientSecret'));
 
         $this->googleResourceOwner->configureCredentials($this->cm);
