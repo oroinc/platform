@@ -34,7 +34,14 @@ define(function(require) {
 
         events: {
             click: 'updatePosition',
-            'datepicker:dialogReposition': 'updatePosition'
+            updatePosition: 'updatePosition',
+            'datepicker:dialogShow': 'updatePosition',
+            'datepicker:dialogReposition': 'updatePosition',
+            'datepicker:dialogHide': 'updatePosition',
+            'showTimepicker': 'updatePosition',
+            'hideTimepicker': 'updatePosition',
+            'select2-open': 'updatePosition',
+            'select2-close': 'updatePosition'
         },
 
         /**

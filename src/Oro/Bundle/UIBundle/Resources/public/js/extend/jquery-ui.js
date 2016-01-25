@@ -57,11 +57,11 @@ define(['jquery', 'jquery-ui'], function($) {
             offset = $.datepicker._checkOffset(inst, offset, isFixed);
             inst.dpDiv.css({left: offset.left + 'px', top: offset.top + 'px'});
 
-            var isBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
+            var isBelow = offset.top - $input.offset().top > 0;
             var isActualClass = $input.hasClass(dropdownClassName) === isBelow &&
                 $input.hasClass(dropupClassName) !== isBelow;
 
-            if (!isActualClass) {
+            if (!isActualClass && inst.dpDiv.is(':visible')) {
                 $input.toggleClass(dropdownClassName, isBelow);
                 $input.toggleClass(dropupClassName, !isBelow);
                 $input.trigger('datepicker:dialogReposition', isBelow ? 'below' : 'above');
@@ -84,9 +84,10 @@ define(['jquery', 'jquery-ui'], function($) {
             _showDatepicker.apply(this, arguments);
 
             var input = elem.target || elem;
-            var events = getEvents(input.id);
+            var $input = $(input);
+            var events = getEvents($input.id);
 
-            $(input)
+            $input
                 .removeClass(dropdownClassName + ' ' + dropupClassName)
                 .parents().add(window).each(function() {
                     $(this).on(events, $.proxy(updatePos, input));
@@ -100,6 +101,8 @@ define(['jquery', 'jquery-ui'], function($) {
                 });
 
             updatePos.call(input);
+
+            $input.trigger('datepicker:dialogShow');
         };
 
         /**
@@ -120,13 +123,16 @@ define(['jquery', 'jquery-ui'], function($) {
             }
             var events = getEvents(input.id);
 
-            $(input)
+            var $input = $(input);
+            $input
                 .removeClass(dropdownClassName + ' ' + dropupClassName)
                 .parents().add(window).each(function() {
                     $(this).off(events);
                 });
 
             _hideDatepicker.apply(this, arguments);
+
+            $input.trigger('datepicker:dialogHide');
         };
 
         $.datepicker.constructor.prototype._destroyDatepicker = function() {

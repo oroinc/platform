@@ -79,6 +79,7 @@ define(function(require) {
             dateInputAttrs: {
                 placeholder: __('oro.form.choose_date'),
                 name: 'date',
+                autocomplete: 'off',
                 'data-validation': JSON.stringify({Date: {}})
             },
             datePickerOptions: {
@@ -91,6 +92,7 @@ define(function(require) {
             timeInputAttrs: {
                 placeholder: __('oro.form.choose_time'),
                 name: 'time',
+                autocomplete: 'off',
                 'class': 'input-small timepicker-input',
                 'data-validation': JSON.stringify({Time: {}})
             },

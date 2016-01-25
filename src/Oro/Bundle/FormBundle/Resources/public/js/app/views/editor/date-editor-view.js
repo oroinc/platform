@@ -74,6 +74,7 @@ define(function(require) {
             dateInputAttrs: {
                 placeholder: __('oro.form.choose_date'),
                 name: 'date',
+                autocomplete: 'off',
                 'data-validation': JSON.stringify({Date: {}}),
             },
             datePickerOptions: {
