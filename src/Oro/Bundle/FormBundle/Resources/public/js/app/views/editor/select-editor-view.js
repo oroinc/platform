@@ -200,31 +200,6 @@ define(function(require) {
         _isFocused: false,
 
         /**
-         * Attaches focus tracking
-         */
-        attachFocusTracking: function() {
-            var _this = this;
-            this._isFocused = this.isFocused();
-            this.$('input[name=value]').on('select2-focus', function() {
-                if (!_this._isFocused) {
-                    _this._isFocused = true;
-                    _this.trigger('focus');
-                }
-            });
-            this.$('input[name=value]').on('select2-blur', function() {
-                // let select2 time to work due to bugs
-                _.defer(function() {
-                    if (_this.$el && !_this.isFocused()) {
-                        if (_this._isFocused) {
-                            _this._isFocused = false;
-                            _this.trigger('blur');
-                        }
-                    }
-                });
-            });
-        },
-
-        /**
          * Returns true if element is focused
          *
          * @returns {boolean}

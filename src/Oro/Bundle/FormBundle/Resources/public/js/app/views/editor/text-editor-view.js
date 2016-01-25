@@ -78,7 +78,9 @@ define(function(require) {
             'click [data-action]': 'rethrowAction',
             'keydown': 'rethrowEvent',
             'keypress': 'rethrowEvent',
-            'keyup': 'rethrowEvent'
+            'keyup': 'rethrowEvent',
+            'focusin': 'onFocusin',
+            'focusout': 'onFocusout'
         },
 
         TAB_KEY_CODE: 9,
@@ -135,11 +137,7 @@ define(function(require) {
             data.inputType = this.inputType;
             data.data = this.model.toJSON();
             data.fieldName = this.fieldName;
-            if ('value' in this.options) {
-                data.value = this.formatRawValue(this.options.value);
-            } else {
-                data.value = this.formatRawValue(this.getRawModelValue());
-            }
+            data.value = this.formatRawValue(this.getRawModelValue());
             data.placeholder = this.getPlaceholder();
             return data;
         },
@@ -161,12 +159,37 @@ define(function(require) {
                     value: this.getValidationRules()
                 }
             });
+            if (this.options.value) {
+                this.setFormState(this.options.value);
+            }
             this.onChange();
-            this.attachFocusTracking();
         },
 
+        /**
+         * Shows backend validation errors
+         *
+         * @param {Object} backendErrors map of field name to its error
+         */
         showBackendErrors: function(backendErrors) {
             this.validator.showErrors(backendErrors);
+        },
+
+        /**
+         * Reads state of form (map of element name to its value)
+         *
+         * @return {Object}
+         */
+        getFormState: function() {
+            return this.$el.formFieldValues();
+        },
+
+        /**
+         * Set values to form elements
+         *
+         * @param {Object} value map of element name to its value
+         */
+        setFormState: function(value) {
+            this.$el.formFieldValues(value);
         },
 
         /**
@@ -177,6 +200,39 @@ define(function(require) {
          */
         focus: function(atEnd) {
             this.$('input[name=value]').setCursorToEnd().focus();
+        },
+
+        /**
+         * Handles focusin event
+         *
+         * @param {jQuery.Event} e
+         */
+        onFocusin: function(e) {
+            if (!this._isFocused) {
+                this._isFocused = true;
+                this.trigger('focus');
+            }
+        },
+
+        /**
+         * Handles focusout event
+         *
+         * @param {jQuery.Event} e
+         */
+        onFocusout: function(e) {
+            if (!this.$el.has(e.relatedTarget).length) {
+                this.blur();
+            }
+        },
+
+        /**
+         * Turn view into blur
+         */
+        blur: function() {
+            if (this._isFocused) {
+                delete this._isFocused;
+                this.trigger('blur');
+            }
         },
 
         /**
@@ -414,27 +470,6 @@ define(function(require) {
          */
         getModelUpdateData: function() {
             return this.getServerUpdateData();
-        },
-
-        /**
-         * Attaches focus tracking
-         */
-        attachFocusTracking: function() {
-            this.$('input[name=value]').on('focus', _.bind(function() {
-                this.trigger('focus');
-            }, this));
-            this.$('input[name=value]').on('blur', _.bind(function() {
-                this.trigger('blur');
-            }, this));
-        },
-
-        /**
-         * Returns true if element is focused
-         *
-         * @returns {boolean}
-         */
-        isFocused: function() {
-            return document.activeElement === this.$('input[name=value]').get(0);
         }
     });
 

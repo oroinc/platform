@@ -73,7 +73,8 @@ define(function(require) {
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
                 placeholder: __('oro.form.choose_date'),
-                'data-validation': JSON.stringify({Date: {}})
+                name: 'date',
+                'data-validation': JSON.stringify({Date: {}}),
             },
             datePickerOptions: {
                 altFormat: 'yy-mm-dd',
@@ -89,16 +90,15 @@ define(function(require) {
             'datepicker:dialogReposition .hasDatepicker': 'onDropdownReposition'
         },
 
-        listen: {
-            'inlineEditor:focus mediator': 'onInlineEditorFocus'
-        },
-
         format: datetimeFormatter.backendFormats.date,
 
         render: function() {
             DateEditorView.__super__.render.call(this);
             var View = this.view;
             this.view = new View(this.getViewOptions());
+            if (this.options.value) {
+                this.setFormState(this.options.value);
+            }
             // fix enter behaviour
             this.$('.hasDatepicker').bindFirst('keydown' + this.eventNamespace(),
                 _.bind(this.onGenericEnterKeydown, this));
@@ -106,14 +106,6 @@ define(function(require) {
             this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
             // fix arrows behaviour
             this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
-            this.attachFocusTracking();
-        },
-
-        onInlineEditorFocus: function(view) {
-            if (view === this) {
-                return;
-            }
-            this.$('.hasDatepicker').datepicker('hide');
         },
 
         onGenericEnterKeydown: function(e) {
@@ -167,6 +159,14 @@ define(function(require) {
             this.$('input.hasDatepicker').setCursorToEnd().focus();
         },
 
+        onFocusout: function(e) {
+            if (this._isFocused && $('#ui-datepicker-div').has(e.relatedTarget).length) {
+                this.focus();
+            } else {
+                DateEditorView.__super__.onFocusout.call(this, e);
+            }
+        },
+
         parseRawValue: function(value) {
             try {
                 return datetimeFormatter.getMomentForBackendDate(value);
@@ -211,60 +211,6 @@ define(function(require) {
 
         toggleDropdownBelowClass: function(stateVal) {
             this.$el.toggleClass(this.DROPDOWN_BELOW_INPUT_CSS_CLASS, stateVal);
-        },
-
-        /**
-         * Attaches focus tracking
-         */
-        attachFocusTracking: function() {
-            var blurTestIntervalId = -1;
-            var _isFocused = this.isFocused();
-            this.$('.hasDatepicker').off('.attachFocusTracking');
-            if (this.$('.datepicker-focusser').length === 0) {
-                this.$el.append('<input class="datepicker-focusser" tabindex="-1"/>');
-            }
-
-            this.$('.hasDatepicker').on('change', _.bind(function() {
-                if (document.activeElement !== this.$('.hasDatepicker').get(0)) {
-                    this.$('.datepicker-focusser').focus();
-                }
-            }, this));
-
-            var checkBlur = _.bind(function() {
-                if (!_isFocused) {
-                    return;
-                }
-                clearInterval(blurTestIntervalId);
-                blurTestIntervalId = setInterval(_.bind(function() {
-                    if (this.disposed || !this.isFocused()) {
-                        if (!this.disposed) {
-                            this.trigger('blur');
-                        }
-                        _isFocused = false;
-                        clearInterval(blurTestIntervalId);
-                    }
-                }, this), 25);
-            }, this);
-            this.$('.hasDatepicker').datepicker('option', 'onClose', checkBlur);
-            this.$('.hasDatepicker, .datepicker-focusser').on('blur.attachFocusTracking', checkBlur);
-
-            this.$('.hasDatepicker').on('focus.attachFocusTracking', _.bind(function() {
-                if (!_isFocused) {
-                    this.trigger('focus');
-                    _isFocused = true;
-                }
-            }, this));
-        },
-
-        /**
-         * Returns true if element is focused
-         *
-         * @returns {boolean}
-         */
-        isFocused: function() {
-            return document.activeElement === this.$('.hasDatepicker').get(0) ||
-                   document.activeElement === this.$('.datepicker-focusser').get(0) ||
-                   $('#ui-datepicker-div').is(':visible');
         }
     });
 

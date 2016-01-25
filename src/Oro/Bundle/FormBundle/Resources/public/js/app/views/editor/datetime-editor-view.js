@@ -78,6 +78,7 @@ define(function(require) {
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
                 placeholder: __('oro.form.choose_date'),
+                name: 'date',
                 'data-validation': JSON.stringify({Date: {}})
             },
             datePickerOptions: {
@@ -89,6 +90,7 @@ define(function(require) {
             },
             timeInputAttrs: {
                 placeholder: __('oro.form.choose_time'),
+                name: 'time',
                 'class': 'input-small timepicker-input',
                 'data-validation': JSON.stringify({Time: {}})
             },
@@ -120,7 +122,6 @@ define(function(require) {
             // fix arrows behaviour
             this.$('.timepicker-input').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
 
-            this.attachFocusTracking();
             return this;
         },
 
@@ -144,6 +145,16 @@ define(function(require) {
                 this.$('input.hasDatepicker').setCursorToEnd().focus();
             } else {
                 this.$('input.timepicker-input').setCursorToEnd().focus();
+            }
+        },
+
+        onFocusout: function(e) {
+            // if blur event was as sequence of time selection in dropdown, returns focus back
+            if (this._timeSelection) {
+                delete this._timeSelection;
+                this.focus(1);
+            } else {
+                DatetimeEditorView.__super__.onFocusout.call(this, e);
             }
         },
 
@@ -178,76 +189,15 @@ define(function(require) {
         },
 
         onTimepickerShow: function(e) {
-            var isBelow = !$(e.currentTarget).data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+            var $list = $(e.currentTarget).data('timepicker-list');
+            var isBelow = !$list.hasClass('ui-timepicker-positioned-top');
             this.toggleDropdownBelowClass(isBelow);
-        },
-
-        /**
-         * Attaches focus tracking
-         */
-        attachFocusTracking: function() {
-            var blurTestIntervalId = -1;
-            var _isFocused = this.isFocused();
-            this.$('.hasDatepicker').off('.attachFocusTracking');
-            if (this.$('.datepicker-focusser').length === 0) {
-                this.$el.append('<input class="datepicker-focusser" tabindex="-1"/>');
-            }
-
-            this.$('.hasDatepicker').on('change', _.bind(function() {
-                if (document.activeElement !== this.$('.hasDatepicker').get(0) &&
-                    document.activeElement !== this.$('.timepicker-input').get(0)) {
-                    this.$('.timepicker-input').focus();
-                }
-            }, this));
-
-            this.$('.timepicker-input').on('hideTimepicker', _.bind(function() {
-                if (document.activeElement === this.$('.timepicker-input').get(0)) {
-                    this.$('.timepicker-input').one('blur', _.bind(function() {
-                        _.defer(_.bind(function() {
-                            if (!this.disposed && document.activeElement !== this.$('.hasDatepicker').get(0)) {
-                                this.$('.datepicker-focusser').focus();
-                            }
-                        }, this));
-                    }, this));
-                }
-            }, this));
-            var checkBlur = _.bind(function() {
-                if (!_isFocused) {
-                    return;
-                }
-                clearInterval(blurTestIntervalId);
-                blurTestIntervalId = setInterval(_.bind(function() {
-                    if (this.disposed || !this.isFocused()) {
-                        if (!this.disposed) {
-                            this.trigger('blur');
-                        }
-                        _isFocused = false;
-                        clearInterval(blurTestIntervalId);
-                    }
-                }, this), 25);
-            }, this);
-            this.$('.hasDatepicker').datepicker('option', 'onClose', checkBlur);
-            this.$('.hasDatepicker, .datepicker-focusser, .timepicker-input').on('blur.attachFocusTracking', checkBlur);
-
-            this.$('.timepicker-input').on('focus.attachFocusTracking', _.bind(function() {
-                this.$('.hasDatepicker').datepicker('hide');
-            }, this));
-            this.$('.hasDatepicker, .timepicker-input').on('focus.attachFocusTracking', _.bind(function() {
-                if (!_isFocused) {
-                    this.trigger('focus');
-                    _isFocused = true;
-                }
-            }, this));
-        },
-
-        /**
-         * Returns true if element is focused
-         *
-         * @returns {boolean}
-         */
-        isFocused: function() {
-            return DatetimeEditorView.__super__.isFocused.call(this) ||
-                document.activeElement === this.$('.timepicker-input').get(0);
+            $list.find('.ui-timepicker-list')
+                .off(this.eventNamespace())
+                .bindFirst('mousedown' + this.eventNamespace(), 'li', _.bind(function(e) {
+                    // adds flag that blur event was as sequence of time selection in dropdown
+                    this._timeSelection = true;
+                }, this));
         }
     });
 
