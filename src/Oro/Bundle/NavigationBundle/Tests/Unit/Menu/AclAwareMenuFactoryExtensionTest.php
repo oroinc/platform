@@ -188,6 +188,19 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, $item->getExtra('isAllowed'));
     }
 
+    public function testBuildOptionsAlreadyProcessed()
+    {
+        $options = [
+            'extras' => [
+                'isAllowed' => !AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY,
+            ],
+        ];
+        $this->factory->createItem('test', $options);
+
+        $this->securityFacade->expects($this->never())
+            ->method('hasLoggedUser');
+    }
+
     /**
      * @param array $options
      * @param bool $expected
