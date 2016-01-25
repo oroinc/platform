@@ -34,9 +34,7 @@
                                     {% block ownerLink %}
                                         {% if isDesktopVersion() %}
                                             {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                            {% if ownerLink %}
-                                                <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
-                                            {% endif %}
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endblock ownerLink %}
 
@@ -112,9 +110,7 @@
 
                                     {% if isMobileVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                        {% if ownerLink %}
-                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
-                                        {% endif %}
+                                        <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                     {% endif %}
                                 </ul>
                             </div>
