@@ -72,7 +72,7 @@ services:
             - @oro_dashboard.factory
             - @doctrine.orm.entity_manager
             - @oro_security.acl_helper
-            - @security.context
+            - @security.token_storage
 
     oro_dashboard.factory:
         class: %oro_dashboard.factory.class%
