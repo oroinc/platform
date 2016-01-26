@@ -1,25 +1,41 @@
 <?php
 namespace Oro\Bundle\TagBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
-use Oro\Bundle\TagBundle\Entity\TagManager;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+
+use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 
 class TagAutocompleteType extends AbstractType
 {
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var TagTransformer */
+    protected $tagTransformer;
+
     /**
-     * @param SecurityFacade       $securityFacade
+     * @param SecurityFacade $securityFacade
+     * @param TagTransformer $tagTransformer
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(SecurityFacade $securityFacade, TagTransformer $tagTransformer)
     {
         $this->securityFacade = $securityFacade;
+        $this->tagTransformer = $tagTransformer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->resetViewTransformers();
+        $builder->addViewTransformer($this->tagTransformer);
     }
 
     /**
@@ -28,16 +44,21 @@ class TagAutocompleteType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'configs' => array(
-                    'placeholder'    => 'oro.tag.form.choose_or_create_tag',
-                    'component'   => 'multi-autocomplete',
-                    'multiple'       => true
-                ),
+            [
+                'configs'            => [
+                    'placeholder'             => 'oro.tag.form.choose_or_create_tag',
+                    'component'               => 'multi-autocomplete',
+                    'multiple'                => true,
+                    'result_template_twig'    => 'OroTagBundle:Tag:Autocomplete/result.html.twig',
+                    'selection_template_twig' => 'OroTagBundle:Tag:Autocomplete/selection.html.twig',
+                    'properties'              => ['id', 'name'],
+                    'separator'               => ';;',
+                ],
                 'autocomplete_alias' => 'tags'
-            )
+            ]
         );
     }
+
     /**
      * {@inheritdoc}
      */

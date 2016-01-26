@@ -51,4 +51,20 @@ class SearchHandler extends BaseSearchHandler
 
         return $ids;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertItem($item)
+    {
+        return [
+            'id'   => json_encode(
+                [
+                    'id'   => $item->getId(),
+                    'name' => $item->getName(),
+                ]
+            ),
+            'name' => $item->getName()
+        ];
+    }
 }

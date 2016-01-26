@@ -331,6 +331,8 @@ class TagManager
         // Taggable submitted form entity contains array of [autocomplete = [], all => Tag[], owner => Tag[]] tags.
         if (isset($newTags['all'], $newTags['owner'])) {
             $newAllTags = new ArrayCollection($newTags['all']);
+        } elseif (isset($newTags['autocomplete'])) {
+            $newAllTags = new ArrayCollection($newTags['autocomplete']);
         } else {
             $newAllTags = $newTags;
         }

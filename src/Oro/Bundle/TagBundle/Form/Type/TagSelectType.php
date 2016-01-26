@@ -5,25 +5,16 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
 
 class TagSelectType extends AbstractType
 {
-    /**
-     * @var TagSubscriber
-     */
+    /** @var TagSubscriber */
     protected $subscriber;
 
-    /**
-     * @var TagTransformer
-     */
-    protected $transformer;
-
-    public function __construct(TagSubscriber $subscriber, TagTransformer $transformer)
+    public function __construct(TagSubscriber $subscriber)
     {
         $this->subscriber = $subscriber;
-        $this->transformer = $transformer;
     }
 
     /**
@@ -32,9 +23,9 @@ class TagSelectType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'required'     => false,
-            )
+            [
+                'required' => false,
+            ]
         );
     }
 
@@ -48,20 +39,6 @@ class TagSelectType extends AbstractType
         $builder->add(
             'autocomplete',
             'oro_tag_autocomplete'
-        );
-
-        $builder->add(
-            $builder->create(
-                'all',
-                'hidden'
-            )->addViewTransformer($this->transformer)
-        );
-
-        $builder->add(
-            $builder->create(
-                'owner',
-                'hidden'
-            )->addViewTransformer($this->transformer)
         );
     }
 

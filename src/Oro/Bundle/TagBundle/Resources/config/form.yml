@@ -37,7 +37,6 @@ services:
         class: %oro_tag.form.type.tag_select.class%
         arguments:
             - @oro_tag.form.subscriber.tag_select
-            - @oro_tag.form.transformer.tag_select
         tags:
             - { name: form.type, alias: oro_tag_select }
 
@@ -89,6 +88,7 @@ services:
         class: %oro_tag.form.type.tag_autocomplete.class%
         arguments:
             - @oro_security.security_facade
+            - @oro_tag.form.transformer.tag_select
         tags:
             - { name: form.type, alias: oro_tag_autocomplete }
 

@@ -13,6 +13,7 @@ use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 
 /**
  * Class TagSubscriber
+ *
  * @package Oro\Bundle\TagBundle\Form\EventSubscriber
  *
  * Loads tagging and assign to entity on pre set
@@ -31,7 +32,7 @@ class TagSubscriber implements EventSubscriberInterface
 
     public function __construct(TagManager $manager, TagTransformer $transformer)
     {
-        $this->manager = $manager;
+        $this->manager     = $manager;
         $this->transformer = $transformer;
     }
 
@@ -40,10 +41,9 @@ class TagSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            FormEvents::PRE_SET_DATA  => 'preSet',
-            FormEvents::PRE_SUBMIT    => 'preSubmit'
-        );
+        return [
+            FormEvents::PRE_SET_DATA => 'preSet',
+        ];
     }
 
     /**
@@ -60,61 +60,8 @@ class TagSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tags = $this->manager->getPreparedArray($entity, null, $this->organization);
-        $ownTags = array_filter(
-            $tags,
-            function ($item) {
-                return isset($item['owner']) && $item['owner'];
-            }
-        );
+        $this->manager->loadTagging($entity);
 
-        // pass entity to transformer
-        $this->transformer->setEntity($entity);
-        $this->transformer->setOrganization($this->organization);
-
-        $event->setData(
-            array(
-                'autocomplete' => null,
-                'all'          => json_encode($tags),
-                'owner'        => json_encode($ownTags)
-            )
-        );
-    }
-
-    /**
-     * Transform submitted data to model data
-     *
-     * @param FormEvent $event
-     */
-    public function preSubmit(FormEvent $event)
-    {
-        $values = $event->getData();
-        $entities = array(
-            'all'   => array(),
-            'owner' => array()
-        );
-
-        foreach (array_keys($entities) as $type) {
-            if (isset($values[$type]) && !empty($values[$type])) {
-                try {
-                    if (!is_array($values[$type])) {
-                        $values[$type] = json_decode($values[$type]);
-                    }
-                    $names[$type] = array();
-                    foreach ($values[$type] as $value) {
-                        if (!empty($value->name)) {
-                            // new tag
-                            $names[$type][] = $value->name;
-                        }
-                    }
-
-                    $entities[$type] = $this->manager->loadOrCreateTags($names[$type], $this->organization);
-                } catch (\Exception $e) {
-                    $entities[$type] = array();
-                }
-            }
-        }
-
-        $event->setData($entities);
+        $event->setData(['autocomplete' => $entity->getTags()->toArray()]);
     }
 }
