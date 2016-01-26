@@ -192,7 +192,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = [
             'extras' => [
-                'isAllowed' => !AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY,
+                'isAllowed' => false,
             ],
         ];
 
