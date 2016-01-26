@@ -14,9 +14,6 @@ use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class EmailActivityManager
 {
     /** @var ActivityManager */
