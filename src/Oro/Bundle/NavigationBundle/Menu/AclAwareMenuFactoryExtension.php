@@ -83,10 +83,12 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     public function buildOptions(array $options = array())
     {
-        $this->processAcl($options);
+        if (!$this->alreadyDenied($options)) {
+            $this->processAcl($options);
 
-        if ($options['extras']['isAllowed'] && !empty($options['route'])) {
-            $this->processRoute($options);
+            if ($options['extras']['isAllowed'] && !empty($options['route'])) {
+                $this->processRoute($options);
+            }
         }
 
         return $options;
@@ -289,5 +291,15 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     protected function getCacheKey($space, $value)
     {
         return md5($space . ':' . $value);
+    }
+
+    /**
+     * @param array $options
+     * @return bool
+     */
+    protected function alreadyDenied(array $options)
+    {
+        return array_key_exists('extras', $options) && array_key_exists('isAllowed', $options['extras']) &&
+        ($options['extras']['isAllowed'] === false);
     }
 }
