@@ -26,6 +26,9 @@ class ContextsSelectTypeTest extends TypeTestCase
     /* @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityTokenStorage;
 
+    /* @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $dispatcher;
+
     protected function setUp()
     {
         parent::setUp();
@@ -42,6 +45,10 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->getMock();
 
         $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -73,7 +80,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->configManager,
             $this->translator,
             $this->mapper,
-            $this->securityTokenStorage
+            $this->securityTokenStorage,
+            $this->dispatcher
         );
         $type->buildForm($builder, []);
     }
@@ -102,7 +110,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->configManager,
             $this->translator,
             $this->mapper,
-            $this->securityTokenStorage
+            $this->securityTokenStorage,
+            $this->dispatcher
         );
         $type->setDefaultOptions($resolver);
     }
@@ -114,7 +123,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->configManager,
             $this->translator,
             $this->mapper,
-            $this->securityTokenStorage
+            $this->securityTokenStorage,
+            $this->dispatcher
         );
         $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
 
@@ -127,7 +137,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->configManager,
             $this->translator,
             $this->mapper,
-            $this->securityTokenStorage
+            $this->securityTokenStorage,
+            $this->dispatcher
         );
         $this->assertEquals('oro_activity_contexts_select', $type->getName());
     }

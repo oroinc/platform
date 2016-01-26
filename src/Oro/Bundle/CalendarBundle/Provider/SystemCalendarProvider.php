@@ -45,18 +45,13 @@ class SystemCalendarProvider extends AbstractCalendarProvider
      */
     public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
-        $result = [];
-
         if (!$this->calendarConfig->isSystemCalendarEnabled()
             || !$this->securityFacade->isGranted('oro_system_calendar_view')
         ) {
-            foreach ($calendarIds as $id) {
-                $result[$id] = null;
-            }
-
-            return $result;
+            return array_fill_keys($calendarIds, null);
         }
 
+        $result = [];
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
 
@@ -130,7 +125,7 @@ class SystemCalendarProvider extends AbstractCalendarProvider
                 $invisibleIds[] = $id;
             }
         }
-        if (!empty($invisibleIds)) {
+        if ($invisibleIds) {
             $qb
                 ->andWhere('c.id NOT IN (:invisibleIds)')
                 ->setParameter('invisibleIds', $invisibleIds);

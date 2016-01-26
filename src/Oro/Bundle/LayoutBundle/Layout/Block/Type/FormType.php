@@ -118,19 +118,13 @@ class FormType extends AbstractFormType
 
         // prevent form fields rendering by form_rest() method,
         // if the corresponding layout block has been removed
-        $rootView = null;
         foreach ($formAccessor->getProcessedFields() as $formFieldPath => $blockId) {
             if (isset($view[$blockId])) {
                 $this->checkExistingFieldView($view, $view[$blockId], $formFieldPath);
                 continue;
             }
-            if ($rootView === null) {
-                $rootView = $view->parent !== null
-                    ? $this->getRootView($view)
-                    : false;
-            }
-            if ($rootView !== false && isset($rootView[$blockId])) {
-                $this->checkExistingFieldView($view, $rootView[$blockId], $formFieldPath);
+            if (isset($view->blocks[$blockId])) {
+                $this->checkExistingFieldView($view, $view->blocks[$blockId], $formFieldPath);
                 continue;
             }
 
@@ -152,21 +146,6 @@ class FormType extends AbstractFormType
     public function getParent()
     {
         return ContainerType::NAME;
-    }
-
-    /**
-     * @param BlockView $view
-     *
-     * @return BlockView
-     */
-    protected function getRootView(BlockView $view)
-    {
-        $result = $view;
-        while ($result->parent) {
-            $result = $result->parent;
-        }
-
-        return $result;
     }
 
     /**

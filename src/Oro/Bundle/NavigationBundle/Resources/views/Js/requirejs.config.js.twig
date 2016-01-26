@@ -26,7 +26,7 @@ require({
     {% if app.debug %}
         'oro/routes': '{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}'
     {% else %}
-        'oro/routes': '../js/routes'
+        'oro/routes': {{ asset('js/routes.js', 'routing')|json_encode|raw }}
     {% endif %}
     }
 });
