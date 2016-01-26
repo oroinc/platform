@@ -4,12 +4,17 @@ namespace Oro\Bundle\EntityBundle\Helper;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 class DictionaryHelper
 {
     const DEFAULT_SEARCH_FIELD = 'label';
+    const DEFAULT_SEARCH_FIELD_FOR_ENUM = 'name';
+
+    const DEFAULT_REPRESENTATION_FIELD = 'label';
+    const DEFAULT_REPRESENTATION_FIELD_FOR_ENUM = 'name';
 
     /**
      * @param ClassMetadata $metadata
@@ -47,25 +52,38 @@ class DictionaryHelper
             return [self::DEFAULT_SEARCH_FIELD];
         }
 
+        if (in_array(self::DEFAULT_SEARCH_FIELD_FOR_ENUM, $fieldNames)) {
+            return [self::DEFAULT_SEARCH_FIELD_FOR_ENUM];
+        }
+
         throw new \LogicException(
-            sprintf('Search fields are not configured for class %s', $doctrineMetadata->getName())
+            sprintf('Search fields are not configured for class %s', $doctrineMetadata->getName()),
+            Codes::HTTP_NOT_FOUND
         );
     }
 
     /**
      * @param ClassMetadata  $doctrineMetadata
-     * @param EntityMetadata $entityMetadata
+     * @param EntityMetadata|null $entityMetadata
      *
      * @return string|null
      */
-    public function getRepresentationField(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
+    public function getRepresentationField(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata = null)
     {
-        if (isset($entityMetadata->defaultValues['dictionary']['representation_field'])) {
-            $fieldNames = $doctrineMetadata->getFieldNames();
+        $fieldNames = $doctrineMetadata->getFieldNames();
+        if ($entityMetadata && isset($entityMetadata->defaultValues['dictionary']['representation_field'])) {
             $representationField = $entityMetadata->defaultValues['dictionary']['representation_field'];
             if (in_array($representationField, $fieldNames)) {
                 return $representationField;
             }
+        }
+
+        if (in_array(self::DEFAULT_REPRESENTATION_FIELD, $fieldNames)) {
+            return self::DEFAULT_REPRESENTATION_FIELD;
+        }
+
+        if (in_array(self::DEFAULT_REPRESENTATION_FIELD_FOR_ENUM, $fieldNames)) {
+            return self::DEFAULT_REPRESENTATION_FIELD_FOR_ENUM;
         }
 
         return null;

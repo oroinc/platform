@@ -176,7 +176,7 @@ class DictionaryTest extends OrmTestCase
 
         $result = $qb->getQuery()->getDQL();
         $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o WHERE test IN(:param1)',
+            'SELECT o.id FROM Stub:TestEntity o WHERE o.test IN(:param1)',
             $result
         );
         $this->assertEquals(
@@ -220,7 +220,7 @@ class DictionaryTest extends OrmTestCase
 
         $result = $qb->getQuery()->getDQL();
         $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o WHERE test NOT IN(:param1)',
+            'SELECT o.id FROM Stub:TestEntity o WHERE o.test NOT IN(:param1)',
             $result
         );
         $this->assertEquals(

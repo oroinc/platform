@@ -150,7 +150,7 @@ define([
         },
 
         getSelect2Config: function() {
-            return {
+            var config =  {
                 multiple: true,
                 containerCssClass: 'dictionary-filter',
                 ajax: {
@@ -178,6 +178,12 @@ define([
                 escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
                 minimumInputLength: 0
             };
+
+            if (this.templateTheme === '') {
+                config.width = 'resolve';
+            }
+
+            return config;
         },
 
         getDataForSelect2: function() {
