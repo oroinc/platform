@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Cron\CronExpression;
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\JobQueueBundle\Entity\Job;
@@ -15,7 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *  uniqueConstraints={
  *      @ORM\UniqueConstraint(
  *          name="process_trigger_unique_idx",
- *          columns={"event", "field", "definition_name"}
+ *          columns={"event", "field", "definition_name", "cron"}
  *      )
  *  }
  * )
@@ -56,7 +57,7 @@ class ProcessTrigger
     /**
      * @var string
      *
-     * @ORM\Column(name="event", type="string", length=255)
+     * @ORM\Column(name="event", type="string", length=255, nullable=true)
      */
     protected $event;
 
@@ -99,6 +100,13 @@ class ProcessTrigger
      * @ORM\JoinColumn(name="definition_name", referencedColumnName="name", onDelete="CASCADE")
      */
     protected $definition;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="cron", type="string", length=100, nullable=true)
+     */
+    protected $cron;
 
     /**
      * @var \DateTime
@@ -289,6 +297,25 @@ class ProcessTrigger
     }
 
     /**
+     * @param CronExpression|null $cron
+     * @return ProcessTrigger
+     */
+    public function setCron(CronExpression $cron = null)
+    {
+        $this->cron = $cron ? $cron->getExpression() : null;
+
+        return $this;
+    }
+
+    /**
+     * @return CronExpression|null
+     */
+    public function getCron()
+    {
+        return $this->cron ? CronExpression::factory($this->cron) : null;
+    }
+
+    /**
      * @param \DateTime $createdAt
      * @return ProcessTrigger
      */
@@ -384,7 +411,8 @@ class ProcessTrigger
             ->setPriority($trigger->getPriority())
             ->setQueued($trigger->isQueued())
             ->setTimeShift($trigger->getTimeShift())
-            ->setDefinition($trigger->getDefinition());
+            ->setDefinition($trigger->getDefinition())
+            ->setCron($trigger->getCron());
 
         return $this;
     }
