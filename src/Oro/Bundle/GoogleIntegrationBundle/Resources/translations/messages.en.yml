@@ -1,0 +1,11 @@
+oro:
+    google_integration:
+        system_configuration:
+                groups:
+                    google_settings.title: Google settings
+                    google_integration_settings.title: Google Integration Settings
+                fields:
+                    domains.label: Domains
+                    domains.tooltip: Comma separated list of allowed domains
+                    client_id.label: Client Id
+                    client_secret.label: Client secret

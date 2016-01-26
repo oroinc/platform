@@ -24,18 +24,6 @@ class Configuration implements ConfigurationInterface
                 'value' => false,
                 'type' => 'boolean',
             ],
-            'google_sso_domains'=> [
-                'value' => [],
-                'type' => 'array',
-            ],
-            'google_sso_client_id' => [
-                'value' => null,
-                'type' => 'text',
-            ],
-            'google_sso_client_secret' => [
-                'value' => null,
-                'type' => 'text',
-            ],
         ]);
 
         return $treeBuilder;

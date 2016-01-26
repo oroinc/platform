@@ -58,10 +58,9 @@ class GridController extends Controller
     {
         $gridManager = $this->get('oro_datagrid.datagrid.manager');
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
-        $acl         = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
-        $aclSkip     = $gridConfig->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
+        $acl         = $gridConfig->getAclResource();
 
-        if (!$aclSkip && $acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+        if ($acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
             throw new AccessDeniedException('Access denied.');
         }
 
