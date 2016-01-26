@@ -7,6 +7,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var ErrorHolderView = require('../views/inline-editing/error-holder-view');
     var overlayTool = require('oroui/js/tools/overlay');
 
     CellPopupEditorComponent = BaseComponent.extend({
@@ -28,16 +29,11 @@ define(function(require) {
         lockUserActions: false,
 
         OVERLAY_TOOL_DEFAULTS: {
+            zIndex: 1,
             position: {
                 my: 'left top',
-                at: 'left top',
-                collision: 'flip',
-                using: function(position, information) {
-                    information.element.element.css({
-                        left: position.left >= 0 ? position.left - 4 : position.left + 4,
-                        top: position.top >= -1 ? position.top - 4 : position.top
-                    });
-                }
+                at: 'left top+1',
+                collision: 'fit'
             }
         },
 
@@ -52,8 +48,7 @@ define(function(require) {
             saveAndEditNextRowAction: 'saveCurrentCellAndEditNextRow',
             cancelAndEditNextRowAction: 'editNextRowCell',
             saveAndEditPrevRowAction: 'saveCurrentCellAndEditPrevRow',
-            cancelAndEditPrevRowAction: 'editPrevRowCell',
-            'inlineEditor:focus mediator': 'onInlineEditorFocus'
+            cancelAndEditPrevRowAction: 'editPrevRowCell'
         },
 
         initialize: function(options) {
@@ -70,21 +65,18 @@ define(function(require) {
             if (!this.options.save_api_accessor) {
                 throw new Error('Option "save_api_accessor" is required');
             }
+            this.errorHolderView = new ErrorHolderView({
+                el: this.options.cell.$el[0],
+                within: this.options.plugin.main.$('.other-scroll-container')
+            });
+            this.listenTo(this.options.plugin.main, 'scroll', function() {
+                this.errorHolderView.updatePosition();
+            });
             this.listenTo(this.options.plugin, 'lockUserActions', function(value) {
                 this.lockUserActions = value;
             });
             CellPopupEditorComponent.__super__.initialize.apply(this, arguments);
             this.enterEditMode();
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            if (this.options && this.options.cell && this.options.cell.$el) {
-                this.options.cell.$el.removeClass('has-error');
-            }
-            CellPopupEditorComponent.__super__.dispose.apply(this, arguments);
         },
 
         createView: function() {
@@ -96,10 +88,11 @@ define(function(require) {
                 fieldName: cell.column.get('name'),
                 metadata: cell.column.get('metadata')
             });
-            if (this.newState && viewOptions.fieldName in this.newState) {
+            if (this.formState) {
                 this.updateModel(cell.model, this.oldState);
+                this.errorHolderView.render();
                 this.options.plugin.main.trigger('content:update');
-                viewOptions.value = this.newState[viewOptions.fieldName];
+                viewOptions.value = this.formState;
             }
             var viewInstance = this.view = new View(viewOptions);
 
@@ -121,43 +114,33 @@ define(function(require) {
                     overlay.remove();
                 },
                 change: function() {
-                    viewInstance.$el.toggleClass('show-overlay', !viewInstance.isValid());
                     cell.$el.toggleClass('has-error', !viewInstance.isValid());
+                    this.errorHolderView.updatePosition();
                 },
                 keydown: this.onKeyDown,
                 focus: function() {
-                    mediator.trigger('inlineEditor:focus', viewInstance);
                     overlay.focus();
+                    this.errorHolderView.updatePosition();
                 },
                 blur: function() {
-                    if (viewInstance.isValid() && viewInstance.isChanged()) {
-                        this.saveCurrentCell();
-                    }
                     overlay.blur();
+                    if (viewInstance.isValid()) {
+                        this.saveCurrentCell();
+                    } else {
+                        this.options.cell.$el.toggleClass('has-error', !this.view.isValid());
+                        this.formState = this.view.getFormState();
+                        var modelUpdateData = this.view.getModelUpdateData();
+                        this.oldState = _.pick(this.options.cell.model.toJSON(), _.keys(modelUpdateData));
+                        this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
+                        this.updateModel(this.options.cell.model, modelUpdateData);
+                        this.errorHolderView.render();
+                        this.options.plugin.main.trigger('content:update');
+                        this.errorHolderView.updatePosition();
+                    }
                 }
             });
             viewInstance.trigger('change');
-
-            if (this.backendErrors) {
-                this.view.$el.toggleClass('show-overlay', true);
-                this.view.showBackendErrors(this.backendErrors);
-            }
-        },
-
-        onInlineEditorFocus: function(view) {
-            if (!this.view || view === this.view) {
-                return;
-            }
-            if (!this.view.isChanged()) {
-                this.exitEditMode(true);
-            } else {
-                this.options.cell.$el.toggleClass('has-error', !this.view.isValid());
-                this.newState = this.view.getModelUpdateData();
-                this.oldState = _.pick(this.options.cell.model.toJSON(), _.keys(this.newState));
-                this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
-                this.updateModel(this.options.cell.model, this.newState);
-                this.options.plugin.main.trigger('content:update');
-            }
+            this.errorHolderView.render();
         },
 
         /**
@@ -192,12 +175,14 @@ define(function(require) {
 
             var cell = this.options.cell;
             var serverUpdateData = this.view.getServerUpdateData();
-            var modelUpdateData = this.newState = this.view.getModelUpdateData();
+            this.formState = this.view.getFormState();
+            var modelUpdateData = this.view.getModelUpdateData();
             cell.$el.addClass('loading');
             this.oldState = _.pick(cell.model.toJSON(), _.keys(modelUpdateData));
             this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
 
             this.updateModel(cell.model, modelUpdateData);
+            this.errorHolderView.render();
             this.options.plugin.main.trigger('content:update');
             if (this.options.save_api_accessor.initialOptions.field_name) {
                 var keys = _.keys(serverUpdateData);
@@ -263,6 +248,7 @@ define(function(require) {
          */
         exitEditMode: function(withDispose) {
             if (this.view) {
+                this.errorHolderView.adoptErrorMessage();
                 this.options.cell.$el.removeClass('edit-mode');
                 this.options.cell.$el.addClass('view-mode');
                 this.view.dispose();
@@ -315,7 +301,6 @@ define(function(require) {
         exitAndNavigate: function(method) {
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            this.exitEditMode(true);
             plugin[method](cell);
         },
 
@@ -338,8 +323,9 @@ define(function(require) {
         saveAndNavigate: function(method) {
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            this.saveCurrentCell();
-            plugin[method](cell);
+            if (this.isNavigationAvailable()) {
+                plugin[method](cell);
+            }
         },
 
         /**
@@ -365,17 +351,11 @@ define(function(require) {
             }
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            if (e.keyCode === this.ENTER_KEY_CODE) {
-                if (!this.lockUserActions) {
-                    if (this.saveCurrentCell()) {
-                        if (!e.ctrlKey) {
-                            if (e.shiftKey) {
-                                plugin.editPrevRowCell(cell);
-                            } else {
-                                plugin.editNextRowCell(cell);
-                            }
-                        }
-                    }
+            if (e.keyCode === this.ENTER_KEY_CODE && !e.ctrlKey && this.isNavigationAvailable()) {
+                if (e.shiftKey) {
+                    plugin.editPrevRowCell(cell);
+                } else {
+                    plugin.editNextRowCell(cell);
                 }
                 e.preventDefault();
             }
@@ -392,15 +372,11 @@ define(function(require) {
             }
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            if (e.keyCode === this.TAB_KEY_CODE) {
-                if (!this.lockUserActions) {
-                    if (this.saveCurrentCell()) {
-                        if (e.shiftKey) {
-                            plugin.editPrevCell(cell);
-                        } else {
-                            plugin.editNextCell(cell);
-                        }
-                    }
+            if (e.keyCode === this.TAB_KEY_CODE && this.isNavigationAvailable()) {
+                if (e.shiftKey) {
+                    plugin.editPrevCell(cell);
+                } else {
+                    plugin.editNextCell(cell);
                 }
                 e.preventDefault();
             }
@@ -432,34 +408,30 @@ define(function(require) {
             }
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            if (e.altKey) {
+            if (e.altKey && this.isNavigationAvailable()) {
                 switch (e.keyCode) {
                     case this.ARROW_LEFT_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell()) {
-                            plugin.editPrevCell(cell);
-                        }
+                        plugin.editPrevCell(cell);
                         e.preventDefault();
                         break;
                     case this.ARROW_RIGHT_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell()) {
-                            plugin.editNextCell(cell);
-                        }
+                        plugin.editNextCell(cell);
                         e.preventDefault();
                         break;
                     case this.ARROW_TOP_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell()) {
-                            plugin.editPrevRowCell(cell);
-                        }
+                        plugin.editPrevRowCell(cell);
                         e.preventDefault();
                         break;
                     case this.ARROW_BOTTOM_KEY_CODE:
-                        if (!this.lockUserActions && this.saveCurrentCell()) {
-                            plugin.editNextRowCell(cell);
-                        }
+                        plugin.editNextRowCell(cell);
                         e.preventDefault();
                         break;
                 }
             }
+        },
+
+        isNavigationAvailable: function() {
+            return !this.lockUserActions && (!this.view || this.view.isValid());
         },
 
         onSaveSuccess: function(response) {
@@ -475,13 +447,13 @@ define(function(require) {
                     }, this);
                 }
                 this.options.cell.$el
-                    .removeClass('save-fail has-error')
+                    .removeClass('save-fail')
                     .addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
             delete this.oldState;
-            delete this.newState;
-            delete this.backendErrors;
+            delete this.formState;
+            this.errorHolderView.setErrorMessages({});
             this.exitEditMode(true);
         },
 
@@ -525,14 +497,8 @@ define(function(require) {
         },
 
         onValidationError: function(jqXHR) {
-            var message;
-            var fieldName;
-            var fieldLabel;
-
             if (!this.options.cell.disposed) {
-                fieldName = this.options.cell.column.get('name');
-                fieldLabel = this.options.cell.column.get('label');
-                this.options.cell.$el.addClass('has-error');
+                var fieldName = this.options.cell.column.get('name');
             }
             if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
                 var backendErrors = {};
@@ -541,10 +507,7 @@ define(function(require) {
                         backendErrors.value = item.errors[0];
                     }
                 }, this);
-                this.backendErrors = backendErrors;
-                message = __('oro.datagrid.inline_editing.message.save_field.validation_error',
-                    {fieldLabel: fieldLabel, error: backendErrors.value});
-                mediator.execute('showFlashMessage', 'error', message);
+                this.errorHolderView.setErrorMessages(backendErrors);
             }
         }
     });

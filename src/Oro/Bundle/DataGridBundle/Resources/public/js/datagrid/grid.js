@@ -235,6 +235,36 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        delegateEvents: function() {
+            Grid.__super__.delegateEvents.apply(this, arguments);
+
+            var $parents = this.$('.grid-container').parents();
+            if ($parents.length) {
+                $parents = $parents.add(document);
+                $parents.on('scroll' + this.eventNamespace(), _.bind(this.trigger, this, 'scroll'));
+                this._$boundScrollHandlerParents = $parents;
+            }
+
+            return this;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        undelegateEvents: function() {
+            Grid.__super__.undelegateEvents.apply(this, arguments);
+
+            if (this._$boundScrollHandlerParents) {
+                this._$boundScrollHandlerParents.off(this.eventNamespace());
+                delete this._$boundScrollHandlerParents;
+            }
+
+            return this;
+        },
+
+        /**
          * Initializes columns collection required to draw grid
          *
          * @param {Object} options
@@ -599,6 +629,7 @@ define(function(require) {
             this.renderNoDataBlock();
             this.renderLoadingMask();
 
+            this.delegateEvents();
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
             this._deferredRender();

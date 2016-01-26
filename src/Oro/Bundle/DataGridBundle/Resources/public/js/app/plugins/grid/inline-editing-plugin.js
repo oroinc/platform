@@ -51,8 +51,8 @@ define(function(require) {
             this.listenTo(this.main.columns, {
                 'change:renderable': this.onColumnStateChange
             });
-            this.listenTo(mediator, 'page:beforeChange', function() {
-                this.removeActiveEditorComponents();
+            this.listenTo(mediator, {
+                'page:beforeChange': this.removeActiveEditorComponents
             });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
@@ -198,7 +198,16 @@ define(function(require) {
         },
 
         enterEditMode: function(cell, fromPreviousCell) {
-            var existingEditorComponent = this.getOpenedEditor(cell);
+            var existingEditorComponent;
+            // if there's previously focused editor, blur it
+            if (this._focusedCell && this._focusedCell !== cell) {
+                existingEditorComponent = this.getOpenedEditor(this._focusedCell);
+                if (existingEditorComponent && existingEditorComponent.view) {
+                    existingEditorComponent.view.blur();
+                }
+            }
+            // focus to existing component
+            existingEditorComponent = this.getOpenedEditor(cell);
             if (existingEditorComponent) {
                 existingEditorComponent.enterEditMode();
                 existingEditorComponent.view.focus(!!fromPreviousCell);
@@ -223,18 +232,8 @@ define(function(require) {
                 plugin: this
             }));
 
-            editorComponent.view.on('focus', function() {
-                this.highlightCell(cell, true);
-            }, this);
-
-            editorComponent.view.on('blur', function() {
-                this.highlightCell(cell, false);
-            }, this);
-            editorComponent.view.focus(!!fromPreviousCell);
-
             this.activeEditorComponents.push(editorComponent);
-
-            editorComponent.on('dispose', function() {
+            this.listenTo(editorComponent, 'dispose', function() {
                 if (this.disposed) {
                     // @TODO dix it. Rear case, for some reason inline inline-editing-plugin is already disposed
                     return;
@@ -243,7 +242,18 @@ define(function(require) {
                 if (index !== -1) {
                     this.activeEditorComponents.splice(index, 1);
                 }
-            }, this);
+            });
+
+            this.listenTo(editorComponent.view, {
+                focus: function() {
+                    this._focusedCell = cell;
+                    this.highlightCell(cell, true);
+                },
+                blur: function() {
+                    this.highlightCell(cell, false);
+                }
+            });
+            editorComponent.view.focus(!!fromPreviousCell);
         },
 
         buildClassNames: function(editor, cell) {
