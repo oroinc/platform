@@ -2,6 +2,7 @@
 define(function(require) {
     'use strict';
     var BaseView = require('oroui/js/app/views/base/view');
+    var _ = require('underscore');
 
     /**
      * Tags view, able to handle tags array in model.
@@ -26,6 +27,7 @@ define(function(require) {
      * @exports TagsView
      */
     var TagsView = BaseView.extend(/** @exports TagsView.prototype */{
+        showDefault: true,
         template: require('tpl!orotag/templates/viewer/tags-view.html'),
         listen: {
             'change model': 'render'
@@ -35,11 +37,11 @@ define(function(require) {
             return TagsView.__super__.initialize.apply(this, arguments);
         },
         getTemplateData: function() {
+            var tags = this.model.get(this.fieldName);
+            tags = _.sortBy(tags, this.tagSortCallback);
             return {
-                model: this.model.toJSON(),
-                showDefault: true,
-                fieldName: this.fieldName,
-                tagSortCallback: this.tagSortCallback
+                tags: tags,
+                showDefault: this.showDefault
             };
         },
         tagSortCallback: function(a, b) {

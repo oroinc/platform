@@ -70,9 +70,11 @@ define(function(require) {
         inputType: 'date',
         view: DatepickerView,
 
+        DROPDOWN_BELOW_INPUT_CSS_CLASS: 'dropdown-below-input',
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
-                placeholder: __('oro.form.choose_date')
+                placeholder: __('oro.form.choose_date'),
+                'data-validation': JSON.stringify({Date: {}})
             },
             datePickerOptions: {
                 altFormat: 'yy-mm-dd',
@@ -81,6 +83,11 @@ define(function(require) {
                 yearRange: '-80:+1',
                 showButtonPanel: true
             }
+        },
+
+        events: {
+            'blur .hasDatepicker': 'onDatePickerBlur',
+            'datepicker:dialogReposition .hasDatepicker': 'onDropdownReposition'
         },
 
         format: datetimeFormatter.backendFormats.date,
@@ -182,6 +189,18 @@ define(function(require) {
                 return value.diff(modelValue);
             }
             return value !== modelValue;
+        },
+
+        onDatePickerBlur: function() {
+            this.toggleDropdownBelowClass(false);
+        },
+
+        onDropdownReposition: function(e, position) {
+            this.toggleDropdownBelowClass(position === 'below');
+        },
+
+        toggleDropdownBelowClass: function(stateVal) {
+            this.$el.toggleClass(this.DROPDOWN_BELOW_INPUT_CSS_CLASS, stateVal);
         }
     });
 

@@ -20,7 +20,9 @@ define([
             options.title = options.title || __('oro.datagrid.name_modal.title');
             options.content = options.content || this.contentTemplate({
                 value: options.defaultValue || '',
-                label: __('oro.datagrid.gridView.name')
+                label: __('oro.datagrid.gridView.name'),
+                defaultLabel: __('oro.datagrid.action.use_as_default_grid_view'),
+                defaultChecked: options.defaultChecked || false
             });
             options.okText =  __('oro.datagrid.gridView.save_name');
 

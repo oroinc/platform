@@ -24,7 +24,6 @@ class EmailOriginApiEntityManager extends ApiEntityManager
                     'result_name' => 'type'
                 ],
                 '__class__'         => [
-                    'result_name' => 'entity'
                 ],
                 'isActive'          => [
                     'result_name' => 'active'
@@ -58,13 +57,13 @@ class EmailOriginApiEntityManager extends ApiEntityManager
     protected function postSerializeEmailOrigin(array &$result)
     {
         $properties = [];
-        foreach ($this->getEmailOriginProperties($result['entity']) as $prop) {
+        foreach ($this->getEmailOriginProperties($result['__class__']) as $prop) {
             $properties[$prop] = $result[$prop];
             unset($result[$prop]);
         }
         $result['properties'] = $properties;
 
-        unset($result['entity']);
+        unset($result['__class__']);
     }
 
     /**

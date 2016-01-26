@@ -127,13 +127,11 @@ define(function(require) {
         },
 
         _initPager: function() {
-            if (this.collection.getPageSize() < this.collection.getCount()) {
-                this._toggleNext(true);
-            } else {
-                this._toggleNext();
-            }
+            this._refreshStateButtons();
+
             $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
+            $('.activity-list-widget .pagination-current').val(this.collection.getPage());
 
             if (this.collection.getCount() === 0 && this.isFiltersEmpty) {
                 this.gridToolbar.hide();
@@ -170,17 +168,8 @@ define(function(require) {
             if (currentPage > 1) {
                 var nextPage = currentPage - 1;
                 this.collection.setPage(nextPage);
-                if (nextPage === 1) {
-                    this._togglePrevious();
-                }
-
-                if (this.collection.pager.total > 1) {
-                    this._toggleNext(true);
-                } else {
-                    this._toggleNext();
-                }
-
                 this._setPageNumber(nextPage);
+                this._refreshStateButtons();
                 this._reload();
             }
         },
@@ -196,18 +185,10 @@ define(function(require) {
                 return;
             }
 
-            that._togglePrevious(true);
-            that._toggleNext(true);
-
-            if (nextPage === 1) {
-                that._togglePrevious();
-            }
-            if (nextPage === maxPage) {
-                that._toggleNext();
-            }
-
             that.collection.setPage(nextPage);
             that._setPageNumber(nextPage);
+
+            that._refreshStateButtons();
             that._reload();
         },
 
@@ -216,14 +197,9 @@ define(function(require) {
             if (currentPage < this.collection.pager.total) {
                 var nextPage = currentPage + 1;
                 this.collection.setPage(nextPage);
-                if (nextPage === this.collection.pager.total) {
-                    this._toggleNext();
-                } else {
-                    this._toggleNext(true);
-                }
-                this._togglePrevious(true);
-
                 this._setPageNumber(nextPage);
+
+                this._refreshStateButtons();
                 this._reload();
             }
         },
@@ -233,6 +209,31 @@ define(function(require) {
                 pageNumber = 1;
             }
             $('.activity-list-widget .pagination-current').val(pageNumber);
+        },
+
+        _refreshStateButtons: function() {
+            this._updateStateButtonPreviousPage();
+            this._updateStateButtonNextPage();
+        },
+
+        _updateStateButtonPreviousPage: function() {
+            if (this.collection.getPage() === 1) {
+                this._togglePrevious();
+            } else {
+                this._togglePrevious(true);
+            }
+        },
+
+        _updateStateButtonNextPage: function() {
+            if (this.collection.getPageSize() < this.collection.getCount()) {
+                if (this.collection.getPage() === this.collection.pager.total) {
+                    this._toggleNext();
+                } else {
+                    this._toggleNext(true);
+                }
+            } else {
+                this._toggleNext();
+            }
         },
 
         _togglePrevious: function(enable) {

@@ -15,6 +15,7 @@ oro:
             id.label: Id
             name.label: Name
             owner.label: Owner
+            users.label: Users
             organization.label: Organization
             sorters_data.label: Sorters
             type.label: Type
@@ -32,7 +33,7 @@ oro:
             delete:
                 label: Delete
                 confirm_title: Mass Delete Confirmation
-                confirm_content: Are you sure you want to do delete selected items?
+                confirm_content: Are you sure you want to remove these items?
                 success_message: "{0} No entities were removed|{1} One entity was removed|]1,Inf[ %count% entities were removed"
         datagrid.page_size.all: All
         export.csv: CSV

@@ -74,6 +74,7 @@ define([
         _onUpdateCollectionState: function(collection) {
             this.ignoreFiltersUpdateEvents = true;
             this._applyState(collection.state.filters || {});
+            this._resetHintContainer();
             this.ignoreFiltersUpdateEvents = false;
         },
 
@@ -148,11 +149,6 @@ define([
                     }
                 } else {
                     filter.reset();
-                    if (filter.defaultEnabled) {
-                        toEnable.push(filter);
-                    } else {
-                        toDisable.push(filter);
-                    }
                 }
             }, this);
 

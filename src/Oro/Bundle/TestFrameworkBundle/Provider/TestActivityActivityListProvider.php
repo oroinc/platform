@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Provider;
 
+use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
 class TestActivityActivityListProvider implements ActivityListProviderInterface
@@ -18,25 +17,31 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ActivityAssociationHelper */
+    protected $activityAssociationHelper;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper            $doctrineHelper
+     * @param ActivityAssociationHelper $activityAssociationHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ActivityAssociationHelper $activityAssociationHelper
+    ) {
+        $this->doctrineHelper            = $doctrineHelper;
+        $this->activityAssociationHelper = $activityAssociationHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
+    public function isApplicableTarget($entityClass, $accessible = true)
     {
-        $provider = $configManager->getProvider('activity');
-
-        return
-            $provider->hasConfigById($configId)
-            && $provider->getConfigById($configId)->has('activities')
-            && in_array(self::ACTIVITY_CLASS, $provider->getConfigById($configId)->get('activities'));
+        return $this->activityAssociationHelper->isActivityAssociationEnabled(
+            $entityClass,
+            self::ACTIVITY_CLASS,
+            $accessible
+        );
     }
 
     /**

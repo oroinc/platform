@@ -1,13 +1,11 @@
-define([
-    'backgrid',
-    'underscore',
-    'orotranslation/js/translator',
-    'orotag/js/app/views/viewer/tags-view',
-    'routing'
-], function(Backgrid, _, __, TagsView, routing) {
+define(function(require) {
     'use strict';
 
     var TagsCell;
+    var Backgrid = require('backgrid');
+    var _ = require('underscore');
+    var routing = require('routing');
+    var TagsView = require('orotag/js/app/views/viewer/tags-view');
 
     /**
      * Cell able to display tags values.
@@ -23,44 +21,42 @@ define([
      * @class   oro.datagrid.cell.TagsCell
      * @extends oro.datagrid.cell.StringCell
      */
-    TagsCell = Backgrid.StringCell.extend({
-        /**
-         * @property {string}
-         */
-        type: 'tags',
+    TagsCell = Backgrid.StringCell.extend(_.extend(
+        _.pick(TagsView.prototype, [
+            'template',
+            'getTemplateFunction',
+            'getTemplateData',
+            'render'
+        ]), {
 
-        /**
-         * @property {string}
-         */
-        className: 'tags-cell tags-container',
+            showDefault: false,
+            /**
+             * @property {string}
+             */
+            type: 'tags',
 
-        template: TagsView.prototype.template,
+            /**
+             * @property {string}
+             */
+            className: 'tags-cell tags-container',
 
-        tagSortCallback: TagsView.prototype.tagSortCallback,
-
-        /**
-         * @inheritDoc
-         */
-        render: function() {
-            // preparing urls
-            var data = this.model.toJSON();
-            var tags = data[this.column.get('name')];
-            for (var i = 0; i < tags.length; i++) {
-                tags[i].url = routing.generate('oro_tag_search', {
-                    id: tags[i].id
+            initialize: function() {
+                Backgrid.StringCell.__super__.initialize.apply(this, arguments);
+                this.fieldName = this.column.get('name');
+                //TODO move url generation to server side
+                var tags = this.model.get(this.fieldName);
+                tags = _.map(tags, function(tag) {
+                    if (!tag.hasOwnProperty('url')) {
+                        tag.url = routing.generate('oro_tag_search', {
+                            id: tag.id
+                        });
+                    }
+                    return tag;
                 });
+                this.model.set(this.fieldName, tags);
             }
-
-            this.$el.html(this.template({
-                model: data,
-                showDefault: false,
-                fieldName: this.column.get('name'),
-                tagSortCallback: this.tagSortCallback
-            }));
-
-            return this;
-        }
-    });
+        })
+    );
 
     return TagsCell;
 });

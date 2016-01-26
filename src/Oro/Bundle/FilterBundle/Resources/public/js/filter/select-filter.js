@@ -84,6 +84,13 @@ define([
         },
 
         /**
+         * Selector, jQuery object or HTML element that will be target for append multiselect dropdown menu
+         *
+         * @property
+         */
+        dropdownContainer: 'body',
+
+        /**
          * Select widget menu opened flag
          *
          * @property
@@ -104,8 +111,7 @@ define([
             'keydown select': '_preventEnterProcessing',
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
-            'change select': '_onSelectChange',
-            'click .reset-filter': '_onClickResetFilter'
+            'change select': '_onSelectChange'
         },
 
         /**
@@ -114,7 +120,7 @@ define([
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'choices');
+            var opts = _.pick(options || {}, ['choices', 'dropdownContainer']);
             _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
@@ -162,10 +168,9 @@ define([
 
             this.setElement((
                 this.template({
-                    label: this.label,
+                    label: this.labelPrefix + this.label,
                     showLabel: this.showLabel,
                     options: options,
-                    placeholder: this.placeholder,
                     nullLink: this.nullLink,
                     canDisable: this.canDisable,
                     selected: _.extend({}, this.emptyValue, this.value),
@@ -179,11 +184,22 @@ define([
         },
 
         /**
+         * Set dropdownContainer for dropdown element
+         *
+         * @param {(jQuery|Element|String)} container
+         * @protected
+         */
+        setDropdownContainer: function(container) {
+            this.dropdownContainer = $(container);
+        },
+
+        /**
          * Initialize multiselect widget
          *
          * @protected
          */
         _initializeSelectWidget: function() {
+            var $dropdownContainer = this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer;
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
@@ -194,7 +210,9 @@ define([
                     position: {
                         my: 'left top+7',
                         at: 'left bottom',
-                        of: this.$(this.containerSelector)
+                        of: this.$(this.containerSelector),
+                        collision: 'fit none',
+                        within: $dropdownContainer
                     },
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
@@ -202,19 +220,24 @@ define([
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
+                        this.selectWidget.updateDropdownPosition();
                     }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
                         setTimeout(_.bind(function() {
-                            this.selectDropdownOpened = false;
+                            if (!this.disposed) {
+                                this.selectDropdownOpened = false;
+                            }
                         }, this), 100);
-                    }, this)
+                    }, this),
+                    appendTo: this.dropdownContainer
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
             });
 
+            this.selectWidget.multiselect('getButton').hide();
+
             this.selectWidget.setViewDesign(this);
-            this.$(this.buttonSelector).append('<span class="caret"></span>');
             this.selectWidget.getWidget().on('keyup', _.bind(function(e) {
                 if (e.keyCode === 27) {
                     this._onClickFilterArea(e);
@@ -333,8 +356,6 @@ define([
         _onValueUpdated: function(newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');
-            this.$(this.buttonSelector)
-                .toggleClass('filter-default-value', this.isEmpty());
         },
 
         /**

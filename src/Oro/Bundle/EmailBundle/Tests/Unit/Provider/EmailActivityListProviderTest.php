@@ -27,7 +27,13 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
     protected $doctrineRegistryLink;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $mailboxProcessStorage;
+    protected $mailboxProcessStorageLink;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $activityAssociationHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $commentAssociationHelper;
 
     protected function setUp()
     {
@@ -59,15 +65,20 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $htmlTagHelper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineRegistryLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
-        )
+        $this->doctrineRegistryLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->mailboxProcessStorage = $this->getMockBuilder(
-            'Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage'
-        )
+        $this->mailboxProcessStorageLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->activityAssociationHelper = $this
+            ->getMockBuilder('Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->commentAssociationHelper = $this
+            ->getMockBuilder('Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -80,7 +91,9 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             $emailThreadProvider,
             $htmlTagHelper,
             $this->securityFacadeLink,
-            $this->mailboxProcessStorage
+            $this->mailboxProcessStorageLink,
+            $this->activityAssociationHelper,
+            $this->commentAssociationHelper
         );
         $this->emailActivityListProvider->setSecurityContextLink($this->securityContextLink);
     }

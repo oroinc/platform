@@ -44,12 +44,24 @@ define([
          * Ask a confirmation and execute mass action.
          */
         execute: function() {
+            if (this.checkSelectionState()) {
+                MassAction.__super__.execute.call(this);
+            }
+        },
+
+        /**
+         * Checks if any records are selected.
+         *
+         * @returns {boolean}
+         */
+        checkSelectionState: function() {
             var selectionState = this.datagrid.getSelectionState();
             if (_.isEmpty(selectionState.selectedModels) && selectionState.inset) {
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
-            } else {
-                MassAction.__super__.execute.call(this);
+                return false;
             }
+
+            return true;
         },
 
         /**
