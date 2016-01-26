@@ -41,7 +41,7 @@ class EntityListener
     /** @var Email[] */
     protected $createdEmails = [];
 
-    /** @var Email = [] */
+    /** @var Email[] */
     protected $activityManagerEmails = [];
 
     /** @var Email[] */
