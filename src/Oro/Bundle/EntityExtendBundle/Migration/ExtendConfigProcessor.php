@@ -387,7 +387,23 @@ class ExtendConfigProcessor
             $config     = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
             $hasChanges = false;
             foreach ($values as $key => $value) {
-                if ($this->isAppend($scope, $key, $className, $fieldName)) {
+                $path       = explode('.', $key);
+                $pathLength = count($path);
+                if ($pathLength > 1) {
+                    $code        = array_shift($path);
+                    $existingVal = (array)$config->get($code);
+                    $current     = &$existingVal;
+                    foreach ($path as $name) {
+                        if (!array_key_exists($name, $current)) {
+                            $current[$name] = [];
+                        }
+                        $current = &$current[$name];
+                    }
+                    $current = $this->isAppend($scope, $key, $className, $fieldName)
+                        ? array_merge($current, (array)$value)
+                        : $value;
+                    $config->set($code, $existingVal);
+                } elseif ($this->isAppend($scope, $key, $className, $fieldName)) {
                     $config->set($key, array_merge((array)$config->get($key), (array)$value));
                 } else {
                     $config->set($key, $value);
@@ -474,11 +490,11 @@ class ExtendConfigProcessor
         if (empty($fieldName)) {
             return
                 isset($this->appendConfigs[$className]['configs'][$scope]) &&
-                in_array($code, $this->appendConfigs[$className]['configs'][$scope]);
+                in_array($code, $this->appendConfigs[$className]['configs'][$scope], true);
         } else {
             return
                 isset($this->appendConfigs[$className]['fields'][$fieldName]['configs'][$scope]) &&
-                in_array($code, $this->appendConfigs[$className]['fields'][$fieldName]['configs'][$scope]);
+                in_array($code, $this->appendConfigs[$className]['fields'][$fieldName]['configs'][$scope], true);
         }
     }
 }
