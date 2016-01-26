@@ -305,13 +305,13 @@ class DateHelperTest extends OrmTestCase
         $this->assertSame([], $result);
     }
 
-    private function combinePreviousDataWithCurrentPeriodDataProvider()
+    public function combinePreviousDataWithCurrentPeriodDataProvider()
     {
         return [
-            [
-                'previous_from' => new DateTime('2015-05-05'),
-                'previous_to'   => new DateTime('2015-05-10'),
-                'data'          => [
+            'general' => [
+                new DateTime('2015-05-05'),
+                new DateTime('2015-05-10'),
+                [
                     [
                         'yearCreated'  => '2015',
                         'monthCreated' => '05',
@@ -319,7 +319,7 @@ class DateHelperTest extends OrmTestCase
                         'cnt'          => 5,
                     ]
                 ],
-                'expected_data' => [
+                [
                     ['date' => '2015-05-10'],
                     ['date' => '2015-05-11'],
                     ['date' => '2015-05-12', 'count' => 5],
@@ -328,16 +328,16 @@ class DateHelperTest extends OrmTestCase
                     ['date' => '2015-05-15'],
                 ]
             ],
-            [
-                'previous_from' => new DateTime(),
-                'previous_to'   => new DateTime(),
-                'data'          => [],
-                'expected_data' => []
+            'empty_data_returns_empty_array' => [
+                new DateTime(),
+                new DateTime(),
+                [],
+                []
             ],
-            [
-                'previous_from' => new DateTime('2015-05-19 23:00:00'),
-                'previous_to'   => new DateTime('2015-08-30 00:00:00'),
-                'data'          => [
+            'long_period_last_days_of_month' => [
+                new DateTime('2015-05-19 23:00:00'),
+                new DateTime('2015-08-30 00:00:00'),
+                [
                     [
                         'yearCreated'  => '2015',
                         'monthCreated' => '07',
@@ -345,7 +345,7 @@ class DateHelperTest extends OrmTestCase
                         'cnt'          => 5,
                     ]
                 ],
-                'expected_data' => [
+                [
                     ['date' => '2015-08-01'],
                     ['date' => '2015-09-01'],
                     ['date' => '2015-10-01'],
@@ -353,10 +353,10 @@ class DateHelperTest extends OrmTestCase
                     ['date' => '2015-12-01'],
                 ]
             ],
-            [
-                'previous_from' => new DateTime('2015-03-02 22:00:00'),
-                'previous_to'   => new DateTime('2015-08-01 00:00:00'),
-                'data'          => [
+            'long_period_first_days_of_month' => [
+                new DateTime('2015-03-02 22:00:00'),
+                new DateTime('2015-08-01 00:00:00'),
+                [
                     [
                         'yearCreated'  => '2015',
                         'monthCreated' => '07',
@@ -364,7 +364,7 @@ class DateHelperTest extends OrmTestCase
                         'cnt'          => 5,
                     ]
                 ],
-                'expected_data' => [
+                [
                     ['date' => '2015-08-01'],
                     ['date' => '2015-09-01'],
                     ['date' => '2015-10-01'],
@@ -375,20 +375,20 @@ class DateHelperTest extends OrmTestCase
         ];
     }
 
-    public function testCombinePreviousDataWithCurrentPeriod()
+    /**
+     * @dataProvider combinePreviousDataWithCurrentPeriodDataProvider
+     */
+    public function testCombinePreviousDataWithCurrentPeriod($previousFrom, $previousTo, $data, $expectedData)
     {
-        $testDataSet = $this->combinePreviousDataWithCurrentPeriodDataProvider();
+        $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(
+            $previousFrom,
+            $previousTo,
+            $data,
+            'cnt',
+            'count'
+        );
 
-        foreach ($testDataSet as $testData) {
-            $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(
-                $testData['previous_from'],
-                $testData['previous_to'],
-                $testData['data'],
-                'cnt',
-                'count'
-            );
+        $this->assertEquals($expectedData, $actualData);
 
-            $this->assertEquals($testData['expected_data'], $actualData);
-        }
     }
 }
