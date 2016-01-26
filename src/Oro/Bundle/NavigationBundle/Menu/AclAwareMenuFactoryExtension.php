@@ -83,7 +83,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     public function buildOptions(array $options = array())
     {
-        if (!$this->alreadyProcessed($options)) {
+        if (!$this->alreadyDenied($options)) {
             $this->processAcl($options);
 
             if ($options['extras']['isAllowed'] && !empty($options['route'])) {
