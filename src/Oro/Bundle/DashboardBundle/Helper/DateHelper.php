@@ -93,17 +93,20 @@ class DateHelper
         $items = $this->getDatePeriod($from, $to);
 
         // Adjust time intervals to match
-        if (count($currentItems) != count($items)) {
+        $countCurrentItems = count($currentItems);
+        $countItems = count($items);
+
+        if ($countCurrentItems!= $countItems) {
             $config     = self::getFormatStrings($from, $to);
             $interval   = new \DateInterval($config['intervalString']);
-            while (count($items) != count($currentItems)) {
-                if (count($items) > count($currentItems)) {
+            while ($countItems != $countCurrentItems) {
+                if ($countItems > $countCurrentItems) {
                     $from->add($interval);
-                    $items = $this->getDatePeriod($from, $to);
                 } else {
                     $from->sub($interval);
-                    $items = $this->getDatePeriod($from, $to);
                 }
+                $items = $this->getDatePeriod($from, $to);
+                $countItems = count($items);
             }
         }
 
