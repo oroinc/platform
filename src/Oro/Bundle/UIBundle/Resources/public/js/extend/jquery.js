@@ -17,8 +17,12 @@ define(['jquery'], function($) {
         setCursorPosition: function(index) {
             return this.each(function() {
                 var el = this;
-                if ('selectionStart' in el && el.type !== 'number') {
-                    el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
+                if ('selectionStart' in el) {
+                    try {
+                        el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
+                    } catch (ex) {
+                        // avoid exeption when use these actions with unsupported input types (email, number etc)
+                    }
                 }
             });
         },
@@ -97,10 +101,15 @@ define(['jquery'], function($) {
                 var el = this;
                 var value = el.value;
                 if ('selectionStart' in el) {
-                    start = el.selectionStart;
-                    end = el.selectionEnd;
-                    el.value = value.substr(0, start) + str + value.substr(end);
-                    el.selectionEnd = el.selectionStart = start + str.length;
+                    // avoid exeption when use these actions with unsupported input types (email, number etc)
+                    try {
+                        start = el.selectionStart;
+                        end = el.selectionEnd;
+                        el.value = value.substr(0, start) + str + value.substr(end);
+                        el.selectionEnd = el.selectionStart = start + str.length;
+                    } catch (ex) {
+                        el.value += str;
+                    }
                 } else {
                     el.value += str;
                 }
