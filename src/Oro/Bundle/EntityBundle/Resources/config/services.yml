@@ -402,9 +402,9 @@ services:
 
     oro_entity.manager.entity_field_validator:
         class: %oro_entity.manager.entity_field_validator.class%
-        scope: request
         arguments:
             - @doctrine
+            - @translator
 
     oro_entity.provider.abstract_entity_data_provider:
         abstract: true
