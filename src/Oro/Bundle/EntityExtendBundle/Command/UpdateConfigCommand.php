@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByInitialStateFilter;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByOriginFilter;
@@ -57,7 +56,7 @@ class UpdateConfigCommand extends ContainerAwareCommand
 
         $initialStatePath = $input->getOption('initial-state-path');
         if (!empty($initialStatePath)) {
-            $initialStates = Yaml::parse(file_get_contents($initialStatePath));
+            $initialStates = unserialize(file_get_contents($initialStatePath));
             if (!empty($initialStates)) {
                 $filter = new ByInitialStateFilter($initialStates);
             }

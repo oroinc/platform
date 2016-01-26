@@ -514,9 +514,6 @@
   }
 }
 .widget-configuration {
-  .controls > input[type=checkbox]:only-child{
-    margin-top: 8px;
-  }
   .items-selector-widget {
     margin-right: 20px;
   }
@@ -579,8 +576,17 @@
   margin-bottom: 10px;
   .controls {
     width: 445px;
-    .mobile-version & {
+  }
+  .mobile-version & {
+    .controls {
       width: initial;
+    }
+    .action-column {
+      width: 116px;
+      text-align: center;
+    }
+    .action-cell .btn {
+      padding: 0 4px;
     }
   }
 }

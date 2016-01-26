@@ -1,8 +1,8 @@
 datagrid:
     oro_segments-grid:
+        acl_resource: oro_segment_view
         source:
-            type:           orm
-            acl_resource:   oro_segment_view
+            type: orm
             query:
                 select:
                     - s.id

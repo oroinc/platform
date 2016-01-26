@@ -7,6 +7,7 @@ define(function(require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
+    var Backbone = require('backbone');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var Grid = require('orodatagrid/js/datagrid/grid');
@@ -16,6 +17,7 @@ define(function(require) {
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
+    var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
 
     helpers = {
         cellType: function(type) {
@@ -112,12 +114,17 @@ define(function(require) {
                 rowActions: {},
                 massActions: {}
             });
+            this.metadataModel = new MetadataModel(this.metadata);
             this.modules = {};
 
             this.collectModules();
 
             // load all dependencies and build grid
             tools.loadModules(this.modules, this.build, this);
+
+            this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
+                this.grid.massActions.reset(this.buildMassActionsOptions(massActions));
+            }, this);
         },
 
         /**
@@ -228,7 +235,6 @@ define(function(require) {
         combineGridOptions: function() {
             var columns;
             var rowActions = {};
-            var massActions = {};
             var defaultOptions = {
                 sortable: false
             };
@@ -256,9 +262,7 @@ define(function(require) {
             });
 
             // mass actions
-            _.each(metadata.massActions, function(options, action) {
-                massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
-            });
+            var massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);
@@ -276,16 +280,35 @@ define(function(require) {
                 name: this.gridName,
                 columns: columns,
                 rowActions: rowActions,
-                massActions: massActions,
+                massActions: new Backbone.Collection(massActions),
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
-                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
+                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || massActions.length,
                 metadata: this.metadata,
+                metadataModel: this.metadataModel,
                 plugins: plugins
             };
+        },
+
+        /**
+         * @param {Object} actions
+         * @returns {Array}
+         */
+        buildMassActionsOptions: function(actions) {
+            var modules = this.modules;
+            var massActions = [];
+
+            _.each(actions, function(options, action) {
+                massActions.push({
+                    action: action,
+                    module: modules[helpers.actionType(options.frontend_type)].extend(options)
+                });
+            });
+
+            return massActions;
         },
 
         fixStates: function(options) {
