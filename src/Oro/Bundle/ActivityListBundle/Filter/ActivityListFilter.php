@@ -10,7 +10,7 @@ use LogicException;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
@@ -32,8 +32,8 @@ class ActivityListFilter extends EntityFilter
     /** @var ActivityListFilterHelper */
     protected $activityListFilterHelper;
 
-    /** @var ActivityManager */
-    protected $activityManager;
+    /** @var ActivityAssociationHelper */
+    protected $activityAssociationHelper;
 
     /** @var ActivityListChainProvider */
     protected $activityListChainProvider;
@@ -54,19 +54,19 @@ class ActivityListFilter extends EntityFilter
     protected $datagridHelper;
 
     /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility $util
-     * @param ActivityManager $activityManager
+     * @param FormFactoryInterface      $factory
+     * @param FilterUtility             $util
+     * @param ActivityAssociationHelper $activityAssociationHelper
      * @param ActivityListChainProvider $activityListChainProvider
-     * @param ActivityListFilterHelper $activityListFilterHelper
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param Manager $queryDesignerManager
-     * @param DatagridHelper $datagridHelper
+     * @param ActivityListFilterHelper  $activityListFilterHelper
+     * @param EntityRoutingHelper       $entityRoutingHelper
+     * @param Manager                   $queryDesignerManager
+     * @param DatagridHelper            $datagridHelper
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        ActivityManager $activityManager,
+        ActivityAssociationHelper $activityAssociationHelper,
         ActivityListChainProvider $activityListChainProvider,
         ActivityListFilterHelper $activityListFilterHelper,
         EntityRoutingHelper $entityRoutingHelper,
@@ -74,12 +74,12 @@ class ActivityListFilter extends EntityFilter
         DatagridHelper $datagridHelper
     ) {
         parent::__construct($factory, $util);
-        $this->activityManager = $activityManager;
+        $this->activityAssociationHelper = $activityAssociationHelper;
         $this->activityListChainProvider = $activityListChainProvider;
-        $this->activityListFilterHelper = $activityListFilterHelper;
-        $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->queryDesignerManager = $queryDesignerManager;
-        $this->datagridHelper = $datagridHelper;
+        $this->activityListFilterHelper  = $activityListFilterHelper;
+        $this->entityRoutingHelper       = $entityRoutingHelper;
+        $this->queryDesignerManager      = $queryDesignerManager;
+        $this->datagridHelper            = $datagridHelper;
     }
 
     /**
@@ -147,13 +147,12 @@ class ActivityListFilter extends EntityFilter
         array $data,
         $entityIdField
     ) {
+        $entityClass = $data['entityClassName'];
+
         $joinField = sprintf(
             '%s.%s',
             $this->activityListAlias,
-            ExtendHelper::buildAssociationName(
-                $data['entityClassName'],
-                ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
-            )
+            ExtendHelper::buildAssociationName($entityClass, ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND)
         );
 
         $activityListRepository = $em->getRepository('OroActivityListBundle:ActivityList');
@@ -163,10 +162,8 @@ class ActivityListFilter extends EntityFilter
             ->select('1')
             ->setMaxResults(1);
 
-        $availableActivityAssociations = $this->activityManager->getActivityAssociations($data['entityClassName']);
-
-        if (!$availableActivityAssociations
-            && !$activityListRepository->getRecordsCountForTargetClass($data['entityClassName'])
+        if (!$this->activityAssociationHelper->hasActivityAssociations($entityClass)
+            && !$activityListRepository->getRecordsCountForTargetClass($entityClass)
         ) {
             $activityQb->andWhere('1 = 0');
 

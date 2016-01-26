@@ -12,6 +12,7 @@ Table of content
     - [Datasources](./Resources/doc/backend/datasources.md)
         - [ORM](./Resources/doc/backend/datasources/orm.md)
     - [Parameter binding](./Resources/doc/backend/parameter_binding.md)
+    - [Mixin](./Resources/doc/backend/mixin.md)
     - [Extensions](./Resources/doc/backend/extensions.md)
         - [Action](./Resources/doc/backend/extensions/action.md)
         - [Export](./Resources/doc/backend/extensions/export.md)
