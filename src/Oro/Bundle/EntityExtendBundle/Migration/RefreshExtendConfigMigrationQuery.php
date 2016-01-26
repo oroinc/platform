@@ -4,8 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 
@@ -77,7 +75,7 @@ class RefreshExtendConfigMigrationQuery implements MigrationQuery
     {
         $this->removeInitialEntityConfigStateFile();
         $this->ensureDirExists(dirname($this->initialEntityConfigStatePath));
-        file_put_contents($this->initialEntityConfigStatePath, Yaml::dump($this->initialEntityConfigState));
+        file_put_contents($this->initialEntityConfigStatePath, serialize($this->initialEntityConfigState));
     }
 
     /**
