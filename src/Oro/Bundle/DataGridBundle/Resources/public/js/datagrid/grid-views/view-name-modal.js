@@ -21,7 +21,7 @@ define([
             options.content = options.content || this.contentTemplate({
                 value: options.defaultValue || '',
                 label: __('oro.datagrid.gridView.name'),
-                defaultLabel: __('oro.datagrid.action.use_as_default_grid_view'),
+                defaultLabel: __('oro.datagrid.action.set_as_default_grid_view'),
                 defaultChecked: options.defaultChecked || false
             });
             options.okText =  __('oro.datagrid.gridView.save_name');

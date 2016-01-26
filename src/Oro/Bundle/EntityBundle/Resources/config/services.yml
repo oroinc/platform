@@ -402,6 +402,6 @@ services:
 
     oro_entity.manager.entity_field_validator:
         class: %oro_entity.manager.entity_field_validator.class%
-        scope: request
         arguments:
             - @doctrine
+            - @translator

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
@@ -986,6 +987,81 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAddOneToManyInverseRelation()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $selfTable = $schema->createTable('table1');
+        $selfTable->addColumn('id', 'integer');
+        $selfTable->addColumn('name', 'string');
+        $selfTable->setPrimaryKey(['id']);
+
+        $targetTable = $schema->createTable('table2');
+        $targetTable->addColumn('id', 'smallint');
+        $targetTable->addColumn('name', 'string');
+        $targetTable->setPrimaryKey(['id']);
+
+        $targetTable->addColumn('entity1_rooms_id', 'integer');
+        $targetTable->addForeignKeyConstraint($selfTable, ['entity1_rooms_id'], ['id']);
+
+        $extension->addOneToManyInverseRelation(
+            $schema,
+            $selfTable,
+            'rooms',
+            'table2',
+            'user',
+            'name',
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+
+        $relationKey = 'oneToMany|Acme\AcmeBundle\Entity\Entity1|Acme\AcmeBundle\Entity\Entity2|rooms';
+        $this->assertExtendOptions(
+            $schema,
+            [
+                'Acme\AcmeBundle\Entity\Entity1' => [
+                    'configs' => [
+                        'extend' => [
+                            'relation.' . $relationKey . '.target_field_id' => new FieldConfigId(
+                                'extend',
+                                'Acme\AcmeBundle\Entity\Entity2',
+                                'user',
+                                'manyToOne'
+                            )
+                        ]
+                    ]
+                ],
+                'Acme\AcmeBundle\Entity\Entity2' => [
+                    'configs' => [
+                        'extend' => [
+                            'relation.' . $relationKey . '.field_id' => new FieldConfigId(
+                                'extend',
+                                'Acme\AcmeBundle\Entity\Entity2',
+                                'user',
+                                'manyToOne'
+                            )
+                        ]
+                    ],
+                    'fields'  => [
+                        'user' => [
+                            'configs' => [
+                                'extend' => [
+                                    'is_extend'     => true,
+                                    'owner'         => ExtendScope::OWNER_CUSTOM,
+                                    'column_name'   => 'entity1_rooms_id',
+                                    'target_entity' => 'Acme\AcmeBundle\Entity\Entity1',
+                                    'relation_key'  => $relationKey,
+                                    'target_field'  => 'name'
+                                ]
+                            ],
+                            'type'    => 'manyToOne',
+                        ]
+                    ]
+                ],
+            ]
+        );
+    }
+
     /**
      * @expectedException \Doctrine\DBAL\Schema\SchemaException
      * @expectedExceptionMessage The target column name must be "id". Relation column: "table1::rel_id". Target column
@@ -1417,6 +1493,88 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAddManyToManyInverseRelation()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $selfTable = $schema->createTable('table1');
+        $selfTable->addColumn('id', 'integer');
+        $selfTable->addColumn('name', 'string');
+        $selfTable->setPrimaryKey(['id']);
+
+        $targetTable = $schema->createTable('table2');
+        $targetTable->addColumn('id', 'smallint');
+        $targetTable->addColumn('name', 'string');
+        $targetTable->setPrimaryKey(['id']);
+
+        $joinTable = $schema->createTable('oro_rel_f061705960f46bf2d67f27');
+        $joinTable->addColumn('entity1_id', 'integer');
+        $joinTable->addForeignKeyConstraint($selfTable, ['entity1_id'], ['id']);
+        $joinTable->addColumn('entity2_id', 'integer');
+        $joinTable->addForeignKeyConstraint($targetTable, ['entity2_id'], ['id']);
+        $joinTable->setPrimaryKey(['entity1_id', 'entity2_id']);
+
+        $extension->addManyToManyInverseRelation(
+            $schema,
+            $selfTable,
+            'rooms',
+            'table2',
+            'users',
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+
+        $relationKey = 'manyToMany|Acme\AcmeBundle\Entity\Entity1|Acme\AcmeBundle\Entity\Entity2|rooms';
+        $this->assertExtendOptions(
+            $schema,
+            [
+                'Acme\AcmeBundle\Entity\Entity1' => [
+                    'configs' => [
+                        'extend' => [
+                            'relation.' . $relationKey . '.target_field_id' => new FieldConfigId(
+                                'extend',
+                                'Acme\AcmeBundle\Entity\Entity2',
+                                'users',
+                                'manyToMany'
+                            )
+                        ]
+                    ]
+                ],
+                'Acme\AcmeBundle\Entity\Entity2' => [
+                    'configs' => [
+                        'extend' => [
+                            'relation.' . $relationKey . '.field_id' => new FieldConfigId(
+                                'extend',
+                                'Acme\AcmeBundle\Entity\Entity2',
+                                'users',
+                                'manyToMany'
+                            )
+                        ]
+                    ],
+                    'fields'  => [
+                        'users' => [
+                            'configs' => [
+                                'extend' => [
+                                    'is_extend'       => true,
+                                    'owner'           => ExtendScope::OWNER_CUSTOM,
+                                    'target_entity'   => 'Acme\AcmeBundle\Entity\Entity1',
+                                    'relation_key'    => $relationKey,
+                                    'target_title'    => ['name'],
+                                    'target_detailed' => ['name'],
+                                    'target_grid'     => ['name']
+                                ]
+                            ],
+                            'type'    => 'manyToMany',
+                        ]
+                    ]
+                ],
+            ]
+        );
+    }
+
     /**
      * @expectedException \Doctrine\DBAL\Schema\SchemaException
      * @expectedExceptionMessage The table "table2" must have a primary key.
@@ -1585,6 +1743,84 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             ]
                         ]
                     ],
+                ],
+            ]
+        );
+    }
+
+    public function testAddManyToOneInverseRelation()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $selfTable = $schema->createTable('table1');
+        $selfTable->addColumn('id', 'integer');
+        $selfTable->addColumn('name', 'string');
+        $selfTable->setPrimaryKey(['id']);
+
+        $targetTable = $schema->createTable('table2');
+        $targetTable->addColumn('id', 'smallint');
+        $targetTable->addColumn('name', 'string');
+        $targetTable->setPrimaryKey(['id']);
+
+        $selfTable->addColumn('room_id', 'integer');
+        $selfTable->addForeignKeyConstraint($targetTable, ['room_id'], ['id']);
+
+        $extension->addManyToOneInverseRelation(
+            $schema,
+            $selfTable,
+            'room',
+            'table2',
+            'users',
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+
+        $relationKey = 'manyToOne|Acme\AcmeBundle\Entity\Entity1|Acme\AcmeBundle\Entity\Entity2|room';
+        $this->assertExtendOptions(
+            $schema,
+            [
+                'Acme\AcmeBundle\Entity\Entity1' => [
+                    'configs' => [
+                        'extend' => [
+                            'relation.' . $relationKey . '.target_field_id' => new FieldConfigId(
+                                'extend',
+                                'Acme\AcmeBundle\Entity\Entity2',
+                                'users',
+                                'oneToMany'
+                            )
+                        ]
+                    ]
+                ],
+                'Acme\AcmeBundle\Entity\Entity2' => [
+                    'configs' => [
+                        'extend' => [
+                            'relation.' . $relationKey . '.field_id' => new FieldConfigId(
+                                'extend',
+                                'Acme\AcmeBundle\Entity\Entity2',
+                                'users',
+                                'oneToMany'
+                            )
+                        ]
+                    ],
+                    'fields'  => [
+                        'users' => [
+                            'configs' => [
+                                'extend' => [
+                                    'is_extend'       => true,
+                                    'owner'           => ExtendScope::OWNER_CUSTOM,
+                                    'target_entity'   => 'Acme\AcmeBundle\Entity\Entity1',
+                                    'relation_key'    => $relationKey,
+                                    'target_title'    => ['name'],
+                                    'target_detailed' => ['name'],
+                                    'target_grid'     => ['name']
+                                ]
+                            ],
+                            'type'    => 'oneToMany',
+                        ]
+                    ]
                 ],
             ]
         );

@@ -71,7 +71,6 @@ class UserType extends AbstractType
         // user fields
         $builder->addEventSubscriber(new UserSubscriber($builder->getFormFactory(), $this->security));
         $this->setDefaultUserFields($builder);
-
         if ($this->securityFacade->isGranted('oro_user_role_view')) {
             $builder->add(
                 'roles',
@@ -96,7 +95,6 @@ class UserType extends AbstractType
                 ]
             );
         }
-
         if ($this->securityFacade->isGranted('oro_user_group_view')) {
             $builder->add(
                 'groups',
@@ -114,20 +112,15 @@ class UserType extends AbstractType
                 ]
             );
         }
-
         if ($this->securityFacade->isGranted('oro_organization_view')
             && $this->securityFacade->isGranted('oro_business_unit_view')
         ) {
             $builder->add(
                 'organizations',
                 'oro_organizations_select',
-                [
-                    'required' => false,
-                    'label'    => 'oro.user.form.access_settings.label',
-                ]
+                ['required' => false, 'label' => 'oro.user.form.access_settings.label']
             );
         }
-
         $builder
             ->add(
                 'plainPassword',
@@ -153,29 +146,21 @@ class UserType extends AbstractType
                     'prototype_name' => 'tag__name__'
                 ]
             );
-
         if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
             $builder->add(
                 'imapAccountType',
                 'oro_imap_choice_account_type',
-                [
-                    'label' => 'oro.user.imap_configuration.label',
-
-                ]
+                ['label' => 'oro.user.imap_configuration.label']
             );
         } else {
             $builder->add(
                 'imapConfiguration',
                 'oro_imap_configuration',
-                [
-                    'label' => 'oro.user.imap_configuration.label'
-                ]
+                ['label' => 'oro.user.imap_configuration.label']
             );
         }
-
         $builder->add('change_password', ChangePasswordType::NAME)
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
-
 
         $this->addInviteUserField($builder);
     }
