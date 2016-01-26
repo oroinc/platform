@@ -9,6 +9,7 @@ define(function(require) {
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var CellIterator = require('../../../datagrid/cell-iterator');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
+    var Modal = require('oroui/js/modal');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
@@ -48,11 +49,15 @@ define(function(require) {
             this.listenTo(this.main, {
                 afterMakeCell: this.onAfterMakeCell
             });
+            this.listenTo(this.main.collection, {
+                beforeFetch: this.beforeGridCollectionFetch
+            });
             this.listenTo(this.main.columns, {
                 'change:renderable': this.onColumnStateChange
             });
             this.listenTo(mediator, {
-                'page:beforeChange': this.removeActiveEditorComponents
+                'page:beforeChange': this.removeActiveEditorComponents,
+                'openLink:before': this.beforePageChange
             });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
@@ -62,6 +67,15 @@ define(function(require) {
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             this.main.body.refresh();
             InlineEditingPlugin.__super__.enable.call(this);
+            $(window).on('beforeunload.' + this.cid, _.bind(this.onWindowUnload, this));
+        },
+
+        disable: function() {
+            $(window).off('.' + this.cid);
+            this.removeActiveEditorComponents();
+            this.main.$el.removeClass('grid-editable');
+            this.main.body.refresh();
+            InlineEditingPlugin.__super__.disable.call(this);
         },
 
         onColumnStateChange: function() {
@@ -74,11 +88,46 @@ define(function(require) {
             }
         },
 
-        disable: function() {
-            this.removeActiveEditorComponents();
-            this.main.$el.removeClass('grid-editable');
-            this.main.body.refresh();
-            InlineEditingPlugin.__super__.disable.call(this);
+        beforeGridCollectionFetch: function(collection, options) {
+            if (!this.hasChanges()) {
+                return;
+            }
+
+            var confirmModal = new Modal({
+                title: __('oro.datagrid.inline_editing.refresh_confirm_modal.title'),
+                content: __('oro.datagrid.inline_editing.refresh_confirm_modal.content'),
+                okText: __('OK, got it.'),
+                className: 'modal modal-primary',
+                okButtonClass: 'btn-primary btn-large',
+                cancelText: __('Cancel')
+            });
+            var deferredConfirmation = $.Deferred();
+
+            deferredConfirmation.always(_.bind(function() {
+                this.stopListening(confirmModal);
+            }, this));
+
+            this.listenTo(confirmModal, 'ok', function() {
+                deferredConfirmation.resolve();
+            });
+            this.listenTo(confirmModal, 'cancel', function() {
+                deferredConfirmation.reject(deferredConfirmation.promise(), 'abort');
+            });
+
+            options.waitForPromises.push(deferredConfirmation.promise());
+            confirmModal.open();
+        },
+
+        beforePageChange: function(e) {
+            if (this.hasChanges()) {
+                e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
+            }
+        },
+
+        onWindowUnload: function() {
+            if (this.hasChanges()) {
+                return __('oro.ui.leave_page_with_unsaved_data_confirm');
+            }
         },
 
         onAfterMakeCell: function(row, cell) {
@@ -111,6 +160,12 @@ define(function(require) {
                 cell.events = originalEvents;
                 return cell;
             };
+        },
+
+        hasChanges: function() {
+            return _.some(this.activeEditorComponents, function(component) {
+                return component.isChanged();
+            });
         },
 
         isEditable: function(cell) {
@@ -305,8 +360,10 @@ define(function(require) {
             cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
                 _this.enterEditMode(cell, fromPreviousCell);
                 _this.trigger('lockUserActions', false);
-            }).fail(function() {
-                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+            }).fail(function(obj, status) {
+                if (status !== 'abort') {
+                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+                }
                 _this.trigger('lockUserActions', false);
             });
         },
