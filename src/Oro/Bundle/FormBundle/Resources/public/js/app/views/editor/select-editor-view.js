@@ -62,6 +62,7 @@ define(function(require) {
      */
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
+    var $ = require('jquery');
     var _ = require('underscore');
     require('jquery.select2');
 
@@ -73,7 +74,9 @@ define(function(require) {
         SELECTED_ITEMS_H_INCREMENT: 2,
 
         events: {
-            'updatePosition': 'updatePosition'
+            'updatePosition': 'updatePosition',
+            'select2-open': 'onSelect2Open',
+            'select2-close': 'onSelect2Close'
         },
 
         initialize: function(options) {
@@ -177,6 +180,27 @@ define(function(require) {
             SelectEditorView.__super__.dispose.call(this);
         },
 
+        onSelect2Open: function(e) {
+            var select2 = this.$(e.target).data('select2');
+            if (!select2) {
+                return;
+            }
+            select2.dropdown.on('mousedown' + this.eventNamespace(), _.bind(function() {
+                this._isFocused = true;// to suppress focusout event
+            }, this));
+            select2.dropdown.on('mouseup' + this.eventNamespace(), _.bind(function() {
+                this._isFocused = false;
+            }, this));
+        },
+
+        onSelect2Close: function(e) {
+            var select2 = this.$(e.target).data('select2');
+            if (!select2) {
+                return;
+            }
+            select2.dropdown.off(this.eventNamespace());
+        },
+
         focus: function() {
             var isFocused = this.isFocused();
             this.$('input[name=value]').select2('open');
@@ -187,17 +211,22 @@ define(function(require) {
             }
         },
 
+        /**
+         * Handles focusout event
+         *
+         * @param {jQuery.Event} e
+         */
+        onFocusout: function(e) {
+            if (!$('.select2-drop').has(e.relatedTarget).length && !this._isFocused) {
+                SelectEditorView.__super__.onFocusout.call(this, e);
+            }
+        },
+
         isChanged: function() {
             // current value is always string
             // btw model value could be an number
             return this.getValue() !== String(this.getModelValue());
         },
-
-        /**
-         * Internal focus tracking variable
-         * @protected
-         */
-        _isFocused: false,
 
         /**
          * Returns true if element is focused

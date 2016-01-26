@@ -95,6 +95,12 @@ define(function(require) {
         ARROW_RIGHT_KEY_CODE: 39,
         ARROW_BOTTOM_KEY_CODE: 40,
 
+        /**
+         * Internal focus tracking variable
+         * @protected
+         */
+        _isFocused: false,
+
         constructor: function(options) {
             // className adjustment cannot be done in initialize()
             if (options.className) {
@@ -230,7 +236,7 @@ define(function(require) {
          */
         blur: function() {
             if (this._isFocused) {
-                delete this._isFocused;
+                this._isFocused = false;
                 this.trigger('blur');
             }
         },
