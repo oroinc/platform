@@ -43,9 +43,11 @@ class EmailOwnersProvider
     public function getEmailsByOwnerEntity($entity)
     {
         $ownerColumnName = null;
+        $entityClass     = ClassUtils::getClass($entity);
         foreach ($this->emailOwnerStorage->getProviders() as $provider) {
-            if ($this->activityListChainProvider->isSupportedTargetEntity($entity)
-                && $provider->getEmailOwnerClass() === ClassUtils::getClass($entity)) {
+            if ($provider->getEmailOwnerClass() === $entityClass
+                && $this->activityListChainProvider->isSupportedTargetEntity($entity)
+            ) {
                 $ownerColumnName = $this->emailOwnerStorage->getEmailOwnerFieldName($provider);
                 break;
             }
@@ -67,9 +69,11 @@ class EmailOwnersProvider
      */
     public function supportOwnerProvider($entity)
     {
+        $entityClass = ClassUtils::getClass($entity);
         foreach ($this->emailOwnerStorage->getProviders() as $provider) {
-            if ($this->activityListChainProvider->isSupportedTargetEntity($entity)
-                && $provider->getEmailOwnerClass() === ClassUtils::getClass($entity)) {
+            if ($provider->getEmailOwnerClass() === $entityClass
+                && $this->activityListChainProvider->isSupportedTargetEntity($entity)
+            ) {
                 return true;
             }
         }

@@ -229,7 +229,7 @@ define(function(require) {
          */
         enterEditMode: function() {
             if (!this.view) {
-                this.options.cell.$el.removeClass('view-mode save-error');
+                this.options.cell.$el.removeClass('view-mode save-fail');
                 this.options.cell.$el.addClass('edit-mode');
                 this.createView(this.options);
                 // rethrow view events on component

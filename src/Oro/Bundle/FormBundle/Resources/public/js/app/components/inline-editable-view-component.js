@@ -143,6 +143,10 @@ define(function(require) {
         },
 
         enterEditMode: function() {
+            if (!this.view.disposed && this.view.$el) {
+                this.view.$el.removeClass('save-fail');
+            }
+
             var View = this.classes.editor;
             var viewConfiguration = this.inlineEditingOptions.editor ?
                 this.inlineEditingOptions.editor.view_options :

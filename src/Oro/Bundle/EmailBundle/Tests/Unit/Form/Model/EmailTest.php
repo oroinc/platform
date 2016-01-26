@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Model;
 
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 
 class EmailTest extends \PHPUnit_Framework_TestCase
@@ -39,7 +40,8 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['gridName', 'testGridName'],
             ['template', new EmailTemplate('test')],
             ['contexts', [new \stdClass()]],
-            ['organization', new Organization()]
+            ['organization', new Organization()],
+            ['campaignOwner', new User()]
         ];
     }
 

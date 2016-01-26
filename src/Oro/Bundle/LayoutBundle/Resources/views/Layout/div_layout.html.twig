@@ -73,7 +73,6 @@
 
 {% block script_widget %}
     {% if attr.src is defined and attr.src is not empty %}
-        {% set attr = attr|merge({src: asset(attr.src)}) %}
         <script{{ block('block_attributes') }}></script>
     {% else %}
         <script{{ block('block_attributes') }}>
@@ -84,7 +83,6 @@
 
 {% block style_widget %}
     {% if attr.href is defined and attr.href is not empty %}
-        {% set attr = attr|merge({href: asset(attr.href)}) %}
         <link rel="stylesheet"{{ block('block_attributes') }}/>
     {% else %}
         <style{{ block('block_attributes') }}>

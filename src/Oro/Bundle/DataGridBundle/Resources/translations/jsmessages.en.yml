@@ -53,7 +53,7 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.action.share_grid_view": "Share With Others"
 "oro.datagrid.action.unshare_grid_view": "Unshare"
 "oro.datagrid.action.delete_grid_view": "Delete"
-"oro.datagrid.action.use_as_default_grid_view": "Use as default"
+"oro.datagrid.action.set_as_default_grid_view": "Set as default"
 "oro.datagrid.gridView.all": "All"
 "oro.datagrid.gridView.default": "Default"
 "oro.datagrid.gridView.created": "View has been successfully created"
@@ -68,7 +68,7 @@ oro_datagrid.action.refresh: "Refresh"
 oro:
     datagrid:
         column_manager:
-            title: "Table Settings"
+            title: "Grid Settings"
             tooltip: "Use drag and drop to sort items"
             select_all: "Select All"
             filter:

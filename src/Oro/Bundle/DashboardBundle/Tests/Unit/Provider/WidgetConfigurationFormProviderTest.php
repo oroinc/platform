@@ -6,7 +6,6 @@ use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
-use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Yaml\Yaml;
@@ -83,8 +82,7 @@ class DashboardConfigurationFormProviderTest extends FormIntegrationTestCase
         $config = $this->getConfig($configPath);
         $provider = new WidgetConfigurationFormProvider(
             new ConfigProvider($config['oro_dashboard_config'], $eventDispatcher),
-            $this->factory,
-            new ConstraintFactory()
+            $this->factory
         );
 
         return $provider;

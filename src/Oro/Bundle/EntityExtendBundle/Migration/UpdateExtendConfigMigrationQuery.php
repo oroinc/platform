@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
@@ -96,7 +94,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     {
         $this->removeConfigProcessorOptionsFile();
         $this->ensureDirExists(dirname($this->configProcessorOptionsPath));
-        file_put_contents($this->configProcessorOptionsPath, Yaml::dump($this->options));
+        file_put_contents($this->configProcessorOptionsPath, serialize($this->options));
     }
 
     /**

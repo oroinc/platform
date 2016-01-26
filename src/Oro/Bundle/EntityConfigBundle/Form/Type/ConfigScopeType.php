@@ -17,36 +17,26 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
  */
 class ConfigScopeType extends AbstractType
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $items;
 
-    /**
-     * @var ConfigInterface
-     */
+    /** @var ConfigInterface */
     protected $config;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var ConfigModel
-     */
+    /** @var ConfigModel */
     protected $configModel;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $jsRequireOptions;
 
     /**
-     * @param $items
-     * @param $config
-     * @param $configModel
-     * @param $configManager
+     * @param array             $items
+     * @param ConfigInterface   $config
+     * @param ConfigManager     $configManager
+     * @param ConfigModel       $configModel
      */
     public function __construct(
         $items,
@@ -153,7 +143,7 @@ class ConfigScopeType extends AbstractType
                 }
 
                 if (isset($config['constraints'])) {
-                    $options['constraints'] = $this->parseValidator($config['constraints']);
+                    $options['constraints'] = $config['constraints'];
                 }
 
                 $this->setAttr($options, 'data-property_id', $this->config->getId()->toString() . $code);
@@ -169,53 +159,6 @@ class ConfigScopeType extends AbstractType
     public function getName()
     {
         return 'oro_entity_config_scope_type';
-    }
-
-    /**
-     * @param $name
-     * @param $options
-     * @return mixed
-     *
-     * TODO: use ConstraintFactory here, https://magecore.atlassian.net/browse/BAP-2270
-     */
-    protected function newConstraint($name, $options)
-    {
-        if (strpos($name, '\\') !== false && class_exists($name)) {
-            $className = (string) $name;
-        } else {
-            $className = 'Symfony\\Component\\Validator\\Constraints\\' . $name;
-        }
-
-        return new $className($options);
-    }
-
-    /**
-     * @param array $nodes
-     * @return array
-     */
-    protected function parseValidator(array $nodes)
-    {
-        $values = array();
-
-        foreach ($nodes as $name => $childNodes) {
-            if (is_numeric($name) && is_array($childNodes) && count($childNodes) == 1) {
-                $options = current($childNodes);
-
-                if (is_array($options)) {
-                    $options = $this->parseValidator($options);
-                }
-
-                $values[] = $this->newConstraint(key($childNodes), $options);
-            } else {
-                if (is_array($childNodes)) {
-                    $childNodes = $this->parseValidator($childNodes);
-                }
-
-                $values[$name] = $childNodes;
-            }
-        }
-
-        return $values;
     }
 
     protected function appendClassAttr(array &$options, $cssClass)
