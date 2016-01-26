@@ -329,7 +329,7 @@ class EmailActivityListProvider implements
      */
     public function isApplicable($entity)
     {
-        return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS;
+        return $this->doctrineHelper->getEntityClass($entity) === self::ACTIVITY_CLASS;
     }
 
     /**
