@@ -76,11 +76,6 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->method('create')
             ->will($this->returnSelf());
 
-        $builder->expects($this->exactly(2))
-            ->method('addViewTransformer')
-            ->with($this->transformer)
-            ->will($this->returnSelf());
-
         $this->type->buildForm($builder, array());
     }
 

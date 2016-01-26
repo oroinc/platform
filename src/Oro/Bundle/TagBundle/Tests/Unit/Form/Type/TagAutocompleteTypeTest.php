@@ -6,7 +6,6 @@ use Oro\Bundle\TagBundle\Form\Type\TagAutocompleteType;
 
 class TagAutocompleteTypeTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var TagAutocompleteType
      */
@@ -18,7 +17,11 @@ class TagAutocompleteTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new TagAutocompleteType($securityFacade);
+        $tagTransformer = $this->getMockBuilder('Oro\Bundle\TagBundle\Form\Transformer\TagTransformer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->type = new TagAutocompleteType($securityFacade, $tagTransformer);
     }
 
     protected function tearDown()

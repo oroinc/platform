@@ -34,7 +34,7 @@ class TagTransformer implements DataTransformerInterface
         $names = [];
         foreach ($tags as $tag) {
             $tag = json_decode($tag, true);
-            if (array_key_exists('name', $tag) === true) {
+            if ($tag && array_key_exists('name', $tag) === true) {
                 $names[] = $tag['name'];
             }
         }
