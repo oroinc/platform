@@ -5,6 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var template = require('tpl!orodatagrid/templates/inline-editing/error-holder.html');
     require('jquery-ui');
 
     InlineEditorErrorHolderView = BaseView.extend({
@@ -34,6 +35,7 @@ define(function(require) {
 
         events: {
             click: 'updatePosition',
+            mouseenter: 'updatePosition',
             updatePosition: 'updatePosition',
             'datepicker:dialogShow': 'updatePosition',
             'datepicker:dialogReposition': 'updatePosition',
@@ -53,14 +55,30 @@ define(function(require) {
             if (!options.within) {
                 throw new Error('Option "within" is required');
             }
+            this._errors = {};
             _.extend(this, _.pick(options, ['within']));
             InlineEditorErrorHolderView.__super__.initialize.call(this, options);
+        },
+
+        render: function() {
+            var $form = this.$('form');
+            this.$('.error-holder').remove();
+            this.$el.toggleClass('has-error', !_.isEmpty(this._errors));
+            if (!_.isEmpty(this._errors)) {
+                if ($form.length && $form.data('validator')) {
+                    $form.data('validator').showErrors(this._errors);
+                } else {
+                    this.$el.append(template({messages: this._errors}));
+                }
+            }
         },
 
         dispose: function() {
             if (this.disposed) {
                 return;
             }
+            this.$('.error-holder').remove();
+            this.$el.removeClass('has-error');
             delete this.within;
             InlineEditorErrorHolderView.__super__.dispose.call(this);
         },
@@ -91,7 +109,7 @@ define(function(require) {
         },
 
         updatePosition: function() {
-            if (!this.$('.validation-failed:first').length) {
+            if (!this.getErrorMessageElements().length) {
                 return;
             }
 
@@ -111,7 +129,7 @@ define(function(require) {
             }
 
             this.$el.addClass(this.POSITION_TOP);
-            var messageRect = this.$('.validation-failed:first')[0].getBoundingClientRect();
+            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
             if (messageRect.top >= withinRect.top) {
                 done = true;
             } else {
@@ -127,7 +145,7 @@ define(function(require) {
             }
 
             this.$el.addClass(this.POSITION_BOTTOM);
-            var messageRect = this.$('.validation-failed:first')[0].getBoundingClientRect();
+            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
             if (messageRect.bottom <= withinRect.bottom) {
                 done = true;
             } else {
@@ -143,7 +161,7 @@ define(function(require) {
             }
 
             this.$el.addClass(this.POSITION_RIGHT);
-            var messageRect = this.$('.validation-failed:first')[0].getBoundingClientRect();
+            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
             if (messageRect.right <= withinRect.right) {
                 done = true;
             } else {
@@ -159,7 +177,7 @@ define(function(require) {
             }
 
             this.$el.addClass(this.POSITION_LEFT);
-            var messageRect = this.$('.validation-failed:first')[0].getBoundingClientRect();
+            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
             if (messageRect.left >= withinRect.left) {
                 done = true;
             } else {
@@ -167,6 +185,29 @@ define(function(require) {
             }
 
             return done;
+        },
+
+        getErrorMessageElements: function() {
+            return this.$('.validation-failed:visible');
+        },
+
+        setErrorMessages: function(errors) {
+            this._errors = errors;
+            this.render();
+        },
+
+        adoptErrorMessage: function() {
+            var errors = {};
+            _.each(this.getErrorMessageElements(), function(label) {
+                var name = label.getAttribute('for');
+                var $input = this.$('#' + name);
+                // if 'for' attribute reference to an input's ID, map it into its name
+                if ($input.length) {
+                    name = $input[0].getAttribute('name');
+                }
+                errors[name] = label.innerText;
+            }, this);
+            this._errors = errors;
         }
     });
 

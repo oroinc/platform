@@ -51,4 +51,18 @@
       }
     }
   }
+  .error-holder {
+    position: absolute;
+    display: none;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  &.error-message-below .error-holder {
+    top: auto;
+    bottom: 0;
+  }
+  &.view-mode:hover .error-holder {
+    display: block;
+  }
 }

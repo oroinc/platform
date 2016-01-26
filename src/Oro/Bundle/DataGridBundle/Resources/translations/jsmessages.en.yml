@@ -88,7 +88,6 @@ oro:
             message:
                 save_field:
                     permission_denied: You do not have permission to change {{ fieldLabel }} field.
-                    validation_error: Field {{ fieldLabel }} was not saved, due to "{{ error }}"
         inline_editing:
             help: |
                 <ul style="margin-bottom: 0px;">

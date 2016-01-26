@@ -79,16 +79,6 @@ define(function(require) {
             this.enterEditMode();
         },
 
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            if (this.options && this.options.cell && this.options.cell.$el) {
-                this.options.cell.$el.removeClass('has-error');
-            }
-            CellPopupEditorComponent.__super__.dispose.apply(this, arguments);
-        },
-
         createView: function() {
             var View = this.options.view;
             var cell = this.options.cell;
@@ -100,6 +90,7 @@ define(function(require) {
             });
             if (this.formState) {
                 this.updateModel(cell.model, this.oldState);
+                this.errorHolderView.render();
                 this.options.plugin.main.trigger('content:update');
                 viewOptions.value = this.formState;
             }
@@ -142,16 +133,14 @@ define(function(require) {
                         this.oldState = _.pick(this.options.cell.model.toJSON(), _.keys(modelUpdateData));
                         this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
                         this.updateModel(this.options.cell.model, modelUpdateData);
+                        this.errorHolderView.render();
                         this.options.plugin.main.trigger('content:update');
                         this.errorHolderView.updatePosition();
                     }
                 }
             });
             viewInstance.trigger('change');
-
-            if (this.backendErrors) {
-                this.view.showBackendErrors(this.backendErrors);
-            }
+            this.errorHolderView.render();
         },
 
         /**
@@ -193,6 +182,7 @@ define(function(require) {
             this.exitEditMode(); // have to exit first, before model is updated, to dispose view properly
 
             this.updateModel(cell.model, modelUpdateData);
+            this.errorHolderView.render();
             this.options.plugin.main.trigger('content:update');
             if (this.options.save_api_accessor.initialOptions.field_name) {
                 var keys = _.keys(serverUpdateData);
@@ -258,6 +248,7 @@ define(function(require) {
          */
         exitEditMode: function(withDispose) {
             if (this.view) {
+                this.errorHolderView.adoptErrorMessage();
                 this.options.cell.$el.removeClass('edit-mode');
                 this.options.cell.$el.addClass('view-mode');
                 this.view.dispose();
@@ -332,7 +323,9 @@ define(function(require) {
         saveAndNavigate: function(method) {
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            plugin[method](cell);
+            if (this.isNavigationAvailable()) {
+                plugin[method](cell);
+            }
         },
 
         /**
@@ -358,7 +351,7 @@ define(function(require) {
             }
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            if (!this.lockUserActions && e.keyCode === this.ENTER_KEY_CODE && !e.ctrlKey) {
+            if (e.keyCode === this.ENTER_KEY_CODE && !e.ctrlKey && this.isNavigationAvailable()) {
                 if (e.shiftKey) {
                     plugin.editPrevRowCell(cell);
                 } else {
@@ -379,7 +372,7 @@ define(function(require) {
             }
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            if (!this.lockUserActions && e.keyCode === this.TAB_KEY_CODE) {
+            if (e.keyCode === this.TAB_KEY_CODE && this.isNavigationAvailable()) {
                 if (e.shiftKey) {
                     plugin.editPrevCell(cell);
                 } else {
@@ -415,7 +408,7 @@ define(function(require) {
             }
             var plugin = this.options.plugin;
             var cell = this.options.cell;
-            if (e.altKey && !this.lockUserActions) {
+            if (e.altKey && this.isNavigationAvailable()) {
                 switch (e.keyCode) {
                     case this.ARROW_LEFT_KEY_CODE:
                         plugin.editPrevCell(cell);
@@ -437,6 +430,10 @@ define(function(require) {
             }
         },
 
+        isNavigationAvailable: function() {
+            return !this.lockUserActions && (!this.view || this.view.isValid());
+        },
+
         onSaveSuccess: function(response) {
             if (!this.options.cell.disposed && this.options.cell.$el) {
                 if (response) {
@@ -450,13 +447,13 @@ define(function(require) {
                     }, this);
                 }
                 this.options.cell.$el
-                    .removeClass('save-fail has-error')
+                    .removeClass('save-fail')
                     .addClassTemporarily('save-success', 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
             delete this.oldState;
             delete this.formState;
-            delete this.backendErrors;
+            this.errorHolderView.setErrorMessages({});
             this.exitEditMode(true);
         },
 
@@ -500,14 +497,8 @@ define(function(require) {
         },
 
         onValidationError: function(jqXHR) {
-            var message;
-            var fieldName;
-            var fieldLabel;
-
             if (!this.options.cell.disposed) {
-                fieldName = this.options.cell.column.get('name');
-                fieldLabel = this.options.cell.column.get('label');
-                this.options.cell.$el.addClass('has-error');
+                var fieldName = this.options.cell.column.get('name');
             }
             if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
                 var backendErrors = {};
@@ -516,10 +507,7 @@ define(function(require) {
                         backendErrors.value = item.errors[0];
                     }
                 }, this);
-                this.backendErrors = backendErrors;
-                message = __('oro.datagrid.inline_editing.message.save_field.validation_error',
-                    {fieldLabel: fieldLabel, error: backendErrors.value});
-                mediator.execute('showFlashMessage', 'error', message);
+                this.errorHolderView.setErrorMessages(backendErrors);
             }
         }
     });
