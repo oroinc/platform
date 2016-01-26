@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Symfony\Component\Yaml\Yaml;
+
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerListConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
-
-use Symfony\Component\Yaml\Yaml;
 
 class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +34,7 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $input, array $expected)
     {
-        $this->assertSame($expected, $this->configuration->processConfiguration($input));
+        $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }
 
     /**
@@ -63,6 +63,9 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
                             'queued'     => true,
                             'time_shift' => 'P1D'
                         ),
+                        array(
+                            'cron'       => '1 2 3 4 5'
+                        ),
                     ),
                 ),
                 'expected' => array(
@@ -73,6 +76,7 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
                             'priority'   => Job::PRIORITY_DEFAULT,
                             'queued'     => false,
                             'time_shift' => null,
+                            'cron'       => null
                         ),
                     ),
                     'second_definition' => array(
@@ -81,7 +85,8 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
                             'field'      => 'status',
                             'priority'   => Job::PRIORITY_HIGH,
                             'queued'     => true,
-                            'time_shift' => 12345
+                            'time_shift' => 12345,
+                            'cron'       => null
                         ),
                         array(
                             'event'      => ProcessTrigger::EVENT_DELETE,
@@ -89,6 +94,15 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
                             'time_shift' => 24 * 3600,
                             'field'      => null,
                             'priority'   => Job::PRIORITY_DEFAULT,
+                            'cron'       => null
+                        ),
+                        array(
+                            'event'      => null,
+                            'field'      => null,
+                            'priority'   => 0,
+                            'queued'     => false,
+                            'time_shift' => null,
+                            'cron'       => '1 2 3 4 5'
                         ),
                     ),
                 ),

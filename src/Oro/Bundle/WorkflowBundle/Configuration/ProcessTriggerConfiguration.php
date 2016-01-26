@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+use Cron\CronExpression;
 use JMS\JobQueueBundle\Entity\Job;
-
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessTriggerConfiguration implements ConfigurationInterface
 {
@@ -26,15 +27,17 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
     /**
      * @param ArrayNodeDefinition $nodeDefinition
      * @return ArrayNodeDefinition
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function addTriggerNodes(ArrayNodeDefinition $nodeDefinition)
     {
         $nodeDefinition
             ->children()
                 ->enumNode('event')
+                    ->defaultNull()
                     ->values(ProcessTrigger::getAllowedEvents())
-                    ->isRequired()
-                    ->cannotBeEmpty()
                 ->end()
                 ->scalarNode('field')
                     ->defaultNull()
@@ -68,11 +71,36 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
                         )
                     ->end()
                 ->end()
+                ->scalarNode('cron')
+                    ->defaultNull()
+                    ->validate()
+                        ->always(
+                            function ($value) {
+                                if ($value !== null) {
+                                    // validate expression string
+                                    CronExpression::factory($value);
+                                }
+
+                                return $value;
+                            }
+                        )
+                    ->end()
+                ->end()
             ->end()
             ->validate()
                 ->always(
                     function ($data) {
-                        if ($data['field'] && $data['event'] != ProcessTrigger::EVENT_UPDATE) {
+                        if ($data['event'] && $data['cron']) {
+                            throw new \LogicException('Only one child node "event" or "cron" must be configured.');
+                        }
+
+                        if ($data['cron'] && ($data['field'] || $data['queued'] || $data['time_shift'])) {
+                            throw new \LogicException(
+                                'Nodes "field", "queued" and "time_shift" are only allowed with event node.'
+                            );
+                        }
+
+                        if ($data['field'] && $data['event'] !== ProcessTrigger::EVENT_UPDATE) {
                             throw new \LogicException('Field is only allowed for update event');
                         }
 
