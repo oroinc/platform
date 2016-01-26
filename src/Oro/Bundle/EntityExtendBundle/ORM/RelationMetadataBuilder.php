@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class RelationMetadataBuilder implements MetadataBuilderInterface
 {
@@ -41,12 +42,14 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function build(ClassMetadataBuilder $metadataBuilder, ConfigInterface $extendConfig)
     {
         $relations = $extendConfig->get('relation', false, []);
         $schema    = $extendConfig->get('schema', false, []);
-        foreach ($relations as $relation) {
+        foreach ($relations as $relationKey => $relation) {
             /** @var FieldConfigId $fieldId */
             $fieldId = $relation['field_id'];
             if ($fieldId && isset($schema['relation'][$fieldId->getFieldName()])) {
@@ -75,6 +78,12 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
                             $targetFieldId,
                             $cascade
                         );
+                        if (!$relation['owner']
+                            && RelationType::ONE_TO_MANY === ExtendHelper::getRelationType($relationKey)
+                            && $this->isDefaultRelationRequired($fieldId)
+                        ) {
+                            $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
+                        }
                         break;
                     case RelationType::MANY_TO_MANY:
                         if ($relation['owner']) {
@@ -85,6 +94,9 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
                                 $targetFieldId,
                                 $cascade
                             );
+                            if ($this->isDefaultRelationRequired($fieldId)) {
+                                $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
+                            }
                         } elseif ($targetFieldId) {
                             $this->buildManyToManyTargetSideRelation(
                                 $metadataBuilder,
@@ -118,7 +130,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             $builder->inversedBy($targetFieldId->getFieldName());
         }
         $builder->addJoinColumn(
-            $this->nameGenerator->generateManyToOneRelationColumnName($fieldId->getFieldName()),
+            $this->getManyToOneColumnName($fieldId),
             'id',
             true,
             false,
@@ -152,11 +164,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             $builder->{'cascade' . ucfirst($cascadeType)}();
         }
         $builder->build();
-
-        $extendFieldConfig = $this->extendConfigProvider->getConfigById($fieldId);
-        if (!$extendFieldConfig->is('without_default')) {
-            $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
-        }
     }
 
     /**
@@ -188,11 +195,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             $builder->{'cascade' . ucfirst($cascadeType)}();
         }
         $builder->build();
-
-        $extendFieldConfig = $this->extendConfigProvider->getConfigById($fieldId);
-        if (!$extendFieldConfig->is('without_default')) {
-            $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
-        }
     }
 
     /**
@@ -236,5 +238,33 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             'SET NULL'
         );
         $builder->build();
+    }
+
+    /**
+     * @param FieldConfigId $fieldId
+     *
+     * @return bool
+     */
+    protected function isDefaultRelationRequired(FieldConfigId $fieldId)
+    {
+        return !$this->extendConfigProvider->getConfigById($fieldId)->is('without_default');
+    }
+
+    /**
+     * @param FieldConfigId $fieldId
+     *
+     * @return string
+     */
+    protected function getManyToOneColumnName(FieldConfigId $fieldId)
+    {
+        $columnName = null;
+        if ($this->extendConfigProvider->hasConfigById($fieldId)) {
+            $columnName = $this->extendConfigProvider->getConfigById($fieldId)->get('column_name');
+        }
+        if (!$columnName) {
+            $columnName = $this->nameGenerator->generateRelationColumnName($fieldId->getFieldName());
+        }
+
+        return $columnName;
     }
 }

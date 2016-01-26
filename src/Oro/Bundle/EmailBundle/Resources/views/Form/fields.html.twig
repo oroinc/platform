@@ -277,7 +277,13 @@
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% set email_origin = form_widget(form.children.origin) %}
+    {% if  form.children.imapAccountType is defined %}
+        {% set imapAccountType = form_widget(form.children.imapAccountType) %}
+    {% endif %}
+    {% if  form.children.origin is defined %}
+        {% set imapAccountType = form_widget(form.children.origin) %}
+    {% endif %}
+
     {% set process = form_row(form.children.processType) ~
         form_widget(form.children.processSettings) %}
     {% set access = form_row(form.children.authorizedUsers) ~
@@ -294,7 +300,7 @@
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
             <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
-            {{ email_origin|raw }}
+            {{ imapAccountType|raw }}
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
             <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>

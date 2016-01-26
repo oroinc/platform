@@ -22,9 +22,9 @@ class EntityDataApiManager
     protected $entityRoutingHelper;
 
     /**
-     * @param EntityFieldManager $entityDataManager
+     * @param EntityFieldManager   $entityDataManager
      * @param AuthorizationChecker $securityService
-     * @param EntityRoutingHelper $entityRoutingHelper
+     * @param EntityRoutingHelper  $entityRoutingHelper
      */
     public function __construct(
         EntityFieldManager $entityDataManager,
@@ -37,11 +37,12 @@ class EntityDataApiManager
     }
 
     /**
-     * @param $className
-     * @param $id
-     * @param $data
+     * @param string $className
+     * @param int    $id
+     * @param array  $data
      *
      * @return array
+     *
      * @throws \Exception
      */
     public function patch($className, $id, $data)
@@ -52,16 +53,15 @@ class EntityDataApiManager
             throw new AccessDeniedException();
         }
 
-        $result = $this->entityDataManager->update($entity, $data);
-
-        return $result;
+        return $this->entityDataManager->update($entity, $data);
     }
 
     /**
-     * @param $className
-     * @param $id
+     * @param string $className
+     * @param int    $id
      *
      * @return object
+     *
      * @throws \Exception
      */
     protected function getEntity($className, $id)

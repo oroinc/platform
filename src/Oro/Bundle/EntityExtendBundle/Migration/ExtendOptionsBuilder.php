@@ -93,7 +93,7 @@ class ExtendOptionsBuilder
         $columnMode           = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
         $columnUnderlyingType = $this->fieldTypeHelper->getUnderlyingType($columnType);
 
-        if (in_array($columnUnderlyingType, RelationType::$anyToAnyRelations)) {
+        if (in_array($columnUnderlyingType, RelationType::$anyToAnyRelations, true)) {
             if (!isset($options['extend'])) {
                 $options['extend'] = [];
             }
@@ -115,15 +115,20 @@ class ExtendOptionsBuilder
                             $options['extend']['target_' . $group] = $values;
                         }
                         break;
+                    default:
+                        $options['extend'][$optionName] = $optionValue;
+                        break;
                 }
             }
 
-            $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
-                $entityClassName,
-                $fieldName,
-                $columnUnderlyingType,
-                $options['extend']['target_entity']
-            );
+            if (!isset($options['extend']['relation_key'])) {
+                $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
+                    $entityClassName,
+                    $fieldName,
+                    $columnUnderlyingType,
+                    $options['extend']['target_entity']
+                );
+            }
         }
 
         $this->result[$entityClassName]['fields'][$fieldName] = [];
@@ -173,7 +178,9 @@ class ExtendOptionsBuilder
 
     /**
      * @param string $sectionName
+     *
      * @return string
+     *
      * @throws \RuntimeException if unknown section name specified
      */
     public function getAuxiliaryConfigType($sectionName)
@@ -192,7 +199,9 @@ class ExtendOptionsBuilder
      * @param string $tableName
      * @param string $customEntityClassName The name of a custom entity
      * @param bool   $throwExceptionIfNotFound
+     *
      * @return string|null
+     *
      * @throws \RuntimeException if an entity class name was not found and $throwExceptionIfNotFound = TRUE
      */
     protected function getEntityClassName($tableName, $customEntityClassName = null, $throwExceptionIfNotFound = true)
@@ -220,13 +229,14 @@ class ExtendOptionsBuilder
      *
      * @param string $tableName
      * @param string $columnName
+     *
      * @return string
      */
     protected function getFieldName($tableName, $columnName)
     {
         $fieldName = $this->entityMetadataHelper->getFieldNameByColumnName($tableName, $columnName);
 
-        return $fieldName ? : $columnName;
+        return $fieldName ?: $columnName;
     }
 
     /**
@@ -234,6 +244,7 @@ class ExtendOptionsBuilder
      *
      * @param array  $options
      * @param string $name
+     *
      * @return mixed
      */
     protected function getAndRemoveOption(array &$options, $name)
