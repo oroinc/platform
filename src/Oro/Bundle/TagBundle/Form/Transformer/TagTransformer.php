@@ -5,17 +5,20 @@ namespace Oro\Bundle\TagBundle\Form\Transformer;
 use Symfony\Component\Form\DataTransformerInterface;
 
 use Oro\Bundle\TagBundle\Entity\TagManager;
-
-use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class TagTransformer implements DataTransformerInterface
 {
     /**  @var TagManager */
     protected $tagManager;
 
+    /**  @var PropertyAccessor */
+    protected $propertyAccessor;
+
     public function __construct(TagManager $tagManager)
     {
         $this->tagManager = $tagManager;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -51,12 +54,12 @@ class TagTransformer implements DataTransformerInterface
         $result = [];
         if (is_array($value)) {
             $result = array_map(
-                function (Tag $tag) {
+                function ($tag) {
                     return json_encode(
                         [
 
-                            'id'   => $tag->getId(),
-                            'name' => $tag->getName(),
+                            'id'   => $this->propertyAccessor->getValue($tag, 'id'),
+                            'name' => $this->propertyAccessor->getValue($tag, 'name'),
                         ]
                     );
                 },

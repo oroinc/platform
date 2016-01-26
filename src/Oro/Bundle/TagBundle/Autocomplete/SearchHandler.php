@@ -4,11 +4,15 @@ namespace Oro\Bundle\TagBundle\Autocomplete;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler as BaseSearchHandler;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class SearchHandler extends BaseSearchHandler
 {
     /** @var SecurityFacade */
     protected $securityFacade;
+
+    /** @var PropertyAccessor */
+    protected $propertyAccessor;
 
     /**
      * @param string         $entityName
@@ -19,7 +23,8 @@ class SearchHandler extends BaseSearchHandler
     {
         parent::__construct($entityName, $properties);
 
-        $this->securityFacade = $securityFacade;
+        $this->securityFacade   = $securityFacade;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -57,14 +62,18 @@ class SearchHandler extends BaseSearchHandler
      */
     public function convertItem($item)
     {
+        $isGranted = $this->securityFacade->isGranted('oro_tag_unassign_global');
+        $isOwner   = $this->propertyAccessor->getValue($item, 'owner');
+
         return [
-            'id'   => json_encode(
+            'id'     => json_encode(
                 [
-                    'id'   => $item->getId(),
-                    'name' => $item->getName(),
+                    'id'   => $this->propertyAccessor->getValue($item, 'id'),
+                    'name' => $this->propertyAccessor->getValue($item, 'name'),
                 ]
             ),
-            'name' => $item->getName()
+            'name'   => $this->propertyAccessor->getValue($item, 'name'),
+            'locked' => !($isGranted || $isOwner)
         ];
     }
 }

@@ -7,33 +7,31 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 /**
- * Class TagSubscriber
- *
- * @package Oro\Bundle\TagBundle\Form\EventSubscriber
- *
  * Loads tagging and assign to entity on pre set
- * Works in way similar to data transformer
  */
 class TagSubscriber implements EventSubscriberInterface
 {
     /** @var TagManager */
-    protected $manager;
+    protected $tagManager;
 
-    /** @var TagTransformer */
-    protected $transformer;
+    /** @var TaggableHelper */
+    protected $taggableHelper;
 
     /** @var Organization|null */
     protected $organization;
 
-    public function __construct(TagManager $manager, TagTransformer $transformer)
+    /**
+     * @param TagManager     $tagManager
+     * @param TaggableHelper $taggableHelper
+     */
+    public function __construct(TagManager $tagManager, TaggableHelper $taggableHelper)
     {
-        $this->manager     = $manager;
-        $this->transformer = $transformer;
+        $this->tagManager     = $tagManager;
+        $this->taggableHelper = $taggableHelper;
     }
 
     /**
@@ -42,26 +40,24 @@ class TagSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SET_DATA => 'preSet',
+            FormEvents::PRE_SET_DATA => 'preSet'
         ];
     }
 
     /**
-     * Loads tagging and transform it to view data
-     *
      * @param FormEvent $event
      */
     public function preSet(FormEvent $event)
     {
         $entity = $event->getForm()->getParent()->getData();
 
-        if (!$entity instanceof Taggable) {
-            // do nothing if new entity or some error
+        if (!$this->taggableHelper->isTaggable($entity)) {
             return;
         }
 
-        $this->manager->loadTagging($entity);
+        $this->tagManager->loadTagging($entity);
+        $tags = $this->tagManager->getPreparedArray($entity, null, $this->organization);
 
-        $event->setData(['autocomplete' => $entity->getTags()->toArray()]);
+        $event->setData(['autocomplete' => $tags]);
     }
 }

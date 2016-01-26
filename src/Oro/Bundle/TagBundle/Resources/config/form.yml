@@ -44,7 +44,7 @@ services:
         class: %oro_tag.form.subscriber.tag_select.class%
         arguments:
             - @oro_tag.tag.manager
-            - @oro_tag.form.transformer.tag_select
+            - @oro_tag.helper.taggable_helper
 
     oro_tag.form.transformer.tag_select:
         class: %oro_tag.form.transformer.tag_select.class%
