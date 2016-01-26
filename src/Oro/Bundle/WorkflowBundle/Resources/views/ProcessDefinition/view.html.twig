@@ -85,25 +85,31 @@
 
         {%- set triggerData -%}
             {%- for trigger in triggers -%}
-                {% set event = 'oro.workflow.block.view.process.trigger.event.' ~ trigger.event  %}
-                {% set when = trigger.queued ?
-                    trigger.timeShift|oro_format_duration :
-                    'oro.workflow.block.view.process.trigger.when.immediately'|trans
-                %}
+                {% if trigger.event is not null %}
+                    {% set event = 'oro.workflow.block.view.process.trigger.event.' ~ trigger.event  %}
+                    {% set when = trigger.queued ?
+                        trigger.timeShift|oro_format_duration :
+                        'oro.workflow.block.view.process.trigger.when.immediately'|trans
+                    %}
 
-                {% if trigger.field %}
-                    {% set field = entityConfig.trigger.field.lable|default(trigger.field) %}
-                    {% set after = '<b>' ~ field ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.after.property'|trans %}
+                    {% if trigger.field %}
+                        {% set field = entityConfig.trigger.field.lable|default(trigger.field) %}
+                        {% set after = '<b>' ~ field ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.after.property'|trans %}
+                    {% else %}
+                        {% set after = '<b>' ~ relatedEntityLabel ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.after.entity'|trans %}
+                    {% endif %}
+
+                    {{ 'oro.workflow.block.view.process.trigger.description'|trans({
+                            '%after%': after,
+                            '%event%': '<b>' ~ event|trans ~ '</b>',
+                            '%when%':  '<b>' ~ when ~ '</b>'
+                        })|raw
+                    }}
                 {% else %}
-                    {% set after = '<b>' ~ relatedEntityLabel ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.after.entity'|trans %}
+                    {{ 'oro.workflow.block.view.process.trigger.cron.description'|trans({
+                        '{{ cron }}': '<b>' ~ trigger.cron ~ '</b>'
+                    })|raw }}
                 {% endif %}
-
-                {{ 'oro.workflow.block.view.process.trigger.description'|trans({
-                        '%after%': after,
-                        '%event%': '<b>' ~ event|trans ~ '</b>',
-                        '%when%':  '<b>' ~ when ~ '</b>'
-                    })|raw
-                }}
                 <br />
             {%- endfor -%}
         {%- endset -%}
