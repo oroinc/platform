@@ -300,6 +300,6 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     protected function alreadyDenied(array $options)
     {
         return array_key_exists('extras', $options) && array_key_exists('isAllowed', $options['extras']) &&
-        ($options['extras']['isAllowed'] !== self::DEFAULT_ACL_POLICY);
+        ($options['extras']['isAllowed'] === false);
     }
 }
