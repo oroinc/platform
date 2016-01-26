@@ -1,8 +1,12 @@
-define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tools'
-    ], function(_, Backbone, BackbonePageableCollection, tools) {
+define(function(require) {
     'use strict';
 
     var PageableCollection;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var BackbonePageableCollection = require('backbone-pageable-collection');
+    var tools = require('oroui/js/tools');
 
     /**
      * Object declares state keys that will be involved in URL-state saving with their shorthands
@@ -645,7 +649,33 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * Fetch collection data
          */
         fetch: function(options) {
+            options = options || {};
+            options.waitForPromises = [];
+
             this.trigger('beforeFetch', this, options);
+
+            if (options.waitForPromises.length) {
+                var deferredFetch = $.Deferred();
+                $.when.apply($, options.waitForPromises).done(_.bind(function() {
+                    this._fetch(options)
+                        .done(function() {
+                            deferredFetch.resolveWith(this, arguments);
+                        })
+                        .fail(function() {
+                            deferredFetch.rejectWith(this, arguments);
+                        });
+                }, this)).fail(function() {
+                    deferredFetch.rejectWith(this, arguments);
+                });
+
+                return deferredFetch.promise();
+
+            } else {
+                return this._fetch(options);
+            }
+        },
+
+        _fetch: function(options) {
             var BBColProto = Backbone.Collection.prototype;
 
             options = _.defaults(options || {}, {reset: true});

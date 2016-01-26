@@ -434,6 +434,10 @@ define(function(require) {
             return !this.lockUserActions && (!this.view || this.view.isValid());
         },
 
+        isChanged: function() {
+            return this.view && this.view.isChanged() || this.oldState;
+        },
+
         onSaveSuccess: function(response) {
             if (!this.options.cell.disposed && this.options.cell.$el) {
                 if (response) {
