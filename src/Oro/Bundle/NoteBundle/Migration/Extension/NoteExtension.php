@@ -8,13 +8,19 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class NoteExtension implements ExtendExtensionAwareInterface
+class NoteExtension implements ExtendExtensionAwareInterface, NameGeneratorAwareInterface
 {
     const NOTE_TABLE_NAME = 'oro_note';
 
     /** @var ExtendExtension */
     protected $extendExtension;
+
+    /** @var ExtendDbIdentifierNameGenerator */
+    protected $nameGenerator;
 
     /**
      * {@inheritdoc}
@@ -22,6 +28,14 @@ class NoteExtension implements ExtendExtensionAwareInterface
     public function setExtendExtension(ExtendExtension $extendExtension)
     {
         $this->extendExtension = $extendExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
+    {
+        $this->nameGenerator = $nameGenerator;
     }
 
     /**
@@ -59,5 +73,21 @@ class NoteExtension implements ExtendExtensionAwareInterface
             $targetTable,
             $targetColumnName
         );
+    }
+
+    /**
+     * Gets an association column name for note relation
+     *
+     * @param string $targetTableName Target entity table name.
+     *
+     * @return string
+     */
+    public function getAssociationColumnName($targetTableName)
+    {
+        $associationName = ExtendHelper::buildAssociationName(
+            $this->extendExtension->getEntityClassByTableName($targetTableName)
+        );
+
+        return $this->nameGenerator->generateManyToOneRelationColumnName($associationName);
     }
 }

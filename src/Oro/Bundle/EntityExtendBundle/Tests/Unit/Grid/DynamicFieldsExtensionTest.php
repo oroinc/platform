@@ -136,7 +136,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $datagridFieldConfig = new Config(
             new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
         );
-        $this->datagridConfigProvider->expects($this->once())
+        $this->datagridConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($datagridFieldConfig));
@@ -159,7 +159,9 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                     'columns'              => [
                         self::FIELD_NAME => [
                             'label'         => $fieldLabel,
-                            'frontend_type' => 'string'
+                            'frontend_type' => 'string',
+                            'renderable'    => false,
+                            'required'      => false
                         ]
                     ],
                     'sorters'              => [
@@ -206,7 +208,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
         );
         $datagridFieldConfig->set('show_filter', true);
-        $this->datagridConfigProvider->expects($this->once())
+        $this->datagridConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($datagridFieldConfig));
@@ -229,7 +231,9 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                     'columns'              => [
                         self::FIELD_NAME => [
                             'label'         => $fieldLabel,
-                            'frontend_type' => 'string'
+                            'frontend_type' => 'string',
+                            'renderable'    => false,
+                            'required'      => false
                         ]
                     ],
                     'sorters'              => [
@@ -435,7 +439,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('addSelect')
-            ->with($relAlias . '.' . $targetFieldName . ' as ' . self::FIELD_NAME)
+            ->with(sprintf('IDENTITY(%s.%s) as %s', $alias, self::FIELD_NAME, self::FIELD_NAME))
             ->will($this->returnSelf());
 
         $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')

@@ -13,12 +13,12 @@ trait ConfigurableCredentialsTrait
      */
     public function configureCredentials(ConfigManager $configManager)
     {
-        $clientIdKey = sprintf('oro_sso.%s_sso_client_id', $this->getName());
+        $clientIdKey = 'oro_google_integration.client_id';
         if ($clientId = $configManager->get($clientIdKey)) {
             $this->options['client_id'] = $clientId;
         }
 
-        $clientSecretKey = sprintf('oro_sso.%s_sso_client_secret', $this->getName());
+        $clientSecretKey = 'oro_google_integration.client_secret';
         if ($clientSecret = $configManager->get($clientSecretKey)) {
             $this->options['client_secret'] = $clientSecret;
         }
