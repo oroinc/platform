@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormGuesserCompilerPass;
 
 class FormGuesserCompilerPassTest extends \PHPUnit_Framework_TestCase

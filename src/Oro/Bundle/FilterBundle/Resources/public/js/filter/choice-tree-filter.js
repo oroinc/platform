@@ -97,7 +97,6 @@ define(function(require) {
             'keydown [type="text"]': '_preventEnterProcessing',
             'keyup input[name="search"]': '_onChangeSearchQuery',
             'click .filter-update': '_onClickUpdateCriteria',
-            'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
             'click .choice-value': '_onClickChoiceValue',
@@ -114,11 +113,6 @@ define(function(require) {
         searchEngine: searchEngine,
 
         checkedItems: {},
-
-        _onClickCriteriaSelector: function() {
-            ChoiceTreeFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
-            this.$el.find('.list').find('input:first').focus();
-        },
 
         /**
          * @inheritDoc
@@ -447,6 +441,10 @@ define(function(require) {
                 this._onChangeMode();
                 $(event.target).addClass('active');
             }
+        },
+
+        _focusCriteria: function() {
+            this.$el.find('.list').find('input:first').focus();
         }
     });
 

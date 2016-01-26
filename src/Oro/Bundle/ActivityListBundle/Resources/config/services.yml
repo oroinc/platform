@@ -162,7 +162,7 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
-            - @oro_activity.manager
+            - @oro_activity.association_helper
             - @oro_activity_list.provider.chain
             - @oro_activity_list.filter.helper
             - @oro_entity.routing_helper

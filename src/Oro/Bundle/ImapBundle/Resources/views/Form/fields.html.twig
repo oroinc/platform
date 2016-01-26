@@ -1,5 +1,9 @@
 {% block oro_imap_configuration_check_widget %}
-    {% set data = form.parent.parent.vars.value %}
+    {% if form.parent.parent.parent is not null %}
+        {% set data = form.parent.parent.parent.vars.value %}
+    {% else %}
+        {% set data = form.parent.parent.vars.value %}
+    {% endif %}
     {% if data and 'oro_user_user_form' in form.parent.parent.vars.full_name %}
         {% set forEntity = 'user' %}
     {% else %}
@@ -30,12 +34,14 @@
 {% endblock %}
 
 {% block oro_imap_choice_account_type_widget %}
+    {% set data = form.parent.vars.value %}
 
-    {% set options = {
-        'url' :  path("oro_imap_change_account_type"),
+    {% set options = form.vars.options|default({})|merge({
+        'route': "oro_imap_change_account_type",
         'formSelector': '#'~formSelector|default(form.vars.id),
-        'formParentName' : form.parent.vars.name
-    } %}
+        'formParentName': form.parent.vars.name,
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
+    }) %}
 
     <div class="container-change-account-type"
         data-page-component-module="oroimap/js/app/components/account-type-component"
@@ -59,15 +65,17 @@
 {% endblock %}
 
 {% block oro_imap_configuration_gmail_widget %}
+    {% set data = form.parent.parent.vars.value %}
 
-    {% set options = {
-        'url' :  path("oro_imap_change_account_type"),
-        'urlGetFolders': path("oro_imap_gmail_connection_check"),
+    {% set options = form.vars.options|default({})|merge({
+        'route': 'oro_imap_change_account_type',
+        'routeGetFolders': "oro_imap_gmail_connection_check",
         'formSelector': '#'~formSelector|default(form.vars.id),
         'googleErrorMessage': '.google-alert',
         'formParentName' : form.parent.parent.vars.name,
-        'type': constant('Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel::ACCOUNT_TYPE_GMAIL')
-    } %}
+        'type': constant('Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel::ACCOUNT_TYPE_GMAIL'),
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
+    }) %}
 
     <div class="container-imap-gmail-container"
          data-page-component-module="oroimap/js/app/components/imap-gmail-component"
@@ -76,7 +84,6 @@
             {%- if form.parent is empty -%}
                 {{ form_errors(form) }}
             {%- endif -%}
-
 
             {% if form.parent.userEmailOrigin.user.vars.value is not empty %}
                 <div class="control-group">

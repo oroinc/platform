@@ -68,67 +68,14 @@ class FieldNodeDefinition extends AbstractNodeDefinition
     }
 
     /**
-     * Prepare definition, set default values
-     *
-     * @param array $definition
-     *
-     * @return array
+     * {@inheritdoc}
      */
     protected function prepareDefinition(array $definition)
     {
         if (!isset($definition['options'])) {
-            $definition['options'] = array();
-        }
-
-        if (isset($definition['options']['constraints'])) {
-            $definition['options']['constraints'] = $this->parseValidator($definition['options']['constraints']);
+            $definition['options'] = [];
         }
 
         return parent::prepareDefinition($definition);
-    }
-
-    /**
-     * @param $name
-     * @param $options
-     * @return mixed
-     *
-     * TODO: use ConstraintFactory here, https://magecore.atlassian.net/browse/BAP-2270
-     */
-    protected function newConstraint($name, $options)
-    {
-        if (strpos($name, '\\') !== false && class_exists($name)) {
-            $className = (string)$name;
-        } else {
-            $className = 'Symfony\\Component\\Validator\\Constraints\\' . $name;
-        }
-
-        return new $className($options);
-    }
-
-    /**
-     * @param array $nodes
-     *
-     * @return array
-     */
-    protected function parseValidator(array $nodes)
-    {
-        $values = array();
-
-
-        foreach ($nodes as $name => $childNodes) {
-            if (is_numeric($name) && is_array($childNodes) && count($childNodes) == 1) {
-                $options = current($childNodes);
-
-                if (is_array($options)) {
-                    $options = $this->parseValidator($options);
-                }
-
-                $values[] = $this->newConstraint(key($childNodes), $options);
-            } else {
-                $values[$name] = $childNodes;
-            }
-        }
-
-        return $values;
     }
 }

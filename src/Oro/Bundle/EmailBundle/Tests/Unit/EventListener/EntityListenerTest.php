@@ -201,7 +201,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('supportOwnerProvider')
             ->will($this->returnValue(true));
         $this->userEmailOwnerProvider
-            ->expects($this->never())
+            ->expects($this->exactly(3))
             ->method('getEmailOwnerClass')
             ->will($this->returnValue(ClassUtils::getClass(new User)));
 
