@@ -93,22 +93,25 @@ class DateHelper
         $items = $this->getDatePeriod($from, $to);
 
         // Adjust time intervals to match
-        if (count($currentItems) != count($items)) {
+        $countCurrentItems = count($currentItems);
+        $countItems = count($items);
+
+        if ($countCurrentItems!= $countItems) {
             $config     = self::getFormatStrings($from, $to);
             $interval   = new \DateInterval($config['intervalString']);
-            while (count($items) != count($currentItems)) {
-                if (count($items) > count($currentItems)) {
+            while ($countItems != $countCurrentItems) {
+                if ($countItems > $countCurrentItems) {
                     $from->add($interval);
-                    $items = $this->getDatePeriod($from, $to);
                 } else {
                     $from->sub($interval);
-                    $items = $this->getDatePeriod($from, $to);
                 }
+                $items = $this->getDatePeriod($from, $to);
+                $countItems = count($items);
             }
         }
 
         foreach ($data as $row) {
-            $key                   = $this->getKey($from, $to, $row);
+            $key = $this->getKey($from, $to, $row);
             if (isset($items[$key])) {
                 $items[$key][$dataKey] = $row[$rowKey];
             }
@@ -116,7 +119,7 @@ class DateHelper
 
         $mixedItems = array_combine(array_keys($currentItems), array_values($items));
         foreach ($mixedItems as $currentDate => $previousData) {
-            $previousData['date']       = $currentItems[$currentDate]['date'];
+            $previousData['date'] = $currentItems[$currentDate]['date'];
             if (isset($currentItems[$currentDate])) {
                 $currentItems[$currentDate] = $previousData;
             }
