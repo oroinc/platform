@@ -68,7 +68,7 @@ oro_datagrid.action.refresh: "Refresh"
 oro:
     datagrid:
         column_manager:
-            title: "Table Settings"
+            title: "Grid Settings"
             tooltip: "Use drag and drop to sort items"
             select_all: "Select All"
             filter:
