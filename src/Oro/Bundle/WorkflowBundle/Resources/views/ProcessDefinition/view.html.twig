@@ -85,7 +85,7 @@
 
         {%- set triggerData -%}
             {%- for trigger in triggers -%}
-                {% if trigger.event is not null %}
+                {% if trigger.event %}
                     {% set event = 'oro.workflow.block.view.process.trigger.event.' ~ trigger.event  %}
                     {% set when = trigger.queued ?
                         trigger.timeShift|oro_format_duration :
@@ -105,12 +105,13 @@
                             '%when%':  '<b>' ~ when ~ '</b>'
                         })|raw
                     }}
-                {% else %}
+                    <br />
+                {% elseif trigger.cron %}
                     {{ 'oro.workflow.block.view.process.trigger.cron.description'|trans({
                         '{{ cron }}': '<b>' ~ trigger.cron ~ '</b>'
                     })|raw }}
+                    <br />
                 {% endif %}
-                <br />
             {%- endfor -%}
         {%- endset -%}
 

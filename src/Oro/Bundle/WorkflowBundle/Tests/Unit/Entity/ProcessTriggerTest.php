@@ -3,11 +3,15 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Cron\CronExpression;
+
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -161,7 +165,7 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
             ->setQueued(true)
             ->setTimeShift(123)
             ->setDefinition($importedDefinition)
-            ->setCron(CronExpression::factory('*/1 * * * *'));
+            ->setCron('*/1 * * * *');
 
         $this->assertProcessTriggerEntitiesEquals($importedEntity, $this->entity, false);
         $this->entity->import($importedEntity);
