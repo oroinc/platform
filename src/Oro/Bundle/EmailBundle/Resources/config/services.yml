@@ -837,7 +837,7 @@ services:
     oro_email.mailbox_email_owner_provider:
         class: %oro_email.mailbox_email_owner_provider.class%
         tags:
-            - { name: oro_email.owner.provider, order: 1 }
+            - { name: oro_email.owner.provider, order: 2 }
 
     oro_email.mailbox_choice_list:
         class: %oro_email.mailbox_choice_list.class%
@@ -957,6 +957,8 @@ services:
 
     oro_email.placeholder.send_email.filter:
         class: %oro_email.placeholder.send_email.filter.class%
+        arguments:
+            - @oro_activity.manager
 
     oro_email.mailer.email_origin_helper:
         class: %oro_email.mailer.email_origin_helper.class%

@@ -192,7 +192,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
                 } elseif (isset($config['constraints'])) {
                     $result = $this->strategyHelper->validateEntity(
                         $scopeData[$code],
-                        $this->getFieldConstraints($config['constraints'])
+                        $this->constraintFactory->parse($config['constraints'])
                     );
 
                     if ($result) {
@@ -203,21 +203,5 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         }
 
         return $errors;
-    }
-
-    /**
-     * @param array $constraints
-     * @return array|Constraint[]
-     */
-    protected function getFieldConstraints(array $constraints)
-    {
-        $constraintObjects = [];
-        foreach ($constraints as $constraint) {
-            foreach ($constraint as $name => $options) {
-                $constraintObjects[] = $this->constraintFactory->create($name, $options);
-            }
-        }
-
-        return $constraintObjects;
     }
 }

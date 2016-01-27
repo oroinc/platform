@@ -171,7 +171,6 @@ define([
                     label: this.labelPrefix + this.label,
                     showLabel: this.showLabel,
                     options: options,
-                    nullLink: this.nullLink,
                     canDisable: this.canDisable,
                     selected: _.extend({}, this.emptyValue, this.value),
                     isEmpty: this.isEmpty()
