@@ -8,14 +8,14 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessTriggerCommand;
+use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Command\Stub\TestOutput;
 
-class ExecuteProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
+class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ExecuteProcessTriggerCommand */
+    /** @var HandleProcessTriggerCommand */
     private $command;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
@@ -70,7 +70,7 @@ class ExecuteProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->command = new ExecuteProcessTriggerCommand();
+        $this->command = new HandleProcessTriggerCommand();
         $this->command->setContainer($this->container);
 
         $this->input   = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
@@ -102,10 +102,12 @@ class ExecuteProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
     public function testExecute($id, $expectedOutput, \Exception $exception = null)
     {
         $this->expectContainerGetManagerRegistryAndProcessHandler();
-        $this->input->expects($this->once())
+        $this->input->expects($this->exactly(2))
             ->method('getOption')
-            ->with('id')
-            ->will($this->returnValue($id));
+            ->willReturnMap([
+                ['id', $id],
+                ['name', 'name'],
+            ]);
 
         $processTrigger = $this->createProcessTrigger($id);
 
@@ -169,15 +171,15 @@ class ExecuteProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             'valid id' => [
                 'id' => 1,
                 'output' => [
-                    'Executing process trigger #1 "label" (name)',
-                    'Process trigger #1 execution name successfully finished in',
+                    'Handle process trigger #1 "label" (name)',
+                    'Process trigger #1 handle name successfully finished in',
                 ],
             ],
             'wrong id' => [
                 'id' => 2,
                 'output' => [
-                    'Executing process trigger #2 "label" (name)',
-                    'Process trigger #2 execution failed: Process 1 exception',
+                    'Handle process trigger #2 "label" (name)',
+                    'Process trigger #2 handle failed: Process 1 exception',
                 ],
                 'exception' => new \Exception('Process 1 exception'),
             ],
@@ -189,10 +191,12 @@ class ExecuteProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
         $this->expectContainerGetManagerRegistryAndProcessHandler();
 
         $id = 1;
-        $this->input->expects($this->once())
+        $this->input->expects($this->exactly(2))
             ->method('getOption')
-            ->with('id')
-            ->will($this->returnValue($id));
+            ->willReturnMap([
+                ['id', $id],
+                ['name', 'name'],
+            ]);
 
         $this->processHandler->expects($this->never())
             ->method($this->anything());
@@ -208,10 +212,12 @@ class ExecuteProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteEmptyNoIdSpecified()
     {
-        $this->input->expects($this->once())
+        $this->input->expects($this->exactly(2))
             ->method('getOption')
-            ->with('id')
-            ->will($this->returnValue(''));
+            ->willReturnMap([
+                ['id', ''],
+                ['name', 'name'],
+            ]);
 
         $this->processHandler->expects($this->never())
             ->method($this->anything());
@@ -225,17 +231,43 @@ class ExecuteProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testExecuteWrongNameSpecified()
+    {
+        $this->expectContainerGetManagerRegistryAndProcessHandler();
+        $id = 1;
+        $this->input->expects($this->exactly(2))
+            ->method('getOption')
+            ->willReturnMap([
+                ['id', $id],
+                ['name', 'wrong_name'],
+            ]);
+
+        $processTrigger = $this->createProcessTrigger($id);
+        $this->repo
+            ->expects($this->once())
+            ->method('find')
+            ->with($id)
+            ->willReturn($processTrigger);
+
+        $this->processHandler->expects($this->never())
+            ->method($this->anything());
+
+        $this->command->execute($this->input, $this->output);
+
+        $this->assertAttributeEquals(
+            ['Trigger not found in process "wrong_name"'],
+            'messages',
+            $this->output
+        );
+    }
+
     protected function expectContainerGetManagerRegistryAndProcessHandler()
     {
         $this->container->expects($this->atLeastOnce())
             ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['doctrine', 1, $this->managerRegistry],
-                        ['oro_workflow.process.process_handler', 1, $this->processHandler],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['doctrine', 1, $this->managerRegistry],
+                ['oro_workflow.process.process_handler', 1, $this->processHandler],
+            ]);
     }
 }

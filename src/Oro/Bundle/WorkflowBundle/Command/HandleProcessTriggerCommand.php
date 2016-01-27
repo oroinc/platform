@@ -13,9 +13,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 
-class ExecuteProcessTriggerCommand extends ContainerAwareCommand
+class HandleProcessTriggerCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:process:trigger:execute';
+    const NAME = 'oro:process:handle-trigger';
 
     /**
      * @var ManagerRegistry
@@ -57,7 +57,7 @@ class ExecuteProcessTriggerCommand extends ContainerAwareCommand
     public function configure()
     {
         $this->setName(self::NAME)
-            ->setDescription('Execute process job with specified identifiers')
+            ->setDescription('Handle process trigger with specified identifier and process name')
             ->addOption(
                 'id',
                 null,
@@ -66,7 +66,7 @@ class ExecuteProcessTriggerCommand extends ContainerAwareCommand
             )->addOption(
                 'name',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Name of the process (optional)'
             );
     }
@@ -77,6 +77,7 @@ class ExecuteProcessTriggerCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $triggerId = $input->getOption('id');
+        $processName = $input->getOption('name');
 
         if (!is_numeric($triggerId)) {
             $output->writeln('<error>No process trigger identifier defined</error>');
@@ -94,6 +95,11 @@ class ExecuteProcessTriggerCommand extends ContainerAwareCommand
             return;
         }
         $processDefinition = $processTrigger->getDefinition();
+
+        if ($processName !== $processDefinition->getName()) {
+            $output->writeln(sprintf('<error>Trigger not found in process "%s"</error>', $processName));
+            return;
+        }
         $entityClass = $processDefinition->getRelatedEntity();
         $processData = new ProcessData();
 
@@ -105,7 +111,7 @@ class ExecuteProcessTriggerCommand extends ContainerAwareCommand
             $start = microtime(true);
             $output->writeln(
                 sprintf(
-                    '<info>[%s] Executing process trigger #%d "%s" (%s)</info>',
+                    '<info>[%s] Handle process trigger #%d "%s" (%s)</info>',
                     (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                     $triggerId,
                     $processDefinition->getLabel(),
@@ -118,7 +124,7 @@ class ExecuteProcessTriggerCommand extends ContainerAwareCommand
             $entityManager->commit();
             $output->writeln(
                 sprintf(
-                    '<info>[%s] Process trigger #%d execution %s successfully finished in %f s</info>',
+                    '<info>[%s] Process trigger #%d handle %s successfully finished in %f s</info>',
                     (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                     $triggerId,
                     $processDefinition->getName(),
@@ -131,7 +137,7 @@ class ExecuteProcessTriggerCommand extends ContainerAwareCommand
 
             $output->writeln(
                 sprintf(
-                    '<error>[%s] Process trigger #%s execution failed: %s</error>',
+                    '<error>[%s] Process trigger #%s handle failed: %s</error>',
                     (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                     $triggerId,
                     $e->getMessage()
