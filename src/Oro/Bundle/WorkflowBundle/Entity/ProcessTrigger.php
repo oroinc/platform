@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
-use Cron\CronExpression;
-
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\JobQueueBundle\Entity\Job;
