@@ -160,11 +160,9 @@ services:
     oro_email.email.cache.manager:
         class: %oro_email.email.cache.manager.class%
         arguments:
-            - @oro_email.email_body_loader_selector
             - @doctrine.orm.entity_manager
             - @event_dispatcher
-        calls:
-            - [setLogger, [@logger]]
+            - @oro_email.email_body_synchronizer
 
     oro_email.email_holder_helper:
         class: %oro_email.email_holder_helper.class%
@@ -957,3 +955,12 @@ services:
         class: %oro_email.mailer.email_origin_helper.class%
         arguments:
             - @oro_entity.doctrine_helper
+
+        oro_email.email_body_synchronizer:
+            class: Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer
+            arguments:
+                - @oro_email.email_body_loader_selector
+                - @doctrine
+                - @event_dispatcher
+            calls:
+                - [setLogger, [@logger]]

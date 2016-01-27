@@ -230,6 +230,12 @@ class Email extends ExtendEmail
      */
     protected $acceptLanguageHeader;
 
+    /**
+     * @var boolean
+     * @ORM\Column(name="body_synced", type="boolean", nullable=true, options={"default"=false})
+     */
+    protected $bodySynced;
+
     public function __construct()
     {
         parent::__construct();
@@ -824,5 +830,25 @@ class Email extends ExtendEmail
     public function __toString()
     {
         return (string)$this->getSubject();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBodySynced()
+    {
+        return $this->bodySynced;
+    }
+
+    /**
+     * @param $bodySynced
+     *
+     * @return Email
+     */
+    public function setBodySynced($bodySynced)
+    {
+        $this->bodySynced = $bodySynced;
+
+        return $this;
     }
 }
