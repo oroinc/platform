@@ -4,13 +4,36 @@ namespace Oro\Bundle\EmailBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
+use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 
 class ChoiceMessageTypeFilter extends ChoiceFilter
 {
+    /** @var EmailOwnerProviderStorage */
+    protected $emailOwnerProviderStorage;
+
+    /**
+     * @param FormFactoryInterface $factory
+     * @param FilterUtility $util
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
+     */
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        EmailOwnerProviderStorage $emailOwnerProviderStorage
+    ) {
+        parent::__construct($factory, $util);
+        $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -49,7 +72,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
     {
         $qb
             ->leftJoin('e.fromEmailAddress', '_fea')
-            ->leftJoin('_fea.owner1', '_fo')
+            ->leftJoin(sprintf('_fea.%s', $this->getUserOwnerFieldName()), '_fo')
             ->leftJoin('eu.owner', '_eo')
             ->andWhere(
                 $qb->expr()->orX(
@@ -72,7 +95,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
     {
         $qb
             ->leftJoin('e.fromEmailAddress', '_fea')
-            ->leftJoin('_fea.owner1', '_fo')
+            ->leftJoin(sprintf('_fea.%s', $this->getUserOwnerFieldName()), '_fo')
             ->leftJoin('eu.owner', '_eo')
             ->andWhere(
                 $qb->expr()->orX(
@@ -86,5 +109,20 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
             )
             ->setParameter('outcoming_types', FolderType::outcomingTypes())
             ->setParameter('incoming_types', FolderType::incomingTypes());
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUserOwnerFieldName()
+    {
+        return $this->emailOwnerProviderStorage->getEmailOwnerFieldName(
+            ArrayUtil::find(
+                function(EmailOwnerProviderInterface $provider) {
+                    return $provider->getEmailOwnerClass() === 'Oro\Bundle\UserBundle\Entity\User';
+                },
+                $this->emailOwnerProviderStorage->getProviders()
+            )
+        );
     }
 }
