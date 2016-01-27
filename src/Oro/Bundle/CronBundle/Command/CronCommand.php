@@ -2,7 +2,13 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -44,10 +50,7 @@ class CronCommand extends ContainerAwareCommand
             return;
         }
 
-        $commands = $this->getApplication()->all('oro:cron');
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $daemon = $this->getContainer()->get('oro_cron.job_daemon');
-        $schedules = $em->getRepository('OroCronBundle:Schedule')->findAll();
         $skipCheckDaemon = $input->getOption('skipCheckDaemon');
 
         // check if daemon is running
@@ -64,28 +67,13 @@ class CronCommand extends ContainerAwareCommand
             }
         }
 
-        foreach ($commands as $name => $command) {
-            $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
+        $schedules = $this->getAllSchedules();
+        $em = $this->getEntityManager('JMSJobQueueBundle:Job');
 
-            if ($this->skipCommand($command, $output)) {
-                continue;
-            }
+        $jobs = $this->processCommands($this->getApplication()->all('oro:cron'), $schedules, $output);
+        $jobs = array_merge($jobs, $this->processSchedules($schedules, $output));
 
-            $schedule = $this->getSchedule($schedules, $name);
-            if (0 === count($schedule)) {
-                $schedule = $this->createSchedule($command, $name, $output);
-                $em->persist($schedule);
-                continue;
-            }
-
-            $schedule = current($schedule);
-            $this->checkDefinition($command, $schedule);
-            $job = $this->createJob($output, $schedule, $name);
-
-            if ($job) {
-                $em->persist($job);
-            }
-        }
+        array_walk($jobs, [$em, 'persist']);
 
         $em->flush();
 
@@ -94,12 +82,83 @@ class CronCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param CronCommandInterface $command
+     * @param array|Command[]|CronCommandInterface[] $commands
+     * @param Collection $schedules
+     * @param OutputInterface $output
+     *
+     * @return array|Job[]
+     */
+    protected function processCommands(array $commands, Collection $schedules, OutputInterface $output)
+    {
+        $jobs = [];
+        $em = $this->getEntityManager('OroCronBundle:Schedule');
+
+        foreach ($commands as $name => $command) {
+            $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
+
+            if ($this->skipCommand($command, $output)) {
+                continue;
+            }
+
+            $matchedSchedules = $this->matchSchedules($schedules, $name);
+            foreach ($matchedSchedules as $schedule) {
+                $schedules->removeElement($schedule);
+            }
+
+            if (0 === count($matchedSchedules)) {
+                $em->persist($this->createSchedule($command, $name, $output));
+
+                continue;
+            }
+
+            $schedule = $matchedSchedules->first();
+            $this->checkDefinition($command, $schedule);
+
+            if ($job = $this->createJob($output, $schedule, $name)) {
+                $jobs[] = $job;
+            }
+        }
+
+        $em->flush();
+
+        return $jobs;
+    }
+
+    /**
+     * @param Collection|Schedule[] $schedules
+     * @param OutputInterface $output
+     *
+     * @return array|Job[]
+     */
+    protected function processSchedules(Collection $schedules, OutputInterface $output)
+    {
+        $jobs = [];
+
+        foreach ($schedules as $schedule) {
+            if (!$this->getApplication()->has($schedule->getCommand())) {
+                continue;
+            }
+
+            $arguments = $schedule->getArguments() ? ' ' . implode(' ', $schedule->getArguments()) : '';
+
+            $output->write(sprintf('Processing command "<info>%s%s</info>": ', $schedule->getCommand(), $arguments));
+
+            $job = $this->createJob($output, $schedule, $schedule->getCommand());
+            if ($job) {
+                $jobs[] = $job;
+            }
+        }
+
+        return $jobs;
+    }
+
+    /**
+     * @param Command $command
      * @param OutputInterface $output
      *
      * @return bool
      */
-    protected function skipCommand(CronCommandInterface $command, OutputInterface $output)
+    protected function skipCommand(Command $command, OutputInterface $output)
     {
         if (!$command instanceof CronCommandInterface) {
             $output->writeln(
@@ -119,22 +178,18 @@ class CronCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param Schedule[] $schedules
+     * @param Collection|Schedule[] $schedules
      * @param string $name
      *
-     * @return array
+     * @return Collection
      */
-    protected function getSchedule(array $schedules, $name)
+    protected function matchSchedules(Collection $schedules, $name)
     {
-        $schedule = array_filter(
-            $schedules,
-            function ($element) use ($name) {
-                /** @var Schedule $element */
-                return $element->getCommand() == $name;
+        return $schedules->filter(
+            function (Schedule $schedule) use ($name) {
+                return $schedule->getCommand() === $name && $schedule->getArguments() === [];
             }
         );
-
-        return $schedule;
     }
 
     /**
@@ -173,18 +228,19 @@ class CronCommand extends ContainerAwareCommand
      * @param Schedule $schedule
      * @param string $name
      *
-     * @return bool|Job
+     * @return null|Job
      */
     protected function createJob(OutputInterface $output, Schedule $schedule, $name)
     {
-        $cronHelper = $this->getContainer()->get('oro_cron.helper.cron');
-        $cron = $cronHelper->createCron($schedule->getDefinition());
+        $cron = $this->getContainer()->get('oro_cron.helper.cron')->createCron($schedule->getDefinition());
+        $arguments = array_values($schedule->getArguments());
+
         /**
          * @todo Add "Oro timezone" setting as parameter to isDue method
          */
         if ($cron->isDue()) {
-            if (!$this->hasJobInQueue($name)) {
-                $job = new Job($name);
+            if (!$this->hasJobInQueue($name, $arguments)) {
+                $job = new Job($name, $arguments);
 
                 $output->writeln('<comment>added to job queue</comment>');
 
@@ -196,18 +252,43 @@ class CronCommand extends ContainerAwareCommand
             $output->writeln('<comment>skipped</comment>');
         }
 
-        return false;
+        return null;
     }
 
     /**
      * @param string $name
+     * @param array $arguments
      *
      * @return bool
      */
-    protected function hasJobInQueue($name)
+    protected function hasJobInQueue($name, array $arguments)
     {
-        $jobManager = $this->getContainer()->get('oro_cron.job_manager');
+        return $this->getContainer()->get('oro_cron.job_manager')->hasJobInQueue($name, json_encode($arguments));
+    }
 
-        return $jobManager->hasJobInQueue($name, '[]');
+    /**
+     * @param string $className
+     * @return ObjectManager
+     */
+    protected function getEntityManager($className)
+    {
+        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+    }
+
+    /**
+     * @param string $className
+     * @return ObjectRepository
+     */
+    protected function getRepository($className)
+    {
+        return $this->getEntityManager($className)->getRepository($className);
+    }
+
+    /**
+     * @return ArrayCollection|Schedule[]
+     */
+    protected function getAllSchedules()
+    {
+        return new ArrayCollection($this->getRepository('OroCronBundle:Schedule')->findAll());
     }
 }

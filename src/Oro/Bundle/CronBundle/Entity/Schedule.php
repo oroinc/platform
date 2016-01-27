@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="oro_cron_schedule", uniqueConstraints={
- *      @ORM\UniqueConstraint(name="UQ_COMMAND", columns={"command"})
+ *      @ORM\UniqueConstraint(name="UQ_COMMAND", columns={"command", "args", "definition"})
  * })
  * @ORM\Entity
  */
@@ -27,6 +27,13 @@ class Schedule
      * @ORM\Column(name="command", type="string", length=255)
      */
     protected $command;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="args", type = "array")
+     */
+    protected $args = [];
 
     /**
      * @var string
@@ -64,6 +71,27 @@ class Schedule
     public function setCommand($command)
     {
         $this->command = $command;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getArguments()
+    {
+        return $this->args;
+    }
+
+    /**
+     * @param array $args
+     * @return Schedule
+     */
+    public function setArguments(array $args)
+    {
+        sort($args);
+
+        $this->args = $args;
 
         return $this;
     }

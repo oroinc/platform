@@ -2,73 +2,23 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-
+use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 
 class LoadProcessConfigurationCommand extends ContainerAwareCommand
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var EntityRepository
-     */
-    protected $definitionRepository;
-
-    /**
-     * @var ProcessConfigurationBuilder
-     */
-    protected $configurationBuilder;
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-        }
-
-        return $this->entityManager;
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    protected function getDefinitionRepository()
-    {
-        if (!$this->definitionRepository) {
-            $this->definitionRepository
-                = $this->getEntityManager()->getRepository('OroWorkflowBundle:ProcessDefinition');
-        }
-
-        return $this->definitionRepository;
-    }
-
-    /**
-     * @return ProcessConfigurationBuilder
-     */
-    protected function getConfigurationBuilder()
-    {
-        if (!$this->configurationBuilder) {
-            $this->configurationBuilder
-                = $this->getContainer()->get('oro_workflow.configuration.builder.process_configuration');
-        }
-
-        return $this->configurationBuilder;
-    }
-
     /**
      * @inheritdoc
      */
@@ -116,6 +66,9 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
         $triggersConfiguration = $processConfiguration[ProcessConfigurationProvider::NODE_TRIGGERS];
         $this->loadTriggers($output, $triggersConfiguration);
 
+        // create cron schedules for process triggers
+        $this->processCronSchedules($output);
+
         // update triggers cache
         $this->getContainer()->get('oro_workflow.cache.process_trigger')->build();
     }
@@ -131,8 +84,8 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
         if ($definitions) {
             $output->writeln('Loading process definitions...');
 
-            $entityManager = $this->getEntityManager();
-            $definitionRepository = $this->getDefinitionRepository();
+            $entityManager = $this->getEntityManager('OroWorkflowBundle:ProcessDefinition');
+            $definitionRepository = $this->getRepository('OroWorkflowBundle:ProcessDefinition');
 
             foreach ($definitions as $definition) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $definition->getName()));
@@ -154,21 +107,25 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * @param OutputInterface $output
+     * @param array $configuration
+     */
     protected function loadTriggers(OutputInterface $output, array $configuration)
     {
         /** @var ProcessDefinition[] $allDefinitions */
-        $allDefinitions = $this->getDefinitionRepository()->findAll();
+        $allDefinitions = $this->getRepository('OroWorkflowBundle:ProcessDefinition')->findAll();
         $definitionsByName = array();
         foreach ($allDefinitions as $definition) {
             $definitionsByName[$definition->getName()] = $definition;
         }
 
-        $triggers = $this->configurationBuilder->buildProcessTriggers($configuration, $definitionsByName);
+        $triggers = $this->getConfigurationBuilder()->buildProcessTriggers($configuration, $definitionsByName);
 
         if ($triggers) {
             $output->writeln('Loading process triggers...');
 
-            $entityManager = $this->getEntityManager();
+            $entityManager = $this->getEntityManager('OroWorkflowBundle:ProcessTrigger');
             $triggerRepository = $entityManager->getRepository('OroWorkflowBundle:ProcessTrigger');
 
             foreach ($triggers as $trigger) {
@@ -176,7 +133,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
                     sprintf(
                         '  <comment>></comment> <info>%s:%s</info>',
                         $trigger->getDefinition()->getName(),
-                        $trigger->getEvent()
+                        $trigger->getEvent() ?: 'cron:' . $trigger->getCron()
                     )
                 );
 
@@ -192,5 +149,81 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
         } else {
             $output->writeln('No process triggers found.');
         }
+    }
+
+    protected function processCronSchedules(OutputInterface $output)
+    {
+        $triggers = $this->getCronTriggers();
+
+        if ($triggers) {
+            $output->writeln('Loading cron schedules for process triggers...');
+
+            $command = HandleProcessTriggerCommand::NAME;
+            $entityManager = $this->getEntityManager('OroCronBundle:Schedule');
+            $scheduleManager = $this->getContainer()->get('oro_cron.schedule_manager');
+
+            foreach ($triggers as $trigger) {
+                $arguments = [
+                    sprintf('--id=%d', $trigger->getId()),
+                    sprintf('--name=%s', $trigger->getDefinition()->getName())
+                ];
+
+                $output->writeln(
+                    sprintf(
+                        '  <comment>></comment> <info>[%s] %s %s</info>',
+                        $trigger->getCron(),
+                        $command,
+                        implode(' ', $arguments)
+                    )
+                );
+
+                if (!$scheduleManager->hasSchedule($command, $arguments, $trigger->getCron())) {
+                    $schedule = $scheduleManager->createSchedule($command, $arguments, $trigger->getCron());
+
+                    $entityManager->persist($schedule);
+                }
+            }
+
+            $entityManager->flush();
+        } else {
+            $output->writeln('No process triggers with cron expression found.');
+        }
+    }
+
+    /**
+     * @param string $className
+     * @return ObjectManager
+     */
+    protected function getEntityManager($className)
+    {
+        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+    }
+
+    /**
+     * @param string $className
+     * @return ObjectRepository
+     */
+    protected function getRepository($className)
+    {
+        return $this->getEntityManager($className)->getRepository($className);
+    }
+
+    /**
+     * @return ProcessConfigurationBuilder
+     */
+    protected function getConfigurationBuilder()
+    {
+        return $this->getContainer()->get('oro_workflow.configuration.builder.process_configuration');
+    }
+
+    /**
+     * @return array|ProcessTrigger[]
+     */
+    protected function getCronTriggers()
+    {
+        /** @var ProcessTriggerRepository $repository */
+        $repository = $this->getRepository('OroWorkflowBundle:ProcessTrigger');
+
+        return $repository->findAllCronTriggers();
     }
 }

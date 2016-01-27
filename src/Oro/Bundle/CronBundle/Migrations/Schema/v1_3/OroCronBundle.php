@@ -16,5 +16,8 @@ class OroCronBundle implements Migration
     {
         $table = $schema->getTable('oro_cron_schedule');
         $table->changeColumn('command', ['length' => 255]);
+        $table->addColumn('args', 'array', []);
+        $table->dropIndex('UQ_COMMAND');
+        $table->addUniqueIndex(['command', 'args', 'definition'], 'UQ_COMMAND');
     }
 }

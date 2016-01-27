@@ -127,9 +127,10 @@ class OroCronBundleInstaller implements Installation
         $table = $schema->createTable('oro_cron_schedule');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('command', 'string', ['length' => 255]);
+        $table->addColumn('args', 'array', []);
         $table->addColumn('definition', 'string', ['notnull' => false, 'length' => 100]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['command'], 'UQ_COMMAND');
+        $table->addUniqueIndex(['command', 'args', 'definition'], 'UQ_COMMAND');
     }
 
     /**

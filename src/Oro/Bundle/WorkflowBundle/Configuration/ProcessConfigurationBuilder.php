@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+use Cron\CronExpression;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -83,9 +84,13 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      */
     public function buildProcessTrigger(array $configuration, ProcessDefinition $definition)
     {
-        $this->assertConfigurationOptions($configuration, array('event'));
-        $event = $configuration['event'];
-        if (!in_array($event, ProcessTrigger::getAllowedEvents())) {
+        $cron = $this->getConfigurationOption($configuration, 'cron', null);
+        if ($cron !== null) {
+            $cron = CronExpression::factory($cron);
+        }
+
+        $event = $this->getConfigurationOption($configuration, 'event', null);
+        if (!$cron && !in_array($event, ProcessTrigger::getAllowedEvents(), true)) {
             throw new InvalidParameterException(sprintf('Event "%s" is not allowed', $event));
         }
 
@@ -98,7 +103,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
             throw new InvalidParameterException('Time shift parameter must be either integer or DateInterval');
         }
 
-        if ($field && $event != ProcessTrigger::EVENT_UPDATE) {
+        if ($field && $event !== ProcessTrigger::EVENT_UPDATE) {
             throw new InvalidParameterException('Field is only allowed for update event');
         }
 
@@ -108,7 +113,8 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
             ->setField($field)
             ->setPriority($priority)
             ->setQueued($queued)
-            ->setDefinition($definition);
+            ->setDefinition($definition)
+            ->setCron($cron);
 
         if ($timeShift instanceof \DateInterval) {
             $trigger->setTimeShiftInterval($timeShift);
