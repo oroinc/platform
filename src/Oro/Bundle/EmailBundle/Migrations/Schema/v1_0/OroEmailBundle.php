@@ -65,6 +65,7 @@ class OroEmailBundle implements Migration
         $table->addColumn('message_id', 'string', ['notnull' => $mandatoryAndIndexedMessageId, 'length' => 255]);
         $table->addColumn('x_message_id', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('x_thread_id', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('body_synced', 'boolean', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         if ($hasFolderId) {
             $table->addIndex(['folder_id'], 'IDX_2A30C171162CB942', []);
