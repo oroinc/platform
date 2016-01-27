@@ -400,7 +400,10 @@ class User extends AbstractPageEntity
         $this->test->byXPath("//button[@id='oro_user_user_form_imapConfiguration_check_connection']")->click();
         $this->waitForAjax();
         $this->waitPageToLoad();
-        $this->test->byXPath("//div[@class='control-group folder-tree']//input[@id='check-all']")->click();
+        $this->test->byXPath(
+            "//div[@class='control-group folder-tree "
+            . "ontrol-group-oro_email_email_folder_tree']//input[@id='check-all']"
+        )->click();
 
         return $this;
     }
