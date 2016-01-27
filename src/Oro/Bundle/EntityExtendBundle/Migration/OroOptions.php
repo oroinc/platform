@@ -25,17 +25,19 @@ class OroOptions
     /**
      * Indicates whether this class contains data for the given scope or attribute
      *
-     * @param string      $scope
-     * @param string|null $code
+     * @param string      $scope        The name of the scope
+     * @param string|null $propertyPath The name or path of an attribute
+     *                                  Names inside a path should be delimited by the dot character (.)
+     *
      * @return bool
      */
-    public function has($scope, $code = null)
+    public function has($scope, $propertyPath = null)
     {
         if (isset($this->options[$scope])) {
             return
-                null === $code ||
-                isset($this->options[$scope][$code]) ||
-                array_key_exists($code, $this->options[$scope]);
+                null === $propertyPath ||
+                isset($this->options[$scope][$propertyPath]) ||
+                array_key_exists($propertyPath, $this->options[$scope]);
         }
 
         return false;
@@ -44,14 +46,16 @@ class OroOptions
     /**
      * Gets the value of the given attribute
      *
-     * @param string $scope
-     * @param string $code
+     * @param string $scope        The name of the scope
+     * @param string $propertyPath The name or path of an attribute
+     *                             Names inside a path should be delimited by the dot character (.)
+     *
      * @return mixed|null The attribute value or NULL if this class does not contain the attribute
      */
-    public function get($scope, $code)
+    public function get($scope, $propertyPath)
     {
-        return isset($this->options[$scope][$code])
-            ? $this->options[$scope][$code]
+        return isset($this->options[$scope][$propertyPath])
+            ? $this->options[$scope][$propertyPath]
             : null;
     }
 
@@ -60,23 +64,24 @@ class OroOptions
      *
      * This method replaces the previous value with the new one
      *
-     * @param string $scope
-     * @param string $code
-     * @param mixed  $val
+     * @param string $scope        The name of the scope
+     * @param string $propertyPath The name or path of an attribute
+     *                             Names inside a path should be delimited by the dot character (.)
+     * @param mixed  $val          A value to be set
      */
-    public function set($scope, $code, $val)
+    public function set($scope, $propertyPath, $val)
     {
         if (!isset($this->options)) {
             $this->options[$scope] = [];
         }
-        $this->options[$scope][$code] = $val;
+        $this->options[$scope][$propertyPath] = $val;
     }
 
     /**
      * Sets the value of auxiliary option
      *
-     * @param string $name
-     * @param string $val
+     * @param string $name The name of auxiliary option. Usually such names start with underscore (_).
+     * @param string $val  A value of auxiliary option
      */
     public function setAuxiliary($name, $val)
     {
@@ -86,24 +91,25 @@ class OroOptions
     /**
      * Merges new value with old value. The attribute type should be an array
      *
-     * @param string $scope
-     * @param string $code
-     * @param mixed  $val
+     * @param string $scope        The name of the scope
+     * @param string $propertyPath The name or path of an attribute
+     *                             Names inside a path should be delimited by the dot character (.)
+     * @param mixed  $val          A value to be added to already existing value
      */
-    public function append($scope, $code, $val)
+    public function append($scope, $propertyPath, $val)
     {
         if (!isset($this->options)) {
             $this->options[$scope] = [];
         }
-        if ($this->has($scope, $code)) {
-            $this->options[$scope][$code] = array_merge(
-                $this->options[$scope][$code],
+        if ($this->has($scope, $propertyPath)) {
+            $this->options[$scope][$propertyPath] = array_merge(
+                $this->options[$scope][$propertyPath],
                 is_array($val) ? $val : [$val]
             );
         } else {
-            $this->options[$scope][$code] = is_array($val) ? $val : [$val];
+            $this->options[$scope][$propertyPath] = is_array($val) ? $val : [$val];
         }
-        $this->markAsAppended($scope, $code);
+        $this->markAsAppended($scope, $propertyPath);
     }
 
     /**
@@ -118,9 +124,9 @@ class OroOptions
 
     /**
      * @param string $scope
-     * @param string $code
+     * @param string $propertyPath
      */
-    protected function markAsAppended($scope, $code)
+    protected function markAsAppended($scope, $propertyPath)
     {
         if (!isset($this->options[self::APPEND_SECTION])) {
             $this->options[self::APPEND_SECTION] = [];
@@ -128,8 +134,8 @@ class OroOptions
         if (!isset($this->options[self::APPEND_SECTION][$scope])) {
             $this->options[self::APPEND_SECTION][$scope] = [];
         }
-        if (!in_array($code, $this->options[self::APPEND_SECTION][$scope])) {
-            $this->options[self::APPEND_SECTION][$scope][] = $code;
+        if (!in_array($propertyPath, $this->options[self::APPEND_SECTION][$scope], true)) {
+            $this->options[self::APPEND_SECTION][$scope][] = $propertyPath;
         }
     }
 }
