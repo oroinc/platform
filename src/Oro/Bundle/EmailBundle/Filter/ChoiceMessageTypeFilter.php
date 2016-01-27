@@ -118,7 +118,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
     {
         return $this->emailOwnerProviderStorage->getEmailOwnerFieldName(
             ArrayUtil::find(
-                function(EmailOwnerProviderInterface $provider) {
+                function (EmailOwnerProviderInterface $provider) {
                     return $provider->getEmailOwnerClass() === 'Oro\Bundle\UserBundle\Entity\User';
                 },
                 $this->emailOwnerProviderStorage->getProviders()
