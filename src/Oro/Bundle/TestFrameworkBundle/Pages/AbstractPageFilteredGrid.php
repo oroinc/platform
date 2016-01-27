@@ -21,7 +21,7 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
     {
         $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "[a[contains(.,'{$filterName}')]]/a[contains(., 'Close')]"
+            . "[*[contains(@class,'filter-criteria-selector')][contains(.,'{$filterName}')]]/a[contains(., 'Close')]"
         )->click();
         $this->waitForAjax();
         return $this;
