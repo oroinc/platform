@@ -955,6 +955,8 @@ services:
 
     oro_email.placeholder.send_email.filter:
         class: %oro_email.placeholder.send_email.filter.class%
+        arguments:
+            - @oro_activity.manager
 
     oro_email.mailer.email_origin_helper:
         class: %oro_email.mailer.email_origin_helper.class%
