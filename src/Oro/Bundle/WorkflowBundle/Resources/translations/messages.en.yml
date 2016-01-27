@@ -100,6 +100,7 @@ oro:
                             create:  created
                             delete:  deleted
                             update:  updated
+                        cron.description: Execute by cron expression: {{ cron }}
                 workflow:
                     default_step: Default step
 
