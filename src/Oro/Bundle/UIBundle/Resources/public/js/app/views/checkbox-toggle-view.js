@@ -12,10 +12,6 @@ define([
             'change': '_onChange'
         },
 
-        requiredOptions: [
-            'relatedCheckboxesSelector'
-        ],
-
         initialize: function(options) {
             if (!_.has(options, 'relatedCheckboxesSelector')) {
                 throw new Error('Required option "relatedCheckboxesSelector" not found.');
