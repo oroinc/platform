@@ -251,7 +251,7 @@ class MigrateOptionSetsToEnums implements
         $query  = sprintf(
             'UPDATE %s SET %s = :enumValueId WHERE id = :entityId',
             $entityTableName,
-            $nameGenerator->generateManyToOneRelationColumnName($entityFieldName)
+            $nameGenerator->generateRelationColumnName($entityFieldName)
         );
         $params = [
             'entityId'    => $entityId,
@@ -293,8 +293,8 @@ class MigrateOptionSetsToEnums implements
             'INSERT INTO %s (%s, %s) SELECT %s, :enumValueId '
             . 'FROM %s WHERE %s = :entityId',
             $nameGenerator->generateManyToManyJoinTableName($entityClassName, $entityFieldName, $enumClassName),
-            $nameGenerator->generateManyToManyRelationColumnName($entityClassName),
-            $nameGenerator->generateManyToManyRelationColumnName($enumClassName),
+            $nameGenerator->generateManyToManyJoinTableColumnName($entityClassName),
+            $nameGenerator->generateManyToManyJoinTableColumnName($enumClassName),
             $entityPkColumnName,
             $entityTableName,
             $entityPkColumnName

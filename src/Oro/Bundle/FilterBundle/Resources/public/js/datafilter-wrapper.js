@@ -25,7 +25,6 @@ define([
                 label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
                 criteriaHint: this._getCriteriaHint(),
-                nullLink: this.nullLink,
                 canDisable: this.canDisable,
                 isEmpty: this.isEmptyValue()
             }));
