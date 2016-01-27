@@ -22,7 +22,7 @@ define(function(require) {
         var handleGridSelect = function(e) {
             e.preventDefault();
 
-            var routeName = urlParts.grid.route;
+            var routeName = (urlParts.grid.gridWidgetView) ? urlParts.grid.gridWidgetView : urlParts.grid.route;
             var routeParams = urlParts.grid.parameters;
 
             var additionalRequestParams = selectorEl.data('select2_query_additional_params');

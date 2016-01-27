@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -60,11 +61,9 @@ class ActivityEntityApiHandler extends ApiFormHandler
      */
     public function process($entity)
     {
-        if ($this->securityFacade->isGranted('EDIT', $entity)) {
-            return parent::process($entity);
-        }
+        $this->checkPermissions($entity);
 
-        return null;
+        return parent::process($entity);
     }
 
     /**
@@ -80,5 +79,15 @@ class ActivityEntityApiHandler extends ApiFormHandler
         $this->activityManager->addActivityTargets($activity, $relations->toArray());
 
         $this->entityManager->flush();
+    }
+
+    /**
+     * @param object $entity
+     */
+    protected function checkPermissions($entity)
+    {
+        if (!$this->securityFacade->isGranted('EDIT', $entity)) {
+            throw new AccessDeniedException();
+        }
     }
 }
