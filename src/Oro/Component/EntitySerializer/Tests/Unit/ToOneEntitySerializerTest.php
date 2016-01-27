@@ -289,8 +289,9 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             $qb,
             [
                 'fields' => [
-                    'groups' => ['exclude' => true],
-                    'owner'  => [
+                    'category' => null,
+                    'groups'   => ['exclude' => true],
+                    'owner'    => [
                         'exclusion_policy' => 'all',
                         'fields'           => [
                             'id'       => null,
