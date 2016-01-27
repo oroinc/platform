@@ -402,7 +402,7 @@ class User extends AbstractPageEntity
         $this->waitPageToLoad();
         $this->test->byXPath(
             "//div[@class='control-group folder-tree "
-            . "ontrol-group-oro_email_email_folder_tree']//input[@id='check-all']"
+            . "control-group-oro_email_email_folder_tree']//input[@id='check-all']"
         )->click();
 
         return $this;
