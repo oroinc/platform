@@ -126,12 +126,18 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $this->manager->selectFolder($folder->getFullName());
 
             $this->em->transactional(function () use ($imapFolder, $folder) {
+                $existingUids = $this->manager->getEmailUIDs();
+
                 $staleImapEmailsQb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
                 $staleImapEmailsQb
-                    ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
-                    ->andWhere('ie.imapFolder = :imap_folder')
-                    ->setParameter('imap_folder', $imapFolder)
-                    ->setParameter('uids', $this->manager->getEmailUIDs());
+                    ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
+                    ->setParameter('imap_folder', $imapFolder);
+
+                if ($existingUids) {
+                    $staleImapEmailsQb
+                        ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
+                        ->setParameter('uids', $existingUids);
+                }
 
                 $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
                     ->setPageCallback(function () {
