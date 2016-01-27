@@ -20,12 +20,13 @@ trait FilteredGridTrait
     {
         $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "/a[contains(.,'{$filterName}')]"
+            . "/*[contains(@class,'filter-criteria-selector')][contains(.,'{$filterName}')]"
         )->click();
 
         $criteria = $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "[a[contains(.,'{$filterName}')]]/div[contains(@class, 'filter-criteria')]"
+            . "[*[contains(@class,'filter-criteria-selector')][contains(.,'{$filterName}')]]"
+            . "/div[contains(@class, 'dropdown-menu')]"
         );
         $input = $criteria->element($this->test->using('xpath')->value("div/div/input[@name='value']"));
 
