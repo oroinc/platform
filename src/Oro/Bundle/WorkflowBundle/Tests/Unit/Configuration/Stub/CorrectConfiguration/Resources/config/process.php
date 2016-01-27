@@ -36,6 +36,7 @@ return array(
                 'priority'   => 10,
                 'queued'     => true,
                 'time_shift' => 123456,
+                'cron'       => null
             ),
             array(
                 'event'      => ProcessTrigger::EVENT_CREATE,
@@ -43,13 +44,23 @@ return array(
                 'time_shift' => 86700,
                 'field'      => null,
                 'priority'   => Job::PRIORITY_DEFAULT,
+                'cron'       => null
             ),
             array(
                 'event'      => ProcessTrigger::EVENT_DELETE,
                 'field'      => null,
                 'priority'   => Job::PRIORITY_DEFAULT,
-                'queued'     => null,
+                'queued'     => false,
                 'time_shift' => null,
+                'cron'       => null
+            ),
+            array(
+                'event'      => null,
+                'field'      => null,
+                'priority'   => Job::PRIORITY_DEFAULT,
+                'queued'     => false,
+                'time_shift' => null,
+                'cron'       => '*/1 * * * *'
             )
         )
     ),
