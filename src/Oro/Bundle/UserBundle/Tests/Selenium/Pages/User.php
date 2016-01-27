@@ -378,7 +378,7 @@ class User extends AbstractPageEntity
     public function setImap($imapSetting)
     {
         $this->test->byXpath(
-            "//div[@class='control-group imap-config check-connection']" .
+            "//div[@class='control-group imap-config check-connection control-group-checkbox']" .
             "//input[@data-ftid='oro_user_user_form_imapConfiguration_useImap']"
         )->click();
         $this->waitForAjax();
