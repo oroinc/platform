@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
@@ -21,7 +20,6 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -43,13 +41,11 @@ class AclPrivilegeRepository
     /**
      * @param AclManager          $manager
      * @param TranslatorInterface $translator
-     * @param Registry            $doctrine
      */
-    final public function __construct(AclManager $manager, TranslatorInterface $translator, Registry $doctrine)
+    public function __construct(AclManager $manager, TranslatorInterface $translator)
     {
         $this->manager = $manager;
         $this->translator = $translator;
-        $this->doctrine = $doctrine;
     }
 
     /**
@@ -82,73 +78,6 @@ class AclPrivilegeRepository
         }
 
         return $result;
-    }
-
-    /**
-     * @param string                $className
-     * @param AclExtensionInterface $extension
-     *
-     * @return EntitySecurityMetadata
-     */
-    protected function getClassMetadata($className, $extension)
-    {
-        $entityClasses = array_filter(
-            $extension->getClasses(),
-            function (EntitySecurityMetadata $entityMetadata) use ($className) {
-                return $entityMetadata->getClassName() == $className;
-            }
-        );
-
-        return reset($entityClasses);
-    }
-
-    /**
-     * @param SID    $sid
-     * @param string $className
-     *
-     * @return ArrayCollection|AclPrivilege[]
-     */
-    public function getFieldsPrivileges(SID $sid, $className)
-    {
-        $extensionKey = 'field';
-        $extension = $this->manager->getExtensionSelector()->select(
-            $extensionKey . ':' . $className
-        );
-        $entityClass = $this->getClassMetadata($className, $extension);
-
-
-        // get class level field ACL
-        $objectIdentity = new OID($extensionKey, $className);
-        $acls = $this->findAcls($sid, [$objectIdentity]);
-
-        // find ACL for the root object identity
-        // root identify for field level ACL is corresponding class level entity ACL
-        $rootOid = new OID('entity', $className);
-        $rootAcl = $this->findAcls($sid, [$rootOid]);
-        $rootAcl = $this->findAclByOid($rootAcl, $rootOid);
-
-        $privileges = new ArrayCollection();
-
-        // loop through the class fields
-        $fields = $this->doctrine->getManagerForClass($className)->getClassMetadata($className)->getFieldNames();
-        foreach ($fields as $fieldName) {
-            $privilege = new AclPrivilege();
-            $privilege->setIdentity(
-                new AclPrivilegeIdentity(
-                    sprintf('%s+%s:%s', $objectIdentity->getIdentifier(), $fieldName, $objectIdentity->getType()),
-                    $fieldName
-                )
-            )
-            ->setGroup($entityClass->getGroup())
-            ->setExtensionKey($extensionKey);
-
-            $this->addPermissions($sid, $privilege, $objectIdentity, $acls, $extension, $rootAcl, $fieldName);
-            $privileges->add($privilege);
-        }
-
-        $this->sortPrivileges($privileges);
-
-        return $privileges;
     }
 
     /**
@@ -216,52 +145,6 @@ class AclPrivilegeRepository
         $this->sortPrivileges($privileges);
 
         return $privileges;
-    }
-
-    /**
-     * @param SID             $sid
-     * @param OID             $oid
-     * @param ArrayCollection $privileges
-     *
-     * @throws \Exception
-     */
-    public function saveFieldPrivileges(SID $sid, OID $oid, ArrayCollection $privileges)
-    {
-        $extension = $this->manager->getExtensionSelector()->select('field:' . $oid->getType());
-
-        /** @var MaskBuilder[] $maskBuilders */
-        $maskBuilders = [];
-        $this->prepareMaskBuilders($maskBuilders, $extension);
-
-        /** @var AclPrivilege $privilege */
-        foreach ($privileges as $privilege) {
-            // compile masks
-            $masks = $this->getPermissionMasks($privilege->getPermissions(), $extension, $maskBuilders);
-
-            $fieldName = explode('+', explode(':', $privilege->getIdentity()->getId())[0])[1];
-
-            foreach ($this->manager->getAces($sid, $oid, $fieldName) as $ace) {
-                if (!$ace->isGranting()) {
-                    // denying ACE is not supported
-                    continue;
-                }
-
-                $mask = $this->findSimilarMask($masks, $ace->getMask(), $extension);
-
-                // as we have already processed $mask, remove it from $masks collection
-                if ($mask !== false) {
-                    $this->manager->setFieldPermission($sid, $oid, $fieldName, $mask);
-                    $this->removeMask($masks, $mask);
-                }
-            }
-
-            // check if we have new masks so far, and process them if any
-            foreach ($masks as $mask) {
-                $this->manager->setFieldPermission($sid, $oid, $fieldName, $mask);
-            }
-        }
-
-        $this->manager->flush();
     }
 
     /**

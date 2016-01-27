@@ -5,6 +5,7 @@ parameters:
     oro_security.acl.sid_manager.class:                        Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
     oro_security.acl.ace_provider.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper
     oro_security.acl.privilege_repository.class:               Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository
+    oro_security.acl.field_privilege_repository.class:         Oro\Bundle\SecurityBundle\Acl\Persistence\FieldAclPrivilegeRepository
     oro_security.acl.extension_selector.class:                 Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
     oro_security.acl.extension.entity.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension
     oro_security.acl.extension.field.class:                    Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension
@@ -103,6 +104,12 @@ services:
 
     oro_security.acl.privilege_repository:
         class: %oro_security.acl.privilege_repository.class%
+        arguments:
+            - @oro_security.acl.manager
+            - @translator
+
+    oro_security.acl.field_privilege_repository:
+        class: %oro_security.acl.field_privilege_repository.class%
         arguments:
             - @oro_security.acl.manager
             - @translator
