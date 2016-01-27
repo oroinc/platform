@@ -170,15 +170,13 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
             return;
         }
 
-        if ($this->isCompoundField($form)) {
-            /** @var FormInterface $child */
-            foreach ($form as $child) {
-                $this->processForm($child, $fieldPath);
-            }
-        } else {
-            $id = $this->getFieldId($fieldPath);
-            $this->addField($fieldPath, $id);
-            $this->processedFields[$fieldPath] = $id;
+        $id = $this->getFieldId($fieldPath);
+        $this->addField($fieldPath, $id);
+        $this->processedFields[$fieldPath] = $id;
+
+        /** @var FormInterface $child */
+        foreach ($form as $child) {
+            $this->processForm($child, $fieldPath);
         }
     }
 
