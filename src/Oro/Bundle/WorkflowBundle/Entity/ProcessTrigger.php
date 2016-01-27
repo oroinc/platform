@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
-use Cron\CronExpression;
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\JobQueueBundle\Entity\Job;
@@ -297,22 +296,22 @@ class ProcessTrigger
     }
 
     /**
-     * @param CronExpression|null $cron
+     * @param string $cron
      * @return ProcessTrigger
      */
-    public function setCron(CronExpression $cron = null)
+    public function setCron($cron)
     {
-        $this->cron = $cron ? $cron->getExpression() : null;
+        $this->cron = $cron;
 
         return $this;
     }
 
     /**
-     * @return CronExpression|null
+     * @return string
      */
     public function getCron()
     {
-        return $this->cron ? CronExpression::factory($this->cron) : null;
+        return $this->cron;
     }
 
     /**

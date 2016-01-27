@@ -6,9 +6,9 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerListConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerListConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
 {

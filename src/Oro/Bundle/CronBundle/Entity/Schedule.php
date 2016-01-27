@@ -24,7 +24,7 @@ class Schedule
     /**
      * @var string
      *
-     * @ORM\Column(name="command", type="string", length=50)
+     * @ORM\Column(name="command", type="string", length=255)
      */
     protected $command;
 
