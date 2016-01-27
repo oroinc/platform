@@ -18,6 +18,7 @@ use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyL
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\CustomGridFieldValidatorCompilerPass;
 
 class OroEntityBundle extends Bundle
 {
@@ -52,6 +53,7 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new DictionaryValueListProviderPass());
         $container->addCompilerPass(new QueryHintResolverPass());
         $container->addCompilerPass(new EntityFieldHandlerPass());
+        $container->addCompilerPass(new CustomGridFieldValidatorCompilerPass());
 
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new GeneratedValueStrategyListenerPass());

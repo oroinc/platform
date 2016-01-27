@@ -82,7 +82,10 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testResolve($config, $expected)
     {
-        $result = $this->resolver->resolve($config, array('testVar' => 'test context var'));
+        $result = $this->resolver->resolve($config, array(
+            'testVar' => 'test context var',
+            'testArray' => ['param' => 'param from array'],
+        ));
         $this->assertEquals($expected, $result);
     }
 
@@ -204,6 +207,14 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('root' => array('node' => 'func3 + test context var + const1')),
+            ),
+            'service call with two parameters ($testArray.param$ and const)' => array(
+                array(
+                    'root' => array(
+                        'node' => '@test.service1->func3($testArray.param$, ' . self::STATIC_CLASS . '::CONST1)'
+                    )
+                ),
+                array('root' => array('node' => 'func3 + param from array + const1')),
             ),
             'service call with two parameters (const and const the same)' => array(
                 array(

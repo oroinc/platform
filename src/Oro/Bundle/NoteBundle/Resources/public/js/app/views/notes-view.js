@@ -70,13 +70,13 @@ define(function(require) {
         },
 
         expandAll: function() {
-            _.each(this.subviews, function(itemView) {
+            _.each(this.getItemViews(), function(itemView) {
                 itemView.toggle(false);
             });
         },
 
         collapseAll: function() {
-            _.each(this.subviews, function(itemView) {
+            _.each(this.getItemViews(), function(itemView) {
                 itemView.toggle(true);
             });
         },
@@ -104,13 +104,13 @@ define(function(require) {
             }
             this._showLoading();
             try {
-                _.each(this.subviews, function(itemView) {
+                _.each(this.getItemViews(), function(itemView) {
                     state[itemView.model.get('id')] = itemView.isCollapsed();
                 });
                 this.collection.fetch({
                     reset: true,
                     success: _.bind(function() {
-                        _.each(this.subviews, function(itemView) {
+                        _.each(this.getItemViews(), function(itemView) {
                             itemView.toggle(state[itemView.model.get('id')]);
                         });
                         this._hideLoading();

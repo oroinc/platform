@@ -312,13 +312,8 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->translator->expects($this->at(0))
+        $this->translator->expects($this->exactly(2))
             ->method('trans')
-            ->with('Class 1')
-            ->will($this->returnArgument(0));
-        $this->translator->expects($this->at(1))
-            ->method('trans')
-            ->with('Class 2')
             ->will($this->returnArgument(0));
 
         $result = $this->repository->getPrivileges($sid);

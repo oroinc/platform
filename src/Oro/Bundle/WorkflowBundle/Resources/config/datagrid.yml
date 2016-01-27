@@ -3,9 +3,9 @@ datagrid:
         options:
             entityHint: processes
             export:     false
+        acl_resource: oro_process_definition_view
         source:
-            type:         orm
-            acl_resource: oro_process_definition_view
+            type: orm
             query:
                 select:
                     - process.name
@@ -100,9 +100,9 @@ datagrid:
         options:
             entityHint: workflowssss
             export:     false
+        acl_resource: oro_workflow_definition_view
         source:
             type: orm
-            acl_resource: oro_workflow_definition_view
             query:
                 select:
                     - w.name as id

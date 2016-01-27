@@ -1,0 +1,25 @@
+{
+    "name": "oro/google-integration-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP Google Integration Bundle",
+    "keywords": ["BAP"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4",
+        "symfony/symfony": "2.7.*",
+        "oro/config-bundle": "dev-master",
+        "oro/migration-bundle": "dev-master",
+        "hwi/oauth-bundle": "~0.3",
+        "oro/ui-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-4": { "Oro\\Bundle\\GoogleIntegrationBundle": "" }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
