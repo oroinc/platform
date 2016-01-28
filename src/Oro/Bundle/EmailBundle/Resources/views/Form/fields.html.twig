@@ -211,14 +211,15 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_widget %}
-    <div id="{{ id }}" class="folder-tree-widget"
+    {% set options = {
+        dataInputSelector: 'input[name="' ~ full_name ~ '"]',
+        checkAllSelector: '.check-all',
+        relatedCheckboxesSelector: '.folder-list :checkbox'
+    } %}
+    <div class="folder-tree-widget"
          data-page-component-module="oroemail/js/app/components/folder-tree-component"
-         data-page-component-options="{{ {
-            dataInputSelector: 'input[name="' ~ full_name ~ '"]',
-            checkAllSelector: '.check-all',
-            relatedCheckboxesSelector: '.folder-list :checkbox'
-         }|json_encode }}">
-        <input class="check-all" type="checkbox"/><label class="folder-label">All</label>
+         data-page-component-options="{{ options|json_encode }}">
+        <input class="check-all" type="checkbox"/><label class="folder-label">{{ "oro.email.imap.folder.checkAll"|trans }}</label>
         <div class="folder-list">
             {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
                 {{ _self.renderFolder(key, folder, form.vars.full_name) }}

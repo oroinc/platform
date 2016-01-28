@@ -1,11 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view'
-], function($, _, BaseView) {
+define(function(require) {
     'use strict';
 
-    var EmailFolderTreeView = BaseView.extend({
+    var EmailFolderTreeView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+
+    EmailFolderTreeView = BaseView.extend({
         dataInputSelector: null,
 
         checkAllSelector: null,

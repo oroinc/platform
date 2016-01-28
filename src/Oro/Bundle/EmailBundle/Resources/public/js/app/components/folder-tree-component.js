@@ -1,9 +1,9 @@
-define([
-    'underscore',
-    'oroui/js/app/components/base/component',
-    'oroemail/js/app/views/email-folder-tree-view'
-],function(_, BaseComponent, EmailFolderTreeView) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var EmailFolderTreeView = require('oroemail/js/app/views/email-folder-tree-view');
 
     return BaseComponent.extend({
         emailFolderTreeView: null,
