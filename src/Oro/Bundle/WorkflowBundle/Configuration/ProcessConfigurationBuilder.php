@@ -84,15 +84,10 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      */
     public function buildProcessTrigger(array $configuration, ProcessDefinition $definition)
     {
-        $cron = $this->getConfigurationOption($configuration, 'cron', null);
-        if ($cron !== null) {
-            $cron = CronExpression::factory($cron);
-        }
-
         $event = $this->getConfigurationOption($configuration, 'event', null);
-        if (!$cron && !in_array($event, ProcessTrigger::getAllowedEvents(), true)) {
-            throw new InvalidParameterException(sprintf('Event "%s" is not allowed', $event));
-        }
+        $cron = $this->getCronExpression($configuration);
+
+        $this->validateEventAndCronParameters($event, $cron);
 
         $field     = $this->getConfigurationOption($configuration, 'field', null);
         $priority  = $this->getConfigurationOption($configuration, 'priority', Job::PRIORITY_DEFAULT);
@@ -123,5 +118,36 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
         }
 
         return $trigger;
+    }
+
+    /**
+     * @param array $configuration
+     * @return string|null
+     */
+    protected function getCronExpression(array $configuration)
+    {
+        $cron = $this->getConfigurationOption($configuration, 'cron', null);
+        if ($cron !== null) {
+            // validate cron expression
+            CronExpression::factory($cron);
+        }
+
+        return $cron;
+    }
+
+    /**
+     * @param string $event
+     * @param string $cron
+     * @throws InvalidParameterException
+     */
+    protected function validateEventAndCronParameters($event, $cron)
+    {
+        if ($cron && $event) {
+            throw new InvalidParameterException('Only one parameter "event" or "cron" must be configured.');
+        }
+
+        if (!$cron && !in_array($event, ProcessTrigger::getAllowedEvents(), true)) {
+            throw new InvalidParameterException(sprintf('Event "%s" is not allowed', $event));
+        }
     }
 }

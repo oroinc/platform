@@ -25,6 +25,8 @@ oro:
             cron_job.label:                Job Queue
             cron_job_shortcut.label:       Jobs List
             cron_job_shortcut.description: List of cron jobs
+            cron_schedule.label:           Cron Schedule
+            cron_schedule.description:     Cron Schedule Tasks
 
         message:
             start:
@@ -61,3 +63,12 @@ oro:
                 terminated: Terminated
                 incomplete: Incomplete
                 unknown:    Unknown
+
+        schedule:
+            entity_label: 'Schedule'
+            entity_plural_label: 'Schedules'
+
+            id.label: 'Id'
+            command.label: 'Command'
+            arguments.label: 'Arguments'
+            definition.label: 'Definition'

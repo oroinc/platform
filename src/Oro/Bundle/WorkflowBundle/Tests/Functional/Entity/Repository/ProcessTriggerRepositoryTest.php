@@ -80,6 +80,11 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         $this->assertTriggersOrder($triggers);
     }
 
+    public function testFindAllCronTriggers()
+    {
+        $this->assertCount(1, $this->repository->findAllCronTriggers());
+    }
+
     /**
      * @param ProcessTrigger[] $triggers
      */

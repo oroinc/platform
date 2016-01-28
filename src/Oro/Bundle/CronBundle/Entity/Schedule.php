@@ -33,7 +33,7 @@ class Schedule
      *
      * @ORM\Column(name="args", type = "array")
      */
-    protected $args = [];
+    protected $arguments = [];
 
     /**
      * @var string
@@ -80,18 +80,18 @@ class Schedule
      */
     public function getArguments()
     {
-        return $this->args;
+        return $this->arguments;
     }
 
     /**
-     * @param array $args
+     * @param array $arguments
      * @return Schedule
      */
-    public function setArguments(array $args)
+    public function setArguments(array $arguments)
     {
-        sort($args);
+        sort($arguments);
 
-        $this->args = $args;
+        $this->arguments = $arguments;
 
         return $this;
     }

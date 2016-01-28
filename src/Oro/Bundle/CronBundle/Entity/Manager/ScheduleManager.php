@@ -36,6 +36,8 @@ class ScheduleManager
     {
         $schedules = $this->getRepository()->findBy(['command' => $command, 'definition' => $definition]);
 
+        sort($arguments);
+
         $schedules = array_filter($schedules, function (Schedule $schedule) use ($arguments) {
             return $schedule->getArguments() == $arguments;
         });
@@ -51,6 +53,14 @@ class ScheduleManager
      */
     public function createSchedule($command, array $arguments, $definition)
     {
+        if (!$command || !$definition) {
+            throw new \InvalidArgumentException('Parameters "command" and "definition" must be specified.');
+        }
+
+        if ($this->hasSchedule($command, $arguments, $definition)) {
+            throw new \LogicException('Schedule with same parameters already exists.');
+        }
+
         $schedule = new Schedule();
         $schedule
             ->setCommand($command)
