@@ -27,10 +27,10 @@
 {% endif %}
 {% if sender is defined %}
     {{ EA.wrapTextToTag(sender|truncate(22, false, '...'), isNew) }}
-{% elseif (recipients|length > 0 and recipients|length < 3) %}
+{% elseif (recipients is defined and recipients|length > 0 and recipients|length < 3) %}
     {{ EA.wrapTextToTag(EA.email_participants_name(recipients, true, false), isNew) }}
 {% else %}
-        {% if recipients|length > 0 %}
+        {% if (recipients is defined and recipients|length > 0) %}
             {% set firstEmail = recipients|first %}
             {% set lastEmail = recipients|last %}
             {% set firstLastRecipients =
