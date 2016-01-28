@@ -9,11 +9,17 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class ActivityExtension implements ExtendExtensionAwareInterface
+class ActivityExtension implements ExtendExtensionAwareInterface, NameGeneratorAwareInterface
 {
     /** @var ExtendExtension */
     protected $extendExtension;
+
+    /** @var ExtendDbIdentifierNameGenerator */
+    protected $nameGenerator;
 
     /**
      * {@inheritdoc}
@@ -21,6 +27,14 @@ class ActivityExtension implements ExtendExtensionAwareInterface
     public function setExtendExtension(ExtendExtension $extendExtension)
     {
         $this->extendExtension = $extendExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
+    {
+        $this->nameGenerator = $nameGenerator;
     }
 
     /**
@@ -84,6 +98,31 @@ class ActivityExtension implements ExtendExtensionAwareInterface
                     'without_default' => true
                 ]
             ]
+        );
+    }
+
+    /**
+     * Gets a table name for many-to-many relation
+     *
+     * @param string $activityTableName Activity entity table name. It is owning side of the association.
+     * @param string $targetTableName   Target entity table name.
+     *
+     * @return string
+     */
+    public function getAssociationTableName($activityTableName, $targetTableName)
+    {
+        $sourceClassName = $this->extendExtension->getEntityClassByTableName($activityTableName);
+        $targetClassName = $this->extendExtension->getEntityClassByTableName($targetTableName);
+
+        $associationName = ExtendHelper::buildAssociationName(
+            $targetClassName,
+            ActivityScope::ASSOCIATION_KIND
+        );
+
+        return $this->nameGenerator->generateManyToManyJoinTableName(
+            $sourceClassName,
+            $associationName,
+            $targetClassName
         );
     }
 }

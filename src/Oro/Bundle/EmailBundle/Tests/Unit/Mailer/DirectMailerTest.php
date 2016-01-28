@@ -15,6 +15,9 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $userEmailOrigin;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $imapEmailGoogleOauth2Manager;
+
     protected function setUp()
     {
         $this->baseMailer = $this->getMailerMock();
@@ -33,6 +36,12 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $this->userEmailOrigin->expects($this->any())
             ->method('getUser')
             ->will($this->returnValue('user1'));
+
+        $managerClass = 'Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager';
+        $this->imapEmailGoogleOauth2Manager = $this->getMockBuilder($managerClass)
+            ->disableOriginalConstructor()
+            ->setMethods(['getAccessTokenWithCheckingExpiration'])
+            ->getMock();
     }
 
     public function testSendNonSpooled()
@@ -62,7 +71,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $transport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
@@ -111,7 +120,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $realTransport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
@@ -145,7 +154,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $transport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
@@ -181,7 +190,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_security.encoder.mcrypt'))
             ->will($this->returnValue($encoder));
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
 
         $transport->expects($this->once())->method('setHost');
         $transport->expects($this->once())->method('setPort');
@@ -207,7 +216,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_security.encoder.mcrypt'))
             ->will($this->returnValue($encoder));
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
 
         $transport->expects($this->never())->method('setHost');
         $transport->expects($this->never())->method('setPort');
@@ -229,7 +238,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->method('getTransport')
             ->will($this->returnValue($transport));
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
         $plugin = $this->getMock('\Swift_Events_EventListener');
         $mailer->registerPlugin($plugin);
     }

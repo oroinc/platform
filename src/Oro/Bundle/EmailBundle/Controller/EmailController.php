@@ -381,11 +381,18 @@ class EmailController extends Controller
      */
     public function userEmailsSyncAction()
     {
-        $this->get('oro_email.email_synchronization_manager')->syncOrigins(
-            $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
-                $this->get('oro_security.security_facade')->getLoggedUserId()
-            )
-        );
+        try {
+            $this->get('oro_email.email_synchronization_manager')->syncOrigins(
+                $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
+                    $this->get('oro_security.security_facade')->getLoggedUserId()
+                )
+            );
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                ['error' => $this->get('translator')->trans('oro.email.action.message.error')],
+                Codes::HTTP_OK
+            );
+        }
 
         return new JsonResponse([], Codes::HTTP_OK);
     }

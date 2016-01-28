@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -46,16 +48,33 @@ class MailboxManager
      * Returns a list of mailboxes available to user logged under organization.
      *
      * @param User|integer $user User or user id
-     * @param Organization $organization|null
+     * @param Organization|null $organization
      *
      * @return Collection|Mailbox[] Array or collection of Mailboxes
      */
     public function findAvailableMailboxes($user, Organization $organization = null)
     {
-        $qb = $this->registry->getRepository('OroEmailBundle:Mailbox')
-            ->createAvailableMailboxesQuery($user, $organization);
+        return $this->createAvailableMailboxesQuery($user, $organization)
+            ->getQuery()
+            ->getResult();
+    }
 
-        return $qb->getQuery()->getResult();
+    /**
+     * Returns a list of mailbox emails available to user logged under organization.
+     *
+     * @param User|integer $user User or user id
+     * @param Organization|null $organization
+     *
+     * @return string[] Emails
+     */
+    public function findAvailableMailboxEmails($user, Organization $organization = null)
+    {
+        $result = $this->createAvailableMailboxesQuery($user, $organization)
+            ->select('mb.email AS email')
+            ->getQuery()
+            ->getResult();
+
+        return array_map('current', $result);
     }
 
     /**
@@ -71,5 +90,17 @@ class MailboxManager
             'organization' => $organization,
             'isActive' => true,
         ]);
+    }
+
+    /**
+     * @param User|integer $user User or user id
+     * @param Organization|integer|null $organization
+     *
+     * @return QueryBuilder
+     */
+    protected function createAvailableMailboxesQuery($user, Organization $organization = null)
+    {
+        return $this->registry->getRepository('OroEmailBundle:Mailbox')
+            ->createAvailableMailboxesQuery($user, $organization);
     }
 }
