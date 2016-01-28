@@ -147,7 +147,7 @@ define([
         _getSelectedChoices: function(value, choices) {
             return _.reduce(
                 choices,
-                function (result, choice) {
+                function(result, choice) {
                     if (_.has(choice, 'choices')) {
                         return result.concat(this._getSelectedChoices(value, choice.choices));
                     }
