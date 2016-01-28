@@ -753,6 +753,7 @@ define(function(require) {
                         return;
                     }
                     this._afterLayoutInit();
+                    this.trigger('widgetReady', this);
                 }, this));
         },
 

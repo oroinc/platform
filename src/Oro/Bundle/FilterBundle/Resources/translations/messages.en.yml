@@ -1,5 +1,6 @@
 oro:
     filter:
+        reset.label: Clear All Filters
         form:
             label_type_equal:             "="
             label_type_not_equal:         "<>"

@@ -19,7 +19,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDescription()
     {
-        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.bin';
         $options     = ['test'];
 
         $this->commandExecutor->expects($this->once())
@@ -52,7 +52,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
     public function testExecute()
     {
         $logger = new ArrayLogger();
-        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.bin';
         $options     = ['test'];
 
         $this->commandExecutor->expects($this->once())
