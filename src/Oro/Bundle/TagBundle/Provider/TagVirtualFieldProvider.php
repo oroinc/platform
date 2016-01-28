@@ -45,7 +45,8 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
             'select' => [
                 'expr'        => 'entity.' . $this->doctrineHelper->getSingleEntityIdentifierFieldName($className),
                 'label'       => 'oro.tag.entity_plural_label',
-                'return_type' => 'tag'
+                'return_type' => 'tag',
+                'related_entity_name' => 'Oro\Bundle\TagBundle\Entity\Tag',
             ]
         ];
     }
