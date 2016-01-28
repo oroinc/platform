@@ -26,7 +26,7 @@ define(function(require) {
             });
 
             this.dataInputSelector = options.dataInputSelector;
-            this.$el.closest('form').on('submit'  + this.eventNamespace(), _.bind(this._onSubmit, this));
+            this.$el.closest('form').on('submit' + this.eventNamespace(), _.bind(this._onSubmit, this));
 
             this.checkAllSelector = options.checkAllSelector;
             this.relatedCheckboxesSelector = options.relatedCheckboxesSelector;
