@@ -347,11 +347,9 @@ class AttachmentManager
      */
     public function getAttachmentIconClass(File $entity)
     {
-        if (isset($this->fileIcons[$entity->getExtension()])) {
-            return $this->fileIcons[$entity->getExtension()];
-        }
-
-        return $this->fileIcons['default'];
+        return isset($this->fileIcons[$entity->getExtension()])
+            ? $this->fileIcons[$entity->getExtension()]
+            : $this->fileIcons['default'];
     }
 
     /**
