@@ -104,10 +104,6 @@ class ExtendConfigDumper
      */
     public function addExtension(AbstractEntityConfigDumperExtension $extension, $priority = 0)
     {
-        if (!isset($this->extensions[$priority])) {
-            $this->extensions[$priority] = [];
-        }
-
         $this->extensions[$priority][] = $extension;
     }
 
