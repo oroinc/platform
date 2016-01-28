@@ -126,7 +126,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                                 'join' => [
                                     'left' => [
                                         [
-                                            'join'  => sprintf('entity.%s', $associationName),
+                                            'join'  => 'entity.' . $associationName,
                                             'alias' => 'target'
                                         ]
                                     ]
