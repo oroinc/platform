@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
+use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 
 class EntityDataApiManager
 {
@@ -53,7 +54,11 @@ class EntityDataApiManager
             throw new AccessDeniedException();
         }
 
-        return $this->entityDataManager->update($entity, $data);
+        try {
+            return $this->entityDataManager->update($entity, $data);
+        } catch (FieldUpdateAccessException $e) {
+            throw new AccessDeniedException($e->getMessage(), $e);
+        }
     }
 
     /**
