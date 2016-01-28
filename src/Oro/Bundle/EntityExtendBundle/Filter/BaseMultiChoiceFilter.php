@@ -30,7 +30,9 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
-        $metadata['class'] = $this->params['options']['class'];
+        if (isset($this->params['options']['class'])) {
+            $metadata['class'] = $this->params['options']['class'];
+        }
 
         return $metadata;
     }
