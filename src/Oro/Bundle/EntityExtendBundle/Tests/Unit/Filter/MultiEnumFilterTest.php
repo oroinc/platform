@@ -179,10 +179,7 @@ class MultiEnumFilterTest extends OrmTestCase
             'SELECT o.id FROM Stub:TestEntity o WHERE o.values IN(:param1)',
             $result
         );
-            $this->assertEquals(
-            $values,
-            $qb->getParameter('param1')->getValue()
-        );
+        $this->assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
     public function testApplyNot()

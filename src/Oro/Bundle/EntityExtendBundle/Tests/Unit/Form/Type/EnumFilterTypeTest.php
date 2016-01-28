@@ -213,6 +213,10 @@ class EnumFilterTypeTest extends TypeTestCase
                 ],
                 'expectedOptions' => [
                     'enum_code'     => null,
+                    'operator_choices' => [
+                        1 => 'None',
+                        2 => 'None'
+                    ],
                     'class'         => 'Extend\Entity\EV_Test_Enum',
                     'null_value'    => ':empty:',
                     'field_options' => [

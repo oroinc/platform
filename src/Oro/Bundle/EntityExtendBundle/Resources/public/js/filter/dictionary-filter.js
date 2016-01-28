@@ -146,7 +146,7 @@ define([
             select2element.attr('multiple', 'multiple');
             select2element.select2(select2Config);
             if (this.templateTheme) {
-                select2element.on('change', function () {
+                select2element.on('change', function() {
                     self.applyValue();
                 });
             }
@@ -251,7 +251,7 @@ define([
             return selectedChoiceLabel;
         },
 
-        _refreshWidth: function () {
+        _refreshWidth: function() {
             var valueFrame = this.$('.value-field-frame');
             // update left and right margins of value field frame
             var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
