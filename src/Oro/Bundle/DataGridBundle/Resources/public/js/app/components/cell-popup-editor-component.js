@@ -156,7 +156,7 @@ define(function(require) {
          * @returns {number}
          */
         getWidthIncrement: function() {
-            return 67;
+            return 48;
         },
 
         /**

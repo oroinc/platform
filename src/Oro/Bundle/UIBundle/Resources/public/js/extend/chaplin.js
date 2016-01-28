@@ -176,7 +176,7 @@ define([
 
         // jshint -W107
         // not link to same page and not javascript code link
-        if (!Chaplin.mediator.execute('compareUrl', href) && href.substr(0, 11) !== 'javascript:') {
+        if (href && !Chaplin.mediator.execute('compareUrl', href) && href.substr(0, 11) !== 'javascript:') {
             Chaplin.mediator.publish('openLink:before', payload);
         }
 

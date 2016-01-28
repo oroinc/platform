@@ -133,6 +133,7 @@ define(function(require) {
                 openOnEnter: false,
                 selectOnBlur: false,
                 noFocus: true,
+                dropdownCssClass: 'inline-editor__select2-drop',
                 formatSelection: function(item) {
                     return item.label;
                 },

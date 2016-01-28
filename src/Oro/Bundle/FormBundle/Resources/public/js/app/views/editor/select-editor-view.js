@@ -157,6 +157,7 @@ define(function(require) {
                 allowClear: !this.getValidationRules().NotBlank,
                 selectOnBlur: false,
                 openOnEnter: false,
+                dropdownCssClass: 'inline-editor__select2-drop',
                 data: {results: this.availableChoices}
             };
         },
@@ -186,10 +187,10 @@ define(function(require) {
                 return;
             }
             select2.dropdown.on('mousedown' + this.eventNamespace(), _.bind(function() {
-                this._isFocused = true;// to suppress focusout event
+                this._isSelection = true;// to suppress focusout event
             }, this));
             select2.dropdown.on('mouseup' + this.eventNamespace(), _.bind(function() {
-                this._isFocused = false;
+                delete this._isSelection;
             }, this));
         },
 
@@ -217,7 +218,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onFocusout: function(e) {
-            if (!$('.select2-drop').has(e.relatedTarget).length && !this._isFocused) {
+            if (!this._isSelection && !(e.relatedTarget && $('.select2-drop').has(e.relatedTarget).length)) {
                 SelectEditorView.__super__.onFocusout.call(this, e);
             }
         },
