@@ -130,7 +130,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
 
             $entity = $form->getData();
             foreach ($expectedModelData as $name => $value) {
-                if ($name == 'userEmailOrigin') {
+                if ($name === 'userEmailOrigin') {
                     $userEmailOrigin = $this->readAttribute($entity, $name);
 
                     if ($userEmailOrigin) {
@@ -154,86 +154,86 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
      */
     public function setDataProvider()
     {
-        return array(
-            'should have only accountType field' => array(
-                array(
-                    'accountType'       => '',
-                    'userEmailOrigin'       => [
-                        'user'=>'test',
+        return [
+            'should have only accountType field' => [
+                [
+                    'accountType' => '',
+                    'userEmailOrigin' => [
+                        'user' => 'test',
                         'imapHost' => '',
                         'imapPort' => '',
                         'imapEncryption' => '',
-                        'accessTokenExpiresAt' =>'',
+                        'accessTokenExpiresAt' => '',
                     ],
-                ),
-                array(
-                    'accountType'       => ''
-                ),
-                array(
-                    'accountType'        => '',
-                    'userEmailOrigin'   => null
-                ),
-            ),
-            'should have accountType field and ConnectionGmailType' => array(
-                array(
-                    'accountType'       => 'gmail',
-                    'userEmailOrigin'       => [
-                        'user'=>'test',
+                ],
+                [
+                    'accountType' => ''
+                ],
+                [
+                    'accountType' => '',
+                    'userEmailOrigin' => null
+                ],
+            ],
+            'should have accountType field and ConnectionGmailType' => [
+                [
+                    'accountType' => 'gmail',
+                    'userEmailOrigin' => [
+                        'user' => 'test',
                         'imapHost' => '',
                         'imapPort' => '',
                         'imapEncryption' => '',
-                        'accessTokenExpiresAt' =>new \DateTime(),
+                        'accessTokenExpiresAt' => new \DateTime(),
                         'accessToken' => 'token',
                         'googleAuthCode' => 'googleAuthCode'
                     ],
-                ),
-                array(
-                    'accountType'       => 'gmail',
+                ],
+                [
+                    'accountType' => 'gmail',
                     'userEmailOrigin' => $this->getUserEmailOrigin([
                         'user' => 'test',
                         'accessTokenExpiresAt' => new \DateTime(),
-                        'googleAuthCode'    => 'googleAuthCode',
+                        'googleAuthCode' => 'googleAuthCode',
                         'accessToken' => 'token',
                     ])
-                ),
-                array(
-                    'accountType'        => 'gmail',
+                ],
+                [
+                    'accountType' => 'gmail',
                     'userEmailOrigin' => $this->getUserEmailOrigin([
                         'user' => 'test',
                         'accessTokenExpiresAt' => new \DateTime(),
-                        'googleAuthCode'    => 'googleAuthCode',
+                        'googleAuthCode' => 'googleAuthCode',
                         'accessToken' => 'token'
                     ])
-                ),
-            ),
-            'should have accountType field and ConnectionType' => array(
-                array(
-                    'accountType'       => 'other',
-                    'userEmailOrigin'       => [
-                        'user'=>'test',
+                ],
+            ],
+            'should have accountType field and ConnectionType' => [
+                [
+                    'accountType' => 'other',
+                    'userEmailOrigin' => [
+                        'user' => 'test',
                         'imapHost' => '',
                         'imapPort' => '',
                         'imapEncryption' => '',
                         'accessTokenExpiresAt' => new \DateTime(),
                         'accessToken' => '',
                         'googleAuthCode' => 'googleAuthCode',
-                        'password'=> '111'
+                        'password' => '111'
                     ],
-                ),
-                array(
-                    'accountType'       => 'other',
-                ),
-                array(
-                    'accountType'        => 'other',
+                ],
+                [
+                    'accountType' => 'other',
+                ],
+                [
+                    'accountType' => 'other',
                     'userEmailOrigin' => $this->getUserEmailOrigin([
                         'user' => 'test',
                         'accessTokenExpiresAt' => null,
-                        'googleAuthCode'    => null,
+                        'googleAuthCode' => null,
                         'password' => '111'
                     ])
-                ),
-            )
-        );
+                ],
+            ]
+        ];
     }
 
     /**
