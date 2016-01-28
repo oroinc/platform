@@ -560,11 +560,13 @@ class TagManager
                 $tagIds->toArray()
             );
 
-        } elseif (!is_array($tagIds)) {
-            return [];
         }
 
-        return $tagIds;
+        if (is_array($tagIds)) {
+            return $tagIds;
+        }
+
+        return [];
     }
 
     /**
