@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Helper;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use FOS\RestBundle\Util\Codes;
+
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 

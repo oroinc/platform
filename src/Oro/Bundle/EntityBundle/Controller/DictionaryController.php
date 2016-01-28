@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
