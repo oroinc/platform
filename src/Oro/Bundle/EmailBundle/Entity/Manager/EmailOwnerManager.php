@@ -180,8 +180,6 @@ class EmailOwnerManager
                 'owner' => false
             ];
         }
-
-        return $emailOwnerData;
     }
 
     /**

@@ -162,7 +162,7 @@ class EntityListener
                 $metadata = $em->getClassMetadata($class);
 
                 return new Job(
-                    'oro:email:update-email-owner-emails',
+                    'oro:email:update-email-owner-associations',
                     [
                         'class' => ClassUtils::getClass($entity),
                         'id' => $metadata->getIdentifierValues($entity)[$metadata->getSingleIdentifierFieldName()],

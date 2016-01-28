@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 
-class UpdateEmailOwnerEmailsCommand extends ContainerAwareCommand
+class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
 {
     const OWNER_CLASS_ARGUMENT = 'class';
     const OWNER_ID_ARGUMENT = 'id';
@@ -24,7 +24,7 @@ class UpdateEmailOwnerEmailsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:email:update-email-owner-emails')
+            ->setName('oro:email:update-email-owner-associations')
             ->setDescription('Updates emails for email owner')
             ->addArgument(static::OWNER_CLASS_ARGUMENT, InputArgument::REQUIRED)
             ->addArgument(static::OWNER_ID_ARGUMENT, InputArgument::REQUIRED);

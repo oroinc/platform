@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmail;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
@@ -11,11 +13,16 @@ use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 
 class EmailOwnerManagerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailOwnerProviderStorage */
     protected $emailOwnerProviderStorage;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailAddressManager */
     protected $emailAddressManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailOwnerManager */
     protected $emailOwnerManager;
 
+    /** @var array */
     protected $fixtures;
 
     public function setUp()

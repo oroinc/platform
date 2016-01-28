@@ -2,17 +2,25 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailEntity;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestThread;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
 class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var  \PHPUnit_Framework_MockObject_MockObject|EmailThreadProvider */
     protected $emailThreadProvider;
+
+    /** @var  \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $em;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject|EmailThreadManager */
     protected $emailThreadManager;
 
+    /** @var array */
     protected $fixtures = [];
 
     public function setUp()
@@ -56,8 +64,13 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider updateThreadsDataProvider
      */
-    public function testUpdateThreads(array $newEmails, array $threadIds, array $expectedEmails)
-    {
+    public function testUpdateThreads(
+        array $newEmails,
+        array $threadIds,
+        array $emailReferences,
+        array $expectedEmails,
+        array $expectedReferences
+    ) {
         $consecutiveThreads = array_map(
             function ($threadId) {
                 return $this->findFixtureBy($threadId, 'threads');
@@ -70,10 +83,11 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
             ->will(call_user_func_array([$this, 'onConsecutiveCalls'], $consecutiveThreads));
         $this->emailThreadProvider->expects($this->any())
             ->method('getEmailReferences')
-            ->will($this->returnValue([]));
+            ->will($this->returnValue($emailReferences));
 
         $this->emailThreadManager->updateThreads($newEmails);
         $this->assertEquals($expectedEmails, $newEmails);
+        $this->assertEquals($expectedReferences, $emailReferences);
     }
 
     public function updateThreadsDataProvider()
@@ -86,10 +100,12 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     null,
                 ],
+                [],
                 [
                     (new TestEmailEntity())
                         ->setThread(new TestThread()),
                 ],
+                [],
             ],
             'new email within thread' => [
                 [
@@ -99,9 +115,20 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
                     1,
                 ],
                 [
+                    new TestEmailEntity(1),
+                    (new TestEmailEntity(2))
+                        ->setThread(new TestThread(3)),
+                ],
+                [
                     (new TestEmailEntity())
                         ->setThread(new TestThread(1)),
                 ],
+                [
+                    (new TestEmailEntity(1))
+                        ->setThread(new TestThread(1)),
+                    (new TestEmailEntity(2))
+                        ->setThread(new TestThread(3)),
+                ]
             ],
         ];
     }
@@ -109,18 +136,19 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider updateHeadsDataProvider
      */
-    public function testUpdateHeads(array $updatedEmails, array $expectedEmails)
+    public function testUpdateHeads(array $updatedEmails, array $returnThreadEmails, array $expectedEmails)
     {
+        $consecutiveThreadEmails = array_map(
+            function (TestEmailEntity $entity, $returnEmails) {
+                return $returnEmails ? $this->getThreadEmails($entity) : [];
+            },
+            $updatedEmails,
+            $returnThreadEmails
+        );
+
         $this->emailThreadProvider->expects($this->any())
             ->method('getThreadEmails')
-            ->will($this->returnCallback(function ($em, TestEmailEntity $entity) {
-                return array_merge(
-                    [$entity],
-                    array_filter($this->fixtures['emails'], function (TestEmailEntity $email) use ($entity) {
-                        return $entity !== $email && $entity->getThread() == $email->getThread();
-                    })
-                );
-            }));
+            ->will(call_user_func_array([$this, 'onConsecutiveCalls'], $consecutiveThreadEmails));
 
         $this->emailThreadManager->updateHeads($updatedEmails);
         $this->assertEquals($expectedEmails, $updatedEmails);
@@ -137,6 +165,10 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
                         ->setHead(true)
                 ],
                 [
+                    true,
+                    true,
+                ],
+                [
                     (new TestEmailEntity())
                         ->setHead(false),
                     (new TestEmailEntity())
@@ -149,6 +181,10 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
                         ->setHead(false),
                     (new TestEmailEntity(4))
                         ->setHead(true),
+                ],
+                [
+                    true,
+                    true,
                 ],
                 [
                     (new TestEmailEntity(4))
@@ -164,14 +200,51 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
                         ->setHead(false)
                 ],
                 [
+                    true,
+                ],
+                [
                     (new TestEmailEntity(4))
                         ->setThread(new TestThread(3))
                         ->setHead(true)
                 ],
             ],
+            'updated email without thread emails are not updated' => [
+                [
+                    (new TestEmailEntity(4))
+                        ->setThread(new TestThread(3))
+                        ->setHead(false)
+                ],
+                [
+                    false,
+                ],
+                [
+                    (new TestEmailEntity(4))
+                        ->setThread(new TestThread(3))
+                        ->setHead(false)
+                ],
+            ],
         ];
     }
 
+    /**
+     * @param object $entity
+     */
+    protected function getThreadEmails($entity)
+    {
+        return array_merge(
+            [$entity],
+            array_filter($this->fixtures['emails'], function (TestEmailEntity $email) use ($entity) {
+                return $entity !== $email && $entity->getThread() == $email->getThread();
+            })
+        );
+    }
+
+    /**
+     * @param string $value
+     * @param string $key
+     *
+     * @return mixed
+     */
     protected function findFixtureBy($value, $key)
     {
         if (array_key_exists($key, $this->fixtures) && array_key_exists($value, $this->fixtures[$key])) {
