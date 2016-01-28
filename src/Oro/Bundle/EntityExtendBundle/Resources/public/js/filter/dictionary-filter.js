@@ -9,7 +9,6 @@ define([
     var routing = require('routing');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
     var ChoiceFilter = require('oro/filter/choice-filter');
     var messenger = require('oroui/js/messenger');
 
