@@ -123,6 +123,7 @@ define(function(require) {
                 openOnEnter: false,
                 selectOnBlur: false,
                 multiple: true,
+                dropdownCssClass: 'inline-editor__select2-drop',
                 id: 'label',
                 formatSelection: function(item) {
                     return item.label;
