@@ -19,12 +19,14 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 
 class LoadProcessConfigurationCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:process:configuration:load';
+
     /**
      * @inheritdoc
      */
     protected function configure()
     {
-        $this->setName('oro:process:configuration:load')
+        $this->setName(self::NAME)
             ->setDescription('Load process configuration from configuration files to the database')
             ->addOption(
                 'directories',
@@ -186,7 +188,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
 
             $entityManager->flush();
         } else {
-            $output->writeln('No process triggers with cron expression found.');
+            $output->writeln('No enabled process triggers with cron expression found.');
         }
     }
 

@@ -74,15 +74,6 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
 
         try {
             $start = microtime(true);
-            $output->writeln(
-                sprintf(
-                    '<info>[%s] Handle process trigger #%d "%s" (%s)</info>',
-                    (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
-                    $triggerId,
-                    $processDefinition->getLabel(),
-                    $processDefinition->getName()
-                )
-            );
 
             $processHandler = $this->getProcessHandler();
             $processHandler->handleTrigger($processTrigger, $processData);
@@ -91,7 +82,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
 
             $output->writeln(
                 sprintf(
-                    '<info>[%s] Process trigger #%d handle %s successfully finished in %f s</info>',
+                    '<info>[%s] Trigger #%d of process "%s" successfully finished in %f s</info>',
                     (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                     $triggerId,
                     $processDefinition->getName(),
@@ -103,9 +94,10 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
 
             $output->writeln(
                 sprintf(
-                    '<error>[%s] Process trigger #%s handle failed: %s</error>',
+                    '<error>[%s] Trigger #%s of process "%s" failed: %s</error>',
                     (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                     $triggerId,
+                    $processDefinition->getName(),
                     $e->getMessage()
                 )
             );
