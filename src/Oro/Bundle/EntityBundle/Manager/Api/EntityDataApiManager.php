@@ -48,7 +48,7 @@ class EntityDataApiManager
      */
     public function patch($className, $id, $data)
     {
-        $entity = $this->getEntity($className, $id);
+        $entity = $this->entityRoutingHelper->getEntity($className, $id);
 
         if (!$this->securityService->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
@@ -59,24 +59,5 @@ class EntityDataApiManager
         } catch (FieldUpdateAccessException $e) {
             throw new AccessDeniedException($e->getMessage(), $e);
         }
-    }
-
-    /**
-     * @param string $className
-     * @param int    $id
-     *
-     * @return object
-     *
-     * @throws \Exception
-     */
-    protected function getEntity($className, $id)
-    {
-        try {
-            $entity = $this->entityRoutingHelper->getEntity($className, $id);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), Codes::HTTP_NOT_FOUND);
-        }
-
-        return $entity;
     }
 }
