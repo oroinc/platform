@@ -8,13 +8,28 @@ define([
     var EmailFolderTreeView = BaseView.extend({
         dataInputSelector: null,
 
+        checkAllSelector: null,
+        relatedCheckboxesSelector: null,
+
+        requiredOptions: [
+            'dataInputSelector',
+            'checkAllSelector',
+            'relatedCheckboxesSelector'
+        ],
+
         initialize: function(options) {
-            if (!_.has(options, 'dataInputSelector')) {
-                throw new Error('Required option "dataInputSelector" not found.');
-            }
+            _.each(this.requiredOptions, function(optionName) {
+                if (!_.has(options, optionName)) {
+                    throw new Error('Required option "' + optionName + '" not found.');
+                }
+            });
 
             this.dataInputSelector = options.dataInputSelector;
             this.$el.closest('form').on('submit'  + this.eventNamespace(), _.bind(this._onSubmit, this));
+
+            this.checkAllSelector = options.checkAllSelector;
+            this.relatedCheckboxesSelector = options.relatedCheckboxesSelector;
+            this.$(this.checkAllSelector).on('change' + this.eventNamespace(), _.bind(this._onCheckAllChange, this));
         },
 
         dispose: function() {
@@ -22,15 +37,17 @@ define([
                 return;
             }
             this.$el.closest('form').off(this.eventNamespace());
+            this.$(this.checkAllSelector).off(this.eventNamespace());
             EmailFolderTreeView.__super__.dispose.apply(this, arguments);
         },
 
         _inputData: function($input) {
             var data = {};
-            $input.find('input[data-name]:not(input[type=checkbox]:not(:checked))').each(function() {
+            $input.find('> input[data-name]:not(input[type=checkbox]:not(:checked))').each(function() {
                 var $input = $(this);
                 data[$input.attr('data-name')] = $input.val();
             });
+            data.subFolders = this._inputCollectionData($input.find('> .folder-sub-folders').children());
 
             return data;
         },
@@ -46,8 +63,12 @@ define([
         },
 
         _onSubmit: function() {
-            var folders = this._inputCollectionData(this.$el.find('#folder-list').children());
-            $(this.dataInputSelector).val(JSON.stringify(folders));
+            var folders = this._inputCollectionData(this.$('.folder-list').children());
+            this.$(this.dataInputSelector).val(JSON.stringify(folders));
+        },
+
+        _onCheckAllChange: function(e) {
+            this.$(this.relatedCheckboxesSelector).prop('checked', e.currentTarget.checked);
         }
     });
 
