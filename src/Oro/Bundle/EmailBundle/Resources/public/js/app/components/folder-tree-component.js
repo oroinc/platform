@@ -6,6 +6,8 @@ define([
     'use strict';
 
     return BaseComponent.extend({
+        emailFolderTreeView: null,
+
         requiredOptions: [
             'dataInputSelector',
             'checkAllSelector',
@@ -19,7 +21,7 @@ define([
                 }
             });
 
-            new EmailFolderTreeView({
+            this.emailFolderTreeView = new EmailFolderTreeView({
                 el: options._sourceElement,
                 dataInputSelector: options.dataInputSelector,
                 checkAllSelector: options.checkAllSelector,

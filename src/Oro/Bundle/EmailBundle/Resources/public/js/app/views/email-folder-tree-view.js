@@ -8,6 +8,7 @@ define([
     var EmailFolderTreeView = BaseView.extend({
         dataInputSelector: null,
 
+        checkAllSelector: null,
         relatedCheckboxesSelector: null,
 
         requiredOptions: [
@@ -26,8 +27,9 @@ define([
             this.dataInputSelector = options.dataInputSelector;
             this.$el.closest('form').on('submit'  + this.eventNamespace(), _.bind(this._onSubmit, this));
 
+            this.checkAllSelector = options.checkAllSelector;
             this.relatedCheckboxesSelector = options.relatedCheckboxesSelector;
-            this.$(options.checkAllSelector).on('change' + this.eventNamespace(), _.bind(this._onCheckAllChange, this));
+            this.$(this.checkAllSelector).on('change' + this.eventNamespace(), _.bind(this._onCheckAllChange, this));
         },
 
         dispose: function() {
@@ -35,6 +37,7 @@ define([
                 return;
             }
             this.$el.closest('form').off(this.eventNamespace());
+            this.$(this.checkAllSelector).off(this.eventNamespace());
             EmailFolderTreeView.__super__.dispose.apply(this, arguments);
         },
 
