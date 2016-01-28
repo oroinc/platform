@@ -36,36 +36,31 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
     /** @var TestOutput */
     private $output;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
         $em->expects($this->any())
             ->method('getRepository')
             ->with('OroWorkflowBundle:ProcessTrigger')
             ->willReturn($this->repo);
 
-        $this->managerRegistry    = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->with('OroWorkflowBundle:ProcessTrigger')
             ->willReturn($em);
-
         $this->managerRegistry->expects($this->any())
             ->method('getManager')
             ->willReturn($em);
 
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+
         $this->processHandler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessHandler')
             ->disableOriginalConstructor()
             ->getMock();
@@ -73,13 +68,10 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
         $this->command = new HandleProcessTriggerCommand();
         $this->command->setContainer($this->container);
 
-        $this->input   = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
+        $this->input = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
         $this->output = new TestOutput();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown()
     {
         unset($this->repo, $this->processHandler, $this->managerRegistry, $this->input, $this->output, $this->command);
@@ -111,21 +103,20 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
 
         $processTrigger = $this->createProcessTrigger($id);
 
-        $this->repo
-            ->expects($this->once())
+        $this->repo->expects($this->once())
             ->method('find')
             ->with($id)
             ->willReturn($processTrigger);
 
-            $stub = $exception ? $this->throwException($exception) : $this->returnSelf();
-            $this->processHandler->expects($this->once())
-                ->method('handleTrigger')
-                ->withAnyParameters()
-                ->will($stub);
+        $this->processHandler->expects($this->once())
+            ->method('handleTrigger')
+            ->withAnyParameters()
+            ->will($exception ? $this->throwException($exception) : $this->returnSelf());
 
         $this->command->execute($this->input, $this->output);
 
         $messages = $this->getObjectAttribute($this->output, 'messages');
+
         $found = 0;
         foreach ($messages as $message) {
             foreach ($expectedOutput as $expected) {
@@ -154,7 +145,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
         $processTrigger->setDefinition($definition);
 
         $class = new \ReflectionClass($processTrigger);
-        $prop  = $class->getProperty('id');
+        $prop = $class->getProperty('id');
         $prop->setAccessible(true);
 
         $prop->setValue($processTrigger, $id);
@@ -190,24 +181,18 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectContainerGetManagerRegistryAndProcessHandler();
 
-        $id = 1;
         $this->input->expects($this->exactly(2))
             ->method('getOption')
             ->willReturnMap([
-                ['id', $id],
+                ['id', 1],
                 ['name', 'name'],
             ]);
 
-        $this->processHandler->expects($this->never())
-            ->method($this->anything());
+        $this->processHandler->expects($this->never())->method($this->anything());
 
         $this->command->execute($this->input, $this->output);
 
-        $this->assertAttributeEquals(
-            ['Process trigger not found'],
-            'messages',
-            $this->output
-        );
+        $this->assertAttributeEquals(['Process trigger not found'], 'messages', $this->output);
     }
 
     public function testExecuteEmptyNoIdSpecified()
@@ -219,21 +204,17 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
                 ['name', 'name'],
             ]);
 
-        $this->processHandler->expects($this->never())
-            ->method($this->anything());
+        $this->processHandler->expects($this->never())->method($this->anything());
 
         $this->command->execute($this->input, $this->output);
 
-        $this->assertAttributeEquals(
-            ['No process trigger identifier defined'],
-            'messages',
-            $this->output
-        );
+        $this->assertAttributeEquals(['No process trigger identifier defined'], 'messages', $this->output);
     }
 
     public function testExecuteWrongNameSpecified()
     {
         $this->expectContainerGetManagerRegistryAndProcessHandler();
+
         $id = 1;
         $this->input->expects($this->exactly(2))
             ->method('getOption')
@@ -243,22 +224,17 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             ]);
 
         $processTrigger = $this->createProcessTrigger($id);
-        $this->repo
-            ->expects($this->once())
+
+        $this->repo->expects($this->once())
             ->method('find')
             ->with($id)
             ->willReturn($processTrigger);
 
-        $this->processHandler->expects($this->never())
-            ->method($this->anything());
+        $this->processHandler->expects($this->never())->method($this->anything());
 
         $this->command->execute($this->input, $this->output);
 
-        $this->assertAttributeEquals(
-            ['Trigger not found in process "wrong_name"'],
-            'messages',
-            $this->output
-        );
+        $this->assertAttributeEquals(['Trigger not found in process "wrong_name"'], 'messages', $this->output);
     }
 
     protected function expectContainerGetManagerRegistryAndProcessHandler()
