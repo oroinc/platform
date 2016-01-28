@@ -44,7 +44,7 @@ class EntityDataApiManager
      *
      * @return array
      *
-     * @throws \Exception
+     * @throws AccessDeniedException
      */
     public function patch($className, $id, $data)
     {
