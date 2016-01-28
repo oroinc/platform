@@ -79,8 +79,21 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
                     $qb->expr()->in('f.type', ':incoming_types'),
                     $qb->expr()->andX(
                         $qb->expr()->notIn('f.type', ':outcoming_types'),
-                        $qb->expr()->isNotNull('_eo.id'),
-                        $qb->expr()->neq('_fo.id', '_eo.id')
+                        $qb->expr()->orX(
+                            $qb->expr()->andX(
+                                $qb->expr()->isNull('_eo.id'),
+                                $qb->expr()->isNotNull('_fo.id')
+                            ),
+                            $qb->expr()->andX(
+                                $qb->expr()->isNotNull('_eo.id'),
+                                $qb->expr()->isNull('_fo.id')
+                            ),
+                            $qb->expr()->andX(
+                                $qb->expr()->isNotNull('_eo.id'),
+                                $qb->expr()->isNotNull('_fo.id'),
+                                $qb->expr()->neq('_fo.id', '_eo.id')
+                            )
+                        )
                     )
                 )
             )
