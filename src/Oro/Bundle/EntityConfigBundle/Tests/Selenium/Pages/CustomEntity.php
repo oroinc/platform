@@ -119,7 +119,9 @@ class CustomEntity extends AbstractPageEntity
             $field->clear();
             $field->value($option);
             if ($flag < count($options)-1) {
-                $this->test->byXPath("//div[contains(@class,'control-group-collection')]//a[normalize-space(text()) = 'Add']")->click();
+                $this->test->byXPath(
+                    "//div[contains(@class,'control-group-collection')]//a[normalize-space(text()) = 'Add']"
+                )->click();
                 $this->waitForAjax();
                 $flag++;
             }
