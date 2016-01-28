@@ -40,10 +40,11 @@ define([
 
         _inputData: function($input) {
             var data = {};
-            $input.find('input[data-name]:not(input[type=checkbox]:not(:checked))').each(function() {
+            $input.find('> input[data-name]:not(input[type=checkbox]:not(:checked))').each(function() {
                 var $input = $(this);
                 data[$input.attr('data-name')] = $input.val();
             });
+            data.subFolders = this._inputCollectionData($input.find('> .folder-sub-folders').children());
 
             return data;
         },
