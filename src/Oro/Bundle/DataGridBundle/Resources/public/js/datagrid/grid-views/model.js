@@ -20,7 +20,8 @@ define([
             sorters: [],
             columns: {},
             deletable: false,
-            editable:  false
+            editable:  false,
+            is_default: false
         },
 
         /** @property */

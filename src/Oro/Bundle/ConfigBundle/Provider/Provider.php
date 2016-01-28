@@ -11,8 +11,6 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDec
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-
 abstract class Provider implements ProviderInterface
 {
     /** @var ConfigBag */
@@ -24,17 +22,12 @@ abstract class Provider implements ProviderInterface
     /** @var array */
     protected $processedSubTrees = array();
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     /**
-     * @param ConfigBag      $configBag
-     * @param SecurityFacade $securityFacade
+     * @param ConfigBag $configBag
      */
-    public function __construct(ConfigBag $configBag, SecurityFacade $securityFacade)
+    public function __construct(ConfigBag $configBag)
     {
-        $this->configBag      = $configBag;
-        $this->securityFacade = $securityFacade;
+        $this->configBag = $configBag;
     }
 
     /**
@@ -159,18 +152,6 @@ abstract class Provider implements ProviderInterface
         }
 
         return new FieldNodeDefinition($node, $fieldsRoot);
-    }
-
-    /**
-     * Check ACL resource
-     *
-     * @param string $resourceName
-     *
-     * @return bool
-     */
-    protected function checkIsGranted($resourceName)
-    {
-        return $this->securityFacade->isGranted($resourceName);
     }
 
     /**

@@ -176,7 +176,7 @@ class ArrayUtil
      *
      * @param int[] $order
      *
-     * @return int
+     * @return callable
      */
     public static function createOrderedComparator(array $order)
     {
@@ -191,5 +191,135 @@ class ArrayUtil
 
             return $order[$a] - $order[$b];
         };
+    }
+
+    /**
+     * Return true if callback on any element returns truthy value, false otherwise
+     *
+     * @param callable $callback
+     * @param array    $array
+     *
+     * @return boolean
+     */
+    public static function some(callable $callback, array $array)
+    {
+        foreach ($array as $item) {
+            if (call_user_func($callback, $item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Return first element on which callback returns truthy value, null otherwise
+     *
+     * @param callable $callback
+     * @param array $array
+     */
+    public static function find(callable $callback, array $array)
+    {
+        foreach ($array as $item) {
+            if (call_user_func($callback, $item)) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Return copy of the array starting with item for which callback returns falsity value
+     *
+     * @param callable $callback
+     * @param array    $array
+     *
+     * @return array
+     */
+    public static function dropWhile(callable $callback, array $array)
+    {
+        foreach ($array as $key => $value) {
+            if (!call_user_func($callback, $value)) {
+                return array_slice($array, $key);
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Recursively merge arrays.
+     *
+     * Merge two arrays as array_merge_recursive do, but instead of converting values to arrays when keys are same
+     * replaces value from first array with value from second
+     *
+     * @param array $first
+     * @param array $second
+     *
+     * @return array
+     */
+    public static function arrayMergeRecursiveDistinct(array $first, array $second)
+    {
+        foreach ($second as $idx => $value) {
+            if (is_integer($idx)) {
+                $first[] = $value;
+            } else {
+                if (!array_key_exists($idx, $first)) {
+                    $first[$idx] = $value;
+                } else {
+                    if (is_array($value)) {
+                        $first[$idx] = self::arrayMergeRecursiveDistinct($first[$idx], $value);
+                    } else {
+                        $first[$idx] = $value;
+                    }
+                }
+            }
+        }
+
+        return $first;
+    }
+
+    /**
+     * Return the values from a single column in the input array
+     *
+     * http://php.net/manual/en/function.array-column.php
+     *
+     * @param array $array
+     * @param mixed $columnKey
+     * @param mixed $indexKey
+     *
+     * @return array
+     */
+    public static function arrayColumn(array $array, $columnKey, $indexKey = null)
+    {
+        $result = [];
+
+        if (empty($array)) {
+            return [];
+        }
+
+        if (empty($columnKey)) {
+            throw new \InvalidArgumentException('Column key is empty');
+        }
+
+        foreach ($array as $item) {
+            if (!isset($item[$columnKey])) {
+                continue;
+            }
+
+            if ($indexKey && !isset($item[$indexKey])) {
+                continue;
+            }
+
+            if ($indexKey) {
+                $index          = $item[$indexKey];
+                $result[$index] = $item[$columnKey];
+            } else {
+                $result[] = $item[$columnKey];
+            }
+        }
+
+        return $result;
     }
 }

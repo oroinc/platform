@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -34,6 +35,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 {
@@ -162,6 +164,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $updatedAt;
 
     /**
+     * @var AccountTypeModel
+     */
+    protected $imapAccountType;
+
+    /**
      * Mailbox constructor.
      */
     public function __construct()
@@ -281,17 +288,22 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param EmailOrigin|null $origin
+     * @param UserEmailOrigin|null $origin
      *
      * @return $this
      */
-    public function setOrigin(EmailOrigin $origin = null)
+    public function setOrigin($origin = null)
     {
         $currentOrigin = $this->getOrigin();
-        if ($currentOrigin && ($origin === null || $currentOrigin !== $origin)) {
+        if ($currentOrigin && ($origin === null || $origin->getUser() === null
+                || $currentOrigin->getId() !== $origin->getId())) {
             $currentOrigin->setActive(false);
+            $this->origin = null;
         }
-        $this->origin = $origin;
+
+        if ($origin !== null && $origin->getUser() !== null) {
+            $this->origin = $origin;
+        }
 
         return $this;
     }
@@ -480,6 +492,45 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function getAutoResponseRules()
     {
         return $this->autoResponseRules;
+    }
+
+    /**
+     * @param AccountTypeModel|null $accountTypeModel
+     */
+    public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
+    {
+        $this->imapAccountType = $accountTypeModel;
+        if ($accountTypeModel instanceof AccountTypeModel) {
+            $this->setOrigin($accountTypeModel->getUserEmailOrigin());
+        }
+    }
+
+    /**
+     * @return AccountTypeModel
+     */
+    public function getImapAccountType()
+    {
+        if ($this->imapAccountType === null) {
+            /** @var UserEmailOrigin $userEmailOrigin */
+            $userEmailOrigin = $this->getOrigin();
+            $accountTypeModel = null;
+            if ($userEmailOrigin) {
+                $accountTypeModel = new AccountTypeModel();
+                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
+                } else {
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
+                }
+            }
+
+            if ($accountTypeModel) {
+                return $accountTypeModel;
+            }
+        }
+
+        return $this->imapAccountType;
     }
 
     /**
