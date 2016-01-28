@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Manager\Api;
 
-use FOS\RestBundle\Util\Codes;
-
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
