@@ -8,13 +8,26 @@ define([
     var EmailFolderTreeView = BaseView.extend({
         dataInputSelector: null,
 
+        relatedCheckboxesSelector: null,
+
+        requiredOptions: [
+            'dataInputSelector',
+            'checkAllSelector',
+            'relatedCheckboxesSelector'
+        ],
+
         initialize: function(options) {
-            if (!_.has(options, 'dataInputSelector')) {
-                throw new Error('Required option "dataInputSelector" not found.');
-            }
+            _.each(this.requiredOptions, function(optionName) {
+                if (!_.has(options, optionName)) {
+                    throw new Error('Required option "' + optionName + '" not found.');
+                }
+            });
 
             this.dataInputSelector = options.dataInputSelector;
             this.$el.closest('form').on('submit'  + this.eventNamespace(), _.bind(this._onSubmit, this));
+
+            this.relatedCheckboxesSelector = options.relatedCheckboxesSelector;
+            this.$(options.checkAllSelector).on('change' + this.eventNamespace(), _.bind(this._onCheckAllChange, this));
         },
 
         dispose: function() {
@@ -46,8 +59,12 @@ define([
         },
 
         _onSubmit: function() {
-            var folders = this._inputCollectionData(this.$el.find('#folder-list').children());
-            $(this.dataInputSelector).val(JSON.stringify(folders));
+            var folders = this._inputCollectionData(this.$('.folder-list').children());
+            this.$(this.dataInputSelector).val(JSON.stringify(folders));
+        },
+
+        _onCheckAllChange: function(e) {
+            this.$(this.relatedCheckboxesSelector).prop('checked', e.currentTarget.checked);
         }
     });
 

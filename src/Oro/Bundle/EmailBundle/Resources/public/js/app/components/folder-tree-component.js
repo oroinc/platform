@@ -1,25 +1,29 @@
 define([
     'underscore',
     'oroui/js/app/components/base/component',
-    'oroemail/js/app/views/email-folder-tree-view',
-    'oroui/js/app/views/checkbox-toggle-view'
-],function(_, BaseComponent, EmailFolderTreeView, CheckBoxToggleView) {
+    'oroemail/js/app/views/email-folder-tree-view'
+],function(_, BaseComponent, EmailFolderTreeView) {
     'use strict';
 
     return BaseComponent.extend({
+        requiredOptions: [
+            'dataInputSelector',
+            'checkAllSelector',
+            'relatedCheckboxesSelector'
+        ],
+
         initialize: function(options) {
-            if (!_.has(options, 'dataInputSelector')) {
-                throw new Error('Required option "dataInputSelector" not found.');
-            }
+            _.each(this.requiredOptions, function(optionName) {
+                if (!_.has(options, optionName)) {
+                    throw new Error('Required option "' + optionName + '" not found.');
+                }
+            });
 
             new EmailFolderTreeView({
                 el: options._sourceElement,
-                dataInputSelector: options.dataInputSelector
-            });
-
-            new CheckBoxToggleView({
-                el: $('#check-all'),
-                relatedCheckboxesSelector: '#folder-list :checkbox'
+                dataInputSelector: options.dataInputSelector,
+                checkAllSelector: options.checkAllSelector,
+                relatedCheckboxesSelector: options.relatedCheckboxesSelector
             });
         }
     });
