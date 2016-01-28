@@ -5,13 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class LoadProcessEntities extends AbstractFixture implements ContainerAwareInterface
+class LoadProcessEntities extends AbstractFixture
 {
     const FIRST_DEFINITION = 'first';
     const SECOND_DEFINITION = 'second';
@@ -71,24 +68,11 @@ class LoadProcessEntities extends AbstractFixture implements ContainerAwareInter
         ],
     ];
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
-        $entityManager = $this->container->get('doctrine')->getManager();
-
         foreach ($this->definitions as $name => $config) {
             $definition = new ProcessDefinition();
             $definition
@@ -100,7 +84,7 @@ class LoadProcessEntities extends AbstractFixture implements ContainerAwareInter
 
             $this->definitions[$name] = $definition;
 
-            $entityManager->persist($definition);
+            $manager->persist($definition);
         }
 
         foreach ($this->triggers as $config) {
@@ -111,9 +95,9 @@ class LoadProcessEntities extends AbstractFixture implements ContainerAwareInter
                 ->setField($config['field'])
                 ->setCron($config['cron']);
 
-            $entityManager->persist($trigger);
+            $manager->persist($trigger);
         }
 
-        $entityManager->flush();
+        $manager->flush();
     }
 }
