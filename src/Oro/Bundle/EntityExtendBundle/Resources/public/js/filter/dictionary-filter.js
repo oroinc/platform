@@ -26,7 +26,6 @@ define([
          */
         elementSelector: '.select-values-autocomplete',
 
-        wrapperTemplateSelector: '#dictionary-filter-template',
         /**
          * Filter selector template
          *
@@ -57,8 +56,6 @@ define([
             type: 'input[type="hidden"]:last'
         },
 
-        nullLink: '#',
-
         /**
          * @inheritDoc
          */
@@ -72,9 +69,18 @@ define([
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
 
+        reset: function() {
+            DictionaryFilter.__super__.reset.apply(this, arguments);
+            var select2element = this.$el.find(this.elementSelector);
+            select2element.select2('data',  null);
+        },
+
         render: function() {
             this.renderDeferred = $.Deferred();
-            this._renderCriteria();
+            this._wrap('');
+            if (this.$el.html() === '') {
+                this._renderCriteria();
+            }
         },
 
         _renderCriteria: function() {
@@ -115,19 +121,19 @@ define([
             }
             var parts = this._getParts();
 
-            this.$el.addClass('filter-item oro-drop');
-            this.$el.append(this.template({
+            var $filter = $(this.template({
                 parts: parts,
-                nullLink: this.nullLink,
                 isEmpty: false,
                 showLabel: this.showLabel,
-                criteriaHint: 'All',
                 label: this.label,
                 selectedChoiceLabel: selectedChoiceLabel,
                 selectedChoice: value.type,
                 choices: this.choices,
                 name: this.name
             }));
+
+            this._appendFilter($filter);
+            this._refreshWidth();
         },
 
         applySelect2: function() {
@@ -243,6 +249,15 @@ define([
             }
 
             return selectedChoiceLabel;
+        },
+
+        _refreshWidth: function () {
+            var valueFrame = this.$('.value-field-frame');
+            // update left and right margins of value field frame
+            var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
+            var rightWidth = this.$('.filter-update').outerWidth();
+            valueFrame.css('margin-left', leftWidth);
+            valueFrame.css('margin-right', rightWidth);
         }
     });
 
