@@ -388,6 +388,27 @@ HTML;
             data-ftid="form_for_layout_renderer_test_jobTitle"/>
     </div>
     <div>
+        <label class="required">User</label>
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+            <div>
+                <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_firstName"
+                    name="form_for_layout_renderer_test[user][firstName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+            </div>
+            <div>
+                <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_lastName"
+                    name="form_for_layout_renderer_test[user][lastName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+            </div>
+        </div>
+    </div>
+    <div>
         <label>Gender</label>
         <div id="form_for_layout_renderer_test_gender" data-ftid="form_for_layout_renderer_test_gender">
             <input type="radio"
@@ -413,22 +434,6 @@ HTML;
 </fieldset>
 <fieldset>
     <legend>General Info</legend>
-    <div>
-        <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_lastName"
-            name="form_for_layout_renderer_test[user][lastName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_lastName"/>
-    </div>
-    <div>
-        <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_firstName"
-            name="form_for_layout_renderer_test[user][firstName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_firstName"/>
-    </div>
 </fieldset>
 HTML;
 
@@ -451,6 +456,27 @@ HTML;
             data-ftid="form_for_layout_renderer_test_jobTitle"/>
     </div>
     <div>
+        <label class="required">User</label>
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+            <div>
+                <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_firstName"
+                    name="form_for_layout_renderer_test[user][firstName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+            </div>
+            <div>
+                <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_lastName"
+                    name="form_for_layout_renderer_test[user][lastName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+            </div>
+        </div>
+    </div>
+    <div>
         <label>Gender</label>
         <div id="form_for_layout_renderer_test_gender" data-ftid="form_for_layout_renderer_test_gender">
             <input type="radio"
@@ -476,22 +502,6 @@ HTML;
 </fieldset>
 <fieldset>
     <legend>General Info</legend>
-    <div>
-        <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_lastName"
-            name="form_for_layout_renderer_test[user][lastName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_lastName"/>
-    </div>
-    <div>
-        <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_firstName"
-            name="form_for_layout_renderer_test[user][firstName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_firstName"/>
-    </div>
 </fieldset>
 HTML;
 

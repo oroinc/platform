@@ -108,13 +108,22 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->at(1))
             ->method('add')
             ->with(
+                self::FIELD_PREFIX . 'field2',
+                self::GROUP_PREFIX . 'group2',
+                FormFieldType::NAME,
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+            )
+            ->will($this->returnSelf());
+        $this->layoutManipulator->expects($this->at(2))
+            ->method('add')
+            ->with(
                 self::FIELD_PREFIX . 'field2:field21',
                 self::GROUP_PREFIX . 'group1',
                 FormFieldType::NAME,
                 ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(2))
+        $this->layoutManipulator->expects($this->at(3))
             ->method('add')
             ->with(
                 self::GROUP_PREFIX . 'group1',
@@ -123,7 +132,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 ['title' => 'Group 1']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(3))
+        $this->layoutManipulator->expects($this->at(4))
             ->method('add')
             ->with(
                 self::GROUP_PREFIX . 'group2',
@@ -132,13 +141,14 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 ['title' => 'Group 2']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->exactly(4))
+        $this->layoutManipulator->expects($this->exactly(5))
             ->method('add');
 
         $this->builder->build($formAccessor, $this->blockBuilder, $options);
         $this->assertSame(
             [
                 'field1'         => self::FIELD_PREFIX . 'field1',
+                'field2'         => self::FIELD_PREFIX . 'field2',
                 'field2.field21' => self::FIELD_PREFIX . 'field2:field21'
             ],
             $formAccessor->getProcessedFields()
@@ -192,13 +202,22 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->at(2))
             ->method('add')
             ->with(
+                self::FIELD_PREFIX . 'field2',
+                self::GROUP_PREFIX . 'group2',
+                FormFieldType::NAME,
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+            )
+            ->will($this->returnSelf());
+        $this->layoutManipulator->expects($this->at(3))
+            ->method('add')
+            ->with(
                 self::FIELD_PREFIX . 'field2:field21',
                 self::GROUP_PREFIX . 'group1',
                 FormFieldType::NAME,
                 ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(3))
+        $this->layoutManipulator->expects($this->at(4))
             ->method('add')
             ->with(
                 self::GROUP_PREFIX . 'group1',
@@ -207,7 +226,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 ['title' => 'Group 1']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(4))
+        $this->layoutManipulator->expects($this->at(5))
             ->method('add')
             ->with(
                 self::GROUP_PREFIX . 'group2',
@@ -216,7 +235,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 ['title' => 'Group 2']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->exactly(5))
+        $this->layoutManipulator->expects($this->exactly(6))
             ->method('add');
 
         $this->builder->build($formAccessor, $this->blockBuilder, $options);
@@ -224,6 +243,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             [
                 'field2.field22' => self::FIELD_PREFIX . 'field2:field22',
                 'field1'         => self::FIELD_PREFIX . 'field1',
+                'field2'         => self::FIELD_PREFIX . 'field2',
                 'field2.field21' => self::FIELD_PREFIX . 'field2:field21'
             ],
             $formAccessor->getProcessedFields()
@@ -267,13 +287,22 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->at(1))
             ->method('add')
             ->with(
+                self::FIELD_PREFIX . 'field2',
+                self::GROUP_PREFIX . 'group1',
+                FormFieldType::NAME,
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+            )
+            ->will($this->returnSelf());
+        $this->layoutManipulator->expects($this->at(2))
+            ->method('add')
+            ->with(
                 self::FIELD_PREFIX . 'field2:field21',
                 self::GROUP_PREFIX . 'group1',
                 FormFieldType::NAME,
                 ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(2))
+        $this->layoutManipulator->expects($this->at(3))
             ->method('add')
             ->with(
                 self::FIELD_PREFIX . 'field2:field22',
@@ -282,7 +311,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field22']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(3))
+        $this->layoutManipulator->expects($this->at(4))
             ->method('add')
             ->with(
                 self::GROUP_PREFIX . 'group1',
@@ -291,7 +320,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 ['title' => 'Group 1']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(4))
+        $this->layoutManipulator->expects($this->at(5))
             ->method('add')
             ->with(
                 self::GROUP_PREFIX . 'group2',
@@ -300,13 +329,14 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 ['title' => 'Group 2']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->exactly(5))
+        $this->layoutManipulator->expects($this->exactly(6))
             ->method('add');
 
         $this->builder->build($formAccessor, $this->blockBuilder, $options);
         $this->assertSame(
             [
                 'field1'         => self::FIELD_PREFIX . 'field1',
+                'field2'         => self::FIELD_PREFIX . 'field2',
                 'field2.field21' => self::FIELD_PREFIX . 'field2:field21',
                 'field2.field22' => self::FIELD_PREFIX . 'field2:field22'
             ],
