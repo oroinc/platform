@@ -39,9 +39,12 @@ Trigger can be following types:
     should be performed - immediately or after some delay (and delay interval in the seconds of PHP date interval 
     format). In case of delayed execution you can also control execution priority of process jobs.
     - **cron**
-    Allow execute process by cron-definition setted in parameter ``cron``. For this type of triggers cron job for
-    the command ``oro:cron`` should be enabled. 
-    
+    Allow to execute process by cron-definition specified in parameter ``cron``. For this type of triggers should be
+    enabled cron job for the command ``oro:cron``.
+
+    **Notice**
+    In the same time should be specified only one of this parameters.
+
 * **Job** - entity that contain information specific to performing process in case of delayed processing
 (in this case JMS job will be created). According to event job can contain following data:
     - ``create`` event - entity identity;
