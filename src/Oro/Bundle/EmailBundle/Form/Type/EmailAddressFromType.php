@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 
 class EmailAddressFromType extends AbstractType
 {
@@ -19,14 +20,22 @@ class EmailAddressFromType extends AbstractType
     /** @var RelatedEmailsProvider */
     protected $relatedEmailsProvider;
 
+    /** @var MailboxManager */
+    protected $mailboxManager;
+
     /**
      * @param SecurityFacade $securityFacade
      * @param RelatedEmailsProvider $relatedEmailsProvider
+     * @param MailboxManager $mailboxManager
      */
-    public function __construct(SecurityFacade $securityFacade, RelatedEmailsProvider $relatedEmailsProvider)
-    {
+    public function __construct(
+        SecurityFacade $securityFacade,
+        RelatedEmailsProvider $relatedEmailsProvider,
+        MailboxManager $mailboxManager
+    ) {
         $this->securityFacade = $securityFacade;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
+        $this->mailboxManager = $mailboxManager;
     }
 
     /**
@@ -52,7 +61,10 @@ class EmailAddressFromType extends AbstractType
             return [];
         }
 
-        $emails = array_values($this->relatedEmailsProvider->getEmails($user, 1, true));
+        $emails = array_merge(
+            array_values($this->relatedEmailsProvider->getEmails($user, 1, true)),
+            $this->mailboxManager->findAvailableMailboxEmails($user, $this->securityFacade->getOrganization())
+        );
 
         return array_combine($emails, $emails);
     }

@@ -8,6 +8,10 @@ class GmailImap extends Imap
     const DEFAULT_GMAIL_PORT = '993';
     const DEFAULT_GMAIL_SSL = 'ssl';
 
+    const DEFAULT_GMAIL_SMTP_HOST = 'smtp.gmail.com';
+    const DEFAULT_GMAIL_SMTP_PORT = '465';
+    const DEFAULT_GMAIL_SMTP_SSL = 'ssl';
+
     const X_GM_MSGID = 'X-GM-MSGID';
     const X_GM_THRID = 'X-GM-THRID';
     const X_GM_LABELS = 'X-GM-LABELS';

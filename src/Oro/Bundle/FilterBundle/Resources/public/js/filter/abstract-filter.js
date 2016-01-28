@@ -3,9 +3,18 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/app/views/base/view',
-    'oroui/js/tools'
-], function($, _, __, BaseView, tools) {
+    'module',
+    'oroui/js/tools',
+    'orofilter/js/filter-template',
+    'orofilter/js/filter-hint'
+], function($, _, __, BaseView, module, tools, FilterTemplate, FilterHint) {
     'use strict';
+
+    var config = module.config();
+    config = _.extend({
+        placeholder: __('All'),
+        labelPrefix: ''
+    }, config);
 
     var AbstractFilter;
 
@@ -16,30 +25,7 @@ define([
      * @class   oro.filter.AbstractFilter
      * @extends Backbone.View
      */
-    AbstractFilter = BaseView.extend({
-        /**
-         * Template for filter criteria
-         *
-         * @property
-         */
-        template: '',
-
-        /**
-         * Template selector for filter criteria
-         * (should be defined for descendant filter)
-         *
-         * @property
-         */
-        templateSelector: '',
-
-        /**
-         * Filter decoration theme, empty string means default theme.
-         * Gets appended to base templateSelector property
-         *
-         * @property
-         */
-        templateTheme: '',
-
+    AbstractFilter = BaseView.extend(_.extend({}, FilterTemplate, {
         /**
          * Is filter can be disabled
          *
@@ -73,7 +59,7 @@ define([
          *
          * @property
          */
-        placeholder: __('All'),
+        placeholder: config.placeholder,
 
         /**
          * Label of filter
@@ -81,6 +67,13 @@ define([
          * @property {String}
          */
         label: __('Input Label'),
+
+        /**
+         * Label prefix of filter
+         *
+         * @property {String}
+         */
+        labelPrefix: config.labelPrefix,
 
         /**
          * Is filter label visible
@@ -95,13 +88,6 @@ define([
          * @property {String}
          */
         buttonActiveClass: 'open-filter',
-
-        /**
-         * Null link value
-         *
-         * @property {String}
-         */
-        nullLink: '#',
 
         /**
          * Element enclosing a criteria dropdown
@@ -133,6 +119,18 @@ define([
             this.value = tools.deepClone(this.emptyValue);
 
             AbstractFilter.__super__.initialize.apply(this, arguments);
+
+            var hintView = new FilterHint({
+                filter: this
+            });
+
+            this.subview('hint', hintView);
+
+            this.listenTo(hintView, 'reset', this.reset);
+        },
+
+        rendered: function() {
+            this.subview('hint').render();
         },
 
         /**
@@ -277,18 +275,21 @@ define([
          * @protected
          */
         _onValueUpdated: function(newValue, oldValue) {
+            this._updateCriteriaHint();
             this._triggerUpdate(newValue, oldValue);
         },
 
         /**
-         * Handles click on filter-item reset button
+         * Updates criteria hint element with actual criteria hint value
          *
-         * @param {jQuery.Event} e
-         * @private
+         * @protected
+         * @return {*}
          */
-        _onClickResetFilter: function(e) {
-            e.stopPropagation();
-            this.reset();
+        _updateCriteriaHint: function() {
+            this.subview('hint').update(this._getCriteriaHint());
+            this.$el.find('.filter-criteria-selector')
+                .toggleClass('filter-default-value', this.isEmptyValue());
+            return this;
         },
 
         /**
@@ -470,24 +471,8 @@ define([
          */
         applyValue: function() {
             this.setValue(this._formatRawValue(this._readDOMValue()));
-        },
-
-        /**
-         * Defines which template to use
-         *
-         * @private
-         */
-        _defineTemplate: function() {
-            this.template = this._getTemplate(this.templateSelector);
-        },
-
-        _getTemplate: function(selector) {
-            var theme = this.templateTheme;
-            var src = theme && $(selector + '-' + theme).text() || $(selector).text();
-
-            return _.template(src);
         }
-    });
+    }));
 
     return AbstractFilter;
 });
