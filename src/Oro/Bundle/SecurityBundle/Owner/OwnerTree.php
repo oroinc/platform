@@ -279,7 +279,7 @@ class OwnerTree implements OwnerTreeInterface
                 $this->getSubordinateBusinessUnitIds($buId),
                 $resultBuIds
             );
-            if (!empty($diff)) {
+            if ($diff) {
                 $resultBuIds = array_merge($resultBuIds, $diff);
             }
         }
@@ -362,9 +362,6 @@ class OwnerTree implements OwnerTreeInterface
     public function addDeepEntity($localLevelEntityId, $deepLevelEntityId)
     {
         if ($deepLevelEntityId !== null) {
-            if (!isset($this->subordinateBusinessUnitIds[$deepLevelEntityId])) {
-                $this->subordinateBusinessUnitIds[$deepLevelEntityId] = [];
-            }
             $this->subordinateBusinessUnitIds[$deepLevelEntityId][] = $localLevelEntityId;
         }
 
