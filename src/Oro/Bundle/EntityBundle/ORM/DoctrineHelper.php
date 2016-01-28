@@ -464,6 +464,6 @@ class DoctrineHelper
             return $manager;
         }
 
-        return $this->managersMap[$entityClass] === null ? null : $this->managers[$this->managersMap[$entityClass]];
+        return $this->managersMap[$entityClass] ? $this->managers[$this->managersMap[$entityClass]] : null;
     }
 }
