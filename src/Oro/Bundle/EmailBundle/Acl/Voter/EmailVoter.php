@@ -85,8 +85,8 @@ class EmailVoter implements VoterInterface
                 if ($mailbox = $emailUser->getMailboxOwner() !== null
                     && $token instanceof UsernamePasswordOrganizationToken
                 ) {
-                    $repo = $this->container->get('doctrine')->getRepository('OroEmailBundle:Mailbox');
-                    $mailboxes = $repo->findAvailableMailboxes(
+                    $manager = $this->container->get('oro_email.mailbox.manager');
+                    $mailboxes = $manager->findAvailableMailboxes(
                         $token->getUser(),
                         $token->getOrganizationContext()
                     );

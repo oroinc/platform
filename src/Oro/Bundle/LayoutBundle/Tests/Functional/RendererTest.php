@@ -143,7 +143,15 @@ class RendererTest extends LayoutTestCase
             ->add('head', 'root', 'head', ['title' => 'Test'])
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
-            ->add('external_style', 'head', 'style', ['src' => 'test.css', 'scoped' => new Condition\False()])
+            ->add(
+                'external_style',
+                'head',
+                'style',
+                [
+                    'src' => ['@asset' => 'test.css'],
+                    'scoped' => new Condition\False()
+                ]
+            )
             ->add(
                 'script',
                 'head',
@@ -155,7 +163,15 @@ class RendererTest extends LayoutTestCase
                 ]
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
-            ->add('content', 'root', 'body')
+            ->add(
+                'content',
+                'root',
+                'body',
+                [
+                    'class_prefix' => 'content',
+                    'attr' => ['class' => '{{ class_prefix }}-body']
+                ]
+            )
             ->add('list', 'content', 'list')
             ->add(
                 'list_item_1',
@@ -272,6 +288,13 @@ class RendererTest extends LayoutTestCase
                 ['type' => 'input', 'action' => 'submit', 'name' => 'btn2', 'text' => 'Btn2'],
                 'button'
             )
+            ->add(
+                'input_text',
+                'content',
+                'input',
+                ['name' => 'search'],
+                'button'
+            )
             // test manipulations of 'class' attribute
             ->appendOption('content', 'attr.class', ['@join' => [' ', 'class1', 'class2']])
             ->replaceOption('content', 'attr.class', 'class1', ['@value' => ['$context.body_class']])
@@ -322,14 +345,15 @@ class RendererTest extends LayoutTestCase
         <style type="text/css" scoped="scoped">
             body { color: red; }
         </style>
-        <link rel="stylesheet" type="text/css" href="test.css"/>
+        <link rel="stylesheet" type="text/css" href="/test.css"/>
         <script type="text/javascript" async="async">
             alert('test');
         </script>
         <link rel="stylesheet" href="test.css"/>
     </head>
-<body class="test-body class2">
+<body class="content-body test-body class2">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
+    <input type="text" name="search"/>
     <input type="submit" name="btn2" value="Btn2"/>
     <ul>
         <li>Hi World!</li>

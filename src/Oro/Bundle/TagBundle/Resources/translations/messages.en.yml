@@ -11,7 +11,7 @@ oro:
             tag.saved.message: "Tag saved"
         form:
             choose_tag: "Choose a tag"
-            choose_or_create_tag: "Select an existing tag or create new"
+            choose_or_create_tag: "Select an existing tag or create a new one"
         datagrid:
             usage_count: Usage Count
             search:      Search by tag
@@ -22,7 +22,7 @@ oro:
         entity_label:        Tag
         entity_plural_label: Tags
         id.label:            Id
-        name.label:          Tag
+        name.label:          Name
         owner.label:         Owner
         tagging.label:       Tagging
         updated_by.label:    Updated By
@@ -42,3 +42,10 @@ oro:
             owner.label:         Owner
             record_id.label:     Record
             tag.label:           Tag
+
+        tags_label: Tags
+
+        config:
+            enabled: Enable tags
+            disable.alert: Disabling Tags will irreversibly erase all existing tags
+

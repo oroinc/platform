@@ -4,6 +4,8 @@ parameters:
     oro_address.address.manager.class:      Oro\Bundle\AddressBundle\Entity\Manager\AddressManager
     oro_address.provider.address.class:     Oro\Bundle\AddressBundle\Provider\AddressProvider
     oro_address.provider.phone.class:       Oro\Bundle\AddressBundle\Provider\PhoneProvider
+    oro_address.validator.valid_region.class: Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator
+
 
 services:
     oro_address.address.manager:
@@ -22,3 +24,8 @@ services:
         class: %oro_address.provider.phone.class%
         arguments:
             - @oro_entity_config.provider.extend
+
+    oro_address.validator.valid_region:
+        class: %oro_address.validator.valid_region.class%
+        tags:
+            - { name: validator.constraint_validator, alias: oro_address_valid_region }

@@ -6,6 +6,7 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider;
 
@@ -25,6 +26,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
     {
         $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $this->provider = new OrganizationRememberMeAuthenticationProvider($this->userChecker, 'testKey', 'provider');
+        $this->provider->setTokenFactory(new OrganizationRememberMeTokenFactory());
     }
 
     public function testSupports()
@@ -41,6 +43,19 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\AbstractToken');
         $this->assertFalse($this->provider->supports($token));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
+     * @expectedExceptionMessage Token Factory is not set in OrganizationRememberMeAuthenticationProvider.
+     */
+    public function testAuthenticateIfTokenFactoryIsNotSet()
+    {
+        $user = new User(1);
+        $organization = new Organization(2);
+        $token = new OrganizationRememberMeToken($user, 'provider', 'testKey', $organization);
+        $provider = new OrganizationRememberMeAuthenticationProvider($this->userChecker, 'testKey', 'provider');
+        $provider->authenticate($token);
     }
 
     public function testAuthenticate()

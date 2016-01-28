@@ -97,11 +97,9 @@ define(function(require) {
             'keydown [type="text"]': '_preventEnterProcessing',
             'keyup input[name="search"]': '_onChangeSearchQuery',
             'click .filter-update': '_onClickUpdateCriteria',
-            'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
             'click .choice-value': '_onClickChoiceValue',
-            'click .reset-filter': '_onClickResetFilter',
             'change input[type="checkbox"]': '_onChangeBusinessUnit',
             'click .button-all': '_onClickButtonAll',
             'click .button-selected': '_onClickButtonSelected'
@@ -115,11 +113,6 @@ define(function(require) {
         searchEngine: searchEngine,
 
         checkedItems: {},
-
-        _onClickCriteriaSelector: function() {
-            ChoiceTreeFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
-            this.$el.find('.list').find('input:first').focus();
-        },
 
         /**
          * @inheritDoc
@@ -192,7 +185,7 @@ define(function(require) {
                 items = this._getSelectedItems(items);
                 var temp = [];
                 _.each(items, function(value) {
-                    temp .push({
+                    temp.push({
                         value: value,
                         children: []
                     });
@@ -249,19 +242,27 @@ define(function(require) {
         },
 
         _convertToTree: function(data) {
-            var self = this;
             var response = [];
-            _.each(data, function(value) {
-                if (!value.owner_id) {
-                    response.push({
-                        value: value,
-                        children: []
-                    });
-                }
-            });
+            var idToNodeMap = {};
+            var element = {};
 
-            _.each(response, function(value, key) {
-                response[key].children = self.searchEngine.findChild(value, data);
+            _.each(data, function(value) {
+                element = {};
+                element.value = value;
+                element.children = [];
+
+                idToNodeMap[element.value.id] = element;
+
+                if (!element.value.owner_id) {
+                    response.push(element);
+                } else {
+                    var parentNode = idToNodeMap[element.value.owner_id];
+                    if (parentNode) {
+                        parentNode.children.push(element);
+                    } else {
+                        response.push(element);
+                    }
+                }
             });
 
             return response;
@@ -298,12 +299,12 @@ define(function(require) {
                 var id = self.name + '-' + value.value.id;
 
                 template += '<li>' +
-                '<label for="' + id + '" class="' + classSearchResult + '">' +
+                    '<label for="' + id + '" class="' + classSearchResult + '">' +
                     '<input id="' + id + '" ' +
-                            'value="' + value.value.id + '" ' +
-                            'type="checkbox" ' + classSelected + '>' +
+                    'value="' + value.value.id + '" ' +
+                    'type="checkbox" ' + classSelected + '>' +
                     value.value.name +
-                '</label>';
+                    '</label>';
                 if (value.children.length > 0) {
                     template += self.getListTemplate(value.children);
                 }
@@ -333,12 +334,12 @@ define(function(require) {
         },
 
         /**
-        * Set raw value to filter
-        *
-        * @param value
-        * @param skipRefresh
-        * @return {*}
-        */
+         * Set raw value to filter
+         *
+         * @param value
+         * @param skipRefresh
+         * @return {*}
+         */
         setValue: function(value, skipRefresh) {
             if (!tools.isEqualsLoosely(this.value, value)) {
                 var oldValue = this.value;
@@ -397,8 +398,8 @@ define(function(require) {
             return (option ? option.label + ' ' : '') + hintValue;
         },
 
-        _onClickResetFilter: function() {
-            ChoiceTreeFilter.__super__._onClickResetFilter.apply(this, arguments);
+        reset: function() {
+            ChoiceTreeFilter.__super__.reset.apply(this, arguments);
             this._hideCriteria();
             this.checkedItems = {};
             this.$el.find('input[name="search"]').val('');
@@ -440,6 +441,10 @@ define(function(require) {
                 this._onChangeMode();
                 $(event.target).addClass('active');
             }
+        },
+
+        _focusCriteria: function() {
+            this.$el.find('.list').find('input:first').focus();
         }
     });
 

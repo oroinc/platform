@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 /**
- * @ORM\MappedSuperclass
+ * @ORM\MappedSuperclass()
  */
 abstract class AbstractAuditField
 {

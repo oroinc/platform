@@ -117,7 +117,6 @@ services:
         arguments:
             - @oro_dashboard.config_provider
             - @form.factory
-            - @oro_form.validator.constraint_factory
 
     oro_dashboard.datetime.helper:
         class: %oro_dashboard.datetime.helper.class%
@@ -245,6 +244,8 @@ services:
 
     oro_dashboard.widget_config_value.widget_business_unit_select.converter:
         class: %oro_dashboard.widget_config_value.widget_business_unit_select.converter.class%
+        arguments:
+            - @=service('doctrine.orm.entity_manager').getRepository(parameter('oro_organization.business_unit.entity.class'))
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_business_unit_select" }
 

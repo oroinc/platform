@@ -258,6 +258,9 @@ class UserTest extends AbstractUserTest
         $imapConfiguration->expects($this->exactly(2))
             ->method('isActive')
             ->willReturn(true);
+        $imapConfiguration->expects($this->once())
+            ->method('getUser')
+            ->willReturn($entity);
 
         $this->assertCount(0, $entity->getEmailOrigins());
         $this->assertNull($entity->getImapConfiguration());
@@ -342,38 +345,6 @@ class UserTest extends AbstractUserTest
         $user = $this->getUser();
         $this->assertInternalType('array', $user->getEmailFields());
         $this->assertEquals(['email'], $user->getEmailFields());
-    }
-
-    public function testGetTaggableId()
-    {
-        $id = 2;
-        $user = $this->getUser();
-        $user->setId($id);
-        $this->assertEquals($id, $user->getId());
-        $this->assertEquals($id, $user->getTaggableId());
-    }
-
-    public function testTags()
-    {
-        $user = $this->getUser();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getTags());
-
-        // should return same collection
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getTags());
-
-        $tags = ['tag1', 'tag2'];
-        $user->setTags($tags);
-        $this->assertEquals($tags, $user->getTags());
-
-        // should return same collection
-        $this->assertEquals($tags, $user->getTags());
-
-        $newTags = ['tag2', 'tag3'];
-        $user->setTags($newTags);
-        $this->assertEquals($newTags, $user->getTags());
-
-        // should return same collection
-        $this->assertEquals($newTags, $user->getTags());
     }
 
     public function testGetNotificationEmails()

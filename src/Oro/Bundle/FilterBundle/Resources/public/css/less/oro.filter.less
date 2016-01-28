@@ -69,7 +69,7 @@
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
     display: none;
-    z-index: @zindexPopover;
+    z-index: @oroZindexDropdown;
     margin-top: 7px;
     top: auto;
 }
@@ -115,11 +115,14 @@
     margin-bottom: 0;
 }
 .filter-select .select-filter-widget {
-    font-weight: bold;
-    color: #333333;
-    padding: 0 0 2px 0;
-    background: none;
-    border: none;
+    &, &.ui-multiselect {
+      font-weight: bold;
+      color: #333333;
+      padding: 0 0 2px 0;
+      background: none;
+      border: none;
+      margin-left: 0;
+    }
 }
 
 .filter-select .select-filter-widget .ui-icon {
@@ -200,7 +203,8 @@
     margin: 0 6px 5px 5px;
 }
 
-.ui-multiselect.filter-list {
+.ui-multiselect.filter-list, .ui-multiselect.select-filter-widget {
+
     background: none;
     border: none;
     font-size: 13px;
@@ -209,15 +213,15 @@
     line-height: 1em;
 }
 
-.ui-multiselect.filter-list:hover .add-filter-button span.caret {
+.ui-multiselect.select-filter-widget:hover .add-filter-button span.caret {
     border-top-color: #005099; /* @linkColorHover; */
 }
 
-.ui-multiselect.filter-list:hover a {
+.ui-multiselect.select-filter-widget:hover a {
     color: #005099; /* @linkColorHover; */
 }
 
-.ui-multiselect.filter-list.select-filter-widget span.caret {
+.ui-multiselect.select-filter-widget span.caret {
     margin-top: 5px;
 }
 
@@ -351,9 +355,14 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     vertical-align: middle;
   }
 }
-.filter-item.filter-business-unit {
+.filter-item.choice-tree-filter {
   margin-right: 0;
   margin-bottom: 0;
+  max-width: 300px;
+  min-width: 180px;
+  .choice-tree-filter-search{
+    width: calc(~"100% - 14px");
+  }
   .buttons {
     margin-bottom: 5px;
     span {
@@ -366,7 +375,6 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     }
   }
   .list {
-    height: 200px;
     max-height: 200px;
     overflow: auto;
     margin-bottom: 10px;
@@ -375,18 +383,35 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     }
     ul {
       list-style-type: none;
-      margin-right: 25px;
       input {
         margin-right: 5px;
         margin-top: 0;
+        margin-left: -18px;
       }
-      label.search-result {
-        color: #000000;
-        font-weight: bold;
+      label {
+        padding-left: 20px;
+        &.search-result {
+          color: #000000;
+          font-weight: bold;
+        }
       }
     }
   }
   input[name="value"] {
     display: none;
   }
+}
+
+.filter-container {
+    position: relative;
+}
+.filter-items-hint {
+    padding-right: 80px;
+    position: relative;
+
+    .reset-filter-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
 }

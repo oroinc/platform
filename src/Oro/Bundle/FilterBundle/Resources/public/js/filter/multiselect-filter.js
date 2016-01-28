@@ -127,6 +127,20 @@ define([
                 }
             }
             return value;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _getCriteriaHint: function() {
+            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            var choices = [];
+            _.each(this.choices, function(choice) {
+                if (_.indexOf(value.value, choice.value) !== -1) {
+                    choices.push(choice.label);
+                }
+            });
+            return choices.length > 0 ? choices.join(', ') : this.placeholder;
         }
     });
 

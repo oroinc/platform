@@ -28,6 +28,7 @@ class FormTypeTest extends BlockTypeTestCase
             'no options'                     => [
                 'options'  => [],
                 'expected' => [
+                    'form'              => null,
                     'form_name'         => 'form',
                     'preferred_fields'  => [],
                     'groups'            => [],
@@ -41,6 +42,7 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name' => 'test'
                 ],
                 'expected' => [
+                    'form'              => null,
                     'form_name'         => 'test',
                     'preferred_fields'  => [],
                     'groups'            => [],
@@ -55,6 +57,7 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_prefix' => 'test_prefix'
                 ],
                 'expected' => [
+                    'form'              => null,
                     'form_name'         => 'test_form',
                     'preferred_fields'  => [],
                     'groups'            => [],
@@ -73,6 +76,7 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_group_prefix' => 'form_group_prefix_'
                 ],
                 'expected' => [
+                    'form'              => null,
                     'form_name'         => 'test',
                     'preferred_fields'  => ['field1'],
                     'groups'            => ['group1' => ['title' => 'TestGroup']],
@@ -168,7 +172,7 @@ class FormTypeTest extends BlockTypeTestCase
 
         $view         = new BlockView();
         $block        = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface');
         $context      = new LayoutContext();
         $formView     = new FormView();
 
@@ -211,13 +215,16 @@ class FormTypeTest extends BlockTypeTestCase
         $field3View->children['field32'] = new FormView($field3View);
 
         $view->children['block1']         = new BlockView($view);
-        $view['block1']->vars['form']     = $formView['field1'];
+        $view->children['block1']->vars['form']     = $formView->children['field1'];
+        $rootView->children['block'] = $view;
         $rootView->children['block3']     = new BlockView($rootView);
-        $rootView['block3']->vars['form'] = $field3View['field31'];
+        $rootView->children['block3']->vars['form'] = $field3View->children['field31'];
         $rootView->children['block4']     = new BlockView($rootView);
         // emulate remove form field blocks and then add new blocks with same ids
         $view->children['block2']         = new BlockView($view);
-        $rootView['block4']->vars['form'] = new FormView();
+        $rootView->children['block4']->vars['form'] = new FormView();
+
+        $this->setLayoutBlocks(['root' => $rootView]);
 
         $context->set('form', $formAccessor);
 
@@ -267,9 +274,11 @@ class FormTypeTest extends BlockTypeTestCase
         $field3View->children['field32'] = new FormView($field3View);
 
         $view->children['block1']     = new BlockView($view);
-        $view['block1']->vars['form'] = $formView['field1'];
+        $view->children['block1']->vars['form'] = $formView['field1'];
         $view->children['block3']     = new BlockView($view);
-        $view['block3']->vars['form'] = $field3View['field31'];
+        $view->children['block3']->vars['form'] = $field3View['field31'];
+
+        $this->setLayoutBlocks(['root' => $view]);
 
         $context->set('form', $formAccessor);
 

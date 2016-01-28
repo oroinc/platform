@@ -7,11 +7,8 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
-class UserCalendarProvider implements CalendarProviderInterface
+class UserCalendarProvider extends AbstractCalendarProvider
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
@@ -28,7 +25,7 @@ class UserCalendarProvider implements CalendarProviderInterface
         EntityNameResolver $entityNameResolver,
         AbstractCalendarEventNormalizer $calendarEventNormalizer
     ) {
-        $this->doctrineHelper          = $doctrineHelper;
+        parent::__construct($doctrineHelper);
         $this->entityNameResolver      = $entityNameResolver;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
     }
@@ -39,9 +36,9 @@ class UserCalendarProvider implements CalendarProviderInterface
     public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
         if (empty($calendarIds)) {
-            return array();
+            return [];
         }
-        
+
         $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar')
             ->createQueryBuilder('o')
             ->select('o, owner')
@@ -83,8 +80,9 @@ class UserCalendarProvider implements CalendarProviderInterface
         $extraFields = []
     ) {
         /** @var CalendarEventRepository $repo */
-        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
+        $repo        = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $extraFields = $this->filterSupportedFields($extraFields, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+        $qb          = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
 
         $visibleIds = [];
         foreach ($connections as $id => $visible) {

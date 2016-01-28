@@ -31,6 +31,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "organization_field_name"="organization",
  *          "organization_column_name"="organization_id"
  *      },
+ *      "grid"={
+ *          "default"="website-grid"
+ *     }
  *  }
  * )
  */

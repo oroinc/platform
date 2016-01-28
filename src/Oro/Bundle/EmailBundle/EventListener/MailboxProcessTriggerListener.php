@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
@@ -36,6 +37,20 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
         $this->handler = $handler;
         $this->processStorage = $processStorage;
         $this->doctrine = $doctrine;
+    }
+
+    /**
+     * {@inheritdoc} In addition it filters out emails which are part of thread
+     */
+    public function onFlush(OnFlushEventArgs $args)
+    {
+        parent::onFlush($args);
+        $this->emailBodies = array_filter(
+            $this->emailBodies,
+            function (EmailBody $body) {
+                return $body->getEmail() && !$body->getEmail()->getThread();
+            }
+        );
     }
 
     /**
@@ -78,6 +93,8 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
          */
         foreach ($definitions as $definition) {
             $trigger = new ProcessTrigger();
+            //id must be unique otherwise in cache will be saved and runned first definition with id = null
+            $trigger->setId($definition->getName());
             $trigger->setDefinition($definition);
 
             $data = new ProcessData();
