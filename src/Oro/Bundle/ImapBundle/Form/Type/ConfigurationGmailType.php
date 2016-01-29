@@ -15,6 +15,7 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\GmailOAuthSubscriber;
+use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -54,6 +55,7 @@ class ConfigurationGmailType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber(new DecodeFolderSubscriber());
         $this->addOwnerOrganizationEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);
         $builder->addEventSubscriber(new OriginFolderSubscriber());
