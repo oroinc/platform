@@ -27,3 +27,8 @@ div.disabled-choice div.selector span:after {
     height: 25px;
     padding: 5px;
 }
+
+.filter-criteria .choice-filter .select2-container-multi .select2-choices .select2-search-choice {
+    margin: 2px 0 2px 5px;
+    padding: 3px 20px 3px 7px;
+}

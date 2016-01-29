@@ -68,12 +68,18 @@ define([
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
 
+        /**
+         * @inheritDoc
+         */
         reset: function() {
             DictionaryFilter.__super__.reset.apply(this, arguments);
             var select2element = this.$el.find(this.elementSelector);
             select2element.select2('data',  null);
         },
 
+        /**
+         * Init render
+         */
         render: function() {
             this.renderDeferred = $.Deferred();
             this._wrap('');
@@ -82,6 +88,9 @@ define([
             }
         },
 
+        /**
+         * @inheritDoc
+         */
         _renderCriteria: function() {
             var self = this;
 
@@ -109,6 +118,9 @@ define([
             });
         },
 
+        /**
+         * Render template for filter
+         */
         renderTemplate: function() {
             var value = _.extend({}, this.emptyValue, this.value);
             var selectedChoiceLabel = '';
@@ -135,6 +147,9 @@ define([
             this._refreshWidth();
         },
 
+        /**
+         * init select2 for input
+         */
         applySelect2: function() {
             var self = this;
             var select2Config = this.getSelect2Config();
@@ -154,6 +169,9 @@ define([
             this._criteriaRenderd = true;
         },
 
+        /**
+         * Return config for select2
+         */
         getSelect2Config: function() {
             var config =  {
                 multiple: true,
@@ -191,6 +209,10 @@ define([
             return config;
         },
 
+        /**
+         * Convert data to format for select2
+         * @returns {Array}
+         */
         getDataForSelect2: function() {
             var values = [];
             $.each(this.value.value, function(index, value) {
@@ -203,10 +225,18 @@ define([
             return values;
         },
 
+        /**
+         * @inheritDoc
+         */
         isEmptyValue: function() {
-            return false;
+            var value = this.getValue();
+
+            return value.value && value.value.length === 0;
         },
 
+        /**
+         * @inheritDoc
+         */
         _getParts: function() {
             var value = _.extend({}, this.emptyValue, this.getValue());
             var dictionaryPartTemplate = this._getTemplate(this.fieldTemplateSelector);
@@ -227,10 +257,16 @@ define([
             return parts;
         },
 
+        /**
+         * @inheritDoc
+         */
         _writeDOMValue: function(value) {
             this._setInputValue(this.criteriaValueSelectors.type, value.type);
         },
 
+        /**
+         * @inheritDoc
+         */
         _readDOMValue: function() {
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.type),
@@ -238,6 +274,9 @@ define([
             };
         },
 
+        /**
+         * @inheritDoc
+         */
         _getSelectedChoiceLabel: function(property, value) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this[property])) {
@@ -250,6 +289,9 @@ define([
             return selectedChoiceLabel;
         },
 
+        /**
+         * Update width of filter
+         */
         _refreshWidth: function() {
             var valueFrame = this.$('.value-field-frame');
             // update left and right margins of value field frame
@@ -257,6 +299,31 @@ define([
             var rightWidth = this.$('.filter-update').outerWidth();
             valueFrame.css('margin-left', leftWidth);
             valueFrame.css('margin-right', rightWidth);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _getCriteriaHint: function() {
+            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            var option = null;
+
+            if (!_.isUndefined(value.type)) {
+                var type = value.type;
+                option = this._getChoiceOption(type);
+
+                if (this.isEmptyType(type)) {
+                    return option ? option.label : this.placeholder;
+                }
+            }
+
+            if (!value.value || value.value.length === 0 ) {
+                return this.placeholder;
+            }
+
+            var hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
+
+            return (option ? option.label + ' ' : '') + hintValue;
         }
     });
 
