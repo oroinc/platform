@@ -24,6 +24,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ConnectionControllerManager
 {
+    /**
+     * @deprecated Use parameter oro_imap.user_form_type instead
+     */
     const ORO_USER_USER_FORM = 'oro_user_user_form';
     const ORO_EMAIL_MAILBOX = 'oro_email_mailbox';
 
@@ -42,25 +45,31 @@ class ConnectionControllerManager
     /** @var ImapConnectorFactory */
     protected $imapConnectorFactory;
 
+    /** @var string */
+    protected $userFormType;
+
     /**
      * @param FormInterface $formUser
      * @param FormFactory $formFactory
      * @param Mcrypt $mcrypt
      * @param Registry $doctrineHelper
      * @param ImapConnectorFactory $imapConnectorFactory
+     * @param string $userFormType
      */
     public function __construct(
         FormInterface $formUser,
         FormFactory $formFactory,
         Mcrypt $mcrypt,
         Registry $doctrineHelper,
-        ImapConnectorFactory $imapConnectorFactory
+        ImapConnectorFactory $imapConnectorFactory,
+        $userFormType = 'oro_user_user_form'
     ) {
         $this->formUser = $formUser;
         $this->formFactory = $formFactory;
         $this->mcrypt = $mcrypt;
         $this->doctrine = $doctrineHelper;
         $this->imapConnectorFactory = $imapConnectorFactory;
+        $this->userFormType = $userFormType;
     }
 
     /**
@@ -136,7 +145,7 @@ class ConnectionControllerManager
     protected function prepareForm($formParentName, $accountTypeModel)
     {
         $form = null;
-        if ($formParentName === self::ORO_USER_USER_FORM) {
+        if ($formParentName === $this->userFormType) {
             $data = $user = new User();
             $data->setImapAccountType($accountTypeModel);
             $this->formUser->setData($data);
