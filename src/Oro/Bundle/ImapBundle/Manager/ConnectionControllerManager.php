@@ -103,7 +103,7 @@ class ConnectionControllerManager
         $connector = $this->imapConnectorFactory->createImapConnector($config);
         $manager = new ImapEmailFolderManager(
             $connector,
-            $this->doctrine->getEntityManager(),
+            $this->doctrine->getManager(),
             $origin
         );
 
