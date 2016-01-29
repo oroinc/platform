@@ -322,7 +322,7 @@ define([
                 }
             }
 
-            if (!value.value || value.value.length === 0 ) {
+            if (!value.value || value.value.length === 0) {
                 return this.placeholder;
             }
 
