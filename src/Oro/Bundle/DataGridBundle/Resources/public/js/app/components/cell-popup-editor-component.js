@@ -33,7 +33,7 @@ define(function(require) {
             position: {
                 my: 'left top',
                 at: 'left top+1',
-                collision: 'fit'
+                collision: 'flipfit'
             }
         },
 
