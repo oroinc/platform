@@ -1,8 +1,4 @@
-define([
-    'require',
-    'jquery.select2',
-    'oro/filter/choice-filter'
-], function(require) {
+define(function(require) {
     'use strict';
 
     var DictionaryFilter;
@@ -12,6 +8,7 @@ define([
     var __ = require('orotranslation/js/translator');
     var ChoiceFilter = require('oro/filter/choice-filter');
     var messenger = require('oroui/js/messenger');
+    require('jquery.select2');
 
     /**
      * Multiple select filter: filter values as multiple select options
