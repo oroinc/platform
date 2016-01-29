@@ -63,7 +63,7 @@ class EnumFilterTypeTest extends TypeTestCase
             ->will($this->returnValue('None'));
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options = [];
         if ($enumCode !== null) {
