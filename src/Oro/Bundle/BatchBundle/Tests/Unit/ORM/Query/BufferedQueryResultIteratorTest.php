@@ -561,4 +561,94 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             $actualSqls[2]
         );
     }
+
+    /**
+     * @dataProvider pageCallbackDataProvider
+     */
+    public function testPageCallback(array $statements, $bufferSize, $expectedPages)
+    {
+        $statementCounter = 0;
+
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
+            ->method('query')
+            ->will(
+                $this->returnCallback(
+                    function ($sql) use (&$statements, &$statementCounter, &$actualSqls) {
+                        $actualSqls[$statementCounter] = $sql;
+                        $statement = $statements[$statementCounter];
+                        $statementCounter++;
+                        return $statement;
+                    }
+                )
+            );
+
+        $source = $this->em->createQueryBuilder()
+            ->select('o')
+            ->from('Stub:Entity', 'o');
+
+        $iterator = (new BufferedQueryResultIterator($source))
+            ->setBufferSize($bufferSize);
+        $pages = 0;
+        $iterator->setPageCallback(function () use (&$pages) {
+            $pages++;
+        });
+
+        $this->assertEquals(0, $pages);
+        iterator_to_array($iterator);
+        $this->assertEquals($expectedPages, $pages);
+    }
+
+    public function pageCallbackDataProvider()
+    {
+        $records = [
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
+        ];
+
+        return [
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => 0]]),
+                ],
+                $bufferSize = 1,
+                $pages = 0,
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0]]),
+                    $this->createFetchStatementMock([$records[1]]),
+                    $this->createFetchStatementMock([$records[2]]),
+                ],
+                $bufferSize = 1,
+                $pages = 3,
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0], $records[1]]),
+                    $this->createFetchStatementMock([$records[2]]),
+                ],
+                $bufferSize = 2,
+                $pages = 2,
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
+                ],
+                $bufferSize = 3,
+                $pages = 1,
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
+                ],
+                $bufferSize = 5,
+                $pages = 1,
+            ],
+        ];
+    }
 }

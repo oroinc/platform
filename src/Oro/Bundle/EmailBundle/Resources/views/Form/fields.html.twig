@@ -211,31 +211,22 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_widget %}
-    <div class="folder-tree-widget">
-        <input id="check-all" type="checkbox"/><label class="folder-label">All</label>
-        <div id="folder-list">
+    {% set options = {
+        dataInputSelector: 'input[name="' ~ full_name ~ '"]',
+        checkAllSelector: '.check-all',
+        relatedCheckboxesSelector: '.folder-list :checkbox'
+    } %}
+    <div class="folder-tree-widget"
+         data-page-component-module="oroemail/js/app/components/folder-tree-component"
+         data-page-component-options="{{ options|json_encode }}">
+        <input class="check-all" type="checkbox"/><label class="folder-label">{{ "oro.email.imap.folder.checkAll"|trans }}</label>
+        <div class="folder-list">
             {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
                 {{ _self.renderFolder(key, folder, form.vars.full_name) }}
             {% endfor %}
         </div>
+        <input name="{{ full_name }}" type="hidden">
     </div>
-
-    <script type="text/javascript">
-        require(['jquery'], function($) {
-            var $folderList = $('#folder-list');
-            var $checkAll = $('#check-all');
-            $checkAll.click(function() {
-                var checked = this.checked;
-                $folderList.find(':checkbox').each(function() {
-                    this.checked = checked;
-                });
-            });
-
-            $folderList.find(':checkbox').each(function() {
-                $(this).css('margin', 0);
-            });
-        });
-    </script>
 {% endblock %}
 
 {% block oro_email_mailbox_grid_row %}
@@ -346,11 +337,11 @@
 {% macro renderFolder(key, folder, namePrefix, maxDepth = 10) %}
     {% if maxDepth %}
         <div>
-            <input type="checkbox" name="{{ namePrefix }}[{{ key }}][syncEnabled]"{% if folder.syncEnabled %}checked="checked"{% endif %}>
+            <input type="checkbox" data-name="syncEnabled"{% if folder.syncEnabled %}checked="checked"{% endif %}>
             <label class="folder-label">{{ folder.name }}</label>
-            <input type="hidden" name="{{ namePrefix }}[{{ key }}][fullName]" value="{{ folder.fullName }}">
-            <input type="hidden" name="{{ namePrefix }}[{{ key }}][name]" value="{{ folder.name }}">
-            <input type="hidden" name="{{ namePrefix }}[{{ key }}][type]" value="{{ folder.type }}">
+            <input type="hidden" data-name="fullName" value="{{ folder.fullName }}">
+            <input type="hidden" data-name="name" value="{{ folder.name }}">
+            <input type="hidden" data-name="type" value="{{ folder.type }}">
             {% if maxDepth > 1 and folder.subFolders|length > 0 %}
                 <div class="folder-sub-folders">
                     {% for subKey, subFolder in folder.subFolders %}
