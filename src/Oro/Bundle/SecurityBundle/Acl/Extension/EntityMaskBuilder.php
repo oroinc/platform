@@ -7,17 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 
 final class EntityMaskBuilder extends MaskBuilder
 {
-    const PATTERN_ALL_OFF   = '................. permission3:..... permission2:..... permission1:.....';
-
-    const CODE_VIEW         = 'V';
-    const CODE_CREATE       = 'C';
-    const CODE_EDIT         = 'E';
-    const CODE_DELETE       = 'D';
-    const CODE_ASSIGN       = 'A';
-    const CODE_SHARE        = 'S';
-
     const MAX_PERMISSIONS_IN_MASK = 3;
-    const DATA_BITS_COUNT         = 15;
 
     const SERVICE_BITS            = -32768;
     const REMOVE_SERVICE_BITS     = 32767;
@@ -132,11 +122,12 @@ final class EntityMaskBuilder extends MaskBuilder
     public function add($mask)
     {
         if (is_string($mask)) {
-            $mask = $this->getMask('MASK_' . $mask);
+            $mask = $this->getMask('MASK_' . strtoupper($mask));
         } elseif (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be a string or an integer.');
         }
 
+        $mask &= self::REMOVE_SERVICE_BITS;
         $this->mask |= $mask;
 
         return $this;
@@ -148,12 +139,13 @@ final class EntityMaskBuilder extends MaskBuilder
     public function remove($mask)
     {
         if (is_string($mask)) {
-            $mask = $this->getMask('MASK_' . $mask);
+            $mask = $this->getMask('MASK_' . strtoupper($mask));
         } elseif (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be a string or an integer.');
         }
 
         $this->mask &= ~$mask;
+        $this->mask |= $this->getIdentity();
 
         return $this;
     }

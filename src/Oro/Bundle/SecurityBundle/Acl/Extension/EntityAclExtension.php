@@ -148,7 +148,7 @@ class EntityAclExtension extends AbstractAclExtension
     {
         $identity = (int) (($pk - 1) / EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
 
-        return $identity << EntityMaskBuilder::DATA_BITS_COUNT;
+        return $identity << (count(AccessLevel::$allAccessLevelNames) * EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
     }
 
     /**
