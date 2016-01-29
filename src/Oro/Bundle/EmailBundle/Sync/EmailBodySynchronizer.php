@@ -3,6 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\Common\Persistence\ObjectManager;
+
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
@@ -10,10 +17,6 @@ use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailBodySynchronizer implements LoggerAwareInterface
 {
@@ -74,6 +77,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             $emailBody = null;
             try {
                 $emailBody = $loader->loadEmailBody($folder, $email, $this->getManager());
+                $email->setEmailBody($emailBody);
             } catch (LoadEmailBodyException $loadEx) {
                 $this->logger->notice(
                     sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
@@ -86,10 +90,6 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                     ['exception' => $ex]
                 );
                 throw new LoadEmailBodyFailedException($email, $ex);
-            }
-
-            if ($emailBody) {
-                $email->setEmailBody($emailBody);
             }
 
             $this->getManager()->persist($email);

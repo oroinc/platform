@@ -12,7 +12,7 @@ use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Component\Log\OutputLogger;
 
 /**
- * @deprecated Cron command oro:cron:email-body-sync should be used instead off
+ * @deprecated Cron command oro:cron:email-body-sync should be used instead
  */
 class EmailBodySyncCommand extends ContainerAwareCommand
 {
@@ -25,7 +25,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand
             ->setName('oro:email:body-sync')
             ->setDescription(
                 'Synchronization email body. This command is deprecated. '
-                .'Cron command oro:cron:email-body-sync should be used instead off'
+                .'Cron command oro:cron:email-body-sync should be used instead'
             )
             ->addOption(
                 'id',
