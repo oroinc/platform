@@ -147,6 +147,7 @@ oro:
             priority.label:       Priority
             queued.label:         Queued
             time_shift.label:     Time shift
+            cron.label:           Cron Expression
 
         transition:
             start: "Start %workflow%"
