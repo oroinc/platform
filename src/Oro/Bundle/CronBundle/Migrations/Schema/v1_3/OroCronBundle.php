@@ -41,7 +41,7 @@ class OroCronBundle implements Migration, DatabasePlatformAwareInterface
             $queries->addQuery($query);
         }
 
-        $queries->addQuery('UPDATE oro_cron_schedule SET args = \'[]\', args_hash = md5(args) WHERE args IS NULL');
+        $queries->addQuery(sprintf('UPDATE oro_cron_schedule SET args = \'%s\', args_hash = \'%s\'', '[]', md5('[]')));
 
         $postSchema = clone $preSchema;
 
