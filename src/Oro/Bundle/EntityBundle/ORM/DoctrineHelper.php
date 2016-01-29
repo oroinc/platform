@@ -14,11 +14,20 @@ use Oro\Bundle\EntityBundle\Exception;
 
 class DoctrineHelper
 {
-    /** @var ManagerRegistry */
+    /**
+     * @var ManagerRegistry
+     */
     protected $registry;
 
-    /** @var EntityManager[] */
+    /**
+     * @var EntityManager[]
+     */
     private $managers = [];
+
+    /**
+     * @var array
+     */
+    private $managersMap = [];
 
     /**
      * @param ManagerRegistry $registry
@@ -443,10 +452,18 @@ class DoctrineHelper
      */
     private function getManagerForClass($entityClass)
     {
-        if (!array_key_exists($entityClass, $this->managers)) {
-            $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
+        if (!array_key_exists($entityClass, $this->managersMap)) {
+            $manager = $this->registry->getManagerForClass($entityClass);
+            if (null !== $manager) {
+                $hash = spl_object_hash($manager);
+                $this->managers[$hash] = $manager;
+                $this->managersMap[$entityClass] = $hash;
+            } else {
+                $this->managersMap[$entityClass] = null;
+            }
+            return $manager;
         }
 
-        return $this->managers[$entityClass];
+        return $this->managersMap[$entityClass] ? $this->managers[$this->managersMap[$entityClass]] : null;
     }
 }
