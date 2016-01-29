@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_20;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
@@ -37,12 +38,11 @@ class OroEmailBundle implements Migration
      */
     protected function deleteBodySyncProcess(QueryBag $queries)
     {
-        $sql = <<<SQL
-    DELETE
-    FROM
-      oro_process_definition
-    WHERE name = 'sync_email_body_after_email_synchronize'
-SQL;
-        $queries->addPostQuery(new SqlMigrationQuery($sql));
+        $queries->addQuery(
+            new ParametrizedSqlMigrationQuery(
+                'DELETE FROM oro_process_definition WHERE name = :processName',
+                ['processName' => 'sync_email_body_after_email_synchronize']
+            )
+        );
     }
 }
