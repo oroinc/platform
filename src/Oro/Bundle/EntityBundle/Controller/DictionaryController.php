@@ -33,7 +33,7 @@ class DictionaryController extends Controller
         $results = $manager->findValueBySearchQuery($searchQuery);
         $responseContext = ['results' => $results];
 
-        return new JsonResponse($responseContext, $code);
+        return new JsonResponse($responseContext);
     }
 
     /**

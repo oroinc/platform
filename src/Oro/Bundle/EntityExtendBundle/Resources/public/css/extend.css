@@ -22,3 +22,8 @@ div.disabled-choice div.selector span:after {
 .filter-criteria .choice-filter .value-field-frame .dictionary-filter {
     width: 200px;
 }
+
+.filter-criteria .choice-filter .value-field-frame .select2-search-field input[type=text] {
+    height: 25px;
+    padding: 5px;
+}
