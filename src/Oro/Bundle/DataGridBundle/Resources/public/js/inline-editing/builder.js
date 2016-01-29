@@ -5,6 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var InlineEditingHelpPlugin = require('../app/plugins/grid/inline-editing-help-plugin');
+    var console = window.console;
 
     var gridViewsBuilder = {
         /**
@@ -35,6 +36,14 @@ define(function(require) {
                     }
                     deferred.resolve();
                 });
+            }).fail(function(e) {
+                if (console && console.error) {
+                    console.log(e);
+                    console.error('Inline editing loading failed. Reason: ' + e.message);
+                } else {
+                    throw e;
+                }
+                deferred.resolve();
             });
         },
 
