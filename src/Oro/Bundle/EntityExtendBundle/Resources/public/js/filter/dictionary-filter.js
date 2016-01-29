@@ -1,6 +1,7 @@
 define([
     'require',
-    'jquery.select2'
+    'jquery.select2',
+    'oro/filter/choice-filter'
 ], function(require) {
     'use strict';
 
@@ -54,6 +55,10 @@ define([
         criteriaValueSelectors: {
             type: 'input[type="hidden"]:last'
         },
+
+        filterParams: null,
+
+        class: null,
 
         /**
          * @inheritDoc
