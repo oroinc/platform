@@ -68,8 +68,8 @@ define([
      */
     function getErrorTarget(element) {
         var $target = $(validationBelongs(element));
-        if ($target.getInputWidget()) {
-            $target = $target.getInputWidget().$el;
+        if ($target.parent().is('.selector, .uploader, .input-append, .input-prepend')) {
+            $target = $target.parent();
         }
         return $target;
     }

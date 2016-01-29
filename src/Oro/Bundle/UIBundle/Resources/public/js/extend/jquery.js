@@ -160,29 +160,6 @@ define(['jquery'], function($) {
                     $el.removeClass(className);
                 }, delay);
             });
-        },
-
-        /**
-         * Return form element widget
-         * @returns {null|Object}
-         */
-        getInputWidget: function() {
-            if (this.inputWidget !== undefined) {
-                return this.inputWidget;
-            }
-            this.inputWidget = null;
-
-            if (this.parent().is('.selector, .uploader, .input-append, .input-prepend')) {
-                this.inputWidget = {
-                    $el: this.parent()
-                };
-            } else if (this.data('chosen')) {
-                this.inputWidget = {
-                    $el: this.data('chosen').container
-                };
-            }
-
-            return this.inputWidget;
         }
     });
 
