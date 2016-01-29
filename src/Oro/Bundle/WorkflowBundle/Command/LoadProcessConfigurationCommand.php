@@ -115,7 +115,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
     {
         /** @var ProcessDefinition[] $allDefinitions */
         $allDefinitions = $this->getRepository('OroWorkflowBundle:ProcessDefinition')->findAll();
-        $definitionsByName = array();
+        $definitionsByName = [];
         foreach ($allDefinitions as $definition) {
             $definitionsByName[$definition->getName()] = $definition;
         }
