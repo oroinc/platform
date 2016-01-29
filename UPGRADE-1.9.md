@@ -5,6 +5,7 @@ UPGRADE FROM 1.8 to 1.9
 - Services with tag `oro_activity.activity_widget_provider` was marked as private
 
 ####ActivityListBundle
+- The signature of `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface::isApplicableTarget` method changed. Before: `isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)`. After: `isApplicableTarget($entityClass, $accessible = true)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getDate` removed. Use `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getCreatedAt` and `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getUpdatedAt` instead
@@ -15,10 +16,16 @@ UPGRADE FROM 1.8 to 1.9
 - `oro_address.address.manager` service was marked as private
 - Validation `AbstractAddress::isRegionValid` was moved to `Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion` constraint
 
+####AttachmentBundle
+- Class `Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig` marked as deprecated. Use `Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper` instead.
+
 ####CalendarBundle
 - `oro_calendar.calendar_provider.user` service was marked as private
 - `oro_calendar.calendar_provider.system` service was marked as private
 - `oro_calendar.calendar_provider.public` service was marked as private
+
+####CommentBundle
+- The `Oro\Bundle\CommentBundle\Model\CommentProviderInterface` changed. The `hasComments` method removed. The `isCommentsEnabled` method added. The signature of the old method was `hasComments(ConfigManager $configManager, $entityName)`. The signature of the new method is `isCommentsEnabled($entityClass)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\CommentBundle\Model\CommentProviderInterface`.
 
 ####ConfigBundle
 - An implementation of scope managers has been changed to be simpler and performant. This can bring a `backward compatibility break` if you have own scope managers. See [add_new_config_scope.md](./src/Oro/Bundle/ConfigBundle/Resources/doc/add_new_config_scope.md) and the next items for more detailed info.
@@ -160,9 +167,12 @@ grid-name:
 - Added parameters `Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Type\FieldType`
 - Services with tag `oro_entity_extend.entity_config_dumper_extension` was marked as private
 - Services with tag `oro_entity_extend.entity_generator_extension` was marked as private
+- Method `generateManyToOneRelationColumnName` of `Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator` marked as deprecated. Use `generateRelationColumnName` method instead.
+- Method `generateManyToManyRelationColumnName` of `Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator` marked as deprecated. Use `generateManyToManyJoinTableColumnName` method instead.
 
 ####EntitySerializer component
 - `Oro\Component\EntitySerializer\EntitySerializer` class has a lot of changes. This can bring a `backward compatibility break` if you have inherited classes.
+- Changed the default behaviour for relations which does not have explicit configuration. Now such relations are skipped. Before that the all fields of a related entity were returned, this could cause indefinite loop if a target entity has another relation to parent entity. To restore the previous result you should configure all relations explicitly, for example: `users => null`.
 - `excluded_fields` attribute is marked as deprecated. Use `exclude` attribute for a field.
 - `orderBy` attribute is marked as deprecated. Use `order_by` attribute instead.
 - `result_name` attribute is marked as deprecated. Use `property_path` attribute instead.
@@ -218,6 +228,7 @@ after:
 - Services with tag `oro_importexport.normalizer` was marked as private
 - Allow to omit empty identity fields. To use this feature set `Use As Identity Field` option to `Only when not empty
 ` (-1 or `Oro\Bundle\ImportExportBundle\Field\FieldHelper::IDENTITY_ONLY_WHEN_NOT_EMPTY` in a code)
+- The signature of `Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter::getRelatedEntityRulesAndBackendHeaders` method changed. Before: `getRelatedEntityRulesAndBackendHeaders($entityName, $fullData, $singleRelationDeepLevel, $multipleRelationDeepLevel, $field, $fieldHeader, $fieldOrder, $isIdentifier = false)`. After: `getRelatedEntityRulesAndBackendHeaders($entityName, $singleRelationDeepLevel, $multipleRelationDeepLevel, $field, $fieldHeader, $fieldOrder)`. This can bring a `backward compatibility break` if you have classes inherited from `Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter`.
 
 ####InstallerBundle
 - `Oro\Bundle\InstallerBundle\EventListener\RequestListener` added to the class cache as performance improvement

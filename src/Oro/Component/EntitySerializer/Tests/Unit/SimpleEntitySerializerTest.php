@@ -1052,4 +1052,53 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             $result
         );
     }
+
+    /**
+     * tests that not configured relations is skipped
+     * it is a temporary fix until the identifier field will not be used by default for them
+     */
+    public function testNotConfiguredRelations()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' p0_.category_name AS category_name_2, p0_.owner_id AS owner_id_3'
+            . ' FROM product_table p0_'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'category_name_2' => 'category_name',
+                    'owner_id_3'      => 10,
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'fields' => [
+                    'id'   => null,
+                    'name' => null
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'   => 1,
+                    'name' => 'product_name'
+                ]
+            ],
+            $result
+        );
+    }
 }

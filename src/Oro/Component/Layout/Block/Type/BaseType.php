@@ -98,6 +98,8 @@ class BaseType extends AbstractType
         if (isset($view->vars['attr']['id']) && !isset($view->vars['label_attr']['for'])) {
             $view->vars['label_attr']['for'] = $view->vars['attr']['id'];
         }
+
+        $view->vars['blocks'] = $view->blocks;
     }
 
     /**
