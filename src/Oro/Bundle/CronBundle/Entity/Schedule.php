@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="oro_cron_schedule", uniqueConstraints={
- *      @ORM\UniqueConstraint(name="UQ_COMMAND", columns={"command", "args", "definition"})
+ *      @ORM\UniqueConstraint(name="UQ_COMMAND", columns={"command", "args_hash", "definition"})
  * })
  * @ORM\Entity
  */
@@ -31,9 +31,16 @@ class Schedule
     /**
      * @var array
      *
-     * @ORM\Column(name="args", type = "array")
+     * @ORM\Column(name="args", type = "json_array")
      */
-    protected $arguments = [];
+    protected $arguments;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="args_hash", type="string", length=32)
+     */
+    protected $argumentsHash;
 
     /**
      * @var string
@@ -41,6 +48,11 @@ class Schedule
      * @ORM\Column(name="definition", type="string", length=100, nullable=true)
      */
     protected $definition;
+
+    public function __construct()
+    {
+        $this->setArguments([]);
+    }
 
     /**
      * Get id
@@ -92,6 +104,7 @@ class Schedule
         sort($arguments);
 
         $this->arguments = $arguments;
+        $this->argumentsHash = md5(json_encode($arguments));
 
         return $this;
     }
