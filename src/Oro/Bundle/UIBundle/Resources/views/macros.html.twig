@@ -960,3 +960,33 @@
         {% endfor -%}
     </ul>
 {% endmacro %}
+
+{%- macro renderViewLink(entity, label, route, permission) -%}
+    {% spaceless %}
+        {%- if entity %}
+            {% if route != 'none' and resource_granted(permission|default('VIEW'), entity) %}
+                {{ _self.renderUrl(path(route, {'id': entity.id}), label) }}
+            {% else %}
+                {{ label|escape }}
+            {% endif %}
+        {% endif -%}
+    {% endspaceless %}
+{%- endmacro -%}
+
+{%- macro renderViewLinks(entities, property, route, permission) -%}
+    {% spaceless %}
+        {% set links = [] %}
+        {% for entity in entities %}
+            {% set links = links|merge([_self.renderViewLink(entity, attribute(entity, property), route, permission)]) %}
+        {% endfor %}
+        {{ _self.renderList(links) }}
+    {% endspaceless %}
+{%- endmacro -%}
+
+{%- macro renderUserViewLinks(entities, property, route) -%}
+    {{ _self.renderViewLinks(entities, property|default('fullName'), route|default('oro_user_view')) }}
+{%- endmacro -%}
+
+{%- macro renderUserViewLink(entity, property, route) -%}
+    {{ _self.renderViewLink(entity, attribute(entity, property|default('fullName')), route|default('oro_user_view')) }}
+{%- endmacro -%}
