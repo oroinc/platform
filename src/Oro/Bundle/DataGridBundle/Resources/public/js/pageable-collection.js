@@ -1,12 +1,13 @@
-define(function(require) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'backbone-pageable-collection',
+    'oroui/js/tools'
+], function($, _, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
     var PageableCollection;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var BackbonePageableCollection = require('backbone-pageable-collection');
-    var tools = require('oroui/js/tools');
 
     /**
      * Object declares state keys that will be involved in URL-state saving with their shorthands
