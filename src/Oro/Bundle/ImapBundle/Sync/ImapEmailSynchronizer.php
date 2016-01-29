@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
@@ -24,27 +25,31 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /** @var Mcrypt */
     protected $encryptor;
 
+    /** @var ImapEmailGoogleOauth2Manager */
+    protected $imapEmailGoogleOauth2Manager;
+
     /**
-     * Constructor
-     *
-     * @param ManagerRegistry                          $doctrine
-     * @param KnownEmailAddressCheckerFactory          $knownEmailAddressCheckerFactory
+     * @param ManagerRegistry $doctrine
+     * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
      * @param ImapEmailSynchronizationProcessorFactory $syncProcessorFactory
-     * @param ImapConnectorFactory                     $connectorFactory
-     * @param Mcrypt                                   $encryptor
+     * @param ImapConnectorFactory $connectorFactory
+     * @param Mcrypt $encryptor
+     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
      */
     public function __construct(
         ManagerRegistry $doctrine,
         KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
         ImapEmailSynchronizationProcessorFactory $syncProcessorFactory,
         ImapConnectorFactory $connectorFactory,
-        Mcrypt $encryptor
+        Mcrypt $encryptor,
+        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
     ) {
         parent::__construct($doctrine, $knownEmailAddressCheckerFactory);
 
         $this->syncProcessorFactory = $syncProcessorFactory;
         $this->connectorFactory     = $connectorFactory;
         $this->encryptor            = $encryptor;
+        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
     }
 
     /**
@@ -76,7 +81,8 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
-            $this->encryptor->decryptData($origin->getPassword())
+            $this->encryptor->decryptData($origin->getPassword()),
+            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
         );
 
         return $this->syncProcessorFactory->create(

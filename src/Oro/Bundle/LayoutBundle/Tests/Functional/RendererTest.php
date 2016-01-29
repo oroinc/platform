@@ -143,7 +143,15 @@ class RendererTest extends LayoutTestCase
             ->add('head', 'root', 'head', ['title' => 'Test'])
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
-            ->add('external_style', 'head', 'style', ['src' => 'test.css', 'scoped' => new Condition\False()])
+            ->add(
+                'external_style',
+                'head',
+                'style',
+                [
+                    'src' => ['@asset' => 'test.css'],
+                    'scoped' => new Condition\False()
+                ]
+            )
             ->add(
                 'script',
                 'head',
