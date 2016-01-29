@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -31,10 +30,17 @@ class DictionaryController extends Controller
         $searchQuery = $this->get('request_stack')->getCurrentRequest()->get('q');
         $manager = $this->container->get('oro_entity.manager.dictionary.api');
         $manager->setClass($manager->resolveEntityClass($dictionary, true));
-        $results = $manager->findValueBySearchQuery($searchQuery);
-        $responseContext = ['results' => $results];
+        $code = Codes::HTTP_OK;
 
-        return new JsonResponse($responseContext);
+        try {
+            $results = $manager->findValueBySearchQuery($searchQuery);
+            $responseContext = ['results' => $results];
+        } catch (\LogicException $e) {
+            $responseContext = ['error' => $e->getMessage()];
+            $code = $e->getCode();
+        }
+
+        return new JsonResponse($responseContext, $code);
     }
 
     /**

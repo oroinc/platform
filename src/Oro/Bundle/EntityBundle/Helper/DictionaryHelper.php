@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityBundle\Helper;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
@@ -57,7 +56,8 @@ class DictionaryHelper
         }
 
         throw new \LogicException(
-            sprintf('Search fields are not configured for class %s', $doctrineMetadata->getName())
+            sprintf('Search fields are not configured for class %s', $doctrineMetadata->getName()),
+            Codes::HTTP_NOT_FOUND
         );
     }
 
