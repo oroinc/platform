@@ -935,18 +935,33 @@ define(function(require) {
 
         /**
          *
-         * @param {Integer} pageSize
+         * @param {number} pageSize
          * @param {Object} options
          * @returns {Object}
          */
         setPageSize: function(pageSize, options) {
+            var result;
+            // make state clone
+            var oldState = _.extend({}, this.state);
+
             this.state.pageSize = pageSize;
             if (this.mode === 'server') {
-                this.fetch({reset: true});
-                return this.getPage(this.state.currentPage, options);
+                options = _.extend(options || {}, {reset: true});
+                result = this.getPage(this.state.currentPage, options);
             } else {
-                return PageableCollection.__super__.setPageSize.call(this, pageSize, options);
+                result = PageableCollection.__super__.setPageSize.call(this, pageSize, options);
             }
+
+            // getPage has inconsistent return value: collection or promise,
+            // so we have to check it's a promise
+            if (_.isFunction(result.fail)) {
+                result.fail(_.bind(function() {
+                    // revert state if page change fail
+                    this.state = this._checkState(oldState);
+                }, this));
+            }
+
+            return result;
         },
 
         /**

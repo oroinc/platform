@@ -57,7 +57,8 @@ define(function(require) {
             });
             this.listenTo(mediator, {
                 'page:beforeChange': this.removeActiveEditorComponents,
-                'openLink:before': this.beforePageChange
+                'openLink:before': this.beforePageChange,
+                'page:beforeRedirectTo': this.beforeRedirectTo
             });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
@@ -88,14 +89,10 @@ define(function(require) {
             }
         },
 
-        beforeGridCollectionFetch: function(collection, options) {
-            if (!this.hasChanges()) {
-                return;
-            }
-
+        confirmNavigation: function() {
             var confirmModal = new Modal({
                 title: __('oro.datagrid.inline_editing.refresh_confirm_modal.title'),
-                content: __('oro.datagrid.inline_editing.refresh_confirm_modal.content'),
+                content: __('oro.ui.leave_page_with_unsaved_data_confirm'),
                 okText: __('OK, got it.'),
                 className: 'modal modal-primary',
                 okButtonClass: 'btn-primary btn-large',
@@ -114,8 +111,24 @@ define(function(require) {
                 deferredConfirmation.reject(deferredConfirmation.promise(), 'abort');
             });
 
-            options.waitForPromises.push(deferredConfirmation.promise());
             confirmModal.open();
+
+            return deferredConfirmation;
+        },
+
+        beforeGridCollectionFetch: function(collection, options) {
+            if (this.hasChanges()) {
+                var deferredConfirmation = this.confirmNavigation();
+                options.waitForPromises.push(deferredConfirmation.promise());
+            }
+
+        },
+
+        beforeRedirectTo: function(queue) {
+            if (this.hasChanges()) {
+                var deferredConfirmation = this.confirmNavigation();
+                queue.push(deferredConfirmation.promise());
+            }
         },
 
         beforePageChange: function(e) {
