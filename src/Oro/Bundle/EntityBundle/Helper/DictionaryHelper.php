@@ -57,8 +57,7 @@ class DictionaryHelper
         }
 
         throw new \LogicException(
-            sprintf('Search fields are not configured for class %s', $doctrineMetadata->getName()),
-            Codes::HTTP_NOT_FOUND
+            sprintf('Search fields are not configured for class %s', $doctrineMetadata->getName())
         );
     }
 
