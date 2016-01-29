@@ -19,6 +19,11 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         unset($this->object);
     }
 
+    public function testConstructor()
+    {
+        $this->assertAttributes([]);
+    }
+
     public function testGetId()
     {
         $this->assertNull($this->object->getId());
@@ -70,5 +75,21 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'testValue' => '*/5 * * * *'
             ]
         ];
+    }
+
+    public function testSetArguments()
+    {
+        $this->object->setArguments(['test' => 'value', 'some' => 'data']);
+
+        $this->assertAttributes(['data', 'value']);
+    }
+
+    /**
+     * @param array $attributes
+     */
+    protected function assertAttributes(array $attributes = [])
+    {
+        $this->assertAttributeEquals($attributes, 'arguments', $this->object);
+        $this->assertAttributeEquals(md5(json_encode($attributes)), 'argumentsHash', $this->object);
     }
 }
