@@ -25,8 +25,8 @@ oro:
             cron_job.label:                Job Queue
             cron_job_shortcut.label:       Jobs List
             cron_job_shortcut.description: List of cron jobs
-            cron_schedule.label:           Cron Schedule
-            cron_schedule.description:     Cron Schedule Tasks
+            cron_schedule.label:           Scheduled Tasks
+            cron_schedule.description:     Cron Scheduled Tasks
 
         message:
             start:

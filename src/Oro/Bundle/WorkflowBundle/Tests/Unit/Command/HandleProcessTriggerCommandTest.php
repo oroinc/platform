@@ -162,15 +162,13 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             'valid id' => [
                 'id' => 1,
                 'output' => [
-                    'Handle process trigger #1 "label" (name)',
-                    'Process trigger #1 handle name successfully finished in',
+                    'Trigger #1 of process "name" successfully finished in',
                 ],
             ],
             'wrong id' => [
                 'id' => 2,
                 'output' => [
-                    'Handle process trigger #2 "label" (name)',
-                    'Process trigger #2 handle failed: Process 1 exception',
+                    'Trigger #2 of process "name" failed: Process 1 exception',
                 ],
                 'exception' => new \Exception('Process 1 exception'),
             ],

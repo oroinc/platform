@@ -15,6 +15,12 @@ class LoadProcessEntities extends AbstractFixture
     const DISABLED_DEFINITION = 'disabled';
     const UPDATE_TRIGGER_FIELD = 'name';
 
+    const TRIGGER_UPDATE = 'trigger_update';
+    const TRIGGER_CREATE = 'trigger_create';
+    const TRIGGER_DELETE = 'trigger_delete';
+    const TRIGGER_CRON = 'trigger_cron';
+    const TRIGGER_DISABLED = 'trigger_disabled';
+
     /** @var array */
     protected $definitions = [
         self::FIRST_DEFINITION => [
@@ -36,31 +42,31 @@ class LoadProcessEntities extends AbstractFixture
 
     /** @var array */
     protected $triggers = [
-        'update' => [
+        self::TRIGGER_UPDATE => [
             'definition' => self::FIRST_DEFINITION,
             'event' => ProcessTrigger::EVENT_UPDATE,
             'field' => self::UPDATE_TRIGGER_FIELD,
             'cron' => null
         ],
-        'create' => [
+        self::TRIGGER_CREATE => [
             'definition' => self::SECOND_DEFINITION,
             'event' => ProcessTrigger::EVENT_CREATE,
             'field' => null,
             'cron' => null
         ],
-        'delete' => [
+        self::TRIGGER_DELETE => [
             'definition' => self::SECOND_DEFINITION,
             'event' => ProcessTrigger::EVENT_DELETE,
             'field' => null,
             'cron' => null
         ],
-        'cron' => [
+        self::TRIGGER_CRON => [
             'definition' => self::SECOND_DEFINITION,
             'event' => null,
             'field' => null,
             'cron' => '*/1 * * * *'
         ],
-        'create_disabled' => [
+        self::TRIGGER_DISABLED => [
             'definition' => self::DISABLED_DEFINITION,
             'event' => ProcessTrigger::EVENT_CREATE,
             'field' => null,
@@ -87,7 +93,7 @@ class LoadProcessEntities extends AbstractFixture
             $manager->persist($definition);
         }
 
-        foreach ($this->triggers as $config) {
+        foreach ($this->triggers as $key => $config) {
             $trigger = new ProcessTrigger();
             $trigger
                 ->setDefinition($this->definitions[$config['definition']])
@@ -96,6 +102,7 @@ class LoadProcessEntities extends AbstractFixture
                 ->setCron($config['cron']);
 
             $manager->persist($trigger);
+            $this->addReference($key, $trigger);
         }
 
         $manager->flush();
