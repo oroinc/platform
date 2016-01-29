@@ -34,7 +34,7 @@ class OroCronBundle implements Migration, DatabasePlatformAwareInterface
 
         $table = $preSchema->getTable('oro_cron_schedule');
         $table->changeColumn('command', ['length' => 255]);
-        $table->addColumn('args', 'array', []);
+        $table->addColumn('args', 'array', ['notnull' => false]);
         $table->addColumn('args_hash', 'string', ['notnull' => false, 'length' => 32]);
 
         foreach ($this->getSchemaDiff($schema, $preSchema) as $query) {
@@ -46,6 +46,7 @@ class OroCronBundle implements Migration, DatabasePlatformAwareInterface
         $postSchema = clone $preSchema;
 
         $table = $postSchema->getTable('oro_cron_schedule');
+        $table->changeColumn('args', ['notnull' => true]);
         $table->changeColumn('args_hash', ['notnull' => true, 'length' => 32]);
         $table->dropIndex('UQ_COMMAND');
         $table->addUniqueIndex(['command', 'args_hash', 'definition'], 'UQ_COMMAND');
