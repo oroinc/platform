@@ -54,7 +54,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      */
     public function setGetDataProvider()
     {
-        return array(
+        return [
             'command' => [
                 'propertyName' => 'command',
                 'testValue' => 'oro:test'
@@ -69,6 +69,6 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'propertyName' => 'definition',
                 'testValue' => '*/5 * * * *'
             ]
-        );
+        ];
     }
 }

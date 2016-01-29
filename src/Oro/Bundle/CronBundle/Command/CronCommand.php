@@ -83,7 +83,7 @@ class CronCommand extends ContainerAwareCommand
 
     /**
      * @param array|Command[]|CronCommandInterface[] $commands
-     * @param Collection $schedules
+     * @param Collection|Schedule[] $schedules
      * @param OutputInterface $output
      *
      * @return array|Job[]
@@ -143,8 +143,7 @@ class CronCommand extends ContainerAwareCommand
 
             $output->write(sprintf('Processing command "<info>%s%s</info>": ', $schedule->getCommand(), $arguments));
 
-            $job = $this->createJob($output, $schedule, $schedule->getCommand());
-            if ($job) {
+            if ($job = $this->createJob($output, $schedule, $schedule->getCommand())) {
                 $jobs[] = $job;
             }
         }
