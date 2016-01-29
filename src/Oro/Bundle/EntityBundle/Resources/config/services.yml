@@ -405,9 +405,3 @@ services:
         arguments:
             - @doctrine
             - @translator
-
-    oro_entity.provider.abstract_entity_data_provider:
-        abstract: true
-        class: Oro\Bundle\EntityBundle\Layout\Extension\Provider\AbstractEntityDataProvider
-        arguments:
-            - @doctrine
