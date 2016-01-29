@@ -376,6 +376,5 @@ class DateHelperTest extends OrmTestCase
         );
 
         $this->assertEquals($expectedData, $actualData);
-
     }
 }
