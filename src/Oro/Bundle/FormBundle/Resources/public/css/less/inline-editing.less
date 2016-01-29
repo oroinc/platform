@@ -48,6 +48,11 @@
       background: @cellErrorBackground;
       &:hover {
         background: @cellErrorBackground;
+        > .inline-editor__edit-action {
+          &:before{
+            color: @errorMessageBalloonBackground;
+          }
+        }
       }
       &:before{
         content: '';

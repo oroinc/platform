@@ -76,7 +76,13 @@ define(function(require) {
         events: {
             'updatePosition': 'updatePosition',
             'select2-open': 'onSelect2Open',
-            'select2-close': 'onSelect2Close'
+            'select2-close': 'onSelect2Close',
+            'mousedown .select2-choices': function() {
+                this._isSelection = true;
+            },
+            'mouseup .select2-choices': function() {
+                delete this._isSelection;
+            }
         },
 
         initialize: function(options) {
@@ -218,7 +224,9 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onFocusout: function(e) {
-            if (!this._isSelection && !(e.relatedTarget && $('.select2-drop').has(e.relatedTarget).length)) {
+            if (this._isSelection) {
+                this.$('.select2-focused').focus();
+            } else if (!e.relatedTarget || !$('.select2-drop').has(e.relatedTarget).length) {
                 SelectEditorView.__super__.onFocusout.call(this, e);
             }
         },
