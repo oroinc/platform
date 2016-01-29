@@ -20,12 +20,13 @@ trait FilteredGridTrait
     {
         $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "/a[contains(.,'{$filterName}')]"
+            . "/*[contains(@class,'filter-criteria-selector')][contains(.,'{$filterName}')]"
         )->click();
 
         $criteria = $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "[a[contains(.,'{$filterName}')]]/div[contains(@class, 'filter-criteria')]"
+            . "[*[contains(@class,'filter-criteria-selector')][contains(.,'{$filterName}')]]"
+            . "/div[contains(@class, 'dropdown-menu')]"
         );
         $input = $criteria->element($this->test->using('xpath')->value("div/div/input[@name='value']"));
 
@@ -59,7 +60,7 @@ trait FilteredGridTrait
         foreach ($values as $value) {
             $this->test->byXPath(
                 "//div[@class='btn filter-select filter-criteria-selector filter-default-value']".
-                "[contains(., '{$filterName}')]//button"
+                "[contains(., '{$filterName}')]"
             )->click();
             $this->waitForAjax();
             $this->test->byXPath(
@@ -75,6 +76,20 @@ trait FilteredGridTrait
             "//div[@class='ui-corner-all ui-multiselect-header ui-helper-clearfix ui-multiselect-hasfilter']//input"
         )->click();
         $this->test->keys(\PHPUnit_Extensions_Selenium2TestCase_Keys::ESCAPE);
+
+        return $this;
+    }
+
+    /**
+     * Method to refresh grid
+     * @return $this
+     */
+    public function refreshGrid()
+    {
+        $this->test->byXpath(
+            "//div[@class='actions-panel pull-right form-horizontal']//a[contains(., 'Refresh')]"
+        )->click();
+        $this->waitForAjax();
 
         return $this;
     }

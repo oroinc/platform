@@ -169,6 +169,16 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setFormTheme($themes)
+    {
+        $this->layoutManipulator->setFormTheme($themes);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function clear()
     {
         $this->layoutManipulator->clear();
@@ -195,6 +205,8 @@ class LayoutBuilder implements LayoutBuilderInterface
         foreach ($blockThemes as $blockId => $themes) {
             $layout->setBlockTheme($themes, $blockId !== $rootBlockId ? $blockId : null);
         }
+        $formThemes = $rawLayout->getFormThemes();
+        $layout->setFormTheme($formThemes);
 
         return $layout;
     }

@@ -73,7 +73,9 @@
     -moz-border-radius: 3px;
     border-radius: 3px;
     position: relative;
-
+    .widget-header {
+      min-height: 38px;
+    }
     .actions-container .collapse-expand-action-container {
       margin-top: -1px;
     }
@@ -95,7 +97,8 @@
           margin-right: 8px;
           background-color: #fcfcfc;
           font-size: 12px;
-          line-height: 13px;
+          line-height: 12px;
+          padding: 1px 0 0px 0;
           text-align: center;
           color: #727272;
           #gradient > .horizontal(#fcfcfc, #e9e9e9);
@@ -117,6 +120,14 @@
         padding: 3px 13px;
       }
     }
+    .default-actions-container {
+      .action-wrapper {
+        padding: 0 3px;
+        > a {
+          padding: 10px 8px;
+        }
+      }
+    }
 
     .widget-actions-container .widget-actions-section {
       .action-wrapper:last-child {
@@ -125,7 +136,11 @@
     }
 
     .widget-actions-container {
-      margin: 10px -1px 0 0;
+      margin: 10px -1px 8px 0;
+    }
+
+    .dashboard-btn {
+      margin-top: -3px;
     }
 
     .move-action {
@@ -141,16 +156,20 @@
     .title {
       padding-left: 0;
       padding-right: 0;
+      padding-bottom: 3px;
       max-width: ~"calc(100% - 120px)";
-      padding-bottom: 2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      &:before {
+        content: '';
+        display: inline;
+        min-height: 40px;
+      }
     }
 
     .row-fluid {
       border-top: 1px solid #ddd;
-      margin-top: 5px;
     }
 
     .dashboard-widget-content {
@@ -193,11 +212,10 @@
     .row-fluid {
       border-top: none;
     }
-    height: 43px;
     overflow: hidden;
   }
   .collapse-expand-action-container {
-    padding-left: 8px;
+    padding: 0 2px 0 10px;
   }
 }
 
@@ -292,8 +310,11 @@
   & > li{
     float: left;
     border-left: 1px solid #eaeaea;
-    padding: 15px 0 25px;
     text-align: center;
+    > a {
+      padding: 15px 0 25px;
+      display: block;
+    }
     /* width: 20%; calculated on backend and depends on a number of items */
     #gradient > .vertical(#ffffff, #f1f1f1);
     &:first-child{
@@ -501,9 +522,6 @@
   }
 }
 .widget-configuration {
-  .controls > input[type=checkbox]:only-child{
-    margin-top: 8px;
-  }
   .items-selector-widget {
     margin-right: 20px;
   }
@@ -565,6 +583,31 @@
 .dashboard-widget-items {
   margin-bottom: 10px;
   .controls {
-    width: 445px
+    width: 445px;
+  }
+  .mobile-version & {
+    .controls {
+      width: initial;
+    }
+    .action-column {
+      width: 116px;
+      text-align: center;
+    }
+    .action-cell .btn {
+      padding: 0 4px;
+    }
+  }
+}
+#dashboard_selector, #uniform-dashboard_selector {
+  height: 28px;
+  &.selector {
+    line-height: 28px;
+    span {
+      height: 28px;
+      line-height: 28px;
+      &:after {
+        margin: 1px 2px 0 0;
+      }
+    }
   }
 }

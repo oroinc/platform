@@ -11,11 +11,8 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 /**
  * Represents system wide calendars
  */
-class PublicCalendarProvider implements CalendarProviderInterface
+class PublicCalendarProvider extends AbstractCalendarProvider
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
@@ -37,7 +34,7 @@ class PublicCalendarProvider implements CalendarProviderInterface
         SystemCalendarConfig $calendarConfig,
         SecurityFacade $securityFacade
     ) {
-        $this->doctrineHelper          = $doctrineHelper;
+        parent::__construct($doctrineHelper);
         $this->calendarEventNormalizer = $calendarEventNormalizer;
         $this->calendarConfig          = $calendarConfig;
         $this->securityFacade          = $securityFacade;
@@ -48,19 +45,14 @@ class PublicCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
-        $result = [];
-
         if (!$this->calendarConfig->isPublicCalendarEnabled()) {
-            foreach ($calendarIds as $id) {
-                $result[$id] = null;
-            }
-
-            return $result;
+            return array_fill_keys($calendarIds, null);
         }
 
+        $result = [];
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
-        $qb = $repo->getPublicCalendarsQueryBuilder();
+        $qb   = $repo->getPublicCalendarsQueryBuilder();
         /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
 
@@ -100,8 +92,9 @@ class PublicCalendarProvider implements CalendarProviderInterface
         }
 
         /** @var CalendarEventRepository $repo */
-        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder(
+        $repo         = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $extraFields  = $this->filterSupportedFields($extraFields, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+        $qb           = $repo->getPublicEventListByTimeIntervalQueryBuilder(
             $start,
             $end,
             [],

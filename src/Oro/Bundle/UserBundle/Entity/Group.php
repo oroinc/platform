@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Model\ExtendGroup;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\GroupRepository")
@@ -47,7 +48,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
-class Group
+class Group extends ExtendGroup
 {
     /**
      * @ORM\Id
@@ -108,6 +109,8 @@ class Group
      */
     public function __construct($name = '')
     {
+        parent::__construct();
+
         $this->name  = $name;
         $this->roles = new ArrayCollection();
     }
@@ -243,11 +246,7 @@ class Group
     public function setRoles($roles)
     {
         if ($roles instanceof Collection) {
-            $this->roles->clear();
-
-            foreach ($roles as $role) {
-                $this->addRole($role);
-            }
+            $this->roles = new ArrayCollection($roles->toArray());
         } elseif (is_array($roles)) {
             $this->roles = new ArrayCollection($roles);
         } else {

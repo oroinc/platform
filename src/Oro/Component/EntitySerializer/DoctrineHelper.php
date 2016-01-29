@@ -141,4 +141,16 @@ class DoctrineHelper
 
         return $this->resolveEntityClass($entities[0]);
     }
+
+    /**
+     * Gets the name of entity identifier field if an entity has a single-field identifier
+     *
+     * @param string $entityClass
+     *
+     * @return string
+     */
+    public function getEntityIdFieldName($entityClass)
+    {
+        return $this->getEntityMetadata($entityClass)->getSingleIdentifierFieldName();
+    }
 }

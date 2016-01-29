@@ -11,6 +11,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockBuilderInterface;
 
+use Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
 
 /**
@@ -69,6 +70,9 @@ class FormType extends AbstractFormType
                 }
             ]
         );
+        $resolver
+            ->setOptional(['form_data']);
+
         $resolver->setAllowedTypes(
             [
                 'preferred_fields'  => 'array',
@@ -95,7 +99,12 @@ class FormType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
+        $view->vars['form_data'] = isset($options['form_data']) ? $options['form_data'] : null;
+
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        if ($formAccessor instanceof ConfigurableFormAccessorInterface) {
+            $formAccessor->setFormData($view->vars['form_data']);
+        }
 
         $view->vars['form'] = $formAccessor->getView();
     }
@@ -109,19 +118,13 @@ class FormType extends AbstractFormType
 
         // prevent form fields rendering by form_rest() method,
         // if the corresponding layout block has been removed
-        $rootView = null;
         foreach ($formAccessor->getProcessedFields() as $formFieldPath => $blockId) {
             if (isset($view[$blockId])) {
                 $this->checkExistingFieldView($view, $view[$blockId], $formFieldPath);
                 continue;
             }
-            if ($rootView === null) {
-                $rootView = $view->parent !== null
-                    ? $this->getRootView($view)
-                    : false;
-            }
-            if ($rootView !== false && isset($rootView[$blockId])) {
-                $this->checkExistingFieldView($view, $rootView[$blockId], $formFieldPath);
+            if (isset($view->blocks[$blockId])) {
+                $this->checkExistingFieldView($view, $view->blocks[$blockId], $formFieldPath);
                 continue;
             }
 
@@ -143,21 +146,6 @@ class FormType extends AbstractFormType
     public function getParent()
     {
         return ContainerType::NAME;
-    }
-
-    /**
-     * @param BlockView $view
-     *
-     * @return BlockView
-     */
-    protected function getRootView(BlockView $view)
-    {
-        $result = $view;
-        while ($result->parent) {
-            $result = $result->parent;
-        }
-
-        return $result;
     }
 
     /**

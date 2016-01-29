@@ -32,23 +32,21 @@
                                     {% placeholder view_pageActions_before with {entity: entity} %}
 
                                     {% block ownerLink %}
-                                        {% if isDesktopVersion() %}
+                                        {% if isDesktopVersion() and entity is not null %}
                                             {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                            {% if ownerLink %}
-                                                <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
-                                            {% endif %}
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endblock ownerLink %}
 
                                     {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : entity.id|default %}
                                     {% if audit_entity_id %}
                                         {% placeholder change_history_block with {
-                                        'entity': entity,
-                                        'entity_class': audit_entity_class|default(null),
-                                        'id': audit_entity_id,
-                                        'title': audit_title|default(entity.__toString is defined ? entity : null),
-                                        'audit_path': audit_path|default('oro_dataaudit_history'),
-                                        'audit_show_change_history': audit_show_change_history|default(false)
+                                            'entity': entity,
+                                            'entity_class': audit_entity_class|default(null),
+                                            'id': audit_entity_id,
+                                            'title': audit_title|default(entity.__toString is defined ? entity : null),
+                                            'audit_path': audit_path|default('oro_dataaudit_history'),
+                                            'audit_show_change_history': audit_show_change_history|default(false)
                                         } %}
                                     {% endif %}
 
@@ -110,11 +108,9 @@
                                     {% endblock stats %}
                                     {% placeholder page_header_stats_after with {entity: entity} %}
 
-                                    {% if isMobileVersion() %}
+                                    {% if isMobileVersion() and entity is not null %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                        {% if ownerLink %}
-                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
-                                        {% endif %}
+                                        <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -133,6 +129,7 @@
     <div class="layout-content scrollable-container">
         {% block content_data %}
             {% if data is defined and data.dataBlocks is defined %}
+                {% set data = oro_view_process(data, entity) %}
                 {% set dataBlocks = data.dataBlocks %}
 
                 {%- set activitiesData -%}

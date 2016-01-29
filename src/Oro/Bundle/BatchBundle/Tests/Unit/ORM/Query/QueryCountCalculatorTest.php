@@ -272,7 +272,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Bundle\EntityBundle\ORM\SqlQuery, "integer" given
+     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Component\DoctrineUtils\ORM\SqlQuery, "integer" given
      */
     // @codingStandardsIgnoreEnd
     public function testCalculateCountForInvalidQueryType()
@@ -283,7 +283,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Bundle\EntityBundle\ORM\SqlQuery, "integer" given
+     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Component\DoctrineUtils\ORM\SqlQuery, "integer" given
      */
     // @codingStandardsIgnoreEnd
     public function testCalculateCountForInvalidQueryTypeAndUseWalker()

@@ -160,6 +160,7 @@ class ConfigEntity extends CustomEntity
     {
         $this->test->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title='Update schema']")->click();
         $this->test->byXPath("//div[@class='modal-footer']/a[contains(., 'Yes, Proceed')]")->click();
+        $this->waitForAjax();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
@@ -181,13 +182,12 @@ class ConfigEntity extends CustomEntity
     {
         //label
         $this->assertElementPresent(
-            "//div[@class='control-group']/div[@class='control-label wrap']" .
-            "/label[contains(@for,'{$fieldName}-uid') and contains(text(),'{$fieldName}')]",
+            "//label[contains(@for,'{$fieldName}-uid') and contains(text(),'{$fieldName}')]",
             "Custom entity field label not found : {$fieldName}"
         );
         //input
         $this->assertElementPresent(
-            "//div[@class='control-group']/div[@class='controls']//*[contains(@id,'{$fieldName}-uid')]",
+            "//div[@class='controls']//*[contains(@id,'{$fieldName}-uid')]",
             "Custom entity field input not found : {$fieldName}"
         );
         return $this;
@@ -200,20 +200,22 @@ class ConfigEntity extends CustomEntity
      */
     public function setCustomField($fieldName, $value)
     {
-        if ($this->isElementPresent("//div[@class='control-group']/div/input[contains(@id, '{$fieldName}')]")) {
-            $field = $this->test->byXPath("//div[@class='control-group']/div/input[contains(@id, '{$fieldName}')]");
+        $fields = $this->test->elements($this->test->using('xpath')
+            ->value("//div/input[contains(@id, '{$fieldName}')]"));
+        if (count($fields) === 1) {
+            $field = $this->test->byXPath("//div/input[contains(@id, '{$fieldName}')]");
             $field->clear();
             $field->value($value);
         } else {
-            if ($this->isElementPresent("//div[@class='control-group']//select[contains(@id, '{$fieldName}')]")) {
+            if ($this->isElementPresent("//select[contains(@id, '{$fieldName}')]")) {
                 $field = $this->test->select(
-                    $this->test->byXPath("//div[@class='control-group']//select[contains(@id, '{$fieldName}')]")
+                    $this->test->byXPath("//select[contains(@id, '{$fieldName}')]")
                 );
                 $field->selectOptionByLabel($value);
             } else {
-                if ($this->isElementPresent("//div[@class='control-group']//textarea[contains(@id, '{$fieldName}')]")) {
+                if ($this->isElementPresent("//textarea[contains(@id, '{$fieldName}')]")) {
                     $field = $this->test->byXPath(
-                        "//div[@class='control-group']//textarea[contains(@id, '{$fieldName}')]"
+                        "//textarea[contains(@id, '{$fieldName}')]"
                     );
                     $field->clear();
                     $field->value($value);
@@ -222,15 +224,15 @@ class ConfigEntity extends CustomEntity
                     $timeField = "[contains(@id, '{$fieldName}') and contains(@id, 'time_selector_')]";
 
                     if (preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $value, $valueParts)
-                        and $this->isElementPresent("//div[@class='control-group']//input{$dateField}")
-                        and $this->isElementPresent("//div[@class='control-group']//input{$timeField}")
+                        and $this->isElementPresent("//input{$dateField}")
+                        and $this->isElementPresent("//input{$timeField}")
                     ) {
-                        $field = $this->test->byXPath("//div[@class='control-group']//input{$dateField}");
+                        $field = $this->test->byXPath("//input{$dateField}");
                         $field->click(); // focus
                         $field->clear();
                         $field->value($valueParts[1]);
 
-                        $field = $this->test->byXPath("//div[@class='control-group']//input{$timeField}");
+                        $field = $this->test->byXPath("//input{$timeField}");
                         $field->click(); // focus
                         $field->clear();
                         $field->value($valueParts[2]);
@@ -251,8 +253,8 @@ class ConfigEntity extends CustomEntity
     {
         foreach ($options as $option) {
             $this->test->byXPath(
-                "//div[@class='control-group'][div/label[text() = '{$fieldName}']]".
-                "/div[@class='controls']//label[contains(., '{$option}')]"
+                "//div[div/label[text() = '{$fieldName}']]".
+                "//label[contains(., '{$option}')]"
             )->click();
         }
 

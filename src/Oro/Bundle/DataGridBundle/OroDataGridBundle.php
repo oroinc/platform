@@ -11,6 +11,7 @@ use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\FormattersPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ConfigurationPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\GuessPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\InlineEditColumnOptionsGuesserPass;
+use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\SetDatagridEventListenersLazyPass;
 
 class OroDataGridBundle extends Bundle
 {
@@ -27,5 +28,6 @@ class OroDataGridBundle extends Bundle
         $container->addCompilerPass(new MassActionsPass());
         $container->addCompilerPass(new GuessPass());
         $container->addCompilerPass(new InlineEditColumnOptionsGuesserPass());
+        $container->addCompilerPass(new SetDatagridEventListenersLazyPass());
     }
 }

@@ -362,6 +362,16 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setFormTheme($themes)
+    {
+        $this->rawLayout->setFormTheme($themes);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function clear()
     {
         $this->rawLayout->clear();

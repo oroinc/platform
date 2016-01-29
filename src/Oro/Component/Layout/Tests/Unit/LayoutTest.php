@@ -6,7 +6,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutRendererRegistry;
 
-class LayoutTest extends \PHPUnit_Framework_TestCase
+class LayoutTest extends LayoutTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
@@ -108,6 +108,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
 
         $childView                  = new BlockView($view);
         $view->children['child_id'] = $childView;
+        $this->setLayoutBlocks(['root' => $view]);
 
         $this->renderer->expects($this->once())
             ->method('setBlockTheme')
@@ -122,5 +123,17 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $layout->setBlockTheme($theme, 'child_id');
         $result = $layout->render();
         $this->assertEquals($expected, $result);
+    }
+
+    public function testSetFormTheme()
+    {
+        $theme = 'MyBundle::forms.html.twig';
+        $view = new BlockView();
+        $this->renderer->expects($this->once())
+            ->method('setFormTheme')
+            ->with([$theme]);
+        $layout = new Layout($view, $this->rendererRegistry);
+        $layout->setFormTheme($theme);
+        $layout->render();
     }
 }

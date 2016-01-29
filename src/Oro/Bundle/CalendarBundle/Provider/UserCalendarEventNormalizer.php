@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -15,6 +17,9 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var PropertyAccessor */
+    protected $propertyAccessor;
 
     /**
      * @param ReminderManager $reminderManager
@@ -37,11 +42,13 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
      * @param CalendarEvent $event      The calendar event object
      * @param int           $calendarId The target calendar id
      *
+     * @param array         $extraFields
+     *
      * @return array
      */
-    public function getCalendarEvent(CalendarEvent $event, $calendarId = null)
+    public function getCalendarEvent(CalendarEvent $event, $calendarId = null, array $extraFields = [])
     {
-        $item = $this->transformEntity($this->serializeCalendarEvent($event));
+        $item = $this->transformEntity($this->serializeCalendarEvent($event, $extraFields));
         if (!$calendarId) {
             $calendarId = $item['calendar'];
         }
@@ -57,24 +64,36 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     /**
      * @param CalendarEvent $event
      *
+     * @param array         $extraFields
+     *
      * @return array
      */
-    protected function serializeCalendarEvent(CalendarEvent $event)
+    protected function serializeCalendarEvent(CalendarEvent $event, array $extraFields = [])
     {
-        return [
-            'id'               => $event->getId(),
-            'title'            => $event->getTitle(),
-            'description'      => $event->getDescription(),
-            'start'            => $event->getStart(),
-            'end'              => $event->getEnd(),
-            'allDay'           => $event->getAllDay(),
-            'backgroundColor'  => $event->getBackgroundColor(),
-            'createdAt'        => $event->getCreatedAt(),
-            'updatedAt'        => $event->getUpdatedAt(),
-            'invitationStatus' => $event->getInvitationStatus(),
-            'parentEventId'    => $event->getParent() ? $event->getParent()->getId() : null,
-            'calendar'         => $event->getCalendar() ? $event->getCalendar()->getId() : null
-        ];
+        $propertyAccessor = $this->getPropertyAccessor();
+        $extraValues = [];
+
+        foreach ($extraFields as $field) {
+            $extraValues[$field] = $propertyAccessor->getValue($event, $field);
+        }
+
+        return array_merge(
+            [
+                'id'               => $event->getId(),
+                'title'            => $event->getTitle(),
+                'description'      => $event->getDescription(),
+                'start'            => $event->getStart(),
+                'end'              => $event->getEnd(),
+                'allDay'           => $event->getAllDay(),
+                'backgroundColor'  => $event->getBackgroundColor(),
+                'createdAt'        => $event->getCreatedAt(),
+                'updatedAt'        => $event->getUpdatedAt(),
+                'invitationStatus' => $event->getInvitationStatus(),
+                'parentEventId'    => $event->getParent() ? $event->getParent()->getId() : null,
+                'calendar'         => $event->getCalendar() ? $event->getCalendar()->getId() : null,
+            ],
+            $extraValues
+        );
     }
 
     /**
@@ -83,7 +102,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     protected function applyAdditionalData(&$items, $calendarId)
     {
         $parentEventIds = $this->getParentEventIds($items);
-        if (!empty($parentEventIds)) {
+        if ($parentEventIds) {
             /** @var CalendarEventRepository $repo */
             $repo     = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
             $invitees = $repo->getInvitedUsersByParentsQueryBuilder($parentEventIds)
@@ -143,5 +162,17 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         return $ids;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if (null === $this->propertyAccessor) {
+            $this->propertyAccessor = new PropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

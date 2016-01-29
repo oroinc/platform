@@ -463,6 +463,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                         $self->assertEquals($expected['subject'], $model->getSubject());
                         $self->assertEquals($expected['from'], $model->getFrom());
                         $self->assertEquals($expected['to'], $model->getTo());
+                        $self->assertEquals('txt', $model->getType());
 
                         return $emailUserEntity;
                     }

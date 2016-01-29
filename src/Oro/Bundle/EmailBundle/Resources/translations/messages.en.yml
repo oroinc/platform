@@ -9,6 +9,7 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        imap.folder.checkAll: All
         autocomplete:
             recently_used: Recently used
             contexts: Contexts
@@ -170,6 +171,8 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        folders.tooltip:          If a folder is uncheked, all the data saved in it will be deleted
+        retrieve_folders.label:   Retrieve Folders
         message_type:
             label:                Message type
         folder_type:
@@ -205,6 +208,8 @@ oro:
             no_subject.label:     (no subject)
         to.label:                 To
         cc_bcc.label:             Cc/Bcc
+        cc.label:                 Cc
+        bcc.label:                Bcc
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
         template.label:           Apply template
@@ -239,6 +244,7 @@ oro:
         reply:                    Reply
         reply_all:                Reply All
         forward:                  Forward
+        view:                     View email
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
         load_more_emails:         "%quantity% older messages"
@@ -256,6 +262,7 @@ oro:
             seen.label:               Seen
             folders.label:            Folders
             origin.label:             Email Origin
+            unsynced_flag_count.label: Unsynced Flag Count
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes

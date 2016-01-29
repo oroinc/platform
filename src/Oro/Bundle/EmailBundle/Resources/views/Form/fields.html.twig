@@ -204,22 +204,6 @@
     </script>
 {% endblock %}
 
-{% block oro_email_email_folder_row %}
-    {% if form.vars.value is not null and form.vars.value.outdatedAt is null %}
-        <div>
-            {{ form_widget(form.syncEnabled) }}<label class="folder-label">{{ form.vars.value.name }}</label>
-            {{ form_widget(form.fullName) }}
-            {{ form_widget(form.name) }}
-            {{ form_widget(form.type) }}
-            {% if form.vars.value.subFolders|length > 0 %}
-                <div class="folder-sub-folders">
-                    {{ form_widget(form.subFolders) }}
-                </div>
-            {% endif %}
-        </div>
-    {% endif %}
-{% endblock %}
-
 {% block oro_email_email_folder_tree_row %}
     {% if form.vars.value is not null and form.vars.value|length > 0 %}
         {{ form_row(form) }}
@@ -227,33 +211,22 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_widget %}
-    <div class="folder-tree-widget">
-        <input id="check-all" type="checkbox"/><label class="folder-label">All</label>
-        <div id="folder-list">
-            {% for child in form.children %}
-                {% if child.vars.value.parentFolder is null and child.vars.value.outdatedAt is null %}
-                    {{ form_row(child) }}
-                {% endif %}
+    {% set options = {
+        dataInputSelector: 'input[name="' ~ full_name ~ '"]',
+        checkAllSelector: '.check-all',
+        relatedCheckboxesSelector: '.folder-list :checkbox'
+    } %}
+    <div class="folder-tree-widget"
+         data-page-component-module="oroemail/js/app/components/folder-tree-component"
+         data-page-component-options="{{ options|json_encode }}">
+        <input class="check-all" type="checkbox"/><label class="folder-label">{{ "oro.email.imap.folder.checkAll"|trans }}</label>
+        <div class="folder-list">
+            {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
+                {{ _self.renderFolder(key, folder, form.vars.full_name) }}
             {% endfor %}
         </div>
+        <input name="{{ full_name }}" type="hidden">
     </div>
-
-    <script type="text/javascript">
-        require(['jquery'], function($) {
-            var $folderList = $('#folder-list');
-            var $checkAll = $('#check-all');
-            $checkAll.click(function() {
-                var checked = this.checked;
-                $folderList.find(':checkbox').each(function() {
-                    this.checked = checked;
-                });
-            });
-
-            $folderList.find(':checkbox').each(function() {
-                $(this).css('margin', 0);
-            });
-        });
-    </script>
 {% endblock %}
 
 {% block oro_email_mailbox_grid_row %}
@@ -295,7 +268,13 @@
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% set email_origin = form_widget(form.children.origin) %}
+    {% if  form.children.imapAccountType is defined %}
+        {% set imapAccountType = form_widget(form.children.imapAccountType) %}
+    {% endif %}
+    {% if  form.children.origin is defined %}
+        {% set imapAccountType = form_widget(form.children.origin) %}
+    {% endif %}
+
     {% set process = form_row(form.children.processType) ~
         form_widget(form.children.processSettings) %}
     {% set access = form_row(form.children.authorizedUsers) ~
@@ -312,7 +291,7 @@
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
             <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
-            {{ email_origin|raw }}
+            {{ imapAccountType|raw }}
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
             <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
@@ -353,4 +332,23 @@
     <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane{% if (app.request.locale == locale) %} active{% endif %}">
         {{ form_widget(form) }}
     </div>
+{% endmacro %}
+
+{% macro renderFolder(key, folder, namePrefix, maxDepth = 10) %}
+    {% if maxDepth %}
+        <div>
+            <input type="checkbox" data-name="syncEnabled"{% if folder.syncEnabled %}checked="checked"{% endif %}>
+            <label class="folder-label">{{ folder.name }}</label>
+            <input type="hidden" data-name="fullName" value="{{ folder.fullName }}">
+            <input type="hidden" data-name="name" value="{{ folder.name }}">
+            <input type="hidden" data-name="type" value="{{ folder.type }}">
+            {% if maxDepth > 1 and folder.subFolders|length > 0 %}
+                <div class="folder-sub-folders">
+                    {% for subKey, subFolder in folder.subFolders %}
+                        {{ _self.renderFolder(subKey, subFolder, namePrefix ~ '[' ~ key ~ '][subFolders]', maxDepth - 1) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endmacro %}

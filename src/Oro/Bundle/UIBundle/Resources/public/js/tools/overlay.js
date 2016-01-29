@@ -2,12 +2,19 @@ define(function(require) {
     'use strict';
     var $ = require('jquery');
     var backdropManager = require('./backdrop-manager');
-    var overlayTool = {
+    var mediator = require('oroui/js/mediator');
 
+    var overlayTool = {
         createOverlay: function($overlayContent, options) {
-            $(document.body).append($overlayContent);
+            if (!options.insertInto) {
+                options.insertInto = $(document.body);
+            }
+            if (!options.zIndex) {
+                options.zIndex = 700;
+            }
+            options.insertInto.append($overlayContent);
             $overlayContent.css({
-                zIndex: 10000
+                zIndex: options.zIndex
             });
             this.updatePosition($overlayContent, options);
             var interval = setInterval(function() {
@@ -19,14 +26,48 @@ define(function(require) {
             }, 400);
             $overlayContent.data('interval', interval);
             if (options.backdrop) {
-                $overlayContent.data('backdrop', backdropManager.hold());
+                var backdropId = backdropManager.hold();
+                $overlayContent.data('backdrop', backdropId);
             }
-            return {
+            var overlayControl = {
                 remove: function() {
+                    mediator.off('overlay:focus', onOverlayFocus);
+                    $overlayContent.removeClass('overlay-focused');
+                    $overlayContent.off('click.overlay-tool');
                     clearInterval(interval);
+                    if (backdropId) {
+                        backdropManager.release(backdropId);
+                    }
                     overlayTool.removeOverlay($overlayContent);
+                },
+                focus: function() {
+                    $overlayContent.addClass('overlay-focused');
+                    $overlayContent.css({
+                        zIndex: options.zIndex + 1
+                    });
+                    mediator.trigger('overlay:focus', $overlayContent);
+                },
+                blur: function() {
+                    $overlayContent.removeClass('overlay-focused');
+                    $overlayContent.css({
+                        zIndex: options.zIndex
+                    });
+                    mediator.trigger('overlay:blur', $overlayContent);
                 }
             };
+            overlayControl.focus();
+            function onOverlayFocus($content) {
+                if ($content === $overlayContent) {
+                    return;
+                }
+                overlayControl.blur();
+            }
+            $overlayContent.on('click.overlay-tool focus.overlay-tool', function() {
+                overlayControl.focus();
+            });
+            mediator.on('overlay:focus', onOverlayFocus);
+
+            return overlayControl;
         },
 
         updatePosition: function($overlayContent, options) {
@@ -39,6 +80,7 @@ define(function(require) {
                     old = _new || ($overlayContent.css('top') + '.' + $overlayContent.css('left'));
                     $overlayContent.position(options.position);
                     _new = $overlayContent.css('top') + '.' + $overlayContent.css('left');
+                    $overlayContent.trigger('updatePosition');
                     iterations--;
                 } while (old !== _new && iterations > 0);
             }

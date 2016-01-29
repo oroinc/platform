@@ -7,7 +7,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 class EntityFilter extends ChoiceFilter
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function init($name, array $params)
     {

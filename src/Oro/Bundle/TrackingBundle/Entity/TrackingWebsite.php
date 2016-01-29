@@ -22,10 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "icon"="icon-external-link"
  *      },
  *      "security"={
- *          "type"="ACL",
- *          "share_scopes"={
- *              "user"
- *          }
+ *          "type"="ACL"
  *      },
  *      "ownership"={
  *          "owner_type"="USER",
@@ -34,6 +31,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "organization_field_name"="organization",
  *          "organization_column_name"="organization_id"
  *      },
+ *      "grid"={
+ *          "default"="website-grid"
+ *     }
  *  }
  * )
  */

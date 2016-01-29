@@ -133,6 +133,18 @@ services:
             - @doctrine
             - @oro_tracking.provider.identifier_provider
 
+    oro_tracking.exclusion_provider.identifier_event:
+        class: Oro\Bundle\TrackingBundle\Provider\IdentifierEventExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
+
+    oro_tracking.exclusion_provider.visit_event:
+        class: Oro\Bundle\TrackingBundle\Provider\VisitEventExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
+
     #
     # Chain provider for identicating tracking visit
     #

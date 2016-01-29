@@ -50,6 +50,7 @@ class EmailUserRepository extends EntityRepository
      * @param Organization $organization
      * @param array        $folderTypes
      * @param bool         $isSeen
+     *
      * @return array
      */
     public function getEmailUserList(User $user, Organization $organization, array $folderTypes = [], $isSeen = null)
@@ -69,7 +70,7 @@ class EmailUserRepository extends EntityRepository
 
         if ($isSeen !== null) {
             $qb->andWhere($qb->expr()->eq('eu.seen', ':seen'))
-                ->setParameter('seen', (bool) $isSeen);
+                ->setParameter('seen', (bool)$isSeen);
         }
 
         return $qb->getQuery()->getResult();
@@ -78,10 +79,11 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param array       $ids
      * @param EmailFolder $folder
+     * @param \DateTime   $date
      *
      * @return array
      */
-    public function getInvertedIdsFromFolder(array $ids, EmailFolder $folder)
+    public function getInvertedIdsFromFolder(array $ids, EmailFolder $folder, $date = null)
     {
         $qb = $this->createQueryBuilder('email_user');
 
@@ -93,6 +95,11 @@ class EmailUserRepository extends EntityRepository
         if ($ids) {
             $qb->andWhere($qb->expr()->notIn('email_user.id', ':ids'))
                 ->setParameter('ids', $ids);
+        }
+
+        if ($date) {
+            $qb->andWhere($qb->expr()->gt('email_user.receivedAt', ':date'))
+                ->setParameter('date', $date);
         }
 
         $emailUserIds = $qb->getQuery()->getArrayResult();
@@ -117,6 +124,7 @@ class EmailUserRepository extends EntityRepository
 
         return $qb->update()->set('email_user.seen', ':seen')
             ->where($qb->expr()->in('email_user.id', ':ids'))
+            ->andWhere('email_user.unsyncedFlagCount = 0')
             ->setParameter('seen', $seen)
             ->setParameter('ids', $ids)
             ->getQuery()->execute();
@@ -127,6 +135,8 @@ class EmailUserRepository extends EntityRepository
      *
      * @param User         $user
      * @param Organization $organization
+     * @param array        $ids
+     *
      * @return mixed
      */
     public function findUnseenUserEmail(User $user, Organization $organization, $ids = [])
@@ -152,6 +162,7 @@ class EmailUserRepository extends EntityRepository
      * @param User                 $user
      * @param string|string[]|null $folderType
      * @param bool                 $isAllSelected
+     *
      * @return QueryBuilder
      */
     public function getEmailUserBuilderForMassAction($ids, User $user, $folderType, $isAllSelected)
@@ -176,6 +187,7 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param array $threadIds
      * @param User  $user
+     *
      * @return QueryBuilder
      */
     public function getEmailUserByThreadId($threadIds, User $user)
@@ -192,6 +204,8 @@ class EmailUserRepository extends EntityRepository
 
     /**
      * @param EmailFolder $folder
+     * @param int|null $limit
+     * @param int|null $offset
      *
      * @return QueryBuilder
      */
@@ -216,6 +230,7 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param EmailFolder $folder
      * @param array       $messages
+     *
      * @return EmailUser[]
      */
     public function getEmailUsersByFolderAndMessageIds(EmailFolder $folder, array $messages)
@@ -232,8 +247,58 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
+     * Gets array of EmailUser's by Email or EmailThread of this email depends on $checkThread flag
+     * for current user and organization or which have mailbox owner.
+     *
+     * @param Email        $email
+     * @param User         $user
+     * @param Organization $organization
+     * @param bool|false   $checkThread
+     *
+     * @return EmailUser[]
+     */
+    public function getAllEmailUsersByEmail(Email $email, User $user, Organization $organization, $checkThread = false)
+    {
+        $parameters   = [];
+        $queryBuilder = $this
+            ->createQueryBuilder('eu')
+            ->join('eu.email', 'e');
+
+        if ($checkThread && $thread = $email->getThread()) {
+            $queryBuilder
+                ->andWhere('e.thread = :thread');
+            $parameters['thread'] = $thread;
+        } else {
+            $queryBuilder
+                ->andWhere('eu.email = :email');
+            $parameters['email'] = $email;
+        }
+
+        $orx = $queryBuilder->expr()->orX();
+        $orx
+            ->add('eu.mailboxOwner IS NOT NULL')
+            ->add('eu.owner = :owner AND eu.organization = :organization');
+
+        return $queryBuilder
+            ->andWhere($orx)
+            ->setParameters(
+                array_merge(
+                    $parameters,
+                    [
+                        'owner'        => $user,
+                        'organization' => $organization
+
+                    ]
+                )
+            )
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @param QueryBuilder $queryBuilder
      * @param User         $user
+     *
      * @return $this
      */
     protected function applyOwnerFilter(QueryBuilder $queryBuilder, User $user)
@@ -247,6 +312,7 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param QueryBuilder $queryBuilder
      * @param array        $ids
+     *
      * @return $this
      */
     protected function applyIdFilter(QueryBuilder $queryBuilder, $ids)
@@ -261,6 +327,7 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param QueryBuilder    $queryBuilder
      * @param string|string[] $type
+     *
      * @return $this
      */
     protected function applyFolderFilter(QueryBuilder $queryBuilder, $type)
@@ -298,6 +365,6 @@ class EmailUserRepository extends EntityRepository
     {
         $queryBuilder
             ->add('where', $queryBuilder->expr()->andX($queryBuilder->expr()->eq('e.head', ':head')))
-            ->setParameters(['head' => (bool) $isHead]);
+            ->setParameters(['head' => (bool)$isHead]);
     }
 }

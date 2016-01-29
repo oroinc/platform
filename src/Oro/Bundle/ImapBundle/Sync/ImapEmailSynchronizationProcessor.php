@@ -7,15 +7,16 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
-
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
@@ -93,7 +94,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
                 $startDate = $folder->getSynchronizedAt();
                 $checkStartDate = clone $startDate;
-                $checkStartDate->modify('-1 month');
+                $checkStartDate->modify('-6 month');
 
                 // set seen flags from previously synchronized emails
                 $this->checkFlags($imapFolder, $checkStartDate);
@@ -106,9 +107,56 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $this->cleanUp(true, $imapFolder->getFolder());
         }
 
+        $this->removeRemotelyRemovedEmails($origin);
+
         // run removing of empty outdated folders every N synchronizations
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
+        }
+    }
+
+    /**
+     * @param EmailOrigin $origin
+     */
+    protected function removeRemotelyRemovedEmails(EmailOrigin $origin)
+    {
+        $imapFolders = $this->getSyncEnabledImapFolders($origin);
+        foreach ($imapFolders as $imapFolder) {
+            $folder = $imapFolder->getFolder();
+            $this->manager->selectFolder($folder->getFullName());
+
+            $this->em->transactional(function () use ($imapFolder, $folder) {
+                $existingUids = $this->manager->getEmailUIDs();
+
+                $staleImapEmailsQb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
+                $staleImapEmailsQb
+                    ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
+                    ->setParameter('imap_folder', $imapFolder);
+
+                if ($existingUids) {
+                    $staleImapEmailsQb
+                        ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
+                        ->setParameter('uids', $existingUids);
+                }
+
+                $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
+                    ->setPageCallback(function () {
+                        $this->em->flush();
+                        $this->em->clear();
+                    });
+
+                /* @var $staleImapEmails ImapEmail[] */
+                foreach ($staleImapEmails as $imapEmail) {
+                    $email = $imapEmail->getEmail();
+                    $email->getEmailUsers()->forAll(function ($key, EmailUser $emailUser) use ($folder) {
+                        $emailUser->removeFolder($folder);
+                        if (!$emailUser->getFolders()->count()) {
+                            $this->em->remove($emailUser);
+                        }
+                    });
+                    $this->em->remove($imapEmail);
+                }
+            });
         }
     }
 
@@ -124,8 +172,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
             $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
 
-            $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder());
-            $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder());
+            $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder(), $startDate);
+            $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder(), $startDate);
 
             $emailUserRepository->setEmailUsersSeen($ids, false);
             $emailUserRepository->setEmailUsersSeen($invertedIds, true);

@@ -43,7 +43,7 @@
     {% set action %}
         {% if resource_granted('oro_email_email_user_edit') %}
             <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
-               data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': '{{ entityClass }}' }) %>"
+               data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': '{{ entityClass|replace({'\\': '_'}) }}' }) %>"
                     {{ UI.renderWidgetDataAttributes({
                     'type' : 'dialog',
                     'multiple' : true,
@@ -135,6 +135,13 @@
                 }
             }) }}><i class="icon-mail-forward hide-text">{{ 'oro.email.forward'|trans|raw }}</i></a>
         {% endif %}
+    {% endset %}
+    {% set actions = actions|merge([action]) %}
+
+    {% set action %}
+        <a href="<%= routing.generate('oro_email_thread_view', {'id': relatedActivityId}) %>"
+           title="{{ 'oro.email.view'|trans|raw }}"><i
+                class="icon-eye-open hide-text">{{ 'oro.email.view'|trans|raw }}</i></a>
     {% endset %}
     {% set actions = actions|merge([action]) %}
 

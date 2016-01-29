@@ -69,7 +69,13 @@ define(function(require) {
             _.defaults(this.options.activityListOptions, defaults.activityListOptions);
             _.defaults(this.options.commentOptions, defaults.commentOptions);
 
-            activityListData = JSON.parse(this.options.activityListData);
+            try {
+                activityListData = JSON.parse(this.options.activityListData);
+            } catch (e) {
+                mediator.execute('showMessage', 'error', __('oro.activitylist.load_error'));
+                activityListData = {data: [], count: 0};
+            }
+
             this.options.activityListData = activityListData.data;
             this.options.activityListCount = activityListData.count;
 
@@ -213,6 +219,7 @@ define(function(require) {
             this.activityTypeFilter.render();
             this.activityTypeFilter.on('update', this.onFilterStateChange, this);
             $el.find('.activity-type-filter').append(this.activityTypeFilter.$el);
+            this.activityTypeFilter.rendered();
 
             /*
              * Render "Date Range" filter
@@ -228,6 +235,7 @@ define(function(require) {
             this.dateRangeFilter.render();
             this.dateRangeFilter.on('update', this.onFilterStateChange, this);
             $el.find('.date-range-filter').append(this.dateRangeFilter.$el);
+            this.dateRangeFilter.rendered();
         },
 
         registerWidget: function() {

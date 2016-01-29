@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -16,12 +18,23 @@ class ActivityEntityDeleteHandler extends DeleteHandler
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var ActivityManager */
+    protected $activityManager;
+
     /**
      * @param SecurityFacade $securityFacade
      */
     public function setSecurityFacade(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;
+    }
+
+    /**
+     * @param ActivityManager $activityManager
+     */
+    public function setActivityManager(ActivityManager $activityManager)
+    {
+        $this->activityManager = $activityManager;
     }
 
     /**
@@ -42,20 +55,36 @@ class ActivityEntityDeleteHandler extends DeleteHandler
         if (!$entity) {
             throw new EntityNotFoundException();
         }
-        if (!$this->securityFacade->isGranted('EDIT', $entity)) {
-            throw new ForbiddenException('has no edit permissions for activity entity');
-        }
+        $this->checkPermissions($entity, $em);
 
         $targetEntity = $em->find($id->getTargetEntityClass(), $id->getTargetEntityId());
         if (!$targetEntity) {
             throw new EntityNotFoundException();
         }
-        if (!$this->securityFacade->isGranted('VIEW', $targetEntity)) {
-            throw new ForbiddenException('has no view permissions for related entity');
-        }
+        $this->checkPermissionsForTargetEntity($targetEntity, $em);
 
-        $entity->removeActivityTarget($targetEntity);
+        $this->activityManager->removeActivityTarget($entity, $targetEntity);
 
         $em->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkPermissions($entity, ObjectManager $em)
+    {
+        if (!$this->securityFacade->isGranted('EDIT', $entity)) {
+            throw new ForbiddenException('has no edit permissions for activity entity');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkPermissionsForTargetEntity($entity, ObjectManager $em)
+    {
+        if (!$this->securityFacade->isGranted('VIEW', $entity)) {
+            throw new ForbiddenException('has no view permissions for related entity');
+        }
     }
 }

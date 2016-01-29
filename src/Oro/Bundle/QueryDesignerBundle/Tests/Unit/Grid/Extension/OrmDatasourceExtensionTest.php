@@ -188,10 +188,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
             . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
             . 'INNER JOIN user.address address '
             //. 'WHERE (user_name IS NULL OR NOT(user_name LIKE :string1)) AND ('
-            . 'WHERE user_name NOT LIKE :string1 AND ('
+            . 'WHERE user_name NOT LIKE :string1 AND '
             . '(user_status < :datetime2 OR user_status > :datetime3) AND '
-            . '(address.country LIKE :string4 OR address.city LIKE :string5 OR address.zip LIKE :string6)'
-            . ')',
+            . '(address.country LIKE :string4 OR address.city LIKE :string5 OR address.zip LIKE :string6)',
             $result
         );
     }

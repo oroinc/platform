@@ -39,6 +39,9 @@ definitions:
                 conditions:
                     @equal: [$seen, false]
                 actions:
+                    - @call_method:
+                        object: $.data
+                        method: incrementUnsyncedFlagCount
                     - @format_string:
                         attribute: $.arguments
                         string: '--ids=%id%'
@@ -55,6 +58,9 @@ definitions:
                 conditions:
                     @equal: [$seen, true]
                 actions:
+                    - @call_method:
+                        object: $.data
+                        method: incrementUnsyncedFlagCount
                     - @format_string:
                         attribute: $.arguments
                         string: '--ids=%id%'

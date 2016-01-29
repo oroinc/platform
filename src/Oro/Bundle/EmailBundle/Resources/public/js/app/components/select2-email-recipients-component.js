@@ -108,7 +108,7 @@ define([
         * Extracts contexts and organizations from data
         */
         _processData: function(data) {
-           if (typeof data === 'undefined') {
+           if (typeof data === 'undefined' || this.disposed) {
                return;
            }
 
