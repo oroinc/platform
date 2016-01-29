@@ -19,8 +19,29 @@ class ProcessTriggerRepository extends EntityRepository
                 'event' => $trigger->getEvent(),
                 'field' => $trigger->getField(),
                 'definition' => $trigger->getDefinition(),
+                'cron' => $trigger->getCron()
             )
         );
+    }
+
+    /**
+     * @return array|ProcessTrigger[]
+     */
+    public function findAllCronTriggers()
+    {
+        $qb = $this->createQueryBuilder('trigger');
+
+        return $qb
+            ->innerJoin('trigger.definition', 'definition')
+            ->where(
+                $qb->expr()->isNotNull('trigger.cron'),
+                $qb->expr()->isNull('trigger.event'),
+                $qb->expr()->eq('definition.enabled', ':enabled')
+            )
+            ->setParameter('enabled', true)
+            ->orderBy('definition.executionOrder')
+            ->getQuery()
+            ->getResult();
     }
 
     /**

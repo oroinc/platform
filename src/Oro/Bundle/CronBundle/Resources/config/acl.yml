@@ -3,3 +3,9 @@ oro_jobs:
     type: action
     group_name: ""
     bindings: ~
+
+oro_schedules:
+    label: oro.cron.action.schedules
+    type: action
+    group_name: ""
+    bindings: ~

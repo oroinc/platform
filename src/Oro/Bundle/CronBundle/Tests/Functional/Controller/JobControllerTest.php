@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Functional;
+namespace Oro\Bundle\CronBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
  */
-class ControllersTest extends WebTestCase
+class JobControllerTest extends WebTestCase
 {
     protected function setUp()
     {
