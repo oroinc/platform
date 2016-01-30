@@ -52,7 +52,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
@@ -64,6 +63,7 @@ define(function(require) {
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
     var $ = require('jquery');
+    var _ = require('underscore');
     require('jquery.select2');
 
     SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
@@ -74,7 +74,15 @@ define(function(require) {
         SELECTED_ITEMS_H_INCREMENT: 2,
 
         events: {
-            'updatePosition': 'updatePosition'
+            'updatePosition': 'updatePosition',
+            'select2-open': 'onSelect2Open',
+            'select2-close': 'onSelect2Close',
+            'mousedown .select2-choices': function() {
+                this._isSelection = true;
+            },
+            'mouseup .select2-choices': function() {
+                delete this._isSelection;
+            }
         },
 
         initialize: function(options) {
@@ -84,7 +92,7 @@ define(function(require) {
         },
 
         getAvailableOptions: function(options) {
-            var choices = this.metadata.choices;
+            var choices = this.options.choices;
             var result = [];
             for (var id in choices) {
                 if (choices.hasOwnProperty(id)) {
@@ -115,7 +123,7 @@ define(function(require) {
                 _this.prestine = false;
                 switch (e.keyCode) {
                     case _this.ENTER_KEY_CODE:
-                        if (prestine  && !_this.getModelValue()) {
+                        if (prestine) {
                             e.stopImmediatePropagation();
                             e.preventDefault();
                             _this.$('input[name=value]').select2('close');
@@ -155,6 +163,7 @@ define(function(require) {
                 allowClear: !this.getValidationRules().NotBlank,
                 selectOnBlur: false,
                 openOnEnter: false,
+                dropdownCssClass: 'inline-editor__select2-drop',
                 data: {results: this.availableChoices}
             };
         },
@@ -174,20 +183,77 @@ define(function(require) {
             }
             this.$('.select2-focusser').off(this.eventNamespace());
             this.$('input.select2-input').off(this.eventNamespace());
-            this.$('input[name=value]').select2('destroy');
-            // due to bug in select2
-            $('body > .select2-drop-mask, body > .select2-drop').remove();
+            this.$('input[name=value]').select2('close').select2('destroy');
             SelectEditorView.__super__.dispose.call(this);
         },
 
+        onSelect2Open: function(e) {
+            var select2 = this.$(e.target).data('select2');
+            if (!select2) {
+                return;
+            }
+            select2.dropdown.on('mousedown' + this.eventNamespace(), _.bind(function() {
+                this._isSelection = true;// to suppress focusout event
+            }, this));
+            select2.dropdown.on('mouseup' + this.eventNamespace(), _.bind(function() {
+                delete this._isSelection;
+            }, this));
+        },
+
+        onSelect2Close: function(e) {
+            var select2 = this.$(e.target).data('select2');
+            if (!select2) {
+                return;
+            }
+            select2.dropdown.off(this.eventNamespace());
+        },
+
         focus: function() {
+            var isFocused = this.isFocused();
             this.$('input[name=value]').select2('open');
+            if (!isFocused) {
+                // trigger custom focus event as select2 doesn't trigger 'select2-focus' when focused manually
+                this.trigger('focus');
+                this._isFocused = true;
+            }
+        },
+
+        /**
+         * Handles focusout event
+         *
+         * @param {jQuery.Event} e
+         */
+        onFocusout: function(e) {
+            if (this._isSelection) {
+                this.$('.select2-focused').focus();
+            } else if (!e.relatedTarget || !$('.select2-drop').has(e.relatedTarget).length) {
+                SelectEditorView.__super__.onFocusout.call(this, e);
+            }
         },
 
         isChanged: function() {
             // current value is always string
             // btw model value could be an number
             return this.getValue() !== String(this.getModelValue());
+        },
+
+        /**
+         * Returns true if element is focused
+         *
+         * @returns {boolean}
+         */
+        isFocused: function() {
+            return this.$('.select2-container-active').length;
+        }
+    }, {
+        processMetadata: function(columnMetadata) {
+            if (_.isUndefined(columnMetadata.choices)) {
+                throw new Error('`choices` is required option');
+            }
+            if (!columnMetadata.inline_editing.editor.view_options) {
+                columnMetadata.inline_editing.editor.view_options = {};
+            }
+            columnMetadata.inline_editing.editor.view_options.choices = columnMetadata.choices;
         }
     });
 

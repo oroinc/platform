@@ -48,7 +48,6 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
 | options.fieldName | <code>string</code> | Field name to edit in model |
-| options.metadata | <code>string</code> | Editor metadata |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 | options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
 | options.datePickerOptions | <code>Object</code> | See [documentation here](http://goo.gl/pddxZU) |

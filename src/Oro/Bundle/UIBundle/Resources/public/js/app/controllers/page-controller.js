@@ -287,11 +287,17 @@ define([
          * @private
          */
         _setNavigationHandlers: function(url) {
-            mediator.setHandler('redirectTo', this._processRedirect, this);
+            mediator.setHandler('redirectTo', function(pathDesc, params, options) {
+                var queue = [];
+                mediator.trigger('page:beforeRedirectTo', queue, pathDesc, params, options);
+                $.when.apply($, queue).done(_.bind(function() {
+                    this._processRedirect(pathDesc, params, options);
+                }, this));
+            }, this);
 
             mediator.setHandler('refreshPage', function(options) {
-                var queue;
-                mediator.trigger('page:beforeRefresh', (queue = []));
+                var queue = [];
+                mediator.trigger('page:beforeRefresh', queue);
                 options = options || {};
                 _.defaults(options, {forceStartup: true, force: true});
                 $.when.apply($, queue).done(function(customOptions) {
