@@ -23,6 +23,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($provider, '/Tests/Functional/Command/DataFixtures/permission.yml');
     }
+
     /**
      * @dataProvider executeDataProvider
      *
@@ -43,6 +44,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
             $this->assertDefinitionLoaded($definitions, $definition);
         }
     }
+
     /**
      * @return array
      */
@@ -61,6 +63,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
             ]
         ];
     }
+
     /**
      * @param string $className
      * @return ObjectRepository
@@ -69,6 +72,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($className)->getRepository($className);
     }
+
     /**
      * @param array|PermissionDefinition[] $definitions
      * @param string $name
