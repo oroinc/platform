@@ -68,7 +68,6 @@ inline_editing.editor.autocomplete_api_accessor.class | One of the [list of sear
 | options.model | <code>Object</code> | Current row model |
 | options.input_delay | <code>Object</code> | Delay before user finished input and request sent to server |
 | options.fieldName | <code>string</code> | Field name to edit in model |
-| options.metadata | <code>string</code> | Editor metadata |
 | options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
 | options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |

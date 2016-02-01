@@ -22,7 +22,7 @@ define([
 
         defaultMessages: {
             confirm_title: 'Delete Confirmation',
-            confirm_content: 'Are you sure you want to remove this item?',
+            confirm_content: 'Are you sure you want to delete this item?',
             confirm_ok: 'Yes',
             confirm_cancel: 'Cancel',
             success: 'Removed.',

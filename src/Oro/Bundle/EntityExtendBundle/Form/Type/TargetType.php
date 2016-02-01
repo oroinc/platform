@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class TargetType extends AbstractType
 {
@@ -22,26 +23,44 @@ class TargetType extends AbstractType
     /** @var FieldConfigId */
     protected $configId;
 
-    public function __construct(ConfigManager $configManager, $configId)
+    /** @var string|null */
+    protected $targetEntityClass;
+
+    /**
+     * @param ConfigManager $configManager
+     * @param FieldConfigId $configId
+     */
+    public function __construct(ConfigManager $configManager, FieldConfigId $configId)
     {
         $this->configManager = $configManager;
         $this->configId = $configId;
-        $this->targetEntity = $this->configManager
+        $this->targetEntityClass = $this->configManager
             ->getProvider('extend')
             ->getConfigById($this->configId)
             ->get('target_entity');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSetData'));
     }
 
+    /**
+     * Sets selected target entity class
+     *
+     * @param FormEvent $event
+     */
     public function preSetData(FormEvent $event)
     {
-        $event->setData($this->targetEntity);
+        $event->setData($this->targetEntityClass);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
@@ -50,8 +69,8 @@ class TargetType extends AbstractType
                     'class' => 'extend-rel-target-name'
                 ),
                 'label'       => 'oro.entity_extend.form.target_entity',
-                'empty_value' => $this->targetEntity ? null : '',
-                'read_only'   => (bool) $this->targetEntity,
+                'empty_value' => $this->targetEntityClass ? null : '',
+                'read_only'   => (bool) $this->targetEntityClass,
                 'choices'     => $this->getEntityChoiceList(
                     $this->configId->getClassName(),
                     $this->configId->getFieldType()
@@ -69,15 +88,18 @@ class TargetType extends AbstractType
         );
     }
 
+    /**
+     * @param string $entityClassName
+     * @param string $relationType
+     *
+     * @return array
+     */
     protected function getEntityChoiceList($entityClassName, $relationType)
     {
-        $choices       = [];
-        $extendEntityConfig = $this->configManager->getProvider('extend');
-
         /** @var EntityConfigId[] $entityIds */
-        $entityIds = $this->targetEntity
-            ? [$extendEntityConfig->getId($this->targetEntity)]
-            : $extendEntityConfig->getIds();
+        $entityIds = $this->targetEntityClass
+            ? [$this->configManager->getId('extend', $this->targetEntityClass)]
+            : $this->configManager->getIds('extend');
 
         if (in_array($relationType, [RelationTypeBase::ONE_TO_MANY, RelationTypeBase::MANY_TO_MANY], true)) {
             $entityIds = array_filter(
@@ -98,14 +120,20 @@ class TargetType extends AbstractType
                 return
                     !$config->is('state', ExtendScope::STATE_NEW)
                     && (
-                        $this->targetEntity
+                        $this->targetEntityClass
                         || !$config->is('is_deleted')
                     );
             }
         );
 
+        $choices = [];
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
+            if (!$this->configManager->hasConfig($className, 'id') && !ExtendHelper::isCustomEntity($className)) {
+                // @todo: temporary ignore entities that don't have PK with name 'id'
+                // remove this in https://magecore.atlassian.net/browse/BAP-9713
+                continue;
+            }
             if ($className !== $entityClassName) {
                 $entityConfig        = $this->configManager->getProvider('entity')->getConfig($className);
                 $choices[$className] = $entityConfig->get('label');
