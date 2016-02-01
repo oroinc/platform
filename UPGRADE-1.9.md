@@ -130,7 +130,9 @@ grid-name:
 - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
 - `oro_email.emailtemplate.variable_provider.entity` service was marked as private
 - `oro_email.emailtemplate.variable_provider.system` service was marked as private
-- `oro_email.emailtemplate.variable_provider.user` service was marked as private 
+- `oro_email.emailtemplate.variable_provider.user` service was marked as private
+- Command `oro:email:body-sync` was marked as deprecated
+- Command `oro:cron:email-body-sync` was added
 
 ####EmbeddedFormBundle
 - Bundle now contains configuration of security firewall `embedded_form`
