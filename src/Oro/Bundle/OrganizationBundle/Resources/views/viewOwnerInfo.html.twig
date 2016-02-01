@@ -11,6 +11,16 @@
             {% set bracket_parts = [businessUnitName]|merge(bracket_parts) %}
         {% endif %}
     {% endif %}
+{% elseif ownerType == 'ORGANIZATION' %}
+    {% if organizationInfo is not defined %}
+        {% set organizationOwner = oro_get_entity_owner(entity) %}
+        {% if organizationOwner is not null %}
+            {% set organizationInfo =  'oro.ui.owner'|trans ~ ': ' ~ organizationOwner.name %}
+        {% else %}
+            {% set organizationInfo = '' %}
+        {% endif %}
+    {% endif %}
+    {{ organizationInfo|raw }}
 {% endif %}
 {% if bracket_parts is not empty %}
     ({{ bracket_parts|join(', ')|raw }})
