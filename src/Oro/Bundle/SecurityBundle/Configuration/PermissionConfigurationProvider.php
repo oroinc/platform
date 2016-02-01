@@ -16,6 +16,11 @@ class PermissionConfigurationProvider
     protected $definitionConfiguration;
 
     /**
+     * @var string
+     */
+    protected $configPath = 'Resources/config/permission.yml';
+
+    /**
      * @param PermissionDefinitionListConfiguration $definitionConfiguration
      */
     public function __construct(PermissionDefinitionListConfiguration $definitionConfiguration)
@@ -31,7 +36,7 @@ class PermissionConfigurationProvider
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_security',
-            new YamlCumulativeFileLoader('Resources/config/permission.yml')
+            new YamlCumulativeFileLoader($this->configPath)
         );
 
         $definitions = [];

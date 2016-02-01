@@ -16,6 +16,8 @@ use Oro\Bundle\SecurityBundle\Entity\PermissionDefinition;
 
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:permission:configuration:load';
+
     /**
      * @var EntityManager
      */
@@ -74,7 +76,7 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('oro:permission:configuration:load')
+        $this->setName(self::NAME)
             ->setDescription('Load permission configuration from configuration files to the database')
             ->addOption(
                 'definitions',
