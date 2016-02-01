@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
 use Oro\Bundle\SecurityBundle\Entity\PermissionDefinition;
+use Oro\Bundle\SecurityBundle\Exception\MissedRequiredOptionException;
 
 class PermissionConfigurationBuilder
 {
@@ -12,7 +13,7 @@ class PermissionConfigurationBuilder
      */
     public function buildPermissionDefinitions(array $configuration)
     {
-        $definitions = array();
+        $definitions = [];
         foreach ($configuration as $name => $definitionConfiguration) {
             $definitions[] = $this->buildPermissionDefinition($name, $definitionConfiguration);
         }
@@ -32,7 +33,9 @@ class PermissionConfigurationBuilder
         $definition = new PermissionDefinition();
         $definition
             ->setName($name)
-            ->setLabel($configuration['label']);
+            ->setLabel($configuration['label'])
+            ->setGroupName(array_key_exists('group_name', $configuration) ? $configuration['group_name'] : '')
+            ->setDescription(array_key_exists('description', $configuration) ? $configuration['description'] : '');
 
         return $definition;
     }
@@ -62,6 +65,7 @@ class PermissionConfigurationBuilder
         if (array_key_exists($key, $options)) {
             return $options[$key];
         }
+
         return $default;
     }
 }

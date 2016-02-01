@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
-
-use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 
 class PermissionDefinitionConfiguration implements ConfigurationInterface
 {
@@ -46,8 +43,10 @@ class PermissionDefinitionConfiguration implements ConfigurationInterface
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
+                ->scalarNode('group_name')->end()
+                ->scalarNode('description')->end()
             ->end();
 
-       return $nodeDefinition;
+        return $nodeDefinition;
     }
 }

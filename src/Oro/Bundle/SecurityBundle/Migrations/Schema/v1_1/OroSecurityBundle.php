@@ -37,6 +37,8 @@ class OroSecurityBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('label', 'string', ['length' => 255]);
+        $table->addColumn('group_name', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('description', 'string', ['length' => 255, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'UNIQ_83424D0F5E237E06');
     }

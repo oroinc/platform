@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 
 class PermissionDefinitionListConfiguration implements ConfigurationInterface
 {

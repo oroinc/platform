@@ -45,22 +45,25 @@ class PermissionDefinition
     protected $label;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="group_name", type="string", length=255, nullable=true)
+     */
+    protected $groupName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="string", length=255, nullable=true)
+     */
+    protected $description;
+
+    /**
      * @return int
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     /**
@@ -100,15 +103,55 @@ class PermissionDefinition
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getGroupName()
+    {
+        return $this->groupName;
+    }
+
+    /**
+     * @param string $groupName
+     * @return $this
+     */
+    public function setGroupName($groupName)
+    {
+        $this->groupName = $groupName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
     /**
      * @param PermissionDefinition $definition
      * @return PermissionDefinition
      */
     public function import(PermissionDefinition $definition)
     {
-        // enabled flag should not be imported
         $this->setName($definition->getName())
-            ->setLabel($definition->getLabel());
+            ->setLabel($definition->getLabel())
+            ->setGroupName($definition->getGroupName())
+            ->setDescription($definition->getDescription());
 
         return $this;
     }
