@@ -28,6 +28,12 @@ services:
         calls:
             - [setEventDispatcher, [@event_dispatcher]]
 
+    oro_activity.association_helper:
+        class: Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+
     oro_activity.entity_config_dumper.extension:
         class: %oro_activity.entity_config_dumper.extension.class%
         parent: oro_entity_extend.entity_config_dumper.extension.association
@@ -151,6 +157,7 @@ services:
             - @request
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
+            - @oro_security.security_facade
 
     oro_activity.form.activity_entity.api:
         class: Symfony\Component\Form\Form
@@ -185,3 +192,5 @@ services:
             - @oro_search.mapper
             - @translator
             - @oro_entity.doctrine_helper
+        calls:
+            - [setEventDispatcher, [@event_dispatcher]]

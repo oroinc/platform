@@ -2,25 +2,24 @@
 
 namespace Oro\Bundle\OrganizationBundle\Twig;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Symfony\Component\Security\Core\Util\ClassUtils;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
 class OwnerTypeExtension extends \Twig_Extension
 {
     const EXTENSION_NAME = 'oro_owner_type';
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /** @var EntityOwnerAccessor */
     protected $ownerAccessor;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider      $configProvider
+     * @param EntityOwnerAccessor $entityOwnerAccessor
      */
     public function __construct(ConfigProvider $configProvider, EntityOwnerAccessor $entityOwnerAccessor)
     {
@@ -65,9 +64,7 @@ class OwnerTypeExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {

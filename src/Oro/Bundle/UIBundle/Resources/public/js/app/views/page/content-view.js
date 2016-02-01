@@ -78,11 +78,7 @@ define([
             var activeElement = document.activeElement;
             var delay = 200;
 
-            try {
-                this.$('form:first').focusFirstInput();
-            } catch (err) {
-                // skipp unsupported element
-            }
+            this.$('form:first').focusFirstInput();
 
             if (!tools.isMobile() && activeElement === document.activeElement) {
                 _.delay(focusScrollElement, delay);
