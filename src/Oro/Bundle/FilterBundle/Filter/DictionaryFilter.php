@@ -1,12 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Filter;
+namespace Oro\Bundle\FilterBundle\Filter;
 
 use LogicException;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\DictionaryFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
 class DictionaryFilter extends BaseMultiChoiceFilter

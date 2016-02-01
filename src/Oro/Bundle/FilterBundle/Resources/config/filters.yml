@@ -15,6 +15,9 @@ parameters:
     oro_filter.datetime_range_filter.class:       Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter
     oro_filter.many_to_many_filter.class:         Oro\Bundle\FilterBundle\Filter\ManyToManyFilter
     oro_filter.choice_tree_filter.class:          Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter
+    oro_filter.dictionary_filter.class:           Oro\Bundle\FilterBundle\Filter\DictionaryFilter
+    oro_filter.enum_filter.class:                 Oro\Bundle\FilterBundle\Filter\EnumFilter
+    oro_filter.multi_enum_filter.class:           Oro\Bundle\FilterBundle\Filter\MultiEnumFilter
 
 services:
     oro_filter.filter_utility:
@@ -139,3 +142,27 @@ services:
             - @doctrine
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: choice-tree }
+
+    oro_filter.dictionary_filter:
+        class: %oro_filter.dictionary_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: dictionary }
+
+    oro_filter.enum_filter:
+        class: %oro_filter.enum_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: enum }
+
+    oro_filter.multi_enum_filter:
+        class: %oro_filter.multi_enum_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: multi_enum }

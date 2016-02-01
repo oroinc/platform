@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\EnumFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 

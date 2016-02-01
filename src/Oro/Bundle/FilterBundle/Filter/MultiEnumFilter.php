@@ -1,12 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Filter;
+namespace Oro\Bundle\FilterBundle\Filter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\EnumFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 class MultiEnumFilter extends BaseMultiChoiceFilter
 {

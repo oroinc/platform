@@ -1,10 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Form\Type\Filter;
+namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
 
 abstract class AbstractMultiChoiceType extends AbstractChoiceType
 {

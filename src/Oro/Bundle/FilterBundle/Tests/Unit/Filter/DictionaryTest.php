@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
-use Oro\Bundle\EntityExtendBundle\Filter\DictionaryFilter;
-use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\DictionaryFilterType;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
+use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;

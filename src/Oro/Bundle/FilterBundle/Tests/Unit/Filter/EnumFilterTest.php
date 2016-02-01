@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
-use Oro\Bundle\EntityExtendBundle\Filter\EnumFilter;
-use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\EnumFilterType;
+use Oro\Bundle\FilterBundle\Filter\EnumFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 class EnumFilterTest extends \PHPUnit_Framework_TestCase

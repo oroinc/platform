@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
-use Oro\Bundle\EntityExtendBundle\Filter\MultiEnumFilter;
-use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\EnumFilterType;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
+use Oro\Bundle\FilterBundle\Filter\MultiEnumFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
+use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;
@@ -32,14 +32,14 @@ class MultiEnumFilterTest extends OrmTestCase
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
             $reader,
-            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures'
+            'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
         );
 
         $this->em = $this->getTestEntityManager();
         $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
         $this->em->getConfiguration()->setEntityNamespaces(
             [
-                'Stub' => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures'
+                'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
             ]
         );
 
