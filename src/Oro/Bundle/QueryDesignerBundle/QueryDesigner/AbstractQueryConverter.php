@@ -1180,7 +1180,7 @@ abstract class AbstractQueryConverter
             }
 
             $usedAliases = $this->qbTools->getTablesUsedInJoinCondition(
-                isset($join['condition']) ? $join['condition'] : null,
+                $this->getDefinitionJoinCondition($join),
                 $this->queryAliases
             );
             $unknownAliases = array_diff(
@@ -1231,9 +1231,33 @@ abstract class AbstractQueryConverter
             $join['join'],
             $parentJoinId,
             $joinType ?: $join['type'],
-            isset($join['conditionType']) ? $join['conditionType'] : null,
-            isset($join['condition']) ? $join['condition'] : null
+            $this->getJoinDefinitionConditionType($join),
+            $this->getDefinitionJoinCondition($join)
         );
+    }
+
+    /**
+     * @param array $join
+     *
+     * @return string|null
+     */
+    protected function getJoinDefinitionConditionType(array $join)
+    {
+        return isset($join['conditionType'])
+            ? $join['conditionType']
+            : null;
+    }
+
+    /**
+     * @param array $join
+     *
+     * @return string|null
+     */
+    protected function getDefinitionJoinCondition(array $join)
+    {
+        return isset($join['condition'])
+            ? $join['condition']
+            : null;
     }
 
     /**
@@ -1278,7 +1302,10 @@ abstract class AbstractQueryConverter
                         if (!isset($mapItem['processed'])) {
                             $joinType     = $mapItem['type'];
                             $join         = $query['join'][$joinType][$mapItem['key']];
-                            $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin($join['join'], $mainEntityJoinId);
+                            $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin(
+                                $join['join'],
+                                $mainEntityJoinId
+                            );
                             if (null !== $parentJoinId) {
                                 $alias    = $join['alias'];
                                 $newAlias = $this->generateTableAlias();
