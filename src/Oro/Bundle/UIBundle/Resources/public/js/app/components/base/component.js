@@ -81,7 +81,9 @@ define([
                 if (item && typeof item.dispose === 'function' && !item.disposed) {
                     item.dispose();
                 }
-                delete this[name];
+                if (['cid'].indexOf(name) === -1) {
+                    delete this[name];
+                }
             }, this);
             this.disposed = true;
 

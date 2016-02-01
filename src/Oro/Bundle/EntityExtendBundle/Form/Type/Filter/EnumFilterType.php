@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type\Filter;
 
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
@@ -38,7 +40,7 @@ class EnumFilterType extends AbstractMultiChoiceType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $defaultFieldOptions = [
             'multiple' => true
@@ -56,45 +58,77 @@ class EnumFilterType extends AbstractMultiChoiceType
                 ],
             ]
         );
-        $resolver->setNormalizers(
-            [
-                'class' => function (Options $options, $value) {
-                    if ($value !== null) {
-                        return $value;
-                    }
 
-                    if (empty($options['enum_code'])) {
-                        throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
-                    }
-
-                    $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
-                    if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
-                        throw new InvalidOptionsException(
-                            sprintf(
-                                '"%s" must be a child of "%s"',
-                                $class,
-                                'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
-                            )
-                        );
-                    }
-
-                    return $class;
-                },
-                // this normalizer allows to add/override field_options options outside
-                'field_options' => function (Options $options, $value) use (&$defaultFieldOptions) {
-                    if (isset($options['class'])) {
-                        $nullValue = null;
-                        if ($options->has('null_value')) {
-                            $nullValue = $options->get('null_value');
-                        }
-                        $value['choices'] = $this->getChoices($options['class'], $nullValue);
-                    } else {
-                        $value['choices'] = [];
-                    }
-
-                    return array_merge($defaultFieldOptions, $value);
+        $resolver->setNormalizer(
+            'class',
+            function (Options $options, $value) {
+                if ($value !== null) {
+                    return $value;
                 }
-            ]
+
+                if (empty($options['enum_code'])) {
+                    throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
+                }
+
+                $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
+                    throw new InvalidOptionsException(
+                        sprintf(
+                            '"%s" must be a child of "%s"',
+                            $class,
+                            'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                        )
+                    );
+                }
+
+                return $class;
+            }
+        );
+
+        // this normalizer allows to add/override field_options options outside
+        $resolver->setNormalizer(
+            'field_options',
+            function (Options $options, $value) use (&$defaultFieldOptions) {
+                if (isset($options['class'])) {
+                    $nullValue = null;
+                    if ($options->offsetExists('null_value')) {
+                        $nullValue = $options->offsetGet('null_value');
+                    }
+                    $value['choices'] = $this->getChoices($options['class'], $nullValue);
+                } else {
+                    $value['choices'] = [];
+                }
+
+                return array_merge($defaultFieldOptions, $value);
+            }
+        );
+    }
+
+    /**
+     * Convert value to string.
+     *
+     * AbstractEnumValue declare primary key as string.
+     * For enums with numerical PK value should be converted to string for correct types in DB query.
+     *
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->addModelTransformer(
+            new CallbackTransformer(
+                function ($value) {
+                    return $value;
+                },
+                function ($value) {
+                    if (is_array($value) && array_key_exists('value', $value)) {
+                        foreach ($value['value'] as &$data) {
+                            $data = (string)$data;
+                        }
+                    }
+
+                    return $value;
+                }
+            )
         );
     }
 

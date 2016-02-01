@@ -1,18 +1,21 @@
 .inline-editor-wrapper.multi-checkbox-editor {
-  min-width: 188px;
+  z-index: 10002 !important; // to show over .ui-multiselect-menu
+  min-width: 190px;
+  .inline-editor__fields {
+    height: 0;
+    overflow: hidden;
+  }
   button.ui-multiselect {
-    width: calc(~"100% - 55px") !important;
-    margin-left: -4px;
-    min-width: 120px;
+    width: 100% !important;
     height: 0;
     border: 0 none;
     padding: 0;
     overflow: hidden;
   }
 }
-.multi-checkbox-editor.ui-multiselect-menu {
+.ui-multiselect-menu.multi-checkbox-editor {
   margin: 0;
-  padding: 2px 0;
+  padding: 0;
   border: 0 none;
   z-index: 10001;
   background: transparent;
@@ -20,22 +23,24 @@
     padding: 0;
     background: transparent;
     border: 0 none;
+    margin: 0;
   }
   .ui-multiselect-filter {
     float: none;
     margin-right: 0;
-    padding-left: 4px;
     input {
+      padding: 4px 52px 4px 9px;
       box-sizing: border-box;
       width: 100%;
       margin: 0;
       height: 30px;
       font-size: 14px;
-      border-radius: 4px 0 0 4px;
+      border-radius: 0;
       border: 1px solid #ccc;
       &:focus {
         border-color: rgba(82,168,236,0.8);
-        outline: 0;
+        outline: none;
+        box-shadow: none;
       }
     }
   }
@@ -45,7 +50,7 @@
     background: white;
     padding: 0 3px;
     max-height: 300px;
-    .border-radius(0 0 4px 4px);
+    border-radius: 0;
     .box-shadow(0 4px 5px rgba(0,0,0,0.15));
     input[type="radio"], input[type="checkbox"] {
       margin-top: -4px;
