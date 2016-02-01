@@ -47,6 +47,7 @@ services:
             - @oro_imap.connector.factory
             - @oro_security.encoder.mcrypt
             - @oro_imap.imap_email_google_oauth2_manager
+            - @oro_config.global
         tags:
             - { name: oro_email.email_body_loader }
 
