@@ -100,14 +100,14 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
         $type       = $value['type'];
 
         if ($type === AbstractDateFilterType::TYPE_LESS_THAN
-            || ($type === AbstractDateFilterType::TYPE_BETWEEN && $startValue === null)
+            || ($type === AbstractDateFilterType::TYPE_BETWEEN && !$startValue)
         ) {
             $startValue = new DateTime(self::MIN_DATE, new \DateTimeZone('UTC'));
             $type       = AbstractDateFilterType::TYPE_LESS_THAN;
         }
 
         if ($type === AbstractDateFilterType::TYPE_MORE_THAN
-            || ($type === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
+            || ($type === AbstractDateFilterType::TYPE_BETWEEN && !$endValue)
         ) {
             $endValue = new DateTime('now', new \DateTimeZone('UTC'));
             $type     = AbstractDateFilterType::TYPE_MORE_THAN;

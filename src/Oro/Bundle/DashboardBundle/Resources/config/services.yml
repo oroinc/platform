@@ -143,6 +143,7 @@ services:
         class: %oro_dashboard.form.type.widget_date_range.class%
         arguments:
             - @translator
+            - @oro_filter.form.event_subscriber.date
         tags:
             - { name: form.type, alias: "oro_type_widget_date_range" }
 
@@ -177,6 +178,11 @@ services:
             - @oro_dashboard.event_listener.widget_items_form_subscriber
         tags:
             - { name: form.type, alias: oro_type_widget_items }
+
+    oro_dashboard.form.type.widget_date_range_item:
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeItemType
+        tags:
+            - { name: form.type, alias: "oro_type_widget_date_range_item" }
 
     oro_dashboard.event_listener.widget_items_form_subscriber:
         class: %oro_dashboard.event_listener.widget_items_form_subscriber.class%

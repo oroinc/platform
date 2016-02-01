@@ -119,7 +119,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
                 $this->mapValues($children, $data, $this->getDatePartAccessorClosure('Y'));
                 $this->replaceValueFields($form->get('value'), array_flip(range(date('Y') - 50, date('Y') + 50)));
                 break;
-            case DateModifierInterface::PART_SOURCE:
             case DateModifierInterface::PART_VALUE:
             default:
                 $this->mapValues(

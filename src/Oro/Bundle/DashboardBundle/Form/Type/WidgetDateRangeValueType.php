@@ -27,7 +27,7 @@ class WidgetDateRangeValueType extends AbstractType
     {
         $builder->add(
             'start',
-            'text',
+            'oro_type_widget_date_range_item',
             array_merge(
                 ['required' => false],
                 $options['field_options'],
@@ -37,7 +37,7 @@ class WidgetDateRangeValueType extends AbstractType
 
         $builder->add(
             'end',
-            'text',
+            'oro_type_widget_date_range_item',
             array_merge(
                 ['required' => false],
                 $options['field_options'],
@@ -66,7 +66,7 @@ class WidgetDateRangeValueType extends AbstractType
                 'field_type'          => 'text',
                 'field_options'       => [],
                 'start_field_options' => [],
-                'end_field_options'   => []
+                'end_field_options'   => [],
             )
         );
     }
