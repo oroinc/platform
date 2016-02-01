@@ -238,6 +238,10 @@ i.invitation-status.icon-question-sign {
     margin-top: 10px;
 }
 
+.calendar-dashboard-widget .fc-toolbar {
+    display: none;
+}
+
 .reminder-status {
     float: right;
     margin-top: 1px;

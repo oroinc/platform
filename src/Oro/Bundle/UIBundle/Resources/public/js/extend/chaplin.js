@@ -173,7 +173,12 @@ define([
         }
 
         payload = {prevented: false, target: el};
-        Chaplin.mediator.publish('openLink:before', payload);
+
+        // jshint -W107
+        // not link to same page and not javascript code link
+        if (href && !Chaplin.mediator.execute('compareUrl', href) && href.substr(0, 11) !== 'javascript:') {
+            Chaplin.mediator.publish('openLink:before', payload);
+        }
 
         if (payload.prevented !== false) {
             event.preventDefault();

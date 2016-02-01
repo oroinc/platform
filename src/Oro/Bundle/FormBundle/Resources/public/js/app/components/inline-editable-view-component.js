@@ -54,7 +54,6 @@ define(function(require) {
      * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
      * @param {*} options.value - value to edit
      * @param {string} options.fieldName - field name to use when sending value to server
-     * @param {Object} options.metadata - Editor metadata
      * @param {Object} options.metadata.inline_editing - inline-editing configuration
      *
      * @augments BaseComponent
@@ -74,12 +73,12 @@ define(function(require) {
 
     InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
         OVERLAY_TOOL_DEFAULTS: {
+            zIndex: 1,
             position: {
                 my: 'left top',
-                at: 'left-10 top-6',
+                at: 'left-7 top-7',
                 collision: 'flipfit'
-            },
-            backdrop: true
+            }
         },
 
         METADATA_DEFAULTS: {
@@ -90,6 +89,8 @@ define(function(require) {
                 }
             }
         },
+
+        ESCAPE_KEY_CODE: 27,
 
         WIDTH_INCREMENT: 15,
 
@@ -142,6 +143,10 @@ define(function(require) {
         },
 
         enterEditMode: function() {
+            if (!this.view.disposed && this.view.$el) {
+                this.view.$el.removeClass('save-fail');
+            }
+
             var View = this.classes.editor;
             var viewConfiguration = this.inlineEditingOptions.editor ?
                 this.inlineEditingOptions.editor.view_options :
@@ -150,8 +155,7 @@ define(function(require) {
                 className: 'inline-view-editor',
                 autoRender: true,
                 model: this.model,
-                fieldName: this.fieldName,
-                metadata: this.metadata
+                fieldName: this.fieldName
             }));
 
             this.editorView = viewInstance;
@@ -164,7 +168,25 @@ define(function(require) {
                 }
             });
             this.resizeTo(viewInstance, this.wrapper);
-            this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+
+            var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+
+            this.listenTo(viewInstance, {
+                dispose: function() {
+                    overlay.remove();
+                },
+                keydown: this.onGenericEscapeKeydown,
+                focus: function() {
+                    mediator.trigger('inlineEditor:focus', viewInstance);
+                },
+                blur: function() {
+                    if (viewInstance.isChanged()) {
+                        this.saveCurrentCell();
+                    }
+                }
+            });
+
+            viewInstance.focus();
 
             this.listenTo(viewInstance, 'saveAction', this.saveCurrentCell);
             this.listenTo(viewInstance, 'saveAndExitAction', this.saveCurrentCellAndExit);
@@ -177,12 +199,21 @@ define(function(require) {
             this.listenTo(viewInstance, 'cancelAndEditNextRowAction', this.exitEditMode);
             this.listenTo(viewInstance, 'saveAndEditPrevRowAction', this.saveCurrentCellAndExit);
             this.listenTo(viewInstance, 'cancelAndEditPrevRowAction', this.exitEditMode);
+            this.listenTo(mediator, 'inlineEditor:focus', this.onInlineEditorFocus);
 
             return viewInstance;
         },
 
+        onInlineEditorFocus: function(view) {
+            if (!this.editorView || view === this.editorView) {
+                return;
+            }
+            if (!this.editorView.isChanged()) {
+                this.exitEditMode();
+            }
+        },
+
         exitEditMode: function() {
-            this.overlay.remove();
             this.editorView.dispose();
             delete this.editorView;
         },
@@ -246,7 +277,7 @@ define(function(require) {
             // assume "undefined" as delete value request
             for (var key in updateData) {
                 if (updateData.hasOwnProperty(key)) {
-                    if (updateData[key] === editorView.UNSET_FIELD_VALUE) {
+                    if (updateData[key] === void 0) {
                         model.unset(key);
                         delete updateData[key];
                     }
@@ -262,6 +293,18 @@ define(function(require) {
             view.$el.css({
                 width: baseView.$el.outerWidth() + this.WIDTH_INCREMENT
             });
+        },
+
+        /**
+         * Generic keydown handler, which handles ESCAPE
+         *
+         * @param {$.Event} e
+         */
+        onGenericEscapeKeydown: function(e) {
+            if (e.keyCode === this.ESCAPE_KEY_CODE) {
+                this.exitEditMode(true);
+                e.preventDefault();
+            }
         }
     }, {
         onSaveSuccess: function(response) {
@@ -281,7 +324,7 @@ define(function(require) {
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.view.disposed && this.view.$el) {
-                this.view.$el.addClassTemporarily('save-fail', 2000);
+                this.view.$el.addClass('save-fail');
             }
             if (!this.model.disposed) {
                 this.model.set(this.oldState);

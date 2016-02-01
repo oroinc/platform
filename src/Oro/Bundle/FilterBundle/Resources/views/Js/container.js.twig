@@ -10,7 +10,7 @@
                                 <a class="reset-filter-button" href="javascript:void(0);">{{ 'Reset'|trans|e('html')|raw }}</a>
                                 <select data-action="add-filter-select" multiple>
                                     <% _.each(filters, function (filter, name) { %>
-                                    <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                                    <option title="<%- _.escape(filter.label) %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
                                     <%- filter.label %>
                                     </option>
                                     <% }); %>
@@ -27,7 +27,7 @@
                 <div class="filter-container">
                     <select data-action="add-filter-select" multiple>
                         <% _.each(filters, function (filter, name) { %>
-                        <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                        <option title="<%- _.escape(filter.label) %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
                         <%- filter.label %>
                         </option>
                         <% }); %>
