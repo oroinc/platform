@@ -42,17 +42,17 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $this->container->get('security.acl.dbal.schema')->addToSchema($schema);
 
         /** Tables generation **/
-        $this->createOroSecurityPermissionDefinitionTable($schema);
+        $this->createOroSecurityPermDefinitionTable($schema);
     }
 
     /**
-     * Create oro_security_permission_definition table
+     * Create oro_security_perm_definition table
      *
      * @param Schema $schema
      */
-    protected function createOroSecurityPermissionDefinitionTable(Schema $schema)
+    protected function createOroSecurityPermDefinitionTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_security_permission_definition');
+        $table = $schema->createTable('oro_security_perm_definition');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('label', 'string', ['length' => 255]);
