@@ -116,20 +116,18 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
         $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        while (true) {
+        while ($emails = $repo->getEmailsWithoutBody($batchSize)) {
+            if (count($emails) === 0) {
+                $this->logger->notice('All emails was processed');
+                break;
+            }
+
             if ($maxExecTimeout !== false) {
                 $date = new \DateTime('now', new \DateTimeZone('UTC'));
                 if ($date->sub($maxExecTimeout) >= $startTime) {
                     $this->logger->notice('Exit because allocated time frame elapsed.');
                     break;
                 }
-            }
-
-            $emails = $repo->getEmailsWithoutBody($batchSize);
-
-            if (count($emails) === 0) {
-                $this->logger->notice('All emails was processed');
-                break;
             }
 
             $batchStartTime = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -139,11 +137,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 try {
                     $this->syncOneEmailBody($email);
                     $this->logger->notice(
-                        sprintf(
-                            'The "%s" (ID: %d) email body was synced.',
-                            $email->getSubject(),
-                            $email->getId()
-                        )
+                        sprintf('The "%s" (ID: %d) email body was synced.', $email->getSubject(), $email->getId())
                     );
                 } catch (\Exception $e) {
                     // in case of exception, we should save state that email body was synced.
