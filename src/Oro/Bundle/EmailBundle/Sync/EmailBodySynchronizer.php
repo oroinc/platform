@@ -125,13 +125,6 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
             /** @var Email $email */
             foreach ($emails as $email) {
-                if ($maxExecTimeout !== false) {
-                    $date = new \DateTime('now', new \DateTimeZone('UTC'));
-                    if ($date->sub($maxExecTimeout) >= $startTime) {
-                        $this->logger->notice('Exit because allocated time frame elapsed.');
-                        break;
-                    }
-                }
                 try {
                     $this->syncOneEmailBody($email);
                     $this->logger->notice(
@@ -153,7 +146,15 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
             $currentTime = new \DateTime('now', new \DateTimeZone('UTC'));
             $diff = $currentTime->diff($startTime);
-            $this->logger->info(sprintf('Batch save time: "%d" seconds.', $diff->format('%s')));
+            $this->logger->info(sprintf('Batch save time: %s.', $diff->format('%i minutes %s seconds')));
+
+            if ($maxExecTimeout !== false) {
+                $date = new \DateTime('now', new \DateTimeZone('UTC'));
+                if ($date->sub($maxExecTimeout) >= $startTime) {
+                    $this->logger->notice('Exit because allocated time frame elapsed.');
+                    break;
+                }
+            }
         }
     }
 
