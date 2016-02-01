@@ -34,7 +34,7 @@ class OroCronBundle implements Migration, DatabasePlatformAwareInterface
 
         $table = $preSchema->getTable('oro_cron_schedule');
         $table->changeColumn('command', ['length' => 255]);
-        $table->addColumn('args', 'array', ['notnull' => false]);
+        $table->addColumn('args', 'json_array', ['notnull' => false]);
         $table->addColumn('args_hash', 'string', ['notnull' => false, 'length' => 32]);
 
         foreach ($this->getSchemaDiff($schema, $preSchema) as $query) {
