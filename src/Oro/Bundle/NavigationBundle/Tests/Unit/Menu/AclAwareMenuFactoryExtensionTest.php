@@ -54,6 +54,11 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('hasLoggedUser')
             ->willReturn($this->hasLoggedUser);
 
+        $this->securityFacade
+            ->expects($this->any())
+            ->method('getToken')
+            ->willReturn($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+
         $this->factoryExtension = new AclAwareMenuFactoryExtension($this->router, $this->securityFacade);
         $this->factory = new MenuFactory();
         $this->factory->addExtension($this->factoryExtension);
