@@ -116,18 +116,19 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
         $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        while ($emails = $repo->getEmailsWithoutBody($batchSize)) {
-            if (count($emails) === 0) {
-                $this->logger->notice('All emails was processed');
-                break;
-            }
-
+        while (true) {
             if ($maxExecTimeout !== false) {
                 $date = new \DateTime('now', new \DateTimeZone('UTC'));
                 if ($date->sub($maxExecTimeout) >= $startTime) {
                     $this->logger->notice('Exit because allocated time frame elapsed.');
                     break;
                 }
+            }
+
+            $emails = $repo->getEmailsWithoutBody($batchSize);
+            if (count($emails) === 0) {
+                $this->logger->notice('All emails was processed');
+                break;
             }
 
             $batchStartTime = new \DateTime('now', new \DateTimeZone('UTC'));
