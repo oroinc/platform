@@ -123,9 +123,9 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             return;
         }
 
-        if (($this->hideAllForNotLoggedInUsers && !$this->securityFacade->hasLoggedUser()) ||
-            null === $this->securityFacade->getToken()
-        ) {
+        if (null === $this->securityFacade->getToken()) { // don't check anything if it's CLI
+            return;
+        } elseif ($this->hideAllForNotLoggedInUsers && !$this->securityFacade->hasLoggedUser()) {
             if (isset($options['extras'])
                 && array_key_exists('showNonAuthorized', $options['extras'])
                 && $options['extras']['showNonAuthorized']
