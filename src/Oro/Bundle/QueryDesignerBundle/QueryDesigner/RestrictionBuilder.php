@@ -48,6 +48,9 @@ class RestrictionBuilder implements RestrictionBuilderInterface
                 $operator = array_pop($operatorStack);
 
                 $params = [];
+                if ($operator !== null) {
+                    $params[FilterUtility::CONDITION_KEY] = $operator;
+                }
                 if (isset($item['filterData']['params'])) {
                     $params = $item['filterData']['params'];
                     unset($item['filterData']['params']);
