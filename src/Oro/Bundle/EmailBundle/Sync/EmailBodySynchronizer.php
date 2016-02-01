@@ -34,7 +34,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     /** @var array */
     protected $emailBodyLoaders = [];
 
-    /** @var ObjectManager  */
+    /** @var ObjectManager */
     protected $manager = null;
 
     /**
@@ -109,8 +109,22 @@ class EmailBodySynchronizer implements LoggerAwareInterface
      */
     public function sync($maxExecTimeInMin = -1, $batchSize = 10)
     {
-        $repo = $this->doctrine->getRepository('OroEmailBundle:Email');
+        $repo           = $this->doctrine->getRepository('OroEmailBundle:Email');
+        $maxExecTimeout = $maxExecTimeInMin > 0
+            ? new \DateInterval('PT' . $maxExecTimeInMin . 'M')
+            : false;
+
+        $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
         while (true) {
+            if ($maxExecTimeout !== false) {
+                $date = new \DateTime('now', new \DateTimeZone('UTC'));
+                if ($date->sub($maxExecTimeout) >= $startTime) {
+                    $this->logger->notice('Exit because allocated time frame elapsed.');
+                    break;
+                }
+            }
+
             $emails = $repo->getEmailsWithoutBody($batchSize);
 
             if (count($emails) === 0) {
@@ -118,10 +132,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 break;
             }
 
-            $startTime      = new \DateTime('now', new \DateTimeZone('UTC'));
-            $maxExecTimeout = $maxExecTimeInMin > 0
-                ? new \DateInterval('PT' . $maxExecTimeInMin . 'M')
-                : false;
+            $batchStartTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
             /** @var Email $email */
             foreach ($emails as $email) {
@@ -145,16 +156,8 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             $this->getManager()->clear();
 
             $currentTime = new \DateTime('now', new \DateTimeZone('UTC'));
-            $diff = $currentTime->diff($startTime);
+            $diff        = $currentTime->diff($batchStartTime);
             $this->logger->info(sprintf('Batch save time: %s.', $diff->format('%i minutes %s seconds')));
-
-            if ($maxExecTimeout !== false) {
-                $date = new \DateTime('now', new \DateTimeZone('UTC'));
-                if ($date->sub($maxExecTimeout) >= $startTime) {
-                    $this->logger->notice('Exit because allocated time frame elapsed.');
-                    break;
-                }
-            }
         }
     }
 
