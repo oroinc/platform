@@ -17,13 +17,13 @@ define(['jquery', 'underscore'], function($, _) {
 
         if (useImap.prop('checked') === false) {
             imapFields.each(function() {
-                $(this).parents('.control-group').hide();
+                $(this).closest('.control-group').hide();
                 $(this).enable(false);
             });
         }
         if (useSmtp.prop('checked') === false) {
             smtpFields.each(function() {
-                $(this).parents('.control-group').hide();
+                $(this).closest('.control-group').hide();
                 $(this).enable(false);
             });
         }
@@ -38,12 +38,12 @@ define(['jquery', 'underscore'], function($, _) {
         var configShowHide = function(controlCheckbox, configValues) {
             if (controlCheckbox.is(':checked')) {
                 configValues.each(function() {
-                    $(this).parents('.control-group').show();
+                    $(this).closest('.control-group').show();
                     $(this).enable();
                 });
             } else {
                 configValues.each(function() {
-                    $(this).parents('.control-group').hide();
+                    $(this).closest('.control-group').hide();
                     $(this).enable(false);
                 });
             }

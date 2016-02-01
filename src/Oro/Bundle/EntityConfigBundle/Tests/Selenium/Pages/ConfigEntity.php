@@ -200,7 +200,9 @@ class ConfigEntity extends CustomEntity
      */
     public function setCustomField($fieldName, $value)
     {
-        if ($this->isElementPresent("//div/input[contains(@id, '{$fieldName}')]")) {
+        $fields = $this->test->elements($this->test->using('xpath')
+            ->value("//div/input[contains(@id, '{$fieldName}')]"));
+        if (count($fields) === 1) {
             $field = $this->test->byXPath("//div/input[contains(@id, '{$fieldName}')]");
             $field->clear();
             $field->value($value);
