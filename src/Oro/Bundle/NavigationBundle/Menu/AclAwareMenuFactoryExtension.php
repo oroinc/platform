@@ -45,6 +45,11 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     protected $aclCache = array();
 
     /**
+     * @var bool
+     */
+    protected $hideAllForNotLoggedInUsers = true;
+
+    /**
      * @param RouterInterface $router
      * @param SecurityFacade $securityFacade
      */
@@ -62,6 +67,14 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     public function setCache(CacheProvider $cache)
     {
         $this->cache = $cache;
+    }
+
+    /**
+     * @param bool $value
+     */
+    public function setHideAllForNotLoggedInUsers($value)
+    {
+        $this->hideAllForNotLoggedInUsers = $value;
     }
 
     /**
@@ -83,10 +96,12 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     public function buildOptions(array $options = array())
     {
-        $this->processAcl($options);
+        if (!$this->alreadyDenied($options)) {
+            $this->processAcl($options);
 
-        if ($options['extras']['isAllowed'] && !empty($options['route'])) {
-            $this->processRoute($options);
+            if ($options['extras']['isAllowed'] && !empty($options['route'])) {
+                $this->processRoute($options);
+            }
         }
 
         return $options;
@@ -108,7 +123,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             return;
         }
 
-        if (!$this->securityFacade->hasLoggedUser()) {
+        if ($this->hideAllForNotLoggedInUsers && !$this->securityFacade->hasLoggedUser()) {
             if (isset($options['extras'])
                 && array_key_exists('showNonAuthorized', $options['extras'])
                 && $options['extras']['showNonAuthorized']
@@ -117,7 +132,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
 
             $isAllowed = false;
-        } else {
+        } elseif ($this->securityFacade->getToken() !== null) { // don't check access if it's CLI
             if (array_key_exists('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
                 $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
             }
@@ -289,5 +304,15 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     protected function getCacheKey($space, $value)
     {
         return md5($space . ':' . $value);
+    }
+
+    /**
+     * @param array $options
+     * @return bool
+     */
+    protected function alreadyDenied(array $options)
+    {
+        return array_key_exists('extras', $options) && array_key_exists('isAllowed', $options['extras']) &&
+        ($options['extras']['isAllowed'] === false);
     }
 }
