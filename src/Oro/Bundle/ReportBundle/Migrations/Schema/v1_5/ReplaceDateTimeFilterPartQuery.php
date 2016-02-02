@@ -1,0 +1,66 @@
+<?php
+
+namespace Oro\Bundle\ReportBundle\Migrations\Schema\v1_5;
+
+use Doctrine\DBAL\Types\Type;
+use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
+
+class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function processQueries(LoggerInterface $logger, $dryRun = false)
+    {
+        $reports = $this->connection->createQueryBuilder()
+            ->select('r.id, r.definition')
+            ->from('oro_report', 'r')
+            ->execute()
+            ->fetchAll(\PDO::FETCH_ASSOC);
+        $reportsToUpdate = [];
+        foreach ($reports as $report) {
+            $definition = $report['definition'];
+            $needUpdate = false;
+            $updated = [];
+            if ($definition) {
+                $definition = json_decode($definition, JSON_OBJECT_AS_ARRAY);
+                if (!empty($definition['filters'])) {
+                    foreach ($definition['filters'] as $filterDefinition) {
+                        $newDefinition = $filterDefinition;
+                        if (isset($filterDefinition['criterion']['filter']) &&
+                            in_array($filterDefinition['criterion']['filter'], ['date', 'datetime'], true) &&
+                            isset($filterDefinition['criterion']['data']['part']) &&
+                            $filterDefinition['criterion']['data']['part'] === 'source'
+                        ) {
+                                $newDefinition['criterion']['data']['part'] = 'value';
+                                $needUpdate = true;
+                        }
+                        $updated[] = $newDefinition;
+                    }
+                    if ($needUpdate) {
+                        $definition['filters'] = $updated;
+                        $reportsToUpdate[$report['id']] = $definition;
+                    }
+                }
+            }
+        }
+
+        foreach ($reportsToUpdate as $id => $definitionToUpdate) {
+            $this->addSql(
+                'UPDATE oro_report SET definition = :definition WHERE id = :id',
+                [
+                    'id' => $id,
+                    'definition' => $definitionToUpdate
+                ],
+                [
+                    'id' => Type::INTEGER,
+                    'definition' => Type::JSON_ARRAY
+                ]
+            );
+        }
+
+        parent::processQueries($logger, $dryRun);
+    }
+}
