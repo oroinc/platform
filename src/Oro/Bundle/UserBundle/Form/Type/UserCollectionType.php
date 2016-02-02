@@ -39,6 +39,9 @@ class UserCollectionType extends AbstractType
                 'property' => 'fullName',
                 'multiple' => true,
                 'required' => false,
+                'attr' => [
+                    'class' => 'user-user-collection',
+                ],
             ]
         );
     }

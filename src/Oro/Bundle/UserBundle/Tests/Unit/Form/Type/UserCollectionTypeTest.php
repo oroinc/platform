@@ -36,6 +36,9 @@ class UserCollectionTypeTest extends \PHPUnit_Framework_TestCase
                     'class'  => self::CLASS_USER_ENTITY,
                     'property' => 'fullName',
                     'multiple' => true,
+                    'attr' => [
+                        'class' => 'user-user-collection',
+                    ],
                 ]
             );
 
