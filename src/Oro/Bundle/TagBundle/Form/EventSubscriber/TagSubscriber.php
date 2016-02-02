@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Form\EventSubscriber;
 
+use Oro\Component\Layout\ArrayCollection;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -58,6 +59,6 @@ class TagSubscriber implements EventSubscriberInterface
         $this->tagManager->loadTagging($entity);
         $tags = $this->tagManager->getPreparedArray($entity, null, $this->organization);
 
-        $event->setData(['autocomplete' => $tags]);
+        $event->setData($tags);
     }
 }

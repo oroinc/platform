@@ -6,14 +6,10 @@
                     {{ form_label(form, '' , { label_attr: label_attr}) }}
                 </div>
                 <div class="controls tags-form-select-editor">
-                    {{ form_row(form.autocomplete) }}
+                    {{ form_widget(form) }}
+                    {{ form_javascript(form) }}
                 </div>
             </div>
         {% endif %}
     {% endif %}
-{% endblock %}
-
-{% block oro_tag_autocomplete_row %}
-    {{ form_widget(form) }}
-    {{ form_javascript(form) }}
 {% endblock %}

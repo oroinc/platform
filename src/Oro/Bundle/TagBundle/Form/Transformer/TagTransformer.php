@@ -4,6 +4,8 @@ namespace Oro\Bundle\TagBundle\Form\Transformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
@@ -27,7 +29,7 @@ class TagTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (!$value) {
-            return [];
+            return new ArrayCollection();
         }
 
         $tags  = explode(';;', $value);
@@ -40,10 +42,10 @@ class TagTransformer implements DataTransformerInterface
         }
 
         if (!empty($names)) {
-            return $this->tagManager->loadOrCreateTags($names);
+            return new ArrayCollection($this->tagManager->loadOrCreateTags($names));
         }
 
-        return [];
+        return new ArrayCollection();
     }
 
     /**
