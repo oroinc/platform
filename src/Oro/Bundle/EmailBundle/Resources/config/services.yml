@@ -956,11 +956,11 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
 
-        oro_email.email_body_synchronizer:
-            class: Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer
-            arguments:
-                - @oro_email.email_body_loader_selector
-                - @doctrine
-                - @event_dispatcher
-            calls:
-                - [setLogger, [@logger]]
+    oro_email.email_body_synchronizer:
+        class: Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer
+        arguments:
+            - @oro_email.email_body_loader_selector
+            - @doctrine
+            - @event_dispatcher
+        calls:
+            - [setLogger, [@logger]]
