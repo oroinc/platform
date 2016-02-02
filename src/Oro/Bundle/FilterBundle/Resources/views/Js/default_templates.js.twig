@@ -1,14 +1,14 @@
 <script type="text/template" id="filter-wrapper-template">
     <div class="filter-item oro-drop">
         <div class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %><% } %><span class="filter-item-hint"></span>
+            <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
             <span class="caret"></span>
         </div>
         <div class="filter-criteria dropdown-menu" />
     </div>
 </script>
 <script type="text/template" id="filter-hint-template">
-    <span><%= label %>: <strong class="filter-criteria-hint"></strong>
+    <span><%- label %>: <strong class="filter-criteria-hint"></strong>
         <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>">
             <i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i>
         </span>
@@ -154,7 +154,7 @@
 <script type="text/template" id="select-filter-template">
     <div class="filter-item oro-drop">
         <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %><% } %><span class="filter-item-hint"></span>
+            <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
             <select>
                 <% _.each(options, function (option) { %>
                 <option value="<%= option.value %>" title="<%- option.label %>"
@@ -170,7 +170,7 @@
 <script type="text/template" id="multiselect-filter-template">
     <div class="filter-item oro-drop">
         <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
-            <% if (showLabel) { %><%= label %><% } %><span class="filter-item-hint"></span>
+            <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
             <select multiple>
                 <% _.each(options, function (option) { %>
                 <option value="<%= option.value %>" title="<%- option.label %>"
