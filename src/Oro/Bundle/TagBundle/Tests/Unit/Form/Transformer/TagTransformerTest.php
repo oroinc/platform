@@ -36,7 +36,10 @@ class TagTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testReverseTransform($value, $tags)
     {
-        $this->manager->expects($this->once())->method('loadOrCreateTags')->with($tags);
+        $this->manager->expects($this->once())
+            ->method('loadOrCreateTags')
+            ->with($tags)
+            ->willReturn([]);
         $this->transformer->reverseTransform($value);
     }
 
