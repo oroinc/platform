@@ -9,6 +9,8 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -112,6 +114,9 @@ class ImportStrategyHelper
                 continue;
             }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
+            if ($importedValue instanceof Collection) {
+                $this->fieldHelper->setObjectValue($basicEntity, $propertyName, new ArrayCollection());
+            }
             $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
         }
     }
