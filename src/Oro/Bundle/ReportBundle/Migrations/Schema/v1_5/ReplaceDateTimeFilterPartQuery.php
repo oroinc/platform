@@ -23,22 +23,10 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
         foreach ($reports as $report) {
             $definition = $report['definition'];
             $needUpdate = false;
-            $updated = [];
             if ($definition) {
                 $definition = json_decode($definition, JSON_OBJECT_AS_ARRAY);
                 if (!empty($definition['filters'])) {
-                    foreach ($definition['filters'] as $filterDefinition) {
-                        $newDefinition = $filterDefinition;
-                        if (isset($filterDefinition['criterion']['filter']) &&
-                            in_array($filterDefinition['criterion']['filter'], ['date', 'datetime'], true) &&
-                            isset($filterDefinition['criterion']['data']['part']) &&
-                            $filterDefinition['criterion']['data']['part'] === 'source'
-                        ) {
-                                $newDefinition['criterion']['data']['part'] = 'value';
-                                $needUpdate = true;
-                        }
-                        $updated[] = $newDefinition;
-                    }
+                    $updated = $this->processFilters($definition['filters'], $needUpdate);
                     if ($needUpdate) {
                         $definition['filters'] = $updated;
                         $reportsToUpdate[$report['id']] = $definition;
@@ -62,5 +50,36 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
         }
 
         parent::processQueries($logger, $dryRun);
+    }
+
+    /**
+     * @param array $filtersToProcess
+     *
+     * @param bool  $needUpdate
+     *
+     * @return array
+     */
+    protected function processFilters(array $filtersToProcess, &$needUpdate)
+    {
+        $updated = [];
+        foreach ($filtersToProcess as $filterDefinition) {
+            $newDefinition = $filterDefinition;
+            if (isset($filterDefinition['criterion'])) {
+                if (isset($filterDefinition['criterion']['filter']) &&
+                    in_array($filterDefinition['criterion']['filter'], ['date', 'datetime'], true) &&
+                    isset($filterDefinition['criterion']['data']['part']) &&
+                    $filterDefinition['criterion']['data']['part'] === 'source'
+                ) {
+                    $newDefinition['criterion']['data']['part'] = 'value';
+                    $needUpdate = true;
+                }
+            } elseif (is_array($filterDefinition)) {
+                $newDefinition = $this->processFilters($filterDefinition, $needUpdate);
+            }
+
+            $updated[] = $newDefinition;
+        }
+
+        return $updated;
     }
 }
