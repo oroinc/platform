@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var EmailAttachmentCollectionView;
-    var _ = require('underscore');
     var $ = require('jquery');
     var EmailAttachmentView = require('oroemail/js/app/views/email-attachment-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
