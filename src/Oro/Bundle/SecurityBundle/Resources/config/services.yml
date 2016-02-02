@@ -77,10 +77,10 @@ parameters:
 
     oro_security.orm.acl_conditional_factor_builder.class:     Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder
 
-    oro_security.configuration.config.permission_definition.class: Oro\Bundle\securityBundle\Configuration\permissionDefinitionConfiguration
-    oro_security.configuration.config.permission_definition_list.class: Oro\Bundle\securityBundle\Configuration\permissionDefinitionListConfiguration
-    oro_security.configuration.provider.permission_config.class: Oro\Bundle\securityBundle\Configuration\permissionConfigurationProvider
-    oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\securityBundle\Configuration\permissionConfigurationBuilder
+    oro_security.configuration.config.permission_definition.class: Oro\Bundle\SecurityBundle\Configuration\PermissionDefinitionConfiguration
+    oro_security.configuration.config.permission_definition_list.class: Oro\Bundle\SecurityBundle\Configuration\PermissionDefinitionListConfiguration
+    oro_security.configuration.provider.permission_config.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
+    oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
 
 services:
     oro_security.security_facade:
