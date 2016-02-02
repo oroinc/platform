@@ -3,9 +3,10 @@
 namespace Oro\Bundle\CalendarBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
@@ -68,17 +69,23 @@ class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterfac
 
             // grant to manage own calendar events
             $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
-            $maskBuilder = $manager->getMaskBuilder($oid)
+            $extension = $manager->getExtensionSelector()->select($oid);
+            $maskBuilders = $extension->getAllMaskBuilders();
+
+            foreach ($maskBuilders as $maskBuilder) {
                 // ->add('VIEW_BASIC')
                 // ->add('CREATE_BASIC')
                 // ->add('EDIT_BASIC')
                 // ->add('DELETE_BASIC');
                 // @todo now only SYSTEM level is supported
-                ->add('VIEW_SYSTEM')
-                ->add('CREATE_SYSTEM')
-                ->add('EDIT_SYSTEM')
-                ->add('DELETE_SYSTEM');
-            $manager->setPermission($sid, $oid, $maskBuilder->get());
+                foreach (['VIEW_SYSTEM', 'CREATE_SYSTEM', 'EDIT_SYSTEM', 'DELETE_SYSTEM'] as $permission) {
+                    if ($maskBuilder->hasMask('MASK_' . $permission)) {
+                        $maskBuilder->add($permission);
+                    }
+                }
+
+                $manager->setPermission($sid, $oid, $maskBuilder->get());
+            }
         }
     }
 
@@ -91,17 +98,23 @@ class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterfac
 
             // grant to manage own calendar events
             $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
-            $maskBuilder = $manager->getMaskBuilder($oid)
+            $extension = $manager->getExtensionSelector()->select($oid);
+            $maskBuilders = $extension->getAllMaskBuilders();
+
+            foreach ($maskBuilders as $maskBuilder) {
                 // ->add('VIEW_BASIC')
                 // ->add('CREATE_BASIC')
                 // ->add('EDIT_BASIC')
                 // ->add('DELETE_BASIC');
                 // @todo now only SYSTEM level is supported
-                ->add('VIEW_SYSTEM')
-                ->add('CREATE_SYSTEM')
-                ->add('EDIT_SYSTEM')
-                ->add('DELETE_SYSTEM');
-            $manager->setPermission($sid, $oid, $maskBuilder->get());
+                foreach (['VIEW_SYSTEM', 'CREATE_SYSTEM', 'EDIT_SYSTEM', 'DELETE_SYSTEM'] as $permission) {
+                    if ($maskBuilder->hasMask('MASK_' . $permission)) {
+                        $maskBuilder->add($permission);
+                    }
+                }
+
+                $manager->setPermission($sid, $oid, $maskBuilder->get());
+            }
         }
     }
 
