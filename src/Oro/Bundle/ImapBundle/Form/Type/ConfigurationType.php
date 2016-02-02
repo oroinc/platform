@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -13,6 +12,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
+use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
+use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -52,6 +53,7 @@ class ConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber(new DecodeFolderSubscriber());
         $this->modifySettingsFields($builder);
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);

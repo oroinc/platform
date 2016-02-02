@@ -130,7 +130,9 @@ grid-name:
 - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
 - `oro_email.emailtemplate.variable_provider.entity` service was marked as private
 - `oro_email.emailtemplate.variable_provider.system` service was marked as private
-- `oro_email.emailtemplate.variable_provider.user` service was marked as private 
+- `oro_email.emailtemplate.variable_provider.user` service was marked as private
+- Command `oro:email:body-sync` was marked as deprecated
+- Command `oro:cron:email-body-sync` was added
 
 ####EmbeddedFormBundle
 - Bundle now contains configuration of security firewall `embedded_form`
@@ -172,6 +174,7 @@ grid-name:
 
 ####EntitySerializer component
 - `Oro\Component\EntitySerializer\EntitySerializer` class has a lot of changes. This can bring a `backward compatibility break` if you have inherited classes.
+- Changed the default behaviour for relations which does not have explicit configuration. Now such relations are skipped. Before that the all fields of a related entity were returned, this could cause indefinite loop if a target entity has another relation to parent entity. To restore the previous result you should configure all relations explicitly, for example: `users => null`.
 - `excluded_fields` attribute is marked as deprecated. Use `exclude` attribute for a field.
 - `orderBy` attribute is marked as deprecated. Use `order_by` attribute instead.
 - `result_name` attribute is marked as deprecated. Use `property_path` attribute instead.
