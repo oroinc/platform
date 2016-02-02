@@ -57,6 +57,8 @@ define(function(require) {
 
         class: null,
 
+        isInitSelect2: false,
+
         /**
          * @inheritDoc
          */
@@ -95,6 +97,7 @@ define(function(require) {
          */
         _renderCriteria: function() {
             var self = this;
+            self.renderTemplate();
 
             $.ajax({
                 url: routing.generate(
@@ -106,15 +109,13 @@ define(function(require) {
                 data: {
                     'keys': this.value.value
                 },
-                success: function(reposne) {
+                success: function (reposne) {
                     self.value.value = reposne.results;
                     self._writeDOMValue(self.value);
-                    self.renderTemplate();
-
                     self.applySelect2();
                     self.renderDeferred.resolve();
                 },
-                error: function(jqXHR) {
+                error: function (jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 }
             });
@@ -161,6 +162,7 @@ define(function(require) {
             select2element.removeClass('hide');
             select2element.attr('multiple', 'multiple');
             select2element.select2(select2Config);
+            self.isInitSelect2 = true;
             if (this.templateTheme) {
                 select2element.on('change', function() {
                     self.applyValue();
@@ -270,9 +272,14 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
+            if (this.isInitSelect2) {
+                var value = this.$el.find('.select-values-autocomplete').select2('val');
+            } else {
+                var value = null;
+            }
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.type),
-                value: this.$el.find('.select-values-autocomplete').select2('val')
+                value: value
             };
         },
 
@@ -285,7 +292,10 @@ define(function(require) {
                 var foundChoice = _.find(this[property], function(choice) {
                     return (choice.value === value.type);
                 });
-                selectedChoiceLabel = foundChoice.label;
+
+                if (foundChoice) {
+                    selectedChoiceLabel = foundChoice.label;
+                }
             }
 
             return selectedChoiceLabel;
