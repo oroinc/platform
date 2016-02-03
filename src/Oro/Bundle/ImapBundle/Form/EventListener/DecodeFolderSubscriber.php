@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Form\EventListener;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
