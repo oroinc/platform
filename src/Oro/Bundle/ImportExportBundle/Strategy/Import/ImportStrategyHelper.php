@@ -114,8 +114,16 @@ class ImportStrategyHelper
                 continue;
             }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
-            if ($importedValue instanceof Collection) {
-                $this->fieldHelper->setObjectValue($basicEntity, $propertyName, new ArrayCollection());
+            if ($importedValue instanceof Collection && !$importedValue->isEmpty()) {
+                $singular = \Oro\Component\PhpUtils\ArrayUtil::find(
+                    function ($singular) use ($basicEntity) {
+                        return is_callable([$basicEntity, sprintf('add%s', $singular)]);
+                    },
+                    (array) \Symfony\Component\PropertyAccess\StringUtil::singularify($propertyName)
+                );
+                if ($singular) {
+                    array_map([$basicEntity, sprintf('add%s', $singular)], $importedValue->toArray());
+                }
             }
             $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
         }
