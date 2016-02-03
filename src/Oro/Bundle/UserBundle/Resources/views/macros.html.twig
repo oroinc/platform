@@ -47,20 +47,3 @@
         {{ userName }}
     {% endif %}
 {% endmacro %}
-
-{%- macro renderUserViewLinks(entities, labelProperty, route) -%}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {{ UI.entityViewLinks(entities, labelProperty|default('fullName'), route|default('oro_user_view')) }}
-{%- endmacro -%}
-
-{%- macro renderUserViewLink(entity, labelProperty, route) -%}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {{ UI.entityViewLink(entity, attribute(entity, labelProperty|default('fullName')), route|default('oro_user_view')) }}
-{%- endmacro -%}
-
-{%- macro renderUsersProperty(label, entities, labelProperty, route) -%}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% if entities | length %}
-        {{ UI.renderHtmlProperty(label, _self.renderUserViewLinks(entities, labelProperty, route)) }}
-    {% endif %}
-{%- endmacro -%}
