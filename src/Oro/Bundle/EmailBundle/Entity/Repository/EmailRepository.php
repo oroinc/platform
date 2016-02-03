@@ -108,6 +108,25 @@ class EmailRepository extends EntityRepository
     }
 
     /**
+     * Get emails with empty body and at not synced body state
+     *
+     * @param int $batchSize
+     *
+     * @return Email[]
+     */
+    public function getEmailsWithoutBody($batchSize)
+    {
+        return $this->createQueryBuilder('email')
+            ->select('email')
+            ->where('email.emailBody is null')
+            ->andWhere('email.bodySynced = false or email.bodySynced is null')
+            ->setMaxResults($batchSize)
+            ->orderBy('email.sentAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Get count new emails per folders
      *
      * @param User         $user

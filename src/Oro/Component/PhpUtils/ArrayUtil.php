@@ -6,6 +6,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ArrayUtil
 {
     /**
@@ -216,7 +219,7 @@ class ArrayUtil
      * Return first element on which callback returns truthy value, null otherwise
      *
      * @param callable $callback
-     * @param array $array
+     * @param array    $array
      */
     public static function find(callable $callback, array $array)
     {
