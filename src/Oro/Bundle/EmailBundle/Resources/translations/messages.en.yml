@@ -239,6 +239,7 @@ oro:
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
+        body_synced.label:        Email body synced
         status:
             label:                Status
             unread.label:         Unread

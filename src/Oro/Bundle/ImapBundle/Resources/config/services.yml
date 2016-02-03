@@ -1,4 +1,7 @@
 parameters:
+    oro_imap.user_form_name:                         oro_user_user_form
+    oro_imap.email_mailbox_form_name:                oro_email_mailbox
+    oro_imap.email_mailbox_form_type:                oro_email_mailbox
     oro_imap.connector.factory.class:                Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory
     oro_imap.connector.class:                        Oro\Bundle\ImapBundle\Connector\ImapConnector
     oro_imap.services.factory.class:                 Oro\Bundle\ImapBundle\Connector\ImapServicesFactory
@@ -162,3 +165,6 @@ services:
             - @oro_security.encoder.mcrypt
             - @doctrine
             - @oro_imap.connector.factory
+            - %oro_imap.user_form_name%
+            - %oro_imap.email_mailbox_form_name%
+            - %oro_imap.email_mailbox_form_type%

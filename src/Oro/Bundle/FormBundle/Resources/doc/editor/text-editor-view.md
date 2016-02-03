@@ -53,7 +53,6 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
 | options.fieldName | <code>string</code> | Field name to edit in model |
-| options.metadata | <code>string</code> | Editor metadata |
 | options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
 | options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
@@ -64,7 +63,9 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
   * [.getPlaceholder()](#module_TextEditorView#getPlaceholder) ⇒ <code>string</code>
   * [.focus(atEnd)](#module_TextEditorView#focus)
   * [.getValidationRules()](#module_TextEditorView#getValidationRules) ⇒ <code>Object</code>
-  * [.getFormattedValue()](#module_TextEditorView#getFormattedValue) ⇒ <code>string</code>
+  * [.getRawModelValue()](#module_TextEditorView#getRawModelValue) ⇒ <code>*</code>
+  * [.formatRawValue()](#module_TextEditorView#formatRawValue) ⇒ <code>string</code>
+  * [.parseRawValue()](#module_TextEditorView#parseRawValue) ⇒ <code>*</code>
   * [.getModelValue()](#module_TextEditorView#getModelValue) ⇒ <code>string</code>
   * [.getValue()](#module_TextEditorView#getValue) ⇒ <code>string</code>
   * [.rethrowAction()](#module_TextEditorView#rethrowAction) ⇒ <code>string</code>
@@ -103,9 +104,19 @@ Places focus on the editor
 Prepares validation rules for usage
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
-<a name="module_TextEditorView#getFormattedValue"></a>
-### textEditorView.getFormattedValue() ⇒ <code>string</code>
-Formats and returns the model value before it is rendered
+<a name="module_TextEditorView#getRawModelValue"></a>
+### textEditorView.getRawModelValue() ⇒ <code>*</code>
+Reads proper model's field value
+
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
+<a name="module_TextEditorView#formatRawValue"></a>
+### textEditorView.formatRawValue() ⇒ <code>string</code>
+Converts model value to the format that can be passed to a template as field value
+
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
+<a name="module_TextEditorView#parseRawValue"></a>
+### textEditorView.parseRawValue() ⇒ <code>*</code>
+Parses value that is stored in model
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getModelValue"></a>

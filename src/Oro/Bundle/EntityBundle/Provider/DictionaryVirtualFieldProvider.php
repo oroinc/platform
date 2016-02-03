@@ -106,7 +106,6 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                     $fields = $this->dictionaries[$targetClassName];
                     $isCombinedLabelName = count($fields) > 1;
                     $fieldNames = array_keys($fields);
-                    $target = Inflector::tableize(uniqid(sprintf('t_%s', $associationName), false));
                     foreach ($fieldNames as $fieldName) {
                         $virtualFieldName = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
                         $fieldName = Inflector::tableize($fieldName);
@@ -117,16 +116,16 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                         $this->virtualFields[$className][$virtualFieldName] = [
                             'query' => [
                                 'select' => [
-                                    'expr' => sprintf('%s.%s', $target, $fieldName),
-                                    'return_type' => GroupingScope::GROUP_DICTIONARY,
-                                    'related_entity_name' => $targetClassName,
-                                    'label' => $label
+                                    'expr'                => 'target.' . $fieldName,
+                                    'label'               => $label,
+                                    'return_type'         => 'dictionary',
+                                    'related_entity_name' => $targetClassName
                                 ],
                                 'join' => [
                                     'left' => [
                                         [
-                                            'join' => sprintf('entity.%s', $associationName),
-                                            'alias' => $target
+                                            'join'  => 'entity.' . $associationName,
+                                            'alias' => 'target'
                                         ]
                                     ]
                                 ]

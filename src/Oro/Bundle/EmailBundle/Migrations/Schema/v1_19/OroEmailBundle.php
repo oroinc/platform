@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_18;
+namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_19;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -23,6 +23,8 @@ class OroEmailBundle implements Migration
     public static function oroEmailUserTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');
-        $table->addColumn('unsyncedFlagCount', 'integer', ['default' => '0']);
+        if (!$table->hasColumn('unsyncedFlagCount')) {
+            $table->addColumn('unsyncedFlagCount', 'integer', ['default' => '0']);
+        }
     }
 }
