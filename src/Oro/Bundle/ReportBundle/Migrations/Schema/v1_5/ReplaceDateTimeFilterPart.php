@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class ReplaceDateTimeFilterPart implements  Migration
+class ReplaceDateTimeFilterPart implements Migration
 {
     /**
      * {@inheritdoc}
