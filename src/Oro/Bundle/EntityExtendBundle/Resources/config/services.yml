@@ -451,3 +451,6 @@ services:
                 - oneToMany
                 - manyToOne
                 - manyToMany
+
+    oro_entity_extend.tools.extend_helper:
+        class: Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper
