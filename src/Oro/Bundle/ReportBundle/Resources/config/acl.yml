@@ -1,0 +1,5 @@
+oro_report_display_sql:
+    label: oro.report.action.display_sql
+    type: action
+    group_name: ""
+    bindings: ~

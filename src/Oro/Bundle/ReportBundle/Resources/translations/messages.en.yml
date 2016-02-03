@@ -81,6 +81,9 @@ oro:
                 label:   Report design
                 tooltip: Add chart to the report
 
+        action:
+            display_sql: "Display report query SQL"
+
 "New Report": New Report
 "Manage Custom Reports": Manage Custom Reports
 "Manage Custom Reports - Reports": Manage Custom Reports - Reports
