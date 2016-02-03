@@ -8,7 +8,6 @@ parameters:
     oro_user.form.type.status.class:            Oro\Bundle\UserBundle\Form\Type\StatusType
     oro_user.form.type.user_select.class:       Oro\Bundle\UserBundle\Form\Type\UserSelectType
     oro_user.form.type.user_multiselect.class:  Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType
-    oro_user.form.type.user_collection.class:   Oro\Bundle\UserBundle\Form\Type\UserCollectionType
     oro_user.form.type.role_multiselect.class:  Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType
     oro_user.form.type.gender.class:            Oro\Bundle\UserBundle\Form\Type\GenderType
     oro_user.form.type.email.class:             Oro\Bundle\UserBundle\Form\Type\EmailType
@@ -167,13 +166,6 @@ services:
             - @doctrine.orm.entity_manager
         tags:
             - { name: form.type, alias: oro_user_multiselect }
-
-    oro_user.form.type.user_collection:
-        class: %oro_user.form.type.user_collection.class%
-        calls:
-            - [setDataClass, [%oro_user.entity.class%]]
-        tags:
-            - { name: form.type, alias: oro_user_collection }
 
     oro_user.form.type.role_multiselect:
         class: %oro_user.form.type.role_multiselect.class%
