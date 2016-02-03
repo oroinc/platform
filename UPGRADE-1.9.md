@@ -275,7 +275,7 @@ after:
 
 ####TagBundle
 - Removed class `Oro\Bundle\TagBundle\Form\Type\TagAutocompleteType` and service `oro_tag.form.type.tag_autocomplete`, use `Oro\Bundle\TagBundle\Form\Type\TagSelectType` and `oro_tag_select` instead.
-- Removed `oro_tag_autocomplete` form type. User `oro_tag_select` instead.
+- Removed `oro_tag_autocomplete` form type, use `oro_tag_select` instead.
 
 ####TrackingBundle
 - Bundle now contains configuration of security firewall `tracking_data`
