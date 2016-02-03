@@ -2,42 +2,49 @@
 
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
-use Oro\Bundle\SecurityBundle\Entity\PermissionDefinition;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Exception\MissedRequiredOptionException;
 
 class PermissionConfigurationBuilder
 {
     /**
      * @param array $configuration
-     * @return PermissionDefinition[]
+     * @return Permission[]
      */
-    public function buildPermissionDefinitions(array $configuration)
+    public function buildPermissions(array $configuration)
     {
-        $definitions = [];
-        foreach ($configuration as $name => $definitionConfiguration) {
-            $definitions[] = $this->buildPermissionDefinition($name, $definitionConfiguration);
+        $permissions = [];
+        foreach ($configuration as $name => $permissionConfiguration) {
+            $permissions[] = $this->buildPermission($name, $permissionConfiguration);
         }
 
-        return $definitions;
+        return $permissions;
     }
 
     /**
      * @param $name
      * @param array $configuration
-     * @return PermissionDefinition
+     * @return Permission
      */
-    public function buildPermissionDefinition($name, array $configuration)
+    public function buildPermission($name, array $configuration)
     {
         $this->assertConfigurationOptions($configuration, ['label']);
 
-        $definition = new PermissionDefinition();
-        $definition
+        $permission = new Permission();
+        $permission
             ->setName($name)
             ->setLabel($configuration['label'])
-            ->setGroupName(array_key_exists('group_name', $configuration) ? $configuration['group_name'] : '')
+            ->setApplyToAll(array_key_exists('apply_to_all', $configuration) ? $configuration['apply_to_all'] : true)
+            ->setGroupNames(array_key_exists('group_names', $configuration) ? $configuration['group_names'] : [])
+            ->setExcludeEntities(
+                array_key_exists('excluded_entities', $configuration) ? $configuration['excluded_entities'] : []
+            )
+            ->setApplyToEntities(
+                array_key_exists('apply_to_entities', $configuration) ? $configuration['apply_to_entities'] : []
+            )
             ->setDescription(array_key_exists('description', $configuration) ? $configuration['description'] : '');
 
-        return $definition;
+        return $permission;
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Command;
 
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -6,7 +7,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\SecurityBundle\Entity\PermissionDefinition;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 
 /**
@@ -28,20 +29,20 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
      * @dataProvider executeDataProvider
      *
      * @param array $expectedMessages
-     * @param array $expectedDefinitions
+     * @param array $expectedPermissions
      */
-    public function testExecute(array $expectedMessages, array $expectedDefinitions)
+    public function testExecute(array $expectedMessages, array $expectedPermissions)
     {
-        $definitionsBefore = $this->getRepository('OroSecurityBundle:PermissionDefinition')->findAll();
+        $permissionsBefore = $this->getRepository('OroSecurityBundle:Permission')->findAll();
         $result = $this->runCommand(LoadPermissionConfigurationCommand::NAME);
         $this->assertNotEmpty($result);
         foreach ($expectedMessages as $message) {
             $this->assertContains($message, $result);
         }
-        $definitions = $this->getRepository('OroSecurityBundle:PermissionDefinition')->findAll();
-        $this->assertCount(count($definitionsBefore) + 3, $definitions);
-        foreach ($expectedDefinitions as $definition) {
-            $this->assertDefinitionLoaded($definitions, $definition);
+        $permissions = $this->getRepository('OroSecurityBundle:Permission')->findAll();
+        $this->assertCount(count($permissionsBefore) + 3, $permissions);
+        foreach ($expectedPermissions as $permission) {
+            $this->assertPermissionLoaded($permissions, $permission);
         }
     }
 
@@ -53,9 +54,9 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         return [
             [
                 'expectedMessages' => [
-                    'Loading permission definitions...',
+                    'Loading permissions...',
                 ],
-                'expectedDefinitions' => [
+                'expectedPermissions' => [
                     'PERMISSION1',
                     'PERMISSION2',
                     'PERMISSION3',
@@ -74,14 +75,14 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     }
 
     /**
-     * @param array|PermissionDefinition[] $definitions
+     * @param array|Permission[] $permissions
      * @param string $name
      */
-    protected function assertDefinitionLoaded(array $definitions, $name)
+    protected function assertPermissionLoaded(array $permissions, $name)
     {
         $found = false;
-        foreach ($definitions as $definition) {
-            if ($definition->getName() === $name) {
+        foreach ($permissions as $permission) {
+            if ($permission->getName() === $name) {
                 $found = true;
                 break;
             }

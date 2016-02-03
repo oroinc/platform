@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
-class PermissionDefinitionConfiguration implements ConfigurationInterface
+class PermissionConfiguration implements ConfigurationInterface
 {
     /**
      * @param array $configs
@@ -43,7 +43,29 @@ class PermissionDefinitionConfiguration implements ConfigurationInterface
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->scalarNode('group_name')->end()
+                ->arrayNode('group_names')
+                    ->defaultValue(['default'])
+                    ->beforeNormalization()
+                        ->always(
+                            function ($value) {
+                                return (array) $value;
+                            }
+                        )
+                    ->end()
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->booleanNode('apply_to_all')
+                    ->defaultValue(true)
+                ->end()
+                ->arrayNode('apply_to_entities')
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('excluded_entities')
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
                 ->scalarNode('description')->end()
             ->end();
 

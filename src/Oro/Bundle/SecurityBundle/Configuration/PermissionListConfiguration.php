@@ -6,17 +6,17 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
-class PermissionDefinitionListConfiguration implements ConfigurationInterface
+class PermissionListConfiguration implements ConfigurationInterface
 {
     /**
-     * @var PermissionDefinitionConfiguration
+     * @var PermissionConfiguration
      */
     protected $configuration;
 
     /**
-     * @param PermissionDefinitionConfiguration $configuration
+     * @param PermissionConfiguration $configuration
      */
-    public function __construct(PermissionDefinitionConfiguration $configuration)
+    public function __construct(PermissionConfiguration $configuration)
     {
         $this->configuration = $configuration;
     }

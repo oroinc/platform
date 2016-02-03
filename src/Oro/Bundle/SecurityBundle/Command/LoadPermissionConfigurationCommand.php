@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
-use Oro\Bundle\SecurityBundle\Entity\PermissionDefinition;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
 
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {
@@ -26,7 +26,7 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
     /**
      * @var EntityRepository
      */
-    protected $definitionRepository;
+    protected $permissionRepository;
 
     /**
      * @var PermissionConfigurationBuilder
@@ -48,14 +48,14 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
     /**
      * @return EntityRepository
      */
-    protected function getDefinitionRepository()
+    protected function getPermissionRepository()
     {
-        if (!$this->definitionRepository) {
-            $this->definitionRepository
-                = $this->getEntityManager()->getRepository('OroSecurityBundle:PermissionDefinition');
+        if (!$this->permissionRepository) {
+            $this->permissionRepository
+                = $this->getEntityManager()->getRepository('OroSecurityBundle:Permission');
         }
 
-        return $this->definitionRepository;
+        return $this->permissionRepository;
     }
 
     /**
@@ -77,12 +77,12 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName(self::NAME)
-            ->setDescription('Load permission configuration from configuration files to the database')
+            ->setDescription('Load permissions configuration from configuration files to the database')
             ->addOption(
-                'definitions',
+                'permissions',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Names of the permission definitions that should be loaded'
+                'Names of the permissions that should be loaded'
             );
     }
 
@@ -91,51 +91,50 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $usedDefinitions = $input->getOption('definitions');
-        $usedDefinitions = $usedDefinitions ?: null;
+        $usedPermissions = $input->getOption('permissions');
+        $usedPermissions = $usedPermissions ?: null;
 
         /** @var PermissionConfigurationProvider $configurationProvider */
         $configurationProvider = $this->getContainer()->get('oro_security.configuration.provider.permission_config');
         $permissionConfiguration = $configurationProvider->getPermissionConfiguration(
-            $usedDefinitions
+            $usedPermissions
         );
 
-        // permission definitions
-        $definitionsConfiguration = $permissionConfiguration[PermissionConfigurationProvider::ROOT_NODE_NAME];
-        $this->loadDefinitions($output, $definitionsConfiguration);
+        $permissionsConfiguration = $permissionConfiguration[PermissionConfigurationProvider::ROOT_NODE_NAME];
+        $this->loadPermissions($output, $permissionsConfiguration);
     }
 
     /**
      * @param OutputInterface $output
      * @param array $configuration
      */
-    protected function loadDefinitions(OutputInterface $output, array $configuration)
+    protected function loadPermissions(OutputInterface $output, array $configuration)
     {
-        $definitions = $this->getConfigurationBuilder()->buildPermissionDefinitions($configuration);
+        $permissions = $this->getConfigurationBuilder()->buildPermissions($configuration);
 
-        if ($definitions) {
-            $output->writeln('Loading permission definitions...');
+        if ($permissions) {
+            $output->writeln('Loading permissions...');
 
             $entityManager = $this->getEntityManager();
-            $definitionRepository = $this->getDefinitionRepository();
+            $permissionRepository = $this->getPermissionRepository();
 
-            foreach ($definitions as $definition) {
-                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $definition->getName()));
+            foreach ($permissions as $permission) {
+                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
 
-                /** @var PermissionDefinition $existingDefinition */
-                $existingDefinition = $definitionRepository->findOneBy(['name' => $definition->getName()]);
+                /** @var Permission $existingPermission */
+                $existingPermission = $permissionRepository->findOneBy(['name' => $permission->getName()]);
 
-                // definition should be overridden if definition with such name already exists
-                if ($existingDefinition) {
-                    $existingDefinition->import($definition);
+                // permission in DB should be overridden if permission with such name already exists
+                if ($existingPermission) {
+                    $existingPermission->import($permission);
                 } else {
-                    $entityManager->persist($definition);
+                    $entityManager->persist($permission);
                 }
             }
 
             $entityManager->flush();
         } else {
-            $output->writeln('No permission definitions found.');
+            $output->writeln('No permissions found.');
         }
     }
 }

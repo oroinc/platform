@@ -7,13 +7,17 @@ use Symfony\Component\Finder\Finder;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Merger\ConfigurationMerger;
 
 class PermissionConfigurationProvider
 {
     const ROOT_NODE_NAME = 'permissions';
 
-    /** @var PermissionDefinitionListConfiguration */
-    protected $definitionConfiguration;
+    /** @var PermissionListConfiguration */
+    protected $permissionConfiguration;
+
+    /** @var array */
+    protected $kernelBundles;
 
     /**
      * @var string
@@ -21,67 +25,72 @@ class PermissionConfigurationProvider
     protected $configPath = 'Resources/config/permission.yml';
 
     /**
-     * @param PermissionDefinitionListConfiguration $definitionConfiguration
+     * @param PermissionListConfiguration $permissionConfiguration
      */
-    public function __construct(PermissionDefinitionListConfiguration $definitionConfiguration)
+    public function __construct(PermissionListConfiguration $permissionConfiguration, array $kernelBundles)
     {
-        $this->definitionConfiguration = $definitionConfiguration;
+        $this->permissionConfiguration = $permissionConfiguration;
+        $this->kernelBundles = array_values($kernelBundles);
     }
 
     /**
-     * @param array $usedDefinitions
+     * @param array $usedPermissions
      * @return array
      */
-    public function getPermissionConfiguration(array $usedDefinitions = null)
+    public function getPermissionConfiguration(array $usedPermissions = null)
     {
+
         $configLoader = new CumulativeConfigLoader(
             'oro_security',
             new YamlCumulativeFileLoader($this->configPath)
         );
 
-        $definitions = [];
-
         $resources = $configLoader->load();
+        $configs = [];
 
         foreach ($resources as $resource) {
-            $definitionsData =  $this->parseConfiguration($resource->data, $resource->name);
-            foreach ($definitionsData as $definitionName => $definitionConfiguration) {
-                // skip not used definitions
-                if ($usedDefinitions !== null && !in_array($definitionName, $usedDefinitions, true)) {
-                    continue;
-                }
-
-                $definitions[$definitionName] = $definitionConfiguration;
-            }
+            $configs[$resource->bundleClass] = $resource->data;
         }
 
-        return [self::ROOT_NODE_NAME => $definitions];
+        $merger = new ConfigurationMerger($this->kernelBundles);
+        $configs = $merger->mergeConfiguration($configs);
+
+        $permissionsData = $this->parseConfiguration($configs);
+        $permissions = [];
+        foreach ($permissionsData as $permissionName => $permissionConfiguration) {
+            // skip not used permissions
+            if ($usedPermissions !== null && !in_array($permissionName, $usedPermissions, true)) {
+                continue;
+            }
+
+            $permissions[$permissionName] = $permissionConfiguration;
+        }
+
+        return [self::ROOT_NODE_NAME => $permissions];
     }
 
     /**
      * @param array $configuration
-     * @param $fileName
      * @return array
      * @throws InvalidConfigurationException
      */
-    protected function parseConfiguration(array $configuration, $fileName)
+    protected function parseConfiguration(array $configuration)
     {
         try {
-            $definitionsData = array();
+            $permissionsData = [];
             if (!empty($configuration[self::ROOT_NODE_NAME])) {
-                $definitionsData = $this->definitionConfiguration->processConfiguration(
+                $permissionsData = $this->permissionConfiguration->processConfiguration(
                     $configuration[self::ROOT_NODE_NAME]
                 );
             }
         } catch (InvalidConfigurationException $exception) {
             $message = sprintf(
-                'Can\'t parse permission configuration from %s. %s',
-                $fileName,
+                'Can\'t parse permission configuration. %s',
                 $exception->getMessage()
             );
             throw new InvalidConfigurationException($message);
         }
 
-        return $definitionsData;
+        return $permissionsData;
     }
 }
