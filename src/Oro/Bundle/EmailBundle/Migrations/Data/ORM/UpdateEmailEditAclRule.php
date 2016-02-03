@@ -67,13 +67,20 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
         $role = $this->getRole(LoadRolesData::ROLE_ADMINISTRATOR);
         if ($role) {
             $sid = $manager->getSid($role);
-
             $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
-            $maskBuilder = $manager->getMaskBuilder($oid)
-                ->add('VIEW_SYSTEM')
-                ->add('CREATE_SYSTEM')
-                ->add('EDIT_SYSTEM');
-            $manager->setPermission($sid, $oid, $maskBuilder->get());
+
+            $extension = $manager->getExtensionSelector()->select($oid);
+            $maskBuilders = $extension->getAllMaskBuilders();
+
+            foreach ($maskBuilders as $maskBuilder) {
+                foreach (['VIEW_SYSTEM', 'CREATE_SYSTEM', 'EDIT_SYSTEM'] as $permission) {
+                    if ($maskBuilder->hasMask('MASK_' . $permission)) {
+                        $maskBuilder->add($permission);
+                    }
+                }
+
+                $manager->setPermission($sid, $oid, $maskBuilder->get());
+            }
         }
     }
 
