@@ -7,8 +7,6 @@ use Oro\Bundle\SecurityBundle\Entity\Permission;
 
 class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_PERMISSION_NAME = 'test_permission';
-
     /**
      * @var PermissionConfigurationBuilder
      */
