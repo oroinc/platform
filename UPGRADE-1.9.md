@@ -277,6 +277,10 @@ after:
 - Bundle now contains configuration of security firewall `wsse_secured` 
 - `Oro\Bundle\SoapBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
 
+####TagBundle
+- Removed class `Oro\Bundle\TagBundle\Form\Type\TagAutocompleteType` and service `oro_tag.form.type.tag_autocomplete`, use `Oro\Bundle\TagBundle\Form\Type\TagSelectType` and `oro_tag_select` instead.
+- Removed `oro_tag_autocomplete` form type, use `oro_tag_select` instead.
+
 ####TrackingBundle
 - Bundle now contains configuration of security firewall `tracking_data`
 
