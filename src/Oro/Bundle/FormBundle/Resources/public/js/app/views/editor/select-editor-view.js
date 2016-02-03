@@ -42,6 +42,7 @@ define(function(require) {
      * :---------------------------------------------------|:---------------------------------------
      * choices                                             | Key-value set of available choices
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
+     * inline_editing.editor.view_options.key_type         | Optional. Specifies type of value that should be sent to server. Currently string/boolean/number key types are supported.
      * inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
@@ -85,7 +86,16 @@ define(function(require) {
             }
         },
 
+        keyType: 'string',
+
         initialize: function(options) {
+            if (options.key_type) {
+                this.keyType = options.key_type;
+            } else {
+                if (_.isArray(options.choices)) {
+                    this.keyType = 'number';
+                }
+            }
             SelectEditorView.__super__.initialize.apply(this, arguments);
             this.availableChoices = this.getAvailableOptions(options);
             this.prestine = true;
@@ -94,14 +104,12 @@ define(function(require) {
         getAvailableOptions: function(options) {
             var choices = this.options.choices;
             var result = [];
-            for (var id in choices) {
-                if (choices.hasOwnProperty(id)) {
-                    result.push({
-                        id: id,
-                        text: choices[id]
-                    });
-                }
-            }
+            _.each(choices, function(text, id) {
+                result.push({
+                    id: id,
+                    text: text
+                });
+            });
             return result;
         },
 
@@ -208,6 +216,19 @@ define(function(require) {
             select2.dropdown.off(this.eventNamespace());
         },
 
+        parseRawValue: function(value) {
+            if (_.isString(value)) {
+                return value;
+            }
+            if (_.isNumber(value) && !isNaN(value)) {
+                return '' + value;
+            }
+            if (_.isBoolean(value)) {
+                return value ? '1' : '0';
+            }
+            throw new Error('Value must be either string/number/bool');
+        },
+
         focus: function() {
             var isFocused = this.isFocused();
             this.$('input[name=value]').select2('open');
@@ -234,7 +255,7 @@ define(function(require) {
         isChanged: function() {
             // current value is always string
             // btw model value could be an number
-            return this.getValue() !== String(this.getModelValue());
+            return this.getValue() !== this.getModelValue();
         },
 
         /**
@@ -244,6 +265,28 @@ define(function(require) {
          */
         isFocused: function() {
             return this.$('.select2-container-active').length;
+        },
+
+        /**
+         * Returns data which should be sent to the server
+         *
+         * @returns {Object}
+         */
+        getServerUpdateData: function() {
+            var data = {};
+            var value = this.getValue();
+            switch (this.keyType) {
+                case 'number':
+                    value = parseFloat(value);
+                    break;
+                case 'boolean':
+                    value = (value === '1');
+                    break;
+                default:
+                    break;
+            }
+            data[this.fieldName] = value;
+            return data;
         }
     }, {
         processMetadata: function(columnMetadata) {
