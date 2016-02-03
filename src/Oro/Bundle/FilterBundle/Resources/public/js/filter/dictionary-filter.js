@@ -109,13 +109,13 @@ define(function(require) {
                 data: {
                     'keys': this.value.value
                 },
-                success: function (reposne) {
+                success: function(reposne) {
                     self.value.value = reposne.results;
                     self._writeDOMValue(self.value);
                     self.applySelect2();
                     self.renderDeferred.resolve();
                 },
-                error: function (jqXHR) {
+                error: function(jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 }
             });
@@ -272,10 +272,11 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
+            var value;
             if (this.isInitSelect2) {
-                var value = this.$el.find('.select-values-autocomplete').select2('val');
+                value = this.$el.find('.select-values-autocomplete').select2('val');
             } else {
-                var value = null;
+                value = null;
             }
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.type),

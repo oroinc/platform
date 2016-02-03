@@ -17,7 +17,7 @@ class OroEmailBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::oroEmailTable($schema);
-        $this->deleteBodySyncProcess($queries);
+        $this->deleteBodySyncProcess($schema, $queries);
     }
 
     /**
@@ -34,15 +34,18 @@ class OroEmailBundle implements Migration
     /**
      * Delete sync_email_body_after_email_synchronize process definition
      *
+     * @param Schema   $schema
      * @param QueryBag $queries
      */
-    protected function deleteBodySyncProcess(QueryBag $queries)
+    protected function deleteBodySyncProcess(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(
-            new ParametrizedSqlMigrationQuery(
-                'DELETE FROM oro_process_definition WHERE name = :processName',
-                ['processName' => 'sync_email_body_after_email_synchronize']
-            )
-        );
+        if ($schema->hasTable('oro_process_definition')) {
+            $queries->addQuery(
+                new ParametrizedSqlMigrationQuery(
+                    'DELETE FROM oro_process_definition WHERE name = :processName',
+                    ['processName' => 'sync_email_body_after_email_synchronize']
+                )
+            );
+        }
     }
 }
