@@ -9,7 +9,7 @@ Table of Contents
  - [Actions](#actions)
  - [Types of Processors](#types-of-processors)
  - [Processors Priority](#processors-priority)
- - [Applicable Checkers](#applicable checkers)
+ - [Applicable Checkers](#applicable-checkers)
  - [Key Classes](#key-classes)
 
 Overview
