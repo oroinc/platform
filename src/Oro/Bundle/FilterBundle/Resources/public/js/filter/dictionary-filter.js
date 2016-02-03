@@ -272,10 +272,11 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
+            var value;
             if (this.isInitSelect2) {
-                var value = this.$el.find('.select-values-autocomplete').select2('val');
+                value = this.$el.find('.select-values-autocomplete').select2('val');
             } else {
-                var value = null;
+                value = null;
             }
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.type),
