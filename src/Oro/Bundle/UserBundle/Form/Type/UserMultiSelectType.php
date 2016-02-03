@@ -13,6 +13,8 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
 class UserMultiSelectType extends AbstractType
 {
+    const NAME = 'oro_user_multiselect';
+
     /**
      * @var EntityManager
      */
@@ -76,6 +78,6 @@ class UserMultiSelectType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_user_multiselect';
+        return self::NAME;
     }
 }
