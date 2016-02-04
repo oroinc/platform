@@ -111,7 +111,7 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
-        $sql = 'SELECT e.*, c.class_type
+        $sql = 'SELECT e.*
                 FROM %s AS o
                 INNER JOIN %s AS c ON c.id = o.class_id
                 LEFT JOIN %s AS e ON e.class_id = o.class_id
@@ -142,12 +142,6 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
         foreach ($groupedAces as $key => $aces) {
             foreach ($aces as $aceOrder => $ace) {
                 $newMasks = $this->processMask($ace['mask']);
-
-                $this->validateMasks(
-                    $newMasks,
-                    new ObjectIdentity('entity', $ace['class_type'])
-                );
-                unset($ace['class_type']);
 
                 $ace['mask'] = $newMasks[0];
 

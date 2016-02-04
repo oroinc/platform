@@ -157,10 +157,6 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $extension->expects($this->exactly(count($this->getAcesData())))
             ->method('getAllMaskBuilders')
             ->willReturn($this->getMaskBuilders());
-        $extension->expects($this->atLeastOnce())
-            ->method('validateMask')
-            ->with($this->isType('int'), $this->isInstanceOf('Symfony\Component\Security\Acl\Domain\ObjectIdentity'))
-            ->willReturn($extension);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|AclExtensionSelector $extensionSelector */
         $extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
