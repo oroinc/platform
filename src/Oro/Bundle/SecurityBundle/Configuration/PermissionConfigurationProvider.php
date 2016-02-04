@@ -22,7 +22,7 @@ class PermissionConfigurationProvider
     /**
      * @var string
      */
-    protected $configPath = 'Resources/config/permission.yml';
+    protected $configPath = 'Resources/config/permissions.yml';
 
     /**
      * @param PermissionListConfiguration $permissionConfiguration

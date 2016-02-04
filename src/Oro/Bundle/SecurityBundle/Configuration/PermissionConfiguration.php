@@ -62,7 +62,7 @@ class PermissionConfiguration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
-                ->arrayNode('excluded_entities')
+                ->arrayNode('exclude_entities')
                     ->prototype('scalar')
                     ->end()
                 ->end()

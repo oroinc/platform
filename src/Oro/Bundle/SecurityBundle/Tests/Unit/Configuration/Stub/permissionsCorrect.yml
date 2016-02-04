@@ -1,0 +1,15 @@
+permissions:
+    PERMISSION1:
+        label: Label for Permission 1
+        group_names: frontend
+
+    PERMISSION2:
+        label: Label for Permission 2
+        description: Permission 2 description
+        apply_to_entities: ['Entity1', 'Entity2']
+        exclude_entities: ['Entity3', 'Entity4']
+        group_names: ['', 'frontend']
+        apply_to_all: false
+
+    PERMISSION3:
+        label: Label for Permission 3

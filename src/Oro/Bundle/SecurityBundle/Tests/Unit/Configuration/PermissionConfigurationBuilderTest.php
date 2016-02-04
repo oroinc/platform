@@ -31,7 +31,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected['label'], $definition->getLabel());
         $this->assertSame($expected['apply_to_all'], $definition->isApplyToAll());
         $this->assertSame($expected['group_names'], $definition->getGroupNames());
-        $this->assertSame($expected['excluded_entities'], $definition->getExcludeEntities());
+        $this->assertSame($expected['exclude_entities'], $definition->getExcludeEntities());
         $this->assertSame($expected['apply_to_entities'], $definition->getApplyToEntities());
         $this->assertSame($expected['description'], $definition->getDescription());
     }
@@ -66,7 +66,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'label' => 'My Label',
                     'apply_to_all' => true,
                     'group_names' => [],
-                    'excluded_entities' => [],
+                    'exclude_entities' => [],
                     'apply_to_entities' => [],
                     'description' => '',
                 ],
@@ -77,7 +77,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'label' => 'My Label',
                     'apply_to_all' => false,
                     'group_names' => ['frontend'],
-                    'excluded_entities' => ['Entity1'],
+                    'exclude_entities' => ['Entity1'],
                     'apply_to_entities' => ['Entity2'],
                     'description' => 'Test description',
                 ],
@@ -85,7 +85,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'label' => 'My Label',
                     'apply_to_all' => false,
                     'group_names' => ['frontend'],
-                    'excluded_entities' => ['Entity1'],
+                    'exclude_entities' => ['Entity1'],
                     'apply_to_entities' => ['Entity2'],
                     'description' => 'Test description',
                 ],

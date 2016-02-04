@@ -22,7 +22,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         $reflection = new \ReflectionClass('Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider');
         $reflectionProperty = $reflection->getProperty('configPath');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($provider, '/Tests/Functional/Command/DataFixtures/permission.yml');
+        $reflectionProperty->setValue($provider, '/Tests/Functional/Command/DataFixtures/permissions.yml');
     }
 
     /**

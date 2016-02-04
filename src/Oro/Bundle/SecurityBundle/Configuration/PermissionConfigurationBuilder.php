@@ -37,7 +37,7 @@ class PermissionConfigurationBuilder
             ->setApplyToAll(array_key_exists('apply_to_all', $configuration) ? $configuration['apply_to_all'] : true)
             ->setGroupNames(array_key_exists('group_names', $configuration) ? $configuration['group_names'] : [])
             ->setExcludeEntities(
-                array_key_exists('excluded_entities', $configuration) ? $configuration['excluded_entities'] : []
+                array_key_exists('exclude_entities', $configuration) ? $configuration['exclude_entities'] : []
             )
             ->setApplyToEntities(
                 array_key_exists('apply_to_entities', $configuration) ? $configuration['apply_to_entities'] : []
