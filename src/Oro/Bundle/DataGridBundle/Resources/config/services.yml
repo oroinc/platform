@@ -243,3 +243,8 @@ services:
         class: Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper
         arguments:
              - @oro_datagrid.configuration.provider
+
+    oro_datagrid.event_listener.store_sql:
+        class: Oro\Bundle\DataGridBundle\EventListener\StoreSqlListener
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }

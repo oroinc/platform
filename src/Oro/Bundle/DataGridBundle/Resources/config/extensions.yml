@@ -130,3 +130,8 @@ services:
         class: %oro_datagrid.extension.mode.class%
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.store_sql:
+        class: Oro\Bundle\DataGridBundle\Extension\StoreSql\StoreSqlExtension
+        tags:
+            - { name: oro_datagrid.extension }

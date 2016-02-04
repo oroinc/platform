@@ -40,17 +40,17 @@
                 {{ chartView.render()|raw }}
             </div>
         {% endif %}
-        {% set renderParams = renderParams|default({})|merge({enableFullScreenLayout: true, enableViews: false}) %}
-        {% set params = params|default({})|merge({
-                '_grid_view': {
-                    '_disabled': true
-                },
-                '_tags': {
-                    '_disabled': true
-                }
-            })
+        {% set renderParams = renderParams|default({})|merge({enableViews: false}) %}
+        {% set gridParams =  {
+            '_grid_view': {'_disabled': true},
+            '_tags'     : {'_disabled': true}
+        } %}
+        {% if resource_granted('oro_report_display_sql') %}
+            {% set gridParams = gridParams|merge({'show_sql_source': true})
         %}
-
+        {% endif %}
+        {% set params = params|default({})|merge(gridParams)
+        %}
         {{ dataGrid.renderGrid(gridName, params, renderParams) }}
     {% else %}
         <div class="container-fluid">
