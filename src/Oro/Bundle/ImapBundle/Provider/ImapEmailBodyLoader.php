@@ -106,7 +106,8 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
                 $attachment->getContent(),
                 $attachment->getContentType(),
                 $attachment->getContentTransferEncoding(),
-                $attachment->getContentId()
+                $attachment->getContentId(),
+                $attachment->getFileSize()
             );
         }
 
