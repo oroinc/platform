@@ -446,25 +446,33 @@ class DoctrineHelper
     }
 
     /**
+     * Clears manager cache
+     */
+    public function clearManagerCache()
+    {
+        $this->managers = [];
+        $this->managersMap = [];
+    }
+
+    /**
      * @param string $entityClass The real class name of an entity
      *
      * @return EntityManager|null
      */
     private function getManagerForClass($entityClass)
     {
-        return $this->registry->getManagerForClass($entityClass);
-//        if (!array_key_exists($entityClass, $this->managersMap)) {
-//            $manager = $this->registry->getManagerForClass($entityClass);
-//            if (null !== $manager) {
-//                $hash = spl_object_hash($manager);
-//                $this->managers[$hash] = $manager;
-//                $this->managersMap[$entityClass] = $hash;
-//            } else {
-//                $this->managersMap[$entityClass] = null;
-//            }
-//            return $manager;
-//        }
-//
-//        return $this->managersMap[$entityClass] ? $this->managers[$this->managersMap[$entityClass]] : null;
+        if (!array_key_exists($entityClass, $this->managersMap)) {
+            $manager = $this->registry->getManagerForClass($entityClass);
+            if (null !== $manager) {
+                $hash = spl_object_hash($manager);
+                $this->managers[$hash] = $manager;
+                $this->managersMap[$entityClass] = $hash;
+            } else {
+                $this->managersMap[$entityClass] = null;
+            }
+            return $manager;
+        }
+
+        return $this->managersMap[$entityClass] ? $this->managers[$this->managersMap[$entityClass]] : null;
     }
 }
