@@ -51,8 +51,8 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
     protected function getPermissionRepository()
     {
         if (!$this->permissionRepository) {
-            $this->permissionRepository
-                = $this->getEntityManager()->getRepository('OroSecurityBundle:Permission');
+            $this->permissionRepository = $this->getEntityManager()
+                ->getRepository('OroSecurityBundle:Permission');
         }
 
         return $this->permissionRepository;
@@ -64,8 +64,8 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
     protected function getConfigurationBuilder()
     {
         if (!$this->configurationBuilder) {
-            $this->configurationBuilder
-                = $this->getContainer()->get('oro_security.configuration.builder.permission_configuration');
+            $this->configurationBuilder = $this->getContainer()
+                ->get('oro_security.configuration.builder.permission_configuration');
         }
 
         return $this->configurationBuilder;
@@ -91,8 +91,7 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $usedPermissions = $input->getOption('permissions');
-        $usedPermissions = $usedPermissions ?: null;
+        $usedPermissions = $input->getOption('permissions') ?: null;
 
         /** @var PermissionConfigurationProvider $configurationProvider */
         $configurationProvider = $this->getContainer()->get('oro_security.configuration.provider.permission_config');
