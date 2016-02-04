@@ -2,21 +2,22 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ConstraintViolationInterface;
-
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\PropertyAccess\StringUtil;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ValidatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class ImportStrategyHelper
 {
@@ -115,15 +116,7 @@ class ImportStrategyHelper
             }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
             if ($importedValue instanceof Collection && !$importedValue->isEmpty()) {
-                $singular = \Oro\Component\PhpUtils\ArrayUtil::find(
-                    function ($singular) use ($basicEntity) {
-                        return is_callable([$basicEntity, sprintf('add%s', $singular)]);
-                    },
-                    (array) \Symfony\Component\PropertyAccess\StringUtil::singularify($propertyName)
-                );
-                if ($singular) {
-                    array_map([$basicEntity, sprintf('add%s', $singular)], $importedValue->toArray());
-                }
+                $this->forceCallingAdders($importedValue, $basicEntity, $propertyName);
             }
             $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
         }
@@ -173,6 +166,25 @@ class ImportStrategyHelper
         }
         foreach ($validationErrors as $validationError) {
             $context->addError($errorPrefix . ' ' . $validationError);
+        }
+    }
+
+    /**
+     * @param Collection $importedValue
+     * @param object $entity
+     * @param string $propertyName
+     */
+    protected function forceCallingAdders(Collection $importedValue, $entity, $propertyName)
+    {
+        $singular = ArrayUtil::find(
+            function ($singular) use ($entity) {
+                return is_callable([$entity, sprintf('add%s', $singular)]);
+            },
+            (array) StringUtil::singularify($propertyName)
+        );
+
+        if ($singular) {
+            array_map([$entity, sprintf('add%s', $singular)], $importedValue->toArray());
         }
     }
 
