@@ -26,6 +26,7 @@ class PermissionConfigurationProvider
 
     /**
      * @param PermissionListConfiguration $permissionConfiguration
+     * @param array $kernelBundles
      */
     public function __construct(PermissionListConfiguration $permissionConfiguration, array $kernelBundles)
     {
@@ -39,7 +40,6 @@ class PermissionConfigurationProvider
      */
     public function getPermissionConfiguration(array $usedPermissions = null)
     {
-
         $configLoader = new CumulativeConfigLoader(
             'oro_security',
             new YamlCumulativeFileLoader($this->configPath)

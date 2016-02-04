@@ -7,8 +7,8 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
 
 /**
  * @dbIsolation
