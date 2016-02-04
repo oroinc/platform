@@ -5,18 +5,19 @@ namespace Oro\Bundle\EntityBundle\Manager;
 use Doctrine\Bundle\DoctrineBundle\Registry as DoctrineRegistry;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class Registry extends DoctrineRegistry
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var ServiceLink */
+    protected $doctrineHelperLink;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param ServiceLink $doctrineHelperLink
      */
-    public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
+    public function setDoctrineHelperLink(ServiceLink $doctrineHelperLink)
     {
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrineHelperLink = $doctrineHelperLink;
     }
 
     /**
@@ -24,8 +25,16 @@ class Registry extends DoctrineRegistry
      */
     public function resetManager($name = null)
     {
-        $this->doctrineHelper->clearManagerCache();
+        $this->getDoctrineHelper()->clearManagerCache();
 
         return parent::resetManager($name);
+    }
+
+    /**
+     * @return DoctrineHelper
+     */
+    protected function getDoctrineHelper()
+    {
+        return $this->doctrineHelperLink->getService();
     }
 }

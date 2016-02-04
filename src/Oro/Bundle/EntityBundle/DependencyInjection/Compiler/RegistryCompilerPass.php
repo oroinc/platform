@@ -15,6 +15,6 @@ class RegistryCompilerPass implements CompilerPassInterface
     {
         $container->findDefinition('doctrine')
             ->setClass('Oro\Bundle\EntityBundle\Manager\Registry')
-            ->addMethodCall('setDoctrineHelper', [new Reference('oro_entity.doctrine_helper')]);
+            ->addMethodCall('setDoctrineHelperLink', [new Reference('oro_entity.doctrine_helper.link')]);
     }
 }
