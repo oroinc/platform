@@ -66,6 +66,7 @@ class EmailBodyBuilder
      * @param string      $contentType
      * @param string      $contentTransferEncoding
      * @param null|string $embeddedContentId
+     * @param null|int    $contentSize
      *
      * @throws \LogicException
      */
@@ -74,14 +75,21 @@ class EmailBodyBuilder
         $content,
         $contentType,
         $contentTransferEncoding,
-        $embeddedContentId = null
+        $embeddedContentId = null,
+        $contentSize = null
     ) {
-        if (!$this->allowSaveAttachment(strlen(base64_decode($content)))) {
-            return;
-        }
-
         if ($this->emailBody === null) {
             throw new \LogicException('Call setEmailBody first.');
+        }
+
+        if (!$this->allowSaveAttachment(
+            $this->checkContentSizeValue(
+                $content,
+                $contentSize,
+                $contentTransferEncoding
+            )
+        )) {
+            return;
         }
 
         $emailAttachment        = new EmailAttachment();
@@ -108,22 +116,44 @@ class EmailBodyBuilder
      *
      * @return bool
      */
-    protected function allowSaveAttachment($size) {
+    protected function allowSaveAttachment($size)
+    {
+        $attachmentSyncMaxSize = 0;
+
         // skipp attachment if disabled to save
         if ($this->configManager && !$this->configManager->get('oro_email.attachment_sync_enable')) {
             return false;
         }
 
-        $attachmentSyncMaxSize = $this->configManager->get('oro_email.attachment_sync_max_size');
+        if ($this->configManager) {
+            $attachmentSyncMaxSize = $this->configManager->get('oro_email.attachment_sync_max_size');
+        }
         // skipp save large attachemnt files
-        if (
-            $this->configManager
-            && $attachmentSyncMaxSize !== 0 // unlimit
+        if ($attachmentSyncMaxSize !== 0 // unlimit
             && $size / 1024 / 1024 > $attachmentSyncMaxSize
         ) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @param string $content
+     * @param int $contentSize
+     * @param string $contentTransferEncoding
+     *
+     * @return int
+     */
+    protected function checkContentSizeValue($content, $contentSize, $contentTransferEncoding)
+    {
+        if (!$contentSize) {
+            $contentSize = strlen(base64_decode($content));
+        } elseif ($contentTransferEncoding === 'base64') {
+            $overhead = ceil($contentSize / 77);
+            $contentSize = (int) (($contentSize - $overhead) * 3 / 4 - 2);
+        }
+
+        return $contentSize;
     }
 }
