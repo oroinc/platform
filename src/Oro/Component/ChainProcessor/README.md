@@ -340,20 +340,20 @@ The [context](./Context.php) is abstraction designed to isolate implementations 
 Actions
 -------
 
-The action is a set of operations what should be performed over the context to get result data for some input data.
+The action is a set of operations what should be performed over the context to get output data for some input data.
 
 Types of Processors
 -------------------
 
 There are three types of processors:
   - **common processors** - These processors are executed for all actions. They may be helpful if you need to do some common things at the beginning or at the ending.
-  - **ungrouped processors** - These processors are executed for a specified action but not included in any group. They can be used if you need to do some things at the beginning or at the ending of an action processing.
-  - **grouped processors** - It is most general used processors. They are created for a specified action and grouped by some logical groups. Grouping of processors allows you to build structured and flexible logic.
+  - **ungrouped processors** - The same as above but in scope of specified action. They can be used if you need to do some things at the beginning or at the ending of an action processing.
+  - **grouped processors** - It is most generally used processors. They are created for a specified action and grouped by some logical groups.
 
 Processors Priority
 -------------------
 
-Each processor and each group of processors can have the `priority` attribute that is used to specify the order processors are executed. The higher the priority, the earlier the processor is executed. The default priority is 0.
+Each processor and each group of processors can have the `priority` attribute that is used to specify the order of processors execution. The higher the priority, the earlier the processor is executed. The default priority is 0.
 
 The processors are executed in the following order:
   - initial common processors
@@ -375,7 +375,7 @@ The following table shows limitations for values of the priority attribute.
 Applicable Checkers
 -------------------
 
-The applicable checkers are used to filter processors to be executed to complete some action. All applicable checkers must implement [ApplicableCheckerInterface](./ApplicableCheckerInterface.php). All applicable checkers you want to use should be registered in a [processor bag](./ProcessorBag.php).
+The applicable checkers are used to filter processors to be executed for the current execution context. All applicable checkers you want to use should be registered in a [processor bag](./ProcessorBag.php) and must implement [ApplicableCheckerInterface](./ApplicableCheckerInterface.php).
 
 There are a list of existing applicable checkers that are registered in the processor bag by default:
 
