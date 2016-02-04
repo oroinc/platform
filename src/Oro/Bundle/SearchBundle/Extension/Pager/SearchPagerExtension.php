@@ -37,7 +37,7 @@ class SearchPagerExtension extends OrmPagerExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
+        $defaultPerPage = (int) $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
         $this->pager->setQuery($datasource->getQuery());
         $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
