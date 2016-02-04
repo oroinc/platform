@@ -63,10 +63,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
             return;
         }
 
-        $entityClass = $processDefinition->getRelatedEntity();
-
         $processData = new ProcessData();
-        $processData->set('data', new $entityClass);
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine')->getManager();
