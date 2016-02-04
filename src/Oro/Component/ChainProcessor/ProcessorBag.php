@@ -282,7 +282,7 @@ class ProcessorBag implements ProcessorBagInterface
     }
 
     /**
-     * Calculates a real priority od a processor based on its priority and a priority of its group.
+     * Calculates a real priority of a processor based on its priority and a priority of its group.
      *
      * The calculated priority is between -65535(-0xFFFF) and 65535(0xFFFF).
      * This allows to add ungrouped and common processors before and after processors grouped inside an action.

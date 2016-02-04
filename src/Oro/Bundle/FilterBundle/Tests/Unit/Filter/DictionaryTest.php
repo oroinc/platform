@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
-use Oro\Bundle\EntityExtendBundle\Filter\DictionaryFilter;
-use Oro\Bundle\EntityExtendBundle\Form\Type\DictionaryFilterType;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
+use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;
@@ -68,7 +68,7 @@ class DictionaryTest extends OrmTestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice'
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary'
             ],
             'params',
             $this->filter
@@ -83,11 +83,8 @@ class DictionaryTest extends OrmTestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
-                'null_value'                     => ':empty:',
-                'options'                        => [
-                    'null_value' => ':empty:'
-                ]
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
+                'null_value'                     => ':empty:'
             ],
             'params',
             $this->filter
@@ -102,7 +99,7 @@ class DictionaryTest extends OrmTestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options'                        => [
                     'class' => 'Test\EnumValue'
                 ]
@@ -120,7 +117,7 @@ class DictionaryTest extends OrmTestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options'                        => [
                     'dictionary_code' => 'test_dictionary'
                 ]
@@ -179,12 +176,7 @@ class DictionaryTest extends OrmTestCase
 
         $result = $qb->getQuery()->getDQL();
         $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o'
-            . ' WHERE o IN('
-            . 'SELECT filter_test'
-            . ' FROM Stub:TestEntity filter_test'
-            . ' INNER JOIN filter_test.values filter_test_rel'
-            . ' WHERE filter_test_rel IN(:param1))',
+            'SELECT o.id FROM Stub:TestEntity o WHERE test IN(:param1)',
             $result
         );
         $this->assertEquals(
@@ -228,78 +220,12 @@ class DictionaryTest extends OrmTestCase
 
         $result = $qb->getQuery()->getDQL();
         $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o'
-            . ' WHERE o NOT IN('
-            . 'SELECT filter_test'
-            . ' FROM Stub:TestEntity filter_test'
-            . ' INNER JOIN filter_test.values filter_test_rel'
-            . ' WHERE filter_test_rel IN(:param1))',
+            'SELECT o.id FROM Stub:TestEntity o WHERE test NOT IN(:param1)',
             $result
         );
         $this->assertEquals(
             $values,
             $qb->getParameter('param1')->getValue()
-        );
-    }
-
-    public function testApplyNull()
-    {
-        $qb = $this->em->createQueryBuilder()
-            ->select('o.id')
-            ->from('Stub:TestEntity', 'o');
-
-        $data = [
-            'value' => [':empty:']
-        ];
-
-        $params = [
-            'null_value'                 => ':empty:',
-            FilterUtility::DATA_NAME_KEY => 'o.values'
-        ];
-        $this->filter->init('test', $params);
-
-        $this->filter->apply(new OrmFilterDatasourceAdapter($qb), $data);
-
-        $result = $qb->getQuery()->getDQL();
-        $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o'
-            . ' WHERE o IN('
-            . 'SELECT null_filter_test'
-            . ' FROM Stub:TestEntity null_filter_test'
-            . ' LEFT JOIN null_filter_test.values null_filter_test_rel'
-            . ' WHERE null_filter_test_rel IS NULL)',
-            $result
-        );
-    }
-
-    public function testApplyNullNot()
-    {
-        $qb = $this->em->createQueryBuilder()
-            ->select('o.id')
-            ->from('Stub:TestEntity', 'o');
-
-        $data = [
-            'type'  => ChoiceFilterType::TYPE_NOT_CONTAINS,
-            'value' => [':empty:']
-        ];
-
-        $params = [
-            'null_value'                 => ':empty:',
-            FilterUtility::DATA_NAME_KEY => 'o.values'
-        ];
-        $this->filter->init('test', $params);
-
-        $this->filter->apply(new OrmFilterDatasourceAdapter($qb), $data);
-
-        $result = $qb->getQuery()->getDQL();
-        $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o'
-            . ' WHERE o IN('
-            . 'SELECT null_filter_test'
-            . ' FROM Stub:TestEntity null_filter_test'
-            . ' LEFT JOIN null_filter_test.values null_filter_test_rel'
-            . ' WHERE null_filter_test_rel IS NOT NULL)',
-            $result
         );
     }
 }

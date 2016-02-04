@@ -6,45 +6,43 @@ use Oro\Bundle\TagBundle\Form\Type\TagSelectType;
 
 class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
-
-    /**
-     * @var TagSelectType
-     */
+    /** @var TagSelectType */
     protected $type;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $transformer;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $subscriber;
 
     protected function setUp()
     {
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->transformer = $this->getMockBuilder('Oro\Bundle\TagBundle\Form\Transformer\TagTransformer')
             ->disableOriginalConstructor()
             ->getMock();
+
 
         $this->subscriber = $this->getMockBuilder('Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new TagSelectType($this->subscriber, $this->transformer);
+        $this->type = new TagSelectType($this->securityFacade, $this->transformer, $this->subscriber);
     }
 
     protected function tearDown()
     {
-        unset($this->transformer);
-        unset($this->subscriber);
-        unset($this->type);
+        unset($this->securityFacade, $this->transformer, $this->subscriber, $this->type);
     }
 
     public function testSetDefaultOptions()
     {
-
         $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
@@ -63,22 +61,12 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->subscriber)
             ->will($this->returnSelf());
 
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with('autocomplete', 'oro_tag_autocomplete')
-            ->will($this->returnSelf());
-
         $builder->expects($this->any())
             ->method('add')
             ->will($this->returnSelf());
 
         $builder->expects($this->any())
             ->method('create')
-            ->will($this->returnSelf());
-
-        $builder->expects($this->exactly(2))
-            ->method('addViewTransformer')
-            ->with($this->transformer)
             ->will($this->returnSelf());
 
         $this->type->buildForm($builder, array());

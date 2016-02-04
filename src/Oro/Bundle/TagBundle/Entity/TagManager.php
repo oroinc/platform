@@ -322,21 +322,14 @@ class TagManager
      */
     public function saveTagging($entity, $flush = true, Organization $organization = null)
     {
-        // Tag[]  - assigned to the entity.
+        // Tags stored for the entity.
         $oldAllTags = $this->fetchTags($entity, null, false, $organization);
 
-        // Modified entity Tags, could contains new tags, or does not contains tags that need to remove.
-        $newTags = $this->getTags($entity);
-
-        // Taggable submitted form entity contains array of [autocomplete = [], all => Tag[], owner => Tag[]] tags.
-        if (isset($newTags['all'], $newTags['owner'])) {
-            $newAllTags = new ArrayCollection($newTags['all']);
-        } else {
-            $newAllTags = $newTags;
-        }
+        // Actual tags for current entity, could contains new tags, or does not contains tags that need to remove.
+        $tags = $this->getTags($entity);
 
         // Get all tags that should be added
-        $tagsToAdd = $newAllTags->filter(
+        $tagsToAdd = $tags->filter(
             function ($tag) use ($oldAllTags) {
                 return !$oldAllTags->exists($this->getComparePredicate($tag));
             }
@@ -347,8 +340,8 @@ class TagManager
 
         // Get all tags that should be deleted
         $tagsToDelete = $oldAllTags->filter(
-            function (Tag $tag) use ($newAllTags) {
-                return !$newAllTags->exists($this->getComparePredicate($tag));
+            function (Tag $tag) use ($tags) {
+                return !$tags->exists($this->getComparePredicate($tag));
             }
         );
         if (!$tagsToDelete->isEmpty()) {
@@ -419,13 +412,12 @@ class TagManager
      *
      * @return callable
      *
-     * @@deprecated
+     * @deprecated Use {@see getComparePredicate} instead
      */
     public function compareCallback($tag)
     {
         return $this->getComparePredicate($tag);
     }
-
 
     /**
      * Deletes tags relations for given entity class.
