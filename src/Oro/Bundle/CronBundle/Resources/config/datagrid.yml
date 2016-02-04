@@ -95,7 +95,7 @@ datagrid:
             entityHint: job
 
     oro-cron-schedules-grid:
-        acl_resource: oro_schedules
+        acl_resource: oro_cron_schedule_view
         options:
             entityHint: schedule
         source:

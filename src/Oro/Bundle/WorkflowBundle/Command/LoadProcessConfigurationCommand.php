@@ -166,8 +166,8 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
 
             foreach ($triggers as $trigger) {
                 $arguments = [
-                    sprintf('--id=%d', $trigger->getId()),
-                    sprintf('--name=%s', $trigger->getDefinition()->getName())
+                    sprintf('--name=%s', $trigger->getDefinition()->getName()),
+                    sprintf('--id=%d', $trigger->getId())
                 ];
 
                 $output->writeln(

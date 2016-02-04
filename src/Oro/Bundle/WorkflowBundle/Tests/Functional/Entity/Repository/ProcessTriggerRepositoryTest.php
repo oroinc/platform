@@ -78,6 +78,11 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         $triggers = $this->repository->findAllWithDefinitions(false);
         $this->assertCount($this->getTriggersCount(false), $triggers);
         $this->assertTriggersOrder($triggers);
+
+        // without cron triggers
+        $triggers = $this->repository->findAllWithDefinitions(false, false);
+        $this->assertCount($this->getTriggersCount(false, false), $triggers);
+        $this->assertTriggersOrder($triggers);
     }
 
     public function testFindAllCronTriggers()
@@ -110,13 +115,19 @@ class ProcessTriggerRepositoryTest extends WebTestCase
 
     /**
      * @param bool|null $enabled
+     * @param bool $withCronTriggers
      * @return int
      */
-    protected function getTriggersCount($enabled = null)
+    protected function getTriggersCount($enabled = null, $withCronTriggers = false)
     {
         $queryBuilder = $this->repository->createQueryBuilder('trigger')
             ->select('COUNT(trigger.id) as triggerCount')
             ->innerJoin('trigger.definition', 'definition');
+
+        if (!$withCronTriggers) {
+            $queryBuilder->andWhere($queryBuilder->expr()->isNull('trigger.cron'));
+            $queryBuilder->andWhere($queryBuilder->expr()->isNotNull('trigger.event'));
+        }
 
         if (null !== $enabled) {
             $queryBuilder->andWhere('definition.enabled = :enabled')->setParameter('enabled', $enabled);

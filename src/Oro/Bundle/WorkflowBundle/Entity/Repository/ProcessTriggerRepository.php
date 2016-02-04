@@ -57,14 +57,21 @@ class ProcessTriggerRepository extends EntityRepository
 
     /**
      * @param bool|null $enabled
+     * @param bool $withCronTriggers
+     *
      * @return ProcessTrigger[]
      */
-    public function findAllWithDefinitions($enabled = null)
+    public function findAllWithDefinitions($enabled = null, $withCronTriggers = false)
     {
         $queryBuilder = $this->createQueryBuilder('trigger')
             ->select('trigger, definition')
             ->innerJoin('trigger.definition', 'definition')
             ->orderBy('definition.executionOrder');
+
+        if (!$withCronTriggers) {
+            $queryBuilder->andWhere($queryBuilder->expr()->isNotNull('trigger.event'));
+            $queryBuilder->andWhere($queryBuilder->expr()->isNull('trigger.cron'));
+        }
 
         if (null !== $enabled) {
             $queryBuilder->andWhere('definition.enabled = :enabled')->setParameter('enabled', $enabled);

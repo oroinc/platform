@@ -113,6 +113,10 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->will($exception ? $this->throwException($exception) : $this->returnSelf());
 
+        if ($exception) {
+            $this->setExpectedException(get_class($exception), $exception->getMessage());
+        }
+
         $this->command->execute($this->input, $this->output);
 
         $messages = $this->getObjectAttribute($this->output, 'messages');
@@ -170,7 +174,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
                 'output' => [
                     'Trigger #2 of process "name" failed: Process 1 exception',
                 ],
-                'exception' => new \Exception('Process 1 exception'),
+                'exception' => new \RuntimeException('Process 1 exception'),
             ],
         ];
     }
@@ -198,7 +202,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
         $this->input->expects($this->exactly(2))
             ->method('getOption')
             ->willReturnMap([
-                ['id', ''],
+                ['id', '123a'],
                 ['name', 'name'],
             ]);
 

@@ -31,7 +31,7 @@ when it has been updated last time.
 
 * **Trigger** - entity provides information about the trigger used to run the related process when
 this process will be invoked. 
-Trigger can be following types:
+There are two types of triggers:
     - **event**
     First parameter is trigger event - one of ``create``, ``update`` or ``delete``;
     second parameter defines entity field name used to listen (used for ``update`` event only) and  process will be 
@@ -39,11 +39,12 @@ Trigger can be following types:
     should be performed - immediately or after some delay (and delay interval in the seconds of PHP date interval 
     format). In case of delayed execution you can also control execution priority of process jobs.
     - **cron**
-    Allow to execute process by cron-definition specified in parameter ``cron``. For this type of triggers should be
-    enabled cron job for the command ``oro:cron``.
+    Allows execution of a processes based on cron-definition. Cron definition itself is specified in ``cron`` parameter
+    (e.g. ``*/1 * * * *``). These triggers can be executed only if system has configured cron script with the command
+    ``oro:cron``.
 
     **Notice**
-    In the same time should be specified only one of this parameters.
+    Each trigger can define only one of these types.
 
 * **Job** - entity that contain information specific to performing process in case of delayed processing
 (in this case JMS job will be created). According to event job can contain following data:
