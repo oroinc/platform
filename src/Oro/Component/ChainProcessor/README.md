@@ -347,7 +347,7 @@ Types of Processors
 
 There are three types of processors:
   - **common processors** - These processors are executed for all actions. They may be helpful if you need to do some common things at the beginning or at the ending.
-  - **ungrouped processors** - The same as above but in scope of specified action. They can be used if you need to do some things at the beginning or at the ending of an action processing.
+  - **ungrouped processors** - The same as above but in scope of specified action.
   - **grouped processors** - It is most generally used processors. They are created for a specified action and grouped by some logical groups.
 
 Processors Priority
