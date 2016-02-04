@@ -348,7 +348,7 @@ Types of Processors
 There are three types of processors:
   - **common processors** - These processors are executed for all actions. They may be helpful if you need to do some common things at the beginning or at the ending.
   - **ungrouped processors** - The same as above but in scope of specified action.
-  - **grouped processors** - It is most generally used processors. They are created for a specified action and grouped by some logical groups.
+  - **grouped processors** - It is most generally used processors. They are defined in scope of specified action and logically grouped.
 
 Processors Priority
 -------------------
@@ -377,7 +377,7 @@ Applicable Checkers
 
 The applicable checkers are used to filter processors to be executed for the current execution context. All applicable checkers you want to use should be registered in a [processor bag](./ProcessorBag.php) and must implement [ApplicableCheckerInterface](./ApplicableCheckerInterface.php).
 
-There are a list of existing applicable checkers that are registered in the processor bag by default:
+There is a list of existing applicable checkers that are registered in the processor bag by default:
 
 - [GroupRangeApplicableChecker](./GroupRangeApplicableChecker.php) - It allows to execute processors only from specified range of groups. To set the range you can use `setFirstGroup` and `setLastGroup` methods of the context.
 - [SkipGroupApplicableChecker](./SkipGroupApplicableChecker.php) - It allows to skip processors included in some groups. To manage skipped groups  you can use `skipGroup` and `undoGroupSkipping` methods of the context.
