@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
@@ -21,6 +22,9 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
     /** @var AclManager */
     protected $aclManager;
 
+    /** @var EntityAclExtension */
+    protected $aclExtension;
+
     /** @var AclCacheInterface */
     protected $aclCache;
 
@@ -32,6 +36,9 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
 
     /** @var string */
     protected $aclClassesTableName;
+
+    /** @var string[] */
+    protected $queries = [];
 
     /** @var array */
     protected $masks = [
@@ -96,7 +103,7 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
      */
     public function getDescription()
     {
-        return sprintf('Update all ACE`s mask to support new EntityMaskBuilder');
+        return 'Update all ACE`s mask to support EntityMaskBuilder with dynamical identities';
     }
 
     /**
@@ -104,7 +111,7 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
-        $sql = 'SELECT e.*
+        $sql = 'SELECT e.*, c.class_type
                 FROM %s AS o
                 INNER JOIN %s AS c ON c.id = o.class_id
                 LEFT JOIN %s AS e ON e.class_id = o.class_id
@@ -136,6 +143,12 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
             foreach ($aces as $aceOrder => $ace) {
                 $newMasks = $this->processMask($ace['mask']);
 
+                $this->validateMasks(
+                    $newMasks,
+                    new ObjectIdentity('entity', $ace['class_type'])
+                );
+                unset($ace['class_type']);
+
                 $ace['mask'] = $newMasks[0];
 
                 $forUpdate[$key][$aceOrder] = $ace;
@@ -156,7 +169,23 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
         $this->updateAces($forUpdate);
         $this->insertAces($forInsert);
 
+        foreach ($this->queries as $query) {
+            $logger->notice($query);
+            $this->connection->executeUpdate($query);
+        }
+
         $this->aclCache->clearCache();
+    }
+
+    /**
+     * @param int[] $masks
+     * @param ObjectIdentity $oid
+     */
+    protected function validateMasks($masks, ObjectIdentity $oid)
+    {
+        foreach ($masks as $mask) {
+            $this->getAclExtension()->validateMask($mask, $oid);
+        }
     }
 
     /**
@@ -168,7 +197,7 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
 
         foreach ($aces as $rows) {
             foreach ($rows as $ace) {
-                $this->connection->executeQuery(sprintf($sql, $this->entriesTableName, $ace['mask'], $ace['id']));
+                $this->addSql(sprintf($sql, $this->entriesTableName, $ace['mask'], $ace['id']));
             }
         }
     }
@@ -196,7 +225,7 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
 
         foreach ($aces as $rows) {
             foreach ($rows as $ace) {
-                $this->connection->executeQuery(
+                $this->addSql(
                     sprintf(
                         $sql,
                         $this->entriesTableName,
@@ -222,7 +251,8 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
      */
     protected function processMask($mask)
     {
-        $maskBuilders = $this->getMaskBuilders();
+        /** @var EntityMaskBuilder[] $maskBuilders */
+        $maskBuilders = $this->getAclExtension()->getAllMaskBuilders();
 
         foreach ($this->masks as $maskName => $oldMask) {
             if (($mask & $oldMask) > 0) {
@@ -244,10 +274,22 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
     }
 
     /**
-     * @return array|EntityMaskBuilder[]
+     * @return EntityAclExtension
      */
-    protected function getMaskBuilders()
+    protected function getAclExtension()
     {
-        return $this->aclManager->getExtensionSelector()->select('entity:(root)')->getAllMaskBuilders();
+        if (!$this->aclExtension) {
+            $this->aclExtension = $this->aclManager->getExtensionSelector()->select('entity:(root)');
+        }
+
+        return $this->aclExtension;
+    }
+
+    /**
+     * @param string $query
+     */
+    public function addSql($query)
+    {
+        $this->queries[] = $query;
     }
 }
