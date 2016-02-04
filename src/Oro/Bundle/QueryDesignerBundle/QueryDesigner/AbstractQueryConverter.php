@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Doctrine\ORM\Query\Expr\Join;
-
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
@@ -24,6 +22,11 @@ abstract class AbstractQueryConverter
     const TABLE_ALIAS_TEMPLATE  = 't%d';
     const ROOT_ALIAS_KEY = '';
     const MAX_ITERATIONS = 100;
+
+    const INNER_JOIN = 'inner';
+    const LEFT_JOIN  = 'left';
+
+    const CONDITIONAL_JOIN = 'WITH';
 
     /**
      * @var JoinIdentifierHelper
@@ -218,13 +221,14 @@ abstract class AbstractQueryConverter
     /**
      * Performs conversion of a single WHERE condition
      *
-     * @param string $entityClassName
-     * @param string $tableAlias
-     * @param string $fieldName
-     * @param string $columnExpr
-     * @param string $columnAlias
-     * @param string $filterName
-     * @param array  $filterData
+     * @param string                        $entityClassName
+     * @param string                        $tableAlias
+     * @param string                        $fieldName
+     * @param string                        $columnExpr
+     * @param string                        $columnAlias
+     * @param string                        $filterName
+     * @param array                         $filterData
+     * @param string|FunctionInterface|null $functionExpr
      */
     abstract protected function addWhereCondition(
         $entityClassName,
@@ -233,7 +237,8 @@ abstract class AbstractQueryConverter
         $columnExpr,
         $columnAlias,
         $filterName,
-        array $filterData
+        array $filterData,
+        $functionExpr = null
     );
 
     /**
@@ -285,7 +290,7 @@ abstract class AbstractQueryConverter
      *
      * @param string      $tableAlias      The alias of a table to check
      * @param string      $joinByFieldName The name of a field should be used to check a join
-     * @param null|string $joinType
+     * @param string|null $joinType
      *
      * @return string The table alias for the checked join
      */
@@ -325,11 +330,9 @@ abstract class AbstractQueryConverter
      */
     public function getJoinIdentifierByTableAlias($tableAlias)
     {
-        if (isset($this->joins[$tableAlias])) {
-            return $this->joins[$tableAlias];
-        }
-
-        return null;
+        return isset($this->joins[$tableAlias])
+            ? $this->joins[$tableAlias]
+            : null;
     }
 
     /**
@@ -453,12 +456,11 @@ abstract class AbstractQueryConverter
                 $column['func']['group_name'],
                 $column['func']['group_type']
             );
-            $functionExpr = $function['expr'];
-            if (isset($function['return_type'])) {
-                $functionReturnType = $function['return_type'];
-            } else {
-                $functionReturnType = null;
-            }
+
+            $functionExpr       = $function['expr'];
+            $functionReturnType = isset($function['return_type'])
+                ? $function['return_type']
+                : null;
 
             return [$functionExpr, $functionReturnType];
         }
@@ -477,11 +479,9 @@ abstract class AbstractQueryConverter
             list($functionExpr, $functionReturnType) = $this->createColumnFunction($column);
             $isDistinct = !empty($column['distinct']);
             $tableAlias = $this->getTableAliasForColumn($columnName);
-            if (isset($column['label'])) {
-                $columnLabel = $column['label'];
-            } else {
-                $columnLabel = $fieldName;
-            }
+            $columnLabel = isset($column['label'])
+                ? $column['label']
+                : $fieldName;
             $this->addSelectColumn(
                 $this->getEntityClassName($columnName),
                 $tableAlias,
@@ -502,11 +502,9 @@ abstract class AbstractQueryConverter
      */
     protected function getColumnAlias($columnAliasKey)
     {
-        if (isset($this->columnAliases[$columnAliasKey])) {
-            return $this->columnAliases[$columnAliasKey];
-        }
-
-        return null;
+        return isset($this->columnAliases[$columnAliasKey])
+            ? $this->columnAliases[$columnAliasKey]
+            : null;
     }
 
     /**
@@ -546,7 +544,7 @@ abstract class AbstractQueryConverter
                         $this->getJoinType($joinId),
                         $entityClassName,
                         $joinAlias,
-                        Join::WITH,
+                        self::CONDITIONAL_JOIN,
                         $this->getUnidirectionalJoinCondition(
                             $joinTableAlias,
                             $joinFieldName,
@@ -595,11 +593,9 @@ abstract class AbstractQueryConverter
      */
     protected function buildColumnExpression($columnName, $tableAlias, $fieldName)
     {
-        if (isset($this->virtualColumnExpressions[$columnName])) {
-            return $this->virtualColumnExpressions[$columnName];
-        }
-
-        return sprintf('%s.%s', $tableAlias, $fieldName);
+        return isset($this->virtualColumnExpressions[$columnName])
+            ? $this->virtualColumnExpressions[$columnName]
+            : sprintf('%s.%s', $tableAlias, $fieldName);
     }
 
     /**
@@ -723,8 +719,7 @@ abstract class AbstractQueryConverter
      */
     protected function addTableAliasForRootEntity()
     {
-        $joinIds = [self::ROOT_ALIAS_KEY];
-        $this->addTableAliasesForJoinIdentifiers($joinIds);
+        $this->registerTableAlias(self::ROOT_ALIAS_KEY);
     }
 
     /**
@@ -734,8 +729,9 @@ abstract class AbstractQueryConverter
      */
     protected function addTableAliasesForJoinIdentifier($joinId)
     {
-        $joinIds = $this->joinIdHelper->explodeJoinIdentifier($joinId);
-        $this->addTableAliasesForJoinIdentifiers($joinIds);
+        $this->addTableAliasesForJoinIdentifiers(
+            $this->joinIdHelper->explodeJoinIdentifier($joinId)
+        );
     }
 
     /**
@@ -746,18 +742,8 @@ abstract class AbstractQueryConverter
      */
     protected function addTableAliasesForColumn($columnName)
     {
-        /**
-         * joinIds - array of joins with parent definition but without select field join definition(last one)
-         *
-         * For `rootEntityField+Class\Name::joinedEntityRelation+Relation\Class::fieldToSelect` column name will be
-         *
-         * - `Root\Class::rootEntityField`
-         * - `Root\Class::rootEntityField+Class\Name::joinedEntityRelation`
-         */
-        $joinIds = $this->joinIdHelper->explodeColumnName($columnName);
-        $this->addTableAliasesForJoinIdentifiers($joinIds);
-        $this->addColumnAliasesForVirtualRelation($columnName, $joinIds);
-        $this->addTableAliasesForVirtualColumn($columnName);
+        $this->addTableAliasesForVirtualRelation($columnName);
+        $this->addTableAliasesForVirtualField($columnName);
     }
 
     /**
@@ -767,53 +753,46 @@ abstract class AbstractQueryConverter
      */
     protected function addTableAliasesForFilters(array $filters)
     {
-        foreach ($filters as $item) {
-            if (is_array($item)) {
-                if (isset($item['columnName'])) {
-                    $this->addTableAliasesForColumn($item['columnName']);
+        foreach ($filters as $filter) {
+            if (is_array($filter)) {
+                if (isset($filter['columnName'])) {
+                    $this->addTableAliasesForColumn($filter['columnName']);
                 } else {
-                    $this->addTableAliasesForFilters($item);
+                    $this->addTableAliasesForFilters($filter);
                 }
             }
         }
     }
 
     /**
-     * Checks if the given column is the virtual one and if so, generates and saves table aliases for it
+     * Checks if the given column is a virtual field and if so, generates and saves table aliases for it
      *
      * @param string $columnName
      */
-    protected function addTableAliasesForVirtualColumn($columnName)
+    protected function addTableAliasesForVirtualField($columnName)
     {
         if (isset($this->virtualColumnExpressions[$columnName])) {
-            // already added
+            // already processed
             return;
         }
+
         $className = $this->getEntityClassName($columnName);
         $fieldName = $this->getFieldName($columnName);
         if (!$className || !$this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
-            // non virtual column
+            // not a virtual field
             return;
         }
+
         $mainEntityJoinId = $this->getParentJoinIdentifier(
             $this->joinIdHelper->buildColumnJoinIdentifier($columnName)
         );
-        $mainEntityJoinAlias = $this->tableAliases[$mainEntityJoinId];
-        $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
-        $this->prepareAliases($query, $mainEntityJoinAlias);
 
-        if (isset($query['join'])) {
-            $joins = $this->buildVirtualJoins($query, $mainEntityJoinId);
-            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
-            foreach ($joins as &$item) {
-                $this->registerVirtualColumnTableAlias($joins, $item, $mainEntityJoinId);
-            }
-        }
-        $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect(
-            $query['select']['expr'],
-            $this->aliases
+        $query = $this->registerVirtualColumnQueryAliases(
+            $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName),
+            $mainEntityJoinId
         );
-        $this->virtualColumnExpressions[$columnName] = $columnExpr;
+
+        $this->virtualColumnExpressions[$columnName] = $query['select']['expr'];
         $key = sprintf('%s::%s', $className, $fieldName);
         if (!isset($this->virtualColumnOptions[$key])) {
             $options = $query['select'];
@@ -880,7 +859,7 @@ abstract class AbstractQueryConverter
                         $tableAlias = $this->tableAliases[$fullRelationColumnJoinId];
                     }
 
-                    $this->registerAliases($mainEntityJoinId, $tableAlias);
+                    $this->registerTableAlias($mainEntityJoinId, $tableAlias);
                 }
 
                 continue;
@@ -902,7 +881,7 @@ abstract class AbstractQueryConverter
                  * For non virtual join we register aliases with replaced virtual relations joins in path
                  */
                 $mainEntityJoinId = trim($mainEntityJoinId . '+' . $columnJoinId, '+');
-                $this->registerAliases($mainEntityJoinId);
+                $this->registerTableAlias($mainEntityJoinId);
 
                 continue;
             }
@@ -924,7 +903,7 @@ abstract class AbstractQueryConverter
              */
             $joins = $this->buildVirtualJoins($query, $mainEntityJoinId);
 
-            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
+            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins);
 
             /**
              * Store mainEntityJoinId to build columnJoinId after virtual relations joins build
@@ -933,8 +912,8 @@ abstract class AbstractQueryConverter
              */
             $baseMainEntityJoinId = $mainEntityJoinId;
             $virtualJoinId = self::ROOT_ALIAS_KEY;
-            foreach ($joins as &$item) {
-                $tableAlias = $item['alias'];
+            foreach ($joins as $join) {
+                $tableAlias = $join['alias'];
 
                 /**
                  * Build virtual relation join including parent one and register it
@@ -945,9 +924,9 @@ abstract class AbstractQueryConverter
                  * `Rel\Class|left|WITH|alias.code = 1`
                  *      => `Root\Class::rootEntityField+Join\Class::someField+Rel\Class|left|WITH|alias.code = 1`
                  */
-                $virtualJoinId = $this->buildVirtualColumnJoinIdentifier($joins, $item, $mainEntityJoinId);
+                $virtualJoinId = $this->buildVirtualColumnJoinIdentifier($joins, $join, $mainEntityJoinId);
 
-                $this->registerAliases($virtualJoinId, $tableAlias);
+                $this->registerTableAlias($virtualJoinId, $tableAlias);
                 $mainEntityJoinId = $virtualJoinId;
             }
 
@@ -974,21 +953,24 @@ abstract class AbstractQueryConverter
     }
 
     /**
-     * @var array $aliasMap
-     *      key   = local alias (defined in virtual column query definition)
-     *      value = alias
-     *
      * @param array  $query
      * @param string $mainEntityJoinAlias
      */
     protected function prepareAliases(array $query, $mainEntityJoinAlias)
     {
-        if (isset($query['root_alias'])) {
-            $aliasKey = $query['root_alias'];
-        } else {
-            $aliasKey = 'entity';
-        }
-        $this->aliases[$aliasKey] = $mainEntityJoinAlias;
+        $this->aliases[$this->getQueryRootAlias($query)] = $mainEntityJoinAlias;
+    }
+
+    /**
+     * @param array $query
+     *
+     * @return string
+     */
+    protected function getQueryRootAlias(array $query)
+    {
+        return isset($query['root_alias'])
+            ? $query['root_alias']
+            : 'entity';
     }
 
     /**
@@ -1005,8 +987,8 @@ abstract class AbstractQueryConverter
         $this->buildQueryAliases($query);
 
         do {
-            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
-            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $query, self::INNER_JOIN, $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $query, self::LEFT_JOIN, $mainEntityJoinId);
 
             if ($iterations > self::MAX_ITERATIONS) {
                 throw new \RuntimeException(
@@ -1026,7 +1008,7 @@ abstract class AbstractQueryConverter
      * @param string      $joinId
      * @param string|null $tableAlias
      */
-    protected function registerAliases($joinId, $tableAlias = null)
+    protected function registerTableAlias($joinId, $tableAlias = null)
     {
         if (!isset($this->tableAliases[$joinId])) {
             if (!$tableAlias) {
@@ -1039,14 +1021,20 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * Checks if the given column is a virtual relation and if so, generates and saves table aliases for it
+     *
      * @param string $columnName
-     * @param array $joinIds
      */
-    protected function addColumnAliasesForVirtualRelation($columnName, array $joinIds)
+    protected function addTableAliasesForVirtualRelation($columnName)
     {
         if (!empty($this->virtualColumnExpressions[$columnName])) {
+            // already processed
             return;
         }
+
+        $joinIds = $this->addTableAliasesForJoinIdentifiers(
+            $this->joinIdHelper->explodeColumnName($columnName)
+        );
 
         if (!$this->virtualRelationsJoins) {
             return;
@@ -1061,7 +1049,9 @@ abstract class AbstractQueryConverter
             return;
         }
 
-        $parentJoinId = $this->getParentJoinIdentifier($this->joinIdHelper->buildColumnJoinIdentifier($columnName));
+        $parentJoinId = $this->getParentJoinIdentifier(
+            $this->joinIdHelper->buildColumnJoinIdentifier($columnName)
+        );
         $fieldName = $this->getFieldName($parentJoinId);
         $className = $this->getEntityClassName($parentJoinId);
 
@@ -1083,49 +1073,54 @@ abstract class AbstractQueryConverter
      * Generates and saves aliases for the given joins
      *
      * @param string[] $joinIds
+     *
+     * @return string[] updated ids of joins
      */
-    protected function addTableAliasesForJoinIdentifiers(array &$joinIds)
+    protected function addTableAliasesForJoinIdentifiers(array $joinIds)
     {
-        foreach ($joinIds as &$joinId) {
+        $result = [];
+        foreach ($joinIds as $joinId) {
             $joinId = $this->replaceJoinsForVirtualRelation($joinId);
-
-            $this->registerAliases($joinId);
+            $this->registerTableAlias($joinId);
+            $result[] = $joinId;
         }
+
+        return $result;
     }
 
     /**
      * Saves table alias for the given join which is a part of the virtual column query
      *
      * @param array  $joins
-     * @param array  $item
+     * @param array  $join
      * @param string $mainEntityJoinId
      */
-    protected function registerVirtualColumnTableAlias(&$joins, $item, $mainEntityJoinId)
+    protected function registerVirtualColumnTableAlias($joins, $join, $mainEntityJoinId)
     {
-        $tableAlias = $item['alias'];
+        $tableAlias = $join['alias'];
         if (!empty($this->joins[$tableAlias])) {
             return;
         }
 
-        $joinId = $this->buildVirtualColumnJoinIdentifier($joins, $item, $mainEntityJoinId);
+        $joinId = $this->buildVirtualColumnJoinIdentifier($joins, $join, $mainEntityJoinId);
 
-        $this->registerAliases($joinId, $tableAlias);
+        $this->registerTableAlias($joinId, $tableAlias);
     }
 
     /**
      * @param array  $joins
-     * @param array  $item
+     * @param array  $join
      * @param string $mainEntityJoinId
      *
      * @return string
      */
-    protected function buildVirtualColumnJoinIdentifier(&$joins, $item, $mainEntityJoinId)
+    protected function buildVirtualColumnJoinIdentifier($joins, $join, $mainEntityJoinId)
     {
         $parentJoinId = $mainEntityJoinId;
 
-        $delimiterPos = strpos($item['join'], '.');
+        $delimiterPos = strpos($join['join'], '.');
         if (false !== $delimiterPos) {
-            $parentJoinAlias = substr($item['join'], 0, $delimiterPos);
+            $parentJoinAlias = substr($join['join'], 0, $delimiterPos);
             $parentItems = array_filter(
                 $joins,
                 function ($join) use ($parentJoinAlias) {
@@ -1142,25 +1137,7 @@ abstract class AbstractQueryConverter
             }
         }
 
-        if (isset($item['conditionType'])) {
-            $conditionType = $item['conditionType'];
-        } else {
-            $conditionType = null;
-        }
-
-        if (isset($item['condition'])) {
-            $condition = $item['condition'];
-        } else {
-            $condition = null;
-        }
-
-        return $this->joinIdHelper->buildJoinIdentifier(
-            $item['join'],
-            $parentJoinId,
-            $item['type'],
-            $conditionType,
-            $condition
-        );
+        return $this->buildJoinIdentifier($join, $parentJoinId);
     }
 
     /**
@@ -1170,12 +1147,12 @@ abstract class AbstractQueryConverter
     {
         $queryAliases = array_keys($this->aliases);
 
-        foreach ([Join::INNER_JOIN, Join::LEFT_JOIN] as $type) {
-            if (empty($query['join'][strtolower($type)])) {
+        foreach ([self::INNER_JOIN, self::LEFT_JOIN] as $type) {
+            if (empty($query['join'][$type])) {
                 continue;
             }
 
-            foreach ($query['join'][strtolower($type)] as $join) {
+            foreach ($query['join'][$type] as $join) {
                 $queryAliases[] = $join['alias'];
             }
         }
@@ -1187,252 +1164,310 @@ abstract class AbstractQueryConverter
      * Processes all virtual column join declarations of $joinType type
      *
      * @param array  $joins
-     * @param array  $aliases
      * @param array  $query
      * @param string $joinType
      * @param string $parentJoinId
      */
-    protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType, $parentJoinId)
+    protected function processVirtualColumnJoins(&$joins, &$query, $joinType, $parentJoinId)
     {
-        $joinType = strtolower($joinType);
-
         if (!isset($query['join'][$joinType])) {
             return;
         }
 
-        foreach ($query['join'][$joinType] as &$item) {
-            if (!empty($item['processed'])) {
+        foreach ($query['join'][$joinType] as &$join) {
+            if (!empty($join['processed'])) {
                 continue;
             }
 
-            $condition = $this->getDefinitionJoinCondition($item);
-            $usedAliases = $this->qbTools->getTablesUsedInJoinCondition($condition, $this->queryAliases);
+            $usedAliases = $this->qbTools->getTablesUsedInJoinCondition(
+                $this->getDefinitionJoinCondition($join),
+                $this->queryAliases
+            );
             $unknownAliases = array_diff(
                 $usedAliases,
-                array_merge(array_keys($this->aliases), [$item['alias']])
+                array_merge(array_keys($this->aliases), [$join['alias']])
             );
             if ($unknownAliases) {
                 continue;
             }
 
-            $item['type'] = $joinType;
-            $delimiterPos = strpos($item['join'], '.');
+            $join['type'] = $joinType;
+            $delimiterPos = strpos($join['join'], '.');
             if (false !== $delimiterPos) {
-                $alias = substr($item['join'], 0, $delimiterPos);
-                if (!isset($aliases[$alias])) {
-                    $aliases[$alias] = $this->generateTableAlias();
+                $alias = substr($join['join'], 0, $delimiterPos);
+                if (!isset($this->aliases[$alias])) {
+                    $this->aliases[$alias] = $this->generateTableAlias();
                 }
-                $item['join'] = $aliases[$alias] . substr($item['join'], $delimiterPos);
+                $join['join'] = $this->aliases[$alias] . substr($join['join'], $delimiterPos);
             }
 
-            $alias = $item['alias'];
-            if (!isset($aliases[$alias])) {
-                $aliases[$alias] = $this->generateTableAlias();
+            $alias = $join['alias'];
+            if (!isset($this->aliases[$alias])) {
+                $this->aliases[$alias] = $this->generateTableAlias();
             }
-            $item['alias'] = $aliases[$alias];
+            $join['alias'] = $this->aliases[$alias];
 
-            $itemJoinId = $this->joinIdHelper->buildJoinIdentifier(
-                $item['join'],
-                $parentJoinId,
-                $item['type'],
-                $this->getJoinDefinitionConditionType($item),
-                $condition
-            );
-
-            if (isset($this->tableAliases[$itemJoinId])) {
-                $item['alias']   = $this->tableAliases[$itemJoinId];
-                $aliases[$alias] = $this->tableAliases[$itemJoinId];
+            $joinId = $this->buildJoinIdentifier($join, $parentJoinId);
+            if (isset($this->tableAliases[$joinId])) {
+                $this->aliases[$alias] = $this->tableAliases[$joinId];
+                $join['alias']         = $this->aliases[$alias];
             }
 
-            $item['processed'] = true;
-            $joins[] = $item;
+            $join['processed'] = true;
+            $joins[] = $join;
         }
     }
 
     /**
+     * @param array       $join
+     * @param string      $parentJoinId
+     * @param string|null $joinType
+     *
+     * @return string
+     */
+    protected function buildJoinIdentifier(array $join, $parentJoinId, $joinType = null)
+    {
+        return $this->joinIdHelper->buildJoinIdentifier(
+            $join['join'],
+            $parentJoinId,
+            $joinType ?: $join['type'],
+            $this->getJoinDefinitionConditionType($join),
+            $this->getDefinitionJoinCondition($join)
+        );
+    }
+
+    /**
      * @param array $join
+     *
      * @return string|null
      */
     protected function getJoinDefinitionConditionType(array $join)
     {
-        $conditionType = null;
-        if (isset($join['conditionType'])) {
-            $conditionType = $join['conditionType'];
-        }
-
-        return $conditionType;
+        return isset($join['conditionType'])
+            ? $join['conditionType']
+            : null;
     }
 
     /**
      * @param array $join
+     *
      * @return string|null
      */
     protected function getDefinitionJoinCondition(array $join)
     {
-        $condition = null;
-        if (isset($join['condition'])) {
-            $condition = $join['condition'];
+        return isset($join['condition'])
+            ? $join['condition']
+            : null;
+    }
+
+    /**
+     * @param array  $query
+     * @param string $mainEntityJoinId
+     *
+     * @return array
+     */
+    protected function registerVirtualColumnQueryAliases($query, $mainEntityJoinId)
+    {
+        $this->replaceTableAliasesInVirtualColumnQuery(
+            $query,
+            $this->getTableAliasesForVirtualColumnQuery($query, $mainEntityJoinId)
+        );
+
+        if (isset($query['join'])) {
+            $joinMap = $this->getJoinMapForVirtualColumnQuery($query);
+            $finished = false;
+            while (!$finished) {
+                $finished = true;
+                $alias    = null;
+                $newAlias = null;
+                $joinId   = null;
+                foreach ($joinMap as $alias => $mapItem) {
+                    if (isset($mapItem['processed'])) {
+                        continue;
+                    }
+                    $joinType     = $mapItem['type'];
+                    $join         = $query['join'][$joinType][$mapItem['key']];
+                    $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin($join['join'], $mainEntityJoinId);
+                    if (null !== $parentJoinId) {
+                        $alias    = $join['alias'];
+                        $joinId   = $this->buildJoinIdentifier($join, $parentJoinId, $joinType);
+                        $newAlias = $this->findExistingTableAlias($joinId, $alias);
+                        if ($newAlias) {
+                            break;
+                        }
+                    }
+                }
+                if (!$newAlias) {
+                    foreach ($joinMap as $alias => $mapItem) {
+                        if (!isset($mapItem['processed'])) {
+                            $joinType     = $mapItem['type'];
+                            $join         = $query['join'][$joinType][$mapItem['key']];
+                            $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin(
+                                $join['join'],
+                                $mainEntityJoinId
+                            );
+                            if (null !== $parentJoinId) {
+                                $alias    = $join['alias'];
+                                $newAlias = $this->generateTableAlias();
+                                $joinId   = str_replace(
+                                    $alias,
+                                    $newAlias,
+                                    $this->buildJoinIdentifier($join, $parentJoinId, $joinType)
+                                );
+                                $this->registerTableAlias($joinId, $newAlias);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if ($newAlias) {
+                    $finished = false;
+                    $this->replaceTableAliasesInVirtualColumnQuery($query, [$alias => $newAlias]);
+                    $joinMap[$newAlias] = array_merge(
+                        $joinMap[$alias],
+                        ['processed' => true, 'joinId' => $joinId]
+                    );
+                    unset($joinMap[$alias]);
+                }
+            }
         }
 
-        return $condition;
+        return $query;
+    }
+
+    /**
+     * @param string $virtualColumnJoinId
+     * @param string $virtualColumnJoinAlias
+     *
+     * @return string|null
+     */
+    protected function findExistingTableAlias($virtualColumnJoinId, $virtualColumnJoinAlias)
+    {
+        $foundAlias = null;
+        foreach ($this->tableAliases as $existingJoinId => $existingAlias) {
+            if ($existingJoinId
+                && str_replace($virtualColumnJoinAlias, $existingAlias, $virtualColumnJoinId) === $existingJoinId
+            ) {
+                $foundAlias = $existingAlias;
+                break;
+            }
+        }
+
+        return $foundAlias;
+    }
+
+    /**
+     * @param string $joinExpr
+     * @param string $mainEntityJoinId
+     *
+     * @return string|null
+     */
+    protected function getParentJoinIdForVirtualColumnJoin($joinExpr, $mainEntityJoinId)
+    {
+        $parts = explode('.', $joinExpr, 2);
+
+        $parentAlias = count($parts) === 2
+            ? $parts[0]
+            : null;
+
+        $parentJoinId = null;
+        if (null === $parentAlias) {
+            $parentJoinId = self::ROOT_ALIAS_KEY;
+        } elseif ($this->tableAliases[$mainEntityJoinId] === $parentAlias) {
+            $parentJoinId = $mainEntityJoinId;
+        } elseif (isset($joinMap[$parentAlias]['processed'])) {
+            $parentJoinId = $joinMap[$parentAlias]['joinId'];
+        }
+
+        return $parentJoinId;
+    }
+
+    /**
+     * @param array  $query
+     * @param string $mainEntityJoinId
+     *
+     * @return array
+     */
+    protected function getTableAliasesForVirtualColumnQuery($query, $mainEntityJoinId)
+    {
+        $aliases = [
+            $this->getQueryRootAlias($query) => $this->tableAliases[$mainEntityJoinId]
+        ];
+        if (isset($query['join'])) {
+            $counter = 0;
+            foreach ($query['join'] as $joins) {
+                foreach ($joins as $join) {
+                    $aliases[$join['alias']] = sprintf('__tmp%d__', ++$counter);
+                }
+            }
+        }
+
+        return $aliases;
+    }
+
+    /**
+     * @param array $query
+     *
+     * @return array
+     */
+    protected function getJoinMapForVirtualColumnQuery($query)
+    {
+        $joinMap = [];
+        foreach ($query['join'] as $joinType => $joins) {
+            foreach ($joins as $key => $join) {
+                $parentAlias = null;
+                $parts = explode('.', $join['join'], 2);
+                if (count($parts)) {
+                    $parentAlias = $parts[0];
+                }
+                $joinMap[$join['alias']] = [
+                    'type'        => $joinType,
+                    'key'         => $key,
+                    'parentAlias' => $parentAlias
+                ];
+            }
+        }
+
+        return $joinMap;
+    }
+
+    /**
+     * @param array $query
+     * @param array $aliases
+     */
+    protected function replaceTableAliasesInVirtualColumnQuery(&$query, $aliases)
+    {
+        if (isset($query['join'])) {
+            foreach ($query['join'] as &$joins) {
+                QueryUtils::replaceTableAliasesInJoinAlias($joins, $aliases);
+                QueryUtils::replaceTableAliasesInJoinExpr($joins, $aliases);
+                QueryUtils::replaceTableAliasesInJoinConditions($joins, $aliases);
+            }
+            unset($joins);
+        }
+        $query['select']['expr'] = QueryUtils::replaceTableAliasesInSelectExpr($query['select']['expr'], $aliases);
     }
 
     /**
      * Replaces all table aliases declared in the virtual column query with unique aliases for built query
      *
      * @param array $joins
-     * @param array $aliases
      */
-    protected function replaceTableAliasesInVirtualColumnJoinConditions(&$joins, &$aliases)
+    protected function replaceTableAliasesInVirtualColumnJoinConditions(&$joins)
     {
-        // replace alias with {{newAlias}} - this is required to prevent collisions
-        // between old and new aliases in case if some new alias has the same name as some old alias
-        foreach ($joins as &$item) {
-            if (isset($item['condition'])) {
-                $condition = $item['condition'];
-                foreach ($aliases as $alias => $newAlias) {
-                    $tryFind = true;
-                    while ($tryFind) {
-                        $tryFind = false;
-                        $pos     = $this->checkTableAliasInCondition($condition, $alias);
-                        if (false !== $pos) {
-                            $condition = sprintf(
-                                '%s{{%s}}%s',
-                                substr($condition, 0, $pos),
-                                $newAlias,
-                                substr($condition, $pos + strlen($alias))
-                            );
-                            $tryFind   = true;
-                        }
-                    }
-                }
-                $item['condition'] = $condition;
-            }
-        }
-        // replace {{newAlias}} with newAlias
-        foreach ($joins as &$item) {
-            if (isset($item['condition'])) {
-                $condition = $item['condition'];
-                foreach ($aliases as $newAlias) {
-                    $condition = str_replace(sprintf('{{%s}}', $newAlias), $newAlias, $condition);
-                }
-                $item['condition'] = $condition;
-            }
-        }
+        QueryUtils::replaceTableAliasesInJoinConditions($joins, $this->aliases);
     }
 
     /**
      * Replaces all table aliases declared in the virtual column select expression with unique aliases for built query
      *
      * @param string $selectExpr
-     * @param array  $aliases
      *
      * @return string The corrected select expression
      */
-    protected function replaceTableAliasesInVirtualColumnSelect($selectExpr, &$aliases)
+    protected function replaceTableAliasesInVirtualColumnSelect($selectExpr)
     {
-        // replace alias with {{newAlias}} - this is required to prevent collisions
-        // between old and new aliases in case if some new alias has the same name as some old alias
-        foreach ($aliases as $alias => $newAlias) {
-            $tryFind = true;
-            while ($tryFind) {
-                $tryFind = false;
-                $pos     = $this->checkTableAliasInSelect($selectExpr, $alias);
-                if (false !== $pos) {
-                    $selectExpr = sprintf(
-                        '%s{{%s}}%s',
-                        substr($selectExpr, 0, $pos),
-                        $newAlias,
-                        substr($selectExpr, $pos + strlen($alias))
-                    );
-                    $tryFind    = true;
-                }
-            }
-        }
-        // replace {{newAlias}} with newAlias
-        foreach ($aliases as $newAlias) {
-            $selectExpr = str_replace(sprintf('{{%s}}', $newAlias), $newAlias, $selectExpr);
-        }
-
-        return $selectExpr;
-    }
-
-    /**
-     * Checks if $selectExpr contains the given table alias
-     *
-     * @param string $selectExpr
-     * @param string $alias
-     *
-     * @return bool|int The position of $alias in selectExpr or FALSE if it was not found
-     */
-    protected function checkTableAliasInSelect($selectExpr, $alias)
-    {
-        $pos = strpos($selectExpr, $alias);
-        while (false !== $pos) {
-            if (0 === $pos) {
-                $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
-                if ('.' === $nextChar) {
-                    return $pos;
-                }
-            } elseif (strlen($selectExpr) !== $pos + strlen($alias) + 1) {
-                $prevChar = substr($selectExpr, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '(', ','])) {
-                    $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
-                    if ('.' === $nextChar) {
-                        return $pos;
-                    }
-                }
-            }
-            $pos = strpos($selectExpr, $alias, $pos + strlen($alias));
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if $condition contains the given table alias
-     *
-     * @param string $condition
-     * @param string $alias
-     * @param int    $offset
-     *
-     * @return bool|int The position of $alias in $condition or FALSE if it was not found
-     */
-    protected function checkTableAliasInCondition($condition, $alias, $offset = 0)
-    {
-        $pos = strpos($condition, $alias, $offset);
-        if (false !== $pos) {
-            if (0 === $pos) {
-                // handle case "ALIAS.", "ALIAS.field"
-                $nextChar = substr($condition, $pos + strlen($alias), 1);
-                if (in_array($nextChar, ['.', ' ', '='])) {
-                    return $pos;
-                }
-
-                // handle case "ALIASWord.entity = ALIAS"
-                return $this->checkTableAliasInCondition($condition, $alias, ++$pos);
-            } elseif (strlen($condition) === $pos + strlen($alias)) {
-                // handle case "t2.someField = ALIAS"
-                $prevChar = substr($condition, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '='])) {
-                    return $pos;
-                }
-            } else {
-                // handle case "t2.someField = ALIAS.id"
-                $prevChar = substr($condition, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '=', '('])) {
-                    $nextChar = substr($condition, $pos + strlen($alias), 1);
-                    if (in_array($nextChar, ['.', ' ', '=', ')'])) {
-                        return $pos;
-                    }
-                }
-
-                // handle case "t2.ALIAS = ALIAS AND"
-                return $this->checkTableAliasInCondition($condition, $alias, ++$pos);
-            }
-        }
-
-        return false;
+        return QueryUtils::replaceTableAliasesInSelectExpr($selectExpr, $this->aliases);
     }
 
     /**
@@ -1508,13 +1543,13 @@ abstract class AbstractQueryConverter
      *
      * @param string $joinId
      *
-     * @return null|string NULL for autodetect, or a string represents the join type, for example 'INNER' or 'LEFT'
+     * @return null|string NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
      */
     protected function getJoinType($joinId)
     {
         $relationType = $this->joinIdHelper->getJoinType($joinId);
         if ($relationType) {
-            return strtoupper($relationType);
+            return $relationType;
         }
 
         return null;
