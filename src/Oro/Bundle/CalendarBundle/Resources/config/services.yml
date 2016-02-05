@@ -30,6 +30,7 @@ parameters:
     oro_calendar.system_calendar.handler.delete.class:           Oro\Bundle\CalendarBundle\Handler\SystemCalendarDeleteHandler
     oro_calendar.calendar_event.handler.delete.class:            Oro\Bundle\CalendarBundle\Handler\CalendarEventDeleteHandler
     oro_calendar.system_calendar_event.datagrid_helper.class:    Oro\Bundle\CalendarBundle\Datagrid\SystemCalendarEventGridHelper
+    oro_calendar.workflow.action.create_calendar_event.class:    Oro\Bundle\CalendarBundle\Workflow\Action\CreateCalendarEventAction
 
 services:
     oro_calendar.listener.entity_listener:
@@ -254,4 +255,12 @@ services:
         class: %oro_calendar.system_calendar_event.datagrid_helper.class%
         arguments:
             - @oro_security.security_facade
+
+    oro_calendar.workflow.action.create_calendar_event:
+        class: %oro_calendar.workflow.action.create_calendar_event.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_workflow.action, alias: create_calendar_event }
 
