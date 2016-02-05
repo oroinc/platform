@@ -59,7 +59,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
 
         $processDefinition = $processTrigger->getDefinition();
         if ($processName !== $processDefinition->getName()) {
-            $output->writeln(sprintf('<error>Trigger not found in process "%s"</error>', $processName));
+            $output->writeln(sprintf('<error>Trigger not found in process definition "%s"</error>', $processName));
             return;
         }
 

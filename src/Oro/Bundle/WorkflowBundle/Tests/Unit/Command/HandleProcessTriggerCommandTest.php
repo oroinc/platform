@@ -236,7 +236,11 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $this->assertAttributeEquals(['Trigger not found in process "wrong_name"'], 'messages', $this->output);
+        $this->assertAttributeEquals(
+            ['Trigger not found in process definition "wrong_name"'],
+            'messages',
+            $this->output
+        );
     }
 
     protected function expectContainerGetManagerRegistryAndProcessHandler()
