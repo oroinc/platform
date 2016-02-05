@@ -123,11 +123,6 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager
             ->expects($this->once())
-            ->method('getTags')
-            ->willReturn(new ArrayCollection());
-
-        $this->manager
-            ->expects($this->once())
             ->method('saveTagging');
 
         $this->helper
