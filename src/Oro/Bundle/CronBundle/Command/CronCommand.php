@@ -70,8 +70,8 @@ class CronCommand extends ContainerAwareCommand
         $schedules = $this->getAllSchedules();
         $em = $this->getEntityManager('JMSJobQueueBundle:Job');
 
-        $jobs = $this->processCommands($this->getApplication()->all('oro:cron'), $schedules, $output);
-        $jobs = array_merge($jobs, $this->processSchedules($schedules, $output));
+        $jobs = $this->processCommands($output, $this->getApplication()->all('oro:cron'), $schedules);
+        $jobs = array_merge($jobs, $this->processSchedules($output, $schedules));
 
         array_walk($jobs, [$em, 'persist']);
 
@@ -82,13 +82,17 @@ class CronCommand extends ContainerAwareCommand
     }
 
     /**
+     * This method accepts commands which implements CronCommandInterface and should have default definition.
+     * All these commands must be used without parameters (just command name), so these commands should have default
+     * values for any options (arguments) and they should use them.
+     *
+     * @param OutputInterface $output
      * @param array|Command[]|CronCommandInterface[] $commands
      * @param Collection|Schedule[] $schedules
-     * @param OutputInterface $output
      *
      * @return array|Job[]
      */
-    protected function processCommands(array $commands, Collection $schedules, OutputInterface $output)
+    protected function processCommands(OutputInterface $output, array $commands, Collection $schedules)
     {
         $jobs = [];
         $em = $this->getEntityManager('OroCronBundle:Schedule');
@@ -96,7 +100,7 @@ class CronCommand extends ContainerAwareCommand
         foreach ($commands as $name => $command) {
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
 
-            if ($this->skipCommand($command, $output)) {
+            if ($this->skipCommand($output, $command)) {
                 continue;
             }
 
@@ -106,7 +110,7 @@ class CronCommand extends ContainerAwareCommand
             }
 
             if (0 === count($matchedSchedules)) {
-                $em->persist($this->createSchedule($command, $name, $output));
+                $em->persist($this->createSchedule($output, $command, $name));
 
                 continue;
             }
@@ -114,7 +118,7 @@ class CronCommand extends ContainerAwareCommand
             $schedule = $matchedSchedules->first();
             $this->checkDefinition($command, $schedule);
 
-            if ($job = $this->createJob($output, $schedule, $name)) {
+            if ($job = $this->createJob($output, $schedule)) {
                 $jobs[] = $job;
             }
         }
@@ -125,12 +129,12 @@ class CronCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param Collection|Schedule[] $schedules
      * @param OutputInterface $output
+     * @param Collection|Schedule[] $schedules
      *
      * @return array|Job[]
      */
-    protected function processSchedules(Collection $schedules, OutputInterface $output)
+    protected function processSchedules(OutputInterface $output, Collection $schedules)
     {
         $jobs = [];
 
@@ -143,7 +147,7 @@ class CronCommand extends ContainerAwareCommand
 
             $output->write(sprintf('Processing command "<info>%s%s</info>": ', $schedule->getCommand(), $arguments));
 
-            if ($job = $this->createJob($output, $schedule, $schedule->getCommand())) {
+            if ($job = $this->createJob($output, $schedule)) {
                 $jobs[] = $job;
             }
         }
@@ -152,12 +156,12 @@ class CronCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param Command $command
      * @param OutputInterface $output
+     * @param Command $command
      *
      * @return bool
      */
-    protected function skipCommand(Command $command, OutputInterface $output)
+    protected function skipCommand(OutputInterface $output, Command $command)
     {
         if (!$command instanceof CronCommandInterface) {
             $output->writeln(
@@ -179,33 +183,40 @@ class CronCommand extends ContainerAwareCommand
     /**
      * @param Collection|Schedule[] $schedules
      * @param string $name
+     * @param array $arguments
      *
      * @return Collection
      */
-    protected function matchSchedules(Collection $schedules, $name)
+    protected function matchSchedules(Collection $schedules, $name, array $arguments = [])
     {
         return $schedules->filter(
-            function (Schedule $schedule) use ($name) {
-                return $schedule->getCommand() === $name && $schedule->getArguments() === [];
+            function (Schedule $schedule) use ($name, $arguments) {
+                return $schedule->getCommand() === $name && $schedule->getArguments() == $arguments;
             }
         );
     }
 
     /**
+     * @param OutputInterface $output
      * @param CronCommandInterface $command
      * @param string $name
-     * @param OutputInterface $output
+     * @param array $arguments
      *
      * @return Schedule
      */
-    protected function createSchedule(CronCommandInterface $command, $name, OutputInterface $output)
-    {
+    protected function createSchedule(
+        OutputInterface $output,
+        CronCommandInterface $command,
+        $name,
+        array $arguments = []
+    ) {
         $output->writeln('<comment>new command found, setting up schedule..</comment>');
 
         $schedule = new Schedule();
         $schedule
             ->setCommand($name)
-            ->setDefinition($command->getDefaultDefinition());
+            ->setDefinition($command->getDefaultDefinition())
+            ->setArguments($arguments);
 
         return $schedule;
     }
@@ -225,11 +236,10 @@ class CronCommand extends ContainerAwareCommand
     /**
      * @param OutputInterface $output
      * @param Schedule $schedule
-     * @param string $name
      *
      * @return null|Job
      */
-    protected function createJob(OutputInterface $output, Schedule $schedule, $name)
+    protected function createJob(OutputInterface $output, Schedule $schedule)
     {
         $cron = $this->getContainer()->get('oro_cron.helper.cron')->createCron($schedule->getDefinition());
         $arguments = array_values($schedule->getArguments());
@@ -238,8 +248,8 @@ class CronCommand extends ContainerAwareCommand
          * @todo Add "Oro timezone" setting as parameter to isDue method
          */
         if ($cron->isDue()) {
-            if (!$this->hasJobInQueue($name, $arguments)) {
-                $job = new Job($name, $arguments);
+            if (!$this->hasJobInQueue($schedule->getCommand(), $arguments)) {
+                $job = new Job($schedule->getCommand(), $arguments);
 
                 $output->writeln('<comment>added to job queue</comment>');
 

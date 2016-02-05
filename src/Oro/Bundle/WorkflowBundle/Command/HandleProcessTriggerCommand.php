@@ -28,13 +28,13 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
                 'name',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the process'
+                'Process definition name'
             )
             ->addOption(
                 'id',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Identifier of the process triggers'
+                'Identifier of the process trigger'
             );
     }
 
@@ -46,7 +46,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
         $processName = $input->getOption('name');
 
         $triggerId = $input->getOption('id');
-        if (!is_numeric($triggerId)) {
+        if (!filter_var($triggerId, FILTER_VALIDATE_INT)) {
             $output->writeln('<error>No process trigger identifier defined</error>');
             return;
         }
@@ -63,10 +63,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
             return;
         }
 
-        $entityClass = $processDefinition->getRelatedEntity();
-
         $processData = new ProcessData();
-        $processData->set('data', new $entityClass);
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine')->getManager();
@@ -78,6 +75,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
             $processHandler = $this->getProcessHandler();
             $processHandler->handleTrigger($processTrigger, $processData);
 
+            $entityManager->flush();
             $entityManager->commit();
 
             $output->writeln(
@@ -101,6 +99,8 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
                     $e->getMessage()
                 )
             );
+
+            throw $e;
         }
     }
 

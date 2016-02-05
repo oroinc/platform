@@ -71,4 +71,5 @@ oro:
             id.label: 'Id'
             command.label: 'Command'
             arguments.label: 'Arguments'
+            arguments_hash.label: 'Arguments Hash'
             definition.label: 'Definition'
