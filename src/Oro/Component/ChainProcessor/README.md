@@ -1,8 +1,22 @@
 Oro ChainProcessor Component
 ============================
 
+Table of Contents
+-----------------
+ - [Overview](#overview)
+ - [Getting Started](#getting-started)
+ - [Context](#context)
+ - [Actions](#actions)
+ - [Types of Processors](#types-of-processors)
+ - [Processors Priority](#processors-priority)
+ - [Applicable Checkers](#applicable-checkers)
+ - [Key Classes](#key-classes)
+
+Overview
+--------
+
 The Oro ChainProcessor component implements enhanced [Chain of Responsibility](http://www.oodesign.com/chain-of-responsibility-pattern.html) design pattern and allows efficiently process requests without hard-wiring handler relationships and precedence, or request-to-handler mappings.
- 
+
 The following enhancements of the original design pattern are added to make a configuration of requests processing more flexible:
 
 - Processors can be grouped in some logical groups.
@@ -318,11 +332,66 @@ class DecorateClassNameIdPair implements ProcessorInterface
 
 This was just an example how the Oro ChainProcessor component may be used. The next section provides a list of key classes that may help you to investigate this component. Also you can find advanced usage of it in Oro Platform.
 
+Context
+-------
+
+The [context](./Context.php) is abstraction designed to isolate implementations of processors from the environment in which they are executed. Actually the context is just key-value storage for input and output data.
+
+Actions
+-------
+
+The action is a set of operations what should be performed over the context to get output data for some input data.
+
+Types of Processors
+-------------------
+
+There are three types of processors:
+  - **common processors** - These processors are executed for all actions. They may be helpful if you need to do some common things at the beginning or at the ending.
+  - **ungrouped processors** - The same as above but in scope of specified action.
+  - **grouped processors** - It is most generally used processors. They are defined in scope of specified action and logically grouped.
+
+Processors Priority
+-------------------
+
+Each processor and each group of processors can have the `priority` attribute that is used to specify the order of processors execution. The higher the priority, the earlier the processor is executed. The default priority is 0.
+
+The processors are executed in the following order:
+  - initial common processors
+  - initial ungrouped processors
+  - grouped processors
+  - final ungrouped processors
+  - final common processors
+
+The following table shows limitations for values of the priority attribute.
+
+| Processor type | Processor priority | Group priority |
+|----------------|--------------------|----------------|
+| initial common processors | from -255 to 255 |  |
+| initial ungrouped processors | from -255 to 255 |  |
+| grouped processors | from -255 to 255 | from -254 to 252 |
+| final ungrouped processors | from -65535 to -65280 |  |
+| final common processors | from min int to -65536 |  |
+
+Applicable Checkers
+-------------------
+
+The applicable checkers are used to filter processors to be executed for the current execution context. All applicable checkers you want to use should be registered in a [processor bag](./ProcessorBag.php) and must implement [ApplicableCheckerInterface](./ApplicableCheckerInterface.php).
+
+There is a list of existing applicable checkers that are registered in the processor bag by default:
+
+- [GroupRangeApplicableChecker](./GroupRangeApplicableChecker.php) - It allows to execute processors only from specified range of groups. To set the range you can use `setFirstGroup` and `setLastGroup` methods of the context.
+- [SkipGroupApplicableChecker](./SkipGroupApplicableChecker.php) - It allows to skip processors included in some groups. To manage skipped groups  you can use `skipGroup` and `undoGroupSkipping` methods of the context.
+- [MatchApplicableChecker](./MatchApplicableChecker.php) - It allows to filter processors based on data stored in the context.
+
 Key Classes
 -----------
 
-- [ChainProcessor](./ChainProcessor.php) - The base class for processors of your actions. This class executes processors registered in [ProcessorBag](./ProcessorBag.php) and suitable for the specified [Context](./Context.php).
+Here is a list of key classes:
+
+- [ActionProcessor](./ActionProcessor.php) - The base class for processors for your actions. This class executes processors registered in [ProcessorBag](./ProcessorBag.php) and suitable for the specified [Context](./Context.php).
 - [Context](./Context.php) - The base implementation of an execution context.
 - [ProcessorBag](./ProcessorBag.php) - A container for processors and applicable checkers.
 - [ProcessorInterface](./ProcessorInterface.php) - An interface of processors.
 - [ApplicableCheckerInterface](./ApplicableCheckerInterface.php) - An interface of applicable checkers.
+- [ProcessorBagAwareApplicableCheckerInterface](./ProcessorBagAwareApplicableCheckerInterface.php) - An interface that should be implemented by applicable checkers that need access to the processor bag.
+

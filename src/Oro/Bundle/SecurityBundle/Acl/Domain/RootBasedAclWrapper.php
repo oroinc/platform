@@ -50,7 +50,7 @@ class RootBasedAclWrapper implements AclInterface
             $exists = false;
             $rootSid = $rootAce->getSecurityIdentity();
             foreach ($aces as $ace) {
-                if ($rootSid->equals($ace->getSecurityIdentity())) {
+                if ($rootSid->equals($ace->getSecurityIdentity()) && $ace->getMask() === $rootAce->getMask()) {
                     $exists = true;
                     break;
                 }

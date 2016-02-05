@@ -39,7 +39,8 @@ class ExpressionBuilder
             $this->currentGroupNode->addNode($groupNode);
             $this->currentGroupNode = $groupNode;
         } elseif ($this->groupNode) {
-            $this->currentGroupNode = $this->groupNode = $groupNode->addNode($this->groupNode);
+            $this->groupNode->addNode($groupNode);
+            $this->currentGroupNode = $groupNode;
         } else {
             $this->currentGroupNode = $this->groupNode = $groupNode;
         }
@@ -51,7 +52,7 @@ class ExpressionBuilder
     public function addRestriction(Restriction $restriction)
     {
         if (!$this->groupNode) {
-            $this->groupNode = new GroupNode(FilterUtility::CONDITION_AND);
+            $this->groupNode        = new GroupNode(FilterUtility::CONDITION_AND);
             $this->currentGroupNode = $this->groupNode;
         }
 
@@ -89,12 +90,12 @@ class ExpressionBuilder
     /**
      * @param GroupNode $gNode
      *
-     * @return mixed Expr[] Where first item  is uncomputed expr and 2nd one is computed
+     * @return mixed Expr[] Where first item is uncomputed expr and 2nd one is computed
      */
     protected function resolveGroupNode(GroupNode $gNode)
     {
         $uncomputedRestrictions = [];
-        $computedRestrictions = [];
+        $computedRestrictions   = [];
 
         foreach ($gNode->getChildren() as $node) {
             if ($node instanceof Restriction) {

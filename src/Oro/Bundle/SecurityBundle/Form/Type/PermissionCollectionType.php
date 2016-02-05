@@ -15,8 +15,8 @@ class PermissionCollectionType extends AbstractType
     {
         $view->vars['privileges_config'] = $options['options']['privileges_config'];
 
-        if (in_array('SHARE', $view->vars['privileges_config']['permissions'])) {
-            array_pop($view->vars['privileges_config']['permissions']);
+        if ($key = array_search('SHARE', $view->vars['privileges_config']['permissions'], true)) {
+            unset($view->vars['privileges_config']['permissions'][$key]);
         }
     }
 

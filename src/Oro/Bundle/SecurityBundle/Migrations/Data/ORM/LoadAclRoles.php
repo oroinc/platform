@@ -4,9 +4,10 @@ namespace Oro\Bundle\SecurityBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -54,13 +55,15 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
 
         if ($manager->isAclEnabled()) {
             $this->loadSuperAdminRole($manager);
-            //$this->loadAdminRole($manager);
             $this->loadManagerRole($manager);
             $this->loadUserRole($manager);
             $manager->flush();
         }
     }
 
+    /**
+     * @param AclManager $manager
+     */
     protected function loadSuperAdminRole(AclManager $manager)
     {
         $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_ADMINISTRATOR));
@@ -68,43 +71,17 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
             foreach ($extension->getAllMaskBuilders() as $maskBuilder) {
-                $fullAccessMask = $maskBuilder->hasConst('GROUP_SYSTEM')
-                    ? $maskBuilder->getConst('GROUP_SYSTEM')
-                    : $maskBuilder->getConst('GROUP_ALL');
+                $fullAccessMask = $maskBuilder->hasMask('GROUP_SYSTEM')
+                    ? $maskBuilder->getMask('GROUP_SYSTEM')
+                    : $maskBuilder->getMask('GROUP_ALL');
                 $manager->setPermission($sid, $rootOid, $fullAccessMask, true);
             }
         }
     }
 
-    protected function loadAdminRole(AclManager $manager)
-    {
-        $sid = $manager->getSid($this->getRole('administrator_role'));
-
-        foreach ($manager->getAllExtensions() as $extension) {
-            $rootOid = $manager->getRootOid($extension->getExtensionKey());
-            foreach ($extension->getAllMaskBuilders() as $maskBuilder) {
-                if ($maskBuilder->hasConst('GROUP_GLOBAL')) {
-                    if ($maskBuilder->hasConst('MASK_VIEW_SYSTEM')) {
-                        $mask =
-                            $maskBuilder->getConst('MASK_VIEW_SYSTEM');
-                            /* @todo now only SYSTEM level is supported
-                            | $maskBuilder->getConst('MASK_CREATE_GLOBAL')
-                            | $maskBuilder->getConst('MASK_EDIT_GLOBAL')
-                            | $maskBuilder->getConst('MASK_DELETE_GLOBAL')
-                            | $maskBuilder->getConst('MASK_ASSIGN_GLOBAL')
-                            | $maskBuilder->getConst('MASK_SHARE_GLOBAL');
-                            */
-                    } else {
-                        $mask = $maskBuilder->getConst('GROUP_GLOBAL');
-                    }
-                } else {
-                    $mask = $maskBuilder->getConst('GROUP_ALL');
-                }
-                $manager->setPermission($sid, $rootOid, $mask, true);
-            }
-        }
-    }
-
+    /**
+     * @param AclManager $manager
+     */
     protected function loadManagerRole(AclManager $manager)
     {
         $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_MANAGER));
@@ -112,28 +89,19 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
             foreach ($extension->getAllMaskBuilders() as $maskBuilder) {
-                if ($maskBuilder->hasConst('GROUP_GLOBAL')) {
-                    if ($maskBuilder->hasConst('MASK_VIEW_SYSTEM')) {
-                        $mask =
-                            $maskBuilder->getConst('MASK_VIEW_SYSTEM');
-                        /* @todo now only SYSTEM level is supported
-                        | $maskBuilder->getConst('MASK_CREATE_GLOBAL')
-                        | $maskBuilder->getConst('MASK_EDIT_GLOBAL')
-                        | $maskBuilder->getConst('MASK_DELETE_GLOBAL')
-                        | $maskBuilder->getConst('MASK_ASSIGN_GLOBAL')
-                        | $maskBuilder->getConst('MASK_SHARE_GLOBAL');
-                         */
-                    } else {
-                        $mask = $maskBuilder->getConst('GROUP_GLOBAL');
-                    }
+                if ($maskBuilder->hasMask('MASK_VIEW_SYSTEM')) {
+                    $mask = $maskBuilder->getMask('MASK_VIEW_SYSTEM');
                 } else {
-                    $mask = $maskBuilder->getConst('GROUP_ALL');
+                    $mask = $maskBuilder->getMask('GROUP_NONE');
                 }
                 $manager->setPermission($sid, $rootOid, $mask, true);
             }
         }
     }
 
+    /**
+     * @param AclManager $manager
+     */
     protected function loadUserRole(AclManager $manager)
     {
         $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_USER));
@@ -141,22 +109,10 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
             foreach ($extension->getAllMaskBuilders() as $maskBuilder) {
-                if ($maskBuilder->hasConst('GROUP_BASIC')) {
-                    if ($maskBuilder->hasConst('MASK_VIEW_SYSTEM')) {
-                        $mask =
-                            $maskBuilder->getConst('MASK_VIEW_SYSTEM');
-                            /* @todo now only SYSTEM level is supported
-                            | $maskBuilder->getConst('MASK_CREATE_BASIC')
-                            | $maskBuilder->getConst('MASK_EDIT_BASIC')
-                            | $maskBuilder->getConst('MASK_DELETE_BASIC')
-                            | $maskBuilder->getConst('MASK_ASSIGN_BASIC')
-                            | $maskBuilder->getConst('MASK_SHARE_BASIC');
-                            */
-                    } else {
-                        $mask = $maskBuilder->getConst('GROUP_BASIC');
-                    }
+                if ($maskBuilder->hasMask('MASK_VIEW_SYSTEM')) {
+                    $mask = $maskBuilder->getMask('MASK_VIEW_SYSTEM');
                 } else {
-                    $mask = $maskBuilder->getConst('GROUP_NONE');
+                    $mask = $maskBuilder->getMask('GROUP_NONE');
                 }
                 $manager->setPermission($sid, $rootOid, $mask, true);
             }

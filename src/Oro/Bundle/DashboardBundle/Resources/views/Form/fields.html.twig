@@ -1,7 +1,7 @@
 {% block oro_type_widget_date_range_widget %}
     <div class="date-range-filter filter-criteria date-range-filter-{{ form.vars.name }}">
         <!-- datetime range filter placeholder -->
-        <input type="hidden" name="{{ form.vars.full_name }}[part]" value="source"/>
+        <input type="hidden" name="{{ form.vars.full_name }}[part]" value="value"/>
     </div>
     <script type="text/javascript">
         require(
@@ -22,7 +22,7 @@
                     valueConfig.startEndPrefix = '{{ form.vars.full_name }}';
 
                     value = {
-                        part: 'source',
+                        part: 'value',
                         type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
                         value: valueConfig
                     };

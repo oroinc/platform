@@ -10,7 +10,7 @@ class Restriction
     /** @var string */
     protected $condition;
 
-    /** bool */
+    /** @var bool */
     protected $computed;
 
     /**
