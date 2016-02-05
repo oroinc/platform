@@ -1,0 +1,25 @@
+services:
+    oro_api.collect_public_resources.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CollectPublicResourcesProcessor
+        public: false
+        arguments:
+            - @oro_api.processor_bag
+            - collect_public_resources
+
+    #
+    # collect_public_resources
+    #
+
+    oro_api.collect_public_resources.load_from_config_bag:
+        class: Oro\Bundle\ApiBundle\Processor\CollectPublicResources\LoadFromConfigBag
+        arguments:
+            - @oro_api.config_bag
+        tags:
+            - { name: oro.api.processor, action: collect_public_resources, priority: -10 }
+
+    oro_api.collect_public_resources.remove_excluded_entities:
+        class: Oro\Bundle\ApiBundle\Processor\CollectPublicResources\RemoveExcludedEntities
+        arguments:
+            - @oro_api.entity_exclusion_provider
+        tags:
+            - { name: oro.api.processor, action: collect_public_resources, priority: -100 }
