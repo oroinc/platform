@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\EntityBundle\Exception;
 
@@ -452,6 +453,32 @@ class DoctrineHelper
     {
         $this->managers = [];
         $this->managersMap = [];
+    }
+
+    /**
+     * @param object $entity
+     */
+    public function refreshIncludingUnitializedRelations($entity)
+    {
+        $em = $this->getEntityManager($entity);
+        $em->refresh($entity);
+
+        $metadata = $this->getEntityMetadata($entity);
+        $associationMappings = array_filter(
+            $metadata->associationMappings,
+            function ($assoc) {
+                return $assoc['isCascadeRefresh'];
+            }
+        );
+
+        foreach ($associationMappings as $assoc) {
+            $relatedEntities = $metadata->reflFields[$assoc['fieldName']]->getValue($entity);
+            if (!$relatedEntities instanceof PersistentCollection || $relatedEntities->isInitialized()) {
+                continue;
+            }
+
+            array_map([$em, 'refresh'], $relatedEntities->toArray());
+        }
     }
 
     /**
