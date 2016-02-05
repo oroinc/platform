@@ -4,11 +4,25 @@ namespace Oro\Bundle\CronBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+
 /**
  * @ORM\Table(name="oro_cron_schedule", uniqueConstraints={
- *      @ORM\UniqueConstraint(name="UQ_COMMAND", columns={"command"})
+ *      @ORM\UniqueConstraint(name="UQ_COMMAND", columns={"command", "args_hash", "definition"})
  * })
  * @ORM\Entity
+ * @Config(
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-tasks"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW",
+ *              "group_name"=""
+ *          }
+ *      }
+ * )
  */
 class Schedule
 {
@@ -24,9 +38,23 @@ class Schedule
     /**
      * @var string
      *
-     * @ORM\Column(name="command", type="string", length=50)
+     * @ORM\Column(name="command", type="string", length=255)
      */
     protected $command;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="args", type = "json_array")
+     */
+    protected $arguments;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="args_hash", type="string", length=32)
+     */
+    protected $argumentsHash;
 
     /**
      * @var string
@@ -34,6 +62,11 @@ class Schedule
      * @ORM\Column(name="definition", type="string", length=100, nullable=true)
      */
     protected $definition;
+
+    public function __construct()
+    {
+        $this->setArguments([]);
+    }
 
     /**
      * Get id
@@ -64,6 +97,28 @@ class Schedule
     public function setCommand($command)
     {
         $this->command = $command;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getArguments()
+    {
+        return $this->arguments;
+    }
+
+    /**
+     * @param array $arguments
+     * @return Schedule
+     */
+    public function setArguments(array $arguments)
+    {
+        sort($arguments);
+
+        $this->arguments = $arguments;
+        $this->argumentsHash = md5(json_encode($arguments));
 
         return $this;
     }
