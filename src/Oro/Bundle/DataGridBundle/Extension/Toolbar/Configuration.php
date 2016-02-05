@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
      */
     public function __construct(ConfigManager $cm)
     {
-        $this->defaultPerPage = (int) $cm->get('oro_data_grid.default_per_page');
+        $this->defaultPerPage = $cm->get('oro_data_grid.default_per_page');
     }
 
     /**

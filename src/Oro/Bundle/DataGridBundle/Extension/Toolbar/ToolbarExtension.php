@@ -85,7 +85,7 @@ class ToolbarExtension extends AbstractExtension
          *  ];
          */
 
-        $perPageDefault = (int) $config->offsetGetByPath(self::PAGER_DEFAULT_PER_PAGE_OPTION_PATH);
+        $perPageDefault = $config->offsetGetByPath(self::PAGER_DEFAULT_PER_PAGE_OPTION_PATH);
         $pageSizeItems  = $config->offsetGetByPath(self::PAGER_ITEMS_OPTION_PATH);
 
         $exist = array_filter(
