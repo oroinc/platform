@@ -7,7 +7,6 @@ use Symfony\Component\Routing\Route;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Provider\PublicResourcesLoader;
-use Oro\Bundle\ApiBundle\Request\PublicResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -44,6 +43,9 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
     /** @var string[] */
     protected $defaultFormat;
+
+    /** @var array */
+    private $supportedEntities;
 
     /**
      * @param bool|string|null      $isApplicationInstalled
@@ -84,8 +86,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
             $this->setFormatAttribute($route);
 
-            $entities = $this->getSupportedEntityClasses();
-
+            $entities = $this->getSupportedEntities();
             if (!empty($entities)) {
                 $this->adjustRoutes($route, $routes, $entities);
             }
@@ -93,40 +94,46 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * @return string[]
+     * @return array [[entity class, entity plural alias], ...]
      */
-    protected function getSupportedEntityClasses()
+    protected function getSupportedEntities()
     {
-        $resources = $this->resourcesLoader->getResources(
-            Version::LATEST,
-            [RequestType::REST, RequestType::JSON_API]
-        );
+        if (null === $this->supportedEntities) {
+            $resources = $this->resourcesLoader->getResources(
+                Version::LATEST,
+                [RequestType::REST, RequestType::JSON_API]
+            );
 
-        return array_map(
-            function (PublicResource $resource) {
-                return $resource->getEntityClass();
-            },
-            $resources
-        );
+            $this->supportedEntities = [];
+            foreach ($resources as $resource) {
+                $className   = $resource->getEntityClass();
+                $pluralAlias = $this->entityAliasResolver->getPluralAlias($className);
+                if (!empty($pluralAlias)) {
+                    $this->supportedEntities[] = [
+                        $className,
+                        $pluralAlias
+                    ];
+                }
+            }
+        }
+
+        return $this->supportedEntities;
     }
 
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param string[]                $entities
+     * @param array                   $entities [[entity class, entity plural alias], ...]
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
         $routeName = $routes->getName($route);
 
-        foreach ($entities as $className) {
-            $entity = $this->entityAliasResolver->getPluralAlias($className);
-            if (empty($entity)) {
-                continue;
-            }
+        foreach ($entities as $entity) {
+            list($className, $pluralAlias) = $entity;
 
             $existingRoute = $routes->getByPath(
-                str_replace(self::ENTITY_PLACEHOLDER, $entity, $route->getPath()),
+                str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $route->getPath()),
                 $route->getMethods()
             );
             if ($existingRoute) {
@@ -137,8 +144,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
-                $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $entity, $strictRoute->getPath()));
-                $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $entity);
+                $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $strictRoute->getPath()));
+                $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $pluralAlias);
                 $requirements = $strictRoute->getRequirements();
                 unset($requirements[self::ENTITY_ATTRIBUTE]);
                 $strictRoute->setRequirements($requirements);

@@ -30,6 +30,9 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
+    /** @var array */
+    private $supportedActivities;
+
     /**
      * @param ConfigProvider      $groupingConfigProvider
      * @param EntityAliasResolver $entityAliasResolver
@@ -50,7 +53,24 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
         }
 
         if ($this->hasAttribute($route, self::ACTIVITY_PLACEHOLDER)) {
-            $activities = array_map(
+            $activities = $this->getSupportedActivities();
+            if (!empty($activities)) {
+                $this->adjustRoutes($route, $routes, $activities);
+                $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
+            }
+            $this->completeRouteRequirements($route);
+        } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
+            $this->completeRouteRequirements($route);
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getSupportedActivities()
+    {
+        if (null === $this->supportedActivities) {
+            $this->supportedActivities = array_map(
                 function (ConfigInterface $config) {
                     // convert to entity alias
                     return $this->entityAliasResolver->getPluralAlias(
@@ -68,15 +88,9 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
                     }
                 )
             );
-
-            if (!empty($activities)) {
-                $this->adjustRoutes($route, $routes, $activities);
-                $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
-            }
-            $this->completeRouteRequirements($route);
-        } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
-            $this->completeRouteRequirements($route);
         }
+
+        return $this->supportedActivities;
     }
 
     /**
