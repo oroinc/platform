@@ -22,7 +22,7 @@ define(function(require) {
             'input input.filter':            'filterChange'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             if (!_.has(options, 'attachedCollection')) {
                 throw new Error('Required option "attachedCollection" not found.');
             }
