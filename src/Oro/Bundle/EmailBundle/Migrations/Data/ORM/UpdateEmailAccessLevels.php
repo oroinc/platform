@@ -59,6 +59,9 @@ class UpdateEmailAccessLevels extends AbstractFixture implements ContainerAwareI
         }
     }
 
+    /**
+     * @param AclManager $manager
+     */
     protected function updateUserRole(AclManager $manager)
     {
         $roles = [LoadRolesData::ROLE_USER, LoadRolesData::ROLE_MANAGER];
@@ -66,13 +69,20 @@ class UpdateEmailAccessLevels extends AbstractFixture implements ContainerAwareI
             $role = $this->getRole($roleName);
             if ($role) {
                 $sid = $manager->getSid($role);
-
                 $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\EmailUser');
-                $maskBuilder = $manager->getMaskBuilder($oid)
-                    ->add('VIEW_BASIC')
-                    ->add('CREATE_BASIC')
-                    ->add('EDIT_BASIC');
-                $manager->setPermission($sid, $oid, $maskBuilder->get());
+
+                $extension = $manager->getExtensionSelector()->select($oid);
+                $maskBuilders = $extension->getAllMaskBuilders();
+
+                foreach ($maskBuilders as $maskBuilder) {
+                    foreach (['VIEW_BASIC', 'CREATE_BASIC', 'EDIT_BASIC'] as $permission) {
+                        if ($maskBuilder->hasMask('MASK_' . $permission)) {
+                            $maskBuilder->add($permission);
+                        }
+                    }
+
+                    $manager->setPermission($sid, $oid, $maskBuilder->get());
+                }
             }
         }
     }
