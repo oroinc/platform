@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
@@ -33,7 +34,11 @@ class EnumFilter extends BaseMultiChoiceFilter
             unset($params['class']);
         }
         if (isset($params['enum_code'])) {
-            $params[FilterUtility::FORM_OPTIONS_KEY]['enum_code'] = $params['enum_code'];
+            $params[FilterUtility::FORM_OPTIONS_KEY] = [
+                'enum_code' => $params['enum_code'],
+                'class' => ExtendHelper::buildEnumValueClassName($params['enum_code'])
+            ];
+            $params['class'] = ExtendHelper::buildEnumValueClassName($params['enum_code']);
             unset($params['enum_code']);
         }
         parent::init($name, $params);
