@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery;
 
 class OroSecurityBundle implements Migration
 {
@@ -31,6 +32,8 @@ class OroSecurityBundle implements Migration
         /** Foreign keys generation **/
         $this->addOroSecurityPermApplyEntityForeignKeys($schema);
         $this->addOroSecurityPermExclEntityForeignKeys($schema);
+
+        $queries->addPostQuery(new LoadBasePermissionsQuery());
     }
 
     /**
