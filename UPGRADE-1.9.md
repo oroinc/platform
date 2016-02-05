@@ -35,6 +35,9 @@ UPGRADE FROM 1.8 to 1.9
 - Removed method `loadStoredSettings` of `Oro\Bundle\ConfigBundle\Config\ConfigManager`.
 - Removed class `Oro\Bundle\ConfigBundle\Manager\UserConfigManager` and service `oro_config.user_config_manager`. Use `oro_config.user` service instead.
 
+####CronBundle
+ - Command `oro:cron:daemon` was renamed to `oro:daemon` and it is no longer executed by cron
+
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
 - `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` has `@InheritanceType("SINGLE_TABLE")`
