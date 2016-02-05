@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
-use Doctrine\ORM\Query\Parameter;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Extension\StoreSql\StoreSqlExtension;
 
@@ -16,23 +18,12 @@ class StoreSqlListener
      */
     public function onResultAfter(OrmResultAfter $event)
     {
-        if ($event->getDatagrid()->getParameters()->get(StoreSqlExtension::SHOW_SQL_SOURCE, false)) {
-            $query = $event->getQuery();
-            $event->getDatagrid()->getConfig()->offsetAddToArrayByPath(
+        $config = $event->getDatagrid()->getConfig();
+        $path   = sprintf('%s[%s]', MetadataObject::OPTIONS_KEY, StoreSqlExtension::STORE_SQL);
+        if ($config->offsetGetByPath($path, false)) {
+            $config->offsetAddToArrayByPath(
                 StoreSqlExtension::STORED_SQL_PATH,
-                [
-                    'sql'        => $query->getSQL(),
-                    'parameters' => array_map(
-                        function (Parameter $parameter) {
-                            return [
-                                'name'  => $parameter->getName(),
-                                'value' => $parameter->getValue(),
-                                'type'  => $parameter->getType()
-                            ];
-                        }
-                        , $query->getParameters()->toArray()
-                    )
-                ]
+                [StoreSqlExtension::SQL => QueryUtils::getExecutableSql($event->getQuery())]
             );
         }
     }

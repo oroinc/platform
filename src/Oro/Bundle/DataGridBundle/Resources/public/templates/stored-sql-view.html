@@ -1,1 +1,7 @@
-<%= sql %>
+<div class="sql-source-container">
+    <a href="#" id="show-sql-source-link"><%= linkLabel %></a>
+    <div id="sql-source-box-<%= gridName %>" style="display: none;">
+        <pre class="sql-source-code"><%= sql %></pre>
+        <a href="#" id="copy-sql-source"><%=  _.__('Copy to Clipboard') %></a>
+    </div>
+</div>

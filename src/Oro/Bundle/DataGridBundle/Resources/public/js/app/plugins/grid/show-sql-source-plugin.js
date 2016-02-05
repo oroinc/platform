@@ -8,13 +8,12 @@ define(function(require) {
 
     ShowSqlSourcePlugin = BasePlugin.extend({
         enable: function() {
-            //this.listenTo(this.main, 'all', console.log.bind(console));
             this.view = new ShowSqlSourceView({
                 grid: this.main,
                 metadata: this.options.data.metadata
             });
             this.view.render();
-            this.main.$el.after(this.view.$el);
+            this.main.$el.append(this.view.$el);
             this.view.listenTo(this.main, 'content:update', this.view.onUpdate);
             this.view.listenTo(this.main, 'render', this.view.render);
             ShowSqlSourcePlugin.__super__.enable.call(this);

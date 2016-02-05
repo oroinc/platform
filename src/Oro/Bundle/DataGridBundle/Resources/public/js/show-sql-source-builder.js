@@ -17,7 +17,7 @@ define(function(require) {
          * @param {Object} [options.metadata] configuration for the grid
          */
         init: function(deferred, options) {
-            if (tools.isMobile() || !options.metadata.options.show_sql_source) {
+            if (tools.isMobile() || !options.data.metadata.display_sql_source) {
                 deferred.resolve();
                 return;
             }
