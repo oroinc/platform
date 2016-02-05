@@ -11,8 +11,8 @@ define(['jquery'], function($) {
          * @returns {boolean}
          */
         hasNotEmptyInput: function(group) {
-            var elementsSelector = 'input[type!="checkbox"][type!="radio"][type!="button"][data-required]' +
-                'input[type="radio"][data-required]:checked,' +
+            var elementsSelector = 'input[type!="checkbox"][type!="radio"][type!="button"][data-required], ' +
+                ' input[type="radio"][data-required]:checked,' +
                 ' input[type="checkbox"][data-required]:checked';
             var checkedElements = group.find(elementsSelector);
             for (var i = 0; i < checkedElements.length; i++) {
