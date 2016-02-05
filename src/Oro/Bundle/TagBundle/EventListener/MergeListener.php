@@ -87,10 +87,8 @@ class MergeListener
             return;
         }
 
-        $masterEntity = $entityData->getMasterEntity();
-        $masterTags   = $this->tagManager->getTags($masterEntity)->getValues();
-        $this->tagManager->setTags($masterEntity, ['all' => $masterTags, 'owner' => $masterTags]);
-        $this->tagManager->saveTagging($masterEntity);
+        $entity = $entityData->getMasterEntity();
+        $this->tagManager->saveTagging($entity);
     }
 
     /**
