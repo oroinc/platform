@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Tests\Unit\Migration;
+namespace Oro\Bundle\SecurityBundle\Tests\Unit\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Oro\Bundle\SecurityBundle\Migration\UpdateAclEntriesMigrationQuery;
+use Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery;
 
 class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +31,10 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
     /** @var UpdateAclEntriesMigrationQuery */
     protected $query;
+
+    /** @var array */
+    protected $keys = ['id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id',
+        'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure'];
 
     protected function setUp()
     {
@@ -53,13 +57,13 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $this->aclCache = $this->getMock('Symfony\Component\Security\Acl\Model\AclCacheInterface');
 
         $this->query = new UpdateAclEntriesMigrationQuery(
-            $this->connection,
             $this->aclManager,
             $this->aclCache,
             self::ENTRIES_TABLE_NAME,
             self::OBJECT_IDENTITIES_TABLE_NAME,
             self::ACL_CLASSES_TABLE_NAME
         );
+        $this->query->setConnection($this->connection);
     }
 
     protected function tearDown()
@@ -69,7 +73,11 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDescription()
     {
-        $this->assertEquals(
+        $this->assertConnectionCalled(true);
+        $this->assertEntityAclExtensionCalled();
+        $this->assertAclCacheCleared(true);
+
+        $this->assertContains(
             'Update all ACE`s mask to support EntityMaskBuilder with dynamical identities',
             $this->query->getDescription()
         );
@@ -77,59 +85,11 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        $this->connection->expects($this->once())
-            ->method('fetchAll')
-            ->with($this->isType('string'))
-            ->willReturn($this->getAces());
-        $this->connection->expects($this->exactly(count($this->getAcesData()) * count($this->getMaskBuilders())))
-            ->method('executeUpdate')
-            ->with($this->isType('string'))
-            ->willReturn($this->getAces());
-
+        $this->assertConnectionCalled();
         $this->assertEntityAclExtensionCalled();
         $this->assertAclCacheCleared();
 
-        $logger = new ArrayLogger();
-
-        $this->query->execute($logger);
-
-        $expectedMessages = [
-            'UPDATE acl_entries SET mask = 32767 WHERE id = 1',
-            'UPDATE acl_entries SET mask = 32767 WHERE id = 2',
-            'UPDATE acl_entries SET mask = 32767 WHERE id = 3',
-            'UPDATE acl_entries SET mask = 32767 WHERE id = 4',
-            'UPDATE acl_entries SET mask = 32767 WHERE id = 5',
-
-            'VALUES (1, 1, NULL, 2, 1, 65535, 1, \'all\', 0, 0)',
-            'VALUES (1, 1, NULL, 3, 1, 65536, 1, \'all\', 0, 0)',
-
-            'VALUES (2, 1, NULL, 1, 1, 65535, 1, \'all\', 0, 0)',
-            'VALUES (2, 1, NULL, 2, 1, 65536, 1, \'all\', 0, 0)',
-
-            'VALUES (1, NULL, NULL, 1, 1, 65535, 1, \'all\', 0, 0)',
-            'VALUES (1, NULL, NULL, 2, 1, 65536, 1, \'all\', 0, 0)',
-
-            'VALUES (1, 2, NULL, 1, 1, 65535, 1, \'all\', 0, 0)',
-            'VALUES (1, 2, NULL, 2, 1, 65536, 1, \'all\', 0, 0)',
-
-            'VALUES (1, 1, NULL, 4, 2, 65535, 1, \'all\', 0, 0)',
-            'VALUES (1, 1, NULL, 5, 2, 65536, 1, \'all\', 0, 0)',
-        ];
-
-        $messages = $logger->getMessages();
-
-        foreach ($expectedMessages as $expectedMessage) {
-            $found = false;
-
-            foreach ($messages as $message) {
-                if (strpos($message, $expectedMessage) !== false) {
-                    $found = true;
-                    break;
-                }
-            }
-
-            $this->assertTrue($found, sprintf('Could not find expected message: "%s"', $expectedMessage));
-        }
+        $this->query->execute(new ArrayLogger());
     }
 
     /**
@@ -137,12 +97,9 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
      */
     protected function getAces()
     {
-        $keys = ['id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id', 'mask',
-            'granting', 'granting_strategy', 'audit_success', 'audit_failure', 'class_type'];
-
         return array_map(
-            function (array $values) use ($keys) {
-                return array_combine($keys, $values);
+            function (array $values) {
+                return array_combine($this->keys, $values);
             },
             $this->getAcesData()
         );
@@ -172,9 +129,42 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
             ->willReturn($extensionSelector);
     }
 
-    protected function assertAclCacheCleared()
+    /**
+     * @param bool $noUpdates
+     */
+    protected function assertConnectionCalled($noUpdates = false)
     {
-        $this->aclCache->expects($this->once())->method('clearCache');
+        $this->connection->expects($this->once())
+            ->method('fetchAll')
+            ->with($this->isType('string'))
+            ->willReturn($this->getAces());
+
+        $updatesCount = $noUpdates ? 0 : count($this->getAcesData()) * count($this->getMaskBuilders());
+        $data = $updatesCount ? $this->getExpectedExecuteUpdateParams() : [];
+
+        $this->connection->expects($this->exactly($updatesCount))
+            ->method('executeUpdate')
+            ->willReturnCallback(
+                function ($query, array $params = [], array $types = []) use (&$data) {
+                    $index = array_search($params, $data, true);
+
+                    $this->assertTrue($index !== false);
+                    $this->assertContains(
+                        (count($data[$index]) > 2 ? 'INSERT INTO ' : 'UPDATE ') . self::ENTRIES_TABLE_NAME,
+                        $query
+                    );
+
+                    unset($data[$index]);
+                }
+            );
+    }
+
+    /**
+     * @param bool $never
+     */
+    protected function assertAclCacheCleared($never = false)
+    {
+        $this->aclCache->expects($never ? $this->never() : $this->once())->method('clearCache');
     }
 
     /**
@@ -195,11 +185,50 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
     protected function getAcesData()
     {
         return [
-            [1, 1,    1, null, 0, 1, (1 << 30) - 1, true, 'all', false, false, '(root)'],
-            [2, 2,    1, null, 0, 1, (1 << 15) - 1, true, 'all', false, false, 'TestEntity'],
-            [3, 1, null, null, 0, 1, (1 << 30) - 1, true, 'all', false, false, '(root)'],
-            [4, 1,    2, null, 0, 1, (1 << 30) - 1, true, 'all', false, false, '(root)'],
-            [5, 1,    1, null, 1, 2, (1 << 30) - 1, true, 'all', false, false, '(root)']
+            [1, 1,    1, null, 0, 1, (1 << 30) - 1, true, 'all', false, false],
+            [2, 2,    1, null, 0, 1, (1 << 15) - 1, true, 'all', false, false],
+            [3, 1, null, null, 0, 1, (1 << 30) - 1, true, 'all', false, false],
+            [4, 1,    2, null, 0, 1, (1 << 30) - 1, true, 'all', false, false],
+            [5, 1,    1, null, 1, 2, (1 << 30) - 1, true, 'all', false, false]
         ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExpectedExecuteUpdateParams()
+    {
+        $keys = $this->keys;
+        array_shift($keys);
+
+        $data = array_map(
+            function (array $values) use ($keys) {
+                return array_combine($keys, $values);
+            },
+            [
+                [1,    1, null, 2, 1, 65535, true, 'all', false, false],
+                [1,    1, null, 3, 1, 65536, true, 'all', false, false],
+                [2,    1, null, 1, 1, 65535, true, 'all', false, false],
+                [2,    1, null, 2, 1, 65536, true, 'all', false, false],
+                [1, null, null, 1, 1, 65535, true, 'all', false, false],
+                [1, null, null, 2, 1, 65536, true, 'all', false, false],
+                [1,    2, null, 1, 1, 65535, true, 'all', false, false],
+                [1,    2, null, 2, 1, 65536, true, 'all', false, false],
+                [1,    1, null, 4, 2, 65535, true, 'all', false, false],
+                [1,    1, null, 5, 2, 65536, true, 'all', false, false]
+            ]
+        );
+        $data = array_merge(
+            [
+                ['mask' => 32767, 'id' => 1],
+                ['mask' => 32767, 'id' => 2],
+                ['mask' => 32767, 'id' => 3],
+                ['mask' => 32767, 'id' => 4],
+                ['mask' => 32767, 'id' => 5]
+            ],
+            $data
+        );
+
+        return $data;
     }
 }

@@ -1,24 +1,20 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Migration;
+namespace Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Type;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
-use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 
-class UpdateAclEntriesMigrationQuery implements MigrationQuery
+class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
 {
-    /** @var Connection */
-    protected $connection;
-
     /** @var AclManager */
     protected $aclManager;
 
@@ -36,9 +32,6 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
 
     /** @var string */
     protected $aclClassesTableName;
-
-    /** @var string[] */
-    protected $queries = [];
 
     /** @var array */
     protected $masks = [
@@ -75,7 +68,6 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
     ];
 
     /**
-     * @param Connection $connection
      * @param AclManager $aclManager
      * @param AclCacheInterface $aclCache
      * @param string $entriesTableName
@@ -83,14 +75,14 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
      * @param string $aclClassesTableName
      */
     public function __construct(
-        Connection $connection,
         AclManager $aclManager,
         AclCacheInterface $aclCache,
         $entriesTableName,
         $objectIdentitiesTableName,
         $aclClassesTableName
     ) {
-        $this->connection = $connection;
+        parent::__construct();
+
         $this->aclManager = $aclManager;
         $this->aclCache = $aclCache;
         $this->entriesTableName = $entriesTableName;
@@ -103,31 +95,25 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
      */
     public function getDescription()
     {
-        return 'Update all ACE`s mask to support EntityMaskBuilder with dynamical identities';
+        $messages = parent::getDescription();
+
+        array_unshift($messages, 'Update all ACE`s mask to support EntityMaskBuilder with dynamical identities');
+
+        return $messages;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function execute(LoggerInterface $logger)
+    protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
-        $sql = 'SELECT e.*
-                FROM %s AS o
-                INNER JOIN %s AS c ON c.id = o.class_id
-                LEFT JOIN %s AS e ON e.class_id = o.class_id
-                  AND (e.object_identity_id = o.id OR e.object_identity_id IS NULL)
-                WHERE o.object_identifier = %s';
+        $query = $this->getSqlForSelectByObjectIdentifier();
+        $params = ['oid' => EntityAclExtension::NAME];
+        $types  = ['field' => Type::STRING];
 
-        $rows = $this->connection->fetchAll(
-            sprintf(
-                $sql,
-                $this->objectIdentitiesTableName,
-                $this->aclClassesTableName,
-                $this->entriesTableName,
-                $this->connection->quote(EntityAclExtension::NAME)
-            )
-        );
+        $this->logQuery($logger, $query, $params, $types);
 
+        $rows = $rows = $this->connection->fetchAll($query, $params, $types);
         $groupedAces = [];
 
         foreach ($rows as $row) {
@@ -148,6 +134,8 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
                 $forUpdate[$key][$aceOrder] = $ace;
                 $groupedAces[$key][$aceOrder] = $ace;
 
+                unset($ace['id']);
+
                 for ($i = 1; $i < count($newMasks); $i++) {
                     $newAceOrder = max(array_keys($groupedAces[$key])) + 1;
 
@@ -163,22 +151,10 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
         $this->updateAces($forUpdate);
         $this->insertAces($forInsert);
 
-        foreach ($this->queries as $query) {
-            $logger->notice($query);
-            $this->connection->executeUpdate($query);
-        }
+        parent::processQueries($logger, $dryRun);
 
-        $this->aclCache->clearCache();
-    }
-
-    /**
-     * @param int[] $masks
-     * @param ObjectIdentity $oid
-     */
-    protected function validateMasks($masks, ObjectIdentity $oid)
-    {
-        foreach ($masks as $mask) {
-            $this->getAclExtension()->validateMask($mask, $oid);
+        if (!$dryRun) {
+            $this->aclCache->clearCache();
         }
     }
 
@@ -187,11 +163,15 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
      */
     protected function updateAces(array $aces)
     {
-        $sql = 'UPDATE %s SET mask = %d WHERE id = %d';
+        $query = sprintf('UPDATE %s SET mask = :mask WHERE id = :id', $this->entriesTableName);
 
         foreach ($aces as $rows) {
             foreach ($rows as $ace) {
-                $this->addSql(sprintf($sql, $this->entriesTableName, $ace['mask'], $ace['id']));
+                $this->addSql(
+                    $query,
+                    ['mask' => $ace['mask'], 'id' => $ace['id']],
+                    ['mask' => Type::INTEGER, 'id' => Type::INTEGER]
+                );
             }
         }
     }
@@ -201,39 +181,25 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
      */
     protected function insertAces(array $aces)
     {
-        $sql = 'INSERT INTO %s (
-                  class_id,
-                  object_identity_id,
-                  field_name,
-                  ace_order,
-                  security_identity_id,
-                  mask,
-                  granting,
-                  granting_strategy,
-                  audit_success,
-                  audit_failure
-                )
-                VALUES (%d, %s, %s, %d, %d, %d, %s, %s, %s, %s)';
-
-        $databasePlatform = $this->connection->getDatabasePlatform();
+        $query = $this->getSqlForInsert();
 
         foreach ($aces as $rows) {
             foreach ($rows as $ace) {
                 $this->addSql(
-                    sprintf(
-                        $sql,
-                        $this->entriesTableName,
-                        $ace['class_id'],
-                        null === $ace['object_identity_id'] ? 'NULL' : (int)$ace['object_identity_id'],
-                        null === $ace['field_name'] ? 'NULL' : $this->connection->quote($ace['field_name']),
-                        $ace['ace_order'],
-                        $ace['security_identity_id'],
-                        $ace['mask'],
-                        $databasePlatform->convertBooleans($ace['granting']),
-                        $this->connection->quote($ace['granting_strategy']),
-                        $databasePlatform->convertBooleans($ace['audit_success']),
-                        $databasePlatform->convertBooleans($ace['audit_failure'])
-                    )
+                    $query,
+                    $ace,
+                    [
+                        'class_id' => Type::INTEGER,
+                        'object_identity_id' => Type::STRING,
+                        'field_name' => Type::STRING,
+                        'ace_order' => Type::INTEGER,
+                        'security_identity_id' => Type::INTEGER,
+                        'mask' => Type::INTEGER,
+                        'granting' => Type::BOOLEAN,
+                        'granting_strategy' => Type::STRING,
+                        'audit_success' => Type::BOOLEAN,
+                        'audit_failure' => Type::BOOLEAN
+                    ]
                 );
             }
         }
@@ -280,10 +246,31 @@ class UpdateAclEntriesMigrationQuery implements MigrationQuery
     }
 
     /**
-     * @param string $query
+     * @return string
      */
-    public function addSql($query)
+    protected function getSqlForSelectByObjectIdentifier()
     {
-        $this->queries[] = $query;
+        return sprintf(
+            'SELECT e.* FROM %s AS o INNER JOIN %s AS c ON c.id = o.class_id LEFT JOIN %s AS e ' .
+            'ON e.class_id = o.class_id AND (e.object_identity_id = o.id OR e.object_identity_id IS NULL) ' .
+            'WHERE o.object_identifier = :oid',
+            $this->objectIdentitiesTableName,
+            $this->aclClassesTableName,
+            $this->entriesTableName
+        );
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSqlForInsert()
+    {
+        return sprintf(
+            'INSERT INTO %s (class_id, object_identity_id, field_name, ace_order, security_identity_id, mask, ' .
+            'granting, granting_strategy, audit_success, audit_failure) VALUES (:class_id, :object_identity_id, ' .
+            ':field_name, :ace_order, :security_identity_id, :mask, :granting, :granting_strategy, :audit_success, ' .
+            ':audit_failure)',
+            $this->entriesTableName
+        );
     }
 }
