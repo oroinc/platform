@@ -5,54 +5,32 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectPublicResources;
 use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\CollectPublicResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\LoadDictionaries;
 use Oro\Bundle\ApiBundle\Request\PublicResource;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class LoadDictionariesTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
+    protected $dictionaryProvider;
 
     /** @var LoadDictionaries */
     protected $processor;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->dictionaryProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new LoadDictionaries($this->configManager);
+        $this->processor = new LoadDictionaries($this->dictionaryProvider);
     }
 
     public function testProcess()
     {
         $context = new CollectPublicResourcesContext();
 
-        $this->configManager->expects($this->once())
-            ->method('getConfigs')
-            ->with('grouping', null, true)
-            ->willReturn(
-                [
-                    $this->getEntityConfig('grouping', 'Test\Entity1', ['groups' => ['dictionary']]),
-                    $this->getEntityConfig('grouping', 'Test\Entity2', ['groups' => ['dictionary', 'another_group']]),
-                    $this->getEntityConfig('grouping', 'Test\Entity3', ['groups' => ['dictionary']]),
-                    $this->getEntityConfig('grouping', 'Test\Entity4'),
-                ]
-            );
-        $this->configManager->expects($this->exactly(3))
-            ->method('getEntityConfig')
-            ->willReturnMap(
-                [
-                    ['extend', 'Test\Entity1', $this->getEntityConfig('extend', 'Test\Entity1')],
-                    ['extend', 'Test\Entity2', $this->getEntityConfig('extend', 'Test\Entity2')],
-                    [
-                        'extend',
-                        'Test\Entity3',
-                        $this->getEntityConfig('extend', 'Test\Entity3', ['is_extend' => true, 'is_deleted' => true])
-                    ],
-                ]
-            );
+        $this->dictionaryProvider->expects($this->once())
+            ->method('getSupportedEntityClasses')
+            ->willReturn(['Test\Entity1', 'Test\Entity2']);
 
         $this->processor->process($context);
 
@@ -63,21 +41,5 @@ class LoadDictionariesTest extends \PHPUnit_Framework_TestCase
             ],
             $context->getResult()->toArray()
         );
-    }
-
-    /**
-     * @param string $scope
-     * @param string $className
-     * @param array  $values
-     *
-     * @return Config
-     */
-    protected function getEntityConfig($scope, $className, $values = [])
-    {
-        $configId = new EntityConfigId($scope, $className);
-        $config   = new Config($configId);
-        $config->setValues($values);
-
-        return $config;
     }
 }

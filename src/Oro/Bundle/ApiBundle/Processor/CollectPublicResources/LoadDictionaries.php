@@ -5,24 +5,22 @@ namespace Oro\Bundle\ApiBundle\Processor\CollectPublicResources;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Request\PublicResource;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 
 /**
  * Collects resources for all entities marked as a dictionary.
  */
 class LoadDictionaries implements ProcessorInterface
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var ChainDictionaryValueListProvider */
+    protected $dictionaryProvider;
 
     /**
-     * @param ConfigManager $configManager
+     * @param ChainDictionaryValueListProvider $dictionaryProvider
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ChainDictionaryValueListProvider $dictionaryProvider)
     {
-        $this->configManager = $configManager;
+        $this->dictionaryProvider = $dictionaryProvider;
     }
 
     /**
@@ -33,17 +31,9 @@ class LoadDictionaries implements ProcessorInterface
         /** @var CollectPublicResourcesContext $context */
 
         $resources = $context->getResult();
-        $configs   = $this->configManager->getConfigs('grouping', null, true);
-        foreach ($configs as $config) {
-            $groups = $config->get('groups');
-            if (!empty($groups)
-                && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)
-                && ExtendHelper::isEntityAccessible(
-                    $this->configManager->getEntityConfig('extend', $config->getId()->getClassName())
-                )
-            ) {
-                $resources->add(new PublicResource($config->getId()->getClassName()));
-            }
+        $entities  = $this->dictionaryProvider->getSupportedEntityClasses();
+        foreach ($entities as $entityClass) {
+            $resources->add(new PublicResource($entityClass));
         }
     }
 }
