@@ -9,7 +9,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\SecurityBundle\Migration\UpdateAclEntriesMigrationQuery;
 
 class OroSecurityBundle implements Migration, ContainerAwareInterface
 {
@@ -31,7 +30,6 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
     {
         $queries->addQuery(
             new UpdateAclEntriesMigrationQuery(
-                $this->container->get('doctrine.dbal.default_connection'),
                 $this->container->get('oro_security.acl.manager'),
                 $this->container->get('security.acl.cache'),
                 $this->container->getParameter('security.acl.dbal.entry_table_name'),
