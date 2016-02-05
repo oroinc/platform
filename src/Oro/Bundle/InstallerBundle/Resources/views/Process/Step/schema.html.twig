@@ -6,7 +6,7 @@
 {% if dropDatabase %}
     {% set steps = steps|merge(['schema-drop', 'clear-config', 'clear-extend']) %}
 {% endif %}
-{% set steps = steps|merge(['schema-update', 'workflows', 'processes', 'fixtures']) %}
+{% set steps = steps|merge(['schema-update', 'permissions', 'workflows', 'processes', 'fixtures']) %}
 
 {% block title %}{{ 'process.step.schema.header'|trans }} - {{ parent() }}{% endblock %}
 

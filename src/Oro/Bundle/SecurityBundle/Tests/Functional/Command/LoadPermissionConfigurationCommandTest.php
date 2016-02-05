@@ -57,9 +57,9 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
                     'Loading permissions...',
                 ],
                 'expectedPermissions' => [
-                    'PERMISSION1',
-                    'PERMISSION2',
-                    'PERMISSION3',
+                    'TEST_PERMISSION1',
+                    'TEST_PERMISSION2',
+                    'TEST_PERMISSION3',
                 ],
             ]
         ];

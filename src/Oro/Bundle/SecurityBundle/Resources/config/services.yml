@@ -620,3 +620,5 @@ services:
 
     oro_security.configuration.builder.permission_configuration:
         class: %oro_security.configuration.builder.permission_configuration.class%
+        arguments:
+            - @doctrine

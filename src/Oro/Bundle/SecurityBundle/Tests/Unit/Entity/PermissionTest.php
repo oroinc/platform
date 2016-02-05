@@ -68,30 +68,30 @@ class PermissionTest extends \PHPUnit_Framework_TestCase
         return [
             'name' => [
                 'propertyName' => 'name',
-                'testValue' => 'test name',
+                'value' => 'test name',
             ],
             'label' => [
                 'propertyName' => 'label',
-                'testValue' => 'test label',
+                'value' => 'test label',
             ],
             'applyToAll' => [
                 'propertyName' => 'applyToAll',
-                'testValue' => 'false',
+                'value' => 'false',
                 'defaultValue' => true,
             ],
             'applyToEntities' => [
                 'propertyName' => 'applyToEntities',
-                'testValue' => ['Entity1', 'Entity2'],
+                'value' => new ArrayCollection(['Entity1', 'Entity2']),
                 'defaultValue' => new ArrayCollection(),
             ],
             'excludeEntities' => [
                 'propertyName' => 'excludeEntities',
-                'testValue' => ['Entity1', 'Entity2'],
+                'value' => new ArrayCollection(['Entity1', 'Entity2']),
                 'defaultValue' => new ArrayCollection(),
             ],
             'groupNames' => [
                 'propertyName' => 'groupNames',
-                'testValue' => ['group1', 'group2'],
+                'value' => ['group1', 'group2'],
                 'defaultValue' => new ArrayCollection(),
             ],
         ];

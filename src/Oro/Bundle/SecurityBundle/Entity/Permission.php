@@ -3,22 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Table("oro_security_permission")
  * @ORM\Entity()
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "security"={
- *              "type"="ACL",
- *              "group_name"=""
- *          }
- *      }
- * )
  */
 class Permission
 {
@@ -53,23 +43,41 @@ class Permission
     protected $applyToAll = true;
 
     /**
-     * @var array
+     * @var Collection|PermissionEntity[]
      *
-     * @ORM\Column(name="apply_to_entities", type="json_array", nullable=true)
-     */
+     * @ORM\ManyToMany(targetEntity="PermissionEntity", cascade={"persist"})
+     * @ORM\JoinTable(
+     *      name="oro_security_perm_apply_entity",
+     *      joinColumns={
+     *          @ORM\JoinColumn(name="permission_id", referencedColumnName="id", onDelete="CASCADE")
+     *      },
+     *      inverseJoinColumns={
+     *          @ORM\JoinColumn(name="permission_entity_id", referencedColumnName="id", onDelete="CASCADE")
+     *      }
+     * )
+     **/
     protected $applyToEntities;
 
     /**
-     * @var array
+     * @var Collection|PermissionEntity[]
      *
-     * @ORM\Column(name="exclude_entities", type="json_array", nullable=true)
-     */
+     * @ORM\ManyToMany(targetEntity="PermissionEntity", cascade={"persist"})
+     * @ORM\JoinTable(
+     *      name="oro_security_perm_excl_entity",
+     *      joinColumns={
+     *          @ORM\JoinColumn(name="permission_id", referencedColumnName="id", onDelete="CASCADE")
+     *      },
+     *      inverseJoinColumns={
+     *          @ORM\JoinColumn(name="permission_entity_id", referencedColumnName="id", onDelete="CASCADE")
+     *      }
+     * )
+     **/
     protected $excludeEntities;
 
     /**
      * @var array
      *
-     * @ORM\Column(name="group_names", type="json_array", nullable=true)
+     * @ORM\Column(name="group_names", type="array", nullable=true)
      */
     protected $groupNames;
 
@@ -164,12 +172,38 @@ class Permission
     }
 
     /**
-     * @param array $applyToEntities
+     * @param Collection|PermissionEntity[] $applyToEntities
      * @return $this
      */
-    public function setApplyToEntities(array $applyToEntities = null)
+    public function setApplyToEntities(Collection $applyToEntities = null)
     {
         $this->applyToEntities = $applyToEntities;
+
+        return $this;
+    }
+
+    /**
+     * @param PermissionEntity $permissionEntity
+     * @return $this
+     */
+    public function addApplyToEntities(PermissionEntity $permissionEntity)
+    {
+        if (!$this->applyToEntities->contains($permissionEntity)) {
+            $this->applyToEntities->add($permissionEntity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param PermissionEntity $permissionEntity
+     * @return $this
+     */
+    public function removeApplyToEntity(PermissionEntity $permissionEntity)
+    {
+        if ($this->applyToEntities->contains($permissionEntity)) {
+            $this->applyToEntities->removeElement($permissionEntity);
+        }
 
         return $this;
     }
@@ -183,12 +217,38 @@ class Permission
     }
 
     /**
-     * @param array $excludeEntities
+     * @param Collection|PermissionEntity[] $excludeEntities
      * @return $this
      */
-    public function setExcludeEntities(array $excludeEntities = null)
+    public function setExcludeEntities(Collection $excludeEntities = null)
     {
         $this->excludeEntities = $excludeEntities;
+
+        return $this;
+    }
+
+    /**
+     * @param PermissionEntity $permissionEntity
+     * @return $this
+     */
+    public function addExcludeEntities(PermissionEntity $permissionEntity)
+    {
+        if (!$this->excludeEntities->contains($permissionEntity)) {
+            $this->excludeEntities->add($permissionEntity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param PermissionEntity $permissionEntity
+     * @return $this
+     */
+    public function removeExcludeEntity(PermissionEntity $permissionEntity)
+    {
+        if ($this->excludeEntities->contains($permissionEntity)) {
+            $this->excludeEntities->removeElement($permissionEntity);
+        }
 
         return $this;
     }

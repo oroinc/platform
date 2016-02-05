@@ -434,6 +434,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 ]
             )
             ->runCommand(
+                'oro:permission:configuration:load',
+                [
+                    '--process-isolation' => true
+                ]
+            )
+            ->runCommand(
                 'oro:workflow:definitions:load',
                 [
                     '--process-isolation' => true,

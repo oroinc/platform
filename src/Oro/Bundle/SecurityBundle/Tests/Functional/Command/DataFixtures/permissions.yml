@@ -1,12 +1,12 @@
 permissions:
-    PERMISSION1:
+    TEST_PERMISSION1:
         label: Label for Permission 1
         group_names: frontend
 
-    PERMISSION2:
+    TEST_PERMISSION2:
         label: Label for Permission 2
         description: Permission 2 description
         group_names: ['', 'frontend']
 
-    PERMISSION3:
+    TEST_PERMISSION3:
         label: Label for Permission 3
