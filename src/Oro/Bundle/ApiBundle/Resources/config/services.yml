@@ -78,6 +78,12 @@ services:
             - @oro_api.processor_bag
             - customize_data_item
 
+    oro_api.public_resources_loader:
+        class: Oro\Bundle\ApiBundle\Provider\PublicResourcesLoader
+        public: false
+        arguments:
+            - @oro_api.collect_public_resources.processor
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
@@ -190,8 +196,8 @@ services:
         class: Oro\Bundle\ApiBundle\Routing\RestRouteOptionsResolver
         public: false
         arguments:
-            - @oro_entity_config.entity_manager_bag
-            - @oro_api.entity_exclusion_provider
+            - %installed%
+            - @oro_api.public_resources_loader
             - @oro_entity.entity_alias_resolver
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer

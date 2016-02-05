@@ -6,29 +6,29 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Oro\Bundle\ApiBundle\Provider\PublicResourcesLoader;
+use Oro\Bundle\ApiBundle\Request\PublicResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP         = 'rest_api';
-    const ENTITY_ATTRIBUTE    = 'entity';
-    const ENTITY_PLACEHOLDER  = '{entity}';
-    const ID_ATTRIBUTE        = 'id';
-    const ID_PLACEHOLDER      = '{id}';
-    const FORMAT_ATTRIBUTE    = '_format';
+    const ROUTE_GROUP        = 'rest_api';
+    const ENTITY_ATTRIBUTE   = 'entity';
+    const ENTITY_PLACEHOLDER = '{entity}';
+    const ID_ATTRIBUTE       = 'id';
+    const ID_PLACEHOLDER     = '{id}';
+    const FORMAT_ATTRIBUTE   = '_format';
 
-    /** @var EntityManagerBag */
-    protected $entityManagerBag;
+    /** @var bool */
+    protected $isApplicationInstalled;
 
-    /** @var ExclusionProviderInterface */
-    protected $entityExclusionProvider;
+    /** @var PublicResourcesLoader */
+    protected $resourcesLoader;
 
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
@@ -46,30 +46,30 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     protected $defaultFormat;
 
     /**
-     * @param EntityManagerBag           $entityManagerBag
-     * @param ExclusionProviderInterface $entityExclusionProvider
-     * @param EntityAliasResolver        $entityAliasResolver
-     * @param DoctrineHelper             $doctrineHelper
-     * @param ValueNormalizer            $valueNormalizer
-     * @param string                     $formats
-     * @param string                     $defaultFormat
+     * @param bool|string|null      $isApplicationInstalled
+     * @param PublicResourcesLoader $resourcesLoader
+     * @param EntityAliasResolver   $entityAliasResolver
+     * @param DoctrineHelper        $doctrineHelper
+     * @param ValueNormalizer       $valueNormalizer
+     * @param string                $formats
+     * @param string                $defaultFormat
      */
     public function __construct(
-        EntityManagerBag $entityManagerBag,
-        ExclusionProviderInterface $entityExclusionProvider,
+        $isApplicationInstalled,
+        PublicResourcesLoader $resourcesLoader,
         EntityAliasResolver $entityAliasResolver,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer,
         $formats,
         $defaultFormat
     ) {
-        $this->entityManagerBag        = $entityManagerBag;
-        $this->entityExclusionProvider = $entityExclusionProvider;
-        $this->entityAliasResolver     = $entityAliasResolver;
-        $this->doctrineHelper          = $doctrineHelper;
-        $this->valueNormalizer         = $valueNormalizer;
-        $this->formats                 = $formats;
-        $this->defaultFormat           = $defaultFormat;
+        $this->isApplicationInstalled = !empty($isApplicationInstalled);
+        $this->resourcesLoader        = $resourcesLoader;
+        $this->entityAliasResolver    = $entityAliasResolver;
+        $this->doctrineHelper         = $doctrineHelper;
+        $this->valueNormalizer        = $valueNormalizer;
+        $this->formats                = $formats;
+        $this->defaultFormat          = $defaultFormat;
     }
 
     /**
@@ -77,7 +77,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if ($route->getOption('group') !== self::ROUTE_GROUP) {
+        if (!$this->isApplicationInstalled || $route->getOption('group') !== self::ROUTE_GROUP) {
             return;
         }
 
@@ -97,22 +97,17 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function getSupportedEntityClasses()
     {
-        $entities       = [];
-        $entityManagers = $this->entityManagerBag->getEntityManagers();
-        foreach ($entityManagers as $em) {
-            $allMetadata = SafeDatabaseChecker::getAllMetadata($em);
-            foreach ($allMetadata as $metadata) {
-                if ($metadata->isMappedSuperclass) {
-                    continue;
-                }
-                if ($this->entityExclusionProvider->isIgnoredEntity($metadata->name)) {
-                    continue;
-                }
-                $entities[] = $metadata->name;
-            }
-        }
+        $resources = $this->resourcesLoader->getResources(
+            Version::LATEST,
+            [RequestType::REST, RequestType::JSON_API]
+        );
 
-        return $entities;
+        return array_map(
+            function (PublicResource $resource) {
+                return $resource->getEntityClass();
+            },
+            $resources
+        );
     }
 
     /**
