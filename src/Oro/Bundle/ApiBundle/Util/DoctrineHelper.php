@@ -102,7 +102,9 @@ class DoctrineHelper extends BaseHelper
 
         $idFieldNames = $metadata->getIdentifierFieldNames();
         if (count($idFieldNames) > 0) {
-            $indexedColumns[reset($idFieldNames)] = true;
+            $mapping = $metadata->getFieldMapping(reset($idFieldNames));
+
+            $indexedColumns[$mapping['columnName']] = true;
         }
 
         if (isset($metadata->table['indexes'])) {
