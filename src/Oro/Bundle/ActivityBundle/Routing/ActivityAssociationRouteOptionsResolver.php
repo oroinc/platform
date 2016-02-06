@@ -56,11 +56,13 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
             $activities = $this->getSupportedActivities();
             if (!empty($activities)) {
                 $this->adjustRoutes($route, $routes, $activities);
-                $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
             }
+
             $this->completeRouteRequirements($route);
+            $route->setOption('hidden', true);
         } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
             $this->completeRouteRequirements($route);
+            $route->setOption('hidden', true);
         }
     }
 
@@ -140,6 +142,11 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      */
     protected function completeRouteRequirements(Route $route)
     {
+        if (null === $route->getRequirement(self::ACTIVITY_ATTRIBUTE)
+            && $this->hasAttribute($route, self::ACTIVITY_PLACEHOLDER)
+        ) {
+            $route->setRequirement(self::ACTIVITY_ATTRIBUTE, '\w+');
+        }
         if (null === $route->getRequirement(self::ACTIVITY_ID_ATTRIBUTE)
             && $this->hasAttribute($route, self::ACTIVITY_ID_PLACEHOLDER)
         ) {
