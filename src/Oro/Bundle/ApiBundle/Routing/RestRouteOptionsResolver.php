@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+
 use Oro\Bundle\ApiBundle\Provider\PublicResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
@@ -90,6 +91,9 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             if (!empty($entities)) {
                 $this->adjustRoutes($route, $routes, $entities);
             }
+            $route->setRequirement(self::ENTITY_ATTRIBUTE, '\w+');
+
+            $route->setOption('hidden', true);
         }
     }
 

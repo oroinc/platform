@@ -56,11 +56,11 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
             $entities = $this->getSupportedEntities();
             if (!empty($entities)) {
-                $processedEntities = $this->adjustRoutes($route, $routes, $entities);
-                if (!empty($processedEntities)) {
-                    $route->setRequirement(self::ENTITY_ATTRIBUTE, implode('|', $processedEntities));
-                }
+                $this->adjustRoutes($route, $routes, $entities);
             }
+            $route->setRequirement(self::ENTITY_ATTRIBUTE, '\w+');
+
+            $route->setOption('hidden', true);
         }
     }
 
@@ -87,20 +87,14 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param string[]                $entities [[entity plural alias, url safe class name], ...]
-     *
-     * @return string[] Entity requirements for the default controller
+     * @param array                   $entities [[entity plural alias, url safe class name], ...]
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
-        $result    = [];
         $routeName = $routes->getName($route);
 
         foreach ($entities as $entity) {
             list($pluralAlias, $urlSafeClassName) = $entity;
-
-            $result[] = $pluralAlias;
-            $result[] = $urlSafeClassName;
 
             $existingRoute = $routes->getByPath(
                 str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $route->getPath()),
@@ -139,8 +133,6 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                 );
             }
         }
-
-        return $result;
     }
 
     /**
