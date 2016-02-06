@@ -282,7 +282,7 @@ class AcmeAppBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new HiddenRoutesPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new HiddenRoutesPass());
     }
 }
 ```
