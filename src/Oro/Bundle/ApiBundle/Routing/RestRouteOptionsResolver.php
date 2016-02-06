@@ -188,26 +188,38 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             // single identifier
             $route->setRequirement(
                 self::ID_ATTRIBUTE,
-                $this->valueNormalizer->getRequirement(
-                    $metadata->getTypeOfField(reset($idFields)),
-                    [RequestType::REST, RequestType::JSON_API]
-                )
+                $this->getIdFieldRequirement($metadata->getTypeOfField(reset($idFields)))
             );
         } elseif ($idFieldCount > 1) {
             // combined identifier
             $requirements = [];
             foreach ($idFields as $field) {
-                $requirements[] = $field . '='
-                    . $this->valueNormalizer->getRequirement(
-                        $metadata->getTypeOfField($field),
-                        [RequestType::REST, RequestType::JSON_API]
-                    );
+                $requirements[] = $field . '=' . $this->getIdFieldRequirement($metadata->getTypeOfField($field));
             }
             $route->setRequirement(
                 self::ID_ATTRIBUTE,
                 implode(RestRequest::ARRAY_DELIMITER, $requirements)
             );
         }
+    }
+
+    /**
+     * @param string $fieldType
+     *
+     * @return string
+     */
+    protected function getIdFieldRequirement($fieldType)
+    {
+        $result = $this->valueNormalizer->getRequirement(
+            $fieldType,
+            [RequestType::REST, RequestType::JSON_API]
+        );
+
+        if (ValueNormalizer::DEFAULT_REQUIREMENT === $result) {
+            $result = '[^\.]+';
+        }
+
+        return $result;
     }
 
     /**
