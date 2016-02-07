@@ -154,7 +154,7 @@ services:
             - @oro_api.config_provider
             - @oro_api.field_config_provider
         tags:
-            - { name: oro.api.processor, action: get_config, requstType: json_api, priority: -40 }
+            - { name: oro.api.processor, action: get_config, priority: -40 }
             - { name: oro.api.processor, action: get_field_config, priority: -40 }
             - { name: oro.api.processor, action: get_relation_config, priority: -40 }
 

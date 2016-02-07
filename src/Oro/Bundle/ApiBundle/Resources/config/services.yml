@@ -225,11 +225,11 @@ services:
         arguments:
             - @request_stack
 
-    oro.api.filter_factory:
+    oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory
         public: false
 
-    oro.api.filter_factory.default:
+    oro_api.filter_factory.default:
         class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
         public: false
         calls:
