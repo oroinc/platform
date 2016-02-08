@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Fixtures;
 
 class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testLoadApiConfiguration()
     {
         $bundle1 = new Fixtures\BarBundle\BarBundle();
