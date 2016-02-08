@@ -71,12 +71,12 @@ class EmailBodyBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->at(0))
             ->method('get')
-            ->with('oro_email.attachment_sync_enable')
+            ->with(EmailBodyBuilder::ORO_EMAIL_ATTACHMENT_SYNC_ENABLE)
             ->willReturn($configSyncEnabled);
         if ($configSyncEnabled) {
             $this->configManager->expects($this->at(1))
                 ->method('get')
-                ->with('oro_email.attachment_sync_max_size')
+                ->with(EmailBodyBuilder::ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE)
                 ->willReturn($configSyncMaxSize);
         }
 
