@@ -111,3 +111,11 @@ oro:
                     Are you sure you want to delete them?
                 restricted_access_empty_message: >
                     You don't have permissions to delete any of the selected records.
+        show_sql:
+            show_sql_code: Show SQL Code
+            hide_sql_code: Hide SQL Code
+            messages:
+                copied: Copied to Clipoboard.
+                copy_not_successful: Copy command was not successful.
+                copy_not_supported: Your browser is not supported copy command. Please press Ctrl/Cmd+C to copy.
+
