@@ -87,7 +87,7 @@ class EmailFlagManager implements LoggerAwareInterface
                 $this->setUnseen($entity);
             }
         } catch (\Exception $ex) {
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf('Set email flag failed. EmailUser id: %d. Error: %s.', $entity->getId(), $ex->getMessage()),
                 ['exception' => $ex]
             );
