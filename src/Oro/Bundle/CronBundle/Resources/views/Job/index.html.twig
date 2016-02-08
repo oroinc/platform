@@ -10,20 +10,16 @@
         intervalUpdate: 30000
     } %}
     <div class="container-fluid"
-            data-page-component-module="oroui/js/app/components/view-component"
-            data-page-component-options="{{ options|json_encode }}">
+         data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ options|json_encode }}">
         <div class="row-fluid">
-            {% if ('prod' == app.environment) %}
+            <div class="span10">
                 {{ parent() }}
-            {% else %}
-                <div class="span10">
-                    {{ parent() }}
-                </div>
-                <div class="span2">
-                    {% use 'OroCronBundle:Job:sidebar.html.twig' %}
-                    {{ block('sidebar') }}
-                </div>
-            {% endif %}
+            </div>
+            <div class="span2">
+                {% use 'OroCronBundle:Job:sidebar.html.twig' %}
+                {{ block('sidebar') }}
+            </div>
         </div>
     </div>
 {% endblock %}
