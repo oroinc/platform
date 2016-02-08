@@ -8,27 +8,13 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var CellIterator = require('../../../datagrid/cell-iterator');
+    var gridViewsBuilder = require('../../../inline-editing/builder');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var Modal = require('oroui/js/modal');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
     InlineEditingPlugin = BasePlugin.extend({
-        /**
-         * This component is used by default for inline editing
-         */
-        DEFAULT_COMPONENT: 'orodatagrid/js/app/components/cell-popup-editor-component',
-
-        /**
-         * This view is used by default for editing
-         */
-        DEFAULT_VIEW: 'oroform/js/app/views/editor/text-editor-view',
-
-        /**
-         * This view is used by default for editing
-         */
-        DEFAULT_COLUMN_TYPE: 'string',
-
         /**
          * Help message for cells
          */
@@ -193,7 +179,7 @@ define(function(require) {
                 case 'enable_all':
                     if (enableConfigValue !== false) {
                         editable = (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
-                            (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
+                            (columnMetadata.type || gridViewsBuilder.DEFAULT_COLUMN_TYPE) in
                                 this.options.metadata.inline_editing.default_editors;
                     } else {
                         editable = false;
@@ -216,13 +202,6 @@ define(function(require) {
                 $.extend(true, {}, columnMetadata.inline_editing.editor) :
                 {};
 
-            if (!editor.component) {
-                editor.component = this.options.metadata.inline_editing.cell_editor.component;
-            }
-            if (!editor.view) {
-                editor.view = this.options.metadata.inline_editing
-                    .default_editors[(columnMetadata.type || this.DEFAULT_COLUMN_TYPE)];
-            }
             if (!editor.component_options) {
                 editor.component_options = {};
             }

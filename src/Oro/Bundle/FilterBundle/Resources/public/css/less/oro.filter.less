@@ -19,20 +19,8 @@
 .filter-item .filter-default-value .reset-filter {
     display: none;
 }
-.filter-select .select-filter-placeholder {
-    display: none;
-}
-.filter-select.filter-default-value .select-filter-placeholder {
-    display: inline-block;
-}
-.filter-select.filter-default-value .select-filter-widget {
-    display: none;
-}
 .filter-select.filter-default-value .multiselect-filter-widget {
     display: inline-block;
-}
-.multiselect-filter-placeholder, .filter-select.filter-default-value .multiselect-filter-placeholder {
-    display: none;
 }
 
 .filter-box .btn-group [class^='icon-'] {
@@ -319,6 +307,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
       position: relative;
       vertical-align: top;
       width: auto;
+      overflow: hidden;
       input[type=text] {
         max-width: 100%;
         width: 280px;
@@ -330,7 +319,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
       }
       .filter-update {
         position: absolute;
-        left: 100%;
+        right: 0;
         top: 0;
       }
     }
