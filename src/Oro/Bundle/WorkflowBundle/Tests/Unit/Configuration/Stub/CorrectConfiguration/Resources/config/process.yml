@@ -31,3 +31,5 @@ triggers:
             time_shift: P1DT5M
         -
             event: delete
+        -
+            cron: '*/1 * * * *'
