@@ -68,7 +68,6 @@ define(function(require) {
      * @param {Object} options.model - Current row model
      * @param {Object} options.input_delay - Delay before user finished input and request sent to server
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
@@ -134,6 +133,7 @@ define(function(require) {
                 openOnEnter: false,
                 selectOnBlur: false,
                 noFocus: true,
+                dropdownCssClass: 'inline-editor__select2-drop',
                 formatSelection: function(item) {
                     return item.label;
                 },
@@ -164,8 +164,12 @@ define(function(require) {
             };
         },
 
-        getModelValue: function() {
-            return this.model.get(this.valueFieldName) || '';
+        getRawModelValue: function() {
+            return this.model.get(this.valueFieldName);
+        },
+
+        parseRawValue: function(value) {
+            return value || '';
         },
 
         getChoiceLabel: function() {
@@ -185,6 +189,7 @@ define(function(require) {
             return data;
         }
     }, {
+        DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
         processMetadata: AbstractRelationEditorView.processMetadata
     });
 

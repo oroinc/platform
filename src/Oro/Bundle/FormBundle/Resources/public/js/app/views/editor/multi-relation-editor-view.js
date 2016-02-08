@@ -66,7 +66,6 @@ define(function(require) {
     var MultiRelationEditorView;
     var RelatedIdRelationEditorView = require('./related-id-relation-editor-view');
     var _ = require('underscore');
-    var tools = require('oroui/js/tools');
     var select2autosizer = require('oroui/js/tools/select2-autosizer');
 
     MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @exports MultiRelationEditorView.prototype */{
@@ -98,10 +97,14 @@ define(function(require) {
             }
         },
 
-        getFormattedValue: function() {
-            return this.getInitialResultItem()
-                .map(function(item) {return item.id;})
-                .join(',');
+        formatRawValue: function(value) {
+            value = this.parseRawValue(value);
+            if (value !== null && value && value.data) {
+                value = value.data;
+            } else {
+                value = [];
+            }
+            return value.map(function(item) {return item.id;}).join(',');
         },
 
         filterInitialResultItem: function(choices) {
@@ -120,8 +123,7 @@ define(function(require) {
             return options;
         },
 
-        getModelValue: function() {
-            var value = this.model.get(this.fieldName);
+        parseRawValue: function(value) {
             if (_.isString(value)) {
                 value = JSON.parse(value);
             }
@@ -164,16 +166,7 @@ define(function(require) {
         }
     }, {
         DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
-        processColumnMetadata: function(columnMetadata) {
-            var apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
-            if (!_.isObject(apiSpec)) {
-                throw new Error('`autocomplete_api_accessor` is required option');
-            }
-            if (!apiSpec.class) {
-                apiSpec.class = RelatedIdRelationEditorView.DEFAULT_ACCESSOR_CLASS;
-            }
-            return tools.loadModuleAndReplace(apiSpec, 'class');
-        }
+        processColumnMetadata: RelatedIdRelationEditorView.processMetadata
     });
 
     return MultiRelationEditorView;

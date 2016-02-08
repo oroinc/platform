@@ -22,10 +22,9 @@ define([
 
         _wrap: function($filter) {
             this.setElement(this._getWrapperTemplate()({
-                label: this.label,
+                label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
                 criteriaHint: this._getCriteriaHint(),
-                nullLink: this.nullLink,
                 canDisable: this.canDisable,
                 isEmpty: this.isEmptyValue()
             }));

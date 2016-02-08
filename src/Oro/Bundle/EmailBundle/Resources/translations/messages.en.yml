@@ -9,6 +9,7 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        imap.folder.checkAll: All
         autocomplete:
             recently_used: Recently used
             contexts: Contexts
@@ -170,6 +171,8 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        folders.tooltip:          If a folder is uncheked, all the data saved in it will be deleted
+        retrieve_folders.label:   Retrieve Folders
         message_type:
             label:                Message type
         folder_type:
@@ -225,6 +228,7 @@ oro:
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
+        body_synced.label:        Email body synced
         status:
             label:                Status
             unread.label:         Unread
@@ -259,6 +263,7 @@ oro:
             seen.label:               Seen
             folders.label:            Folders
             origin.label:             Email Origin
+            unsynced_flag_count.label: Unsynced Flag Count
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes

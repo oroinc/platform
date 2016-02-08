@@ -85,7 +85,7 @@ class EntityDataControllerTest extends WebTestCase
                 'id',
                 1,
                 1,
-                Codes::HTTP_INTERNAL_SERVER_ERROR
+                Codes::HTTP_FORBIDDEN
             ],
             'not found' => [
                 'Oro\Bundle\UserBundle\Entity\Test',

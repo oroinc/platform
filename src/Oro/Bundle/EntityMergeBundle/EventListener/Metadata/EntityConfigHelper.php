@@ -73,6 +73,7 @@ class EntityConfigHelper
 
         if ($this->isExtendField($className, $fieldName)) {
             $fieldMetadata->set('property_path', $fieldName);
+            $fieldMetadata->set('is_extend', true);
         }
     }
 

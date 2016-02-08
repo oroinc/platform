@@ -111,7 +111,7 @@ class DateHelper
         }
 
         foreach ($data as $row) {
-            $key                   = $this->getKey($from, $to, $row);
+            $key = $this->getKey($from, $to, $row);
             if (isset($items[$key])) {
                 $items[$key][$dataKey] = $row[$rowKey];
             }
@@ -119,7 +119,7 @@ class DateHelper
 
         $mixedItems = array_combine(array_keys($currentItems), array_values($items));
         foreach ($mixedItems as $currentDate => $previousData) {
-            $previousData['date']       = $currentItems[$currentDate]['date'];
+            $previousData['date'] = $currentItems[$currentDate]['date'];
             if (isset($currentItems[$currentDate])) {
                 $currentItems[$currentDate] = $previousData;
             }

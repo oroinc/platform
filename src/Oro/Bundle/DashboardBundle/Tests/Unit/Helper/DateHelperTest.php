@@ -292,6 +292,19 @@ class DateHelperTest extends OrmTestCase
         $this->assertEquals($expectedData, $actualData);
     }
 
+    public function testCombinePreviousDataWithCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
+    {
+        $result = $this->helper->combinePreviousDataWithCurrentPeriod(
+            new DateTime(),
+            new DateTime(),
+            [],
+            'row',
+            'data'
+        );
+
+        $this->assertSame([], $result);
+    }
+
     public function combinePreviousDataWithCurrentPeriodDataProvider()
     {
         return [

@@ -100,6 +100,7 @@ oro:
                             create:  created
                             delete:  deleted
                             update:  updated
+                        cron.description: Cron expression: {{ cron }}
                 workflow:
                     default_step: Default step
 
@@ -146,6 +147,7 @@ oro:
             priority.label:       Priority
             queued.label:         Queued
             time_shift.label:     Time shift
+            cron.label:           Cron Expression
 
         transition:
             start: "Start %workflow%"
