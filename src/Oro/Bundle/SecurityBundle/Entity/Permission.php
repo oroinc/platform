@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table("oro_security_permission")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository")
  */
 class Permission
 {
@@ -164,7 +164,7 @@ class Permission
     }
 
     /**
-     * @return array
+     * @return Collection|PermissionEntity[]
      */
     public function getApplyToEntities()
     {
@@ -209,7 +209,7 @@ class Permission
     }
 
     /**
-     * @return array
+     * @return Collection|PermissionEntity[]
      */
     public function getExcludeEntities()
     {
