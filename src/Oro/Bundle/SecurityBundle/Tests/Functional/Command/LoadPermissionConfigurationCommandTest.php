@@ -18,7 +18,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $provider = $this->getContainer()->get('oro_security.configuration.provider.permission_config');
+        $provider = $this->getContainer()->get('oro_security.configuration.provider.permission_configuration');
         $reflection = new \ReflectionClass('Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider');
         $reflectionProperty = $reflection->getProperty('configPath');
         $reflectionProperty->setAccessible(true);

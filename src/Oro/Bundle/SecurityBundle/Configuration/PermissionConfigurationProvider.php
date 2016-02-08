@@ -19,9 +19,7 @@ class PermissionConfigurationProvider
     /** @var array */
     protected $kernelBundles;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $configPath = 'Resources/config/permissions.yml';
 
     /**
@@ -35,10 +33,30 @@ class PermissionConfigurationProvider
     }
 
     /**
-     * @param array $usedPermissions
+     * @param array $acceptedPermissions
      * @return array
      */
-    public function getPermissionConfiguration(array $usedPermissions = null)
+    public function getPermissionConfiguration(array $acceptedPermissions = null)
+    {
+        $configs = $this->loadConfiguration();
+        $permissionsData = $this->parseConfiguration($configs);
+        $permissions = [];
+        foreach ($permissionsData as $permissionName => $permissionConfiguration) {
+            // skip not used permissions
+            if ($acceptedPermissions !== null && !in_array($permissionName, $acceptedPermissions, true)) {
+                continue;
+            }
+
+            $permissions[$permissionName] = $permissionConfiguration;
+        }
+
+        return [self::ROOT_NODE_NAME => $permissions];
+    }
+
+    /**
+     * @return array
+     */
+    protected function loadConfiguration()
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_security',
@@ -53,20 +71,8 @@ class PermissionConfigurationProvider
         }
 
         $merger = new ConfigurationMerger($this->kernelBundles);
-        $configs = $merger->mergeConfiguration($configs);
 
-        $permissionsData = $this->parseConfiguration($configs);
-        $permissions = [];
-        foreach ($permissionsData as $permissionName => $permissionConfiguration) {
-            // skip not used permissions
-            if ($usedPermissions !== null && !in_array($permissionName, $usedPermissions, true)) {
-                continue;
-            }
-
-            $permissions[$permissionName] = $permissionConfiguration;
-        }
-
-        return [self::ROOT_NODE_NAME => $permissions];
+        return $merger->mergeConfiguration($configs);
     }
 
     /**

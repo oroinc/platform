@@ -3,9 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Bundle\SecurityBundle\Exception\MissedRequiredOptionException;
@@ -13,21 +13,22 @@ use Oro\Bundle\SecurityBundle\Exception\MissedRequiredOptionException;
 class PermissionConfigurationBuilder
 {
     /**
-     * @var ManagerRegistry
+     * @var DoctrineHelper
      */
-    private $registry;
+    private $doctrineHelper;
 
     /**
-     * @var EntityRepository
+     * @var array
      */
-    private $permissionEntityRepository;
+    private $processedEntities;
+
 
     /**
-     * @param ManagerRegistry $registry
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->registry = $registry;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -37,19 +38,21 @@ class PermissionConfigurationBuilder
     public function buildPermissions(array $configuration)
     {
         $permissions = [];
+        $this->processedEntities = [];
         foreach ($configuration as $name => $permissionConfiguration) {
             $permissions[] = $this->buildPermission($name, $permissionConfiguration);
         }
+        $this->processedEntities = [];
 
         return $permissions;
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @param array $configuration
      * @return Permission
      */
-    public function buildPermission($name, array $configuration)
+    protected function buildPermission($name, array $configuration)
     {
         $this->assertConfigurationOptions($configuration, ['label']);
 
@@ -57,19 +60,15 @@ class PermissionConfigurationBuilder
         $permission
             ->setName($name)
             ->setLabel($configuration['label'])
-            ->setApplyToAll(array_key_exists('apply_to_all', $configuration) ? $configuration['apply_to_all'] : true)
-            ->setGroupNames(array_key_exists('group_names', $configuration) ? $configuration['group_names'] : [])
+            ->setApplyToAll($this->getConfigurationOption($configuration, 'apply_to_all', true))
+            ->setGroupNames($this->getConfigurationOption($configuration, 'group_names', []))
             ->setExcludeEntities(
-                $this->buildPermissionEntities(
-                    array_key_exists('exclude_entities', $configuration) ? $configuration['exclude_entities'] : []
-                )
+                $this->buildPermissionEntities($this->getConfigurationOption($configuration, 'exclude_entities', []))
             )
             ->setApplyToEntities(
-                $this->buildPermissionEntities(
-                    array_key_exists('apply_to_entities', $configuration) ? $configuration['apply_to_entities'] : []
-                )
+                $this->buildPermissionEntities($this->getConfigurationOption($configuration, 'apply_to_entities', []))
             )
-            ->setDescription(array_key_exists('description', $configuration) ? $configuration['description'] : '');
+            ->setDescription($this->getConfigurationOption($configuration, 'description', ''));
 
         return $permission;
     }
@@ -77,34 +76,31 @@ class PermissionConfigurationBuilder
     /**
      * @param array $configuration
      * @return ArrayCollection|PermissionEntity[]
+     * @throws NotManageableEntityException
      */
-    public function buildPermissionEntities(array $configuration)
+    protected function buildPermissionEntities(array $configuration)
     {
+        $permissionEntityRepository = $this->doctrineHelper
+            ->getEntityRepositoryForClass('OroSecurityBundle:PermissionEntity');
+
         $entities = new ArrayCollection();
         foreach ($configuration as $entityName) {
-            $permissionEntity = $this->getPermissionRepository()->findOneBy(['name' => $entityName]);
-            if (!$permissionEntity) {
-                $permissionEntity = new PermissionEntity();
-                $permissionEntity->setName($entityName);
+            if (!$this->doctrineHelper->isManageableEntityClass($entityName)) {
+                throw new NotManageableEntityException($entityName);
             }
-            $entities->add($permissionEntity);
+            $entityNameNormalized = strtolower($entityName);
+            if (!array_key_exists($entityNameNormalized, $this->processedEntities)) {
+                $permissionEntity = $permissionEntityRepository->findOneBy(['name' => $entityName]);
+                if (!$permissionEntity) {
+                    $permissionEntity = new PermissionEntity();
+                    $permissionEntity->setName($entityName);
+                }
+                $this->processedEntities[$entityNameNormalized] = $permissionEntity;
+            }
+            $entities->add($this->processedEntities[$entityNameNormalized]);
         }
 
         return $entities;
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    protected function getPermissionRepository()
-    {
-        if (!$this->permissionEntityRepository) {
-            $this->permissionEntityRepository = $this->registry
-                ->getManagerForClass('OroSecurityBundle:PermissionEntity')
-                ->getRepository('OroSecurityBundle:PermissionEntity');
-        }
-
-        return $this->permissionEntityRepository;
     }
 
     /**

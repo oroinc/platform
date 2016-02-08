@@ -164,7 +164,7 @@ class Permission
     }
 
     /**
-     * @return array
+     * @return Collection|PermissionEntity[]
      */
     public function getApplyToEntities()
     {
@@ -209,7 +209,7 @@ class Permission
     }
 
     /**
-     * @return array
+     * @return Collection|PermissionEntity[]
      */
     public function getExcludeEntities()
     {

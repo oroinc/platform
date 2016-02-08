@@ -11,65 +11,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:permission:configuration:load';
-
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var EntityRepository
-     */
-    protected $permissionRepository;
-
-    /**
-     * @var PermissionConfigurationBuilder
-     */
-    protected $configurationBuilder;
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-        }
-
-        return $this->entityManager;
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    protected function getPermissionRepository()
-    {
-        if (!$this->permissionRepository) {
-            $this->permissionRepository = $this->getEntityManager()
-                ->getRepository('OroSecurityBundle:Permission');
-        }
-
-        return $this->permissionRepository;
-    }
-
-    /**
-     * @return PermissionConfigurationBuilder
-     */
-    protected function getConfigurationBuilder()
-    {
-        if (!$this->configurationBuilder) {
-            $this->configurationBuilder = $this->getContainer()
-                ->get('oro_security.configuration.builder.permission_configuration');
-        }
-
-        return $this->configurationBuilder;
-    }
 
     /**
      * @inheritdoc
@@ -94,7 +40,8 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
         $usedPermissions = $input->getOption('permissions') ?: null;
 
         /** @var PermissionConfigurationProvider $configurationProvider */
-        $configurationProvider = $this->getContainer()->get('oro_security.configuration.provider.permission_config');
+        $configurationProvider = $this->getContainer()
+            ->get('oro_security.configuration.provider.permission_configuration');
         $permissionConfiguration = $configurationProvider->getPermissionConfiguration(
             $usedPermissions
         );
@@ -109,13 +56,18 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
      */
     protected function loadPermissions(OutputInterface $output, array $configuration)
     {
-        $permissions = $this->getConfigurationBuilder()->buildPermissions($configuration);
+        $permissions = $this->getContainer()
+            ->get('oro_security.configuration.builder.permission_configuration')
+            ->buildPermissions($configuration);
 
         if ($permissions) {
             $output->writeln('Loading permissions...');
 
-            $entityManager = $this->getEntityManager();
-            $permissionRepository = $this->getPermissionRepository();
+            /** @var EntityManager $entityManager */
+            $entityManager = $this->getContainer()->get('doctrine')
+                ->getManagerForClass('OroSecurityBundle:Permission');
+            /** @var EntityRepository $permissionRepository */
+            $permissionRepository = $entityManager->getRepository('OroSecurityBundle:Permission');
 
             foreach ($permissions as $permission) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
