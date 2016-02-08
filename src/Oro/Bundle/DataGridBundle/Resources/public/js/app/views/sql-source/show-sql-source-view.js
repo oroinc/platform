@@ -47,7 +47,7 @@ define(function(require) {
         toggleSqlCode: function() {
             var $box = this.$el.find('#sql-source-box-' + this.grid.name);
             var $link = this.$el.find('#show-sql-source-link');
-            var isShown = $box.is(":visible");
+            var isShown = $box.is(':visible');
             if (!isShown) {
                 $link.text(__(this.labels.hide_sql));
                 $box.show();
@@ -58,15 +58,15 @@ define(function(require) {
                 $box.hide();
             }
         },
-        copySql: function () {
-            var sql = document.querySelector('#sql-source-box-' + this.grid.name+ ' .sql-source-code');
+        copySql: function() {
+            var sql = document.querySelector('#sql-source-box-' + this.grid.name + ' .sql-source-code');
             var range = document.createRange();
             range.selectNode(sql);
             window.getSelection().addRange(range);
             try {
-                document.execCommand('copy')
-                    ? messenger.notificationFlashMessage('success', __(this.messages.copied))
-                    : messenger.notificationFlashMessage('warning', __(this.messages.copy_not_successful))
+                document.execCommand('copy') ?
+                    messenger.notificationFlashMessage('success', __(this.messages.copied)) :
+                    messenger.notificationFlashMessage('warning', __(this.messages.copy_not_successful))
 
             } catch (err) {
                 messenger.notificationFlashMessage('warning', __(this.messages.copy_not_supported));
