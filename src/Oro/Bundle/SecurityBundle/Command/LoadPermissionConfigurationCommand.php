@@ -102,7 +102,7 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
         $permissionsConfiguration = $permissionConfiguration[PermissionConfigurationProvider::ROOT_NODE_NAME];
         $this->loadPermissions($output, $permissionsConfiguration);
 
-        $this->getContainer()->get('oro_security.manager.permission')->buildCache();
+        $this->getContainer()->get('oro_security.acl.permission_manager')->buildCache();
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Model;
+namespace Oro\Bundle\SecurityBundle\Acl\Permission;
 
 use Doctrine\Common\Cache\CacheProvider;
 
@@ -38,19 +38,11 @@ class PermissionManager
 
     /**
      * @param string $groupName
-     * @return Permission[]
+     * @return array
      */
-    public function getAllPermissions($groupName = '')
+    public function getPermissionsMap($groupName = '')
     {
-        $repository = $this->getRepository();
-
-        if (!$groupName) {
-            return $repository->findAll();
-        }
-
-        $ids = $this->findPermissionsIdsByGroupName();
-
-        return $repository->findByIds($ids);
+        return $groupName ? $this->findGroups($groupName) : $this->findPermissions();
     }
 
     /**
@@ -58,22 +50,13 @@ class PermissionManager
      * @param string $groupName
      * @return Permission[]
      */
-    public function getPermissions($entity, $groupName = '')
+    public function getPermissionsForEntity($entity, $groupName = '')
     {
         $repository = $this->getRepository();
 
         $ids = $groupName ? $this->findPermissionsIdsByGroupName($groupName) : null;
 
         return $repository->findByEntityClassAndIds($this->doctrineHelper->getEntityClass($entity), $ids);
-    }
-
-    /**
-     * @param string $name
-     * @return int
-     */
-    public function getPermissionIdByName($name)
-    {
-        return $this->findPermissions($name);
     }
 
     /**
@@ -111,6 +94,23 @@ class PermissionManager
 
     /**
      * @param string $name
+     * @return array|int
+     */
+    protected function findPermissions($name = '')
+    {
+        if (null === $this->permissions) {
+            $this->permissions = $this->cache->fetch(static::CACHE_PERMISSIONS);
+        }
+
+        if ($name) {
+            return isset($this->permissions[$name]) ? $this->permissions[$name] : 0;
+        }
+
+        return $this->permissions;
+    }
+
+    /**
+     * @param string $name
      * @return array
      */
     protected function findGroups($name = '')
@@ -124,22 +124,6 @@ class PermissionManager
         }
 
         return $this->groups;
-    }
-
-    /**
-     * @param string $name
-     * @return array|int
-     */
-    protected function findPermissions($name = '')
-    {
-        if (null === $this->permissions) {
-            $this->permissions = $this->cache->fetch(static::CACHE_PERMISSIONS);
-        }
-
-        if ($name) {
-            return isset($this->permissions[$name]) ? $this->permissions[$name] : 0;
-        }
-        return $this->permissions;
     }
 
     /**

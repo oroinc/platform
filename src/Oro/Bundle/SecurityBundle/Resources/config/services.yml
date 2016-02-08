@@ -14,6 +14,7 @@ parameters:
     oro_security.acl.dbal.provider.class:                      Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider
     oro_security.acl.permission_granting_strategy.class:       Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy
     oro_security.acl.permission_map.class:                     Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap
+    oro_security.acl.permission_manager.class:                 Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
     oro_security.acl.object_identity_factory.class:            Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
     oro_security.acl.object_identity_retrieval_strategy.class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityRetrievalStrategy
     oro_security.acl.object_id_accessor.class:                 Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor
@@ -81,8 +82,6 @@ parameters:
     oro_security.configuration.config.permission_definition_list.class: Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration
     oro_security.configuration.provider.permission_config.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
     oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
-
-    oro_security.manager.permission.class: Oro\Bundle\SecurityBundle\Model\PermissionManager
 
 services:
     oro_security.security_facade:
@@ -193,6 +192,12 @@ services:
         class: %oro_security.acl.permission_map.class%
         arguments:
             - @oro_security.acl.extension_selector
+
+    oro_security.acl.permission_manager:
+        class: %oro_security.acl.permission_manager.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_security.cache.provider.permission
 
     oro_security.acl.object_identity_factory:
         class: %oro_security.acl.object_identity_factory.class%
@@ -605,12 +610,6 @@ services:
 
     oro_security.orm.acl_conditional_factor_builder:
         class: %oro_security.orm.acl_conditional_factor_builder.class%
-
-    oro_security.manager.permission:
-        class: %oro_security.manager.permission.class%
-        arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_security.cache.provider.permission
 
     oro_security.configuration.config.permission_definition:
         class: %oro_security.configuration.config.permission_definition.class%
