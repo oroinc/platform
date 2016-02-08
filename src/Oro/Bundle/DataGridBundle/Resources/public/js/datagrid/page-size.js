@@ -117,8 +117,13 @@ define([
                     this
                 )
             );
-            currentSizeLabel = _.isUndefined(currentSizeLabel[0].label) ?
-                currentSizeLabel[0] : currentSizeLabel[0].label;
+
+            if (currentSizeLabel.length > 0) {
+                currentSizeLabel = _.isUndefined(currentSizeLabel[0].label) ?
+                    currentSizeLabel[0] : currentSizeLabel[0].label;
+            } else {
+                currentSizeLabel = this.items[0];
+            }
 
             this.$el.append($(this.template({
                 disabled: !this.enabled || !this.collection.state.totalRecords,
