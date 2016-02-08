@@ -17,6 +17,13 @@ services:
         tags:
             - { name: oro.api.processor, action: collect_public_resources, priority: -10 }
 
+    oro_api.collect_public_resources.load_custom_entities:
+        class: Oro\Bundle\ApiBundle\Processor\CollectPublicResources\LoadCustomEntities
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro.api.processor, action: collect_public_resources, priority: -10 }
+
     oro_api.collect_public_resources.load_from_config_bag:
         class: Oro\Bundle\ApiBundle\Processor\CollectPublicResources\LoadFromConfigBag
         arguments:
