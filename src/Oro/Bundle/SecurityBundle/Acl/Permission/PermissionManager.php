@@ -99,7 +99,7 @@ class PermissionManager
     protected function findPermissions($name = '')
     {
         if (null === $this->permissions) {
-            $this->permissions = $this->cache->fetch(static::CACHE_PERMISSIONS);
+            $this->permissions = $this->getCache(static::CACHE_PERMISSIONS);
         }
 
         if ($name) {
@@ -116,7 +116,7 @@ class PermissionManager
     protected function findGroups($name = '')
     {
         if (null === $this->groups) {
-            $this->groups = $this->cache->fetch(static::CACHE_GROUPS);
+            $this->groups = $this->getCache(static::CACHE_GROUPS);
         }
 
         if ($name) {
@@ -124,6 +124,19 @@ class PermissionManager
         }
 
         return $this->groups;
+    }
+
+    /**
+     * @param string $key
+     * @return array
+     */
+    protected function getCache($key)
+    {
+        if (!$this->cache->contains($key)) {
+            $this->buildCache();
+        }
+
+        return $this->cache->fetch($key);
     }
 
     /**
