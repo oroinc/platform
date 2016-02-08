@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\TagBundle\Provider;
 
-use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagVirtualFieldProvider implements VirtualFieldProviderInterface
 {
@@ -12,10 +13,17 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
     /** @var TaggableHelper */
     protected $taggableHelper;
 
-    /** @param TaggableHelper $helper */
-    public function __construct(TaggableHelper $helper)
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /**
+     * @param TaggableHelper $taggableHelper
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(TaggableHelper $taggableHelper, DoctrineHelper $doctrineHelper)
     {
-        $this->taggableHelper = $helper;
+        $this->taggableHelper = $taggableHelper;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -24,8 +32,8 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
     public function isVirtualField($className, $fieldName)
     {
         return
-            $this->taggableHelper->isTaggable($className) &&
-            $fieldName === self::TAG_FIELD;
+            $fieldName === self::TAG_FIELD
+            && $this->taggableHelper->isTaggable($className);
     }
 
     /**
@@ -35,10 +43,9 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
     {
         return [
             'select' => [
-                // Do not change this params it using for reports, for executing identifier for target entity.
-                'expr'                => 'entity.id',
-                'label'               => 'oro.tag.entity_plural_label',
-                'return_type'         => 'tag',
+                'expr'        => 'entity.' . $this->doctrineHelper->getSingleEntityIdentifierFieldName($className),
+                'label'       => 'oro.tag.entity_plural_label',
+                'return_type' => 'tag',
                 'related_entity_name' => 'Oro\Bundle\TagBundle\Entity\Tag',
             ]
         ];

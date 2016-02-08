@@ -1,4 +1,3 @@
-
 {% block oro_tag_select_row %}
     {% if resource_granted('oro_tag_view') %}
         {% if resource_granted('oro_tag_assign_unassign') %}
@@ -6,63 +5,11 @@
                 <div class="control-label wrap">
                     {{ form_label(form, '' , { label_attr: label_attr}) }}
                 </div>
-
-                {% import 'OroTagBundle::macros.html.twig' as _tag %}
-
-                {% set tagContainerId = 'tags-' ~ random() %}
-                <div id="{{ tagContainerId }}">
-                    <div class="controls">
-                        <div>
-                            {{ _tag.tagSortActions() }}
-                        </div>
-                    </div>
-
-                    <div class="controls autocomplete-box">
-                        {{ form_row(form.autocomplete) }}
-                    </div>
-
-                    <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}">
-                        {% if not resource_granted('oro_tag_assign_unassign') %}
-                            <div class="control-label wrap">
-                                {{ form_label(form, '' , { label_attr: label_attr}) }}
-                            </div>
-                        {% endif %}
-                        {% set tagOverlayId = 'tag-overlay-' ~ random() %}
-                        <div class="tags-overlay" id="{{ tagOverlayId }}"></div>
-                        <script type="text/javascript">
-                            require(['jquery', 'orotag/js/update-view'],
-                                    function($, TagUpdateView) {
-                                        $(function() {
-                                            new TagUpdateView({
-                                                el: '#{{ tagContainerId }}'
-                                                , tagOverlayId: '#{{ tagOverlayId }}'
-                                                , autocompleteFieldId: '#{{ form.autocomplete.vars.id }}'
-                                                , fieldId: '#{{ form.all.vars.id }}'
-                                                , ownFieldId: '#{{ form.owner.vars.id }}'
-                                                {% if resource_granted('oro_tag_assign_unassign') %}, unassign: true{% endif %}
-                                                {% if resource_granted('oro_tag_unassign_global') %}, unassignGlobal: true{% endif %}
-                                            });
-                                        });
-                                    });
-                        </script>
-                    </div>
+                <div class="controls tags-form-select-editor">
+                    {{ form_widget(form) }}
+                    {{ form_javascript(form) }}
                 </div>
             </div>
         {% endif %}
-
-        {{ form_row(form.all) }}
-        {% if form.owner is defined %}
-            {{ form_row(form.owner) }}
-        {% endif %}
-    {% else %}
-        {{ form_row(form.all) }}
-        {% if form.owner is defined %}
-            {{ form_row(form.owner) }}
-        {% endif %}
     {% endif %}
-{% endblock %}
-
-{% block oro_tag_autocomplete_row %}
-    {{ form_widget(form) }}
-    {{ form_javascript(form) }}
 {% endblock %}

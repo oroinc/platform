@@ -35,6 +35,9 @@ UPGRADE FROM 1.8 to 1.9
 - Removed method `loadStoredSettings` of `Oro\Bundle\ConfigBundle\Config\ConfigManager`.
 - Removed class `Oro\Bundle\ConfigBundle\Manager\UserConfigManager` and service `oro_config.user_config_manager`. Use `oro_config.user` service instead.
 
+####CronBundle
+ - Command `oro:cron:daemon` was renamed to `oro:daemon` and it is no longer executed by cron
+
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
 - `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` has `@InheritanceType("SINGLE_TABLE")`
@@ -130,7 +133,9 @@ grid-name:
 - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
 - `oro_email.emailtemplate.variable_provider.entity` service was marked as private
 - `oro_email.emailtemplate.variable_provider.system` service was marked as private
-- `oro_email.emailtemplate.variable_provider.user` service was marked as private 
+- `oro_email.emailtemplate.variable_provider.user` service was marked as private
+- Command `oro:email:body-sync` was marked as deprecated
+- Command `oro:cron:email-body-sync` was added
 
 ####EmbeddedFormBundle
 - Bundle now contains configuration of security firewall `embedded_form`
@@ -275,6 +280,10 @@ after:
 - Bundle now contains configuration of security firewall `wsse_secured` 
 - `Oro\Bundle\SoapBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
 
+####TagBundle
+- Removed class `Oro\Bundle\TagBundle\Form\Type\TagAutocompleteType` and service `oro_tag.form.type.tag_autocomplete`, use `Oro\Bundle\TagBundle\Form\Type\TagSelectType` and `oro_tag_select` instead.
+- Removed `oro_tag_autocomplete` form type, use `oro_tag_select` instead.
+
 ####TrackingBundle
 - Bundle now contains configuration of security firewall `tracking_data`
 
@@ -319,8 +328,14 @@ after:
 - Route `oro_workflow_api_rest_workflow_deactivate` marked as deprecated. Use the route `oro_api_workflow_deactivate` instead.
 - Route `oro_workflow_api_rest_workflow_start` marked as deprecated. Use the route `oro_api_workflow_start` instead.
 - Route `oro_workflow_api_rest_workflow_transit` marked as deprecated. Use the route `oro_api_workflow_transit` instead.
+- Added new command `Oro\Bundle\WorkflowBundle\Command` (`oro:process:handle-trigger`) for handle ProcessTrigger by `trigger id` and `process name`
+- Added possibility to handle ProcessTrigger by cron schedule - use option `cron` for trigger config.
 
 ####OroIntegrationBundle
 - `Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::addStatus` marked as deprecated since 1.9.0. Will be removed in 1.11.0. Use `Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::addStatusAndFlush` instead.
 - Added possibility to skip connectors during synchronization using implemenation of `Oro\Bundle\IntegrationBundle\Provider\AllowedConnectorInterface`. 
 - Added possibility to sort connectors execution order using implementation of `Oro\Bundle\IntegrationBundle\Provider\OrderedConnectorInterface`.
+
+####OroCronBundle
+- `Oro\Bundle\CronBundle\Entity\Schedule` - field `command` changed size from 50 to 255 chars, added new field `args` for store command arguments.
+- Command `Oro\Bundle\CronBundle\Command\CronCommand` (`oro:cron`) now process not only commands, but all records from entity `Oro\Bundle\CronBundle\Entity\Schedule` too. 
