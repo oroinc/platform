@@ -82,7 +82,13 @@ oro:
                 tooltip: Add chart to the report
 
         action:
-            display_sql: "Display report query SQL"
+            display_sql: "Display SQL query of a report"
+        system_configuration:
+            groups:
+                report_settings.title: 'Reports settings'
+            fields:
+                display_sql_source_code.label: 'Display SQL in Reports'
+                display_sql_source_code.tooltip: 'Displays SQL query of a report on its View page'
 
 "New Report": New Report
 "Manage Custom Reports": Manage Custom Reports
