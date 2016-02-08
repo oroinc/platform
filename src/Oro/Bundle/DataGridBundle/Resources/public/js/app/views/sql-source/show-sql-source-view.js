@@ -51,6 +51,8 @@ define(function(require) {
             if (!isShown) {
                 $link.text(__(this.labels.hide_sql));
                 $box.show();
+                var $copyLink = this.$el.find('#copy-sql-source');
+                $copyLink.focus();
             } else {
                 $link.text(__(this.labels.show_sql));
                 $box.hide();

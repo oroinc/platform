@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Extension\StoreSql;
+namespace Oro\Bundle\ReportBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class StoreSqlExtension extends AbstractExtension
 {
@@ -15,13 +16,27 @@ class StoreSqlExtension extends AbstractExtension
     const SQL                = 'sql';
     const STORE_SQL          = 'store_sql';
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /**
+     * StoreSqlExtension constructor.
+     *
+     * @param SecurityFacade $securityFacade
+     */
+    public function __construct(SecurityFacade $securityFacade)
+    {
+        $this->securityFacade = $securityFacade;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
         return $config->getDatasourceType() == OrmDatasource::TYPE &&
-            $this->getParameters()->get(self::DISPLAY_SQL_SOURCE, false);
+            $this->getParameters()->get(self::DISPLAY_SQL_SOURCE, false) &&
+            $this->securityFacade->isGranted('oro_report_display_sql');
     }
 
     /**

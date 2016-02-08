@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\EventListener;
+namespace Oro\Bundle\ReportBundle\EventListener;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
-use Oro\Bundle\DataGridBundle\Extension\StoreSql\StoreSqlExtension;
+use Oro\Bundle\ReportBundle\Grid\StoreSqlExtension;
 
 class StoreSqlListener
 {
