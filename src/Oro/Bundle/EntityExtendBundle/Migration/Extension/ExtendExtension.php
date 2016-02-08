@@ -964,7 +964,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
         $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
         $this->addRelationColumn($table, $defaultRelationColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $table->addUniqueIndex([$defaultRelationColumnName]);
+        $table->addIndex([$defaultRelationColumnName]);
         $table->addForeignKeyConstraint(
             $targetTable,
             [$defaultRelationColumnName],
