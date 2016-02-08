@@ -3,7 +3,6 @@ define(function(require) {
 
     var ShowSqlSourcePlugin;
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var $ = require('jquery');
     var ShowSqlSourceView = require('../../views/sql-source/show-sql-source-view');
 
     ShowSqlSourcePlugin = BasePlugin.extend({

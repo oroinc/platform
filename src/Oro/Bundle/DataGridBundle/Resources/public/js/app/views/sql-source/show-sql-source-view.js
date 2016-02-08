@@ -3,7 +3,6 @@ define(function(require) {
 
     var StoredSqlView;
     var $ = require('jquery');
-    var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var __ = require('orotranslation/js/translator');
     var messenger = require('oroui/js/messenger');
@@ -64,10 +63,12 @@ define(function(require) {
             range.selectNode(sql);
             window.getSelection().addRange(range);
             try {
-                document.execCommand('copy') ?
-                    messenger.notificationFlashMessage('success', __(this.messages.copied)) :
-                    messenger.notificationFlashMessage('warning', __(this.messages.copy_not_successful))
-
+                var copied = document.execCommand('copy');
+                if (copied) {
+                    messenger.notificationFlashMessage('success', __(this.messages.copied));
+                } else {
+                    messenger.notificationFlashMessage('warning', __(this.messages.copy_not_successful));
+                }
             } catch (err) {
                 messenger.notificationFlashMessage('warning', __(this.messages.copy_not_supported));
             }
