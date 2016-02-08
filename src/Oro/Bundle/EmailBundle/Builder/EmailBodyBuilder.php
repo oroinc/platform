@@ -13,6 +13,9 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
  */
 class EmailBodyBuilder
 {
+    const ORO_EMAIL_ATTACHMENT_SYNC_ENABLE = 'oro_email.attachment_sync_enable';
+    const ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE = 'oro_email.attachment_sync_max_size';
+
     /**
      * @var EmailBody
      */
@@ -110,7 +113,7 @@ class EmailBodyBuilder
     }
 
     /**
-     * Check enabled save and max allow size
+     * Check enabled save and max allow size. If configured max size is 0 then attachment size unlimited
      *
      * @param int $size - byte
      *
@@ -121,21 +124,16 @@ class EmailBodyBuilder
         $attachmentSyncMaxSize = 0;
 
         // skipp attachment if disabled to save
-        if ($this->configManager && !$this->configManager->get('oro_email.attachment_sync_enable')) {
+        if ($this->configManager && !$this->configManager->get(self::ORO_EMAIL_ATTACHMENT_SYNC_ENABLE)) {
             return false;
         }
 
         if ($this->configManager) {
-            $attachmentSyncMaxSize = $this->configManager->get('oro_email.attachment_sync_max_size');
-        }
-        // skipp save large attachemnt files
-        if ($attachmentSyncMaxSize !== 0 // unlimit
-            && $size / 1024 / 1024 > $attachmentSyncMaxSize
-        ) {
-            return false;
+            $attachmentSyncMaxSize = $this->configManager->get(self::ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE);
         }
 
-        return true;
+        // unlimited or size < configured max size
+        return $attachmentSyncMaxSize === 0 || $size / 1024 / 1024 <= $attachmentSyncMaxSize;
     }
 
     /**
@@ -150,7 +148,11 @@ class EmailBodyBuilder
         if (!$contentSize) {
             $contentSize = strlen(base64_decode($content));
         } elseif ($contentTransferEncoding === 'base64') {
+            // if content encoded by base64 then need recalculate size for do not take into account the extra size
+            // new lines
             $overhead = ceil($contentSize / 77);
+            // base64 to binary - size * 3 / 4
+            // and minus special characters (new line, end base64 ==)
             $contentSize = (int) (($contentSize - $overhead) * 3 / 4 - 2);
         }
 
