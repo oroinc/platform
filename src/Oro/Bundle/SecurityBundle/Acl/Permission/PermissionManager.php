@@ -71,7 +71,7 @@ class PermissionManager
             $data[static::CACHE_PERMISSIONS][$permission->getName()] = $permission->getId();
 
             foreach ($permission->getGroupNames() as $group) {
-                $data[static::CACHE_GROUPS][$group][] = $permission->getName();
+                $data[static::CACHE_GROUPS][$group][$permission->getName()] = $permission->getId();
             }
         }
 
