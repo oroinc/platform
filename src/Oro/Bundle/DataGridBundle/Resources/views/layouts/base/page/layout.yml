@@ -1,0 +1,19 @@
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroDataGridBundle:layouts:base/page/layout.html.twig'
+#        - @addTree:
+#             items:
+#                 datagrid_toolbar:
+#                     blockType: container
+#                 datagrid_toolbar_actions:
+#                     blockType: container
+#                 datagrid_toolbar_tools:
+#                     blockType: container
+#                 datagrid_toolbar_pagination:
+#                     blockType: container
+#             tree:
+#                 datagrid_toolbar:
+#                     datagrid_toolbar_actions: ~
+#                     datagrid_toolbar_tools: ~
+#                     datagrid_toolbar_pagination: ~

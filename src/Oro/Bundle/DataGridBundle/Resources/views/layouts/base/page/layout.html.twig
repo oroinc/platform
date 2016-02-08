@@ -1,0 +1,25 @@
+{% block _datagrid_toolbar_actions_widget %}
+    <div class="pull-left grid-toolbar-mass-actions">
+        <div class="mass-actions-panel btn-group icons-holder"></div>
+        <div class="extra-actions-panel"></div>
+    </div>
+{% endblock %}
+
+{% block _datagrid_toolbar_tools_widget %}
+    <div class="pull-right grid-toolbar-tools">
+        <div class="actions-panel pull-right form-horizontal"></div>
+        <div class="page-size pull-right form-horizontal"></div>
+    </div>
+{% endblock %}
+
+{% block _datagrid_toolbar_pagination_widget %}
+    <div class="pagination pagination-centered">{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _toolbar_datagrid_widget %}
+    <script type="text/html" id="template-datagrid-toolbar">
+        <div class="grid-toolbar">
+            {{ block_widget(block) }}
+        </div>
+    </script>
+{% endblock %}

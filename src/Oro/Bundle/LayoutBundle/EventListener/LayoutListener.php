@@ -42,15 +42,9 @@ class LayoutListener
     {
         $request = $event->getRequest();
 
-        /** @var LayoutAnnotation|null $layoutAnnotation */
-        $layoutAnnotation = $request->attributes->get('_layout');
+        $layoutAnnotation = $this->container->get('oro_layout.helper')->getLayoutAnnotation($request);
         if (!$layoutAnnotation) {
             return;
-        }
-        if ($request->attributes->get('_template')) {
-            throw new LogicException(
-                'The @Template() annotation cannot be used together with the @Layout() annotation.'
-            );
         }
 
         $parameters = $event->getControllerResult();
