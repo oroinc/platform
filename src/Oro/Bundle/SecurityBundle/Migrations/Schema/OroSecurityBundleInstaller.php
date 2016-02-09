@@ -52,7 +52,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $this->addOroSecurityPermExclEntityForeignKeys($schema);
     }
 
-
     /**
      * Create oro_security_perm_apply_entity table
      *

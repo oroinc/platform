@@ -22,7 +22,6 @@ class PermissionConfigurationBuilder
      */
     private $processedEntities;
 
-
     /**
      * @param DoctrineHelper $doctrineHelper
      */
