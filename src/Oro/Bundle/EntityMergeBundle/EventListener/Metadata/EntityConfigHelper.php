@@ -74,8 +74,7 @@ class EntityConfigHelper
         $extendConfig = $this->getFieldExtendConfig($className, $fieldName);
         if ($extendConfig && $extendConfig->is('is_extend')) {
             $fieldMetadata->set('property_path', $fieldName);
-            $fieldMetadata->set('is_extend', true);
-            $fieldMetadata->set('is_deleted', $extendConfig->is('is_deleted'));
+            $fieldMetadata->set('display', true);
         }
     }
 
