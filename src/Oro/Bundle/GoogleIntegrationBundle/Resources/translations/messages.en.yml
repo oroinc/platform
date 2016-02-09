@@ -5,5 +5,9 @@ oro:
                     google_settings.title: Google settings
                     google_integration_settings.title: Google Integration Settings
                 fields:
-                    client_id.label: Client Id
+                    domains.label: Domains
+                    domains.tooltip: Comma separated list of allowed domains
+                    client_id:
+                        label: Client Id
+                        tooltip: Please read <a href="https://developers.google.com/identity/protocols/OAuth2WebServer#creatingcred" target="_blank">instructions</a> for obtaining credentials.
                     client_secret.label: Client secret
