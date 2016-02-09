@@ -3,4 +3,3 @@ oro_api:
         Oro\Bundle\IntegrationBundle\Entity\Channel: ~
         Oro\Bundle\IntegrationBundle\Entity\FieldsChanges: ~
         Oro\Bundle\IntegrationBundle\Entity\Status: ~
-        Oro\Bundle\IntegrationBundle\Entity\Transport: ~
