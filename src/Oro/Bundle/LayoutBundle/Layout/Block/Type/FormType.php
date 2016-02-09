@@ -91,6 +91,7 @@ class FormType extends AbstractFormType
     {
         $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
 
+        $options['form_field_prefix'] = $builder->getId() . '_';
         $this->formLayoutBuilder->build($formAccessor, $builder, $options);
     }
 
@@ -130,6 +131,8 @@ class FormType extends AbstractFormType
 
             $this->getFormFieldView($view, $formFieldPath)->setRendered();
         }
+
+        parent::finishView($view, $block, $options);
     }
 
     /**
@@ -182,7 +185,7 @@ class FormType extends AbstractFormType
         } else {
             $formFieldView = $this->getFormFieldView($view, $formFieldPath);
             if ($childView->vars['form'] !== $formFieldView) {
-                $formFieldView->setRendered();
+                //$formFieldView->setRendered();
             }
         }
     }
