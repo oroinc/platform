@@ -27,7 +27,7 @@ oro.imap:
             tooltip: Enable imap sync with your mailbox to send and receive emails from OroCRM. if you don't know your imap credentials, contact your administrator
         use_smtp:
             label: Enable SMTP
-            tooltip: Enable smtp synct to synchronize emails sent from OroCRM to your mailbox so you can see them in other email clients
+            tooltip: Enable smtp sync to synchronize emails sent from OroCRM to your mailbox so you can see them in other email clients
         user.label: User
         password.label: Password
         connect: Connect
