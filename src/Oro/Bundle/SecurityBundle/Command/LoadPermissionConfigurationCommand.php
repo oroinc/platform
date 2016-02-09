@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:permission:configuration:load';
+
     /**
      * @inheritdoc
      */
@@ -26,6 +27,7 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
                 'Names of the permissions that should be loaded'
             );
     }
+
     /**
      * @inheritdoc
      */
@@ -36,13 +38,16 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
         $permissions = $manager->getPermissionsFromConfig($acceptedPermissions);
         if ($permissions) {
             $output->writeln('Loading permissions...');
+
             /** @var EntityManager $entityManager */
             $entityManager = $this->getContainer()->get('doctrine')
                 ->getManagerForClass('OroSecurityBundle:Permission');
+
             foreach ($permissions as $permission) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
                 $entityManager->persist($manager->preparePermissionForDb($permission));
             }
+
             $entityManager->flush();
 
             $manager->buildCache();
