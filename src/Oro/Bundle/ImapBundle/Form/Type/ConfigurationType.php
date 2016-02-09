@@ -74,18 +74,18 @@ class ConfigurationType extends AbstractType
             ->add('imapHost', 'text', [
                 'label'    => 'oro.imap.configuration.imap_host.label',
                 'required' => false,
-                'attr'     => ['class' => 'critical-field imap-config check-connection'],
+                'attr'     => ['class' => 'critical-field imap-config check-connection switchable-field'],
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('imapPort', 'number', [
                 'label'    => 'oro.imap.configuration.imap_port.label',
-                'attr'     => ['class' => 'imap-config check-connection'],
+                'attr'     => ['class' => 'imap-config check-connection switchable-field'],
                 'required' => false
             ])
             ->add('imapEncryption', 'choice', [
                 'label'       => 'oro.imap.configuration.imap_encryption.label',
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
-                'attr'        => ['class' => 'imap-config check-connection'],
+                'attr'        => ['class' => 'imap-config check-connection switchable-field'],
                 'empty_data'  => null,
                 'empty_value' => '',
                 'required'    => false
@@ -99,19 +99,19 @@ class ConfigurationType extends AbstractType
             ])
             ->add('smtpHost', 'text', [
                 'label'    => 'oro.imap.configuration.smtp_host.label',
-                'attr'     => ['class' => 'critical-field smtp-config check-connection'],
+                'attr'     => ['class' => 'critical-field smtp-config check-connection switchable-field'],
                 'required' => false,
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('smtpPort', 'number', [
                 'label'    => 'oro.imap.configuration.smtp_port.label',
-                'attr'     => ['class' => 'smtp-config check-connection'],
+                'attr'     => ['class' => 'smtp-config check-connection switchable-field'],
                 'required' => false
             ])
             ->add('smtpEncryption', 'choice', [
                 'label'       => 'oro.imap.configuration.smtp_encryption.label',
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
-                'attr'        => ['class' => 'smtp-config check-connection'],
+                'attr'        => ['class' => 'smtp-config check-connection switchable-field'],
                 'empty_data'  => null,
                 'empty_value' => '',
                 'required'    => false
