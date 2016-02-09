@@ -16,6 +16,7 @@ class PermissionConfiguration implements ConfigurationInterface
     public function processConfiguration(array $configs)
     {
         $processor = new Processor();
+
         return $processor->processConfiguration($this, $configs);
     }
 

@@ -11,8 +11,6 @@ use Oro\Component\Config\Merger\ConfigurationMerger;
 
 class PermissionConfigurationProvider
 {
-    const ROOT_NODE_NAME = 'permissions';
-
     /** @var PermissionListConfiguration */
     protected $permissionConfiguration;
 
@@ -50,7 +48,7 @@ class PermissionConfigurationProvider
             $permissions[$permissionName] = $permissionConfiguration;
         }
 
-        return [self::ROOT_NODE_NAME => $permissions];
+        return $permissions;
     }
 
     /**
@@ -83,12 +81,7 @@ class PermissionConfigurationProvider
     protected function parseConfiguration(array $configuration)
     {
         try {
-            $permissionsData = [];
-            if (!empty($configuration[self::ROOT_NODE_NAME])) {
-                $permissionsData = $this->permissionConfiguration->processConfiguration(
-                    $configuration[self::ROOT_NODE_NAME]
-                );
-            }
+            $permissionsData = $this->permissionConfiguration->processConfiguration($configuration);
         } catch (InvalidConfigurationException $exception) {
             $message = sprintf(
                 'Can\'t parse permission configuration. %s',

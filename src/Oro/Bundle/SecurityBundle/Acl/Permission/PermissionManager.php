@@ -43,7 +43,7 @@ class PermissionManager
         );
 
         return $this->configurationBuilder
-            ->buildPermissions($permissionConfiguration[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+            ->buildPermissions($permissionConfiguration);
     }
 
     /**

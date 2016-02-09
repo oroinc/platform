@@ -91,7 +91,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->addColumn('label', 'string', ['length' => 255]);
         $table->addColumn('description', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('is_apply_to_all', 'boolean', []);
-        $table->addColumn('group_names', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('group_names', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'UNIQ_83424D0F5E237E06');
     }

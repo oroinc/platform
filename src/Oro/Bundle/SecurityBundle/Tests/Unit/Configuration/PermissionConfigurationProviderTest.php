@@ -97,8 +97,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->loadConfig('permissionsCorrect.yml');
         $permissions = $this->provider->getPermissionConfiguration();
-        $this->assertArrayHasKey(PermissionConfigurationProvider::ROOT_NODE_NAME, $permissions);
-        $this->assertEquals($expectedPermissions, $permissions[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+        $this->assertEquals($expectedPermissions, $permissions);
     }
 
     public function testFilterPermissionsConfiguration()
@@ -110,8 +109,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->loadConfig('permissionsCorrect.yml');
         $permissions = $this->provider->getPermissionConfiguration(array_keys($expectedPermissions));
-        $this->assertArrayHasKey(PermissionConfigurationProvider::ROOT_NODE_NAME, $permissions);
-        $this->assertEquals($expectedPermissions, $permissions[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+        $this->assertEquals($expectedPermissions, $permissions);
     }
 
     /**

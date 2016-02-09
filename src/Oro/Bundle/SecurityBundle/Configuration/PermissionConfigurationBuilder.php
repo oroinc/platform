@@ -84,7 +84,7 @@ class PermissionConfigurationBuilder
 
         $entities = new ArrayCollection();
         foreach ($configuration as $entityName) {
-            if (!$this->doctrineHelper->isManageableEntityClass($entityName)) {
+            if (!$this->isManageableEntityClass($entityName)) {
                 throw new NotManageableEntityException($entityName);
             }
             $entityNameNormalized = strtolower($entityName);
@@ -129,5 +129,18 @@ class PermissionConfigurationBuilder
         }
 
         return $default;
+    }
+
+    /**
+     * @param $entityClass
+     * @return mixed
+     */
+    protected function isManageableEntityClass($entityClass)
+    {
+        try {
+            return $isManageable = $this->doctrineHelper->isManageableEntityClass($entityClass);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

@@ -77,7 +77,7 @@ class Permission
     /**
      * @var array
      *
-     * @ORM\Column(name="group_names", type="array", nullable=true)
+     * @ORM\Column(name="group_names", type="array")
      */
     protected $groupNames;
 

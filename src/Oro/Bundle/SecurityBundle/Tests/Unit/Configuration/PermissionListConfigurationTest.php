@@ -29,7 +29,7 @@ class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $input, array $expected)
     {
-        $this->assertEquals($expected, $this->configuration->processConfiguration($input));
+        $this->assertEquals($expected, $this->configuration->processConfiguration([$input]));
     }
 
     /**

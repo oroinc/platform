@@ -8,6 +8,8 @@ use Symfony\Component\Config\Definition\Processor;
 
 class PermissionListConfiguration implements ConfigurationInterface
 {
+    const ROOT_NODE_NAME = 'permissions';
+
     /**
      * @var PermissionConfiguration
      */
@@ -29,7 +31,7 @@ class PermissionListConfiguration implements ConfigurationInterface
     {
         $processor = new Processor();
 
-        return $processor->processConfiguration($this, [$configs]);
+        return $processor->processConfiguration($this, $configs);
     }
 
     /**
@@ -38,7 +40,7 @@ class PermissionListConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root(PermissionConfigurationProvider::ROOT_NODE_NAME);
+        $root = $builder->root(static::ROOT_NODE_NAME);
         $root->useAttributeAsKey('name');
         $this->configuration->addNodes($root->prototype('array'));
 
