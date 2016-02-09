@@ -241,7 +241,7 @@ class RendererTest extends LayoutTestCase
                     'groups'           => [
                         'general'    => [
                             'title'  => 'General Info',
-                            'fields' => ['user.firstName', 'user.lastName']
+                            'fields' => ['user']
                         ],
                         'additional' => [
                             'title'   => 'Additional Info',
@@ -422,12 +422,17 @@ HTML;
             data-ftid="form_for_layout_renderer_test_user_lastName"/>
     </div>
     <div>
-        <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_firstName"
-            name="form_for_layout_renderer_test[user][firstName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_firstName"/>
+        <label class="required">User</label>
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+            <div>
+                <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_firstName"
+                    name="form_for_layout_renderer_test[user][firstName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+            </div>
+        </div>
     </div>
 </fieldset>
 HTML;
@@ -485,12 +490,17 @@ HTML;
             data-ftid="form_for_layout_renderer_test_user_lastName"/>
     </div>
     <div>
-        <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_firstName"
-            name="form_for_layout_renderer_test[user][firstName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_firstName"/>
+        <label class="required">User</label>
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+            <div>
+                <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_firstName"
+                    name="form_for_layout_renderer_test[user][firstName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+            </div>
+        </div>
     </div>
 </fieldset>
 HTML;
