@@ -93,7 +93,7 @@ class LoadFromConfigBag implements ProcessorInterface
             }
         }
 
-        return $config;
+        return !empty($config) ? $config : null;
     }
 
     /**
