@@ -41,9 +41,6 @@ define(function(require) {
      *                        }
      *                    }
      *                }
-     *            },
-     *            view_options: {
-     *              tooltip: 'Tooltip text'
      *            }
      *        }
      *    }
@@ -75,66 +72,54 @@ define(function(require) {
     var tools = require('oroui/js/tools');
 
     InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
-        options: {
-            overlay: {
-                enable: true,
-                styles: {
-                    zIndex: 1,
-                    position: {
-                        my: 'left top',
-                        at: 'left-7 top-7',
-                        collision: 'flipfit'
-                    }
+        OVERLAY_TOOL_DEFAULTS: {
+            zIndex: 1,
+            position: {
+                my: 'left top',
+                at: 'left-7 top-7',
+                collision: 'flipfit'
+            }
+        },
+
+        METADATA_DEFAULTS: {
+            inline_editing: {
+                enable: false,
+                save_api_accessor: {
+                    'class': 'oroui/js/tools/api-accessor'
                 }
-            },
-            metadata: {
-                inline_editing: {
-                    enable: false,
-                    save_api_accessor: {
-                        'class': 'oroui/js/tools/api-accessor'
-                    }
-                }
-            },
-            width_increment: 15,
-            fieldName: 'value',
-            messages: {
-                success: __('oro.form.inlineEditing.successMessage'),
-                processingMessage: __('oro.form.inlineEditing.saving_progress'),
-                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
             }
         },
 
         ESCAPE_KEY_CODE: 27,
+
+        WIDTH_INCREMENT: 15,
 
         /**
          * @constructor
          * @param {Object} options
          */
         initialize: function(options) {
-            options = $.extend(true, {}, this.options, options);
-
-            this.overlayOptions = options.overlay;
-            this.widthIncrement = options.width_increment;
-            this.messages = options.messages;
+            options.metadata = $.extend(true, {}, this.METADATA_DEFAULTS, options.metadata);
             this.inlineEditingOptions = options.metadata.inline_editing;
             var waitors = [];
-            this.fieldName = options.fieldName;
+            this.fieldName = options.fieldName || 'value';
             // frontend type mapped to viewer/editor/reader
             var classes = frontendTypeMap[options.frontend_type];
             this.classes = classes;
             this.metadata = options.metadata;
             this.model = new BaseModel();
             this.model.set(this.fieldName, options.value);
-            var viewOptions = this.getViewOptions();
             if (this.inlineEditingOptions.enable) {
-                var ViewerWrapper = classes['viewerWrapper'] || InlineEditorWrapperView;
-                this.wrapper = new ViewerWrapper({
+                this.wrapper = new InlineEditorWrapperView({
                     el: options._sourceElement,
                     autoRender: true
                 });
-
-                viewOptions.el = this.wrapper.getContainer();
-                this.view = new classes.viewer(viewOptions);
+                this.view = new classes.viewer(_.extend({
+                    el: this.wrapper.getContainer(),
+                    autoRender: true,
+                    model: this.model,
+                    fieldName: this.fieldName
+                }));
                 if (this.classes.editor.processMetadata) {
                     waitors.push(this.classes.editor.processMetadata(this.metadata));
                 }
@@ -147,18 +132,14 @@ define(function(require) {
                     }, this)
                 ));
             } else {
-                viewOptions.el = options._sourceElement;
-                this.view = new classes.viewer(viewOptions);
+                this.view = new classes.viewer(_.extend({
+                    el: options._sourceElement,
+                    autoRender: true,
+                    model: this.model,
+                    fieldName: this.fieldName
+                }));
             }
             this.deferredInit = $.when.apply($, waitors);
-        },
-
-        getViewOptions: function() {
-            return $.extend(true, {}, _.result(this.metadata, 'view_options', {}), {
-                autoRender: true,
-                model: this.model,
-                fieldName: this.fieldName
-            });
         },
 
         enterEditMode: function() {
@@ -166,56 +147,34 @@ define(function(require) {
                 this.view.$el.removeClass('save-fail');
             }
 
-            var viewInstance = this.createEditorViewInstance();
-
-            if (this.overlayOptions.enable) {
-                var overlayOptions = $.extend(true, {}, this.overlayOptions.styles, {
-                    position: {
-                        of: this.wrapper.$el
-                    }
-                });
-
-                var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
-                this.listenTo(viewInstance, 'dispose', _.bind(overlay.remove, overlay));
-            } else {
-                this.view.$el.hide();
-            }
-
-            this.initializeEditorListeners(this.editorView);
-
-            return viewInstance;
-        },
-
-        createEditorViewInstance: function() {
             var View = this.classes.editor;
-
-            this.editorView = new View(this.getEditorOptions());
-            this.resizeTo(this.editorView, this.wrapper);
-
-            return this.editorView;
-        },
-
-        getEditorOptions: function() {
             var viewConfiguration = this.inlineEditingOptions.editor ?
                 this.inlineEditingOptions.editor.view_options :
-            {};
-
-            if (!this.overlayOptions.enable) {
-                viewConfiguration.container = this.view.$el;
-                viewConfiguration.containerMethod = 'after';
-                viewConfiguration.autoAttach = true;
-            }
-
-            return $.extend(true, {}, viewConfiguration, {
-                className: 'inline-view-editor inline-editor-wrapper',
+                {};
+            var viewInstance = new View(_.extend({}, viewConfiguration, {
+                className: 'inline-view-editor',
                 autoRender: true,
                 model: this.model,
                 fieldName: this.fieldName
-            });
-        },
+            }));
 
-        initializeEditorListeners: function(viewInstance) {
+            this.editorView = viewInstance;
+
+            viewInstance.$el.addClass('inline-editor-wrapper');
+
+            var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
+                position: {
+                    of: this.wrapper.$el
+                }
+            });
+            this.resizeTo(viewInstance, this.wrapper);
+
+            var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+
             this.listenTo(viewInstance, {
+                dispose: function() {
+                    overlay.remove();
+                },
                 keydown: this.onGenericEscapeKeydown,
                 focus: function() {
                     mediator.trigger('inlineEditor:focus', viewInstance);
@@ -241,6 +200,8 @@ define(function(require) {
             this.listenTo(viewInstance, 'saveAndEditPrevRowAction', this.saveCurrentCellAndExit);
             this.listenTo(viewInstance, 'cancelAndEditPrevRowAction', this.exitEditMode);
             this.listenTo(mediator, 'inlineEditor:focus', this.onInlineEditorFocus);
+
+            return viewInstance;
         },
 
         onInlineEditorFocus: function(view) {
@@ -254,9 +215,6 @@ define(function(require) {
 
         exitEditMode: function() {
             this.editorView.dispose();
-            if (!this.overlayOptions.enable) {
-                this.view.$el.show();
-            }
             delete this.editorView;
         },
 
@@ -284,8 +242,7 @@ define(function(require) {
             var ctx = {
                 view: wrapper,
                 model: this.model,
-                oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData)),
-                messages: this.messages
+                oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData))
             };
             this.updateModel(this.model, this.editorView, modelUpdateData);
             if (this.saveApiAccessor.initialOptions.field_name) {
@@ -298,8 +255,8 @@ define(function(require) {
                 serverUpdateData = newData;
             }
             var savePromise = this.saveApiAccessor.send(this.model.toJSON(), serverUpdateData, {}, {
-                processingMessage: this.messages.processingMessage,
-                preventWindowUnload: this.messages.preventWindowUnload
+                processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
             });
 
             if (this.classes.editor.processSavePromise) {
@@ -334,7 +291,7 @@ define(function(require) {
          */
         resizeTo: function(view, baseView) {
             view.$el.css({
-                width: baseView.$el.outerWidth() + this.widthIncrement
+                width: baseView.$el.outerWidth() + this.WIDTH_INCREMENT
             });
         },
 
@@ -361,7 +318,7 @@ define(function(require) {
                     }
                 }, this);
             }
-            mediator.execute('showFlashMessage', 'success', this.messages.success);
+            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
         },
 
         onSaveError: function(jqXHR) {
