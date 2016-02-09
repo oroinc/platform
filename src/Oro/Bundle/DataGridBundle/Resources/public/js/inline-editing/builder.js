@@ -126,7 +126,7 @@ define(function(require) {
                                     options.metadata.inline_editing.enable = false;
                                     options.metadata.inline_editing.enable$changeReason =
                                         'Automatically disabled due to absent editor realization';
-                                    break;
+                                    return;
                                 case 'enable_selected':
                                     // if user selected this column as editable and there is no editor - throw an Error
                                     throw new Error(
