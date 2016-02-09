@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Email;
@@ -258,6 +259,9 @@ class UserTest extends AbstractUserTest
         $imapConfiguration->expects($this->exactly(2))
             ->method('isActive')
             ->willReturn(true);
+        $imapConfiguration->expects($this->once())
+            ->method('getUser')
+            ->willReturn($entity);
 
         $this->assertCount(0, $entity->getEmailOrigins());
         $this->assertNull($entity->getImapConfiguration());
@@ -351,5 +355,57 @@ class UserTest extends AbstractUserTest
         $user->setEmail($email);
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getNotificationEmails());
         $this->assertEquals([$email], $user->getNotificationEmails()->toArray());
+    }
+
+    /**
+     * @param bool $skipOrigin
+     * @param string $accessToken
+     * @param string $accountType
+     *
+     * @dataProvider setDataProviderAccountType
+     */
+    public function testGetAccountType($skipOrigin, $accessToken, $accountType)
+    {
+        $user = $this->getUser();
+        $origin = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $user->addEmailOrigin($origin);
+
+        if ($skipOrigin) {
+            $user->removeEmailOrigin($origin);
+            $this->assertEmpty($user->getImapAccountType());
+        } else {
+            $origin->expects($this->once())->method('isActive')->willReturn(true);
+            $origin->expects($this->once())->method('getMailbox')->willReturn(false);
+
+            $origin->expects($this->any())->method('getAccessToken')->willReturn($accessToken);
+            $this->assertEquals($accountType, $user->getImapAccountType()->getAccountType());
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function setDataProviderAccountType()
+    {
+        return [
+            'empty origin' => [
+                'skipOrigin' => true,
+                'accessToken' => '',
+                'accountType' => ''
+            ],
+            'expect Gmail account type' => [
+                'skipOrigin' => false,
+                'accessToken' => '12345',
+                'accountType' => AccountTypeModel::ACCOUNT_TYPE_GMAIL
+            ],
+            'expect Other account type' => [
+                'skipOrigin' => false,
+                'accessToken' => '',
+                'accountType' => AccountTypeModel::ACCOUNT_TYPE_OTHER
+            ]
+        ];
     }
 }

@@ -48,11 +48,9 @@ define([
             'keyup input': '_onReadCriteriaInputKey',
             'keydown [type="text"]': '_preventEnterProcessing',
             'click .filter-update': '_onClickUpdateCriteria',
-            'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
-            'click .choice-value': '_onClickChoiceValue',
-            'click .reset-filter': '_onClickResetFilter'
+            'click .choice-value': '_onClickChoiceValue'
         },
 
         /**
@@ -149,8 +147,8 @@ define([
             this._updateValueField();
         },
 
-        _onClickResetFilter: function() {
-            ChoiceFilter.__super__._onClickResetFilter.apply(this, arguments);
+        reset: function() {
+            ChoiceFilter.__super__.reset.apply(this, arguments);
             this._updateValueField();
         },
 
@@ -165,7 +163,7 @@ define([
             var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
             var rightWidth = this.$('.filter-update').outerWidth();
             valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('margin-right', rightWidth);
+            valueFrame.css('padding-right', rightWidth);
             // update class of criteria dropdown
             type = this.$(this.criteriaValueSelectors.type).val();
             isEmptyType = this.isEmptyType(type);

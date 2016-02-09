@@ -1,0 +1,45 @@
+.inline-editable-wrapper:not(:hover) {
+  &.save-success .inline-actions-element {
+    background: @cellSuccessBackground;
+    .inline-actions-element-outline(@cellSuccessBackground);
+    &:after {
+      position: relative;
+      font-family: 'FontAwesome';
+      content: '\f00c';
+      font-size: 15px;
+      line-height: 22px;
+      height: 22px;
+      padding: 0 4px;
+      color: @cellSuccessColor;
+    }
+    .inline-actions-element_actions {
+      display: none;
+    }
+  }
+  &.save-fail .inline-actions-element {
+    background: @cellErrorBackground;
+    .inline-actions-element-outline(@cellErrorBackground);
+    .inline-actions-element_actions {
+      display: none;
+    }
+  }
+}
+.inline-editable-wrapper {
+  &.loading .inline-actions-element {
+    background: @cellLoadingBackground;
+    .inline-actions-element-outline(@cellLoadingBackground);
+    &:after {
+      background: url('../../../../bundles/oroui/img/loader-16.gif') no-repeat center center transparent;
+      display: block !important;
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 1px;
+      width: 24px;
+      height: 24px;
+    }
+    &:hover .inline-actions-element_actions {
+      visibility: hidden !important;
+    }
+  }
+}

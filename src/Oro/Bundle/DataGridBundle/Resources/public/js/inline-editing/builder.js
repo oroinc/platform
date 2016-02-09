@@ -5,8 +5,14 @@ define(function(require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var InlineEditingHelpPlugin = require('../app/plugins/grid/inline-editing-help-plugin');
+    var console = window.console;
 
     var gridViewsBuilder = {
+        /**
+         * This column type is used by default for editing
+         */
+        DEFAULT_COLUMN_TYPE: 'string',
+
         /**
          * Prepares and preloads all required files for inline editing plugin
          *
@@ -35,6 +41,14 @@ define(function(require) {
                     }
                     deferred.resolve();
                 });
+            }).fail(function(e) {
+                if (console && console.error) {
+                    console.log(e);
+                    console.error('Inline editing loading failed. Reason: ' + e.message);
+                } else {
+                    throw e;
+                }
+                deferred.resolve();
             });
         },
 
@@ -59,7 +73,9 @@ define(function(require) {
             $.extend(true, mainConfig, this.getDefaultOptions(), options.metadata.inline_editing);
             options.metadata.inline_editing = mainConfig;
             promises.push(tools.loadModuleAndReplace(mainConfig, 'plugin'));
-            promises.push(tools.loadModuleAndReplace(mainConfig, 'default_editors'));
+            options.metadata.inline_editing.defaultEditorsLoadPromise =
+                tools.loadModuleAndReplace(mainConfig, 'default_editors');
+            promises.push(options.metadata.inline_editing.defaultEditorsLoadPromise);
             promises.push(tools.loadModuleAndReplace(mainConfig.cell_editor, 'component'));
             promises.push(tools.loadModuleAndReplace(mainConfig.save_api_accessor, 'class'));
             return promises;
@@ -67,31 +83,53 @@ define(function(require) {
 
         prepareColumns: function(options) {
             var promises = [];
+            var defaultOptions = this.getDefaultOptions();
             // plugin
             // column views and components
             var columnsMeta = options.metadata.columns;
             _.each(columnsMeta, function(columnMeta) {
-                if (columnMeta.inline_editing && columnMeta.inline_editing.editor) {
-                    var editor = columnMeta.inline_editing.editor;
-                    if (editor.component) {
-                        promises.push(tools.loadModule(editor.component)
-                            .then(function(realization) {
-                                editor.component = realization;
-                                if (_.isFunction(realization.processMetadata)) {
-                                    return realization.processMetadata(columnMeta);
-                                }
-                                return realization;
-                            }));
-                    }
-                    if (editor.view) {
-                        promises.push(tools.loadModule(editor.view)
-                            .then(function(realization) {
-                                editor.view = realization;
-                                if (_.isFunction(realization.processMetadata)) {
-                                    return realization.processMetadata(columnMeta);
-                                }
-                                return realization;
-                            }));
+                if (!columnMeta.inline_editing) {
+                    return;
+                }
+                if (!columnMeta.inline_editing.editor) {
+                    columnMeta.inline_editing.editor = {};
+                }
+                var editor = columnMeta.inline_editing.editor;
+                if (!editor.component) {
+                    editor.component = defaultOptions.cell_editor.component;
+                }
+                if (!editor.view) {
+                    options.metadata.inline_editing.defaultEditorsLoadPromise.then(function(defaultEditors) {
+                        var realization = defaultEditors[(columnMeta.type || gridViewsBuilder.DEFAULT_COLUMN_TYPE)];
+                        editor.view = realization;
+                        if (_.isFunction(realization.processMetadata)) {
+                            return realization.processMetadata(columnMeta);
+                        }
+                        return realization;
+                    });
+                } else {
+                    promises.push(tools.loadModule(editor.view)
+                        .then(function(realization) {
+                            editor.view = realization;
+                            if (_.isFunction(realization.processMetadata)) {
+                                return realization.processMetadata(columnMeta);
+                            }
+                            return realization;
+                        }));
+                }
+
+                if (_.isString(editor.component)) {
+                    promises.push(tools.loadModule(editor.component)
+                        .then(function(realization) {
+                            editor.component = realization;
+                            if (_.isFunction(realization.processMetadata)) {
+                                return realization.processMetadata(columnMeta);
+                            }
+                            return realization;
+                        }));
+                } else {
+                    if (_.isFunction(editor.component.processMetadata)) {
+                        return editor.component.processMetadata(columnMeta);
                     }
                 }
                 if (columnMeta.inline_editing && columnMeta.inline_editing.save_api_accessor &&

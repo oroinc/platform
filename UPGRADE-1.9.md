@@ -5,6 +5,7 @@ UPGRADE FROM 1.8 to 1.9
 - Services with tag `oro_activity.activity_widget_provider` was marked as private
 
 ####ActivityListBundle
+- The signature of `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface::isApplicableTarget` method changed. Before: `isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)`. After: `isApplicableTarget($entityClass, $accessible = true)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getDate` removed. Use `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getCreatedAt` and `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getUpdatedAt` instead
@@ -15,10 +16,16 @@ UPGRADE FROM 1.8 to 1.9
 - `oro_address.address.manager` service was marked as private
 - Validation `AbstractAddress::isRegionValid` was moved to `Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion` constraint
 
+####AttachmentBundle
+- Class `Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig` marked as deprecated. Use `Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper` instead.
+
 ####CalendarBundle
 - `oro_calendar.calendar_provider.user` service was marked as private
 - `oro_calendar.calendar_provider.system` service was marked as private
 - `oro_calendar.calendar_provider.public` service was marked as private
+
+####CommentBundle
+- The `Oro\Bundle\CommentBundle\Model\CommentProviderInterface` changed. The `hasComments` method removed. The `isCommentsEnabled` method added. The signature of the old method was `hasComments(ConfigManager $configManager, $entityName)`. The signature of the new method is `isCommentsEnabled($entityClass)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\CommentBundle\Model\CommentProviderInterface`.
 
 ####ConfigBundle
 - An implementation of scope managers has been changed to be simpler and performant. This can bring a `backward compatibility break` if you have own scope managers. See [add_new_config_scope.md](./src/Oro/Bundle/ConfigBundle/Resources/doc/add_new_config_scope.md) and the next items for more detailed info.
@@ -28,12 +35,66 @@ UPGRADE FROM 1.8 to 1.9
 - Removed method `loadStoredSettings` of `Oro\Bundle\ConfigBundle\Config\ConfigManager`.
 - Removed class `Oro\Bundle\ConfigBundle\Manager\UserConfigManager` and service `oro_config.user_config_manager`. Use `oro_config.user` service instead.
 
+####CronBundle
+ - Command `oro:cron:daemon` was renamed to `oro:daemon` and it is no longer executed by cron
+
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
 - `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` has `@InheritanceType("SINGLE_TABLE")`
 - `audit-grid` and `audit-history-grid` based on `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit` now. Make join to get your entity on grid
 
 ####DataGridBundle
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_PATH`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_TYPE_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::getAclResource`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_ACL_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::getAclResource`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::BASE_DATAGRID_CLASS_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::BASE_DATAGRID_CLASS_PATH`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_ACL_CHECK` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::isDatasourceSkipAclApply`.
+- `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH` marked as deprecated. Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH`.
+- Option "acl_resource" moved from option "source" to root node of datagrid configuration:
+
+Before
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        source:
+            acl_resource: 'acme_demo_entity_view'
+            ... # some configuration
+```
+
+Now
+
+```
+datagrid:
+    acme-demo-grid:
+        acl_resource: 'acme_demo_entity_view'
+        ... # some configuration
+```
+
+- Option of datagrid "skip_acl_check" is deprecated, use option "skip_acl_apply" instead. Logic of this option was also changed. Before this option caused ignorance of option "acl_resource". Now it is responsible only for indication whether or not ACL should be applied to source query of the grid. See [advanced_grid_configuration.md](.src/Oro/Bundle/DataGridBundle/Resources/doc/backend/advanced_grid_configuration.md) for use cases. 
+
+Before
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        options:
+            skip_acl_check: true
+```
+
+Now
+
+```
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        source:
+            skip_acl_apply: true
+            ... # some configuration
+```
+
 - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
 - JS collection models format changed to maintain compatibility with Backbone collections: now it is always list of models, and additional parameters are passed through the options 
 - Grid merge uses distinct policy
@@ -72,7 +133,9 @@ grid-name:
 - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
 - `oro_email.emailtemplate.variable_provider.entity` service was marked as private
 - `oro_email.emailtemplate.variable_provider.system` service was marked as private
-- `oro_email.emailtemplate.variable_provider.user` service was marked as private 
+- `oro_email.emailtemplate.variable_provider.user` service was marked as private
+- Command `oro:email:body-sync` was marked as deprecated
+- Command `oro:cron:email-body-sync` was added
 
 ####EmbeddedFormBundle
 - Bundle now contains configuration of security firewall `embedded_form`
@@ -85,6 +148,7 @@ grid-name:
 - `oro_entity.entity_hierarchy_provider` service was marked as private.
 - `oro_entity.entity_hierarchy_provider.class` parameter was removed.
 - `oro_entity.entity_hierarchy_provider.all` service was added. It can be used if you need a hierarchy of all entities but not only configurable ones.
+- Class `Oro\Bundle\EntityBundle\Provider\EntityContextProvider` was moved to `Oro\Bundle\ActivityBundle\Provider\ContextGridProvider` and `oro_entity.entity_context_provider` service was moved to `oro_activity.provider.context_grid`. 
 
 ####EntityConfigBundle
 - Removed `optionSet` field type deprecated since v1.4. Existing options sets are converted to `Select` or `Multi-Select` automatically during the Platform update.
@@ -108,9 +172,12 @@ grid-name:
 - Added parameters `Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Type\FieldType`
 - Services with tag `oro_entity_extend.entity_config_dumper_extension` was marked as private
 - Services with tag `oro_entity_extend.entity_generator_extension` was marked as private
+- Method `generateManyToOneRelationColumnName` of `Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator` marked as deprecated. Use `generateRelationColumnName` method instead.
+- Method `generateManyToManyRelationColumnName` of `Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator` marked as deprecated. Use `generateManyToManyJoinTableColumnName` method instead.
 
 ####EntitySerializer component
 - `Oro\Component\EntitySerializer\EntitySerializer` class has a lot of changes. This can bring a `backward compatibility break` if you have inherited classes.
+- Changed the default behaviour for relations which does not have explicit configuration. Now such relations are skipped. Before that the all fields of a related entity were returned, this could cause indefinite loop if a target entity has another relation to parent entity. To restore the previous result you should configure all relations explicitly, for example: `users => null`.
 - `excluded_fields` attribute is marked as deprecated. Use `exclude` attribute for a field.
 - `orderBy` attribute is marked as deprecated. Use `order_by` attribute instead.
 - `result_name` attribute is marked as deprecated. Use `property_path` attribute instead.
@@ -164,6 +231,9 @@ after:
 - Added `Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter` as default formatter for the date, time and datetime types in `Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer`. This types exported/imported depends on the application locale and timezone and recognized as dates in Microsoft Excel.
 - `Oro\Bundle\ImportExportBundle\Field\DatabaseHelper::getRegistry` is deprecated. Use class methods instead of disposed registry
 - Services with tag `oro_importexport.normalizer` was marked as private
+- Allow to omit empty identity fields. To use this feature set `Use As Identity Field` option to `Only when not empty
+` (-1 or `Oro\Bundle\ImportExportBundle\Field\FieldHelper::IDENTITY_ONLY_WHEN_NOT_EMPTY` in a code)
+- The signature of `Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter::getRelatedEntityRulesAndBackendHeaders` method changed. Before: `getRelatedEntityRulesAndBackendHeaders($entityName, $fullData, $singleRelationDeepLevel, $multipleRelationDeepLevel, $field, $fieldHeader, $fieldOrder, $isIdentifier = false)`. After: `getRelatedEntityRulesAndBackendHeaders($entityName, $singleRelationDeepLevel, $multipleRelationDeepLevel, $field, $fieldHeader, $fieldOrder)`. This can bring a `backward compatibility break` if you have classes inherited from `Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter`.
 
 ####InstallerBundle
 - `Oro\Bundle\InstallerBundle\EventListener\RequestListener` added to the class cache as performance improvement
@@ -210,6 +280,10 @@ after:
 - Bundle now contains configuration of security firewall `wsse_secured` 
 - `Oro\Bundle\SoapBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
 
+####TagBundle
+- Removed class `Oro\Bundle\TagBundle\Form\Type\TagAutocompleteType` and service `oro_tag.form.type.tag_autocomplete`, use `Oro\Bundle\TagBundle\Form\Type\TagSelectType` and `oro_tag_select` instead.
+- Removed `oro_tag_autocomplete` form type, use `oro_tag_select` instead.
+
 ####TrackingBundle
 - Bundle now contains configuration of security firewall `tracking_data`
 
@@ -217,11 +291,17 @@ after:
 - `/Resources/translations/tooltips.*.yml` deprecated since 1.9.0. Will be removed in 1.11.0. Use `/Resources/translations/messages.*.yml` instead
 
 ####UiBundle
+- Added `assets_version_strategy` parameter which can be used to automatically update `assets_version` parameter. Possible values are:
+  - null        - the assets version stays unchanged
+  - time_hash   - a hash of the current time (default strategy)
+  - incremental - the next assets version is the previous version is incremented by one (e.g. 'ver1' -> 'ver2' or '1' -> '2')
+- Removed `assets_version` global variable from TWIG. Use `asset_version` or `asset` TWIG functions instead
 - Added possibility to group tabs in dropdown for tabs panel. Added options to tabPanel function. Example: `{{ tabPanel(tabs, {useDropdown: true}) }}`
 - Added possibility to set content for specific tab. Example: `{{ tabPanel([{label: 'Tab', content: 'Tab content'}]) }}`
 - `Oro\Bundle\UIBundle\EventListener\ContentProviderListener` added to the class cache and constructor have container as performance improvement
 - Services with tag `oro_ui.content_provider` was marked as private
 - Services with tag `oro_formatter` was marked as private
+- Class `Oro\Bundle\UIBundle\Tools\ArrayUtils` marked as deprecated. Use `Oro\Component\PhpUtils\ArrayUtil` instead.
 
 ####UserBundle
 - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
@@ -248,8 +328,14 @@ after:
 - Route `oro_workflow_api_rest_workflow_deactivate` marked as deprecated. Use the route `oro_api_workflow_deactivate` instead.
 - Route `oro_workflow_api_rest_workflow_start` marked as deprecated. Use the route `oro_api_workflow_start` instead.
 - Route `oro_workflow_api_rest_workflow_transit` marked as deprecated. Use the route `oro_api_workflow_transit` instead.
+- Added new command `Oro\Bundle\WorkflowBundle\Command` (`oro:process:handle-trigger`) for handle ProcessTrigger by `trigger id` and `process name`
+- Added possibility to handle ProcessTrigger by cron schedule - use option `cron` for trigger config.
 
 ####OroIntegrationBundle
 - `Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::addStatus` marked as deprecated since 1.9.0. Will be removed in 1.11.0. Use `Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::addStatusAndFlush` instead.
 - Added possibility to skip connectors during synchronization using implemenation of `Oro\Bundle\IntegrationBundle\Provider\AllowedConnectorInterface`. 
 - Added possibility to sort connectors execution order using implementation of `Oro\Bundle\IntegrationBundle\Provider\OrderedConnectorInterface`.
+
+####OroCronBundle
+- `Oro\Bundle\CronBundle\Entity\Schedule` - field `command` changed size from 50 to 255 chars, added new field `args` for store command arguments.
+- Command `Oro\Bundle\CronBundle\Command\CronCommand` (`oro:cron`) now process not only commands, but all records from entity `Oro\Bundle\CronBundle\Entity\Schedule` too. 

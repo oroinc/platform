@@ -51,6 +51,7 @@ define(function(require) {
     var MultiCheckboxEditorView;
     var SelectEditorView = require('./select-editor-view');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     require('jquery.multiselect');
     require('jquery.multiselect.filter');
 
@@ -82,8 +83,8 @@ define(function(require) {
                 header: '',
                 height: 'auto',
                 position: {
-                    my: 'left top-36',
-                    at: 'left bottom',
+                    my: 'left top',
+                    at: 'left top',
                     of: this.$el
                 },
                 beforeclose: function() {
@@ -91,7 +92,7 @@ define(function(require) {
                 }
             }).multiselectfilter({
                 label: '',
-                placeholder: '',
+                placeholder: __('oro.form.inlineEditing.multi_checkbox_editor.filter.placeholder'),
                 autoReset: true
             });
         },

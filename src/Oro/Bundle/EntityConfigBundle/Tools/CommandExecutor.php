@@ -121,7 +121,7 @@ class CommandExecutor
                 if ($type === Process::ERR) {
                     $logger->error($data);
                 } else {
-                    $logger->notice($data);
+                    $logger->info($data);
                 }
             }
         );

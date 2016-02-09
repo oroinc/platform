@@ -222,7 +222,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
      */
     protected function loadKnownEmailAddresses(array $emailsToLoad)
     {
-        $this->logger->notice(sprintf('Loading email address(es) "%s" ...', implode(',', $emailsToLoad)));
+        $this->logger->info(sprintf('Loading email address(es) "%s" ...', implode(',', $emailsToLoad)));
 
         $emails = $this->getKnownEmailAddresses($emailsToLoad);
 
@@ -232,7 +232,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
                 : ['known' => false];
         }
 
-        $this->logger->notice(sprintf('Loaded %d email address(es).', count($emails)));
+        $this->logger->info(sprintf('Loaded %d email address(es).', count($emails)));
     }
 
     /**

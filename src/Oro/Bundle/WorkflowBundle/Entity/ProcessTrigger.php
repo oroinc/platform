@@ -15,7 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *  uniqueConstraints={
  *      @ORM\UniqueConstraint(
  *          name="process_trigger_unique_idx",
- *          columns={"event", "field", "definition_name"}
+ *          columns={"event", "field", "definition_name", "cron"}
  *      )
  *  }
  * )
@@ -56,7 +56,7 @@ class ProcessTrigger
     /**
      * @var string
      *
-     * @ORM\Column(name="event", type="string", length=255)
+     * @ORM\Column(name="event", type="string", length=255, nullable=true)
      */
     protected $event;
 
@@ -101,6 +101,13 @@ class ProcessTrigger
     protected $definition;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="cron", type="string", length=100, nullable=true)
+     */
+    protected $cron;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -134,6 +141,17 @@ class ProcessTrigger
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param int $id
+     * @return ProcessTrigger
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     /**
@@ -278,6 +296,25 @@ class ProcessTrigger
     }
 
     /**
+     * @param string $cron
+     * @return ProcessTrigger
+     */
+    public function setCron($cron)
+    {
+        $this->cron = $cron;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCron()
+    {
+        return $this->cron;
+    }
+
+    /**
      * @param \DateTime $createdAt
      * @return ProcessTrigger
      */
@@ -373,7 +410,8 @@ class ProcessTrigger
             ->setPriority($trigger->getPriority())
             ->setQueued($trigger->isQueued())
             ->setTimeShift($trigger->getTimeShift())
-            ->setDefinition($trigger->getDefinition());
+            ->setDefinition($trigger->getDefinition())
+            ->setCron($trigger->getCron());
 
         return $this;
     }

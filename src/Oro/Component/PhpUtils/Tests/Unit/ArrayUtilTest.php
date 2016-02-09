@@ -456,6 +456,265 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider someProvider
+     */
+    public function testSome(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertSame($expectedResult, ArrayUtil::some($callback, $array));
+    }
+
+    public function someProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item === 1;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 0;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 4;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 5;
+                },
+                [0, 1, 2, 3, 4],
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider findProvider
+     */
+    public function testFind(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertSame($expectedResult, ArrayUtil::find($callback, $array));
+    }
+
+    public function findProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item === 1;
+                },
+                [0, 1, 2, 3, 4],
+                1,
+            ],
+            [
+                function ($item) {
+                    return $item === 0;
+                },
+                [0, 1, 2, 3, 4],
+                0,
+            ],
+            [
+                function ($item) {
+                    return $item === 4;
+                },
+                [0, 1, 2, 3, 4],
+                4,
+            ],
+            [
+                function ($item) {
+                    return $item === 5;
+                },
+                [0, 1, 2, 3, 4],
+                null,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dropWhileProvider
+     */
+    public function testDropWhile(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ArrayUtil::dropWhile($callback, $array));
+    }
+
+    public function dropWhileProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item !== 2;
+                },
+                [],
+                [],
+            ],
+            [
+                function ($item) {
+                    return $item !== 2;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            [
+                function ($item) {
+                    return $item !== 0;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [0, 1, 2, 3, 4, 5],
+            ],
+            [
+                function ($item) {
+                    return $item !== 6;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [],
+            ],
+        ];
+    }
+
+    /**
+     * @param array $array
+     * @param mixed $columnKey
+     * @param mixed $indexKey
+     * @param array $expected
+     *
+     * @dataProvider arrayColumnProvider
+     */
+    public function testArrayColumn(array $array, $columnKey, $indexKey, array $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ArrayUtil::arrayColumn($array, $columnKey, $indexKey)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function arrayColumnProvider()
+    {
+        return [
+            'empty'        => [[], 'value', 'value', []],
+            'no_index'     => [
+                [
+                    [
+                        'id'    => 'id1',
+                        'value' => 'value2'
+                    ]
+                ],
+                'value',
+                null,
+                ['value2']
+            ],
+            'index'        => [
+                [
+                    [
+                        'id'    => 'id1',
+                        'value' => 'value2'
+                    ]
+                ],
+                'value',
+                'id',
+                ['id1' => 'value2']
+            ],
+            'wrong_index'  => [
+                [
+                    ['value' => 'value2']
+                ],
+                'value',
+                'id',
+                []
+            ],
+            'wrong_column' => [
+                [
+                    ['value' => 'value2']
+                ],
+                'id',
+                null,
+                []
+            ],
+
+        ];
+    }
+
+    /**
+     * @param array  $array
+     * @param mixed  $columnKey
+     * @param mixed  $indexKey
+     * @param string $expectedMessage
+     *
+     * @dataProvider arrayColumnInputData
+     */
+    public function testArrayColumnInputData(array $array, $columnKey, $indexKey, $expectedMessage)
+    {
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            $expectedMessage
+        );
+
+        ArrayUtil::arrayColumn($array, $columnKey, $indexKey);
+    }
+
+    /**
+     * @return array
+     */
+    public function arrayColumnInputData()
+    {
+        return [
+            'empty_column_key' => [
+                [
+                    ['id' => 'value']
+                ],
+                null,
+                null,
+                'Column key is empty'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider mergeDataProvider
+     *
+     * @param array $expected
+     * @param array $first
+     * @param array $second
+     */
+    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
+    {
+        $this->assertEquals($expected, ArrayUtil::arrayMergeRecursiveDistinct($first, $second));
+    }
+
+    /**
+     * @return array
+     */
+    public function mergeDataProvider()
+    {
+        return [
+            [
+                [
+                    'a',
+                    'b',
+                    'c' => [
+                        'd' => 'd2',
+                        'e' => 'e1'
+                    ]
+                ],
+                ['a', 'c' => ['d' => 'd1', 'e' => 'e1']],
+                ['b', 'c' => ['d' => 'd2']]
+            ]
+        ];
+    }
+
+    /**
      * @param object $obj
      *
      * @return mixed

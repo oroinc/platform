@@ -303,6 +303,7 @@ class ExtendConfigDumper
             $fieldName     = $fieldConfigId->getFieldName();
             $fieldType     = $fieldConfigId->getFieldType();
             $isDeleted     = $fieldConfig->is('is_deleted');
+            $columnName    = $fieldConfig->get('column_name', false, $fieldName);
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations, true)) {
@@ -325,7 +326,7 @@ class ExtendConfigDumper
                 }
 
                 $doctrine[$entityName]['fields'][$fieldName] = [
-                    'column'    => $fieldName,
+                    'column'    => $columnName,
                     'type'      => $fieldType,
                     'nullable'  => true,
                     'length'    => $fieldConfig->get('length'),

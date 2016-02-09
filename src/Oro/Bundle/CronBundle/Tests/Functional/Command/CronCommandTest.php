@@ -13,12 +13,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class CronCommandTest extends WebTestCase
 {
-    /** @var  Application */
+    /** @var Application */
     protected $application;
 
     protected function setUp()
     {
         $this->initClient();
+        $this->loadFixtures([
+            'Oro\Bundle\CronBundle\Tests\Functional\Command\DataFixtures\LoadScheduleData'
+        ]);
 
         $kernel = self::getContainer()->get('kernel');
         $this->application = new Application($kernel);
@@ -63,6 +66,10 @@ class CronCommandTest extends WebTestCase
         $this->checkMessage('AllJobSkip', $result);
     }
 
+    /**
+     * @param string $key
+     * @param string $result
+     */
     protected function checkMessage($key, $result)
     {
         $messages = [
@@ -70,41 +77,41 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:integration:sync": new command found, setting up schedule..',
                 'Processing command "oro:cron:batch:cleanup": new command found, setting up schedule..',
                 'Processing command "oro:cron:cleanup": new command found, setting up schedule..',
-                'Processing command "oro:cron:daemon": new command found, setting up schedule..',
                 'Processing command "oro:cron:imap-sync": new command found, setting up schedule..',
                 'Processing command "oro:cron:import-tracking": new command found, setting up schedule..',
                 'Processing command "oro:cron:tracking:parse": new command found, setting up schedule..',
-                'Processing command "oro:cron:send-reminders": new command found, setting up schedule..'
+                'Processing command "oro:cron:send-reminders": new command found, setting up schedule..',
+                'Processing command "oro:cron:cleanup --dry-run": added to job queue'
             ],
             'AllJobAlreadyExist' => [
                 'Processing command "oro:cron:integration:sync": already exists in job queue',
                 'Processing command "oro:cron:batch:cleanup": already exists in job queue',
                 'Processing command "oro:cron:cleanup": already exists in job queue',
-                'Processing command "oro:cron:daemon": already exists in job queue',
                 'Processing command "oro:cron:imap-sync": already exists in job queue',
                 'Processing command "oro:cron:import-tracking": already exists in job queue',
                 'Processing command "oro:cron:tracking:parse": already exists in job queue',
-                'Processing command "oro:cron:send-reminders": already exists in job queue'
+                'Processing command "oro:cron:send-reminders": already exists in job queue',
+                'Processing command "oro:cron:cleanup --dry-run": already exists in job queue'
             ],
             'AllJobAdded' => [
                 'Processing command "oro:cron:integration:sync": added to job queue',
                 'Processing command "oro:cron:batch:cleanup": added to job queue',
                 'Processing command "oro:cron:cleanup": added to job queue',
-                'Processing command "oro:cron:daemon": added to job queue',
                 'Processing command "oro:cron:imap-sync": added to job queue',
                 'Processing command "oro:cron:import-tracking": added to job queue',
                 'Processing command "oro:cron:tracking:parse": added to job queue',
-                'Processing command "oro:cron:send-reminders": added to job queue'
+                'Processing command "oro:cron:send-reminders": added to job queue',
+                'Processing command "oro:cron:cleanup --dry-run": already exists in job queue'
             ],
             'AllJobSkip' => [
                 'Processing command "oro:cron:integration:sync": skipped',
                 'Processing command "oro:cron:batch:cleanup": skipped',
                 'Processing command "oro:cron:cleanup": skipped',
-                'Processing command "oro:cron:daemon": skipped',
                 'Processing command "oro:cron:imap-sync": skipped',
                 'Processing command "oro:cron:import-tracking": skipped',
                 'Processing command "oro:cron:tracking:parse": skipped',
-                'Processing command "oro:cron:send-reminders": skipped'
+                'Processing command "oro:cron:send-reminders": skipped',
+                'Processing command "oro:cron:cleanup --dry-run": skipped'
             ]
         ];
 

@@ -37,11 +37,16 @@ class ProcessLogger
     public function debug($message, ProcessTrigger $trigger, ProcessData $data)
     {
         if ($this->logger) {
-            $context = array(
-                'definition' => $trigger->getDefinition()->getName(),
-                'event'      => $trigger->getEvent(),
-                'entityId'   => $this->doctrineHelper->getSingleEntityIdentifier($data['data'], false),
-            );
+            $context = array('definition' => $trigger->getDefinition()->getName());
+            if ($trigger->getEvent()) {
+                $context['event'] = $trigger->getEvent();
+            }
+            if ($trigger->getCron()) {
+                $context['cron'] = $trigger->getCron();
+            }
+            if ($data['data']) {
+                $context['entityId'] = $this->doctrineHelper->getSingleEntityIdentifier($data['data'], false);
+            }
             $this->logger->debug($message, $context);
         }
     }

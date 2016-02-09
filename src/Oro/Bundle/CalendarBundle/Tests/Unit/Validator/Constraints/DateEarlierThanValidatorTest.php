@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\CalendarBundle\Validator\Constraints\DateEarlierThan;
 use Oro\Bundle\CalendarBundle\Validator\Constraints\DateEarlierThanValidator;
+use Symfony\Component\Form\Form;
 
 class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,6 +56,10 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->any())
             ->method('get')
             ->will($this->returnValue($this->formField));
+
+        $form->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
 
         $this->context = $this->getMock('\Symfony\Component\Validator\ExecutionContextInterface');
         $this->context->expects($this->any())
@@ -143,5 +148,20 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->validator->validate($this->dateTimeEnd, $this->constraint);
+    }
+
+    public function testNotExistingFormData()
+    {
+        $formConfig = $this->getMock('\Symfony\Component\Form\FormConfigInterface');
+        $form = new Form($formConfig);
+
+        $this->context = $this->getMock('\Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context->expects($this->any())
+            ->method('getRoot')
+            ->will($this->returnValue($form));
+
+        $this->validator->initialize($this->context);
+
+        $this->assertNull($this->validator->validate(false, $this->constraint));
     }
 }

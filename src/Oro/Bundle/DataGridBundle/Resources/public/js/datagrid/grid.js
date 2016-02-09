@@ -4,6 +4,7 @@ define(function(require) {
     var Grid;
     var $ = require('jquery');
     var _ = require('underscore');
+    var Backbone = require('backbone');
     var Backgrid = require('backgrid');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
@@ -84,6 +85,9 @@ define(function(require) {
         /** @property {orodatagrid.datagrid.Toolbar} */
         toolbar: Toolbar,
 
+        /** @property {orodatagrid.datagrid.MetadataModel} */
+        metadataModel: null,
+
         /** @property {LoadingMaskView|null} */
         loadingMask: null,
 
@@ -108,7 +112,7 @@ define(function(require) {
             rowClickAction:         undefined,
             multipleSorting:        true,
             rowActions:             [],
-            massActions:            [],
+            massActions:            new Backbone.Collection(),
             enableFullScreenLayout: false
         },
 
@@ -129,7 +133,7 @@ define(function(require) {
          * @param {Object} [options.toolbarOptions] Options for toolbar
          * @param {Object} [options.exportOptions] Options for export
          * @param {Array<oro.datagrid.action.AbstractAction>} [options.rowActions] Array of row actions prototypes
-         * @param {Array<oro.datagrid.action.AbstractAction>} [options.massActions] Array of mass actions prototypes
+         * @param {Backbone.Collection<oro.datagrid.action.AbstractAction>} [options.massActions] Collection of mass actions prototypes
          * @param {Boolean} [options.multiSelectRowEnabled] Option for enabling multi select row
          * @param {oro.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for
          *  action that handles row click
@@ -160,6 +164,10 @@ define(function(require) {
 
             if (opts.columns.length === 0) {
                 this.noColumnsFlag = true;
+            }
+
+            if (!opts.metadataModel) {
+                throw new TypeError('"metadataModel" is required');
             }
 
             // Init properties values based on options and defaults
@@ -224,6 +232,36 @@ define(function(require) {
             }, this);
 
             Grid.__super__.dispose.call(this);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        delegateEvents: function() {
+            Grid.__super__.delegateEvents.apply(this, arguments);
+
+            var $parents = this.$('.grid-container').parents();
+            if ($parents.length) {
+                $parents = $parents.add(document);
+                $parents.on('scroll' + this.eventNamespace(), _.bind(this.trigger, this, 'scroll'));
+                this._$boundScrollHandlerParents = $parents;
+            }
+
+            return this;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        undelegateEvents: function() {
+            Grid.__super__.undelegateEvents.apply(this, arguments);
+
+            if (this._$boundScrollHandlerParents) {
+                this._$boundScrollHandlerParents.off(this.eventNamespace());
+                delete this._$boundScrollHandlerParents;
+            }
+
+            return this;
         },
 
         /**
@@ -485,7 +523,7 @@ define(function(require) {
                 xhr.always = function() {
                     always.apply(this, arguments);
                     if (!self.disposed) {
-                        self._afterRequest();
+                        self._afterRequest(this);
                     }
                 };
             });
@@ -591,6 +629,7 @@ define(function(require) {
             this.renderNoDataBlock();
             this.renderLoadingMask();
 
+            this.delegateEvents();
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
             this._deferredRender();
@@ -676,7 +715,12 @@ define(function(require) {
          *
          * @private
          */
-        _afterRequest: function() {
+        _afterRequest: function(jqXHR) {
+            var json = jqXHR.responseJSON || {};
+            if (json.metadata) {
+                this._processLoadedMetadata(json.metadata);
+            }
+
             this.requestsCount -= 1;
             if (this.requestsCount === 0) {
                 this.hideLoading();
@@ -688,6 +732,15 @@ define(function(require) {
                 this.initLayout();
                 this.trigger('content:update');
             }
+        },
+
+        /**
+         * @param {Object} metadata
+         * @private
+         */
+        _processLoadedMetadata: function(metadata) {
+            _.extend(this.metadata, metadata);
+            this.metadataModel.set(metadata);
         },
 
         /**

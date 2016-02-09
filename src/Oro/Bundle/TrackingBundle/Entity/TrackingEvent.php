@@ -22,7 +22,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *  defaultValues={
  *      "entity"={
  *          "icon"="icon-external-link"
- *      }
+ *      },
+ *      "grid"={
+ *          "default"="tracking-events-grid"
+ *     }
  *  }
  * )
  */

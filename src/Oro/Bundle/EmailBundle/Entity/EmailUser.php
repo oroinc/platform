@@ -42,6 +42,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailUser
 {
+    const ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
+
     /**
      * @var integer
      *
@@ -145,6 +147,13 @@ class EmailUser
      * @JMS\Exclude
      */
     protected $email;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="integer", options={"default"=0})
+     */
+    protected $unsyncedFlagCount = 0;
 
     public function __construct()
     {
@@ -389,10 +398,88 @@ class EmailUser
     }
 
     /**
+     * @return int
+     */
+    public function getUnsyncedFlagCount()
+    {
+        return $this->unsyncedFlagCount;
+    }
+
+    /**
+     * @return $this
+     */
+    public function incrementUnsyncedFlagCount()
+    {
+        $this->unsyncedFlagCount++;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function decrementUnsyncedFlagCount()
+    {
+        $this->unsyncedFlagCount = max([0, $this->unsyncedFlagCount - 1]);
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOutgoing()
+    {
+        $directions = $this->getFolderDirections();
+        if (in_array(EmailFolder::DIRECTION_OUTGOING, $directions)) {
+            return true;
+        }
+
+        if (in_array(EmailFolder::DIRECTION_INCOMING, $directions)) {
+            return false;
+        }
+
+        return $this->getEmail() &&
+            $this->getEmail()->getFromEmailAddress() &&
+            $this->getEmail()->getFromEmailAddress()->getOwner() === $this->getOwner();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIncoming()
+    {
+        $directions = $this->getFolderDirections();
+        if (in_array(EmailFolder::DIRECTION_INCOMING, $directions)) {
+            return true;
+        }
+
+        if (in_array(EmailFolder::DIRECTION_OUTGOING, $directions)) {
+            return false;
+        }
+
+        return $this->getEmail() &&
+            $this->getEmail()->getFromEmailAddress() &&
+            $this->getEmail()->getFromEmailAddress()->getOwner() !== $this->getOwner();
+    }
+
+    /**
      * @return string
      */
     public function __toString()
     {
         return (string)$this->getId();
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getFolderDirections()
+    {
+        return array_unique(
+            $this->folders->map(function (EmailFolder $folder) {
+                return $folder->getDirection();
+            })->toArray()
+        );
     }
 }

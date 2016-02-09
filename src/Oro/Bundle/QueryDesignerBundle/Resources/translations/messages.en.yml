@@ -34,6 +34,7 @@ oro:
             criteria:
                 drag_hint: drag to select
                 field_condition:   Field Condition
+                aggregated_field_condition:   Aggregation column
                 conditions_group:  Conditions Group
             choose_entity_field: Choose a field...
         validation:
