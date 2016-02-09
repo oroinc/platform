@@ -46,16 +46,16 @@ class ImapClearManager implements LoggerAwareInterface
     {
         $origins = $this->getOriginsToClear($originId);
         if (!$origins) {
-            $this->logger->notice('Nothing to clear');
+            $this->logger->info('Nothing to clear');
 
             return false;
         }
         foreach ($origins as $origin) {
-            $this->logger->notice(sprintf('Clearing origin: %s, %s', $origin->getId(), $origin));
+            $this->logger->info(sprintf('Clearing origin: %s, %s', $origin->getId(), $origin));
 
             $this->clearOrigin($origin);
 
-            $this->logger->notice('Origin processed successfully');
+            $this->logger->info('Origin processed successfully');
         }
 
         return true;
@@ -75,7 +75,7 @@ class ImapClearManager implements LoggerAwareInterface
             /** @var UserEmailOrigin $origin */
             $origin = $originRepository->find($originId);
             if ($origin === null) {
-                $this->logger->notice(sprintf('Origin with ID %s does not exist', $originId));
+                $this->logger->info(sprintf('Origin with ID %s does not exist', $originId));
 
                 return [];
             }
@@ -101,7 +101,7 @@ class ImapClearManager implements LoggerAwareInterface
             if ($imapFolder && !$origin->isActive()) {
                 $this->clearFolder($imapFolder);
                 $this->em->remove($imapFolder);
-                $this->logger->notice(sprintf('ImapFolder with ID %s removed', $imapFolder->getId()));
+                $this->logger->info(sprintf('ImapFolder with ID %s removed', $imapFolder->getId()));
             } elseif ($imapFolder && !$folder->isSyncEnabled()) {
                 $this->clearFolder($imapFolder);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
@@ -110,13 +110,13 @@ class ImapClearManager implements LoggerAwareInterface
         foreach ($folders as $folder) {
             if (!$origin->isActive()) {
                 $this->em->remove($folder);
-                $this->logger->notice(sprintf('Folder with ID %s removed', $folder->getId()));
+                $this->logger->info(sprintf('Folder with ID %s removed', $folder->getId()));
             }
         }
 
         if (!$origin->isActive()) {
             $this->em->remove($origin);
-            $this->logger->notice(sprintf('Origin with ID %s removed', $origin->getId()));
+            $this->logger->info(sprintf('Origin with ID %s removed', $origin->getId()));
         }
 
         $this->em->flush();
@@ -157,7 +157,7 @@ class ImapClearManager implements LoggerAwareInterface
 
         }
         if ($i > 0) {
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf(
                     'ImapFolder with ID %s cleared. Removed %d emails.',
                     $imapFolder->getId(),
