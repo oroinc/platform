@@ -95,17 +95,44 @@ define(function(require) {
             }
         },
 
+        handleClosedGoogleAuthWindow: function() {
+            mediator.execute('hideLoading');
+            mediator.execute('showFlashMessage', 'error', __('oro.email.error.google_auth'));
+        },
+
         /**
          * Request to google API to get token
          */
         requestAccessToken: function() {
-            var data = this.view.getData();
-            gapi.auth.authorize({
-                'client_id': data.clientId,
-                'scope': this.scopes.join(' '),
-                'immediate': false,
-                'authuser': -1
-            }, _.bind(this.checkAuthorization, this));
+            //https://github.com/google/google-api-javascript-client/issues/25#issuecomment-76695596
+            (function(wrapped) {
+                window.open = function() {
+                    window.open = wrapped;
+
+                    var win = wrapped.apply(this, arguments);
+                    var i = setInterval(function() {
+                        if (win.closed) {
+                            clearInterval(i);
+                            setTimeout(function() {
+                                authorizeDeferred.cancel();
+                            }, 1500);
+                        }
+                    }, 100);
+                    return win;
+                };
+            })(window.open);
+
+            var authorizeDeferred = gapi.auth.authorize({
+                    'client_id': this.view.getData().clientId,
+                    'scope': this.scopes.join(' '),
+                    'immediate': false,
+                    'authuser': -1
+                },
+                _.bind(this.checkAuthorization, this)
+            ).then(
+                null,
+                _.bind(this.handleClosedGoogleAuthWindow, this)
+            );
         },
 
         /**
