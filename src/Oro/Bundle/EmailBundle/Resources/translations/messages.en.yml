@@ -29,7 +29,7 @@ oro:
             tooltip:
                 attachment_sync:
                     enable: Enable load attachments on email sync.
-                    max_size: Maximum sync attacment size. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
+                    max_size: Maximum sync attacment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
 
         variable.not.found:                     N/A
 
@@ -76,7 +76,7 @@ oro:
                 enable:
                     label: Enable attachment sync
                 max_size:
-                    label: Maximum sync attachment size
+                    label: Maximum sync attachment size, Mb
 
         emailtemplate:
             entity_label:        Template
