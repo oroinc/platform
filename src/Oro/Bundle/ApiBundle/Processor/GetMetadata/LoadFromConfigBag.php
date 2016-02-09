@@ -35,7 +35,7 @@ class LoadFromConfigBag implements ProcessorInterface
         }
 
         $config = $this->configBag->getMetadata($context->getClassName(), $context->getVersion());
-        if (null !== $config) {
+        if (!empty($config)) {
             $context->setResult($config);
         }
     }
