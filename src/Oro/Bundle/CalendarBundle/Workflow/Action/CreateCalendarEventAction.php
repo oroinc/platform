@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Workflow\Action;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
@@ -38,12 +39,15 @@ class CreateCalendarEventAction extends AbstractAction
     const OPTION_KEY_INITIATOR   = 'initiator';
     const OPTION_KEY_START       = 'start';
     const OPTION_KEY_END         = 'end';
+    const OPTION_KEY_DURATION    = 'duration';
     const OPTION_KEY_ATTRIBUTE   = 'attribute';
     const OPTION_KEY_REMINDERS   = 'reminders';
 
     const OPTION_REMINDER_KEY_METHOD          = 'method';
     const OPTION_REMINDER_KEY_INTERVAL_NUMBER = 'interval_number';
     const OPTION_REMINDER_KEY_INTERVAL_UNIT   = 'interval_unit';
+
+    const OPTION_DEFAULT_DURATION_INTERVAL = 'PT1H';
 
     /**
      * @var array
@@ -60,13 +64,19 @@ class CreateCalendarEventAction extends AbstractAction
      */
     protected $manager;
 
+    /**
+     * @var array
+     */
     protected $requiredFields = [
         self::OPTION_KEY_TITLE,
         self::OPTION_KEY_INITIATOR,
         self::OPTION_KEY_START,
-        self::OPTION_KEY_END,
     ];
 
+    /**
+     * @param ContextAccessor $contextAccessor
+     * @param Registry $registry
+     */
     public function __construct(ContextAccessor $contextAccessor, Registry $registry)
     {
         $this->calendarRepository = $registry->getRepository('OroCalendarBundle:Calendar');
@@ -76,7 +86,7 @@ class CreateCalendarEventAction extends AbstractAction
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function initialize(array $options)
     {
@@ -92,21 +102,21 @@ class CreateCalendarEventAction extends AbstractAction
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function executeAction($context)
     {
         $initiator = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_INITIATOR]);
         $start = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_START]);
-        $end = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_END]);
 
         $calendarEvent = new CalendarEvent();
         $initiatorCalendar = $this->getDefaultUserCalendar($initiator);
 
         $calendarEvent
             ->setStart($start)
-            ->setEnd($end)
+            ->setEnd($this->getEndDateTime($calendarEvent, $context))
             ->setTitle($this->options[self::OPTION_KEY_TITLE])
+            ->setDescription($this->getDescription())
             ->setCalendar($initiatorCalendar)
             ->setAllDay(false)
         ;
@@ -123,6 +133,26 @@ class CreateCalendarEventAction extends AbstractAction
         if (isset($this->options[self::OPTION_KEY_ATTRIBUTE])) {
             $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_ATTRIBUTE], $calendarEvent);
         }
+    }
+
+    /**
+     * @param CalendarEvent $calendarEvent
+     * @param $context
+     * @return \DateTime
+     */
+    protected function getEndDateTime(CalendarEvent $calendarEvent, $context)
+    {
+        if (true === isset($this->options[self::OPTION_KEY_END])) {
+            $end = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_END]);
+        } elseif (true === isset($this->options[self::OPTION_KEY_DURATION])) {
+            $end = clone $calendarEvent->getStart();
+            $end->modify('+ '.$this->options[self::OPTION_KEY_DURATION]);
+        } else {
+            $end = clone $calendarEvent->getStart();
+            $end->add(new \DateInterval(self::OPTION_DEFAULT_DURATION_INTERVAL));
+        }
+
+        return $end;
     }
 
     /**
@@ -186,6 +216,10 @@ class CreateCalendarEventAction extends AbstractAction
         return $childCalendarEvent;
     }
 
+    /**
+     * @param User $user
+     * @return null|Calendar
+     */
     protected function getDefaultUserCalendar(User $user)
     {
         return $this->calendarRepository->findDefaultCalendar(
@@ -208,5 +242,15 @@ class CreateCalendarEventAction extends AbstractAction
             $user = $this->contextAccessor->getValue($context, $guest);
             $this->createChildEvent($calendarEvent, $user);
         }
+    }
+
+    /**
+     * @return null
+     */
+    protected function getDescription()
+    {
+        return array_key_exists(self::OPTION_KEY_DESCRIPTION, $this->options)
+            ? $this->options[self::OPTION_KEY_DESCRIPTION]
+            : null;
     }
 }

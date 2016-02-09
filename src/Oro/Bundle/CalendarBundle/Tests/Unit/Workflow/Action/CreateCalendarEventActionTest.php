@@ -79,21 +79,40 @@ class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
             'without options' => [
                 'options' => [],
                 'expectedPersistCount' => 0,
-                'exceptionMessage' => 'Required fields "title, initiator, start, end" must be filled',
+                'exceptionMessage' => 'Required fields "title, initiator, start" must be filled',
             ],
             'only title' => [
                 'options' => [
                     CreateCalendarEventAction::OPTION_KEY_TITLE => 'Title',
                 ],
                 'expectedPersistCount' => 0,
-                'exceptionMessage' => 'Required fields "initiator, start, end" must be filled',
+                'exceptionMessage' => 'Required fields "initiator, start" must be filled',
             ],
             'only required options' => [
                 'options' => [
                     CreateCalendarEventAction::OPTION_KEY_TITLE => 'Title',
                     CreateCalendarEventAction::OPTION_KEY_INITIATOR => $this->getUserMock(),
                     CreateCalendarEventAction::OPTION_KEY_START => new \DateTime(),
+                ],
+                'expectedPersistCount' => 1,
+                'exceptionMessage' => '',
+            ],
+            'with end' => [
+                'options' => [
+                    CreateCalendarEventAction::OPTION_KEY_TITLE => 'Title',
+                    CreateCalendarEventAction::OPTION_KEY_INITIATOR => $this->getUserMock(),
+                    CreateCalendarEventAction::OPTION_KEY_START => new \DateTime(),
                     CreateCalendarEventAction::OPTION_KEY_END => new \DateTime(),
+                ],
+                'expectedPersistCount' => 1,
+                'exceptionMessage' => '',
+            ],
+            'with duration' => [
+                'options' => [
+                    CreateCalendarEventAction::OPTION_KEY_TITLE => 'Title',
+                    CreateCalendarEventAction::OPTION_KEY_INITIATOR => $this->getUserMock(),
+                    CreateCalendarEventAction::OPTION_KEY_START => new \DateTime(),
+                    CreateCalendarEventAction::OPTION_KEY_DURATION => '2 hour 30 minutes',
                 ],
                 'expectedPersistCount' => 1,
                 'exceptionMessage' => '',
