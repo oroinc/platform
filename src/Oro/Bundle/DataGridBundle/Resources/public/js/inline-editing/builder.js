@@ -120,21 +120,20 @@ define(function(require) {
                         var realization = defaultEditors[(columnMeta.type || gridViewsBuilder.DEFAULT_COLUMN_TYPE)];
                         editor.view = realization;
                         if (realization === void 0) {
-                            switch (behaviour) {
-                                case 'enable_all':
-                                    // disable editing on this column, as it is not possible to provide it
-                                    columnMeta.inline_editing.enable = false;
-                                    columnMeta.inline_editing.enable$changeReason =
-                                        'Automatically disabled due to absent editor realization';
-                                    return;
-                                case 'enable_selected':
-                                    // if user selected this column as editable and there is no editor - throw an Error
+                            columnMeta.inline_editing.enable = false;
+                            columnMeta.inline_editing.enable$changeReason =
+                                'Automatically disabled due to absent editor realization';
+                            if (behaviour === 'enable_selected') {
+                                // if user selected this column as editable and there is no editor - throw an Error
+                                // but don't lock UI
+                                setTimeout(function() {
                                     throw new Error(
-                                        'Could not enable editing on grid column due to absent editor realization'
+                                        'Could not enable editing on grid column due to absent editor realization' +
+                                        ' for type `' + columnMeta.type + '`'
                                     );
-                                default:
-                                    throw new Error('Unknown behaviour');
+                                }, 0);
                             }
+                            return;
                         }
                         if (_.isFunction(realization.processMetadata)) {
                             return realization.processMetadata(columnMeta);

@@ -20,17 +20,13 @@ class Configuration implements ConfigurationInterface
         $rootNode    = $treeBuilder->root('oro_google_integration');
 
         SettingsBuilder::append($rootNode, [
-            'domains'=> [
-                'value' => [],
-                'type' => 'array',
-            ],
-            'client_id' => [
+            'client_id'     => [
                 'value' => null,
-                'type' => 'text',
+                'type'  => 'text',
             ],
             'client_secret' => [
                 'value' => null,
-                'type' => 'text',
+                'type'  => 'text',
             ],
         ]);
 
