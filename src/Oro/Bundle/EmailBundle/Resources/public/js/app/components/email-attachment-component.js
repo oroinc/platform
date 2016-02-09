@@ -102,7 +102,8 @@ define(function(require) {
             if (!this.popupView) {
                 this.popupView = new EmailAttachmentSelectView({
                     el: this.$popupContentEl,
-                    collection: this.popupCollection
+                    collection: this.popupCollection,
+                    attachedCollection: this.collection
                 });
                 this.popupView.showHideFilter();
                 this.popupView.showHideGroups();

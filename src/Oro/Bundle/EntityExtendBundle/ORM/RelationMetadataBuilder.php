@@ -219,7 +219,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         FieldConfigId $fieldId,
         $targetEntity
     ) {
-        $builder = $metadataBuilder->createOneToOne(
+        $builder = $metadataBuilder->createManyToOne(
             ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName(),
             $targetEntity
         );
