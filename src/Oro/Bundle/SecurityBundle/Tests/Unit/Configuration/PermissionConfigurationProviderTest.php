@@ -29,8 +29,16 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             'label' => 'Label for Permission 2',
             'group_names' => ['', 'frontend', 'new_group'],
             'apply_to_all' => false,
-            'apply_to_entities' => ['Entity11', 'Entity12', 'Entity21', 'Entity22'],
-            'exclude_entities' => ['Entity13', 'Entity14', 'Entity23', 'Entity24'],
+            'apply_to_entities' => [
+                'OroTestFrameworkBundle:TestActivity',
+                'OroTestFrameworkBundle:Product',
+                'OroTestFrameworkBundle:TestActivityTarget',
+            ],
+            'exclude_entities' => [
+                'OroTestFrameworkBundle:Item',
+                'OroTestFrameworkBundle:ItemValue',
+                'OroTestFrameworkBundle:WorkflowAwareEntity',
+            ],
             'description' => 'Permission 2 description',
         ],
 

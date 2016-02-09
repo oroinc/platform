@@ -14,6 +14,7 @@ parameters:
     oro_security.acl.dbal.provider.class:                      Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider
     oro_security.acl.permission_granting_strategy.class:       Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy
     oro_security.acl.permission_map.class:                     Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap
+    oro_security.acl.permission_manager.class:                 Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
     oro_security.acl.object_identity_factory.class:            Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
     oro_security.acl.object_identity_retrieval_strategy.class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityRetrievalStrategy
     oro_security.acl.object_id_accessor.class:                 Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor
@@ -191,6 +192,13 @@ services:
         class: %oro_security.acl.permission_map.class%
         arguments:
             - @oro_security.acl.extension_selector
+
+    oro_security.acl.permission_manager:
+         class: %oro_security.acl.permission_manager.class%
+         arguments:
+             - @oro_entity.doctrine_helper
+             - @oro_security.configuration.provider.permission_configuration
+             - @oro_security.configuration.builder.permission_configuration
 
     oro_security.acl.object_identity_factory:
         class: %oro_security.acl.object_identity_factory.class%
@@ -621,5 +629,4 @@ services:
     oro_security.configuration.builder.permission_configuration:
         class: %oro_security.configuration.builder.permission_configuration.class%
         arguments:
-            - @doctrine
             - @oro_entity.doctrine_helper
