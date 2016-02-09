@@ -123,8 +123,8 @@ define(function(require) {
                             switch (behaviour) {
                                 case 'enable_all':
                                     // disable editing on this column, as it is not possible to provide it
-                                    options.metadata.inline_editing.enable = false;
-                                    options.metadata.inline_editing.enable$changeReason =
+                                    columnMeta.inline_editing.enable = false;
+                                    columnMeta.inline_editing.enable$changeReason =
                                         'Automatically disabled due to absent editor realization';
                                     return;
                                 case 'enable_selected':
