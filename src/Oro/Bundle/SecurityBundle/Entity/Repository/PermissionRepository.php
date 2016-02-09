@@ -42,20 +42,20 @@ class PermissionRepository extends EntityRepository
         $queryBuilder
             ->leftJoin('p.applyToEntities', 'ae', Expr\Join::WITH, 'ae.name = :class')
             ->leftJoin('p.excludeEntities', 'ee', Expr\Join::WITH, 'ee.name = :class')
-            ->where(
-                $queryBuilder->expr()->andx(
-                    $queryBuilder->expr()->orx(
-                        $queryBuilder->expr()->eq('p.applyToAll', '1'),
-                        $queryBuilder->expr()->isNotNull('ae.id')
+            ->groupBy('p.id')
+            ->having(
+                $queryBuilder->expr()->orx(
+                    $queryBuilder->expr()->andx(
+                        $queryBuilder->expr()->eq('p.applyToAll', 1),
+                        $queryBuilder->expr()->eq($queryBuilder->expr()->count('ee'), 0)
                     ),
-                    $queryBuilder->expr()->isNull('ee.name')
+                    $queryBuilder->expr()->andx(
+                        $queryBuilder->expr()->eq('p.applyToAll', 0),
+                        $queryBuilder->expr()->gt($queryBuilder->expr()->count('ae'), 0)
+                    )
                 )
             )
             ->setParameter('class', $class);
-
-        if (null !== $ids) {
-            $queryBuilder->andWhere($queryBuilder->expr()->in('p.id', $ids));
-        }
 
         return $queryBuilder->getQuery()->getResult();
     }
