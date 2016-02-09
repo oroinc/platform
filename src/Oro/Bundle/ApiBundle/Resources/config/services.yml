@@ -80,7 +80,6 @@ services:
 
     oro_api.public_resources_loader:
         class: Oro\Bundle\ApiBundle\Provider\PublicResourcesLoader
-        public: false
         arguments:
             - @oro_api.collect_public_resources.processor
 
