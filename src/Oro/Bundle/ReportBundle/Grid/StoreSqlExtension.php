@@ -36,6 +36,7 @@ class StoreSqlExtension extends AbstractExtension
     {
         return $config->getDatasourceType() == OrmDatasource::TYPE &&
             $this->getParameters()->get(self::DISPLAY_SQL_QUERY, false) &&
+            $this->securityFacade->getLoggedUser() &&
             $this->securityFacade->isGranted('oro_report_view_sql');
     }
 
