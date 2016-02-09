@@ -62,6 +62,7 @@ define(function(require) {
          */
         requestGoogleAuthCode: function(emailAddress) {
             var data = this.view.getData();
+
             if (data.clientId.length === 0) {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.emptyClientId'));
                 this.view.render();
