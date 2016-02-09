@@ -1,0 +1,38 @@
+{% block _scripts_before_widget %}
+    {{ block_widget(block) }}
+    {% block scripts_before %}
+        {% placeholder scripts_before %}
+    {% endblock %}
+{% endblock %}
+
+{% block _require_js_widget %}
+    {% set requirejs_config_extend %}
+        {%- placeholder requirejs_config_extend -%}
+    {% endset %}
+    {% include 'OroRequireJSBundle::scripts.html.twig' with {
+        compressed: not app.debug,
+        config_extend: requirejs_config_extend
+    } %}
+    {% placeholder scripts_after %}
+    <script>
+        require({
+            config: {
+                'oro/datagrid/cell/action-cell': {showCloseButton: true},
+                'orodatagrid/js/app/plugins/grid/column-manager-plugin': {icon: 'gear'},
+                'orodatagrid/js/datagrid/action-launcher': {iconHideText: false},
+                'oro/filter/abstract-filter': {
+                    placeholder: null,
+                    labelPrefix: '{{ 'oro.ui.filter.by'|trans  }} '
+                },
+                'orofilter/js/filter-hint': {inline: false}
+            }
+        });
+    </script>
+    {{ block_widget(block) }}
+{% endblock %}
+
+{% block _require_modules_widget %}
+    <script type="text/javascript">
+        require(['oroui/js/app']);
+    </script>
+{% endblock %}

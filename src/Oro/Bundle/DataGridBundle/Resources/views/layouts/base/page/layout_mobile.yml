@@ -1,0 +1,9 @@
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroDataGridBundle:layouts:base/page/layout_mobile.html.twig'
+        - @remove:
+            id: datagrid_toolbar_extra_actions
+    conditions:
+        @eq: [ $context.user_agent.mobile, true ]
+

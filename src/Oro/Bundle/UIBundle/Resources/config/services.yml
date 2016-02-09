@@ -129,7 +129,7 @@ services:
     oro_ui.user_agent_provider:
         class: %oro_ui.user_agent_provider.class%
         arguments:
-            - @service_container
+            - @request_stack
 
     ## Formatters
     oro_ui.formatter:

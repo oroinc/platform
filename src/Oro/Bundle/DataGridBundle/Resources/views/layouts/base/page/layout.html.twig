@@ -1,22 +1,27 @@
-{% block _datagrid_toolbar_actions_widget %}
-    <div class="pull-left grid-toolbar-mass-actions">
-        <div class="mass-actions-panel btn-group icons-holder"></div>
-        <div class="extra-actions-panel"></div>
-    </div>
+{% block _datagrid_toolbar_mass_actions_widget %}
+    <div class="pull-left grid-toolbar-mass-actions">{{ block_widget(block) }}</div>
 {% endblock %}
 
-{% block _datagrid_toolbar_tools_widget %}
+{% block _datagrid_toolbar_mass_actions_panel_widget %}
+    <div class="mass-actions-panel btn-group icons-holder">{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_extra_actions_widget %}
+    <div class="extra-actions-panel">{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_actions_widget %}
     <div class="pull-right grid-toolbar-tools">
-        <div class="actions-panel pull-right form-horizontal"></div>
+        <div class="actions-panel pull-right form-horizontal">{{ block_widget(block) }}</div>
         <div class="page-size pull-right form-horizontal"></div>
     </div>
 {% endblock %}
 
 {% block _datagrid_toolbar_pagination_widget %}
-    <div class="pagination pagination-centered">{{ block_widget(block) }}</div>
+    <div class="pagination pagination-centered"></div>
 {% endblock %}
 
-{% block _toolbar_datagrid_widget %}
+{% block _datagrid_toolbar_widget %}
     <script type="text/html" id="template-datagrid-toolbar">
         <div class="grid-toolbar">
             {{ block_widget(block) }}

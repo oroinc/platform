@@ -1,0 +1,16 @@
+{% block _datagrid_toolbar_mass_actions_widget %}
+    <div class="pull-left grid-toolbar-mass-actions">
+        <div class="mass-actions-panel btn-group icons-holder">{{ block_widget(block) }}</div>
+    </div>
+{% endblock %}
+
+{% block _datagrid_toolbar_actions_widget %}
+    <div class="actions-panel pull-right">{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_pagination_widget %}
+    <div class="pagination-container">
+        <div class="pagination pull-left"></div>
+        <div class="page-size pull-left"></div>
+    </div>
+{% endblock %}
