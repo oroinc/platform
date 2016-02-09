@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Permission;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -12,6 +11,7 @@ use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
+use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 
 class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +21,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PermissionRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityRepository;
 
     /** @var PermissionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
@@ -38,7 +38,8 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $this->entityRepository = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -51,31 +52,19 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->with('OroSecurityBundle:Permission')
             ->willReturn($this->entityRepository);
 
-        $this->configurationProvider = $this->getMockBuilder(
-                'Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider'
-            )
+        $this->configurationProvider = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configurationBuilder = $this->getMockBuilder(
-                'Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder'
-            )
+        $this->configurationBuilder = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods([
-                'doFetch',
-                'doContains',
-                'doSave',
-                'doDelete',
-                'doFlush',
-                'doGetStats',
-                'fetch',
-                'saveMultiple',
-                'flushAll'
-            ])
-            ->getMock();
+            ->setMethods(['fetch', 'saveMultiple', 'flushAll'])
+            ->getMockForAbstractClass();
 
         $this->manager = new PermissionManager(
             $this->doctrineHelper,
@@ -93,7 +82,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPermissionsMap(array $inputData, array $expectedData)
     {
-        $this->entityRepository->expects($this->any())
+        $this->entityRepository->expects($inputData['cache'] ? $this->never() : $this->once())
             ->method('findAll')
             ->willReturn($inputData['permissions']);
 
@@ -103,6 +92,35 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($inputData['cache']);
 
         $this->assertEquals($expectedData, $this->manager->getPermissionsMap($inputData['group']));
+    }
+
+    /**
+     * @param array $inputData
+     * @param array $expectedData
+     *
+     * @dataProvider getPermissionsForEntityProvider
+     */
+    public function testGetPermissionsForEntity(array $inputData, array $expectedData)
+    {
+        $this->cacheProvider->expects($inputData['group'] ? $this->once() : $this->never())
+            ->method('fetch')
+            ->with(PermissionManager::CACHE_GROUPS)
+            ->willReturn($inputData['cache']);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($inputData['entity'])
+            ->willReturn($inputData['entity']);
+
+        $this->entityRepository->expects($this->once())
+            ->method('findByEntityClassAndIds')
+            ->with($inputData['entity'], $inputData['ids'])
+            ->willReturn($inputData['permissions']);
+
+        $this->assertEquals(
+            $expectedData,
+            $this->manager->getPermissionsForEntity($inputData['entity'], $inputData['group'])
+        );
     }
 
     /**
@@ -140,6 +158,12 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
+        $permissions = [
+            $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
+            $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
+            $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
+        ];
+
         return [
             'get permissions with no cache and no permissions' => [
                 'input' => [
@@ -155,11 +179,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                     'group' => '',
                     'cacheKey' => PermissionManager::CACHE_PERMISSIONS,
                     'cache' => false,
-                    'permissions' => [
-                        $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
-                        $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
-                        $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
-                    ],
+                    'permissions' => $permissions,
                 ],
                 'expected' => ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3],
             ],
@@ -186,11 +206,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                     'group' => 'group1',
                     'cacheKey' => PermissionManager::CACHE_GROUPS,
                     'cache' => false,
-                    'permissions' => [
-                        $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
-                        $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
-                        $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
-                    ],
+                    'permissions' => $permissions,
                 ],
                 'expected' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
             ],
@@ -209,15 +225,91 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
+    public function getPermissionsForEntityProvider()
+    {
+        $cache = [
+            'group1' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
+            'group2' => ['PERMISSION3' => 3],
+        ];
+
+        $permissions = [
+            $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
+            $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
+            $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
+        ];
+
+        return [
+            'entity1 and empty group' => [
+                'input' => [
+                    'entity' => 'entity1',
+                    'group' => '',
+                    'cache' => null,
+                    'ids' => null,
+                    'permissions' => [
+                        $permissions[0],
+                    ],
+                ],
+                'expected' => [
+                    $permissions[0],
+                ],
+            ],
+            'entity1 and unknown group1' => [
+                'input' => [
+                    'entity' => 'entity1',
+                    'group' => 'unknown',
+                    'cache' => $cache,
+                    'ids' => [],
+                    'permissions' => [],
+                ],
+                'expected' => [],
+            ],
+            'entity1 and group1' => [
+                'input' => [
+                    'entity' => 'entity1',
+                    'group' => 'group1',
+                    'cache' => $cache,
+                    'ids' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
+                    'permissions' => [
+                        $permissions[0],
+                        $permissions[1],
+                    ],
+                ],
+                'expected' => [
+                    $permissions[0],
+                    $permissions[1],
+                ],
+            ],
+            'entity1 and group2' => [
+                'input' => [
+                    'entity' => 'entity1',
+                    'group' => 'group2',
+                    'cache' => $cache,
+                    'ids' => ['PERMISSION3' => 3],
+                    'permissions' => [
+                        $permissions[3],
+                    ],
+                ],
+                'expected' => [
+                    $permissions[3],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function buildCacheProvider()
     {
+        $permissions = [
+            $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
+            $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
+            $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
+        ];
+
         return [
             [
-                'input' => [
-                    $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
-                    $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
-                    $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
-                ],
+                'input' => $permissions,
                 'expected' => [
                     'permissions' => ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3],
                     'groups' => [
