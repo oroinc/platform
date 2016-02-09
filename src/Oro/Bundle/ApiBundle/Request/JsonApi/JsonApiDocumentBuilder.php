@@ -221,7 +221,10 @@ class JsonApiDocumentBuilder
         $data = null;
         if (null !== $value) {
             if (null === $targetMetadata) {
-                $data = $this->getResourceIdObject($targetEntityType, $value);
+                $data = $this->getResourceIdObject(
+                    $targetEntityType,
+                    $this->entityIdTransformer->transform($value)
+                );
             } else {
                 $data = $this->getResourceIdObject(
                     $targetEntityType,
@@ -249,7 +252,10 @@ class JsonApiDocumentBuilder
         if (null !== $value) {
             if (null === $targetMetadata) {
                 foreach ($value as $val) {
-                    $data[] = $this->getResourceIdObject($targetEntityType, $val);
+                    $data[] = $this->getResourceIdObject(
+                        $targetEntityType,
+                        $this->entityIdTransformer->transform($val)
+                    );
                 }
             } else {
                 foreach ($value as $val) {
