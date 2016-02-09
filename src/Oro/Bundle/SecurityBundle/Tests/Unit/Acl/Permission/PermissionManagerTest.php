@@ -63,7 +63,19 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->cacheProvider = $this->getMock('Doctrine\Common\Cache\CacheProvider');
+        $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+            ->setMethods([
+                'doFetch',
+                'doContains',
+                'doSave',
+                'doDelete',
+                'doFlush',
+                'doGetStats',
+                'fetch',
+                'saveMultiple',
+                'flushAll'
+            ])
+            ->getMock();
 
         $this->manager = new PermissionManager(
             $this->doctrineHelper,
@@ -81,11 +93,6 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPermissionsMap(array $inputData, array $expectedData)
     {
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityRepository')
-            ->with('OroSecurityBundle:Permission')
-            ->willReturn($this->entityRepository);
-
         $this->entityRepository->expects($this->any())
             ->method('findAll')
             ->willReturn($inputData['permissions']);
@@ -95,7 +102,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->with($inputData['cacheKey'])
             ->willReturn($inputData['cache']);
 
-        $this->assertSame($expectedData, $this->manager->getPermissionsMap($inputData['group']));
+        $this->assertEquals($expectedData, $this->manager->getPermissionsMap($inputData['group']));
     }
 
     /**
@@ -117,7 +124,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('saveMultiple')
             ->with($expectedData);
 
-        $this->manager->buildCache();
+        $this->assertEquals($expectedData, $this->manager->buildCache());
     }
 
     /**
