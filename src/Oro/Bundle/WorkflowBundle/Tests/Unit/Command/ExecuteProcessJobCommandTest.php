@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Command\Stub\TestOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,6 +57,7 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->input   = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
         $this->output = new TestOutput();
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
     }
 
     public function testConfigure()
@@ -158,15 +160,15 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             'single id' => array(
                 'ids' => array(1),
                 'output' => [
-                    'Process job #1 name successfully finished'
+                    'Process job #1 successfully finished'
                 ],
             ),
             'several ids successful' => array(
                 'ids' => array(1, 2, 3),
                 'output' => [
-                    'Process job #1 name successfully finished',
-                    'Process job #2 name successfully finished',
-                    'Process job #3 name successfully finished',
+                    'Process job #1 successfully finished',
+                    'Process job #2 successfully finished',
+                    'Process job #3 successfully finished',
                 ],
             ),
             'several ids failed' => array(

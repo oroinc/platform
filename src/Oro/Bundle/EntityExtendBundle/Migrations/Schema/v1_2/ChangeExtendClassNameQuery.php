@@ -72,7 +72,7 @@ class ChangeExtendClassNameQuery extends ParametrizedMigrationQuery
             $query  = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
             $params = ['data' => $data, 'id' => $id];
             $types  = ['data' => 'array', 'id' => 'integer'];
-            $logger->notice(
+            $logger->info(
                 sprintf(
                     'Change extend class from "%s" to "%s" for "%s".',
                     $oldExtendClass,

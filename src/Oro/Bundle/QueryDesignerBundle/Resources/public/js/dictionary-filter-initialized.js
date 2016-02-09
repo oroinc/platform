@@ -13,9 +13,7 @@ define(['jquery', 'underscore'
     return function(filterOptions, context) {
         var promise = new $.Deferred();
         var className = _.last(context).field.related_entity_name;
-
         filterOptions.filterParams = {'class': className};
-
         // mark promise as resolved
         promise.resolveWith(filterOptions);
 

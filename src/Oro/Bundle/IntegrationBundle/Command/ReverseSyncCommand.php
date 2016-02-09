@@ -90,7 +90,7 @@ class ReverseSyncCommand extends ContainerAwareCommand
                 throw new \InvalidArgumentException('Integration with given ID not found');
             }
 
-            $logger->notice(
+            $logger->info(
                 sprintf(
                     'Run sync for "%s" integration and "%s" connector.',
                     $integration->getName(),
@@ -105,7 +105,7 @@ class ReverseSyncCommand extends ContainerAwareCommand
             $exitCode = self::STATUS_FAILED;
         }
 
-        $logger->notice('Completed');
+        $logger->info('Completed');
 
         return $exitCode;
     }
