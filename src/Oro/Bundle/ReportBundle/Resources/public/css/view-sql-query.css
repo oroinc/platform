@@ -1,4 +1,4 @@
-pre.sql-source-code{
+pre.sql-query-code{
     padding: 2px 4px;
     color: #d14;
     background-color: #f7f7f9;
@@ -6,7 +6,6 @@ pre.sql-source-code{
     word-break: normal;
     display: block;
 }
-div.sql-source-container {
+div.sql-query-container {
     padding: 0 20px 20px 20px;
 }
-

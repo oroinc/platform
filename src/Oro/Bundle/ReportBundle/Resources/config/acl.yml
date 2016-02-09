@@ -1,5 +1,5 @@
-oro_report_display_sql:
-    label: oro.report.action.display_sql
+oro_report_view_sql:
+    label: oro.report.action.view_sql.label
     type: action
     group_name: ""
     bindings: ~

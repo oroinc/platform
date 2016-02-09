@@ -23,7 +23,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'display_sql_source_code' => ['value' => true, 'type' => 'boolean']
+                'display_sql_query' => ['value' => false, 'type' => 'boolean']
             ]
         );
 

@@ -1,35 +1,35 @@
 define(function(require) {
     'use strict';
 
-    var StoredSqlView;
+    var SqlQueryView;
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
     var __ = require('orotranslation/js/translator');
     var messenger = require('oroui/js/messenger');
     require('jquery-ui');
 
-    StoredSqlView = BaseView.extend({
+    SqlQueryView = BaseView.extend({
         labels: {
-            show_sql: 'oro.datagrid.show_sql.show_sql_code',
-            hide_sql: 'oro.datagrid.show_sql.hide_sql_code'
+            show_sql: 'oro.report.view_sql.show_sql_query',
+            hide_sql: 'oro.report.view_sql.hide_sql_query'
         },
         messages: {
-            copy_not_supported: 'oro.datagrid.show_sql.messages.copy_not_supported',
-            copied: 'oro.datagrid.show_sql.messages.copied',
-            copy_not_successful: 'oro.datagrid.show_sql.messages.copy_not_successful'
+            copy_not_supported: 'oro.report.view_sql.messages.copy_not_supported',
+            copied: 'oro.report.view_sql.messages.copied',
+            copy_not_successful: 'oro.datagrid.view_sql.messages.copy_not_successful'
         },
-        linkLabel: __('oro.datagrid.show_sql.show_sql_code'),
-        template: require('tpl!../../../../templates/stored-sql-view.html'),
+        linkLabel: __('oro.report.view_sql.show_sql_query'),
+        template: require('tpl!../../../../templates/sql-query-view.html'),
         initialize: function(options) {
             this.grid = options.grid;
             this.metadata = options.metadata;
-            this.$el.on('click', '#show-sql-source-link', $.proxy(function() {
+            this.$el.on('click', '#show-sql-query-link', $.proxy(function() {
                 this.toggleSqlCode();
             }, this));
-            this.$el.on('click', '#copy-sql-source', $.proxy(function() {
+            this.$el.on('click', '#copy-sql-query', $.proxy(function() {
                 this.copySql();
             }, this));
-            StoredSqlView.__super__.initialize.call(this, options);
+            SqlQueryView.__super__.initialize.call(this, options);
         },
         getTemplateData: function() {
             return {
@@ -44,13 +44,13 @@ define(function(require) {
             this.render();
         },
         toggleSqlCode: function() {
-            var $box = this.$el.find('#sql-source-box-' + this.grid.name);
-            var $link = this.$el.find('#show-sql-source-link');
+            var $box = this.$el.find('#sql-query-box-' + this.grid.name);
+            var $link = this.$el.find('#show-sql-query-link');
             var isShown = $box.is(':visible');
             if (!isShown) {
                 $link.text(__(this.labels.hide_sql));
                 $box.show();
-                var $copyLink = this.$el.find('#copy-sql-source');
+                var $copyLink = this.$el.find('#copy-sql-query');
                 $copyLink.focus();
             } else {
                 $link.text(__(this.labels.show_sql));
@@ -58,7 +58,7 @@ define(function(require) {
             }
         },
         copySql: function() {
-            var sql = document.querySelector('#sql-source-box-' + this.grid.name + ' .sql-source-code');
+            var sql = document.querySelector('#sql-query-box-' + this.grid.name + ' .sql-query-code');
             var range = document.createRange();
             range.selectNode(sql);
             window.getSelection().addRange(range);
@@ -76,5 +76,5 @@ define(function(require) {
         }
     });
 
-    return StoredSqlView;
+    return SqlQueryView;
 });

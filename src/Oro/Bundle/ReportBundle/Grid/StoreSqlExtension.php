@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class StoreSqlExtension extends AbstractExtension
 {
-    const DISPLAY_SQL_SOURCE = 'display_sql_source';
+    const DISPLAY_SQL_QUERY  = 'display_sql_query';
     const STORED_SQL_PATH    = 'metadata[stored_sql]';
     const SQL                = 'sql';
     const STORE_SQL          = 'store_sql';
@@ -35,8 +35,8 @@ class StoreSqlExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return $config->getDatasourceType() == OrmDatasource::TYPE &&
-            $this->getParameters()->get(self::DISPLAY_SQL_SOURCE, false) &&
-            $this->securityFacade->isGranted('oro_report_display_sql');
+            $this->getParameters()->get(self::DISPLAY_SQL_QUERY, false) &&
+            $this->securityFacade->isGranted('oro_report_view_sql');
     }
 
     /**
@@ -44,7 +44,7 @@ class StoreSqlExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $data->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orodatagrid/js/show-sql-source-builder']);
+        $data->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['ororeport/js/view-sql-query-builder']);
     }
 
     /**
@@ -66,7 +66,7 @@ class StoreSqlExtension extends AbstractExtension
     {
         $value = $config->offsetGetByPath(self::STORED_SQL_PATH);
         if ($value) {
-            $result->offsetAddToArray('metadata', [self::DISPLAY_SQL_SOURCE => true]);
+            $result->offsetAddToArray('metadata', [self::DISPLAY_SQL_QUERY => true]);
             $result->offsetAddToArrayByPath(
                 self::STORED_SQL_PATH,
                 $value
