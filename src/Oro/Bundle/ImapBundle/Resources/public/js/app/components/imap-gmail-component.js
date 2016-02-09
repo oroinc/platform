@@ -53,7 +53,6 @@ define(function(require) {
          * Handler event checkConnection
          */
         onCheckConnection: function() {
-            mediator.execute('showLoading');
             this.view.resetErrorMessage();
             this.requestAccessToken();
         },
@@ -63,11 +62,11 @@ define(function(require) {
          */
         requestGoogleAuthCode: function(emailAddress) {
             var data = this.view.getData();
-
             if (data.clientId.length === 0) {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.emptyClientId'));
                 this.view.render();
             } else {
+                this._wrapFirstWindowOpen();
                 gapi.auth.authorize({
                     'client_id': data.clientId,
                     'scope': this.scopes.join(' '),
@@ -95,34 +94,13 @@ define(function(require) {
             }
         },
 
-        handleClosedGoogleAuthWindow: function() {
-            mediator.execute('hideLoading');
-            mediator.execute('showFlashMessage', 'error', __('oro.email.error.google_auth'));
-        },
-
         /**
          * Request to google API to get token
          */
         requestAccessToken: function() {
-            //https://github.com/google/google-api-javascript-client/issues/25#issuecomment-76695596
-            (function(wrapped) {
-                window.open = function() {
-                    window.open = wrapped;
-
-                    var win = wrapped.apply(this, arguments);
-                    var i = setInterval(function() {
-                        if (win.closed) {
-                            clearInterval(i);
-                            setTimeout(function() {
-                                authorizeDeferred.cancel();
-                            }, 1500);
-                        }
-                    }, 100);
-                    return win;
-                };
-            })(window.open);
-
-            var authorizeDeferred = gapi.auth.authorize({
+            var args = {};
+            this._wrapFirstWindowOpen(args);
+            args.deferred = gapi.auth.authorize({
                     'client_id': this.view.getData().clientId,
                     'scope': this.scopes.join(' '),
                     'immediate': false,
@@ -131,8 +109,46 @@ define(function(require) {
                 _.bind(this.checkAuthorization, this)
             ).then(
                 null,
-                _.bind(this.handleClosedGoogleAuthWindow, this)
+                function() {
+                    mediator.execute(
+                        'showFlashMessage',
+                        'error',
+                        __('oro.imap.connection.google.oauth.error.closed_auth')
+                    );
+                }
             );
+        },
+
+        _wrapFirstWindowOpen: function(args) {
+            args = args || {};
+
+            (function(wrapped) {
+                window.open = function() {
+                    window.open = wrapped;
+
+                    var win = wrapped.apply(this, arguments);
+                    if (win) {
+                        var i = setInterval(function() {
+                            if (win.closed) {
+                                clearInterval(i);
+                                setTimeout(function() {
+                                    if (typeof args.deferred !== 'undefined') {
+                                        args.deferred.cancel();
+                                    }
+                                }, 1500);
+                            }
+                        }, 100);
+                    } else {
+                        mediator.execute(
+                            'showFlashMessage',
+                            'error',
+                            __('oro.imap.connection.google.oauth.error.blocked_popup')
+                        );
+                    }
+
+                    return win;
+                };
+            })(window.open);
         },
 
         /**

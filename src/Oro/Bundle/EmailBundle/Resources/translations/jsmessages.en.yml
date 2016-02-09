@@ -34,7 +34,6 @@ oro:
         error:
             get_email_last: "Getting last emails failed"
             mark_as_read: "Marking all as read failed"
-            google_auth: Something has gone wrong. Please address your administrator to check the google API key settings.
         recent_emails_widget:
             title_all_folders: RECENT EMEILS
             settings: Recent Emails Widget Settings
