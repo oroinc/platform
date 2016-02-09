@@ -108,7 +108,6 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     }
 
     /**
-     *
      * Check ACL based on acl_resource_id, route or uri.
      *
      * @param array $options
