@@ -12,6 +12,9 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
     /**#@+
@@ -108,6 +111,8 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
      * Check ACL based on acl_resource_id, route or uri.
      *
      * @param array $options
