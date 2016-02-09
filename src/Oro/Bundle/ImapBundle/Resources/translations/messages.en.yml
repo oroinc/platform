@@ -22,8 +22,12 @@ oro.imap:
         smtp_host.label: SMTP Host
         smtp_port.label: SMTP Port
         smtp_encryption.label: Encryption
-        use_imap.label: Enable IMAP
-        use_smtp.label: Enable SMTP
+        use_imap:
+            label: Enable IMAP
+            tooltip: Enable imap sync with your mailbox to send and receive emails from OroCRM. if you don't know your imap credentials, contact your administrator
+        use_smtp:
+            label: Enable SMTP
+            tooltip: Enable smtp synct to synchronize emails sent from OroCRM to your mailbox so you can see them in other email clients
         user.label: User
         password.label: Password
         connect: Connect

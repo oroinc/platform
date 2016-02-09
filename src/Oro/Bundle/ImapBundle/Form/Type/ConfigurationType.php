@@ -68,7 +68,8 @@ class ConfigurationType extends AbstractType
                 'label'    => 'oro.imap.configuration.use_imap.label',
                 'attr'     => ['class' => 'imap-config check-connection'],
                 'required' => false,
-                'mapped'   => false
+                'mapped'   => false,
+                'tooltip'  => 'oro.imap.configuration.use_imap.tooltip'
             ])
             ->add('imapHost', 'text', [
                 'label'    => 'oro.imap.configuration.imap_host.label',
@@ -93,7 +94,8 @@ class ConfigurationType extends AbstractType
                 'label'    => 'oro.imap.configuration.use_smtp.label',
                 'attr'     => ['class' => 'smtp-config check-connection'],
                 'required' => false,
-                'mapped'   => false
+                'mapped'   => false,
+                'tooltip'  => 'oro.imap.configuration.use_smtp.tooltip'
             ])
             ->add('smtpHost', 'text', [
                 'label'    => 'oro.imap.configuration.smtp_host.label',
