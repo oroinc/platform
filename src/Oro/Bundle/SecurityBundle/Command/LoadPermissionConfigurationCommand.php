@@ -36,6 +36,7 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
         $acceptedPermissions = $input->getOption('permissions') ?: null;
         $manager = $this->getContainer()->get('oro_security.acl.permission_manager');
         $permissions = $manager->getPermissionsFromConfig($acceptedPermissions);
+
         if ($permissions) {
             $output->writeln('Loading permissions...');
 
