@@ -79,8 +79,6 @@ config:
         'orodatagrid/js/inline-editing/builder': 'bundles/orodatagrid/js/inline-editing/builder.js'
         'orodatagrid/js/app/plugins/grid/inline-editing-plugin': 'bundles/orodatagrid/js/app/plugins/grid/inline-editing-plugin.js'
         'orodatagrid/js/inline-editing/default-editors': 'bundles/orodatagrid/js/inline-editing/default-editors.js'
-        'orodatagrid/js/show-sql-source-builder': 'bundles/orodatagrid/js/show-sql-source-builder.js'
-        'orodatagrid/js/app/plugins/grid/show-sql-source-plugin': 'bundles/orodatagrid/js/app/plugins/grid/show-sql-source-plugin.js'
 build:
     paths:
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with

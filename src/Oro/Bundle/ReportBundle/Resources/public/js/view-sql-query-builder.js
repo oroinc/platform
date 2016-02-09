@@ -2,9 +2,9 @@ define(function(require) {
     'use strict';
 
     var tools = require('oroui/js/tools');
-    var ShowSqlSourcePlugin = require('orodatagrid/js/app/plugins/grid/show-sql-source-plugin');
+    var ViewSqlQueryPlugin = require('ororeport/js/app/plugins/grid/view-sql-query-plugin');
 
-    var showSqlSourceBuilder = {
+    var ViewSqlQueryBuilder = {
         /**
          * Prepares and preloads all required files for inline editing plugin
          *
@@ -17,17 +17,17 @@ define(function(require) {
          * @param {Object} [options.metadata] configuration for the grid
          */
         init: function(deferred, options) {
-            if (tools.isMobile() || !options.data.metadata.display_sql_source) {
+            if (tools.isMobile() || !options.data.metadata.display_sql_query) {
                 deferred.resolve();
                 return;
             }
             options.gridPromise.done(function(grid) {
-                grid.pluginManager.create(ShowSqlSourcePlugin, options);
-                grid.pluginManager.enable(ShowSqlSourcePlugin, options);
+                grid.pluginManager.create(ViewSqlQueryPlugin, options);
+                grid.pluginManager.enable(ViewSqlQueryPlugin, options);
                 deferred.resolve();
             });
         }
     };
 
-    return showSqlSourceBuilder;
+    return ViewSqlQueryBuilder;
 });
