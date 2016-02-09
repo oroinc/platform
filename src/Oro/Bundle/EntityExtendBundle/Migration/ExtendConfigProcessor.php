@@ -225,7 +225,7 @@ class ExtendConfigProcessor
             );
         }
 
-        $this->logger->notice(
+        $this->logger->info(
             sprintf('Create entity "%s".', $className),
             ['configs' => $configs]
         );
@@ -247,7 +247,7 @@ class ExtendConfigProcessor
      */
     protected function updateEntityModel($className, array $configs)
     {
-        $this->logger->notice(
+        $this->logger->info(
             sprintf('Update entity "%s".', $className),
             ['configs' => $configs]
         );
@@ -271,7 +271,7 @@ class ExtendConfigProcessor
     protected function changeEntityMode($className, $mode)
     {
         if ($this->configManager->getConfigEntityModel($className)->getMode() !== $mode) {
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf('Update a mode to "%s". Entity: %s.', $mode, $className)
             );
             $this->configManager->changeEntityMode($className, $mode);
@@ -295,7 +295,7 @@ class ExtendConfigProcessor
             );
         }
 
-        $this->logger->notice(
+        $this->logger->info(
             sprintf(
                 'Create field "%s". Type: %s. Mode: %s. Entity: %s.',
                 $fieldName,
@@ -325,7 +325,7 @@ class ExtendConfigProcessor
      */
     protected function updateFieldModel($className, $fieldName, array $configs)
     {
-        $this->logger->notice(
+        $this->logger->info(
             sprintf('Update field "%s". Entity: %s.', $fieldName, $className),
             ['configs' => $configs]
         );
@@ -343,7 +343,7 @@ class ExtendConfigProcessor
     protected function changeFieldType($className, $fieldName, $fieldType)
     {
         if ($this->configManager->getConfigFieldModel($className, $fieldName)->getType() !== $fieldType) {
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
             );
 
@@ -363,7 +363,7 @@ class ExtendConfigProcessor
     protected function changeFieldMode($className, $fieldName, $mode)
     {
         if ($this->configManager->getConfigFieldModel($className, $fieldName)->getMode() !== $mode) {
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf('Update a mode of field "%s" to "%s". Entity: %s.', $fieldName, $mode, $className)
             );
 
@@ -452,7 +452,7 @@ class ExtendConfigProcessor
      */
     protected function renameField($className, $fieldName, $newFieldName)
     {
-        $this->logger->notice(
+        $this->logger->info(
             sprintf('Rename field "%s" to "%s". Entity: %s.', $fieldName, $newFieldName, $className)
         );
 

@@ -27,7 +27,7 @@ class LoadOptionSetsQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $logger->notice('Retrieve existing option sets');
+        $logger->info('Retrieve existing option sets');
         $this->execute($logger);
 
         return $logger->getMessages();
