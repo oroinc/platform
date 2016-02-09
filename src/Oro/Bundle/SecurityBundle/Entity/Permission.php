@@ -186,7 +186,7 @@ class Permission
      * @param PermissionEntity $permissionEntity
      * @return $this
      */
-    public function addApplyToEntities(PermissionEntity $permissionEntity)
+    public function addApplyToEntity(PermissionEntity $permissionEntity)
     {
         if (!$this->applyToEntities->contains($permissionEntity)) {
             $this->applyToEntities->add($permissionEntity);
@@ -231,7 +231,7 @@ class Permission
      * @param PermissionEntity $permissionEntity
      * @return $this
      */
-    public function addExcludeEntities(PermissionEntity $permissionEntity)
+    public function addExcludeEntity(PermissionEntity $permissionEntity)
     {
         if (!$this->excludeEntities->contains($permissionEntity)) {
             $this->excludeEntities->add($permissionEntity);
@@ -268,6 +268,32 @@ class Permission
     public function setGroupNames(array $groupNames = null)
     {
         $this->groupNames = $groupNames;
+
+        return $this;
+    }
+
+    /**
+     * @param string $groupName
+     * @return $this
+     */
+    public function addGroupName($groupName)
+    {
+        if (!$this->groupNames->contains($groupName)) {
+            $this->groupNames->add($groupName);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $groupName
+     * @return $this
+     */
+    public function removeGroupName($groupName)
+    {
+        if ($this->groupNames->contains($groupName)) {
+            $this->groupNames->removeElement($groupName);
+        }
 
         return $this;
     }
