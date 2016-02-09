@@ -33,7 +33,7 @@ class PermissionRepository extends EntityRepository
      */
     public function findByEntityClassAndIds($class, array $ids = null)
     {
-        if (empty($class)) {
+        if (empty($class) || null !== $ids && empty($ids)) {
             return [];
         }
 
@@ -56,6 +56,10 @@ class PermissionRepository extends EntityRepository
                 )
             )
             ->setParameter('class', $class);
+
+        if (null !== $ids) {
+            $queryBuilder->andWhere($queryBuilder->expr()->in('p.id', $ids));
+        }
 
         return $queryBuilder->getQuery()->getResult();
     }

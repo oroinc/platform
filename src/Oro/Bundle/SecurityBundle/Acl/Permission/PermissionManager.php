@@ -54,7 +54,7 @@ class PermissionManager
     {
         $repository = $this->getRepository();
 
-        $ids = $groupName ? $this->findPermissionsIdsByGroupName($groupName) : null;
+        $ids = $groupName ? $this->findGroups($groupName) : null;
 
         return $repository->findByEntityClassAndIds($this->doctrineHelper->getEntityClass($entity), $ids);
     }
@@ -83,19 +83,6 @@ class PermissionManager
         $this->cache->saveMultiple($cache);
 
         return $cache;
-    }
-
-    /**
-     * @param string $name
-     * @return array
-     */
-    protected function findPermissionsIdsByGroupName($name = '')
-    {
-        $permissions = $this->findGroups($name);
-
-        $ids = array_intersect_key($this->findPermissions(), array_combine($permissions, $permissions));
-
-        return $ids;
     }
 
     /**
