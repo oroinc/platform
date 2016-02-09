@@ -6,6 +6,8 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 
@@ -16,6 +18,12 @@ class PermissionManager
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var PermissionConfigurationProvider */
+    protected $configurationProvider;
+
+    /** @var PermissionConfigurationBuilder */
+    protected $configurationBuilder;
 
     /** @var CacheProvider */
     protected $cache;
@@ -28,12 +36,51 @@ class PermissionManager
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param PermissionConfigurationProvider $configurationProvider
+     * @param PermissionConfigurationBuilder $configurationBuilder
      * @param CacheProvider $cache
      */
-    public function __construct(DoctrineHelper $doctrineHelper, CacheProvider $cache)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        PermissionConfigurationProvider $configurationProvider,
+        PermissionConfigurationBuilder $configurationBuilder,
+        CacheProvider $cache
+    ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->configurationProvider = $configurationProvider;
+        $this->configurationBuilder = $configurationBuilder;
         $this->cache = $cache;
+    }
+
+    /**
+     * @param array $acceptedPermissions
+     * @return Permission[]
+     */
+    public function getPermissionsFromConfig(array $acceptedPermissions = null)
+    {
+        $permissionConfiguration = $this->configurationProvider->getPermissionConfiguration(
+            $acceptedPermissions
+        );
+
+        return $this->configurationBuilder
+            ->buildPermissions($permissionConfiguration[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+    }
+
+    /**
+     * @param Permission $permission
+     * @return Permission
+     */
+    public function preparePermissionForDb(Permission $permission)
+    {
+        /** @var Permission $existingPermission */
+        $existingPermission = $this->getRepository()->findOneBy(['name' => $permission->getName()]);
+
+        // permission in DB should be overridden if permission with such name already exists
+        if ($existingPermission) {
+            $existingPermission->import($permission);
+        }
+
+        return $existingPermission ?: $permission;
     }
 
     /**

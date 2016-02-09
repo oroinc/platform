@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
-
 use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
-
-use Symfony\Component\Yaml\Yaml;
 
 class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
 {

@@ -64,8 +64,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->addColumn('permission_id', 'integer', []);
         $table->addColumn('permission_entity_id', 'integer', []);
         $table->setPrimaryKey(['permission_id', 'permission_entity_id']);
-        $table->addIndex(['permission_id'], 'IDX_6CEC2164FED90CCA', []);
-        $table->addIndex(['permission_entity_id'], 'IDX_6CEC2164A3D25331', []);
     }
 
     /**
@@ -79,8 +77,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->addColumn('permission_id', 'integer', []);
         $table->addColumn('permission_entity_id', 'integer', []);
         $table->setPrimaryKey(['permission_id', 'permission_entity_id']);
-        $table->addIndex(['permission_id'], 'IDX_884268C7FED90CCA', []);
-        $table->addIndex(['permission_entity_id'], 'IDX_884268C7A3D25331', []);
     }
 
     /**
