@@ -168,7 +168,7 @@ class MetadataBuilder
                     !in_array($config->getId()->getFieldType(), RelationType::$toAnyRelations, true) &&
                     (
                         !$config->has('target_entity') ||
-                         ExtendHelper::isEntityAccessible(
+                        ExtendHelper::isEntityAccessible(
                             $this->entityExtendProvider->getConfig($config->get('target_entity'))
                         )
                     );
