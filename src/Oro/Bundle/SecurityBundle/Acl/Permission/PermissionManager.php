@@ -59,14 +59,15 @@ class PermissionManager
         return $repository->findByEntityClassAndIds($this->doctrineHelper->getEntityClass($entity), $ids);
     }
 
-    /**
-     * @param Permission[] $permissions
-     */
     public function buildCache()
     {
         $permissions = $this->getRepository()->findAll();
 
-        $data = [];
+        $data = [
+            static::CACHE_GROUPS => [],
+            static::CACHE_PERMISSIONS => [],
+        ];
+
         foreach ($permissions as $permission) {
             $data[static::CACHE_PERMISSIONS][$permission->getName()] = $permission->getId();
 
@@ -136,7 +137,11 @@ class PermissionManager
             $this->buildCache();
         }
 
-        return $this->cache->fetch($key);
+        if (false === ($cache = $this->cache->fetch($key))) {
+            return [];
+        }
+
+        return $cache;
     }
 
     /**
