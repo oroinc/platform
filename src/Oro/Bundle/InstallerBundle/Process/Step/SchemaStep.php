@@ -31,6 +31,8 @@ class SchemaStep extends AbstractStep
                     'oro:migration:data:load',
                     array('--no-interaction' => true)
                 );
+            case 'permissions':
+                return $this->handleAjaxAction('oro:permission:configuration:load');
             case 'workflows':
                 return $this->handleAjaxAction('oro:workflow:definitions:load');
             case 'processes':

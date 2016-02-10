@@ -75,6 +75,7 @@ process:
             schema-drop:   Drop current schema
             schema-update: Schema update
             fixtures:      Load fixtures
+            permissions:   Load permissions configuration
             workflows:     Load workflow definitions
             processes:     Load processes configuration
         setup:
