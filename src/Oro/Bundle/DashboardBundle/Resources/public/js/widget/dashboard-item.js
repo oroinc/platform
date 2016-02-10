@@ -4,8 +4,9 @@ define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oro/block-widget',
-    'oroui/js/delete-confirmation'
-], function(_, Backbone, __, mediator, BlockWidget, DeleteConfirmation) {
+    'oroui/js/delete-confirmation',
+    'tpl!orodashboard/templates/widget/dashboard-item.html'
+], function(_, Backbone, __, mediator, BlockWidget, DeleteConfirmation, dashboardItemTpl) {
     'use strict';
 
     var DashboardItemWidget;
@@ -65,45 +66,7 @@ define([
             contentContainer: '.row-fluid',
             contentClasses: [],
             allowEdit: false,
-            template: _.template(
-                '<div class="box-type1 dashboard-widget <%= allowEdit ? \'editable\' : \'\' %>">' +
-                    '<div class="pull-left actions-container">' +
-                        '<div class="pull-left collapse-expand-action-container">' +
-                            '<a class="collapse-action <%= collapsed ? \'collapsed\' : \'\' %>" href="#" ' +
-                                'data-collapsed-title="<%- _.__(\'oro.dashboard.widget.expand\') %>"' +
-                                ' data-expanded-title="<%- _.__(\'oro.dashboard.widget.collapse\') %>">' +
-                            '</a>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="pull-right actions-container">' +
-                        '<div class="pull-right default-actions-container">' +
-                            '<span class="action-wrapper sortable">' +
-                                '<a class="move-action" href="#" title="<%- _.__(\'oro.dashboard.widget.move\') %>">' +
-                                    '<i class="icon-move hide-text"></i>' +
-                                '</a>' +
-                            '</span>' +
-                            '<% if (showConfig) { %>' +
-                                '<span class="action-wrapper">' +
-                                    '<a class="configure-action" href="#" ' +
-                                        'title="<%- _.__(\'oro.dashboard.widget.configure\') %>">' +
-                                        '<i class="icon-cog hide-text"></i>' +
-                                    '</a>' +
-                                '</span>' +
-                            '<% } %>' +
-                            '<span class="action-wrapper">' +
-                                '<a class="remove-action" href="#" ' +
-                                    'title="<%- _.__(\'oro.dashboard.widget.remove\') %>">' +
-                                    '<i class="icon-trash hide-text"></i>' +
-                                '</a>' +
-                            '</span>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="title sortable widget-title pull-left" title="<%- title %>"><%- title %></div>' +
-                    '<div class="pull-right widget-actions-container"></div>' +
-                    '<div class="new-line"></div>' +
-                    '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
-                '</div>'
-            )
+            template: dashboardItemTpl
         }),
 
         /**

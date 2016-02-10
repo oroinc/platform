@@ -24,6 +24,8 @@ class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $dataKey2 = 'test2';
         $dataId2  = 'dataId2';
         $data2    = null;
+        $dataKey3  = 'dataId3';
+        $data3    = 123;
 
         $context = new LayoutContext();
 
@@ -35,7 +37,8 @@ class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
             $dataKey2 => [
                 'identifier' => $dataId2,
                 'data'       => $data2
-            ]
+            ],
+            $dataKey3 => $data3
         ];
 
         $this->contextConfigurator->configureContext($context);
@@ -48,6 +51,9 @@ class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($context->data()->has($dataKey2));
         $this->assertEquals($dataId2, $context->data()->getIdentifier($dataKey2));
         $this->assertSame($data2, $context->data()->get($dataKey2));
+        $this->assertTrue($context->data()->has($dataKey3));
+        $this->assertEquals(null, $context->data()->getIdentifier($dataKey3));
+        $this->assertSame($data3, $context->data()->get($dataKey3));
     }
 
     public function testEmptyData()
@@ -87,17 +93,6 @@ class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context         = new LayoutContext();
         $context['data'] = [123];
-        $this->contextConfigurator->configureContext($context);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The data item "test" must be an array, but "integer" given.
-     */
-    public function testShouldThrowExceptionIfDataItemIsNotArray()
-    {
-        $context         = new LayoutContext();
-        $context['data'] = ['test' => 123];
         $this->contextConfigurator->configureContext($context);
     }
 

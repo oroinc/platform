@@ -9,6 +9,7 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        imap.folder.checkAll: All
         autocomplete:
             recently_used: Recently used
             contexts: Contexts
@@ -24,6 +25,11 @@ oro:
             no_attachments:                      No available attachments
             thread_attachments:                  Thread Attachments
             record_attachments:                  Record Attachments
+
+            tooltip:
+                attachment_sync:
+                    enable: Enable load attachments on email sync.
+                    max_size: Maximum sync attacment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
 
         variable.not.found:                     N/A
 
@@ -65,6 +71,12 @@ oro:
 
             show_recent_emails_in_user_bar:
                 label: Show recent emails
+
+            attachment_sync:
+                enable:
+                    label: Enable attachment sync
+                max_size:
+                    label: Maximum sync attachment size, Mb
 
         emailtemplate:
             entity_label:        Template
@@ -227,6 +239,7 @@ oro:
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
+        body_synced.label:        Email body synced
         status:
             label:                Status
             unread.label:         Unread

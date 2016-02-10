@@ -30,6 +30,12 @@ class ReplaceStrategy implements StrategyInterface
         $masterEntity  = $entityData->getMasterEntity();
         $fieldMetadata = $fieldData->getMetadata();
         $sourceEntity  = $fieldData->getSourceEntity();
+
+        //for fields that are not in the merge form(system, custom etc) use values from Master record
+        if (!$sourceEntity) {
+            $sourceEntity = $masterEntity;
+        }
+
         $value         = $this->accessor->getValue($sourceEntity, $fieldMetadata);
         $this->accessor->setValue($masterEntity, $fieldMetadata, $value);
     }

@@ -16,13 +16,13 @@ oro_system_configuration:
             title: oro.email.system_configuration.email_threads.label
             priority: 90
 
-        attachment_configuration:
-            title: oro.email.system_configuration.attachment_configuration.label
-            priority: 110
-
         reply_configuration:
             title: oro.email.system_configuration.reply_configuration.label
             priority: 80
+
+        attachment_configuration:
+            title: oro.email.system_configuration.attachment_configuration.label
+            priority: 70
 
         mailboxes:
             title: oro.email.system_configuration.mailbox_configuration.label
@@ -83,6 +83,24 @@ oro_system_configuration:
                 label: oro.email.system_configuration.show_recent_emails_in_user_bar.label
                 required: true
 
+        oro_email.attachment_sync_enable:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 50
+            options:
+                label: oro.email.system_configuration.attachment_sync.enable.label
+                tooltip: oro.email.form.tooltip.attachment_sync.enable
+                required: true
+
+        oro_email.attachment_sync_max_size:
+            data_type: number
+            type: number
+            priority: 50
+            options:
+                label: oro.email.system_configuration.attachment_sync.max_size.label
+                tooltip: oro.email.form.tooltip.attachment_sync.max_size
+                required: true
+
     tree:
         system_configuration:
             platform:
@@ -106,6 +124,10 @@ oro_system_configuration:
                                     reply_configuration:
                                         children:
                                             - oro_email.default_button_reply
+                                    attachment_configuration:
+                                        children:
+                                            - oro_email.attachment_sync_enable
+                                            - oro_email.attachment_sync_max_size
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid

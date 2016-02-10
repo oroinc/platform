@@ -234,8 +234,6 @@ define([
                 contextSearch: this.contextSearch
             });
 
-            this.selectWidget.multiselect('getButton').hide();
-
             this.selectWidget.setViewDesign(this);
             this.selectWidget.getWidget().on('keyup', _.bind(function(e) {
                 if (e.keyCode === 27) {
