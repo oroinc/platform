@@ -127,7 +127,9 @@ class PermissionManager
         }
 
         $this->cache->flushAll();
-        $this->cache->saveMultiple($cache);
+        foreach($cache as $key => $value) {
+            $this->cache->save($key, $value);
+        }
 
         return $cache;
     }

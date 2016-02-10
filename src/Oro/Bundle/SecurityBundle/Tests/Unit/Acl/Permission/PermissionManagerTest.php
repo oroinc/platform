@@ -63,7 +63,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods(['fetch', 'saveMultiple', 'flushAll'])
+            ->setMethods(['fetch', 'save', 'flushAll'])
             ->getMockForAbstractClass();
 
         $this->manager = new PermissionManager(
@@ -138,9 +138,11 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
         $this->cacheProvider->expects($this->once())
             ->method('flushAll');
 
-        $this->cacheProvider->expects($this->once())
-            ->method('saveMultiple')
-            ->with($expectedData);
+        foreach (array_keys($expectedData) as $index => $key) {
+            $this->cacheProvider->expects($this->at($index + 1))
+                ->method('save')
+                ->with($key, $expectedData[$key]);
+        }
 
         $this->assertEquals($expectedData, $this->manager->buildCache());
     }
@@ -286,11 +288,11 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                     'cache' => $cache,
                     'ids' => ['PERMISSION3' => 3],
                     'permissions' => [
-                        $permissions[3],
+                        $permissions[2],
                     ],
                 ],
                 'expected' => [
-                    $permissions[3],
+                    $permissions[2],
                 ],
             ],
         ];
@@ -311,11 +313,11 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             [
                 'input' => $permissions,
                 'expected' => [
-                    'permissions' => ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3],
                     'groups' => [
                         'group1' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
                         'group2' => ['PERMISSION3' => 3],
                     ],
+                    'permissions' => ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3],
                 ],
             ],
         ];
