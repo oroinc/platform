@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SecurityBundle\Acl\Permission;
 
 use Doctrine\ORM\EntityRepository;
@@ -22,6 +23,8 @@ class PermissionManager
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param PermissionConfigurationProvider $configurationProvider
+     * @param PermissionConfigurationBuilder $configurationBuilder
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -86,13 +89,14 @@ class PermissionManager
     }
 
     /**
+     * @param string $entityClass
      * @return bool
      */
     protected function isManageableEntityClass($entityClass)
     {
         try {
             return $this->doctrineHelper->isManageableEntityClass($entityClass);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
     }
