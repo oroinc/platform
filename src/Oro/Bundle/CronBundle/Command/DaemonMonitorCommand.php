@@ -14,20 +14,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\CronBundle\Job\Daemon;
 use Oro\Component\Log\OutputLogger;
 
-class DaemonMonitorCommand extends ContainerAwareCommand implements CronCommandInterface
+class DaemonMonitorCommand extends ContainerAwareCommand
 {
-    const COMMAND_NAME  = 'oro:cron:daemon';
+    const COMMAND_NAME  = 'oro:daemon';
 
     /** @var array */
     protected $repeatTime = [5, 10, 15, 25, 25];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultDefinition()
-    {
-        return '0 */6 * * *';
-    }
 
     /**
      * {@inheritdoc}

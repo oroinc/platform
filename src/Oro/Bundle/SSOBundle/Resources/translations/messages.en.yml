@@ -10,3 +10,5 @@ oro:
                     google_sso_settings.title: Google Single Sign-On
                 fields:
                     enable_google_sso.label: Enable
+                    domains.label: Domains
+                    domains.tooltip: Comma separated list of allowed domains

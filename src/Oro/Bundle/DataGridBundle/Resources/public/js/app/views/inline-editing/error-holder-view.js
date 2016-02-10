@@ -205,7 +205,7 @@ define(function(require) {
                 if ($input.length) {
                     name = $input[0].getAttribute('name');
                 }
-                errors[name] = label.innerText;
+                errors[name] = $(label).text();
             }, this);
             this._errors = errors;
         }
