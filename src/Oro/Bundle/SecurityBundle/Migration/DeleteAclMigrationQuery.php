@@ -50,7 +50,7 @@ class DeleteAclMigrationQuery implements MigrationQuery
     public function execute(LoggerInterface $logger)
     {
         if ($this->aclProvider) {
-            $logger->notice($this->buildDescription());
+            $logger->info($this->buildDescription());
             $this->aclProvider->deleteAclClass($this->oid);
         }
     }

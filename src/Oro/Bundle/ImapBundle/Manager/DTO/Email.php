@@ -98,12 +98,14 @@ class Email extends EmailHeader
             $this->attachments = array();
 
             foreach ($this->message->getAttachments() as $a) {
+                $fileSize = $a->getFileSize();
                 $content  = $a->getContent();
                 $filename = $a->getFileName()->getValue();
                 if ($filename !== null) {
                     $attachment = new EmailAttachment();
                     $attachment
                         ->setFileName($filename)
+                        ->setFileSize($fileSize)
                         ->setContent($content->getContent())
                         ->setContentType($content->getContentType())
                         ->setContentTransferEncoding($content->getContentTransferEncoding())

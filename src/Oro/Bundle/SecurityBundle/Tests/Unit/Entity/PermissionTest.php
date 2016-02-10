@@ -65,7 +65,7 @@ class PermissionTest extends \PHPUnit_Framework_TestCase
      * @dataProvider addRemoveDataProvider
      *
      * @param string $propertyName
-     * @param $getter
+     * @param string $getter
      * @param mixed $value
      * @param mixed $defaultValue
      */

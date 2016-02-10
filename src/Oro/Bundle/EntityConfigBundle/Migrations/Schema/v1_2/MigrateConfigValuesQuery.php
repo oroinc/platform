@@ -61,7 +61,7 @@ class MigrateConfigValuesQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT entity_id, field_id, scope, code, value, serializable'
             . ' FROM oro_entity_config_value'
             . ' ORDER BY entity_id, field_id, scope, code';
-        $logger->notice($sql);
+        $logger->info($sql);
         $configValues = $this->connection->fetchAll($sql);
         $configs = [];
         foreach ($configValues as $configValue) {

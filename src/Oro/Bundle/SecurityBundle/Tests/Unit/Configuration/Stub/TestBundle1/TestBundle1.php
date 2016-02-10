@@ -7,4 +7,3 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class TestBundle1 extends Bundle
 {
 }
-

@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:permission:configuration:load';
+    const NAME = 'security:permission:configuration:load';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -38,19 +38,21 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Loading permissions...');
-
         $acceptedPermissions = $input->getOption('permissions') ?: null;
+
         $manager = $this->getContainer()->get('oro_security.acl.permission_manager');
+
         $permissions = $manager->getPermissionsFromConfig($acceptedPermissions);
-        $permissions = $manager->processPermissions($permissions);
+        if ($permissions) {
+            $output->writeln('Loading permissions...');
 
-        foreach ($permissions as $permission) {
-            $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
-            $this->validatePermissionEntities($permission, $output);
-        }
+            $permissions = $manager->processPermissions($permissions);
 
-        if (!$permissions) {
+            foreach ($permissions as $permission) {
+                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
+                $this->validatePermissionEntities($permission, $output);
+            }
+        } else {
             $output->writeln('No permissions found.');
         }
     }
@@ -67,6 +69,7 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
             $permission->getApplyToEntities()->toArray(),
             $permission->getExcludeEntities()->toArray()
         );
+
         foreach ($permissionEntities as $permissionEntity) {
             if (!$this->isManageableEntityClass($permissionEntity->getName())) {
                 $output->writeln(sprintf(
@@ -86,6 +89,7 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
         if (!$this->doctrineHelper) {
             $this->doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
         }
+
         try {
             return $this->doctrineHelper->isManageableEntityClass($entityClass);
         } catch (\Exception $e) {
