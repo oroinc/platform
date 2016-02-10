@@ -26,8 +26,8 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     {
         $this->initClient();
 
-        $bundle1  = new TestBundle1();
-        $bundle2  = new TestBundle2();
+        $bundle1 = new TestBundle1();
+        $bundle2 = new TestBundle2();
         $bundles = [
             $bundle1->getName() => get_class($bundle1),
             $bundle2->getName() => get_class($bundle2),
@@ -81,7 +81,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
                     ],
                     'PERMISSION2' => [
                         'label' => 'Label for Permission 2',
-                        'group_names' => ['', 'frontend', 'new_group'],
+                        'group_names' => ['default', 'frontend', 'new_group'],
                         'apply_to_all' => false,
                         'apply_to_entities' => [
                             'OroTestFrameworkBundle:TestActivity',
@@ -98,6 +98,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
                     'PERMISSION3' => [
                         'label' => 'Label for Permission 3',
                         'group_names' => ['default'],
+                        'apply_to_entities' => ['NotManageableEntity']
                     ],
                 ],
             ]

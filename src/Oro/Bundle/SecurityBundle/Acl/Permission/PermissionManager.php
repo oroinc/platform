@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Permission;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
-use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
 class PermissionManager
 {
@@ -38,7 +39,7 @@ class PermissionManager
 
     /**
      * @param array $acceptedPermissions
-     * @return Permission[]
+     * @return Permission[]|Collection
      */
     public function getPermissionsFromConfig(array $acceptedPermissions = null)
     {
@@ -51,54 +52,37 @@ class PermissionManager
     }
 
     /**
-     * @param Permission $permission
-     * @return array
+     * @param Permission[]|Collection $permissions
+     * @return Permission[]|Collection
      */
-    public function getNotManageableEntities(Permission $permission)
+    public function processPermissions(Collection $permissions)
     {
-        /** @var PermissionEntity[] $permissionEntities */
-        $permissionEntities = array_merge(
-            $permission->getApplyToEntities()->toArray(),
-            $permission->getExcludeEntities()->toArray()
-        );
-        $entities = [];
-        foreach ($permissionEntities as $permissionEntity) {
-            if (!$this->isManageableEntityClass($permissionEntity->getName())) {
-                $entities[] = $permissionEntity->getName();
+        $entityRepository = $this->getRepository();
+        $entityManager = $this->getEntityManager();
+        foreach ($permissions as &$permission) {
+            /** @var Permission $existingPermission */
+            $existingPermission = $entityRepository->findOneBy(['name' => $permission->getName()]);
+
+            // permission in DB should be overridden if permission with such name already exists
+            if ($existingPermission) {
+                $existingPermission->import($permission);
+                $permission = $existingPermission;
             }
+            $entityManager->persist($permission);
         }
+        unset($permission);
 
-        return array_unique($entities);
+        $entityManager->flush();
+
+        return $permissions;
     }
 
     /**
-     * @param Permission $permission
-     * @return Permission
+     * @return EntityManager
      */
-    public function preparePermissionForDb(Permission $permission)
+    protected function getEntityManager()
     {
-        /** @var Permission $existingPermission */
-        $existingPermission = $this->getRepository()->findOneBy(['name' => $permission->getName()]);
-
-        // permission in DB should be overridden if permission with such name already exists
-        if ($existingPermission) {
-            $existingPermission->import($permission);
-        }
-
-        return $existingPermission ?: $permission;
-    }
-
-    /**
-     * @param string $entityClass
-     * @return bool
-     */
-    protected function isManageableEntityClass($entityClass)
-    {
-        try {
-            return $this->doctrineHelper->isManageableEntityClass($entityClass);
-        } catch (\Exception $e) {
-            return false;
-        }
+        return $this->doctrineHelper->getEntityManagerForClass('OroSecurityBundle:Permission');
     }
 
     /**

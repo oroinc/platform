@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -32,14 +33,14 @@ class PermissionConfigurationBuilder
 
     /**
      * @param array $configuration
-     * @return Permission[]
+     * @return Permission[]|Collection
      */
     public function buildPermissions(array $configuration)
     {
-        $permissions = [];
+        $permissions = new ArrayCollection();
         $this->processedEntities = [];
         foreach ($configuration as $name => $permissionConfiguration) {
-            $permissions[] = $this->buildPermission($name, $permissionConfiguration);
+            $permissions->add($this->buildPermission($name, $permissionConfiguration));
         }
         $this->processedEntities = [];
 
@@ -126,18 +127,5 @@ class PermissionConfigurationBuilder
         }
 
         return $default;
-    }
-
-    /**
-     * @param $entityClass
-     * @return mixed
-     */
-    protected function isManageableEntityClass($entityClass)
-    {
-        try {
-            return $isManageable = $this->doctrineHelper->isManageableEntityClass($entityClass);
-        } catch (\Exception $e) {
-            return false;
-        }
     }
 }
