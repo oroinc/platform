@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:permission:configuration:load';
+    const NAME = 'security:permission:configuration:load';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
