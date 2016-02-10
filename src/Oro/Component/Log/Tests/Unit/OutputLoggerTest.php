@@ -10,7 +10,7 @@ use Oro\Component\Log\OutputLogger;
 
 class OutputLoggerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OutputInterface */
     protected $output;
 
     protected function setUp()
@@ -20,6 +20,11 @@ class OutputLoggerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider itemProvider
+     * @param bool $expectWriteToOutput
+     * @param int $verbosity
+     * @param string $level
+     * @param string $message
+     * @param array $context
      */
     public function testLog($expectWriteToOutput, $verbosity, $level, $message, $context)
     {
@@ -46,6 +51,9 @@ class OutputLoggerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider withTagsProvider
+     * @param int $level
+     * @param string $message
+     * @param string $expected
      */
     public function testLogWithTags($level, $message, $expected)
     {
@@ -57,12 +65,13 @@ class OutputLoggerTest extends \PHPUnit_Framework_TestCase
             ->method('writeln')
             ->with($expected);
 
-
-
         $logger = new OutputLogger($this->output, true, null, null, true);
         $logger->log($level, $message);
     }
 
+    /**
+     * @return array
+     */
     public function withTagsProvider()
     {
         return [
@@ -72,6 +81,9 @@ class OutputLoggerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public function itemProvider()
     {
         return [
@@ -89,15 +101,15 @@ class OutputLoggerTest extends \PHPUnit_Framework_TestCase
             [true, OutputInterface::VERBOSITY_DEBUG, LogLevel::EMERGENCY, 'test', []],
 
             [
-                true,
+                false,
                 OutputInterface::VERBOSITY_QUIET,
                 LogLevel::ALERT,
                 'test',
                 array('exception' => new \Exception())
             ],
-            [true, OutputInterface::VERBOSITY_QUIET, LogLevel::ALERT, 'test', []],
-            [true, OutputInterface::VERBOSITY_NORMAL, LogLevel::ALERT, 'test', []],
-            [true, OutputInterface::VERBOSITY_VERBOSE, LogLevel::ALERT, 'test', []],
+            [false, OutputInterface::VERBOSITY_QUIET, LogLevel::ALERT, 'test', []],
+            [false, OutputInterface::VERBOSITY_NORMAL, LogLevel::ALERT, 'test', []],
+            [false, OutputInterface::VERBOSITY_VERBOSE, LogLevel::ALERT, 'test', []],
             [true, OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::ALERT, 'test', []],
             [true, OutputInterface::VERBOSITY_DEBUG, LogLevel::ALERT, 'test', []],
 
@@ -134,13 +146,13 @@ class OutputLoggerTest extends \PHPUnit_Framework_TestCase
             [true,  OutputInterface::VERBOSITY_DEBUG, LogLevel::WARNING, 'test', []],
 
             [false, OutputInterface::VERBOSITY_QUIET, LogLevel::NOTICE, 'test', []],
-            [true,  OutputInterface::VERBOSITY_NORMAL, LogLevel::NOTICE, 'test', []],
-            [true,  OutputInterface::VERBOSITY_VERBOSE, LogLevel::NOTICE, 'test', []],
+            [false,  OutputInterface::VERBOSITY_NORMAL, LogLevel::NOTICE, 'test', []],
+            [false,  OutputInterface::VERBOSITY_VERBOSE, LogLevel::NOTICE, 'test', []],
             [true,  OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::NOTICE, 'test', []],
             [true,  OutputInterface::VERBOSITY_DEBUG, LogLevel::NOTICE, 'test', []],
 
             [false, OutputInterface::VERBOSITY_QUIET, LogLevel::INFO, 'test', []],
-            [false, OutputInterface::VERBOSITY_NORMAL, LogLevel::INFO, 'test', []],
+            [true, OutputInterface::VERBOSITY_NORMAL, LogLevel::INFO, 'test', []],
             [true,  OutputInterface::VERBOSITY_VERBOSE, LogLevel::INFO, 'test', []],
             [true,  OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::INFO, 'test', []],
             [true,  OutputInterface::VERBOSITY_DEBUG, LogLevel::INFO, 'test', []],

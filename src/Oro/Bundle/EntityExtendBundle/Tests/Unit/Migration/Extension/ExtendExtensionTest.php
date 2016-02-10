@@ -801,7 +801,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UNIQ_1C95229D63A7B402 (default_relation_column1_id), '
+                . 'INDEX IDX_1C95229D63A7B402 (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
@@ -875,7 +875,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UNIQ_1C95229D63A7B402 (default_relation_column1_id), '
+                . 'INDEX IDX_1C95229D63A7B402 (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
@@ -1291,7 +1291,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UNIQ_1C95229D63A7B402 (default_relation_column1_id), '
+                . 'INDEX IDX_1C95229D63A7B402 (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
@@ -1369,7 +1369,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UNIQ_1C95229D63A7B402 (default_relation_column1_id), '
+                . 'INDEX IDX_1C95229D63A7B402 (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '

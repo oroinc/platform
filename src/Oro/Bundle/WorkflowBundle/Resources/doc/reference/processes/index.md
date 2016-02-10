@@ -30,11 +30,21 @@ Other fields of the process definition contain information about process name, w
 when it has been updated last time.
 
 * **Trigger** - entity provides information about the trigger used to run the related process when
-this process will be invoked. First parameter is trigger event - one of ``create``, ``update`` or ``delete``;
-second parameter defines entity field name used to listen (used for ``update`` event only) and  process will be invoked
-only if value of this field has been changed. Also trigger contains information about when process
-should be performed - immediately or after some delay (and delay interval in the seconds of PHP date interval format).
-In case of delayed execution you can also control execution priority of process jobs.
+this process will be invoked. 
+There are two types of triggers:
+    - **event**
+    First parameter is trigger event - one of ``create``, ``update`` or ``delete``;
+    second parameter defines entity field name used to listen (used for ``update`` event only) and  process will be 
+    invoked only if value of this field has been changed. Also trigger contains information about when process
+    should be performed - immediately or after some delay (and delay interval in the seconds of PHP date interval 
+    format). In case of delayed execution you can also control execution priority of process jobs.
+    - **cron**
+    Allows execution of a processes based on cron-definition. Cron definition itself is specified in ``cron`` parameter
+    (e.g. ``*/1 * * * *``). These triggers can be executed only if system has configured cron script with the command
+    ``oro:cron``.
+
+    **Notice**
+    Each trigger can define only one of these types.
 
 * **Job** - entity that contain information specific to performing process in case of delayed processing
 (in this case JMS job will be created). According to event job can contain following data:
@@ -56,7 +66,7 @@ When user performs some action with entity which is related to some enabled proc
 all existing triggers for this process will be analyzed and found appropriate ones to execute.
 
 There are two ways how trigger can be processed. First is immediate execution - in this case process action will be
-executed right after entity will be flushed to the database. Second is delayed execution - it creates job and puts it
+executed right after entity will be flushed to the database or by cron schedule. Second is delayed execution - it creates job and puts it
 to queue with specified priority. If some entity has several appropriate process triggers, then all of them
 will be processed in order defined by definition.
 
@@ -101,10 +111,12 @@ triggers:                                                    # list of triggers
             priority: 10                                     # priority of the job queue
             queued: true                                     # this process must be executed in queue
             time_shift: 60                                   # this process must be executed with 60 seconds delay
+        -
+            cron: */1 * * * *                                # execute process every 1 minute
 ```
 
-This configuration describes process that relates to the ``Contact`` entity; every time when any contact is
-created or ``Assigned To`` field is changed, then current administrator user is set as assigned user.
+This configuration describes process that relates to the ``Contact`` entity; every 1 minute, or every time when any contact is
+created, or ``Assigned To`` field is changed, then current administrator user is set as assigned user.
 In other words contact will be assigned to the current administrator.
 
 Described logic is implemented using one definition and two triggers.
@@ -147,6 +159,13 @@ This command simply executes process job with specified identifier. It used in t
 processes. Command has one required option:
 
 - **--id** - identifier of the process job to execute.
+
+#### oro:process:handle-trigger
+
+This command handle trigger with specified identifier and process name. Command has two required options:
+
+- **--id** - identifier of the ProcessTrigger to handle
+- **--name** - name of ProcessDefinition - trigger should belong this ProcessDefinition
 
 REST API
 --------

@@ -22,7 +22,11 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append($rootNode, [
             'enable_google_sso' => [
                 'value' => false,
-                'type' => 'boolean',
+                'type'  => 'boolean',
+            ],
+            'domains'           => [
+                'value' => [],
+                'type'  => 'array',
             ],
         ]);
 
