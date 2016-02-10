@@ -78,8 +78,10 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options'                        => [
-                    'enum_code' => 'test_enum'
-                ]
+                    'enum_code' => 'test_enum',
+                    'class' => 'Extend\Entity\EV_Test_Enum'
+                ],
+                'class' => 'Extend\Entity\EV_Test_Enum'
             ],
             'params',
             $this->filter
