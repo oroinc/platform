@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1;
+namespace Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle1;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

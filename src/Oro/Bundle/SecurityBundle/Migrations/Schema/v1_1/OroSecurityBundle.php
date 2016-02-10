@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery;
 
 class OroSecurityBundle implements Migration
 {
@@ -55,6 +56,8 @@ class OroSecurityBundle implements Migration
                 $this->container->getParameter('security.acl.dbal.class_table_name')
             )
         );
+
+        $queries->addPostQuery(new LoadBasePermissionsQuery());
     }
 
     /**
@@ -96,9 +99,9 @@ class OroSecurityBundle implements Migration
         $table->addColumn('label', 'string', ['length' => 255]);
         $table->addColumn('description', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('is_apply_to_all', 'boolean', []);
-        $table->addColumn('group_names', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('group_names', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_83424D0F5E237E06');
+        $table->addUniqueIndex(['name']);
     }
 
     /**
@@ -112,7 +115,7 @@ class OroSecurityBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_26F9A8215E237E06');
+        $table->addUniqueIndex(['name']);
     }
 
     /**

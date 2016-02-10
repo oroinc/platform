@@ -3,9 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Permission;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
@@ -53,42 +57,55 @@ class PermissionManager
     }
 
     /**
-     * @param array $acceptedPermissions
-     * @return Permission[]
+     * @param array|null $acceptedPermissions
+     * @return Permission[]|Collection
      */
     public function getPermissionsFromConfig(array $acceptedPermissions = null)
     {
-        $permissionConfiguration = $this->configurationProvider->getPermissionConfiguration(
-            $acceptedPermissions
-        );
+        $permissionConfiguration = $this->configurationProvider->getPermissionConfiguration($acceptedPermissions);
 
-        return $this->configurationBuilder
-            ->buildPermissions($permissionConfiguration[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+        return $this->configurationBuilder->buildPermissions($permissionConfiguration);
     }
 
     /**
-     * @param Permission $permission
-     * @return Permission
+     * @param Permission[]|Collection $permissions
+     * @return Permission[]|Collection
      */
-    public function preparePermissionForDb(Permission $permission)
+    public function processPermissions(Collection $permissions)
     {
-        /** @var Permission $existingPermission */
-        $existingPermission = $this->getRepository()->findOneBy(['name' => $permission->getName()]);
+        $entityRepository = $this->getRepository();
+        $entityManager = $this->getEntityManager();
+        $processedPermissions = new ArrayCollection();
 
-        // permission in DB should be overridden if permission with such name already exists
-        if ($existingPermission) {
-            $existingPermission->import($permission);
+        foreach ($permissions as $permission) {
+            /** @var Permission $existingPermission */
+            $existingPermission = $entityRepository->findOneBy(['name' => $permission->getName()]);
+
+            // permission in DB should be overridden if permission with such name already exists
+            if ($existingPermission) {
+                $existingPermission->import($permission);
+                $permission = $existingPermission;
+            }
+
+            $entityManager->persist($permission);
+            $processedPermissions->add($permission);
         }
 
-        return $existingPermission ?: $permission;
+        $entityManager->flush();
+
+        $this->buildCache();
+
+        return $processedPermissions;
     }
 
     /**
      * @param string $groupName
      * @return array
      */
-    public function getPermissionsMap($groupName = '')
+    public function getPermissionsMap($groupName = null)
     {
+        $this->normalizeGroupName($groupName);
+
         return $groupName ? $this->findGroups($groupName) : $this->findPermissions();
     }
 
@@ -127,7 +144,7 @@ class PermissionManager
         }
 
         $this->cache->flushAll();
-        foreach($cache as $key => $value) {
+        foreach ($cache as $key => $value) {
             $this->cache->save($key, $value);
         }
 
@@ -181,6 +198,24 @@ class PermissionManager
         }
 
         return $cache;
+    }
+
+    /**
+     * @param string|null $groupName
+     */
+    protected function normalizeGroupName(&$groupName)
+    {
+        if ($groupName !== null && empty($groupName)) {
+            $groupName = PermissionConfiguration::DEFAULT_GROUP_NAME;
+        }
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->doctrineHelper->getEntityManagerForClass('OroSecurityBundle:Permission');
     }
 
     /**

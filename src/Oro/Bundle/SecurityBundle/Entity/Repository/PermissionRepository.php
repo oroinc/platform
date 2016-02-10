@@ -41,7 +41,7 @@ class PermissionRepository extends EntityRepository
         $this->addFindByEntityClassCriteria($queryBuilder, $class);
 
         if ($ids) {
-            $this->addFindByIdsCriteria($queryBuilder, $class);
+            $this->addFindByIdsCriteria($queryBuilder, $ids);
         }
 
         return $queryBuilder->getQuery()->getResult();
@@ -75,11 +75,11 @@ class PermissionRepository extends EntityRepository
             ->having(
                 $queryBuilder->expr()->orx(
                     $queryBuilder->expr()->andx(
-                        $queryBuilder->expr()->eq($alias . '.applyToAll', 1),
+                        $queryBuilder->expr()->eq($alias . '.applyToAll', 'true'),
                         $queryBuilder->expr()->eq($queryBuilder->expr()->count('ee'), 0)
                     ),
                     $queryBuilder->expr()->andx(
-                        $queryBuilder->expr()->eq($alias . '.applyToAll', 0),
+                        $queryBuilder->expr()->eq($alias . '.applyToAll', 'false'),
                         $queryBuilder->expr()->gt($queryBuilder->expr()->count('ae'), 0)
                     )
                 )

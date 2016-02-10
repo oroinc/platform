@@ -11,8 +11,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1\TestBundle1;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle2\TestBundle2;
+use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle1\TestBundle1;
+use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle2\TestBundle2;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\CumulativeResourceManager;
 
@@ -21,24 +21,18 @@ use Oro\Component\Config\CumulativeResourceManager;
  */
 class LoadPermissionConfigurationCommandTest extends WebTestCase
 {
-
     protected function setUp()
     {
         $this->initClient();
 
-        $bundle1  = new TestBundle1();
-        $bundle2  = new TestBundle2();
-        $bundles = [
-            $bundle1->getName() => get_class($bundle1),
-            $bundle2->getName() => get_class($bundle2),
-        ];
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->setBundles($bundles);
+        $bundle1 = new TestBundle1();
+        $bundle2 = new TestBundle2();
+        $bundles = [$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)];
+
+        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
 
         $provider = $this->getContainer()->get('oro_security.configuration.provider.permission_configuration');
 
-        $this->setObjectProperty($provider, 'configPath', 'permissionsCorrect.yml');
         $this->setObjectProperty($provider, 'kernelBundles', $bundles);
     }
 
@@ -51,13 +45,17 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     public function testExecute(array $expectedMessages, array $expectedPermissions)
     {
         $permissionsBefore = $this->getRepository('OroSecurityBundle:Permission')->findAll();
+
         $result = $this->runCommand(LoadPermissionConfigurationCommand::NAME);
         $this->assertNotEmpty($result);
+
         foreach ($expectedMessages as $message) {
             $this->assertContains($message, $result);
         }
+
         $permissions = $this->getRepository('OroSecurityBundle:Permission')->findAll();
         $this->assertCount(count($permissionsBefore) + 3, $permissions);
+
         foreach ($expectedPermissions as $name => $permissionData) {
             $this->assertPermissionLoaded($permissions, $permissionData, $name);
         }
@@ -72,6 +70,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
             [
                 'expectedMessages' => [
                     'Loading permissions...',
+                    'NotManageableEntity - is not a manageable entity class',
                 ],
                 'expectedPermissions' => [
                     'PERMISSION1' => [
@@ -80,7 +79,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
                     ],
                     'PERMISSION2' => [
                         'label' => 'Label for Permission 2',
-                        'group_names' => ['', 'frontend', 'new_group'],
+                        'group_names' => ['default', 'frontend', 'new_group'],
                         'apply_to_all' => false,
                         'apply_to_entities' => [
                             'OroTestFrameworkBundle:TestActivity',
@@ -97,6 +96,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
                     'PERMISSION3' => [
                         'label' => 'Label for Permission 3',
                         'group_names' => ['default'],
+                        'apply_to_entities' => ['NotManageableEntity']
                     ],
                 ],
             ]

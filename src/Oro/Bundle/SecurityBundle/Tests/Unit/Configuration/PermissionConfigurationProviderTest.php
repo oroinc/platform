@@ -12,9 +12,7 @@ use Oro\Component\Config\CumulativeResourceManager;
 class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {
     const PERMISSION1 = 'PERMISSION1';
-
     const PERMISSION2 = 'PERMISSION2';
-
     const PERMISSION3 = 'PERMISSION3';
 
     private $permissions = [
@@ -27,7 +25,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         ],
         self::PERMISSION2 => [
             'label' => 'Label for Permission 2',
-            'group_names' => ['', 'frontend', 'new_group'],
+            'group_names' => [PermissionConfiguration::DEFAULT_GROUP_NAME, 'frontend', 'new_group'],
             'apply_to_all' => false,
             'apply_to_entities' => [
                 'OroTestFrameworkBundle:TestActivity',
@@ -41,12 +39,11 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             ],
             'description' => 'Permission 2 description',
         ],
-
         self::PERMISSION3 => [
             'label' => 'Label for Permission 3',
             'group_names' => ['default'],
             'apply_to_all' => true,
-            'apply_to_entities' => [],
+            'apply_to_entities' => ['NotManageableEntity'],
             'exclude_entities' => [],
         ],
     ];
@@ -60,13 +57,10 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $bundle1  = new TestBundle1();
         $bundle2  = new TestBundle2();
-        $bundles = [
-            $bundle1->getName() => get_class($bundle1),
-            $bundle2->getName() => get_class($bundle2),
-        ];
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->setBundles($bundles);
+        $bundles = [$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)];
+
+        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
+
         $this->provider = new PermissionConfigurationProvider(
             new PermissionListConfiguration(new PermissionConfiguration()),
             $bundles
@@ -97,8 +91,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->loadConfig('permissionsCorrect.yml');
         $permissions = $this->provider->getPermissionConfiguration();
-        $this->assertArrayHasKey(PermissionConfigurationProvider::ROOT_NODE_NAME, $permissions);
-        $this->assertEquals($expectedPermissions, $permissions[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+        $this->assertEquals($expectedPermissions, $permissions);
     }
 
     public function testFilterPermissionsConfiguration()
@@ -110,8 +103,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->loadConfig('permissionsCorrect.yml');
         $permissions = $this->provider->getPermissionConfiguration(array_keys($expectedPermissions));
-        $this->assertArrayHasKey(PermissionConfigurationProvider::ROOT_NODE_NAME, $permissions);
-        $this->assertEquals($expectedPermissions, $permissions[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+        $this->assertEquals($expectedPermissions, $permissions);
     }
 
     /**

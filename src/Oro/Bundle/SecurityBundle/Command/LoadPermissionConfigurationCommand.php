@@ -2,16 +2,21 @@
 
 namespace Oro\Bundle\SecurityBundle\Command;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
+
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:permission:configuration:load';
+    const NAME = 'security:permission:configuration:load';
+
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /**
      * @inheritdoc
@@ -34,26 +39,61 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $acceptedPermissions = $input->getOption('permissions') ?: null;
-        $manager = $this->getContainer()->get('oro_security.acl.permission_manager');
-        $permissions = $manager->getPermissionsFromConfig($acceptedPermissions);
 
+        $manager = $this->getContainer()->get('oro_security.acl.permission_manager');
+
+        $permissions = $manager->getPermissionsFromConfig($acceptedPermissions);
         if ($permissions) {
             $output->writeln('Loading permissions...');
 
-            /** @var EntityManager $entityManager */
-            $entityManager = $this->getContainer()->get('doctrine')
-                ->getManagerForClass('OroSecurityBundle:Permission');
+            $permissions = $manager->processPermissions($permissions);
 
             foreach ($permissions as $permission) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
-                $entityManager->persist($manager->preparePermissionForDb($permission));
+                $this->validatePermissionEntities($permission, $output);
             }
-
-            $entityManager->flush();
-
-            $manager->buildCache();
         } else {
             $output->writeln('No permissions found.');
+        }
+    }
+
+    /**
+     * @param Permission $permission
+     * @param OutputInterface $output
+     * @return array
+     */
+    protected function validatePermissionEntities(Permission $permission, OutputInterface $output)
+    {
+        /** @var PermissionEntity[] $permissionEntities */
+        $permissionEntities = array_merge(
+            $permission->getApplyToEntities()->toArray(),
+            $permission->getExcludeEntities()->toArray()
+        );
+
+        foreach ($permissionEntities as $permissionEntity) {
+            if (!$this->isManageableEntityClass($permissionEntity->getName())) {
+                $output->writeln(sprintf(
+                    '    <comment>></comment> <error>%s - is not a manageable entity class</error>',
+                    $permissionEntity->getName()
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param string $entityClass
+     * @return bool
+     */
+    protected function isManageableEntityClass($entityClass)
+    {
+        if (!$this->doctrineHelper) {
+            $this->doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
+        }
+
+        try {
+            return $this->doctrineHelper->isManageableEntityClass($entityClass);
+        } catch (\Exception $e) {
+            return false;
         }
     }
 }

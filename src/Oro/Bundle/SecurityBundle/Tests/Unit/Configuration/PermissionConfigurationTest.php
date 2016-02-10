@@ -51,6 +51,21 @@ class PermissionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'apply_to_entities' => [],
                 ],
             ],
+            'default group names' => [
+                'configuration' => [
+                    'permission1' => [
+                        'label' => 'My Label',
+                        'group_names' => ['default', 'frontend', '', ''],
+                    ],
+                ],
+                'expected' => [
+                    'label' => 'My Label',
+                    'apply_to_all' => true,
+                    'group_names' => ['default', 'frontend'],
+                    'exclude_entities' => [],
+                    'apply_to_entities' => [],
+                ],
+            ],
             'maximum data' => [
                 'configuration' => [
                     'permission1' => [
