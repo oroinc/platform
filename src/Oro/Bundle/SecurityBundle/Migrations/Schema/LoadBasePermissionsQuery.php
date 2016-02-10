@@ -33,7 +33,7 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
                     'name' => $permission,
                     'label' => $permission,
                     'is_apply_to_all' => true,
-                    'group_names' => [],
+                    'group_names' => ['default'],
                     'description' => null
                 ],
                 $types
