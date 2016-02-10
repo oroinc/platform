@@ -1,41 +1,41 @@
 permissions:
-    PERMISSION1:
+    TEST_PERMISSION1:
         label: Label1
         description: Description1
         group_names: group1
         apply_to_all: true
         apply_to_entities:
-            - Entity1
-            - Entity2
+            - TestEntity1
+            - TestEntity2
         exclude_entities:
-            - Entity10
-            - Entity11
+            - TestEntity10
+            - TestEntity11
 
-    PERMISSION2:
+    TEST_PERMISSION2:
         label: Label2
         description: Description2
         group_names: [group1, group2]
         apply_to_all: false
         apply_to_entities:
-            - Entity2
-            - Entity3
+            - TestEntity2
+            - TestEntity3
         exclude_entities:
-            - Entity11
-            - Entity12
+            - TestEntity11
+            - TestEntity12
 
-    PERMISSION3:
+    TEST_PERMISSION3:
         label: Label3
         description: Description3
         apply_to_all: false
         group_names: [group2]
         apply_to_entities:
-            - Entity3
-            - Entity4
+            - TestEntity3
+            - TestEntity4
         exclude_entities:
-            - Entity12
-            - Entity13
+            - TestEntity12
+            - TestEntity13
 
-    PERMISSION4:
+    TEST_PERMISSION4:
         label: Label4
         description: Description4
         apply_to_all: true

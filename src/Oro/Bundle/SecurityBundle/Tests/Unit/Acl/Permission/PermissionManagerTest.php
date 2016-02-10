@@ -157,19 +157,20 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             PermissionManager::CACHE_GROUPS => [
                 'group1' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
                 'group2' => ['PERMISSION3' => 3],
+                'default' => ['PERMISSION2' => 2, 'PERMISSION3' => 3],
             ],
         ];
 
         $permissions = [
             $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
-            $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
-            $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
+            $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['', 'group1']),
+            $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['', 'group2']),
         ];
 
         return [
             'get permissions with no cache and no permissions' => [
                 'input' => [
-                    'group' => '',
+                    'group' => null,
                     'cacheKey' => PermissionManager::CACHE_PERMISSIONS,
                     'cache' => false,
                     'permissions' => [],
@@ -178,7 +179,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ],
             'get permissions with no cache' => [
                 'input' => [
-                    'group' => '',
+                    'group' => null,
                     'cacheKey' => PermissionManager::CACHE_PERMISSIONS,
                     'cache' => false,
                     'permissions' => $permissions,
@@ -187,7 +188,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ],
             'get permissions with cache and no permissions' => [
                 'input' => [
-                    'group' => '',
+                    'group' => null,
                     'cacheKey' => PermissionManager::CACHE_PERMISSIONS,
                     'cache' => $cache[PermissionManager::CACHE_PERMISSIONS],
                     'permissions' => [],
@@ -221,6 +222,15 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
             ],
+            'default group with cache and no permissions' => [
+                'input' => [
+                    'group' => '',
+                    'cacheKey' => PermissionManager::CACHE_GROUPS,
+                    'cache' => $cache[PermissionManager::CACHE_GROUPS],
+                    'permissions' => [],
+                ],
+                'expected' => ['PERMISSION2' => 2, 'PERMISSION3' => 3],
+            ],
         ];
     }
 
@@ -244,7 +254,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             'entity1 and empty group' => [
                 'input' => [
                     'entity' => 'entity1',
-                    'group' => '',
+                    'group' => null,
                     'cache' => null,
                     'ids' => null,
                     'permissions' => [
@@ -349,11 +359,11 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->setGroupNames($groups);
 
         foreach ($applyEntities as $entity) {
-            $permission->addApplyToEntities($this->getPermissionEntity($entity));
+            $permission->addApplyToEntity($this->getPermissionEntity($entity));
         }
 
         foreach ($excludeEntities as $entity) {
-            $permission->addExcludeEntities($this->getPermissionEntity($entity));
+            $permission->addExcludeEntity($this->getPermissionEntity($entity));
         }
 
         return $permission;

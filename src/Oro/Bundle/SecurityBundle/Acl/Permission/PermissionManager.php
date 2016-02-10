@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
@@ -92,6 +93,8 @@ class PermissionManager
 
         $entityManager->flush();
 
+        $this->buildCache();
+
         return $processedPermissions;
     }
 
@@ -99,8 +102,10 @@ class PermissionManager
      * @param string $groupName
      * @return array
      */
-    public function getPermissionsMap($groupName = '')
+    public function getPermissionsMap($groupName = null)
     {
+        $this->normalizeGroupName($groupName);
+
         return $groupName ? $this->findGroups($groupName) : $this->findPermissions();
     }
 
@@ -139,7 +144,7 @@ class PermissionManager
         }
 
         $this->cache->flushAll();
-        foreach($cache as $key => $value) {
+        foreach ($cache as $key => $value) {
             $this->cache->save($key, $value);
         }
 
@@ -193,6 +198,16 @@ class PermissionManager
         }
 
         return $cache;
+    }
+
+    /**
+     * @param string|null $groupName
+     */
+    protected function normalizeGroupName(&$groupName)
+    {
+        if ($groupName !== null && empty($groupName)) {
+            $groupName = PermissionConfiguration::DEFAULT_GROUP_NAME;
+        }
     }
 
     /**
