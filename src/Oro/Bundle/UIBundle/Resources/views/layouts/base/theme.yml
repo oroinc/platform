@@ -16,5 +16,3 @@ data:
                 - 'bundles/oroui/css/less/oro/datepicker.less'
                 - 'bundles/oroui/css/less/oro/filter.less'
                 - 'bundles/oroui/css/less/oro/loading-mask.less'
-            filters: ['cssrewrite', 'cssmin']
-            output: 'css/layout/base/styles.css'
