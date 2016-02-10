@@ -17,7 +17,7 @@ define(function(require) {
      *        frontend_type: 'tags',
      *        value: oro_tag_get_list(entity),
      *        fieldName: 'tags',
-     *        insertEditorMethod: 'overlay', // Possible values are 'overlay' and all supported by containerMethod https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod
+     *        insertEditorMethod: 'overlay', // Possible values are 'overlay' and are all supported by the containerMethod https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod
      *        metadata: {
      *            inline_editing: {
      *                enable: resource_granted('oro_tag_assign_unassign'),
@@ -53,7 +53,7 @@ define(function(require) {
      *
      * @class
      * @param {Object} options - Options container
-     * @param {Object} options._sourceElement - Element where to connect this view (passed automatically when
+     * @param {Object} options._sourceElement - the element to which the view should be connected (passed automatically when
      *                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md))
      * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
      * @param {*} options.value - value to edit
