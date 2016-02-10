@@ -3,7 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
@@ -17,31 +19,30 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository $repository */
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject */
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject */
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->any())
-        ->method('getRepository')
-        ->with('OroSecurityBundle:PermissionEntity')
-        ->willReturn($repository);
-
-
-        $doctrine->expects($this->any())
-            ->method('getManagerForClass')
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityRepositoryForClass')
             ->with('OroSecurityBundle:PermissionEntity')
-            ->willReturn($em);
+            ->willReturn($repository);
 
-        $this->builder = new PermissionConfigurationBuilder($doctrine);
+        $doctrineHelper->expects($this->any())
+            ->method('isManageableEntityClass')
+            ->willReturnMap([
+                ['Entity1', true],
+                ['Entity2', true],
+                ['EntityNotManageable', false],
+            ]);
+
+        $this->builder = new PermissionConfigurationBuilder($doctrineHelper);
     }
 
     protected function tearDown()
@@ -61,66 +62,6 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected['exclude_entities'], $definition->getExcludeEntities());
         $this->assertEquals($expected['apply_to_entities'], $definition->getApplyToEntities());
         $this->assertSame($expected['description'], $definition->getDescription());
-    }
-
-    /**
-     * @param string $name
-     * @param array $configuration
-     * @param array $expected
-     * @dataProvider buildPermissionDataProvider
-     */
-    public function testBuildPermission($name, array $configuration, array $expected)
-    {
-        $definition = $this->builder->buildPermission($name, $configuration);
-
-        $this->assertInstanceOf('Oro\Bundle\SecurityBundle\Entity\Permission', $definition);
-        $this->assertEquals($name, $definition->getName());
-        $this->assertDefinitionConfiguration($expected, $definition);
-    }
-
-    /**
-     * @return array
-     */
-    public function buildPermissionDataProvider()
-    {
-        $permissionEntity1 = (new PermissionEntity())->setName('Entity1');
-        $permissionEntity2 = (new PermissionEntity())->setName('Entity2');
-
-        return [
-            'minimum data' => [
-                'name' => 'minimum_name',
-                'configuration' => [
-                    'label' => 'My Label',
-                ],
-                'expected' => [
-                    'label' => 'My Label',
-                    'apply_to_all' => true,
-                    'group_names' => [],
-                    'exclude_entities' => new ArrayCollection(),
-                    'apply_to_entities' => new ArrayCollection(),
-                    'description' => '',
-                ],
-            ],
-            'maximum data' => [
-                'name' => 'maximum_name',
-                'configuration' => [
-                    'label' => 'My Label',
-                    'apply_to_all' => false,
-                    'group_names' => ['frontend'],
-                    'exclude_entities' => [$permissionEntity1->getName()],
-                    'apply_to_entities' => [$permissionEntity2->getName()],
-                    'description' => 'Test description',
-                ],
-                'expected' => [
-                    'label' => 'My Label',
-                    'apply_to_all' => false,
-                    'group_names' => ['frontend'],
-                    'exclude_entities' => new ArrayCollection([$permissionEntity1]),
-                    'apply_to_entities' => new ArrayCollection([$permissionEntity2]),
-                    'description' => 'Test description',
-                ],
-            ],
-        ];
     }
 
     /**
@@ -145,20 +86,46 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function buildPermissionsDataProvider()
     {
-        $basicDataProvider = $this->buildPermissionDataProvider();
-
-        $configuration = [];
-        $expected = [];
-        foreach ($basicDataProvider as $dataSet) {
-            $definitionName = $dataSet['name'];
-            $configuration[$definitionName] = $dataSet['configuration'];
-            $expected[$definitionName] = $dataSet['expected'];
-        }
+        $permissionEntity1 = (new PermissionEntity())->setName('Entity1');
+        $permissionEntity2 = (new PermissionEntity())->setName('Entity2');
 
         return [
             [
-                'configuration' => $configuration,
-                'expected' => $expected,
+                'configuration' => [
+                    'minimum_name' => [
+                        'name' => 'minimum_name',
+                        'label' => 'My Label',
+                    ],
+                    'maximum_name' => [
+                        'name' => 'maximum_name',
+                        'label' => 'My Label',
+                        'apply_to_all' => false,
+                        'group_names' => ['frontend', 'default'],
+                        'exclude_entities' => [$permissionEntity1->getName()],
+                        'apply_to_entities' => [$permissionEntity2->getName()],
+                        'description' => 'Test description',
+                    ],
+                ],
+                'expected' => [
+                    'minimum_name' => [
+                        'name' => 'minimum_name',
+                        'label' => 'My Label',
+                        'apply_to_all' => true,
+                        'group_names' => [],
+                        'exclude_entities' => new ArrayCollection(),
+                        'apply_to_entities' => new ArrayCollection(),
+                        'description' => '',
+                    ],
+                    'maximum_name' => [
+                        'name' => 'maximum_name',
+                        'label' => 'My Label',
+                        'apply_to_all' => false,
+                        'group_names' => ['frontend', 'default'],
+                        'exclude_entities' => new ArrayCollection([$permissionEntity1]),
+                        'apply_to_entities' => new ArrayCollection([$permissionEntity2]),
+                        'description' => 'Test description',
+                    ],
+                ]
             ]
         ];
     }

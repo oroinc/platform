@@ -7,69 +7,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:permission:configuration:load';
 
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var EntityRepository
-     */
-    protected $permissionRepository;
-
-    /**
-     * @var PermissionConfigurationBuilder
-     */
-    protected $configurationBuilder;
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-        }
-
-        return $this->entityManager;
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    protected function getPermissionRepository()
-    {
-        if (!$this->permissionRepository) {
-            $this->permissionRepository = $this->getEntityManager()
-                ->getRepository('OroSecurityBundle:Permission');
-        }
-
-        return $this->permissionRepository;
-    }
-
-    /**
-     * @return PermissionConfigurationBuilder
-     */
-    protected function getConfigurationBuilder()
-    {
-        if (!$this->configurationBuilder) {
-            $this->configurationBuilder = $this->getContainer()
-                ->get('oro_security.configuration.builder.permission_configuration');
-        }
-
-        return $this->configurationBuilder;
-    }
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /**
      * @inheritdoc
@@ -91,49 +38,62 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $usedPermissions = $input->getOption('permissions') ?: null;
+        $acceptedPermissions = $input->getOption('permissions') ?: null;
 
-        /** @var PermissionConfigurationProvider $configurationProvider */
-        $configurationProvider = $this->getContainer()->get('oro_security.configuration.provider.permission_config');
-        $permissionConfiguration = $configurationProvider->getPermissionConfiguration(
-            $usedPermissions
-        );
+        $manager = $this->getContainer()->get('oro_security.acl.permission_manager');
 
-        $permissionsConfiguration = $permissionConfiguration[PermissionConfigurationProvider::ROOT_NODE_NAME];
-        $this->loadPermissions($output, $permissionsConfiguration);
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param array $configuration
-     */
-    protected function loadPermissions(OutputInterface $output, array $configuration)
-    {
-        $permissions = $this->getConfigurationBuilder()->buildPermissions($configuration);
-
+        $permissions = $manager->getPermissionsFromConfig($acceptedPermissions);
         if ($permissions) {
             $output->writeln('Loading permissions...');
 
-            $entityManager = $this->getEntityManager();
-            $permissionRepository = $this->getPermissionRepository();
+            $permissions = $manager->processPermissions($permissions);
 
             foreach ($permissions as $permission) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
-
-                /** @var Permission $existingPermission */
-                $existingPermission = $permissionRepository->findOneBy(['name' => $permission->getName()]);
-
-                // permission in DB should be overridden if permission with such name already exists
-                if ($existingPermission) {
-                    $existingPermission->import($permission);
-                } else {
-                    $entityManager->persist($permission);
-                }
+                $this->validatePermissionEntities($permission, $output);
             }
-
-            $entityManager->flush();
         } else {
             $output->writeln('No permissions found.');
+        }
+    }
+
+    /**
+     * @param Permission $permission
+     * @param OutputInterface $output
+     * @return array
+     */
+    protected function validatePermissionEntities(Permission $permission, OutputInterface $output)
+    {
+        /** @var PermissionEntity[] $permissionEntities */
+        $permissionEntities = array_merge(
+            $permission->getApplyToEntities()->toArray(),
+            $permission->getExcludeEntities()->toArray()
+        );
+
+        foreach ($permissionEntities as $permissionEntity) {
+            if (!$this->isManageableEntityClass($permissionEntity->getName())) {
+                $output->writeln(sprintf(
+                    '    <comment>></comment> <error>%s - is not a manageable entity class</error>',
+                    $permissionEntity->getName()
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param string $entityClass
+     * @return bool
+     */
+    protected function isManageableEntityClass($entityClass)
+    {
+        if (!$this->doctrineHelper) {
+            $this->doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
+        }
+
+        try {
+            return $this->doctrineHelper->isManageableEntityClass($entityClass);
+        } catch (\Exception $e) {
+            return false;
         }
     }
 }

@@ -9,6 +9,8 @@ use Symfony\Component\Config\Definition\Processor;
 
 class PermissionConfiguration implements ConfigurationInterface
 {
+    const DEFAULT_GROUP_NAME = 'default';
+
     /**
      * @param array $configs
      * @return array
@@ -16,6 +18,7 @@ class PermissionConfiguration implements ConfigurationInterface
     public function processConfiguration(array $configs)
     {
         $processor = new Processor();
+
         return $processor->processConfiguration($this, $configs);
     }
 
@@ -44,11 +47,18 @@ class PermissionConfiguration implements ConfigurationInterface
                     ->cannotBeEmpty()
                 ->end()
                 ->arrayNode('group_names')
-                    ->defaultValue(['default'])
+                    ->defaultValue([static::DEFAULT_GROUP_NAME])
                     ->beforeNormalization()
                         ->always(
-                            function ($value) {
-                                return (array) $value;
+                            function ($groupName) {
+                                return array_unique(
+                                    array_map(
+                                        function ($value) {
+                                            return $value === '' ? static::DEFAULT_GROUP_NAME : $value;
+                                        },
+                                        (array) $groupName
+                                    )
+                                );
                             }
                         )
                     ->end()
@@ -66,7 +76,8 @@ class PermissionConfiguration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
-                ->scalarNode('description')->end()
+                ->scalarNode('description')
+                ->end()
             ->end();
 
         return $nodeDefinition;

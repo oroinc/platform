@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
 class PermissionTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,6 +62,27 @@ class PermissionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider addRemoveDataProvider
+     *
+     * @param string $propertyName
+     * @param string $getter
+     * @param mixed $value
+     * @param mixed $defaultValue
+     */
+    public function testAddRemove($propertyName, $getter, $value, $defaultValue = null)
+    {
+        $defaultValue = $defaultValue ?: new ArrayCollection();
+        $adder = 'add' . ucfirst($propertyName);
+        $remover = 'remove' . ucfirst($propertyName);
+
+        $this->assertEquals($defaultValue, $this->object->$getter());
+        $this->object->$adder($value);
+        $this->assertEquals(new ArrayCollection([$value]), $this->object->$getter());
+        $this->object->$remover($value);
+        $this->assertEquals(new ArrayCollection(), $this->object->$getter());
+    }
+
+    /**
      * @return array
      */
     public function setGetDataProvider()
@@ -93,6 +115,30 @@ class PermissionTest extends \PHPUnit_Framework_TestCase
                 'propertyName' => 'groupNames',
                 'value' => ['group1', 'group2'],
                 'defaultValue' => new ArrayCollection(),
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function addRemoveDataProvider()
+    {
+        return [
+            'groupNames' => [
+                'propertyName' => 'groupName',
+                'getter' => 'getGroupNames',
+                'value' => 'test',
+            ],
+            'applyToEntities' => [
+                'propertyName' => 'applyToEntity',
+                'getter' => 'getApplyToEntities',
+                'value' => new PermissionEntity(),
+            ],
+            'excludeEntities' => [
+                'propertyName' => 'excludeEntity',
+                'getter' => 'getExcludeEntities',
+                'value' => new PermissionEntity(),
             ],
         ];
     }

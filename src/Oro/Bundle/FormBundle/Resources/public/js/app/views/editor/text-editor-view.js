@@ -76,6 +76,7 @@ define(function(require) {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
             'click [data-action]': 'rethrowAction',
+            'keydown input[name=value]': 'onGenericKeydown',
             'keydown': 'rethrowEvent',
             'keypress': 'rethrowEvent',
             'keyup': 'rethrowEvent',
@@ -357,6 +358,17 @@ define(function(require) {
                 this.$('[type=submit]').removeAttr('disabled');
             }
             this.trigger('change');
+        },
+
+        /**
+         * Refers keydown action to proper action handler
+         *
+         * @param e
+         */
+        onGenericKeydown: function(e) {
+            this.onGenericEnterKeydown(e);
+            this.onGenericTabKeydown(e);
+            this.onGenericArrowKeydown(e);
         },
 
         /**

@@ -54,7 +54,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $queries->addPostQuery(new LoadBasePermissionsQuery());
     }
 
-
     /**
      * Create oro_security_perm_apply_entity table
      *
@@ -66,8 +65,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->addColumn('permission_id', 'integer', []);
         $table->addColumn('permission_entity_id', 'integer', []);
         $table->setPrimaryKey(['permission_id', 'permission_entity_id']);
-        $table->addIndex(['permission_id'], 'IDX_6CEC2164FED90CCA', []);
-        $table->addIndex(['permission_entity_id'], 'IDX_6CEC2164A3D25331', []);
     }
 
     /**
@@ -81,8 +78,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->addColumn('permission_id', 'integer', []);
         $table->addColumn('permission_entity_id', 'integer', []);
         $table->setPrimaryKey(['permission_id', 'permission_entity_id']);
-        $table->addIndex(['permission_id'], 'IDX_884268C7FED90CCA', []);
-        $table->addIndex(['permission_entity_id'], 'IDX_884268C7A3D25331', []);
     }
 
     /**
@@ -98,9 +93,9 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->addColumn('label', 'string', ['length' => 255]);
         $table->addColumn('description', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('is_apply_to_all', 'boolean', []);
-        $table->addColumn('group_names', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('group_names', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_83424D0F5E237E06');
+        $table->addUniqueIndex(['name']);
     }
 
     /**
@@ -114,7 +109,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_26F9A8215E237E06');
+        $table->addUniqueIndex(['name']);
     }
 
     /**

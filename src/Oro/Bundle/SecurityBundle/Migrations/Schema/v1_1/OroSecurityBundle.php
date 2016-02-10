@@ -4,18 +4,32 @@ namespace Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery;
 
 class OroSecurityBundle implements Migration
 {
+    /** @var ContainerInterface */
+    protected $container;
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
         return 'v1_1';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
     }
 
     /**
@@ -33,6 +47,16 @@ class OroSecurityBundle implements Migration
         $this->addOroSecurityPermApplyEntityForeignKeys($schema);
         $this->addOroSecurityPermExclEntityForeignKeys($schema);
 
+        $queries->addQuery(
+            new UpdateAclEntriesMigrationQuery(
+                $this->container->get('oro_security.acl.manager'),
+                $this->container->get('security.acl.cache'),
+                $this->container->getParameter('security.acl.dbal.entry_table_name'),
+                $this->container->getParameter('security.acl.dbal.oid_table_name'),
+                $this->container->getParameter('security.acl.dbal.class_table_name')
+            )
+        );
+
         $queries->addPostQuery(new LoadBasePermissionsQuery());
     }
 
@@ -47,8 +71,6 @@ class OroSecurityBundle implements Migration
         $table->addColumn('permission_id', 'integer', []);
         $table->addColumn('permission_entity_id', 'integer', []);
         $table->setPrimaryKey(['permission_id', 'permission_entity_id']);
-        $table->addIndex(['permission_id'], 'IDX_6CEC2164FED90CCA', []);
-        $table->addIndex(['permission_entity_id'], 'IDX_6CEC2164A3D25331', []);
     }
 
     /**
@@ -62,8 +84,6 @@ class OroSecurityBundle implements Migration
         $table->addColumn('permission_id', 'integer', []);
         $table->addColumn('permission_entity_id', 'integer', []);
         $table->setPrimaryKey(['permission_id', 'permission_entity_id']);
-        $table->addIndex(['permission_id'], 'IDX_884268C7FED90CCA', []);
-        $table->addIndex(['permission_entity_id'], 'IDX_884268C7A3D25331', []);
     }
 
     /**
@@ -79,9 +99,9 @@ class OroSecurityBundle implements Migration
         $table->addColumn('label', 'string', ['length' => 255]);
         $table->addColumn('description', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('is_apply_to_all', 'boolean', []);
-        $table->addColumn('group_names', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('group_names', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_83424D0F5E237E06');
+        $table->addUniqueIndex(['name']);
     }
 
     /**
@@ -95,7 +115,7 @@ class OroSecurityBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_26F9A8215E237E06');
+        $table->addUniqueIndex(['name']);
     }
 
     /**

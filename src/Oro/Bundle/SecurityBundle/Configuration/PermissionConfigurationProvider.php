@@ -11,17 +11,13 @@ use Oro\Component\Config\Merger\ConfigurationMerger;
 
 class PermissionConfigurationProvider
 {
-    const ROOT_NODE_NAME = 'permissions';
-
     /** @var PermissionListConfiguration */
     protected $permissionConfiguration;
 
     /** @var array */
     protected $kernelBundles;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $configPath = 'Resources/config/permissions.yml';
 
     /**
@@ -35,15 +31,31 @@ class PermissionConfigurationProvider
     }
 
     /**
-     * @param array $usedPermissions
+     * @param array $acceptedPermissions
      * @return array
      */
-    public function getPermissionConfiguration(array $usedPermissions = null)
+    public function getPermissionConfiguration(array $acceptedPermissions = null)
     {
-        $configLoader = new CumulativeConfigLoader(
-            'oro_security',
-            new YamlCumulativeFileLoader($this->configPath)
-        );
+        $permissions = $this->parseConfiguration($this->loadConfiguration());
+
+        if ($acceptedPermissions !== null) {
+            foreach ($permissions as $permissionName => $permissionConfiguration) {
+                // skip not used permissions
+                if (!in_array($permissionName, $acceptedPermissions, true)) {
+                    unset($permissions[$permissionName]);
+                }
+            }
+        }
+
+        return $permissions;
+    }
+
+    /**
+     * @return array
+     */
+    protected function loadConfiguration()
+    {
+        $configLoader = new CumulativeConfigLoader('oro_security', new YamlCumulativeFileLoader($this->configPath));
 
         $resources = $configLoader->load();
         $configs = [];
@@ -53,20 +65,8 @@ class PermissionConfigurationProvider
         }
 
         $merger = new ConfigurationMerger($this->kernelBundles);
-        $configs = $merger->mergeConfiguration($configs);
 
-        $permissionsData = $this->parseConfiguration($configs);
-        $permissions = [];
-        foreach ($permissionsData as $permissionName => $permissionConfiguration) {
-            // skip not used permissions
-            if ($usedPermissions !== null && !in_array($permissionName, $usedPermissions, true)) {
-                continue;
-            }
-
-            $permissions[$permissionName] = $permissionConfiguration;
-        }
-
-        return [self::ROOT_NODE_NAME => $permissions];
+        return $merger->mergeConfiguration($configs);
     }
 
     /**
@@ -77,18 +77,11 @@ class PermissionConfigurationProvider
     protected function parseConfiguration(array $configuration)
     {
         try {
-            $permissionsData = [];
-            if (!empty($configuration[self::ROOT_NODE_NAME])) {
-                $permissionsData = $this->permissionConfiguration->processConfiguration(
-                    $configuration[self::ROOT_NODE_NAME]
-                );
-            }
+            $permissionsData = $this->permissionConfiguration->processConfiguration($configuration);
         } catch (InvalidConfigurationException $exception) {
-            $message = sprintf(
-                'Can\'t parse permission configuration. %s',
-                $exception->getMessage()
+            throw new InvalidConfigurationException(
+                sprintf('Can\'t parse permission configuration. %s', $exception->getMessage())
             );
-            throw new InvalidConfigurationException($message);
         }
 
         return $permissionsData;
