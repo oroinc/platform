@@ -7,5 +7,7 @@ oro:
                 fields:
                     domains.label: Domains
                     domains.tooltip: Comma separated list of allowed domains
-                    client_id.label: Client Id
+                    client_id:
+                        label: Client Id
+                        tooltip: Please read <a href="https://developers.google.com/identity/protocols/OAuth2WebServer#creatingcred" target="_blank">instructions</a> for obtaining credentials.
                     client_secret.label: Client secret
