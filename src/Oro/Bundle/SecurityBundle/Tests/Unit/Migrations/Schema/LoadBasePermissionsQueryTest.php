@@ -44,12 +44,12 @@ class LoadBasePermissionsQueryTest extends \PHPUnit_Framework_TestCase
                 return array_combine(['name', 'label', 'is_apply_to_all', 'group_names', 'description'], $values);
             },
             [
-                ['VIEW', 'VIEW', true, [], null],
-                ['CREATE', 'CREATE', true, [], null],
-                ['EDIT', 'EDIT', true, [], null],
-                ['DELETE', 'DELETE', true, [], null],
-                ['ASSIGN', 'ASSIGN', true, [], null],
-                ['SHARE', 'SHARE', true, [], null]
+                ['VIEW', 'VIEW', true, ['default'], null],
+                ['CREATE', 'CREATE', true, ['default'], null],
+                ['EDIT', 'EDIT', true, ['default'], null],
+                ['DELETE', 'DELETE', true, ['default'], null],
+                ['ASSIGN', 'ASSIGN', true, ['default'], null],
+                ['SHARE', 'SHARE', true, ['default'], null]
             ]
         );
 
