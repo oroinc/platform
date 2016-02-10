@@ -13,3 +13,4 @@ permissions:
 
     PERMISSION3:
         label: Label for Permission 3
+        apply_to_entities: ['NotManageableEntity']

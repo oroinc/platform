@@ -3,6 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Permission;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -54,7 +56,7 @@ class PermissionManager
 
     /**
      * @param array $acceptedPermissions
-     * @return Permission[]
+     * @return Permission[]|Collection
      */
     public function getPermissionsFromConfig(array $acceptedPermissions = null)
     {
@@ -63,24 +65,41 @@ class PermissionManager
         );
 
         return $this->configurationBuilder
-            ->buildPermissions($permissionConfiguration[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+            ->buildPermissions($permissionConfiguration);
     }
 
     /**
-     * @param Permission $permission
-     * @return Permission
+     * @param Permission[]|Collection $permissions
+     * @return Permission[]|Collection
      */
-    public function preparePermissionForDb(Permission $permission)
+    public function processPermissions(Collection $permissions)
     {
-        /** @var Permission $existingPermission */
-        $existingPermission = $this->getRepository()->findOneBy(['name' => $permission->getName()]);
+        $entityRepository = $this->getRepository();
+        $entityManager = $this->getEntityManager();
+        foreach ($permissions as &$permission) {
+            /** @var Permission $existingPermission */
+            $existingPermission = $entityRepository->findOneBy(['name' => $permission->getName()]);
 
-        // permission in DB should be overridden if permission with such name already exists
-        if ($existingPermission) {
-            $existingPermission->import($permission);
+            // permission in DB should be overridden if permission with such name already exists
+            if ($existingPermission) {
+                $existingPermission->import($permission);
+                $permission = $existingPermission;
+            }
+            $entityManager->persist($permission);
         }
+        unset($permission);
 
-        return $existingPermission ?: $permission;
+        $entityManager->flush();
+
+        return $permissions;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->doctrineHelper->getEntityManagerForClass('OroSecurityBundle:Permission');
     }
 
     /**

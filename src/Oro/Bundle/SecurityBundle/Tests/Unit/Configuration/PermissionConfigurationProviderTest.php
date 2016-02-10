@@ -27,7 +27,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         ],
         self::PERMISSION2 => [
             'label' => 'Label for Permission 2',
-            'group_names' => ['', 'frontend', 'new_group'],
+            'group_names' => [PermissionConfiguration::DEFAULT_GROUP_NAME, 'frontend', 'new_group'],
             'apply_to_all' => false,
             'apply_to_entities' => [
                 'OroTestFrameworkBundle:TestActivity',
@@ -46,7 +46,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             'label' => 'Label for Permission 3',
             'group_names' => ['default'],
             'apply_to_all' => true,
-            'apply_to_entities' => [],
+            'apply_to_entities' => ['NotManageableEntity'],
             'exclude_entities' => [],
         ],
     ];
@@ -97,8 +97,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->loadConfig('permissionsCorrect.yml');
         $permissions = $this->provider->getPermissionConfiguration();
-        $this->assertArrayHasKey(PermissionConfigurationProvider::ROOT_NODE_NAME, $permissions);
-        $this->assertEquals($expectedPermissions, $permissions[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+        $this->assertEquals($expectedPermissions, $permissions);
     }
 
     public function testFilterPermissionsConfiguration()
@@ -110,8 +109,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->loadConfig('permissionsCorrect.yml');
         $permissions = $this->provider->getPermissionConfiguration(array_keys($expectedPermissions));
-        $this->assertArrayHasKey(PermissionConfigurationProvider::ROOT_NODE_NAME, $permissions);
-        $this->assertEquals($expectedPermissions, $permissions[PermissionConfigurationProvider::ROOT_NODE_NAME]);
+        $this->assertEquals($expectedPermissions, $permissions);
     }
 
     /**
