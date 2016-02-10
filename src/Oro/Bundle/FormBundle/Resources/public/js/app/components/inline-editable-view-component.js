@@ -17,6 +17,7 @@ define(function(require) {
      *        frontend_type: 'tags',
      *        value: oro_tag_get_list(entity),
      *        fieldName: 'tags',
+     *        insertEditorMethod: 'overlay', // Possible values are 'overlay' and all supported by containerMethod https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod
      *        metadata: {
      *            inline_editing: {
      *                enable: resource_granted('oro_tag_assign_unassign'),
@@ -41,6 +42,9 @@ define(function(require) {
      *                        }
      *                    }
      *                }
+     *            },
+     *            view_options: {
+     *              tooltip: 'Tooltip text'
      *            }
      *        }
      *    }
@@ -72,54 +76,65 @@ define(function(require) {
     var tools = require('oroui/js/tools');
 
     InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
-        OVERLAY_TOOL_DEFAULTS: {
-            zIndex: 1,
-            position: {
-                my: 'left top',
-                at: 'left-7 top-7',
-                collision: 'flipfit'
-            }
-        },
-
-        METADATA_DEFAULTS: {
-            inline_editing: {
-                enable: false,
-                save_api_accessor: {
-                    'class': 'oroui/js/tools/api-accessor'
+        options: {
+            overlay: {
+                zIndex: 1,
+                position: {
+                    my: 'left top',
+                    at: 'left-7 top-7',
+                    collision: 'flipfit'
                 }
+            },
+            metadata: {
+                inline_editing: {
+                    enable: false,
+                    save_api_accessor: {
+                        'class': 'oroui/js/tools/api-accessor'
+                    }
+                }
+            },
+            insertEditorMethod: 'overlay',
+            widthIncrement: 15,
+            fieldName: 'value',
+            messages: {
+                success: __('oro.form.inlineEditing.successMessage'),
+                processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
             }
         },
 
         ESCAPE_KEY_CODE: 27,
-
-        WIDTH_INCREMENT: 15,
 
         /**
          * @constructor
          * @param {Object} options
          */
         initialize: function(options) {
-            options.metadata = $.extend(true, {}, this.METADATA_DEFAULTS, options.metadata);
+            options = $.extend(true, {}, this.options, options);
+
+            this.insertEditorMethod = options.insertEditorMethod;
+            this.overlayOptions = options.overlay;
+            this.widthIncrement = options.widthIncrement;
+            this.messages = options.messages;
             this.inlineEditingOptions = options.metadata.inline_editing;
             var waitors = [];
-            this.fieldName = options.fieldName || 'value';
+            this.fieldName = options.fieldName;
             // frontend type mapped to viewer/editor/reader
             var classes = frontendTypeMap[options.frontend_type];
             this.classes = classes;
             this.metadata = options.metadata;
             this.model = new BaseModel();
             this.model.set(this.fieldName, options.value);
+            var viewOptions = this.getViewOptions();
             if (this.inlineEditingOptions.enable) {
-                this.wrapper = new InlineEditorWrapperView({
+                var ViewerWrapper = classes['viewerWrapper'] || InlineEditorWrapperView;
+                this.wrapper = new ViewerWrapper({
                     el: options._sourceElement,
                     autoRender: true
                 });
-                this.view = new classes.viewer(_.extend({
-                    el: this.wrapper.getContainer(),
-                    autoRender: true,
-                    model: this.model,
-                    fieldName: this.fieldName
-                }));
+
+                viewOptions.el = this.wrapper.getContainer();
+                this.view = new classes.viewer(viewOptions);
                 if (this.classes.editor.processMetadata) {
                     waitors.push(this.classes.editor.processMetadata(this.metadata));
                 }
@@ -132,14 +147,22 @@ define(function(require) {
                     }, this)
                 ));
             } else {
-                this.view = new classes.viewer(_.extend({
-                    el: options._sourceElement,
-                    autoRender: true,
-                    model: this.model,
-                    fieldName: this.fieldName
-                }));
+                viewOptions.el = options._sourceElement;
+                this.view = new classes.viewer(viewOptions);
             }
             this.deferredInit = $.when.apply($, waitors);
+        },
+
+        isInsertEditorModeOverlay: function() {
+            return this.insertEditorMethod === 'overlay';
+        },
+
+        getViewOptions: function() {
+            return $.extend(true, {}, _.result(this.metadata, 'view_options', {}), {
+                autoRender: true,
+                model: this.model,
+                fieldName: this.fieldName
+            });
         },
 
         enterEditMode: function() {
@@ -147,34 +170,56 @@ define(function(require) {
                 this.view.$el.removeClass('save-fail');
             }
 
+            var viewInstance = this.createEditorViewInstance();
+
+            if (this.isInsertEditorModeOverlay()) {
+                var overlayOptions = $.extend(true, {}, this.overlayOptions, {
+                    position: {
+                        of: this.wrapper.$el
+                    }
+                });
+
+                var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+                this.listenTo(viewInstance, 'dispose', _.bind(overlay.remove, overlay));
+            } else {
+                this.view.$el.hide();
+            }
+
+            this.initializeEditorListeners(this.editorView);
+
+            return viewInstance;
+        },
+
+        createEditorViewInstance: function() {
             var View = this.classes.editor;
+
+            this.editorView = new View(this.getEditorOptions());
+            this.resizeTo(this.editorView, this.wrapper);
+
+            return this.editorView;
+        },
+
+        getEditorOptions: function() {
             var viewConfiguration = this.inlineEditingOptions.editor ?
                 this.inlineEditingOptions.editor.view_options :
-                {};
-            var viewInstance = new View(_.extend({}, viewConfiguration, {
-                className: 'inline-view-editor',
+            {};
+
+            if (!this.isInsertEditorModeOverlay()) {
+                viewConfiguration.container = this.view.$el;
+                viewConfiguration.containerMethod = this.insertEditorMethod;
+                viewConfiguration.autoAttach = true;
+            }
+
+            return $.extend(true, {}, viewConfiguration, {
+                className: 'inline-view-editor inline-editor-wrapper',
                 autoRender: true,
                 model: this.model,
                 fieldName: this.fieldName
-            }));
-
-            this.editorView = viewInstance;
-
-            viewInstance.$el.addClass('inline-editor-wrapper');
-
-            var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
-                position: {
-                    of: this.wrapper.$el
-                }
             });
-            this.resizeTo(viewInstance, this.wrapper);
+        },
 
-            var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
-
+        initializeEditorListeners: function(viewInstance) {
             this.listenTo(viewInstance, {
-                dispose: function() {
-                    overlay.remove();
-                },
                 keydown: this.onGenericEscapeKeydown,
                 focus: function() {
                     mediator.trigger('inlineEditor:focus', viewInstance);
@@ -200,8 +245,6 @@ define(function(require) {
             this.listenTo(viewInstance, 'saveAndEditPrevRowAction', this.saveCurrentCellAndExit);
             this.listenTo(viewInstance, 'cancelAndEditPrevRowAction', this.exitEditMode);
             this.listenTo(mediator, 'inlineEditor:focus', this.onInlineEditorFocus);
-
-            return viewInstance;
         },
 
         onInlineEditorFocus: function(view) {
@@ -215,6 +258,9 @@ define(function(require) {
 
         exitEditMode: function() {
             this.editorView.dispose();
+            if (!this.isInsertEditorModeOverlay()) {
+                this.view.$el.show();
+            }
             delete this.editorView;
         },
 
@@ -242,7 +288,8 @@ define(function(require) {
             var ctx = {
                 view: wrapper,
                 model: this.model,
-                oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData))
+                oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData)),
+                messages: this.messages
             };
             this.updateModel(this.model, this.editorView, modelUpdateData);
             if (this.saveApiAccessor.initialOptions.field_name) {
@@ -255,8 +302,8 @@ define(function(require) {
                 serverUpdateData = newData;
             }
             var savePromise = this.saveApiAccessor.send(this.model.toJSON(), serverUpdateData, {}, {
-                processingMessage: __('oro.form.inlineEditing.saving_progress'),
-                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
+                processingMessage: this.messages.processingMessage,
+                preventWindowUnload: this.messages.preventWindowUnload
             });
 
             if (this.classes.editor.processSavePromise) {
@@ -291,7 +338,7 @@ define(function(require) {
          */
         resizeTo: function(view, baseView) {
             view.$el.css({
-                width: baseView.$el.outerWidth() + this.WIDTH_INCREMENT
+                width: baseView.$el.outerWidth() + this.widthIncrement
             });
         },
 
@@ -318,7 +365,7 @@ define(function(require) {
                     }
                 }, this);
             }
-            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
+            mediator.execute('showFlashMessage', 'success', this.messages.success);
         },
 
         onSaveError: function(jqXHR) {
