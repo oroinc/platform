@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Parser;
 
 use Oro\Bundle\ApiBundle\Request\JsonApi\EntityClassTransformer;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
@@ -17,6 +18,13 @@ class ApiTestCase extends WebTestCase
 
     /** @var EntityClassTransformer */
     protected $entityClassTransformer;
+
+    /**
+     * Local cache for expectations
+     *
+     * @var array
+     */
+    private $expectations = [];
 
     /**
      * {@inheritdoc}
@@ -80,6 +88,26 @@ class ApiTestCase extends WebTestCase
 
             return [implode(RestRequest::ARRAY_DELIMITER, $requirements), $recordExist];
         }
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @return array
+     */
+    protected function loadExpectation($filename)
+    {
+        if (!isset($this->expectations[$filename])) {
+            $expectedContent = file_get_contents(
+                __DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $filename
+            );
+
+            $ymlParser = new Parser();
+
+            $this->expectations[$filename] = $ymlParser->parse($expectedContent);
+        }
+
+        return $this->expectations[$filename];
     }
 
     /**
