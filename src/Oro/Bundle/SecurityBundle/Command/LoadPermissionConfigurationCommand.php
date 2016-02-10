@@ -49,6 +49,13 @@ class LoadPermissionConfigurationCommand extends ContainerAwareCommand
             foreach ($permissions as $permission) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $permission->getName()));
                 $entityManager->persist($manager->preparePermissionForDb($permission));
+
+                foreach ($manager->getNotManageableEntities($permission) as $entityClass) {
+                    $output->writeln(sprintf(
+                        '    <comment>></comment> <error>%s - is not a manageable entity class</error>',
+                        $entityClass
+                    ));
+                }
             }
 
             $entityManager->flush();

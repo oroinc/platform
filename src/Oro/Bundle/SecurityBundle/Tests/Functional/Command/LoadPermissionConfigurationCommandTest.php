@@ -72,6 +72,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
             [
                 'expectedMessages' => [
                     'Loading permissions...',
+                    'NotManageableEntity - is not a manageable entity class',
                 ],
                 'expectedPermissions' => [
                     'PERMISSION1' => [

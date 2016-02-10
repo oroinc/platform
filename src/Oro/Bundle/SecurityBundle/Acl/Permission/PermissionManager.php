@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
 class PermissionManager
 {
@@ -48,6 +49,27 @@ class PermissionManager
 
     /**
      * @param Permission $permission
+     * @return array
+     */
+    public function getNotManageableEntities(Permission $permission)
+    {
+        /** @var PermissionEntity[] $permissionEntities */
+        $permissionEntities = array_merge(
+            $permission->getApplyToEntities()->toArray(),
+            $permission->getExcludeEntities()->toArray()
+        );
+        $entities = [];
+        foreach ($permissionEntities as $permissionEntity) {
+            if (!$this->isManageableEntityClass($permissionEntity->getName())) {
+                $entities[] = $permissionEntity->getName();
+            }
+        }
+
+        return array_unique($entities);
+    }
+
+    /**
+     * @param Permission $permission
      * @return Permission
      */
     public function preparePermissionForDb(Permission $permission)
@@ -61,6 +83,18 @@ class PermissionManager
         }
 
         return $existingPermission ?: $permission;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isManageableEntityClass($entityClass)
+    {
+        try {
+            return $this->doctrineHelper->isManageableEntityClass($entityClass);
+        } catch(\Exception $e) {
+            return false;
+        }
     }
 
     /**

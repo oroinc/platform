@@ -127,20 +127,4 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
-
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
-     */
-    public function testBuildPermissionsNotManageableEntity()
-    {
-        $configuration = [
-            'PERMISSION_BAD' => [
-                'label' => 'My Label',
-                'exclude_entities' => ['EntityNotManageable'],
-            ]
-        ];
-
-        $this->builder->buildPermissions($configuration);
-    }
-
 }

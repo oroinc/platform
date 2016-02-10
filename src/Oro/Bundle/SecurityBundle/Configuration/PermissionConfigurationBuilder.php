@@ -84,9 +84,6 @@ class PermissionConfigurationBuilder
 
         $entities = new ArrayCollection();
         foreach ($configuration as $entityName) {
-            if (!$this->isManageableEntityClass($entityName)) {
-                throw new NotManageableEntityException($entityName);
-            }
             $entityNameNormalized = strtolower($entityName);
             if (!array_key_exists($entityNameNormalized, $this->processedEntities)) {
                 $permissionEntity = $permissionEntityRepository->findOneBy(['name' => $entityName]);
