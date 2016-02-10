@@ -772,11 +772,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function isRegionValid(ExecutionContextInterface $context)
     {
-        // Use validator instead of duplicate code
-        $constraint = new ValidRegion();
-        $validator = new ValidRegionValidator();
-        $validator->initialize($context);
-        $validator->validate($this, $constraint);
     }
 
     /**
