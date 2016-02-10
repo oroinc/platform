@@ -50,6 +50,8 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         /** Foreign keys generation **/
         $this->addOroSecurityPermApplyEntityForeignKeys($schema);
         $this->addOroSecurityPermExclEntityForeignKeys($schema);
+
+        $queries->addPostQuery(new LoadBasePermissionsQuery());
     }
 
     /**

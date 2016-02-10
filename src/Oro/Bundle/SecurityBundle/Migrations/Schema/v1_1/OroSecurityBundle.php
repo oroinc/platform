@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery;
 
 class OroSecurityBundle implements Migration
 {
@@ -55,6 +56,8 @@ class OroSecurityBundle implements Migration
                 $this->container->getParameter('security.acl.dbal.class_table_name')
             )
         );
+
+        $queries->addPostQuery(new LoadBasePermissionsQuery());
     }
 
     /**
