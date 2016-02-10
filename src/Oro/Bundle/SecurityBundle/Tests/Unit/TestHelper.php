@@ -8,6 +8,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInt
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
@@ -66,13 +67,15 @@ class TestHelper
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
+     * @param PermissionManager $permissionManager
      * @return EntityAclExtension
      */
     public function createEntityAclExtension(
         OwnershipMetadataProvider $metadataProvider = null,
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
-        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
+        PermissionManager $permissionManager = null
     ) {
         if ($idAccessor === null) {
             $idAccessor = new ObjectIdAccessor();
@@ -157,7 +160,32 @@ class TestHelper
             new EntityClassResolver($doctrine),
             $entityMetadataProvider,
             $metadataProvider,
-            $decisionMaker
+            $decisionMaker,
+            $permissionManager ?: $this->getPermissionManagerMock($this->testCase)
         );
+    }
+
+    /**
+     * @param \PHPUnit_Framework_TestCase $testCase
+     *
+     * @return PermissionManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getPermissionManagerMock(\PHPUnit_Framework_TestCase $testCase)
+    {
+        $permissionManager = $testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $permissionManager->expects($testCase->any())
+            ->method('getPermissionsMap')
+            ->willReturn([
+                'VIEW'   => 1,
+                'CREATE' => 2,
+                'EDIT'   => 3,
+                'DELETE' => 4,
+                'ASSIGN' => 5,
+                'SHARE'  => 6
+            ]);
+
+        return $permissionManager;
     }
 }
