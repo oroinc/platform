@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAME_CALENDAR_EVENT = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
-    const CLASS_NAME_REMINDER = 'Oro\Bundle\ReminderBundle\Entity\Reminder';
+    const CLASS_NAME_REMINDER       = 'Oro\Bundle\ReminderBundle\Entity\Reminder';
 
     /**
      * @var ContextAccessor
@@ -30,6 +30,7 @@ class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['findDefaultCalendar'])
             ->getMock();
+
         $calendar = new Calendar();
         $calendar->setOwner($this->getUserMock());
         $calendarRepository->method('findDefaultCalendar')->willReturn($calendar);
@@ -60,7 +61,7 @@ class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
         $em
             ->expects($this->exactly($expectedPersistCount))
             ->method('persist')
-            ->will($this->returnCallback(function($object) use ($options) {
+            ->will($this->returnCallback(function ($object) use ($options) {
                 if ('Oro\Bundle\CalendarBundle\Entity\CalendarEvent' === get_class($object)) {
                     $this->assertEquals($options[CreateCalendarEventAction::OPTION_KEY_TITLE], $object->getTitle());
                     $this->assertEquals($options[CreateCalendarEventAction::OPTION_KEY_START], $object->getStart());
@@ -81,8 +82,12 @@ class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
                 } elseif ('Oro\Bundle\ReminderBundle\Entity\Reminder' === get_class($object)) {
                     $this->assertEquals($options[CreateCalendarEventAction::OPTION_KEY_TITLE], $object->getSubject());
                 } else {
-                    throw new \InvalidArgumentException(sprintf('Persistent object must be "%s" or "%s"',
-                        self::CLASS_NAME_CALENDAR_EVENT, self::CLASS_NAME_REMINDER)
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'Persistent object must be "%s" or "%s"',
+                            self::CLASS_NAME_CALENDAR_EVENT,
+                            self::CLASS_NAME_REMINDER
+                        )
                     );
                 }
             }))
@@ -187,7 +192,8 @@ class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
                         CreateCalendarEventAction::OPTION_REMINDER_KEY_METHOD => 'web_socket',
                         CreateCalendarEventAction::OPTION_REMINDER_KEY_INTERVAL_UNIT => 'M',
                         CreateCalendarEventAction::OPTION_REMINDER_KEY_INTERVAL_NUMBER => '10',
-                    ]]
+                        ]
+                    ]
                 ],
                 'expectedPersistCount' => 7,
                 'exceptionMessage' => '',
