@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures;
+namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures;
 
 use Doctrine\ORM\Mapping as ORM;
 

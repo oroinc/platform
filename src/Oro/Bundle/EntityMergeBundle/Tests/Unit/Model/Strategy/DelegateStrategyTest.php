@@ -23,15 +23,36 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 
         $strategy = new DelegateStrategy(array($foo, $bar));
 
-        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $strategy);
+        $expected = [
+            'foo' => [
+                DelegateStrategy::STRATEGY_KEY => $foo,
+                DelegateStrategy::PRIORITY_KEY => DelegateStrategy::DEFAULT_PRIORITY
+            ],
+            'bar' => [
+                DelegateStrategy::STRATEGY_KEY => $bar,
+                DelegateStrategy::PRIORITY_KEY => DelegateStrategy::DEFAULT_PRIORITY
+            ],
+        ];
+
+        $this->assertAttributeEquals($expected, 'elements', $strategy);
     }
 
     public function testAdd()
     {
-        $this->strategy->add($foo = $this->createStrategy('foo'));
-        $this->strategy->add($bar = $this->createStrategy('bar'));
+        $this->strategy->add($foo = $this->createStrategy('foo'), 1);
+        $this->strategy->add($bar = $this->createStrategy('bar'), 2);
+        $this->strategy->add($defaultPriority = $this->createStrategy('defaultPriority'));
 
-        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $this->strategy);
+        $expected = [
+            'bar' => [DelegateStrategy::STRATEGY_KEY => $bar, DelegateStrategy::PRIORITY_KEY => 2],
+            'foo' => [DelegateStrategy::STRATEGY_KEY => $foo, DelegateStrategy::PRIORITY_KEY => 1],
+            'defaultPriority' => [
+                DelegateStrategy::STRATEGY_KEY => $defaultPriority,
+                DelegateStrategy::PRIORITY_KEY => DelegateStrategy::DEFAULT_PRIORITY
+            ],
+        ];
+
+        $this->assertAttributeEquals($expected, 'elements', $this->strategy);
     }
 
     public function testSupportsTrueLast()
@@ -99,16 +120,26 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testMerge()
     {
-        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($lowPriorityApplicable = $this->createStrategy('lowPriorityApplicable'), -1);
+        $this->strategy->add($defaultPriorityApplicable = $this->createStrategy('defaultPriorityApplicable'));
+        $this->strategy->add($highPriorityNotApplicable = $this->createStrategy('highPriorityNotApplicable'), 100);
 
         $data = $this->createFieldData();
 
-        $foo->expects($this->once())
+        $lowPriorityApplicable->expects($this->never())
+            ->method('supports');
+
+        $highPriorityNotApplicable->expects($this->once())
+            ->method('supports')
+            ->with($data)
+            ->will($this->returnValue(false));
+
+        $defaultPriorityApplicable->expects($this->once())
             ->method('supports')
             ->with($data)
             ->will($this->returnValue(true));
 
-        $foo->expects($this->once())
+        $defaultPriorityApplicable->expects($this->once())
             ->method('merge')
             ->with($data);
 

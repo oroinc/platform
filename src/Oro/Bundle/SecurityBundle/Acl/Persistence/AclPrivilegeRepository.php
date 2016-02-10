@@ -417,11 +417,11 @@ class AclPrivilegeRepository
             if ($accessLevelName !== null) {
                 $maskName = 'MASK_' . $permission->getName() . '_' . $accessLevelName;
                 // check if a mask builder supports access levels
-                if (!$maskBuilder->hasConst($maskName)) {
+                if (!$maskBuilder->hasMask($maskName)) {
                     // remove access level name from the mask name if a mask builder do not support access levels
                     $maskName = 'MASK_' . $permission->getName();
                 }
-                $maskBuilder->add($maskBuilder->getConst($maskName));
+                $maskBuilder->add($maskBuilder->getMask($maskName));
             }
             $masks[$extension->getServiceBits($maskBuilder->get())] = $maskBuilder->get();
         }
@@ -647,7 +647,9 @@ class AclPrivilegeRepository
                 $mask = $extension->adaptRootMask($mask, $privilege->getIdentity()->getId());
             }
             if ($extension->removeServiceBits($mask) === 0) {
-                foreach ($permissions as $permission) {
+                $supportedPermissions = array_intersect($permissions, $extension->getPermissions($mask));
+
+                foreach ($supportedPermissions as $permission) {
                     if (!$privilege->hasPermission($permission)) {
                         $privilege->addPermission(new AclPermission($permission, AccessLevel::NONE_LEVEL));
                     }

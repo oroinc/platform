@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
@@ -57,7 +56,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
                         $nullable = ($nullable || (isset($joinColumn['nullable']) ? $joinColumn['nullable'] : false));
                     }
                 }
-                $joinType = $nullable ? Join::LEFT_JOIN : Join::INNER_JOIN;
+                $joinType = $nullable ? self::LEFT_JOIN : self::INNER_JOIN;
             }
         }
 

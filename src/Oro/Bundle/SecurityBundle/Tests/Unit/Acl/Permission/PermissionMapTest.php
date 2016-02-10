@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Permission;
 
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap;
-use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionMaskBuilder;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
@@ -50,46 +49,46 @@ class PermissionMapTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(new TestEntity(), 'VIEW', array(
-                EntityMaskBuilder::MASK_VIEW_BASIC,
-                EntityMaskBuilder::MASK_VIEW_LOCAL,
-                EntityMaskBuilder::MASK_VIEW_DEEP,
-                EntityMaskBuilder::MASK_VIEW_GLOBAL,
-                EntityMaskBuilder::MASK_VIEW_SYSTEM,
+                1 << 0,
+                1 << 1,
+                1 << 2,
+                1 << 3,
+                1 << 4
             )),
             array(new TestEntity(), 'CREATE', array(
-                EntityMaskBuilder::MASK_CREATE_BASIC,
-                EntityMaskBuilder::MASK_CREATE_LOCAL,
-                EntityMaskBuilder::MASK_CREATE_DEEP,
-                EntityMaskBuilder::MASK_CREATE_GLOBAL,
-                EntityMaskBuilder::MASK_CREATE_SYSTEM,
+                1 << 5,
+                1 << 6,
+                1 << 7,
+                1 << 8,
+                1 << 9
             )),
             array(new TestEntity(), 'EDIT', array(
-                EntityMaskBuilder::MASK_EDIT_BASIC,
-                EntityMaskBuilder::MASK_EDIT_LOCAL,
-                EntityMaskBuilder::MASK_EDIT_DEEP,
-                EntityMaskBuilder::MASK_EDIT_GLOBAL,
-                EntityMaskBuilder::MASK_EDIT_SYSTEM,
+                1 << 10,
+                1 << 11,
+                1 << 12,
+                1 << 13,
+                1 << 14
             )),
             array(new TestEntity(), 'DELETE', array(
-                EntityMaskBuilder::MASK_DELETE_BASIC,
-                EntityMaskBuilder::MASK_DELETE_LOCAL,
-                EntityMaskBuilder::MASK_DELETE_DEEP,
-                EntityMaskBuilder::MASK_DELETE_GLOBAL,
-                EntityMaskBuilder::MASK_DELETE_SYSTEM,
+                32768 + (1 << 0),
+                32768 + (1 << 1),
+                32768 + (1 << 2),
+                32768 + (1 << 3),
+                32768 + (1 << 4)
             )),
             array(new TestEntity(), 'ASSIGN', array(
-                EntityMaskBuilder::MASK_ASSIGN_BASIC,
-                EntityMaskBuilder::MASK_ASSIGN_LOCAL,
-                EntityMaskBuilder::MASK_ASSIGN_DEEP,
-                EntityMaskBuilder::MASK_ASSIGN_GLOBAL,
-                EntityMaskBuilder::MASK_ASSIGN_SYSTEM,
+                32768 + (1 << 5),
+                32768 + (1 << 6),
+                32768 + (1 << 7),
+                32768 + (1 << 8),
+                32768 + (1 << 9)
             )),
             array(new TestEntity(), 'SHARE', array(
-                EntityMaskBuilder::MASK_SHARE_BASIC,
-                EntityMaskBuilder::MASK_SHARE_LOCAL,
-                EntityMaskBuilder::MASK_SHARE_DEEP,
-                EntityMaskBuilder::MASK_SHARE_GLOBAL,
-                EntityMaskBuilder::MASK_SHARE_SYSTEM,
+                32768 + (1 << 10),
+                32768 + (1 << 11),
+                32768 + (1 << 12),
+                32768 + (1 << 13),
+                32768 + (1 << 14)
             )),
             array('action: test', 'EXECUTE', array(
                 ActionMaskBuilder::MASK_EXECUTE,
