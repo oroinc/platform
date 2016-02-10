@@ -77,14 +77,11 @@ define(function(require) {
     InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
         options: {
             overlay: {
-                enable: true,
-                styles: {
-                    zIndex: 1,
-                    position: {
-                        my: 'left top',
-                        at: 'left-7 top-7',
-                        collision: 'flipfit'
-                    }
+                zIndex: 1,
+                position: {
+                    my: 'left top',
+                    at: 'left-7 top-7',
+                    collision: 'flipfit'
                 }
             },
             metadata: {
@@ -95,7 +92,8 @@ define(function(require) {
                     }
                 }
             },
-            width_increment: 15,
+            insertEditorMethod: 'overlay',
+            widthIncrement: 15,
             fieldName: 'value',
             messages: {
                 success: __('oro.form.inlineEditing.successMessage'),
@@ -113,8 +111,9 @@ define(function(require) {
         initialize: function(options) {
             options = $.extend(true, {}, this.options, options);
 
+            this.insertEditorMethod = options.insertEditorMethod;
             this.overlayOptions = options.overlay;
-            this.widthIncrement = options.width_increment;
+            this.widthIncrement = options.widthIncrement;
             this.messages = options.messages;
             this.inlineEditingOptions = options.metadata.inline_editing;
             var waitors = [];
@@ -153,6 +152,10 @@ define(function(require) {
             this.deferredInit = $.when.apply($, waitors);
         },
 
+        isInsertEditorModeOverlay: function() {
+            return this.insertEditorMethod === 'overlay';
+        },
+
         getViewOptions: function() {
             return $.extend(true, {}, _.result(this.metadata, 'view_options', {}), {
                 autoRender: true,
@@ -168,8 +171,8 @@ define(function(require) {
 
             var viewInstance = this.createEditorViewInstance();
 
-            if (this.overlayOptions.enable) {
-                var overlayOptions = $.extend(true, {}, this.overlayOptions.styles, {
+            if (this.isInsertEditorModeOverlay()) {
+                var overlayOptions = $.extend(true, {}, this.overlayOptions, {
                     position: {
                         of: this.wrapper.$el
                     }
@@ -200,9 +203,9 @@ define(function(require) {
                 this.inlineEditingOptions.editor.view_options :
             {};
 
-            if (!this.overlayOptions.enable) {
+            if (!this.isInsertEditorModeOverlay()) {
                 viewConfiguration.container = this.view.$el;
-                viewConfiguration.containerMethod = 'after';
+                viewConfiguration.containerMethod = this.insertEditorMethod;
                 viewConfiguration.autoAttach = true;
             }
 
@@ -254,7 +257,7 @@ define(function(require) {
 
         exitEditMode: function() {
             this.editorView.dispose();
-            if (!this.overlayOptions.enable) {
+            if (!this.isInsertEditorModeOverlay()) {
                 this.view.$el.show();
             }
             delete this.editorView;
