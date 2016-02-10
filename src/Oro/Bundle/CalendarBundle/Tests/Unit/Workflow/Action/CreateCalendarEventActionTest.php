@@ -9,6 +9,9 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
 {
+    const CLASS_NAME_CALENDAR_EVENT = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const CLASS_NAME_REMINDER = 'Oro\Bundle\ReminderBundle\Entity\Reminder';
+
     /**
      * @var ContextAccessor
      */
@@ -54,7 +57,36 @@ class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $em->expects($this->exactly($expectedPersistCount))->method('persist');
+        $em
+            ->expects($this->exactly($expectedPersistCount))
+            ->method('persist')
+            ->will($this->returnCallback(function($object) use ($options) {
+                if ('Oro\Bundle\CalendarBundle\Entity\CalendarEvent' === get_class($object)) {
+                    $this->assertEquals($options[CreateCalendarEventAction::OPTION_KEY_TITLE], $object->getTitle());
+                    $this->assertEquals($options[CreateCalendarEventAction::OPTION_KEY_START], $object->getStart());
+                    if (isset($options[CreateCalendarEventAction::OPTION_KEY_END])) {
+                        $this->assertEquals($options[CreateCalendarEventAction::OPTION_KEY_END], $object->getEnd());
+                    } elseif (isset($options[CreateCalendarEventAction::OPTION_KEY_DURATION])) {
+                        $this->assertEquals(
+                            $options[CreateCalendarEventAction::OPTION_KEY_START]
+                                ->modify('+ '.$options[CreateCalendarEventAction::OPTION_KEY_DURATION]),
+                            $object->getEnd()
+                        );
+                    } else {
+                        $this->assertEquals(
+                            $options[CreateCalendarEventAction::OPTION_KEY_START]->modify('+ 1 hour'),
+                            $object->getEnd()
+                        );
+                    }
+                } elseif ('Oro\Bundle\ReminderBundle\Entity\Reminder' === get_class($object)) {
+                    $this->assertEquals($options[CreateCalendarEventAction::OPTION_KEY_TITLE], $object->getSubject());
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Persistent object must be "%s" or "%s"',
+                        self::CLASS_NAME_CALENDAR_EVENT, self::CLASS_NAME_REMINDER)
+                    );
+                }
+            }))
+        ;
         $this->registry->method('getManagerForClass')->willReturn($em);
 
         if ($exceptionMessage) {
