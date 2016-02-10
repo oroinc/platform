@@ -248,55 +248,6 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         $address->isRegionValid($context);
     }
 
-    public function testIsRegionValidNoRegion()
-    {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $country->expects($this->once())
-            ->method('hasRegions')
-            ->will($this->returnValue(false));
-
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $context->expects($this->never())
-            ->method('addViolationAt');
-
-        $address = $this->createAddress();
-        $address->setCountry($country);
-        $address->isRegionValid($context);
-    }
-
-    public function testIsRegionValid()
-    {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $country->expects($this->once())
-            ->method('hasRegions')
-            ->will($this->returnValue(true));
-        $country->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('Country'));
-
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $context->expects($this->once())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('test'));
-        $context->expects($this->once())
-            ->method('addViolationAt')
-            ->with(
-                'test.region',
-                'State is required for country {{ country }}',
-                ['{{ country }}' => 'Country']
-            );
-
-        $address = $this->createAddress();
-        $address->setCountry($country);
-        $address->isRegionValid($context);
-    }
-
     public function testIsEmpty()
     {
         $address = $this->createAddress();
