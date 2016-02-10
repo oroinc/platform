@@ -33,7 +33,7 @@ class Jobs extends AbstractPageFilteredGrid
     {
         $daemonState = "//p[contains(., 'Daemon status:')][contains(., 'Not running')]";
         if ($this->isElementPresent($daemonState)) {
-            $this->test->byXPath("//a[@data-action-name='run-daemon']")->click();
+            $this->test->url('/cron/job/run-daemon');
             $timeOut = 0;
             while ($this->isElementPresent($daemonState)) {
                 if ($timeOut>MAX_EXECUTION_TIME) {

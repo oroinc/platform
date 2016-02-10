@@ -13,10 +13,12 @@ class EmailAttachmentTest extends \PHPUnit_Framework_TestCase
             ->setFileName('testFileName')
             ->setContentType('testContentType')
             ->setContentTransferEncoding('testContentTransferEncoding')
-            ->setContent('testContent');
+            ->setContent('testContent')
+            ->setFileSize(10);
         $this->assertEquals('testFileName', $obj->getFileName());
         $this->assertEquals('testContentType', $obj->getContentType());
         $this->assertEquals('testContentTransferEncoding', $obj->getContentTransferEncoding());
         $this->assertEquals('testContent', $obj->getContent());
+        $this->assertEquals('10', $obj->getFileSize());
     }
 }

@@ -4,7 +4,6 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\EventSubscriber;
 
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
 
 class TagSubscriberTest extends \PHPUnit_Framework_TestCase
@@ -80,8 +79,6 @@ class TagSubscriberTest extends \PHPUnit_Framework_TestCase
             $eventMock->expects($this->never())->method('setData');
         }
 
-
-
         $this->subscriber->preSet($eventMock);
     }
 
@@ -93,18 +90,6 @@ class TagSubscriberTest extends \PHPUnit_Framework_TestCase
         return array(
             'instance of taggable' => array($this->getMock('Oro\Bundle\TagBundle\Entity\Taggable'), 1),
             'another entity'       => array($this->getMock('Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Entity'), false),
-        );
-    }
-
-    public function submittedData()
-    {
-        return array(
-            'json submitted data' => array(
-                array(
-                    'all'   => "[{\"name\":\"" . self::TEST_TAG_NAME . "\"}]",
-                    'owner' => '[incorrect JSON]'
-                )
-            )
         );
     }
 }

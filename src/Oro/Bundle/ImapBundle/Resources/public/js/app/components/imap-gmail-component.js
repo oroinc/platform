@@ -53,7 +53,6 @@ define(function(require) {
          * Handler event checkConnection
          */
         onCheckConnection: function() {
-            mediator.execute('showLoading');
             this.view.resetErrorMessage();
             this.requestAccessToken();
         },
@@ -68,6 +67,7 @@ define(function(require) {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.emptyClientId'));
                 this.view.render();
             } else {
+                this._wrapFirstWindowOpen();
                 gapi.auth.authorize({
                     'client_id': data.clientId,
                     'scope': this.scopes.join(' '),
@@ -99,13 +99,57 @@ define(function(require) {
          * Request to google API to get token
          */
         requestAccessToken: function() {
-            var data = this.view.getData();
-            gapi.auth.authorize({
-                'client_id': data.clientId,
-                'scope': this.scopes.join(' '),
-                'immediate': false,
-                'authuser': -1
-            }, _.bind(this.checkAuthorization, this));
+            var args = {};
+            this._wrapFirstWindowOpen(args);
+            args.deferred = gapi.auth.authorize({
+                    'client_id': this.view.getData().clientId,
+                    'scope': this.scopes.join(' '),
+                    'immediate': false,
+                    'authuser': -1
+                },
+                _.bind(this.checkAuthorization, this)
+            ).then(
+                null,
+                function() {
+                    mediator.execute(
+                        'showFlashMessage',
+                        'error',
+                        __('oro.imap.connection.google.oauth.error.closed_auth')
+                    );
+                }
+            );
+        },
+
+        _wrapFirstWindowOpen: function(args) {
+            args = args || {};
+
+            (function(wrapped) {
+                window.open = function() {
+                    window.open = wrapped;
+
+                    var win = wrapped.apply(this, arguments);
+                    if (win) {
+                        var i = setInterval(function() {
+                            if (win.closed) {
+                                clearInterval(i);
+                                setTimeout(function() {
+                                    if (typeof args.deferred !== 'undefined') {
+                                        args.deferred.cancel();
+                                    }
+                                }, 1500);
+                            }
+                        }, 100);
+                    } else {
+                        mediator.execute(
+                            'showFlashMessage',
+                            'error',
+                            __('oro.imap.connection.google.oauth.error.blocked_popup')
+                        );
+                    }
+
+                    return win;
+                };
+            })(window.open);
         },
 
         /**

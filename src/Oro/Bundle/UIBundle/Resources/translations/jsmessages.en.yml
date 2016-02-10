@@ -46,7 +46,7 @@ minimize: minimize
 close: close
 Undo: Undo
 Redo: Redo
-
+"Copy to Clipboard": "Copy to Clipboard"
 oro:
     ui:
         widget_loading_failed: "Widget content loading failed"
