@@ -98,7 +98,7 @@ class OroSecurityBundle implements Migration
         $table->addColumn('is_apply_to_all', 'boolean', []);
         $table->addColumn('group_names', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_83424D0F5E237E06');
+        $table->addUniqueIndex(['name']);
     }
 
     /**
@@ -112,7 +112,7 @@ class OroSecurityBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_26F9A8215E237E06');
+        $table->addUniqueIndex(['name']);
     }
 
     /**

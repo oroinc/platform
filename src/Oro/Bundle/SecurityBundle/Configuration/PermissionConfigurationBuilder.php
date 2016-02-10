@@ -21,7 +21,7 @@ class PermissionConfigurationBuilder
     /**
      * @var array
      */
-    private $processedEntities;
+    private $processedEntities = [];
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -38,10 +38,10 @@ class PermissionConfigurationBuilder
     public function buildPermissions(array $configuration)
     {
         $permissions = new ArrayCollection();
-        $this->processedEntities = [];
         foreach ($configuration as $name => $permissionConfiguration) {
             $permissions->add($this->buildPermission($name, $permissionConfiguration));
         }
+
         $this->processedEntities = [];
 
         return $permissions;
@@ -56,18 +56,17 @@ class PermissionConfigurationBuilder
     {
         $this->assertConfigurationOptions($configuration, ['label']);
 
+        $excludeEntities = $this->getConfigurationOption($configuration, 'exclude_entities', []);
+        $applyToEntities = $this->getConfigurationOption($configuration, 'apply_to_entities', []);
+
         $permission = new Permission();
         $permission
             ->setName($name)
             ->setLabel($configuration['label'])
             ->setApplyToAll($this->getConfigurationOption($configuration, 'apply_to_all', true))
             ->setGroupNames($this->getConfigurationOption($configuration, 'group_names', []))
-            ->setExcludeEntities(
-                $this->buildPermissionEntities($this->getConfigurationOption($configuration, 'exclude_entities', []))
-            )
-            ->setApplyToEntities(
-                $this->buildPermissionEntities($this->getConfigurationOption($configuration, 'apply_to_entities', []))
-            )
+            ->setExcludeEntities($this->buildPermissionEntities($excludeEntities))
+            ->setApplyToEntities($this->buildPermissionEntities($applyToEntities))
             ->setDescription($this->getConfigurationOption($configuration, 'description', ''));
 
         return $permission;
@@ -80,20 +79,23 @@ class PermissionConfigurationBuilder
      */
     protected function buildPermissionEntities(array $configuration)
     {
-        $permissionEntityRepository = $this->doctrineHelper
-            ->getEntityRepositoryForClass('OroSecurityBundle:PermissionEntity');
+        $repository = $this->doctrineHelper->getEntityRepositoryForClass('OroSecurityBundle:PermissionEntity');
 
         $entities = new ArrayCollection();
         foreach ($configuration as $entityName) {
             $entityNameNormalized = strtolower($entityName);
+
             if (!array_key_exists($entityNameNormalized, $this->processedEntities)) {
-                $permissionEntity = $permissionEntityRepository->findOneBy(['name' => $entityName]);
+                $permissionEntity = $repository->findOneBy(['name' => $entityName]);
+
                 if (!$permissionEntity) {
                     $permissionEntity = new PermissionEntity();
                     $permissionEntity->setName($entityName);
                 }
+
                 $this->processedEntities[$entityNameNormalized] = $permissionEntity;
             }
+
             $entities->add($this->processedEntities[$entityNameNormalized]);
         }
 

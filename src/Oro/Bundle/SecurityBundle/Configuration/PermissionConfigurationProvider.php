@@ -36,16 +36,15 @@ class PermissionConfigurationProvider
      */
     public function getPermissionConfiguration(array $acceptedPermissions = null)
     {
-        $configs = $this->loadConfiguration();
-        $permissionsData = $this->parseConfiguration($configs);
-        $permissions = [];
-        foreach ($permissionsData as $permissionName => $permissionConfiguration) {
-            // skip not used permissions
-            if ($acceptedPermissions !== null && !in_array($permissionName, $acceptedPermissions, true)) {
-                continue;
-            }
+        $permissions = $this->parseConfiguration($this->loadConfiguration());
 
-            $permissions[$permissionName] = $permissionConfiguration;
+        if ($acceptedPermissions !== null) {
+            foreach ($permissions as $permissionName => $permissionConfiguration) {
+                // skip not used permissions
+                if (!in_array($permissionName, $acceptedPermissions, true)) {
+                    unset($permissions[$permissionName]);
+                }
+            }
         }
 
         return $permissions;
@@ -56,10 +55,7 @@ class PermissionConfigurationProvider
      */
     protected function loadConfiguration()
     {
-        $configLoader = new CumulativeConfigLoader(
-            'oro_security',
-            new YamlCumulativeFileLoader($this->configPath)
-        );
+        $configLoader = new CumulativeConfigLoader('oro_security', new YamlCumulativeFileLoader($this->configPath));
 
         $resources = $configLoader->load();
         $configs = [];
@@ -83,11 +79,9 @@ class PermissionConfigurationProvider
         try {
             $permissionsData = $this->permissionConfiguration->processConfiguration($configuration);
         } catch (InvalidConfigurationException $exception) {
-            $message = sprintf(
-                'Can\'t parse permission configuration. %s',
-                $exception->getMessage()
+            throw new InvalidConfigurationException(
+                sprintf('Can\'t parse permission configuration. %s', $exception->getMessage())
             );
-            throw new InvalidConfigurationException($message);
         }
 
         return $permissionsData;

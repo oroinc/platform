@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Permission;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -38,17 +39,14 @@ class PermissionManager
     }
 
     /**
-     * @param array $acceptedPermissions
+     * @param array|null $acceptedPermissions
      * @return Permission[]|Collection
      */
     public function getPermissionsFromConfig(array $acceptedPermissions = null)
     {
-        $permissionConfiguration = $this->configurationProvider->getPermissionConfiguration(
-            $acceptedPermissions
-        );
+        $permissionConfiguration = $this->configurationProvider->getPermissionConfiguration($acceptedPermissions);
 
-        return $this->configurationBuilder
-            ->buildPermissions($permissionConfiguration);
+        return $this->configurationBuilder->buildPermissions($permissionConfiguration);
     }
 
     /**
@@ -59,7 +57,9 @@ class PermissionManager
     {
         $entityRepository = $this->getRepository();
         $entityManager = $this->getEntityManager();
-        foreach ($permissions as &$permission) {
+        $processedPermissions = new ArrayCollection();
+
+        foreach ($permissions as $permission) {
             /** @var Permission $existingPermission */
             $existingPermission = $entityRepository->findOneBy(['name' => $permission->getName()]);
 
@@ -68,13 +68,14 @@ class PermissionManager
                 $existingPermission->import($permission);
                 $permission = $existingPermission;
             }
+
             $entityManager->persist($permission);
+            $processedPermissions->add($permission);
         }
-        unset($permission);
 
         $entityManager->flush();
 
-        return $permissions;
+        return $processedPermissions;
     }
 
     /**

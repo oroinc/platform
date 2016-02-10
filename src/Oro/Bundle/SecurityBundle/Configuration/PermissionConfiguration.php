@@ -50,13 +50,15 @@ class PermissionConfiguration implements ConfigurationInterface
                     ->defaultValue([static::DEFAULT_GROUP_NAME])
                     ->beforeNormalization()
                         ->always(
-                            function ($value) {
-                               $value = (array) $value;
-                                if (($key = array_search('', $value, true)) !== false) {
-                                    $value[$key] = static::DEFAULT_GROUP_NAME;
-                                }
-
-                                return array_unique($value);
+                            function ($groupName) {
+                                return array_unique(
+                                    array_map(
+                                        function ($value) {
+                                            return $value === '' ? static::DEFAULT_GROUP_NAME : $value;
+                                        },
+                                        (array) $groupName
+                                    )
+                                );
                             }
                         )
                     ->end()
@@ -74,7 +76,8 @@ class PermissionConfiguration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
-                ->scalarNode('description')->end()
+                ->scalarNode('description')
+                ->end()
             ->end();
 
         return $nodeDefinition;

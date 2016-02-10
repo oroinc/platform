@@ -19,12 +19,12 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository $repository */
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper $doctrineHelper */
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -90,7 +90,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $permissionEntity2 = (new PermissionEntity())->setName('Entity2');
 
         return [
-            'min max data' => [
+            [
                 'configuration' => [
                     'minimum_name' => [
                         'name' => 'minimum_name',
@@ -100,7 +100,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                         'name' => 'maximum_name',
                         'label' => 'My Label',
                         'apply_to_all' => false,
-                        'group_names' => ['frontend'],
+                        'group_names' => ['frontend', 'default'],
                         'exclude_entities' => [$permissionEntity1->getName()],
                         'apply_to_entities' => [$permissionEntity2->getName()],
                         'description' => 'Test description',
@@ -108,6 +108,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'minimum_name' => [
+                        'name' => 'minimum_name',
                         'label' => 'My Label',
                         'apply_to_all' => true,
                         'group_names' => [],
@@ -116,9 +117,10 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                         'description' => '',
                     ],
                     'maximum_name' => [
+                        'name' => 'maximum_name',
                         'label' => 'My Label',
                         'apply_to_all' => false,
-                        'group_names' => ['frontend'],
+                        'group_names' => ['frontend', 'default'],
                         'exclude_entities' => new ArrayCollection([$permissionEntity1]),
                         'apply_to_entities' => new ArrayCollection([$permissionEntity2]),
                         'description' => 'Test description',

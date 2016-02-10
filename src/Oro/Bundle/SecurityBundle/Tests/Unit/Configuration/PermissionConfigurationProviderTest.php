@@ -12,9 +12,7 @@ use Oro\Component\Config\CumulativeResourceManager;
 class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {
     const PERMISSION1 = 'PERMISSION1';
-
     const PERMISSION2 = 'PERMISSION2';
-
     const PERMISSION3 = 'PERMISSION3';
 
     private $permissions = [
@@ -41,7 +39,6 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             ],
             'description' => 'Permission 2 description',
         ],
-
         self::PERMISSION3 => [
             'label' => 'Label for Permission 3',
             'group_names' => ['default'],
@@ -60,13 +57,10 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $bundle1  = new TestBundle1();
         $bundle2  = new TestBundle2();
-        $bundles = [
-            $bundle1->getName() => get_class($bundle1),
-            $bundle2->getName() => get_class($bundle2),
-        ];
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->setBundles($bundles);
+        $bundles = [$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)];
+
+        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
+
         $this->provider = new PermissionConfigurationProvider(
             new PermissionListConfiguration(new PermissionConfiguration()),
             $bundles
