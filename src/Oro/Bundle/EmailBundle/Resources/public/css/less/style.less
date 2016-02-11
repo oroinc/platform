@@ -472,7 +472,7 @@ span.icon.grid .icon-paperclip {
   }
   .dropdown-menu {
     padding: 8px 10px 2px 0px;
-    margin-left: -20px;
+    margin-left: -16px;
     margin-top: 3px;
     &:before {
       content: '';
@@ -495,13 +495,12 @@ span.icon.grid .icon-paperclip {
       top: -6px;
       left: 20px;
     }
+    &.fixed-width .controls {
+      white-space: normal;
+    }
     ul {
       margin: 0;
       list-style: none;
-    }
-    .control-group .controls {
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
   }
   .control-group {

@@ -7,6 +7,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
+    var tools = require('oroui/js/tools');
     var EmailItemView = require('./email-item-view');
     var BaseView = require('oroui/js/app/views/base/view');
 
@@ -16,7 +17,8 @@ define(function(require) {
         events: {
             'click .email-view-toggle-all': 'onToggleAllClick',
             'click .email-load-more': 'onLoadMoreClick',
-            'shown.bs.dropdown .email-detailed-info-table.mobile .dropdown-menu': 'onDetailedInfoOpen'
+            'shown.bs.dropdown .email-detailed-info-table .dropdown-menu': tools.isMobile() ?
+                'onDetailedInfoOpenMobile' : 'onDetailedInfoOpenDesktop'
         },
 
         selectors: {
@@ -108,7 +110,7 @@ define(function(require) {
             this.loadEmails();
         },
 
-        onDetailedInfoOpen: function(e) {
+        onDetailedInfoOpenMobile: function(e) {
             var rect = e.currentTarget.getBoundingClientRect();
             var parentRect = this.el.getBoundingClientRect();
             var left = parseInt($(e.currentTarget).css('left'));
@@ -116,6 +118,13 @@ define(function(require) {
                 'left': left + parentRect.left - rect.left + 'px',
                 'max-width': parentRect.width + 'px'
             });
+        },
+
+        onDetailedInfoOpenDesktop: function(e) {
+            $(e.currentTarget).css('width', null).removeClass('fixed-width');
+            if (e.currentTarget.scrollWidth > e.currentTarget.clientWidth) {
+                $(e.currentTarget).outerWidth(e.currentTarget.clientWidth).addClass('fixed-width');
+            }
         },
 
         /**
