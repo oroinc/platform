@@ -7,6 +7,8 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class EmailOwnersProvider
 {
@@ -42,17 +44,7 @@ class EmailOwnersProvider
      */
     public function getEmailsByOwnerEntity($entity)
     {
-        $ownerColumnName = null;
-        $entityClass     = ClassUtils::getClass($entity);
-        foreach ($this->emailOwnerStorage->getProviders() as $provider) {
-            if ($provider->getEmailOwnerClass() === $entityClass
-                && $this->activityListChainProvider->isSupportedTargetEntity($entity)
-            ) {
-                $ownerColumnName = $this->emailOwnerStorage->getEmailOwnerFieldName($provider);
-                break;
-            }
-        }
-
+        $ownerColumnName = $this->getOwnerColumnName($entity);
         if ($ownerColumnName === null) {
             return [];
         }
@@ -67,17 +59,57 @@ class EmailOwnersProvider
      * @param object $entity
      * @return bool
      */
-    public function supportOwnerProvider($entity)
+    public function hasEmailsByOwnerEntity($entity)
     {
-        $entityClass = ClassUtils::getClass($entity);
-        foreach ($this->emailOwnerStorage->getProviders() as $provider) {
-            if ($provider->getEmailOwnerClass() === $entityClass
-                && $this->activityListChainProvider->isSupportedTargetEntity($entity)
-            ) {
-                return true;
-            }
+        $ownerColumnName = $this->getOwnerColumnName($entity);
+        if (!$ownerColumnName) {
+            return false;
         }
 
-        return false;
+        return $this
+            ->registry
+            ->getRepository('OroEmailBundle:Email')
+            ->hasEmailsByOwnerEntity($entity, $ownerColumnName);
+    }
+
+    /**
+     * @param object $entity
+     * @return bool
+     */
+    public function supportOwnerProvider($entity)
+    {
+        return (bool) $this->findEmailOwnerProvider($entity);
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return string|null
+     */
+    protected function getOwnerColumnName($entity)
+    {
+        if ($provider = $this->findEmailOwnerProvider($entity)) {
+            return $this->emailOwnerStorage->getEmailOwnerFieldName($provider);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return EmailOwnerProviderInterface|null
+     */
+    protected function findEmailOwnerProvider($entity)
+    {
+        $entityClass = ClassUtils::getClass($entity);
+
+        return ArrayUtil::find(
+            function (EmailOwnerProviderInterface $provider) use ($entity, $entityClass) {
+                return $provider->getEmailOwnerClass() === $entityClass
+                    && $this->activityListChainProvider->isSupportedTargetEntity($entity);
+            },
+            $this->emailOwnerStorage->getProviders()
+        );
     }
 }

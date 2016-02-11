@@ -72,7 +72,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->emailOwnersProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider')
             ->setConstructorArgs([$this->chainProvider, $this->emailOwnerStorage, $this->registry])
-            ->setMethods(['supportOwnerProvider'])
             ->getMock();
 
         $this->listener = new EntityListener(
@@ -143,7 +142,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->emailOwnersProvider
             ->expects($this->exactly(3))
-            ->method('supportOwnerProvider')
+            ->method('hasEmailsByOwnerEntity')
             ->will($this->returnValue(true));
 
         $this->listener->onFlush($onFlushEventArgs);
@@ -225,7 +224,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($createdEmailsArray));
         $this->emailOwnersProvider
             ->expects($this->exactly(6))
-            ->method('supportOwnerProvider')
+            ->method('hasEmailsByOwnerEntity')
             ->will($this->returnValue(true));
         $this->userEmailOwnerProvider
             ->expects($this->never())

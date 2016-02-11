@@ -33,7 +33,7 @@ class EntityListener
     protected $emailsToRemove = [];
 
     /** @var array */
-    protected $entitiesOwnedByEmail = [];
+    protected $possibleEntitiesOwnedByEmails = [];
 
     /** @var EmailOwnersProvider */
     protected $emailOwnersProvider;
@@ -94,7 +94,10 @@ class EntityListener
             )
         );
 
-        $this->addNewEntityOwnedByEmail($uow->getScheduledEntityInsertions());
+        $this->possibleEntitiesOwnedByEmails = array_merge(
+            $this->possibleEntitiesOwnedByEmails,
+            $uow->getScheduledEntityInsertions()
+        );
     }
 
     /**
@@ -133,27 +136,20 @@ class EntityListener
     }
 
     /**
-     * @param array $entities
-     */
-    protected function addNewEntityOwnedByEmail($entities)
-    {
-        if ($entities) {
-            foreach ($entities as $entity) {
-                if ($this->emailOwnersProvider->supportOwnerProvider($entity)) {
-                    $this->entitiesOwnedByEmail[] = $entity;
-                }
-            }
-        }
-    }
-
-    /**
      * @param PostFlushEventArgs $event
      */
     protected function addAssociationWithEmailActivity(PostFlushEventArgs $event)
     {
-        if (!$this->entitiesOwnedByEmail) {
+        if (!$this->possibleEntitiesOwnedByEmails) {
             return;
         }
+
+        $entitiesToUpdate = array_filter(
+            $this->possibleEntitiesOwnedByEmails,
+            function ($entity) {
+                return $this->emailOwnersProvider->hasEmailsByOwnerEntity($entity);
+            }
+        );
 
         $em = $event->getEntityManager();
         $jobs = array_map(
@@ -169,11 +165,11 @@ class EntityListener
                     ]
                 );
             },
-            $this->entitiesOwnedByEmail
+            $entitiesToUpdate
         );
 
         array_map([$em, 'persist'], $jobs);
-        $this->entitiesOwnedByEmail = [];
+        $this->possibleEntitiesOwnedByEmails = [];
         $em->flush();
     }
 
