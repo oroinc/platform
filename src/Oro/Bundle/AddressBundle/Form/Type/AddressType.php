@@ -7,9 +7,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Validator\Constraint;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
-use Symfony\Component\Validator\Constraint;
 
 class AddressType extends AbstractType
 {
