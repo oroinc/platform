@@ -145,7 +145,7 @@ Please note the bigger the priority number is, the sooner the route will be chec
 Create own route options resolver
 ---------------------------------
 
-At the first implement your resolver. It must implement [RouteOptionsResolverInterface](/Resolver/RouteOptionsResolverInterface.php). For example:
+At the first implement your resolver. It must implement [RouteOptionsResolverInterface](./Resolver/RouteOptionsResolverInterface.php). For example:
 
 ``` php
 <?php
