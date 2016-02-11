@@ -11,6 +11,9 @@ use Buzz\Message\Request;
 use Buzz\Message\RequestInterface;
 use Buzz\Message\Response;
 
+use HWI\Bundle\OAuthBundle\OAuth\Response\PathUserResponse;
+use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
@@ -23,6 +26,9 @@ class ImapEmailGoogleOauth2Manager
     /** @var Curl */
     protected $httpClient;
 
+    /** @var ResourceOwnerMap */
+    protected $resourceOwnerMap;
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -31,15 +37,18 @@ class ImapEmailGoogleOauth2Manager
 
     /**
      * @param ClientInterface $httpClient
+     * @param ResourceOwnerMap $resourceOwnerMap
      * @param ConfigManager $configManager
      * @param Registry $doctrine
      */
     public function __construct(
         ClientInterface $httpClient,
+        ResourceOwnerMap $resourceOwnerMap,
         ConfigManager $configManager,
         Registry $doctrine
     ) {
         $this->httpClient = $httpClient;
+        $this->resourceOwnerMap = $resourceOwnerMap;
         $this->configManager = $configManager;
         $this->doctrine = $doctrine;
     }
@@ -71,6 +80,19 @@ class ImapEmailGoogleOauth2Manager
         } while ($attemptNumber <= self::RETRY_TIMES && empty($result['access_token']));
 
         return $result;
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return PathUserResponse
+     */
+    public function getUserInfo($accessToken)
+    {
+        $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName('google');
+        $userInfo = $resourceOwner->getUserInformation(['access_token' => $accessToken]);
+
+        return $userInfo;
     }
 
     /**
