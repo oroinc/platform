@@ -163,8 +163,22 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 
         $permissions = [
             $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
-            $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['', 'group1']),
-            $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['', 'group2']),
+            $this->getPermission(
+                2,
+                'PERMISSION2',
+                false,
+                ['entity2', 'entity3'],
+                ['entity11', 'entity12'],
+                ['', 'group1']
+            ),
+            $this->getPermission(
+                3,
+                'PERMISSION3',
+                true,
+                ['entity3', 'entity4'],
+                ['entity12', 'entity13'],
+                ['', 'group2']
+            ),
         ];
 
         return [

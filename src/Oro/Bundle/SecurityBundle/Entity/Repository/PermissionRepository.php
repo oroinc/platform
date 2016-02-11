@@ -32,7 +32,7 @@ class PermissionRepository extends EntityRepository
      */
     public function findByEntityClassAndIds($class, array $ids = null)
     {
-        if (empty($class) || null !== $ids && empty($ids)) {
+        if (empty($class) || (null !== $ids && empty($ids))) {
             return [];
         }
 
@@ -54,7 +54,7 @@ class PermissionRepository extends EntityRepository
      */
     public function addFindByIdsCriteria(QueryBuilder $queryBuilder, array $ids)
     {
-        $alias = $queryBuilder->getRootAlias();
+        $alias = current($queryBuilder->getRootAliases());
 
         return $queryBuilder->where($queryBuilder->expr()->in($alias . '.id', $ids));
     }
@@ -66,19 +66,19 @@ class PermissionRepository extends EntityRepository
      */
     public function addFindByEntityClassCriteria(QueryBuilder $queryBuilder, $class)
     {
-        $alias = $queryBuilder->getRootAlias();
+        $alias = current($queryBuilder->getRootAliases());
 
         $queryBuilder
             ->leftJoin($alias . '.applyToEntities', 'ae', Expr\Join::WITH, 'ae.name = :class')
             ->leftJoin($alias . '.excludeEntities', 'ee', Expr\Join::WITH, 'ee.name = :class')
             ->groupBy($alias . '.id')
             ->having(
-                $queryBuilder->expr()->orx(
-                    $queryBuilder->expr()->andx(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->andX(
                         $queryBuilder->expr()->eq($alias . '.applyToAll', 'true'),
                         $queryBuilder->expr()->eq($queryBuilder->expr()->count('ee'), 0)
                     ),
-                    $queryBuilder->expr()->andx(
+                    $queryBuilder->expr()->andX(
                         $queryBuilder->expr()->eq($alias . '.applyToAll', 'false'),
                         $queryBuilder->expr()->gt($queryBuilder->expr()->count('ae'), 0)
                     )

@@ -5,9 +5,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Functional\Entity\Repository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
+use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
@@ -112,13 +112,13 @@ class PermissionRepositoryTest extends WebTestCase
                 'expected' => [],
             ],
             'valid ids' => [
-                'input' => function() {
+                'input' => function () {
                     return [
                         $this->getReference('TEST_PERMISSION1')->getId(),
                         $this->getReference('TEST_PERMISSION2')->getId(),
                     ];
                 },
-                'expected' => function() {
+                'expected' => function () {
                     return [
                         $this->getReference('TEST_PERMISSION1'),
                         $this->getReference('TEST_PERMISSION2'),
@@ -129,6 +129,7 @@ class PermissionRepositoryTest extends WebTestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function findByEntityClassAndIdsProvider()
@@ -307,7 +308,7 @@ class PermissionRepositoryTest extends WebTestCase
     {
         $result = [];
         foreach ($permissions as $permission) {
-            if (!in_array($permission->getName(), $validNames)) {
+            if (!in_array($permission->getName(), $validNames, true)) {
                 continue;
             }
             $result[] = $permission->getName();
@@ -325,7 +326,7 @@ class PermissionRepositoryTest extends WebTestCase
     protected function getPermissionsIds(array $names = null)
     {
         if (null === $names) {
-            return;
+            return null;
         }
 
         $ids = [];
