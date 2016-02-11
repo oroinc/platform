@@ -102,8 +102,8 @@ define(function(require) {
                 mediator.execute('hideLoading');
             } else {
                 this.view.setGoogleAuthCode(response.code);
-                this.requestAccessToken(response.code);
                 this.view.render();
+                this.requestAccessToken(response.code);
             }
         },
 
@@ -112,13 +112,14 @@ define(function(require) {
          */
         requestAccessToken: function(code) {
             var data = this.view.getData();
-            data.code = code;
 
             $.ajax({
                 url: this.getUrlGetAccessToken(),
                 method: 'POST',
                 data: data,
-                success: _.bind(this.prepareAuthorization, this)
+                success: _.bind(this.prepareAuthorization, this),
+                error:  _.bind(this.requestError, this)
+
             });
         },
 
@@ -155,20 +156,26 @@ define(function(require) {
         },
 
         /**
-         * Handler response from google API for request to get token
+         * Handler response for request to get token
          */
         prepareAuthorization: function(response) {
-            if (response.code === 403) {
+            if (response.code !== undefined) {
                 this.view.setErrorMessage(response.message);
                 this.view.render();
             } else if (response) {
                 this.view.setEmail(response.email_address);
                 this.view.setToken(response.access_token);
                 this.view.setExpiredAt(response.expires_in);
+                this.view.render();
                 mediator.trigger('change:systemMailBox:email', {email: response.email_address});
 
                 this.requestFormGetFolder();
             }
+        },
+
+        requestError: function(response) {
+            this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.request'));
+            this.view.render();
         },
 
         /**
@@ -177,12 +184,14 @@ define(function(require) {
         requestFormGetFolder: function() {
             var data = this.view.getData();
             data.formParentName = this.formParentName;
+            mediator.execute('showLoading');
 
             $.ajax({
                 url: this.getUrl(),
                 method: 'POST',
                 data: data,
-                success: _.bind(this.renderFormGetFolder, this)
+                success: _.bind(this.renderFormGetFolder, this),
+                error:  _.bind(this.requestError, this)
             });
         },
 
@@ -194,6 +203,11 @@ define(function(require) {
             if (response.error !== undefined) {
                 this.view.setErrorMessage(response.error);
                 this.view.render();
+                mediator.execute('hideLoading');
+            } else if (response.html === undefined) {
+                this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.request'));
+                this.view.render();
+                mediator.execute('hideLoading');
             } else {
                 this.view.setHtml(response.html);
                 this.view.render();
@@ -214,7 +228,8 @@ define(function(require) {
                 url: this.getUrlGetFolders(),
                 method: 'POST',
                 data: data,
-                success: _.bind(this.handlerGetFolders, this)
+                success: _.bind(this.handlerGetFolders, this),
+                error: _.bind(this.requestError, this)
             });
         },
 
@@ -226,12 +241,14 @@ define(function(require) {
             if (response.error !== undefined) {
                 this.view.setErrorMessage(response.error);
                 this.view.render();
-                mediator.execute('hideLoading');
+            } else if (response.html === undefined) {
+                this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.request'));
+                this.view.render();
             } else {
                 this.view.setHtml(response.html);
                 this.view.render();
-                mediator.execute('hideLoading');
             }
+            mediator.execute('hideLoading');
         },
 
         /**

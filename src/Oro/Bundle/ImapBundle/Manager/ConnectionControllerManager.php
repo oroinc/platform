@@ -160,7 +160,7 @@ class ConnectionControllerManager
         $accessToken = $this->imapEmailGoogleOauth2Manager->getAccessTokenByAuthCode($code);
         $userInfo = $this->imapEmailGoogleOauth2Manager->getUserInfo($accessToken['access_token']);
         $userInfoResponse = $userInfo->getResponse();
-        if ($userInfoResponse['error']) {
+        if (array_key_exists('error', $userInfoResponse)) {
             $response = $userInfoResponse['error'];
         } else {
             $response = [

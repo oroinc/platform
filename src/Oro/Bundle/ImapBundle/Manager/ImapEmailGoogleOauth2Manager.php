@@ -22,6 +22,7 @@ class ImapEmailGoogleOauth2Manager
     const OAUTH2_ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
     const OAUTH2_GMAIL_SCOPE = 'https://mail.google.com/';
     const RETRY_TIMES = 3;
+    const RESOURCE_OWNER_GOOGLE = 'google';
 
     /** @var Curl */
     protected $httpClient;
@@ -89,10 +90,9 @@ class ImapEmailGoogleOauth2Manager
      */
     public function getUserInfo($accessToken)
     {
-        $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName('google');
-        $userInfo = $resourceOwner->getUserInformation(['access_token' => $accessToken]);
+        $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName(self::RESOURCE_OWNER_GOOGLE);
 
-        return $userInfo;
+        return $resourceOwner->getUserInformation(['access_token' => $accessToken]);
     }
 
     /**
