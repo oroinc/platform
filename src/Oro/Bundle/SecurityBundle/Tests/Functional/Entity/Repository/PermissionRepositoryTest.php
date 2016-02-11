@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Query\Parameter;
-
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -26,26 +23,11 @@ class PermissionRepositoryTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->repository = $this->getContainer()->get('doctrine')
-            ->getRepository('OroSecurityBundle:Permission');
-
         $this->loadFixtures([
             'Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\LoadPermissionData'
         ]);
-    }
 
-    /**
-     * @param mixed $inputData
-     * @param mixed $expectedData
-     *
-     * @dataProvider findByIdsProvider
-     */
-    public function testFindByIds($inputData, $expectedData)
-    {
-        $this->prepareData($inputData);
-        $this->prepareData($expectedData);
-
-        $this->assertEquals($expectedData, $this->repository->findByIds($inputData));
+        $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroSecurityBundle:Permission');
     }
 
     /**
@@ -62,70 +44,6 @@ class PermissionRepositoryTest extends WebTestCase
         );
 
         $this->assertEquals($expectedData, $this->getPermissionsNames($permissions, $inputData['permissions']));
-    }
-
-    /**
-     * @param array $inputData
-     * @param string $expectedData
-     *
-     * @dataProvider addFindByIdsCriteriaProvider
-     */
-    public function testAddFindByIdsCriteria(array $inputData, $expectedData)
-    {
-        $queryBuilder = $this->repository->createQueryBuilder($inputData['alias']);
-
-        $this->repository->addFindByIdsCriteria($queryBuilder, $inputData['ids']);
-
-        $this->assertEquals($expectedData, $queryBuilder->getQuery()->getDQL());
-    }
-
-    /**
-     * @param array $inputData
-     * @param string $expectedData
-     *
-     * @dataProvider addFindByEntityClassCriteriaProvider
-     */
-    public function testAddFindByEntityClassCriteria(array $inputData, $expectedData)
-    {
-        $queryBuilder = $this->repository->createQueryBuilder($inputData['alias']);
-
-        $this->repository->addFindByEntityClassCriteria($queryBuilder, $inputData['class']);
-
-        $this->assertEquals($expectedData['dql'], $queryBuilder->getQuery()->getDQL());
-        $this->assertEquals($expectedData['parameters'], $queryBuilder->getQuery()->getParameters());
-    }
-
-    /**
-     * @return array
-     */
-    public function findByIdsProvider()
-    {
-        return [
-            'empty ids' => [
-                'input' => [],
-                'expected' => [],
-            ],
-            'bad ids' => [
-                'input' => [
-                    0,
-                ],
-                'expected' => [],
-            ],
-            'valid ids' => [
-                'input' => function () {
-                    return [
-                        $this->getReference('TEST_PERMISSION1')->getId(),
-                        $this->getReference('TEST_PERMISSION2')->getId(),
-                    ];
-                },
-                'expected' => function () {
-                    return [
-                        $this->getReference('TEST_PERMISSION1'),
-                        $this->getReference('TEST_PERMISSION2'),
-                    ];
-                },
-            ],
-        ];
     }
 
     /**
@@ -236,67 +154,6 @@ class PermissionRepositoryTest extends WebTestCase
                 'expected' => ['TEST_PERMISSION1', 'TEST_PERMISSION4'],
             ],
         ];
-    }
-
-    /**
-     * @return array
-     */
-    public function addFindByIdsCriteriaProvider()
-    {
-        return [
-            [
-                'input' => [
-                    'alias' => 'ps',
-                    'ids' => [],
-                ],
-                'expected' => 'SELECT ps FROM Oro\Bundle\SecurityBundle\Entity\Permission ps WHERE ps.id IN()',
-            ],
-            [
-                'input' => [
-                    'alias' => 'ps',
-                    'ids' => [1, 2, 3],
-                ],
-                'expected' => 'SELECT ps FROM Oro\Bundle\SecurityBundle\Entity\Permission ps WHERE ps.id IN(1, 2, 3)',
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function addFindByEntityClassCriteriaProvider()
-    {
-        return [
-            [
-                'input' => [
-                    'alias' => 'ps',
-                    'class' => 'Entity1',
-                ],
-                'expected' => [
-                    'parameters' => new ArrayCollection([
-                        new Parameter('class', 'Entity1'),
-                    ]),
-                    'dql' =>  'SELECT ps FROM Oro\Bundle\SecurityBundle\Entity\Permission ps ' .
-                        'LEFT JOIN ps.applyToEntities ae WITH ae.name = :class ' .
-                        'LEFT JOIN ps.excludeEntities ee WITH ee.name = :class ' .
-                        'GROUP BY ps.id ' .
-                        'HAVING ' .
-                            '(ps.applyToAll = true AND COUNT(ee) = 0) ' .
-                            'OR ' .
-                            '(ps.applyToAll = false AND COUNT(ae) > 0)',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @param mixed $data
-     */
-    protected function prepareData(&$data)
-    {
-        if (is_callable($data)) {
-            $data = $data();
-        }
     }
 
     /**

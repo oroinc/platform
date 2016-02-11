@@ -98,7 +98,7 @@ class PermissionManager
     }
 
     /**
-     * @param string $groupName
+     * @param string|null $groupName
      * @return array
      */
     public function getPermissionsMap($groupName = null)
@@ -110,22 +110,22 @@ class PermissionManager
 
     /**
      * @param mixed $entity
-     * @param string $groupName
+     * @param string|null $groupName
      * @return Permission[]
      */
-    public function getPermissionsForEntity($entity, $groupName = '')
+    public function getPermissionsForEntity($entity, $groupName = null)
     {
-        $repository = $this->getRepository();
+        $this->normalizeGroupName($groupName);
 
         $ids = $groupName ? $this->findGroupPermissions($groupName) : null;
 
-        return $repository->findByEntityClassAndIds($this->doctrineHelper->getEntityClass($entity), $ids);
+        return $this->getRepository()->findByEntityClassAndIds($this->doctrineHelper->getEntityClass($entity), $ids);
     }
 
     /**
      * @return array
      */
-    public function buildCache()
+    protected function buildCache()
     {
         /** @var Permission[] $permissions */
         $permissions = $this->getRepository()->findAll();

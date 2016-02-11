@@ -103,6 +103,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->configurationProvider, 'permissionsCorrect.yml');
         $permissionNames = [];
+
         foreach ($this->manager->getPermissionsFromConfig() as $permission) {
             $permissionNames[] = $permission->getName();
         }
@@ -149,10 +150,11 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $inputData
      * @param array $expectedData
+     * @param array $expectedCacheData
      *
      * @dataProvider getPermissionsMapProvider
      */
-    public function testGetPermissionsMap(array $inputData, array $expectedData)
+    public function testGetPermissionsMap(array $inputData, array $expectedData, array $expectedCacheData = [])
     {
         $this->entityRepository->expects($inputData['cache'] ? $this->never() : $this->once())
             ->method('findAll')
@@ -162,6 +164,13 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('fetch')
             ->with($inputData['cacheKey'])
             ->willReturn($inputData['cache']);
+
+        if ($expectedCacheData) {
+            $this->cacheProvider->expects($this->once())->method('flushAll');
+            $this->cacheProvider->expects($this->exactly(count($expectedCacheData)))
+                ->method('save')
+                ->willReturnMap($expectedCacheData);
+        }
 
         $this->assertEquals($expectedData, $this->manager->getPermissionsMap($inputData['group']));
     }
@@ -196,31 +205,9 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
-     * @dataProvider buildCacheProvider
-     */
-    public function testBuildCache(array $inputData, array $expectedData)
-    {
-        $this->entityRepository->expects($this->once())
-            ->method('findAll')
-            ->willReturn($inputData);
-
-        $this->cacheProvider->expects($this->once())
-            ->method('flushAll');
-
-        foreach (array_keys($expectedData) as $index => $key) {
-            $this->cacheProvider->expects($this->at($index + 1))
-                ->method('save')
-                ->with($key, $expectedData[$key]);
-        }
-
-        $this->assertEquals($expectedData, $this->manager->buildCache());
-    }
-
-    /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getPermissionsMapProvider()
     {
@@ -253,6 +240,21 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ),
         ];
 
+        $expectedCacheData = [
+            [
+                'permissions',
+                ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3]
+            ],
+            [
+                'groups',
+                [
+                    'group1' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
+                    'group2' => ['PERMISSION3' => 3],
+                    '' => ['PERMISSION2' => 2, 'PERMISSION3' => 3]
+                ]
+            ]
+        ];
+
         return [
             'get permissions with no cache and no permissions' => [
                 'input' => [
@@ -271,6 +273,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                     'permissions' => $permissions,
                 ],
                 'expected' => ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3],
+                'expectedCacheData' => $expectedCacheData
             ],
             'get permissions with cache and no permissions' => [
                 'input' => [
@@ -298,6 +301,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                     'permissions' => $permissions,
                 ],
                 'expected' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
+                'expectedCacheData' => $expectedCacheData
             ],
             'get group with cache and no permissions' => [
                 'input' => [
@@ -389,31 +393,6 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     $permissions[2],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function buildCacheProvider()
-    {
-        $permissions = [
-            $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
-            $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
-            $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
-        ];
-
-        return [
-            [
-                'input' => $permissions,
-                'expected' => [
-                    'groups' => [
-                        'group1' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
-                        'group2' => ['PERMISSION3' => 3],
-                    ],
-                    'permissions' => ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3],
                 ],
             ],
         ];
