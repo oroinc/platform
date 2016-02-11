@@ -185,7 +185,7 @@ class FormType extends AbstractFormType
         } else {
             $formFieldView = $this->getFormFieldView($view, $formFieldPath);
             if ($childView->vars['form'] !== $formFieldView) {
-                //$formFieldView->setRendered();
+                $formFieldView->setRendered();
             }
         }
     }

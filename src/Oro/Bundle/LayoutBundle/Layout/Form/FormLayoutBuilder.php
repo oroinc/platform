@@ -8,7 +8,6 @@ use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType;
-use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
 
 class FormLayoutBuilder implements FormLayoutBuilderInterface
 {
@@ -160,6 +159,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
      *
      * @param FormInterface $form
      * @param string        $parentFieldPath
+     * @param string|null   $parentId
      */
     protected function processForm(FormInterface $form, $parentFieldPath = null, $parentId = null)
     {
@@ -172,7 +172,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
         }
 
         $id = $this->getFieldId($fieldPath);
-        $this->addField($fieldPath, $id, $parentId, $this->isCompoundField($form) ? $form : false);
+        $this->addField($fieldPath, $id, $parentId);
         $this->processedFields[$fieldPath] = $id;
     }
 
@@ -183,31 +183,18 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
      * @param string      $id
      * @param string|null $parentId
      */
-    protected function addField($fieldPath, $id, $parentId = null, $form = false)
+    protected function addField($fieldPath, $id, $parentId = null)
     {
-        if ($form) {
-            $this->layoutManipulator->add(
-                $id,
-                $parentId ?: $this->builder->getId(),
-                FormType::NAME,
-                [
-                    'form' => new FormAccessor($form),
-                    'form_name' => $this->options['form_name'],
-                ]
-            );
-        } else {
-            $this->layoutManipulator->add(
-                $id,
-                $parentId ?: $this->builder->getId(),
-                FormFieldType::NAME,
-                [
-                    'form' => $this->options['form'],
-                    'form_name' => $this->options['form_name'],
-                    'field_path' => $fieldPath,
-                ]
-            );
-        }
-
+        $this->layoutManipulator->add(
+            $id,
+            $parentId ?: $this->builder->getId(),
+            FormFieldType::NAME,
+            [
+                'form' => $this->options['form'],
+                'form_name' => $this->options['form_name'],
+                'field_path' => $fieldPath,
+            ]
+        );
     }
 
     /**
