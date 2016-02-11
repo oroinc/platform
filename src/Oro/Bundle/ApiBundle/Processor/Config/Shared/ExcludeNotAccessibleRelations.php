@@ -127,9 +127,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         $uri = $this->getEntityResourceUri($entityClass);
         if ($uri) {
             $matchingContext = $this->router->getContext();
-            if ($matchingContext->getBaseUrl()) {
-                $uri = substr($uri, strlen($matchingContext->getBaseUrl()));
-            }
+
             $prevMethod = $matchingContext->getMethod();
             $matchingContext->setMethod('GET');
             try {
@@ -162,6 +160,13 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
             );
         } catch (RoutingException $e) {
             // ignore any exceptions
+        }
+
+        if ($uri) {
+            $baseUrl = $this->router->getContext()->getBaseUrl();
+            if ($baseUrl) {
+                $uri = substr($uri, strlen($baseUrl));
+            }
         }
 
         return $uri;
