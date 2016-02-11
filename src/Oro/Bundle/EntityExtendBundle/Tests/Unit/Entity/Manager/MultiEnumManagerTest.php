@@ -6,13 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures\TestEntity;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEntity;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
 {
-    const ENUM_VALUE_CLASS = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures\TestEnumValue';
+    const ENUM_VALUE_CLASS = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEnumValue';
 
     /** @var MultiEnumManager */
     protected $manager;

@@ -76,9 +76,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @dataProvider visitDatasourceProvider
      */
-    public function testVisitDatasource()
+    public function testVisitDatasource($source, $expected)
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['user.id', 'user.name as user_name', 'user.status as user_status'])
@@ -106,71 +106,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
             ->method('getQueryBuilder')
             ->will($this->returnValue($qb));
 
-        $config = DatagridConfiguration::create(
-            [
-            'source' => [
-                'query_config' => [
-                    'filters' => [
-                        [
-                            'column'      => 'user_name',
-                            'filter'      => 'string',
-                            'filterData'  => [
-                                'type'  => '2',
-                                'value' => 'test_user_name'
-                            ],
-                            'columnAlias' => 'user_name'
-                        ],
-                        'AND',
-                        [
-                            [
-                                'column'     => 'user_status',
-                                'filter'     => 'datetime',
-                                'filterData' => [
-                                    'type'  => '2',
-                                    'value' => [
-                                        'start' => '2013-11-20 10:30',
-                                        'end'   => '2013-11-25 11:30',
-                                    ]
-                                ]
-                            ],
-                            'AND',
-                            [
-                                [
-                                    [
-                                        'column'      => 'address.country',
-                                        'filter'      => 'string',
-                                        'filterData'  => [
-                                            'type'  => '1',
-                                            'value' => 'test_address_country'
-                                        ],
-                                        'columnAlias' => 'address_country'
-                                    ],
-                                    'OR',
-                                    [
-                                        'column'     => 'address.city',
-                                        'filter'     => 'string',
-                                        'filterData' => [
-                                            'type'  => '1',
-                                            'value' => 'test_address_city'
-                                        ]
-                                    ],
-                                ],
-                                'OR',
-                                [
-                                    'column'     => 'address.zip',
-                                    'filter'     => 'string',
-                                    'filterData' => [
-                                        'type'  => '1',
-                                        'value' => 'address_zip'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-            ]
-        );
+        $config = DatagridConfiguration::create($source);
 
         $extension->visitDatasource($config, $datasource);
         $result  = $qb->getDQL();
@@ -183,16 +119,193 @@ class OrmDatasourceExtensionTest extends OrmTestCase
             $result
         );
 
-        $this->assertEquals(
-            'SELECT user.id, user.name as user_name, user.status as user_status '
-            . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
-            . 'INNER JOIN user.address address '
-            //. 'WHERE (user_name IS NULL OR NOT(user_name LIKE :string1)) AND ('
-            . 'WHERE user_name NOT LIKE :string1 AND '
-            . '(user_status < :datetime2 OR user_status > :datetime3) AND '
-            . '(address.country LIKE :string4 OR address.city LIKE :string5 OR address.zip LIKE :string6)',
-            $result
-        );
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array
+     */
+    public function visitDatasourceProvider()
+    {
+        return [
+            'test with group and simple restrictions' => [
+                'source'   => [
+                    'source' => [
+                        'query_config' => [
+                            'filters' => [
+                                [
+                                    'column'      => 'user_name',
+                                    'filter'      => 'string',
+                                    'filterData'  => [
+                                        'type'  => '2',
+                                        'value' => 'test_user_name'
+                                    ],
+                                    'columnAlias' => 'user_name'
+                                ],
+                                'AND',
+                                [
+                                    [
+                                        'column'     => 'user_status',
+                                        'filter'     => 'datetime',
+                                        'filterData' => [
+                                            'type'  => '2',
+                                            'value' => [
+                                                'start' => '2013-11-20 10:30',
+                                                'end'   => '2013-11-25 11:30',
+                                            ]
+                                        ]
+                                    ],
+                                    'AND',
+                                    [
+                                        [
+                                            [
+                                                'column'      => 'address.country',
+                                                'filter'      => 'string',
+                                                'filterData'  => [
+                                                    'type'  => '1',
+                                                    'value' => 'test_address_country'
+                                                ],
+                                                'columnAlias' => 'address_country'
+                                            ],
+                                            'OR',
+                                            [
+                                                'column'     => 'address.city',
+                                                'filter'     => 'string',
+                                                'filterData' => [
+                                                    'type'  => '1',
+                                                    'value' => 'test_address_city'
+                                                ]
+                                            ],
+                                        ],
+                                        'OR',
+                                        [
+                                            'column'     => 'address.zip',
+                                            'filter'     => 'string',
+                                            'filterData' => [
+                                                'type'  => '1',
+                                                'value' => 'address_zip'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expected' =>
+                    'SELECT user.id, user.name as user_name, user.status as user_status '
+                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
+                    . 'INNER JOIN user.address address '
+                    . 'WHERE user_name NOT LIKE :string1 AND ('
+                    . '(user_status < :datetime2 OR user_status > :datetime3) AND '
+                    . '(address.country LIKE :string4 OR address.city LIKE :string5 OR address.zip LIKE :string6)'
+                    . ')'
+            ],
+            'test with OR conditions' => [
+                'source'   => [
+                    'source' => [
+                        'query_config' => [
+                            'filters' => [
+                                [
+                                    'column'      => 'user_name',
+                                    'filter'      => 'string',
+                                    'filterData'  => [
+                                        'type'  => '2',
+                                        'value' => 'test_user_name'
+                                    ],
+                                    'columnAlias' => 'user_name'
+                                ],
+                                'OR',
+                                [
+                                    [
+                                        'column'     => 'user_status',
+                                        'filter'     => 'datetime',
+                                        'filterData' => [
+                                            'type'  => '2',
+                                            'value' => [
+                                                'start' => '2013-11-20 10:30',
+                                                'end'   => '2013-11-25 11:30',
+                                            ]
+                                        ]
+                                    ],
+                                    'OR',
+                                    [
+                                        'column'      => 'address.country',
+                                        'filter'      => 'string',
+                                        'filterData'  => [
+                                            'type'  => '1',
+                                            'value' => 'test_address_country'
+                                        ],
+                                        'columnAlias' => 'address_country'
+                                    ],
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expected' =>
+                    'SELECT user.id, user.name as user_name, user.status as user_status '
+                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
+                    . 'INNER JOIN user.address address '
+                    . 'WHERE user_name NOT LIKE :string1 OR ('
+                    . 'user_status < :datetime2 OR user_status > :datetime3 OR '
+                    . 'address.country LIKE :string4'
+                    . ')'
+            ],
+            'test with OR filters between simple and group conditions' => [
+                'source'   => [
+                    'source' => [
+                        'query_config' => [
+                            'filters' => [
+                                [
+                                    'column'      => 'user_name',
+                                    'filter'      => 'string',
+                                    'filterData'  => [
+                                        'type'  => '2',
+                                        'value' => 'test_user_name'
+                                    ],
+                                    'columnAlias' => 'user_name'
+                                ],
+                                'OR',
+                                [
+                                    [
+                                        'column'     => 'user_status',
+                                        'filter'     => 'datetime',
+                                        'filterData' => [
+                                            'type'  => '2',
+                                            'value' => [
+                                                'start' => '2013-11-20 10:30',
+                                                'end'   => '2013-11-25 11:30',
+                                            ]
+                                        ]
+                                    ],
+                                    'AND',
+                                    [
+                                        'column'      => 'address.country',
+                                        'filter'      => 'string',
+                                        'filterData'  => [
+                                            'type'  => '1',
+                                            'value' => 'test_address_country'
+                                        ],
+                                        'columnAlias' => 'address_country'
+                                    ],
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expected' =>
+                    'SELECT user.id, user.name as user_name, user.status as user_status '
+                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
+                    . 'INNER JOIN user.address address '
+                    . 'WHERE user_name NOT LIKE :string1 OR ('
+                    . '(user_status < :datetime2 OR user_status > :datetime3) AND '
+                    . 'address.country LIKE :string4'
+                    . ')'
+            ],
+        ];
     }
 
     /**

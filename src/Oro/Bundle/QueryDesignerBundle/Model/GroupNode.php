@@ -63,7 +63,7 @@ class GroupNode
     }
 
     /**
-     * @param GroupNode[]|Restriction[] $node
+     * @return GroupNode[]|Restriction[]
      */
     public function getChildren()
     {
