@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
 class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
 {
