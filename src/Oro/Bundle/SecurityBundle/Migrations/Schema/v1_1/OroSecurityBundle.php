@@ -47,7 +47,8 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
         $this->addOroSecurityPermApplyEntityForeignKeys($schema);
         $this->addOroSecurityPermExclEntityForeignKeys($schema);
 
-        $queries->addQuery(
+        $queries->addPostQuery(new LoadBasePermissionsQuery());
+        $queries->addPostQuery(
             new UpdateAclEntriesMigrationQuery(
                 $this->container->get('oro_security.acl.manager'),
                 $this->container->get('security.acl.cache'),
@@ -56,8 +57,6 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
                 $this->container->getParameter('security.acl.dbal.class_table_name')
             )
         );
-
-        $queries->addPostQuery(new LoadBasePermissionsQuery());
     }
 
     /**
