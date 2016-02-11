@@ -58,8 +58,13 @@ class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
      * @param \Exception $exception
      *
      */
-    public function testGet($cachedData, $resultExpected, $fetchExpected, $fetchedResult = [], \Exception $exception = null)
-    {
+    public function testGet(
+        $cachedData,
+        $resultExpected,
+        $fetchExpected,
+        $fetchedResult = [],
+        \Exception $exception = null
+    ) {
         $this->cache->expects($this->once())->method('fetch')
             ->with($this->equalTo(TranslationStatisticProvider::CACHE_KEY))
             ->will($this->returnValue($cachedData));
