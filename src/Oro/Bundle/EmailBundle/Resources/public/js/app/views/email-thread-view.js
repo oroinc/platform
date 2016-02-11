@@ -17,7 +17,7 @@ define(function(require) {
         events: {
             'click .email-view-toggle-all': 'onToggleAllClick',
             'click .email-load-more': 'onLoadMoreClick',
-            'shown.bs.dropdown .email-detailed-info-table .dropdown-menu': 'onDetailedInfoOpen'
+            'shown.bs.dropdown .email-detailed-info-table.dropdown': 'onDetailedInfoOpen'
         },
 
         selectors: {
@@ -110,8 +110,8 @@ define(function(require) {
         },
 
         onDetailedInfoOpen: function(e) {
-            var target = e.currentTarget;
-            var $target = $(target);
+            var $target = $('>.dropdown-menu', e.currentTarget);
+            var target = $target[0];
             var parentRect = this.el.getBoundingClientRect();
             $target.removeAttr('data-uid').removeClass('fixed-width').css({
                 'width': '',
