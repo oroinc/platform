@@ -57,10 +57,10 @@ class EntityAclExtension extends AbstractAclExtension
      *
      * @var int[]
      */
-    protected $permissionToMaskBuilderIdentity = [];
+    protected $permissionToMaskBuilderIdentity;
 
     /** @var array */
-    protected $maskBuilderIdentityToPermissions = [];
+    protected $maskBuilderIdentityToPermissions;
 
     /**
      * @param ObjectIdAccessor $objectIdAccessor
@@ -189,7 +189,7 @@ class EntityAclExtension extends AbstractAclExtension
 
         $permissions = $permission === null
             ? $this->getPermissions($mask, true)
-            : array($permission);
+            : [$permission];
 
         foreach ($permissions as $permission) {
             $validMasks = $this->getValidMasks($permission, $object);
@@ -364,7 +364,7 @@ class EntityAclExtension extends AbstractAclExtension
             return array_keys($this->permissionToMaskBuilderIdentity);
         }
 
-        $result = array();
+        $result = [];
         if (!$setOnly) {
             $identity = $this->getServiceBits($mask);
             foreach ($this->permissionToMaskBuilderIdentity as $permission => $id) {
@@ -406,7 +406,7 @@ class EntityAclExtension extends AbstractAclExtension
             $metadata = $this->getMetadata($oid);
             if (!$metadata->hasOwner()) {
                 foreach ($result as $key => $value) {
-                    if (in_array($value, array('ASSIGN', 'SHARE'))) {
+                    if (in_array($value, ['ASSIGN', 'SHARE'])) {
                         unset($result[$key]);
                     }
                 }
@@ -573,11 +573,11 @@ class EntityAclExtension extends AbstractAclExtension
 
         $identity = $this->permissionToMaskBuilderIdentity[$permission];
         if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $permission))) {
-            $maskAccessLevels = array();
+            $maskAccessLevels = [];
             foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
                 $_mask = $this->removeServiceBits($mask);
                 $levelMask = $this->removeServiceBits(
-                    $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_' . $accessLevel)
+                    $this->getMaskBuilderConst($identity, sprintf('MASK_%s_%s', $permission, $accessLevel))
                 );
 
                 if (0 !== ($_mask & $levelMask)) {
@@ -734,9 +734,13 @@ class EntityAclExtension extends AbstractAclExtension
 
     protected function loadPermissions()
     {
+        if (null !== $this->permissionToMaskBuilderIdentity && null !== $this->maskBuilderIdentityToPermissions) {
+            return;
+        }
+
         $map = [2, 0, 1];
 
-        $allPermissions = $this->permissionManager->getPermissionsMap(false);
+        $allPermissions = $this->permissionManager->getPermissionsMap();
         $permissionChunks = array_chunk(array_keys($allPermissions), EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
 
         foreach ($permissionChunks as $permissions) {
@@ -767,7 +771,7 @@ class EntityAclExtension extends AbstractAclExtension
             $masks = [];
 
             foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
-                $masks[] = $maskBuilder->getMask('MASK_' . $permission . '_' . $accessLevel);
+                $masks[] = $maskBuilder->getMask(sprintf('MASK_%s_%s', $permission, $accessLevel));
             }
 
             $this->map[$permission] = $masks;
