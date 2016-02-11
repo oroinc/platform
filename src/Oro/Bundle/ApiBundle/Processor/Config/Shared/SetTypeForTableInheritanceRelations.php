@@ -10,6 +10,10 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Updates configuration to ask the EntitySerializer that the entity class should be returned
+ * together with related entity data in case if the entity implemented using Doctrine table inheritance.
+ */
 class SetTypeForTableInheritanceRelations implements ProcessorInterface
 {
     /** @var DoctrineHelper */
