@@ -78,6 +78,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface $container */
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
@@ -366,7 +367,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetAllPermissions()
     {
         $this->assertEquals(
-            array('VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE'),
+            ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE'],
             $this->extension->getPermissions()
         );
     }
@@ -637,7 +638,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $user4 = new User('user4', $bu4);
         $user411 = new User('user411', $bu411);
 
-        return array(
+        return [
             [1 << 4 /* MASK_VIEW_SYSTEM */, null, $org4, null, true],
             [1 << 3 /* MASK_VIEW_GLOBAL */, null, $org4, null, true],
             [1 << 2 /* MASK_VIEW_DEEP */, null, $org4, null, true],
@@ -685,7 +686,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             [1 << 0 /* MASK_VIEW_BASIC */, $user4, $org4, new TestEntity(1, $user4, $org4), true],
             [1 << 0 /* MASK_VIEW_BASIC */, $user4, $org4, new TestEntity(1, $user411, $org4), false],
             [1 << 0 /* MASK_VIEW_BASIC */, $user4, $org4, new TestEntity(1, $user3, $org3), false]
-        );
+        ];
     }
 
     /**

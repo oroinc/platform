@@ -191,7 +191,7 @@ class EntityMaskBuilderTest extends \PHPUnit_Framework_TestCase
             [4096, 4096],
             [8192, 8192],
             [16384, 16384],
-            [(1 << 32) - 1, 32767],
+            [PHP_INT_MAX, 32767],
         ];
     }
 
