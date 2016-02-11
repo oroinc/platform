@@ -182,7 +182,7 @@ define(function(require) {
          * Closes dropdown with date-picker + variable-picker
          */
         close: function() {
-            this.$dropdown.removeClass('open');
+            this.$dropdown.trigger('tohide.bs.dropdown');
             this.trigger('close', this);
         }
     });

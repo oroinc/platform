@@ -28,7 +28,8 @@ define(function(require) {
 
         events: {
             'click .dropdown-menu': 'onDropdownMenuClick',
-            'click [data-toggle=dropdown]': 'onDropdownToggleClick'
+            'click [data-toggle=dropdown]': 'onDropdownToggleClick',
+            'shown.bs.dropdown': 'onOpen'
         },
 
         /**
@@ -105,6 +106,19 @@ define(function(require) {
         onDropdownMenuClick: function(e) {
             if (!this.$(e.target).is('.close')) {
                 e.stopPropagation();
+            }
+        },
+
+        /**
+         * Handles dropdown menu open and sets max-width for the element
+         */
+        onOpen: function() {
+            var $dropdownMenu = this.$('>.dropdown-menu');
+            if ($dropdownMenu.length) {
+                var rect = $dropdownMenu[0].getBoundingClientRect();
+                $dropdownMenu.css({
+                    maxWidth: rect.right + 'px'
+                });
             }
         },
 

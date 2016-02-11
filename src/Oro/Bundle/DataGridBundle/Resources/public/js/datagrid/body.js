@@ -64,6 +64,11 @@ define([
          */
         refresh: function() {
             this._stopListeningToRowsEvents(this.rows);
+            _.each(this.rows, function(row) {
+                // to trigger properly dispose flow for all nested views, instead of just removing rows
+                row.dispose();
+            });
+            this.rows = [];
             Body.__super__.refresh.apply(this, arguments);
             this._listenToRowsEvents(this.rows);
             return this;

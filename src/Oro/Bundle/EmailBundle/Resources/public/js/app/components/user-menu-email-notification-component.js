@@ -51,7 +51,7 @@ define(function(require) {
         },
 
         onWidgetDialogOpen: function() {
-            this.dropdownContainer.removeClass('open');
+            this.dropdownContainer.trigger('tohide.bs.dropdown');
         },
 
         dispose: function() {

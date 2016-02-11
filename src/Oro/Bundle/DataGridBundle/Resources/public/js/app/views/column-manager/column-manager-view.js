@@ -10,8 +10,7 @@ define(function(require) {
         autoRender: true,
         className: 'dropdown-menu',
         events: {
-            'click [data-role="column-manager-select-all"]': 'onSelectAll',
-            'shown.bs.dropdown': 'onOpen'
+            'click [data-role="column-manager-select-all"]': 'onSelectAll'
         },
 
         listen: {
@@ -53,13 +52,6 @@ define(function(require) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
                 model.set('renderable', true);
-            });
-        },
-
-        onOpen: function() {
-            var rect = this.el.getBoundingClientRect();
-            this.$el.css({
-                maxWidth: rect.right + 'px'
             });
         },
 

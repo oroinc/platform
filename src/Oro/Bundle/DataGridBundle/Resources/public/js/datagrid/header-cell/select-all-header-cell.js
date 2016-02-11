@@ -27,10 +27,6 @@ define([
         /** @property */
         tagName: 'th',
 
-        events: {
-            'click': 'onClick'
-        },
-
         template: '#template-select-all-header-cell',
 
         /**
@@ -205,12 +201,24 @@ define([
          */
         render: function() {
             this.$el.html(_.template($(this.template).text())());
+            this.delegateEvents();
             return this;
+        },
+
+        delegateEvents: function(events) {
+            SelectAllHeaderCell.__super__.delegateEvents.call(this, events);
+            // binds event handlers directly to dropdown-menu, because the menu can be attached to document body
+            this.$('.dropdown-menu').on('click' + this.eventNamespace(), _.bind(this.onClick, this));
+            return this;
+        },
+
+        undelegateEvents: function() {
+            this.$('.dropdown-menu').off(this.eventNamespace());
+            return SelectAllHeaderCell.__super__.undelegateEvents.call(this);
         },
 
         onClick: function(e) {
             var $el = $(e.target);
-
             if ($el.is('[data-select]')) {
                 // Handles click on checkbox selectAll/selectNone
                 if (this.inset && _.isEmpty(this.selectedModels) === this.inset) {
