@@ -31,7 +31,6 @@ class PreviousFilterDateRangeConverter extends FilterDateTimeRangeConverter
             }
 
             if ($currentDateRange['type'] !== AbstractDateFilterType::TYPE_LESS_THAN) {
-
                 list($start, $end) = $this->dateHelper->getPreviousDateTimeInterval(
                     $currentDateRange['start'],
                     $currentDateRange['end']
@@ -39,7 +38,7 @@ class PreviousFilterDateRangeConverter extends FilterDateTimeRangeConverter
 
                 $result['start'] = $start;
                 $result['end']   = $end;
-                $result['type'] = AbstractDateFilterType::TYPE_BETWEEN;
+                $result['type']  = AbstractDateFilterType::TYPE_BETWEEN;
             }
         }
 
