@@ -29,10 +29,10 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     /** @var PermissionRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityRepository;
 
-    /** @var PermissionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PermissionConfigurationProvider */
     protected $configurationProvider;
 
-    /** @var PermissionConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PermissionConfigurationBuilder */
     protected $configurationBuilder;
 
     /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
