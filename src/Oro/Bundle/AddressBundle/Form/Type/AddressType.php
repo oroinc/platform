@@ -9,9 +9,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
+use Symfony\Component\Validator\Constraint;
 
 class AddressType extends AbstractType
 {
+    const ABSTRACT_ADDRESS_GROUP = 'AbstractAddress';
     /**
      * @var AddressCountryAndRegionSubscriber
      */
@@ -65,6 +67,7 @@ class AddressType extends AbstractType
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'single_form' => true,
                 'region_route' => 'oro_api_country_get_regions',
+                'validation_groups' => [Constraint::DEFAULT_GROUP, self::ABSTRACT_ADDRESS_GROUP],
             )
         );
     }
