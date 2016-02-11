@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
+
 class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
 {
     /**
@@ -23,6 +25,14 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
         );
 
         parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequestType()
+    {
+        return [RequestType::REST, RequestType::JSON_API];
     }
 
     /**

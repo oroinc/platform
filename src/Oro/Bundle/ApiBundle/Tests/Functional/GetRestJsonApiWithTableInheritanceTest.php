@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 
 /**
@@ -30,6 +31,14 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
         parent::setUp();
 
         $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadAuditData']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequestType()
+    {
+        return [RequestType::REST, RequestType::JSON_API];
     }
 
     /**
