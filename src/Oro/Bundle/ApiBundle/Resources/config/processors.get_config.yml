@@ -166,6 +166,16 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, priority: -50 }
 
+    oro_api.get_config.exclude_not_accessible_relations:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeNotAccessibleRelations
+        arguments:
+            - @oro_api.doctrine_helper
+            - @router
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: oro.api.processor, action: get_config, requestType: json_api, priority: -52 }
+            - { name: oro.api.processor, action: get_relation_config, requestType: json_api, priority: -52 }
+
     oro_api.get_config.set_type_for_table_inheritance_relations:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetTypeForTableInheritanceRelations
         arguments:
