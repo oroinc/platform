@@ -69,6 +69,7 @@
 
     {% set options = form.vars.options|default({})|merge({
         'route': 'oro_imap_change_account_type',
+        'routeAccessToken': "oro_imap_gmail_access_token",
         'routeGetFolders': "oro_imap_gmail_connection_check",
         'formSelector': '#'~formSelector|default(form.vars.id),
         'googleErrorMessage': '.google-alert',

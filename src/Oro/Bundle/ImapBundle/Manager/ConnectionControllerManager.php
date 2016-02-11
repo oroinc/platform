@@ -143,6 +143,22 @@ class ConnectionControllerManager
     }
 
     /**
+     * Get oauth2 access token by security code
+     *
+     * @param $code
+     *
+     * @return array
+     */
+    public function getAccessToken($code)
+    {
+       return [
+           'access_token' => 'ya29.hQJ4jTXnghRm6tSbf3Eo1YJcbkT3kgpEwr4t7fosqohIZTlQC3bJNTbj-nJ2uKD6ixQLhw',
+           'expires_in' => '2016-02-11 12:40:10',
+           'email_address' => 'test1@sichevoy.com'
+       ];
+    }
+
+    /**
      * @param $formParentName
      * @param $accountTypeModel
      * @return null|\Symfony\Component\Form\Form|FormInterface

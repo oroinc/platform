@@ -37,4 +37,24 @@ class GmailConnectionController extends Controller
 
         return new JsonResponse($response);
     }
+
+    /**
+     * @Route("/connection/access-token", name="oro_imap_gmail_access_token", methods={"POST"})
+     */
+    public function accessTokenAction()
+    {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
+        $code = $request->get('code');
+
+        try {
+            $response = $connectionControllerManager->getAccessToken($code);
+        } catch (\Exception $e) {
+            $response = [
+                'error' => $e->getMessage()
+            ];
+        }
+
+        return new JsonResponse($response);
+    }
 }
