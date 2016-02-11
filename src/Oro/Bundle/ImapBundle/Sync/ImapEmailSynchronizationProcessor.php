@@ -481,7 +481,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function checkOnOldEmailForMailbox(EmailFolder $folder, Email $email, $mailbox)
     {
-        if ($mailbox && $folder->getSynchronizedAt() > $email->getSentAt()) {
+        $dateForCheck = max($email->getReceivedAt(), $email->getSentAt());
+
+        if ($mailbox && $folder->getSynchronizedAt() > $dateForCheck) {
             $this->logger->info(
                 sprintf(
                     'Skip "%s" (UID: %d) email, because it was sent earlier than the last synchronization was done',
