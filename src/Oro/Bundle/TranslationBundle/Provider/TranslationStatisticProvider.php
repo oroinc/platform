@@ -36,8 +36,9 @@ class TranslationStatisticProvider
 
         if (false === $data) {
             $data = $this->fetch();
-
-            $this->cache->save(static::CACHE_KEY, $data, static::CACHE_TTL);
+            //save false to cache if empty data has been returned from adapter
+            // to fetch again on the next request.
+            $this->cache->save(static::CACHE_KEY, !empty($data) ? $data : false, static::CACHE_TTL);
         }
 
         return $data;
