@@ -62,7 +62,6 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
             $route->setOption('hidden', true);
         } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
             $this->completeRouteRequirements($route);
-            $route->setOption('hidden', true);
         }
     }
 
