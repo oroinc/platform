@@ -217,16 +217,11 @@ define(function(require) {
         },
 
         parseRawValue: function(value) {
-            if (_.isString(value)) {
-                return value;
-            }
-            if (_.isNumber(value) && !isNaN(value)) {
-                return '' + value;
-            }
             if (_.isBoolean(value)) {
                 return value ? '1' : '0';
+            } else {
+                return '' + value;
             }
-            throw new Error('Value must be either string/number/bool');
         },
 
         focus: function() {
