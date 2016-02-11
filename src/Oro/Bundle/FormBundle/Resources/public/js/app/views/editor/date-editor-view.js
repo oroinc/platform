@@ -95,18 +95,23 @@ define(function(require) {
 
         render: function() {
             DateEditorView.__super__.render.call(this);
+            var $input;
             var View = this.view;
             this.view = new View(this.getViewOptions());
             if (this.options.value) {
                 this.setFormState(this.options.value);
             }
+            this.view.getPickerWidget().on('mousedown' + this.eventNamespace(), _.bind(function() {
+                this._isDateSelection = true;
+            }, this));
             // fix enter behaviour
-            this.$('.hasDatepicker').bindFirst('keydown' + this.eventNamespace(),
+            $input = this.$('.hasDatepicker');
+            $input.bindFirst('keydown' + this.eventNamespace(),
                 _.bind(this.onGenericEnterKeydown, this));
             // fix esc behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
+            $input.on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
             // fix arrows behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
+            $input.on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
         },
 
         onGenericEnterKeydown: function(e) {
@@ -140,6 +145,7 @@ define(function(require) {
                 return;
             }
             this.$('.hasDatepicker').off(this.eventNamespace());
+            this.view.getPickerWidget().off(this.eventNamespace());
             this.view.dispose();
             DateEditorView.__super__.dispose.call(this);
         },
@@ -161,7 +167,8 @@ define(function(require) {
         },
 
         onFocusout: function(e) {
-            if (this._isFocused && $('#ui-datepicker-div').has(e.relatedTarget).length) {
+            if (this._isFocused && this._isDateSelection) {
+                delete this._isDateSelection;
                 this.focus();
             } else {
                 DateEditorView.__super__.onFocusout.call(this, e);

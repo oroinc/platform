@@ -152,8 +152,8 @@ define(function(require) {
 
         onFocusout: function(e) {
             // if blur event was as sequence of time selection in dropdown, returns focus back
-            if (this._isSelection) {
-                delete this._isSelection;
+            if (this._isTimeSelection) {
+                delete this._isTimeSelection;
                 this.focus(1);
             } else {
                 DatetimeEditorView.__super__.onFocusout.call(this, e);
@@ -198,7 +198,7 @@ define(function(require) {
                 .off(this.eventNamespace())
                 .bindFirst('mousedown' + this.eventNamespace(), 'li', _.bind(function(e) {
                     // adds flag that blur event was as sequence of time selection in dropdown
-                    this._isSelection = true;
+                    this._isTimeSelection = true;
                 }, this));
         }
     });
