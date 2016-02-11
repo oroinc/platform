@@ -124,9 +124,9 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
 
                 // Do not export relation in short mode if it does not contain identity fields
                 if (!$isFullMode
-                    && isset($field['related_entity_type'])
-                    && $this->fieldHelper->hasConfig($field['related_entity_type'])
-                    && !$this->hasIdentityFields($field['related_entity_type'])
+                    && isset($field['related_entity_name'])
+                    && $this->fieldHelper->hasConfig($field['related_entity_name'])
+                    && !$this->hasIdentityFields($field['related_entity_name'])
                 ) {
                     continue;
                 }

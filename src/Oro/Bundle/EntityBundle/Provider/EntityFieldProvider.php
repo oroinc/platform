@@ -15,11 +15,9 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
-
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -128,6 +126,43 @@ class EntityFieldProvider
     }
 
     /**
+     * Returns relations for the given entity
+     *
+     * @param string $entityName         Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $applyExclusions    Indicates whether exclusion logic should be applied.
+     * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
+     * @param bool   $translate          Flag means that label, plural label should be translated
+     *                                   .       'name'          - field name
+     *                                   .       'type'          - field type
+     *                                   .       'label'         - field label
+     *                                   .       'related_entity_name' - entity full class name
+     *                                   .       'relation_type'       - relation type
+     *                                   If $withEntityDetails = true the following attributes are added:
+     *                                   .       'related_entity_label'        - entity label
+     *                                   .       'related_entity_plural_label' - entity plural label
+     *                                   .       'related_entity_icon'         - an icon associated with an entity
+     *
+     * @return array of relations
+     */
+    public function getRelations(
+        $entityName,
+        $withEntityDetails = false,
+        $applyExclusions = true,
+        $translate = true
+    ) {
+        $className = $this->entityClassResolver->getEntityClass($entityName);
+        if (!$this->isEntityAccessible($className)) {
+            return [];
+        }
+
+        $result = [];
+
+        $this->addRelations($result, $className, $withEntityDetails, $applyExclusions, $translate);
+
+        return $result;
+    }
+
+    /**
      * Returns fields for the given entity
      *
      * @param string $entityName         Entity name. Can be full class name or short form: Bundle:Entity.
@@ -166,8 +201,7 @@ class EntityFieldProvider
         $translate = true
     ) {
         $className = $this->entityClassResolver->getEntityClass($entityName);
-        if (!$this->entityConfigProvider->hasConfig($className)) {
-            // only configurable entities are supported
+        if (!$this->isEntityAccessible($className)) {
             return [];
         }
 
@@ -220,32 +254,21 @@ class EntityFieldProvider
             $fieldConfigId = $fieldConfig->getId();
             $fieldName = $fieldConfigId->getFieldName();
 
-            $fieldType = $this->fieldTypeHelper->getUnderlyingType(
-                $fieldConfigId->getFieldType()
-            );
-            if ($this->fieldTypeHelper->isRelation($fieldType)) {
+            $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
+            if ($this->fieldTypeHelper->isRelation($underlyingFieldType)) {
                 // skip because this field is relation
                 continue;
             }
-
             if (isset($result[$fieldName])) {
                 // skip because a field with this name is already added, it could be a virtual field
                 continue;
             }
-
-            if (!$this->entityConfigProvider->hasConfig($className, $fieldName)) {
-                // skip non configurable field
+            if (!ExtendHelper::isFieldAccessible($fieldConfig)) {
                 continue;
             }
-
             if ($this->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
-
-            if ($fieldConfig->is('is_deleted')) {
-                continue;
-            }
-
             if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
@@ -318,14 +341,14 @@ class EntityFieldProvider
             return;
         }
 
-        $metadata = $this->getMetadataFor($className);
+        $metadata         = $this->getMetadataFor($className);
         $virtualRelations = $this->virtualRelationProvider->getVirtualRelations($className);
         foreach ($virtualRelations as $associationName => $virtualRelation) {
             if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $associationName)) {
                 continue;
             }
 
-            $fieldType = $virtualRelation['relation_type'];
+            $fieldType       = $virtualRelation['relation_type'];
             $targetClassName = $this->entityClassResolver->getEntityClass($virtualRelation['related_entity_name']);
 
             if (empty($virtualRelation['label'])) {
@@ -345,24 +368,6 @@ class EntityFieldProvider
                 $translate
             );
         }
-    }
-
-    /**
-     * Checks if the given field should be ignored
-     *
-     * @param ClassMetadataInterface $metadata
-     * @param string                 $fieldName
-     *
-     * @return bool
-     */
-    protected function isIgnoredField(ClassMetadataInterface $metadata, $fieldName)
-    {
-        // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
-        if (isset($this->hiddenFields[$metadata->getName()][$fieldName])) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -404,20 +409,18 @@ class EntityFieldProvider
         $applyExclusions,
         $translate
     ) {
-        $metadata = $this->getMetadataFor($className);
+        $metadata         = $this->getMetadataFor($className);
         $associationNames = $metadata->getAssociationNames();
         foreach ($associationNames as $associationName) {
             if (isset($result[$associationName])) {
                 // skip because a relation with this name is already added, it could be a virtual field
                 continue;
             }
-            if (!$this->entityConfigProvider->hasConfig($className, $associationName)) {
-                // skip non configurable relation
+            if (!$this->isFieldAccessible($className, $associationName)) {
                 continue;
             }
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
-            if (!$this->entityConfigProvider->hasConfig($targetClassName)) {
-                // skip if target entity is not configurable
+            if (!$this->isEntityAccessible($targetClassName)) {
                 continue;
             }
             if ($this->isIgnoredRelation($metadata, $associationName)) {
@@ -462,13 +465,11 @@ class EntityFieldProvider
         foreach ($relations as $name => $mapping) {
             $relatedClassName = $mapping['sourceEntity'];
             $fieldName        = $mapping['fieldName'];
-            $metadata         = $this->getMetadataFor($relatedClassName);
-            $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
-            if (!$this->entityConfigProvider->hasConfig($relatedClassName, $fieldName)) {
-                // skip non configurable relation
+            if (!$this->isFieldAccessible($relatedClassName, $fieldName)) {
                 continue;
             }
+            $metadata = $this->getMetadataFor($relatedClassName);
             if ($this->isIgnoredRelation($metadata, $fieldName)) {
                 continue;
             }
@@ -476,7 +477,8 @@ class EntityFieldProvider
                 continue;
             }
 
-            $labelKey = $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label');
+            $labelKey     = $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label');
+            $labelType    = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
             $labelTypeKey = $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType);
             if ($translate) {
                 $labelKey = $this->translator->trans($labelKey);
@@ -511,14 +513,15 @@ class EntityFieldProvider
     {
         $relations = [];
 
-        /** @var EntityConfigId[] $entityConfigIds */
-        $entityConfigIds = $this->entityConfigProvider->getIds();
-        foreach ($entityConfigIds as $entityConfigId) {
-            if ($this->isIgnoredEntity($entityConfigId)) {
+        $entityConfigs = $this->extendConfigProvider->getConfigs();
+        foreach ($entityConfigs as $entityConfig) {
+            if (!ExtendHelper::isEntityAccessible($entityConfig)) {
                 continue;
             }
-
-            $metadata = $this->getMetadataFor($entityConfigId->getClassName());
+            $metadata = $this->getMetadataFor($entityConfig->getId()->getClassName());
+            if ($this->isIgnoredEntity($metadata)) {
+                continue;
+            }
             $targetMappings = $metadata->getAssociationMappings();
             if (empty($targetMappings)) {
                 continue;
@@ -535,45 +538,6 @@ class EntityFieldProvider
         }
 
         return $relations;
-    }
-
-    /**
-     * Check if entity config is new (entity not generated yet) or was deleted
-     *
-     * @param EntityConfigId $entityConfigId
-     *
-     * @return bool
-     */
-    protected function isIgnoredEntity(EntityConfigId $entityConfigId)
-    {
-        $entityConfig = $this->extendConfigProvider->getConfigById($entityConfigId);
-
-        if ($entityConfig->is('is_deleted') ||
-            $entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])
-        ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if the given relation should be ignored
-     *
-     * @param ClassMetadataInterface $metadata
-     * @param string                 $associationName
-     *
-     * @return bool
-     */
-    protected function isIgnoredRelation(ClassMetadataInterface $metadata, $associationName)
-    {
-        // skip a relation if it was deleted
-        $fieldConfig = $this->extendConfigProvider->getConfig($metadata->getName(), $associationName);
-        if ($fieldConfig->is('is_deleted')) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -633,12 +597,84 @@ class EntityFieldProvider
     {
         $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
         foreach ($entity as $key => $val) {
-            if (!in_array($key, ['name'])) {
+            if ($key !== 'name') {
                 $relation['related_entity_' . $key] = $val;
             }
         }
 
         return $relation;
+    }
+
+    /**
+     * Check if the given entity is ready to be used in a business logic.
+     *
+     * @param string $className
+     *
+     * @return bool
+     */
+    protected function isEntityAccessible($className)
+    {
+        return
+            $this->extendConfigProvider->hasConfig($className)
+            && ExtendHelper::isEntityAccessible($this->extendConfigProvider->getConfig($className));
+    }
+
+    /**
+     * Check if the given field is ready to be used in a business logic.
+     *
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isFieldAccessible($className, $fieldName)
+    {
+        return
+            $this->extendConfigProvider->hasConfig($className, $fieldName)
+            && ExtendHelper::isFieldAccessible($this->extendConfigProvider->getConfig($className, $fieldName));
+    }
+
+    /**
+     * Check if the given entity should be ignored
+     *
+     * @param ClassMetadataInterface $metadata
+     *
+     * @return bool
+     */
+    protected function isIgnoredEntity(ClassMetadataInterface $metadata)
+    {
+        return false;
+    }
+
+    /**
+     * Checks if the given field should be ignored
+     *
+     * @param ClassMetadataInterface $metadata
+     * @param string                 $fieldName
+     *
+     * @return bool
+     */
+    protected function isIgnoredField(ClassMetadataInterface $metadata, $fieldName)
+    {
+        // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
+        if (isset($this->hiddenFields[$metadata->getName()][$fieldName])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the given relation should be ignored
+     *
+     * @param ClassMetadataInterface $metadata
+     * @param string                 $associationName
+     *
+     * @return bool
+     */
+    protected function isIgnoredRelation(ClassMetadataInterface $metadata, $associationName)
+    {
+        return false;
     }
 
     /**
@@ -672,7 +708,7 @@ class EntityFieldProvider
     }
 
     /**
-     * Gets a field label
+     * Gets a label of a field
      *
      * @param string $className
      * @param string $fieldName

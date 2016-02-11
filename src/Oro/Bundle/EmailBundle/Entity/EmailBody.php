@@ -29,7 +29,7 @@ class EmailBody
     protected $id;
 
     /**
-     * @var \DateTime $created
+     * @var \DateTime
      *
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
@@ -262,5 +262,13 @@ class EmailBody
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
     }
 }

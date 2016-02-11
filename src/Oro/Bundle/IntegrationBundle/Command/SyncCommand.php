@@ -31,6 +31,8 @@ class SyncCommand extends AbstractSyncCronCommand
 
     const STATUS_SUCCESS = 0;
     const STATUS_FAILED = 255;
+    const INTEGRATION_ID_OPTION = 'integration-id';
+    const CONNECTOR_PARAMETERS_ARGUMENT = 'connector-parameters';
 
     /**
      * @var SyncProcessorRegistry
@@ -53,7 +55,7 @@ class SyncCommand extends AbstractSyncCronCommand
         $this
             ->setName(static::COMMAND_NAME)
             ->addOption(
-                'integration-id',
+                self::INTEGRATION_ID_OPTION,
                 'i',
                 InputOption::VALUE_OPTIONAL,
                 'If option exists sync will be performed for given integration id'
@@ -78,7 +80,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 100
             )
             ->addArgument(
-                'connector-parameters',
+                self::CONNECTOR_PARAMETERS_ARGUMENT,
                 InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                 'Additional connector parameters array. Format - parameterKey=parameterValue',
                 []
@@ -98,28 +100,29 @@ class SyncCommand extends AbstractSyncCronCommand
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
         $connector = $input->getOption('connector');
-        $integrationId = $input->getOption('integration-id');
+        $integrationId = $input->getOption(self::INTEGRATION_ID_OPTION);
         $batchSize = $input->getOption('transport-batch-size');
         $connectorParameters = $this->getConnectorParameters($input);
         $entityManager = $this->getService('doctrine.orm.entity_manager');
         $repository = $entityManager->getRepository('OroIntegrationBundle:Channel');
         $logger = new OutputLogger($output);
-        $exitCode = self::STATUS_SUCCESS;
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
+        $exitCode = self::STATUS_SUCCESS;
 
         if ($this->isJobRunning($integrationId)) {
             $logger->warning('Job already running. Terminating....');
-
             return self::STATUS_SUCCESS;
         }
 
         if ($integrationId) {
             $integration = $repository->getOrLoadById($integrationId);
+
             if (!$integration) {
                 $logger->critical(sprintf('Integration with given ID "%d" not found', $integrationId));
 
                 return self::STATUS_FAILED;
             }
+
             $integrations = [$integration];
         } else {
             $integrations = $repository->getConfiguredChannelsForSync(null, true);
@@ -129,20 +132,16 @@ class SyncCommand extends AbstractSyncCronCommand
         foreach ($integrations as $integration) {
             try {
                 $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
-
                 $this->updateToken($integration);
                 if ($batchSize) {
                     $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
                 }
-
                 $processor = $this->getSyncProcessor($integration, $logger);
                 $result = $processor->process($integration, $connector, $connectorParameters);
                 $exitCode = $result ?: self::STATUS_FAILED;
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
-
                 $exitCode = self::STATUS_FAILED;
-
                 continue;
             }
         }
@@ -164,7 +163,7 @@ class SyncCommand extends AbstractSyncCronCommand
     {
         $result = ['force' => $input->getOption('force')];
 
-        $connectorParameters = $input->getArgument('connector-parameters');
+        $connectorParameters = $input->getArgument(self::CONNECTOR_PARAMETERS_ARGUMENT);
         if (!empty($connectorParameters)) {
             foreach ($connectorParameters as $parameterString) {
                 $parameterConfigArray = explode('=', $parameterString);

@@ -191,7 +191,11 @@ define(function(require) {
          */
         combineCollectionOptions: function() {
             var options = _.extend({
-                inputName: this.inputName,
+                /*
+                 * gridName contains extended information "inputName + scopeName"
+                 * (allows to differentiate grid instances)
+                 */
+                inputName: this.gridName,
                 parse: true,
                 url: '\/user\/json',
                 state: _.extend({

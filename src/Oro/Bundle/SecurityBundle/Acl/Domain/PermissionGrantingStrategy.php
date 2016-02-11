@@ -191,7 +191,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
                             // give an additional chance for the appropriate ACL extension to decide
                             // whether an access to a domain object is granted or not
-                            $decisionResult = $this->getContext()->getAclExtension()->decideIsGranting(
+                            $aclExtension   = $this->getContext()->getAclExtension();
+                            $decisionResult = $aclExtension->decideIsGranting(
                                 $requiredMask,
                                 $this->getContext()->getObject(),
                                 $this->getContext()->getSecurityToken()
@@ -202,19 +203,19 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
                             if ($isGranting) {
                                 // the access is granted if there is at least one granting ACE
-                                $triggeredAce = $ace;
-                                $triggeredMask = $requiredMask;
+                                if ($aclExtension->getAccessLevel($requiredMask)
+                                    > $aclExtension->getAccessLevel($triggeredMask)
+                                ) {
+                                    $triggeredAce = $ace;
+                                    $triggeredMask = $requiredMask;
+                                }
                                 $result = true;
-                                // break all loops when granting ACE was found
-                                break 3;
                             } else {
                                 // remember the first denying ACE
                                 if (null === $triggeredAce) {
                                     $triggeredAce = $ace;
                                     $triggeredMask = $requiredMask;
                                 }
-                                // break for all masks
-                                break 3;
                             }
                         }
                     }

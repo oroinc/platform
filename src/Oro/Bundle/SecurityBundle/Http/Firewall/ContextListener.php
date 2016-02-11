@@ -6,9 +6,12 @@ use Doctrine\ORM\NoResultException;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Security;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 
 class ContextListener
 {
@@ -20,7 +23,7 @@ class ContextListener
 
     /**
      * @param TokenStorageInterface $tokenStorage
-     * @param OrganizationManager      $manager
+     * @param OrganizationManager   $manager
      */
     public function __construct(TokenStorageInterface $tokenStorage, OrganizationManager $manager)
     {
@@ -41,6 +44,15 @@ class ContextListener
                 $token->setOrganizationContext(
                     $this->manager->getOrganizationById($token->getOrganizationContext()->getId())
                 );
+
+                if (!$token->getUser()->getOrganizations(true)->contains($token->getOrganizationContext())) {
+                    $exception = new OrganizationAccessDeniedException();
+                    $exception->setOrganizationName($token->getOrganizationContext()->getName());
+                    $exception->setToken($token);
+                    $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+                    $this->tokenStorage->setToken(null);
+                    throw $exception;
+                }
             } catch (NoResultException $e) {
                 $token->setAuthenticated(false);
             }
