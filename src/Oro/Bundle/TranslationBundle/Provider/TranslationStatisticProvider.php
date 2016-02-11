@@ -36,8 +36,9 @@ class TranslationStatisticProvider
 
         if (false === $data) {
             $data = $this->fetch();
-
-            $this->cache->save(static::CACHE_KEY, $data, static::CACHE_TTL);
+            if (!empty($data)) {
+                $this->cache->save(static::CACHE_KEY, $data, static::CACHE_TTL);
+            }
         }
 
         return $data;
