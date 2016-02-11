@@ -14,7 +14,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 /**
  * Excludes relations that are pointed to not accessible resources.
- * For example it entity1 has a reference to to entity2, but entity2 does not have API resource,
+ * For example if entity1 has a reference to to entity2, but entity2 does not have API resource,
  * the relation will be excluded.
  */
 class ExcludeNotAccessibleRelations implements ProcessorInterface
