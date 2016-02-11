@@ -47,18 +47,7 @@ define(function(require) {
         className: 'oro-datagrid',
 
         /** @property */
-        template: _.template(
-            '<div class="toolbar"></div>' +
-            '<div class="other-scroll-container">' +
-                '<div class="other-scroll"><div></div></div>' +
-                '<div class="container-fluid grid-scrollable-container">' +
-                    '<div class="grid-container">' +
-                        '<table class="grid table-hover table table-bordered table-condensed"></table>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="no-data"></div>' +
-            '</div>'
-        ),
+        template: null,
 
         /** @property */
         noDataTemplate: _.template('<span><%= hint %><span>'),
@@ -121,6 +110,10 @@ define(function(require) {
          * This start index required to display new columns at end of already sorted columns set
          */
         DEFAULT_COLUMN_START_INDEX: 1000,
+
+        viewOptions: {
+            childViews: []
+        },
 
         /**
          * Initialize grid
@@ -203,6 +196,8 @@ define(function(require) {
             this._listenToCollectionEvents();
             this._listenToContentEvents();
             this._listenToCommands();
+
+            this.viewOptions.childViews.push(this.header, this.body, this.footer);
         },
 
         /**
@@ -615,12 +610,34 @@ define(function(require) {
             });
         },
 
+        setTemplate: function() {
+            var tag = 'table';
+            if (this.viewOptions && this.viewOptions.tableView === false) {
+                tag = 'div';
+            }
+            return _.template(
+                '<div class="toolbar"></div>' +
+                '<div class="other-scroll-container">' +
+                    '<div class="other-scroll"><div></div></div>' +
+                    '<div class="container-fluid grid-scrollable-container">' +
+                        '<div class="grid-container">' +
+                            '<' + tag + ' class="grid table-hover table table-bordered table-condensed"></' + tag + '>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="no-data"></div>' +
+                '</div>'
+            );
+        },
+
         /**
          * Renders the grid, no data block and loading mask
          *
          * @return {*}
          */
         render: function() {
+            if (this.template === null) {
+                this.template = this.setTemplate();
+            }
             this.$el.html(this.template());
             this.$grid = this.$(this.selectors.grid);
 

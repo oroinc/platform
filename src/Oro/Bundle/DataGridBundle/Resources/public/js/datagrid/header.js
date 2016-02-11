@@ -26,6 +26,10 @@ define([
         /** @property */
         headerCell: HeaderCell,
 
+        viewOptions: {
+            childViews: []
+        },
+
         /**
          * @inheritDoc
          */
@@ -49,6 +53,8 @@ define([
             });
 
             this.subviews = [this.row];
+
+            this.viewOptions.childViews.push(this.row);
         },
 
         /**

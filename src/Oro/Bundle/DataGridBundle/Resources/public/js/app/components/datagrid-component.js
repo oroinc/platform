@@ -18,6 +18,7 @@ define(function(require) {
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
     var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
+    var DataGridViewOptions = require('orodatagrid/js/datagrid-view-options');
 
     helpers = {
         cellType: function(type) {
@@ -114,6 +115,7 @@ define(function(require) {
                 rowActions: {},
                 massActions: {}
             });
+            this.viewOptions = options.viewOptions || {};
             this.metadataModel = new MetadataModel(this.metadata);
             this.modules = {};
 
@@ -182,7 +184,9 @@ define(function(require) {
 
             this.$el.hide();
             options.el = this.$el[0];
+            //options.viewOptions = DataGridViewOptions.setDefaults(this.viewOptions);
             grid = new Grid(_.extend({collection: collection}, options));
+            DataGridViewOptions.setViewOptions(grid, DataGridViewOptions.setDefaults(this.viewOptions));
             this.grid = grid;
             grid.render();
             mediator.trigger('datagrid:rendered', grid);

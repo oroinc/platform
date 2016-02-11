@@ -25,6 +25,10 @@ define([
         /** @property {String} */
         rowClassName: undefined,
 
+        viewOptions: {
+            childViews: []
+        },
+
         /**
          * @inheritDoc
          */
@@ -42,6 +46,8 @@ define([
             Body.__super__.initialize.apply(this, arguments);
 
             this._listenToRowsEvents(this.rows);
+
+            this.viewOptions.childViews.push.apply(this.viewOptions.childViews, this.rows);
         },
 
         /**

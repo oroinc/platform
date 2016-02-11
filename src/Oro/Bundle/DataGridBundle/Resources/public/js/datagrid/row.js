@@ -30,6 +30,11 @@ define([
 
         DOUBLE_CLICK_WAIT_TIMEOUT: 170,
 
+        viewOptions: {
+            templateKey: 'rowTemplateSelector',
+            childViews: []
+        },
+
         /**
          * @inheritDoc
          */
@@ -38,6 +43,8 @@ define([
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
+
+            this.viewOptions.childViews.push.apply(this.viewOptions.childViews, this.cells);
         },
 
         /**
