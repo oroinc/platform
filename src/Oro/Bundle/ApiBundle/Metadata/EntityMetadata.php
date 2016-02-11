@@ -9,6 +9,9 @@ class EntityMetadata extends ParameterBag
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
+    /** entity inheritance flag */
+    const INHERITED = 'inherited';
+
     /** @var string[] */
     private $identifiers = [];
 
@@ -56,6 +59,28 @@ class EntityMetadata extends ParameterBag
     public function setIdentifierFieldNames(array $fieldNames)
     {
         $this->identifiers = $fieldNames;
+    }
+
+    /**
+     * Checks whether an entity is inherited object.
+     * It can be an entity implemented by Doctrine table inheritance
+     * or by another feature, for example by associations provided by OroPlatform.
+     *
+     * @return bool
+     */
+    public function isInheritedType()
+    {
+        return (bool)$this->get(self::INHERITED);
+    }
+
+    /**
+     * Sets inheritance flag.
+     *
+     * @param bool $inherited
+     */
+    public function setInheritedType($inherited)
+    {
+        $this->set(self::INHERITED, $inherited);
     }
 
     /**

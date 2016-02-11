@@ -1,0 +1,4 @@
+oro_api:
+    entities:
+        Oro\Bundle\SegmentBundle\Entity\Segment: ~
+        Oro\Bundle\SegmentBundle\Entity\SegmentType: ~
