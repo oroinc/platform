@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 
@@ -98,10 +99,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
             $mapping        = $metadata->getAssociationMapping($propertyPath);
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
-            if (!$this->entityAliasResolver->hasAlias($targetMetadata->name)) {
-                continue;
-            }
-            if ($this->isResourceAccessible($targetMetadata->name)) {
+            if ($this->isResourceForRelatedEntityAccessible($targetMetadata)) {
                 continue;
             }
 
@@ -113,6 +111,28 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         }
 
         return $hasChanges;
+    }
+
+    /**
+     * @param ClassMetadata $targetMetadata
+     *
+     * @return bool
+     */
+    protected function isResourceForRelatedEntityAccessible(ClassMetadata $targetMetadata)
+    {
+        if ($this->isResourceAccessible($targetMetadata->name)) {
+            return true;
+        }
+        if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+            // check that at least one inhetited entity has API resource
+            foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
+                if ($this->isResourceAccessible($inheritedEntityClass)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -153,13 +173,15 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     protected function getEntityResourceUri($entityClass)
     {
         $uri = null;
-        try {
-            $uri = $this->router->generate(
-                'oro_rest_api_cget',
-                ['entity' => $this->entityAliasResolver->getPluralAlias($entityClass)]
-            );
-        } catch (RoutingException $e) {
-            // ignore any exceptions
+        if ($this->entityAliasResolver->hasAlias($entityClass)) {
+            try {
+                $uri = $this->router->generate(
+                    'oro_rest_api_cget',
+                    ['entity' => $this->entityAliasResolver->getPluralAlias($entityClass)]
+                );
+            } catch (RoutingException $e) {
+                // ignore any exceptions
+            }
         }
 
         if ($uri) {
