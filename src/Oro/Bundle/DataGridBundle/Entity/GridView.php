@@ -33,7 +33,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *      }
  * )
  * @UniqueEntity(
- *      fields={"name", "owner"},
+ *      fields={"name", "owner", "gridName"},
  *      message="oro.datagrid.gridview.unique"
  * )
  */
