@@ -194,11 +194,12 @@ services:
             - @oro_security.acl.extension_selector
 
     oro_security.acl.permission_manager:
-         class: %oro_security.acl.permission_manager.class%
-         arguments:
-             - @oro_entity.doctrine_helper
-             - @oro_security.configuration.provider.permission_configuration
-             - @oro_security.configuration.builder.permission_configuration
+        class: %oro_security.acl.permission_manager.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_security.configuration.provider.permission_configuration
+            - @oro_security.configuration.builder.permission_configuration
+            - @oro_security.cache.provider.permission
 
     oro_security.acl.object_identity_factory:
         class: %oro_security.acl.object_identity_factory.class%

@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery;
 
-class OroSecurityBundle implements Migration
+class OroSecurityBundle implements Migration, ContainerAwareInterface
 {
     /** @var ContainerInterface */
     protected $container;
