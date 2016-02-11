@@ -35,7 +35,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
+            this.googleErrorMessage = options.googleErrorMessage;
             this.type = options.type;
         },
 
@@ -166,15 +166,29 @@ define(function(require) {
          * Change style for block with error message to show
          */
         showErrorMessage: function() {
-            this.$googleErrorMessage.html(this.errorMessage);
-            this.$googleErrorMessage.show();
+            var $errorBlock = this.getErrorBlock();
+
+            if ($errorBlock.length > 0 ) {
+                $errorBlock.html(this.errorMessage);
+                $errorBlock.show();
+            }
         },
 
         /**
          * Change style for block with error message to hide
          */
         hideErrorMessage: function() {
-            this.$googleErrorMessage.hide();
+            var $errorBlock = this.getErrorBlock();
+            if ($errorBlock.length > 0 ) {
+                $errorBlock.hide();
+            }
+        },
+
+        /**
+         * @returns {*}
+         */
+        getErrorBlock: function() {
+            return this.$el.find(this.googleErrorMessage)
         },
 
         /**
