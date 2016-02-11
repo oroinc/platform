@@ -185,7 +185,7 @@ class PermissionManager
         if (false === ($cache = $this->cache->fetch($key))) {
             $data = $this->buildCache();
 
-            return array_key_exists($key, $data) ? $data[$key] : [];
+            return !empty($data[$key]) ? $data[$key] : [];
         }
 
         return $cache;
