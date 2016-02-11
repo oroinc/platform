@@ -45,6 +45,7 @@ class LanguageSettings extends Configuration
             );
         $this->test->moveto($element);
         $element->click();
+        $this->waitForAjax();
         $this->waitPageToLoad();
         $this->waitForAjax();
 

@@ -124,16 +124,13 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         }
 
         if ($this->hideAllForNotLoggedInUsers && !$this->securityFacade->hasLoggedUser()) {
-            if (isset($options['extras'])
-                && array_key_exists('showNonAuthorized', $options['extras'])
-                && $options['extras']['showNonAuthorized']
-            ) {
+            if (!empty($options['extras']['showNonAuthorized'])) {
                 return;
             }
 
             $isAllowed = false;
         } elseif ($this->securityFacade->getToken() !== null) { // don't check access if it's CLI
-            if (array_key_exists('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
+            if (array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
                 $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
             }
 

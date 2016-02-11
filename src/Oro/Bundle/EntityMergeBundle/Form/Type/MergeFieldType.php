@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
+use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -72,6 +75,14 @@ class MergeFieldType extends AbstractType
                 array('data' => $mergeModes ? MergeModes::REPLACE : current($mergeModes))
             );
         }
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var FieldData $fieldData */
+            $fieldData = $event->getData();
+            if (!$fieldData->getSourceEntity()) {
+                $fieldData->setSourceEntity($fieldData->getEntityData()->getMasterEntity());
+            }
+        });
     }
 
     /**

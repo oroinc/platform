@@ -7,6 +7,7 @@ oro_system_configuration:
         language_settings:
             title: oro.locale.system_configuration.groups.language_settings.title
             icon:  'icon-font'
+            page_reload: true
         language_languages:
             title: oro.locale.system_configuration.groups.language_languages.title
         locale_settings:

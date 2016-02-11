@@ -17,6 +17,7 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class ImapEmailBodyLoader implements EmailBodyLoaderInterface
 {
@@ -31,19 +32,25 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     /** @var ImapEmailGoogleOauth2Manager */
     protected $imapEmailGoogleOauth2Manager;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
      * @param ImapConnectorFactory $connectorFactory
      * @param Mcrypt $encryptor
      * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+     * @param ConfigManager $configManager
      */
     public function __construct(
         ImapConnectorFactory $connectorFactory,
         Mcrypt $encryptor,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager,
+        ConfigManager $configManager
     ) {
         $this->connectorFactory = $connectorFactory;
         $this->encryptor = $encryptor;
         $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -88,7 +95,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
             throw new EmailBodyNotFoundException($email);
         }
 
-        $builder = new EmailBodyBuilder();
+        $builder = new EmailBodyBuilder($this->configManager);
         $builder->setEmailBody(
             $loadedEmail->getBody()->getContent(),
             $loadedEmail->getBody()->getBodyIsText()
@@ -99,7 +106,8 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
                 $attachment->getContent(),
                 $attachment->getContentType(),
                 $attachment->getContentTransferEncoding(),
-                $attachment->getContentId()
+                $attachment->getContentId(),
+                $attachment->getFileSize()
             );
         }
 

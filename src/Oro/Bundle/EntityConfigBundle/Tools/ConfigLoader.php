@@ -84,12 +84,12 @@ class ConfigLoader
         if ($this->hasEntityConfigs($metadata)) {
             $className = $metadata->getName();
             if ($this->configManager->hasConfig($className)) {
-                $this->logger->notice(
+                $this->logger->info(
                     sprintf('Update config for "%s" entity.', $className)
                 );
                 $this->configManager->updateConfigEntityModel($className, $force);
             } else {
-                $this->logger->notice(
+                $this->logger->info(
                     sprintf('Create config for "%s" entity.', $className)
                 );
                 $this->configManager->createConfigEntityModel($className);
