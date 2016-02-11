@@ -181,7 +181,7 @@
 
       > .tab-container {
         padding-top: 0;
-        margin-top: -1px;
+        margin: -1px 0 0 -1px;
       }
     }
     .widget-config-data {
@@ -233,17 +233,6 @@
 }
 .responsive-cell .box-type1{
   .dashboard-widget-content{
-    .tab-container{
-      .nav-tabs > li{
-        &:first-child a{
-          border-left: 0 !important;
-        }
-        &.active a{
-          border-left: 0 !important;
-        }
-
-      }
-    }
     .tab-content{
       .no-data{
         background-color: #f9f9f9;
@@ -428,17 +417,20 @@
     position: relative;
     .nav-tabs{
       & > li{
-        float: left;
         & > a{
           color: #555555;
           background-color: #fafafa;
           border: 1px solid #ddd;
-          border-left: 0;
+          margin-left: -1px;
           border-radius: 0px;
           margin-right: 0px;
           padding: 8px 12px;
           line-height: 20px;
           height: 38px;
+
+          &:focus {
+            outline: none;
+          }
         }
        &.active > a,
        &.active > a:hover,
@@ -455,7 +447,7 @@
        &:first-child > a,
        &first-child > a:hover,
        &:first-child > a:focus{
-          border-left: 1px solid #ddd;
+          border-left: 1px solid transparent;
         }
       }
     }
