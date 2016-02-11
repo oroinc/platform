@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList\JsonApi;
 
 use Doctrine\Common\Collections\Criteria;
 
-use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultSorting as RestSetDefaultSorting;
 use Oro\Bundle\ApiBundle\Processor\GetList\SetDefaultSorting as BaseSetDefaultSorting;
@@ -65,6 +65,13 @@ class SetDefaultSorting extends BaseSetDefaultSorting
      */
     protected function getDefaultValue($entityClass)
     {
-        return ['id' => Criteria::ASC];
+        $result = [];
+
+        $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+        foreach ($idFieldNames as $fieldName) {
+            $result[$fieldName] = Criteria::ASC;
+        }
+
+        return $result;
     }
 }
