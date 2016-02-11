@@ -2318,6 +2318,12 @@ div.selector.disabled span {
 .row-fluid.row-fluid-divider {
   background: url("../../img/vertical-separator.png") repeat-y 50% 0;
 }
+/* fix incorrect aligment of fluid divider line in Firefox */
+@-moz-document url-prefix() {
+  .row-fluid.row-fluid-divider {
+    background-position: calc(~"50% - 1px") 0;
+  }
+}
 h5.user-fieldset {
   font-weight:bold;
   font-size:15px;
