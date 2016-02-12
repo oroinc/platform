@@ -152,20 +152,28 @@ class EntityListener
         );
 
         $em = $event->getEntityManager();
-        $jobs = array_map(
-            function ($entity) use ($em) {
-                $class = ClassUtils::getClass($entity);
+        $jobsArgs = array_reduce(
+            $entitiesToUpdate,
+            function ($jobsArgsByClass, $emailOwner) use ($em) {
+                $class = ClassUtils::getClass($emailOwner);
                 $metadata = $em->getClassMetadata($class);
+                if (!isset($jobsArgsByClass[$class])) {
+                    $jobsArgsByClass[$class] = [$class];
+                }
 
-                return new Job(
-                    'oro:email:update-email-owner-associations',
-                    [
-                        'class' => ClassUtils::getClass($entity),
-                        'id' => $metadata->getIdentifierValues($entity)[$metadata->getSingleIdentifierFieldName()],
-                    ]
-                );
+                $jobsArgsByClass[$class][] =
+                    $metadata->getIdentifierValues($emailOwner)[$metadata->getSingleIdentifierFieldName()];
+
+                return $jobsArgsByClass;
             },
-            $entitiesToUpdate
+            []
+        );
+
+        $jobs = array_map(
+            function ($jobArgs) {
+                return new Job('oro:email:update-email-owner-associations', $jobArgs);
+            },
+            $jobsArgs
         );
 
         array_map([$em, 'persist'], $jobs);
