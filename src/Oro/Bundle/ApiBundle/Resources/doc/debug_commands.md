@@ -16,7 +16,7 @@ If you want to know which processors are registered for a particular action run 
 php app/console oro:api:debug get_list
 ```
 
-Also using `request-type` option you can see the processors which will be executed for a particular request type:
+The `request-type` option can be used to see the processors which will be executed for a particular request type:
 
 ```bash
 php app/console oro:api:debug get_list --request-type=rest --request-type=json_api
@@ -31,7 +31,7 @@ Run this command without parameters to see all available API resources:
 php app/console oro:api:resources:dump
 ```
 
-or specify `request-type` option if you need to know API resources for a particular request type:
+or specify the `request-type` option if you need to know API resources for a particular request type:
 
 ```bash
 php app/console oro:api:resources:dump --request-type=rest --request-type=json_api
@@ -40,7 +40,7 @@ php app/console oro:api:resources:dump --request-type=rest --request-type=json_a
 ### oro:api:config:dump
 This command shows API configuration for a particular entity.
 
-Just run this command and specify entity class or entity alias as an argument:
+Run this command and specify entity class or entity alias as an argument:
 
 ```bash
 php app/console oro:api:config:dump "Oro\Bundle\UserBundle\Entity\User"
@@ -52,19 +52,19 @@ or
 php app/console oro:api:config:dump users
 ```
 
-To see API configuration for a particular request type you can use `request-type` option:
+To see API configuration for a particular request type you can use the `request-type` option:
 
 ```bash
 php app/console oro:api:config:dump users --request-type=rest --request-type=json_api
 ```
 
-Also, if you want to see human-readable representation of entity and its fields, you can use `with-descriptions` option:
+If you want to see human-readable representation of an entity and its fields, you can use the `with-descriptions` option:
 
 ```bash
 php app/console oro:api:config:dump users --with-descriptions
 ```
 
-At the last, you can use `section` option to see a configuration of an entity when it is referenced by another entity:
+The `section` option can be used to see a configuration of an entity when it is referenced by another entity:
 
 ```bash
 php app/console oro:api:config:dump addresses --section=relations
@@ -85,7 +85,7 @@ or
 php app/console oro:api:metadata:dump users
 ```
 
-If you want to see entity metadata that is used for a particular request type you can use `request-type` option:
+If you want to see entity metadata that is used for a particular request type you can use the `request-type` option:
 
 ```bash
 php app/console oro:api:metadata:dump users --request-type=rest --request-type=json_api
