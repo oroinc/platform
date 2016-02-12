@@ -27,7 +27,8 @@ define([
         headerCell: HeaderCell,
 
         viewOptions: {
-            childViews: []
+            className: 'grid-header',
+            childViews: ['row']
         },
 
         /**
@@ -53,8 +54,6 @@ define([
             });
 
             this.subviews = [this.row];
-
-            this.viewOptions.childViews.push(this.row);
         },
 
         /**

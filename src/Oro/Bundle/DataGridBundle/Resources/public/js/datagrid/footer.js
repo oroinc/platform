@@ -31,6 +31,11 @@ define([
 
         renderable: false,
 
+        viewOptions: {
+            className: 'grid-footer',
+            childViews: ['row']
+        },
+
         /**
          * @inheritDoc
          */

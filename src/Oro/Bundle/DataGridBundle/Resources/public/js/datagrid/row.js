@@ -1,8 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'backgrid'
-], function($, _, Backgrid) {
+    'backgrid',
+    'orodatagrid/js/datagrid-view-options'
+], function($, _, Backgrid, DataGridViewOptions) {
     'use strict';
 
     var Row;
@@ -31,8 +32,8 @@ define([
         DOUBLE_CLICK_WAIT_TIMEOUT: 170,
 
         viewOptions: {
-            templateKey: 'rowTemplateSelector',
-            childViews: []
+            className: 'grid-body-row',
+            templateKey: 'rowTemplateSelector'
         },
 
         /**
@@ -43,8 +44,6 @@ define([
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
-
-            this.viewOptions.childViews.push.apply(this.viewOptions.childViews, this.cells);
         },
 
         /**
@@ -181,22 +180,26 @@ define([
          * @inheritDoc
          */
         makeCell: function(column) {
-            var cell = new (column.get('cell'))({
+            var Cell = column.get('cell');
+            var viewOptions = _.extend({
+                className: 'grid-body-cell'
+            }, this.sourceViewOptions);
+            Cell = new (DataGridViewOptions.extend(Cell, viewOptions))({
                 column: column,
                 model: this.model
             });
             if (column.has('align')) {
-                cell.$el.removeClass('align-left align-center align-right');
-                cell.$el.addClass('align-' + column.get('align'));
+                Cell.$el.removeClass('align-left align-center align-right');
+                Cell.$el.addClass('align-' + column.get('align'));
             }
-            if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
-                cell.$el.addClass('skip-row-click');
+            if (!_.isUndefined(Cell.skipRowClick) && Cell.skipRowClick) {
+                Cell.$el.addClass('skip-row-click');
             }
 
             // use columns collection as event bus since there is no alternatives
-            this.columns.trigger('afterMakeCell', this, cell);
+            this.columns.trigger('afterMakeCell', this, Cell);
 
-            return cell;
+            return Cell;
         }
     });
 

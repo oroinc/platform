@@ -26,7 +26,8 @@ define([
         rowClassName: undefined,
 
         viewOptions: {
-            childViews: []
+            className: 'grid-body',
+            childViews: ['row']
         },
 
         /**
@@ -46,8 +47,6 @@ define([
             Body.__super__.initialize.apply(this, arguments);
 
             this._listenToRowsEvents(this.rows);
-
-            this.viewOptions.childViews.push.apply(this.viewOptions.childViews, this.rows);
         },
 
         /**

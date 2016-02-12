@@ -184,9 +184,8 @@ define(function(require) {
 
             this.$el.hide();
             options.el = this.$el[0];
-            //options.viewOptions = DataGridViewOptions.setDefaults(this.viewOptions);
+            Grid = DataGridViewOptions.extend(Grid, DataGridViewOptions.setDefaults(this.viewOptions));
             grid = new Grid(_.extend({collection: collection}, options));
-            DataGridViewOptions.setViewOptions(grid, DataGridViewOptions.setDefaults(this.viewOptions));
             this.grid = grid;
             grid.render();
             mediator.trigger('datagrid:rendered', grid);

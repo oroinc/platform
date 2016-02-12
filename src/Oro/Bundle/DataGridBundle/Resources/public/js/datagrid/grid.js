@@ -112,7 +112,7 @@ define(function(require) {
         DEFAULT_COLUMN_START_INDEX: 1000,
 
         viewOptions: {
-            childViews: []
+            childViews: ['header', 'body', 'footer']
         },
 
         /**
@@ -196,8 +196,6 @@ define(function(require) {
             this._listenToCollectionEvents();
             this._listenToContentEvents();
             this._listenToCommands();
-
-            this.viewOptions.childViews.push(this.header, this.body, this.footer);
         },
 
         /**
@@ -612,7 +610,7 @@ define(function(require) {
 
         setTemplate: function() {
             var tag = 'table';
-            if (this.viewOptions && this.viewOptions.tableView === false) {
+            if (this.viewOptions.tableView === false) {
                 tag = 'div';
             }
             return _.template(
