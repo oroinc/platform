@@ -55,20 +55,12 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
     public function testListenerShouldAddViewsIntoEvent()
     {
         $originalViews = [
-            'choices' => [
-                [
-                    'label' => 'first',
-                    'value' => 'first',
-                ],
+            [
+                'name' => 'first',
+                'filters' => [],
+                'sorters' => [],
+                'type' => 'system',
             ],
-            'views' => [
-                [
-                    'name' => 'first',
-                    'filters' => [],
-                    'sorters' => [],
-                    'type' => 'system',
-                ],
-            ]
         ];
         $event = new GridViewsLoadEvent('grid', $originalViews);
 
@@ -98,50 +90,36 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($gridViews));
 
         $expectedViews = [
-            'choices' => [
-                [
-                    'label' => 'first',
-                    'value' => 'first',
-                ],
-                [
-                    'label' => 'view1',
-                    'value' => 1,
-                ],
-                [
-                    'label' => 'view2',
-                    'value' => 2,
-                ],
+            [
+                'name'    => 'first',
+                'filters' => [],
+                'sorters' => [],
+                'type' => 'system',
             ],
-            'views' => [
-                [
-                    'name'    => 'first',
-                    'filters' => [],
-                    'sorters' => [],
-                    'type' => 'system',
-                ],
-                [
-                    'label'     => 'view1',
-                    'name'      => 1,
-                    'filters'   => [],
-                    'sorters'   => [],
-                    'type'      => GridView::TYPE_PRIVATE,
-                    'deletable' => true,
-                    'editable'  => true,
-                    'columns'   => [],
-                    'is_default' => false
-                ],
-                [
-                    'label'     => 'view2',
-                    'name'      => 2,
-                    'filters'   => [],
-                    'sorters'   => [],
-                    'type'      => GridView::TYPE_PRIVATE,
-                    'deletable' => true,
-                    'editable'  => true,
-                    'columns'   => [],
-                    'is_default' => false
-                ],
-            ]
+            [
+                'label'     => 'view1',
+                'name'      => 1,
+                'filters'   => [],
+                'sorters'   => [],
+                'type'      => GridView::TYPE_PRIVATE,
+                'deletable' => true,
+                'editable'  => true,
+                'columns'   => [],
+                'is_default' => false,
+                'shared_by'  => null
+            ],
+            [
+                'label'     => 'view2',
+                'name'      => 2,
+                'filters'   => [],
+                'sorters'   => [],
+                'type'      => GridView::TYPE_PRIVATE,
+                'deletable' => true,
+                'editable'  => true,
+                'columns'   => [],
+                'is_default' => false,
+                'shared_by'  => null
+            ],
         ];
 
         $this->gridViewsLoadListener->onViewsLoad($event);
