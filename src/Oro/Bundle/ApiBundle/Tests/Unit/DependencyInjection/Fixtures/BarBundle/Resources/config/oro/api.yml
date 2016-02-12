@@ -1,0 +1,34 @@
+oro_api:
+    exclusions:
+        - { entity: Test\Entity1 }
+
+    entities:
+        Test\Entity1: ~
+        Test\Entity2: ~
+        Test\Entity3:
+            exclude: true
+        Test\Entity4:
+            definition:
+                fields:
+                    field1: ~
+                    field2:
+                        exclude: true
+                    field3: ~
+                filters:
+                    fields:
+                        field1: ~
+                        field2:
+                            data_type: string
+                        field3:
+                            exclude: true
+                sorters:
+                    fields:
+                        field1: ~
+                        field2:
+                            exclude: true
+        Test\Entity5:
+            definition:
+                fields:
+                    field1: ~
+        Test\Entity6: ~
+        Test\Entity10: ~

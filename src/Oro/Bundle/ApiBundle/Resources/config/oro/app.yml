@@ -20,29 +20,33 @@ oro_api:
                     priority: -10
                 security_check:
                     priority: -20
-                build_query:
+                normalize_input:
                     priority: -30
-                load_data:
+                build_query:
                     priority: -40
-                normalize_data:
+                load_data:
                     priority: -50
-                finalize:
+                normalize_data:
                     priority: -60
-                normalize_result:
+                finalize:
                     priority: -70
+                normalize_result:
+                    priority: -80
         get:
             processing_groups:
                 initialize:
                     priority: -10
                 security_check:
                     priority: -20
-                build_query:
+                normalize_input:
                     priority: -30
-                load_data:
+                build_query:
                     priority: -40
-                normalize_data:
+                load_data:
                     priority: -50
-                finalize:
+                normalize_data:
                     priority: -60
-                normalize_result:
+                finalize:
                     priority: -70
+                normalize_result:
+                    priority: -80
