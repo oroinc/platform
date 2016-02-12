@@ -49,6 +49,8 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
 
 # Prevent required values for all child of AbstractAddress
 Oro\Bundle\AddressBundle\Entity\Address:
+    constraints:
+        - Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion: { groups: ['RequirePeriod'] }
     properties:
         street:
             - NotBlank: ~
@@ -56,8 +58,6 @@ Oro\Bundle\AddressBundle\Entity\Address:
             - NotBlank: ~
         postalCode:
             - NotBlank: ~
-    constraints:
-        - Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion: ~
 
 Oro\Bundle\AddressBundle\Entity\AbstractEmail:
     properties:

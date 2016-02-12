@@ -287,7 +287,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult' => [
                     'scope'                  => 'global',
                     'value'                  => ['foo' => 'bar'],
-                    'use_parent_scope_value' => false
+                    'use_parent_scope_value' => true
                 ]
             ],
             [
