@@ -17,8 +17,7 @@ define(function(require) {
         events: {
             'click .email-view-toggle-all': 'onToggleAllClick',
             'click .email-load-more': 'onLoadMoreClick',
-            'shown.bs.dropdown .email-detailed-info-table .dropdown-menu': tools.isMobile() ?
-                'onDetailedInfoOpenMobile' : 'onDetailedInfoOpenDesktop'
+            'shown.bs.dropdown .email-detailed-info-table .dropdown-menu': 'onDetailedInfoOpen'
         },
 
         selectors: {
@@ -110,20 +109,32 @@ define(function(require) {
             this.loadEmails();
         },
 
-        onDetailedInfoOpenMobile: function(e) {
-            var rect = e.currentTarget.getBoundingClientRect();
+        onDetailedInfoOpen: function(e) {
+            var target = e.currentTarget;
+            var $target = $(target);
             var parentRect = this.el.getBoundingClientRect();
-            var left = parseInt($(e.currentTarget).css('left'));
-            $(e.currentTarget).css({
-                'left': left + parentRect.left - rect.left + 'px',
-                'max-width': parentRect.width + 'px'
+            $target.removeAttr('data-uid').removeClass('fixed-width').css({
+                'width': '',
+                'left': ''
             });
-        },
-
-        onDetailedInfoOpenDesktop: function(e) {
-            $(e.currentTarget).css('width', null).removeClass('fixed-width');
-            if (e.currentTarget.scrollWidth > e.currentTarget.clientWidth) {
-                $(e.currentTarget).outerWidth(e.currentTarget.clientWidth).addClass('fixed-width');
+            var limitWidth = Math.min(target.clientWidth, parentRect.width);
+            if (target.scrollWidth > limitWidth) {
+                $target.outerWidth(limitWidth).addClass('fixed-width');
+            }
+            var rect = target.getBoundingClientRect();
+            var left = parseInt($target.css('left'));
+            var uid = 'dropdown-menu-' + Date.now();
+            var shift = rect.right - parentRect.right;
+            if (shift > 0) {
+                $target.css({
+                    'left': left - shift + 'px'
+                });
+                // move dropdown triangle to fit to open button
+                $target.attr('data-uid', uid);
+                tools.addCSSRule(
+                    '[data-uid=' + uid + ']:before, [data-uid=' + uid + ']:after',
+                    'margin-left: ' + shift + 'px'
+                );
             }
         },
 
