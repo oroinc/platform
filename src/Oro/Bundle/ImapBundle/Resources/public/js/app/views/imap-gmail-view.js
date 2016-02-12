@@ -188,7 +188,7 @@ define(function(require) {
          * @returns {*}
          */
         getErrorBlock: function() {
-            return this.$el.find(this.googleErrorMessage)
+            return this.$el.find(this.googleErrorMessage);
         },
 
         /**
