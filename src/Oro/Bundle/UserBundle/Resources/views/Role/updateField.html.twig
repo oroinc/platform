@@ -15,9 +15,7 @@
             'type': 'button',
             'class': 'btn-success main-group role-submit',
             'label': 'Save'|trans,
-            'data': {
-                'action': 'save_and_stay'
-            }
+            'action': 'save_and_stay'
         }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
@@ -33,8 +31,10 @@
         elSelector: '.btn-success.role-submit',
         formName: form.vars.name,
         formSelector: '#' ~ form.vars.id,
+        labelSelector: '#' ~ form.label.vars.id,
         privilegesSelector: '#' ~ form.privileges.vars.id,
-        fields : fields
+        fields : fields,
+        tokenSelector: '#' ~ form._token.vars.id
     } %}
     <div data-page-component-module="orouser/js/views/role-view"
          data-page-component-options="{{ options|json_encode }}">

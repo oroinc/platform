@@ -6,7 +6,6 @@ use Doctrine\ORM\NoResultException;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Security;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;

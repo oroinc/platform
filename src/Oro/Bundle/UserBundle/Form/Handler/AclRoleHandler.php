@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Form\Handler;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Doctrine\Common\Persistence\ObjectManager;
@@ -22,7 +23,11 @@ use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\FieldAclPrivilegeRepository;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AclRoleHandler
 {
     /**
@@ -58,9 +63,14 @@ class AclRoleHandler
     protected $aclManager;
 
     /**
-     * @var AclPrivilegeRepository
+     * @var AclPrivilegeRepository|FieldAclPrivilegeRepository
      */
     protected $privilegeRepository;
+
+    /**
+     * @var AclCacheInterface
+     */
+    protected $aclCache;
 
     /**
      * @var array
@@ -76,11 +86,13 @@ class AclRoleHandler
 
     /**
      * @param FormFactory $formFactory
+     * @param AclCacheInterface $aclCache
      * @param array $privilegeConfig
      */
-    public function __construct(FormFactory $formFactory, array $privilegeConfig)
+    public function __construct(FormFactory $formFactory, AclCacheInterface $aclCache, array $privilegeConfig)
     {
         $this->formFactory = $formFactory;
+        $this->aclCache = $aclCache;
         $this->privilegeConfig = $privilegeConfig;
     }
 
@@ -203,13 +215,8 @@ class AclRoleHandler
 
                 return true;
             }
-        } elseif (empty($className)) {
-            $this->setRolePrivileges($role);
         } else {
-            $privileges = $this->getRolePrivileges($role, $className);
-
-            $sortedPrivileges = $this->filterPrivileges($privileges, $this->privilegeConfig['field']['types']);
-            $this->form->get('field')->setData($sortedPrivileges);
+            $this->setRolePrivileges($role, $className);
         }
 
         return false;
@@ -236,20 +243,7 @@ class AclRoleHandler
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $sortedPrivileges = $this->filterPrivileges($privileges, $config['types']);
-            if ($config['fix_values'] || !$config['show_default']) {
-                foreach ($sortedPrivileges as $sortedPrivilege) {
-                    if (!$config['show_default']
-                        && $sortedPrivilege->getIdentity()->getName() == AclPrivilegeRepository::ROOT_PRIVILEGE_NAME) {
-                        $sortedPrivileges->removeElement($sortedPrivilege);
-                        continue;
-                    }
-                    if ($config['fix_values']) {
-                        foreach ($sortedPrivilege->getPermissions() as $permission) {
-                            $permission->setAccessLevel((bool)$permission->getAccessLevel());
-                        }
-                    }
-                }
-            }
+            $this->applyOptions($sortedPrivileges, $config);
 
             $this->form->get($fieldName)->setData($sortedPrivileges);
             $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
@@ -276,6 +270,33 @@ class AclRoleHandler
         }
 
         $this->form->get('privileges')->setData(json_encode($formPrivileges));
+    }
+
+    /**
+     * @param ArrayCollection|AclPrivilege[] $sortedPrivileges
+     * @param array $config
+     */
+    protected function applyOptions(ArrayCollection $sortedPrivileges, array $config)
+    {
+        $hideDefault = !$config['show_default'];
+        $fixValues = $config['fix_values'];
+
+        if ($fixValues || $hideDefault) {
+            foreach ($sortedPrivileges as $sortedPrivilege) {
+                if ($hideDefault
+                    && $sortedPrivilege->getIdentity()->getName() === AclPrivilegeRepository::ROOT_PRIVILEGE_NAME
+                ) {
+                    $sortedPrivileges->removeElement($sortedPrivilege);
+                    continue;
+                }
+
+                if ($fixValues) {
+                    foreach ($sortedPrivilege->getPermissions() as $permission) {
+                        $permission->setAccessLevel((bool)$permission->getAccessLevel());
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -307,7 +328,7 @@ class AclRoleHandler
             $privileges = [];
             foreach ($privilegesArray as $privilege) {
                 $aclPrivilege = new AclPrivilege();
-                foreach ($privilege['permissions'] as $name => $permission) {
+                foreach ($privilege['permissions'] as $permission) {
                     $aclPrivilege->addPermission(new AclPermission($permission['name'], $permission['accessLevel']));
                 }
                 $aclPrivilegeIdentity = new AclPrivilegeIdentity(
@@ -342,11 +363,14 @@ class AclRoleHandler
                 new ArrayCollection($formPrivileges)
             );
         }
+
+        $this->aclCache->clearCache();
     }
 
     /**
      * @param ArrayCollection $privileges
-     * @param array $rootIds
+     * @param array           $rootIds
+     *
      * @return ArrayCollection|AclPrivilege[]
      */
     protected function filterPrivileges(ArrayCollection $privileges, array $rootIds)
