@@ -22,12 +22,12 @@ class OrmSorterExtension extends AbstractExtension
     /**
      * Ascending sorting direction
      */
-    const DIRECTION_ASC = "ASC";
+    const DIRECTION_ASC = 'ASC';
 
     /**
      * Descending sorting direction
      */
-    const DIRECTION_DESC = "DESC";
+    const DIRECTION_DESC = 'DESC';
 
     /**
      * {@inheritDoc}
@@ -77,27 +77,66 @@ class OrmSorterExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $multisort = $config->offsetGetByPath(Configuration::MULTISORT_PATH, false);
-        $sorters   = $this->getSorters($config);
+        $toolbarSort = $config->offsetGetByPath(Configuration::TOOLBAR_SORTING_PATH, false);
+        $multiSort = $config->offsetGetByPath(Configuration::MULTISORT_PATH, false);
+        if ($toolbarSort && $multiSort) {
+            throw new LogicException('Columns multiple_sorting cannot be enabled for toolbar_sorting');
+        }
+
+        $this->processColumns($config, $data);
+
+        $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multiSort]);
+        $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['toolbarSorting' => $toolbarSort]);
+
+        $this->setMetadataStates($config, $data);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param MetadataObject $data
+     */
+    protected function processColumns(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $toolbarSort = $config->offsetGetByPath(Configuration::TOOLBAR_SORTING_PATH, false);
+
+        $sorters = $this->getSorters($config);
 
         $proceed = [];
+
         foreach ($data->offsetGetOr('columns', []) as $key => $column) {
-            if (isset($column['name']) && isset($sorters[$column['name']])) {
-                $data->offsetSetByPath(sprintf('[columns][%s][sortable]', $key), true);
-                $proceed [] = $column['name'];
+            if (!array_key_exists('name', $column) || !array_key_exists($column['name'], $sorters)) {
+                continue;
             }
+            if ($toolbarSort) {
+                if (!array_key_exists(PropertyInterface::TYPE_KEY, $sorters[$column['name']])) {
+                    continue;
+                }
+                $data->offsetSetByPath(
+                    sprintf('[columns][%s][sortable_type]', $key),
+                    $sorters[$column['name']][PropertyInterface::TYPE_KEY]
+                );
+            }
+            $data->offsetSetByPath(sprintf('[columns][%s][sortable]', $key), true);
+            $proceed[] = $column['name'];
         }
 
         $extraSorters = array_diff(array_keys($sorters), $proceed);
         if (count($extraSorters)) {
-            throw new LogicException(
-                sprintf('Could not found column(s) "%s" for sorting', implode(', ', $extraSorters))
-            );
+            $message = 'Could not found column(s) "%s" for sorting';
+            if ($toolbarSort) {
+                $message = 'Could not found column type(s) "%s" for sorting';
+            }
+            throw new LogicException(sprintf($message, implode(', ', $extraSorters)));
         }
+    }
 
-        $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multisort]);
-
-        $sortersState        = $this->getSortersState($config, $data);
+    /**
+     * @param DatagridConfiguration $config
+     * @param MetadataObject $data
+     */
+    protected function setMetadataStates(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $sortersState = $this->getSortersState($config, $data);
         $initialSortersState = $this->getSortersState($config, $data, false);
 
         $data->offsetAddToArray('initialState', ['sorters' => $initialSortersState]);
