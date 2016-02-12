@@ -13,6 +13,9 @@ class PermissionConfigurationProvider
     /** @var PermissionListConfiguration */
     protected $permissionConfiguration;
 
+    /** @var PermissionListConfiguration */
+    protected $permissionConfigurationValidator;
+
     /** @var array */
     protected $kernelBundles;
 
@@ -21,11 +24,16 @@ class PermissionConfigurationProvider
 
     /**
      * @param PermissionListConfiguration $permissionConfiguration
+     * @param PermissionConfigurationValidator $permissionConfigurationValidator
      * @param array $kernelBundles
      */
-    public function __construct(PermissionListConfiguration $permissionConfiguration, array $kernelBundles)
-    {
+    public function __construct(
+        PermissionListConfiguration $permissionConfiguration,
+        PermissionConfigurationValidator $permissionConfigurationValidator,
+        array $kernelBundles
+    ) {
         $this->permissionConfiguration = $permissionConfiguration;
+        $this->permissionConfigurationValidator = $permissionConfigurationValidator;
         $this->kernelBundles = array_values($kernelBundles);
     }
 
@@ -77,6 +85,7 @@ class PermissionConfigurationProvider
     {
         try {
             $permissionsData = $this->permissionConfiguration->processConfiguration($configuration);
+            $this->permissionConfigurationValidator->validate($permissionsData);
         } catch (InvalidConfigurationException $exception) {
             throw new InvalidConfigurationException(
                 sprintf('Can\'t parse permission configuration. %s', $exception->getMessage())

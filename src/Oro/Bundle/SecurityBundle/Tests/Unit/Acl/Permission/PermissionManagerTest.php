@@ -10,6 +10,7 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationValidator;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
@@ -51,6 +52,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->configurationProvider = new PermissionConfigurationProvider(
             new PermissionListConfiguration(new PermissionConfiguration()),
+            new PermissionConfigurationValidator(),
             $bundles
         );
 
