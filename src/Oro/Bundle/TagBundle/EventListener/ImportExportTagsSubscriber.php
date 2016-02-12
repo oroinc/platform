@@ -134,14 +134,9 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         }
 
         $uow = $args->getEntityManager()->getUnitOfWork();
-        $flushedEntities = array_merge(
-            $uow->getScheduledEntityInsertions(),
-            $uow->getScheduledEntityUpdates()
-        );
-
         $this->preparedTaggedObjects = array_merge(
             $this->preparedTaggedObjects,
-            array_intersect_key($this->pendingTaggedObjects, $flushedEntities)
+            array_filter($this->pendingTaggedObjects, [$uow, 'isInIdentityMap'])
         );
         $this->pendingTaggedObjects = array_diff_key($this->pendingTaggedObjects, $this->preparedTaggedObjects);
     }
