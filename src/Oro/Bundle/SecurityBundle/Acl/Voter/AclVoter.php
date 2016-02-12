@@ -13,6 +13,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 
 /**
  * This voter uses ACL to determine whether the access to the particular resource is granted or not.
@@ -61,6 +62,11 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $groupProvider;
 
     /**
+     * @var PermissionManager
+     */
+    protected $permissionManager;
+
+    /**
      * Sets the ACL extension selector
      *
      * @param AclExtensionSelector $selector
@@ -76,6 +82,14 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     public function setAclGroupProvider(AclGroupProviderInterface $provider)
     {
         $this->groupProvider = $provider;
+    }
+
+    /**
+     * @param PermissionManager $permissionManager
+     */
+    public function setPermissionManager(PermissionManager $permissionManager)
+    {
+        $this->permissionManager = $permissionManager;
     }
 
     /**
@@ -123,6 +137,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
 
         //check acl group
         $result = $this->checkAclGroup($group);
+        $result = $this->checkAttributesGroup($attributes, $group, $result);
 
         if ($result !== self::ACCESS_DENIED) {
             $result = parent::vote($token, $this->object, $attributes);
@@ -217,5 +232,33 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         }
 
         return $group === $this->groupProvider->getGroup() ? self::ACCESS_ABSTAIN : self::ACCESS_DENIED;
+    }
+
+    /**
+     * @param array $attributes
+     * @param string $group
+     * @param int $result
+     * @return int
+     */
+    protected function checkAttributesGroup(array $attributes, $group, $result)
+    {
+        if ($group === null || $result === self::ACCESS_DENIED) {
+            return $result;
+        }
+
+        $permissions = array_keys($this->permissionManager->getPermissionsMap($group));
+
+        foreach ($attributes as $attribute) {
+            if (!$this->supportsAttribute($attribute)) {
+                continue;
+            }
+
+            if (!in_array($attribute, $permissions, true)) {
+                $result = self::ACCESS_DENIED;
+                break;
+            }
+        }
+
+        return $result;
     }
 }
