@@ -119,7 +119,6 @@ define(function(require) {
                 data: data,
                 success: _.bind(this.prepareAuthorization, this),
                 error:  _.bind(this.requestError, this)
-
             });
         },
 
