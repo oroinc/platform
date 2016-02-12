@@ -168,7 +168,7 @@ define(function(require) {
         showErrorMessage: function() {
             var $errorBlock = this.getErrorBlock();
 
-            if ($errorBlock.length > 0 ) {
+            if ($errorBlock.length > 0) {
                 $errorBlock.html(this.errorMessage);
                 $errorBlock.show();
             }
@@ -179,7 +179,7 @@ define(function(require) {
          */
         hideErrorMessage: function() {
             var $errorBlock = this.getErrorBlock();
-            if ($errorBlock.length > 0 ) {
+            if ($errorBlock.length > 0) {
                 $errorBlock.hide();
             }
         },

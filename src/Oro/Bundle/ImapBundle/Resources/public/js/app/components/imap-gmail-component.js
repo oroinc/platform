@@ -240,14 +240,12 @@ define(function(require) {
         handlerGetFolders: function(response) {
             if (response.error !== undefined) {
                 this.view.setErrorMessage(response.error);
-                this.view.render();
             } else if (response.html === undefined) {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.request'));
-                this.view.render();
             } else {
                 this.view.setHtml(response.html);
-                this.view.render();
             }
+            this.view.render();
             mediator.execute('hideLoading');
         },
 
@@ -286,7 +284,6 @@ define(function(require) {
         getUrlGetFolders: function() {
             return routing.generate(this.routeGetFolders, this._getUrlParams());
         },
-
 
         /**
          * Generate url for request to get access token
