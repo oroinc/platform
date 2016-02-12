@@ -1,4 +1,8 @@
 oro_entity:
+    exclusions:
+        - { entity: Oro\Bundle\UserBundle\Entity\User, field: password }
+        - { entity: Oro\Bundle\UserBundle\Entity\User, field: salt }
+
     entity_aliases:
         Oro\Bundle\UserBundle\Entity\Email:
             alias:        useremail

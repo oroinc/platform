@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class SetFieldsFilter implements ProcessorInterface
 {
@@ -66,7 +65,7 @@ class SetFieldsFilter implements ProcessorInterface
             $fieldFilter
         );
 
-        $associations = $this->doctrineHelper->getEntityMetadata($entityClass)->getAssociationMappings();
+        $associations = $context->getMetadata()->getAssociations();
         if (!$associations) {
             // no associations - no sense to add associations fields filters
             return;
