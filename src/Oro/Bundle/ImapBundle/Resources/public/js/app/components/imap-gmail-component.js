@@ -29,6 +29,10 @@ define(function(require) {
             var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
 
+            this.view.setAccessToken(_.result(options, 'accessToken') || '');
+            this.view.setExpiredAt(_.result(options, 'accessTokenExpiresAt') || '');
+            this.view.setEmail(_.result(options, 'user') || '');
+
             this.listenTo(this.view, 'getFolders', this.onGetFolders);
 
             require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
@@ -206,7 +210,7 @@ define(function(require) {
                 mediator.execute('hideLoading');
             } else {
                 this.view.setHtml(response.html);
-                this.view.render();
+                //this.view.render();
                 this.view.autoRetrieveFolders();
             }
         },

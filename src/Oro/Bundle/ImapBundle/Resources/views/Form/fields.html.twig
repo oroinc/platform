@@ -75,7 +75,10 @@
         'googleErrorMessage': '.google-alert',
         'formParentName' : form.parent.parent.vars.name,
         'type': constant('Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel::ACCOUNT_TYPE_GMAIL'),
-        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null,
+        'user': form.parent.userEmailOrigin.user.vars.value,
+        'accessToken': form.parent.userEmailOrigin.accessToken.vars.value,
+        'accessTokenExpiresAt': form.parent.userEmailOrigin.accessTokenExpiresAt.vars.value
     }) %}
 
     <div class="container-imap-gmail-container"
