@@ -32,6 +32,7 @@ define([
         renderable: false,
 
         viewOptions: {
+            view: 'footer',
             className: 'grid-footer',
             childViews: ['row']
         },

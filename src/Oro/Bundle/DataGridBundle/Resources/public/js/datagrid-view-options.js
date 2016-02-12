@@ -8,8 +8,7 @@ define(function(require) {
     var DataGridViewOptions = {
         setDefaults: function(options) {
             return _.defaults(options, {
-                tableView: true,
-                rowTemplateSelector: null
+                tableView: true
             });
         },
 
@@ -33,18 +32,24 @@ define(function(require) {
                         }
                     }, this));
 
-                    if (this.viewOptions.templateKey && this.viewOptions[this.viewOptions.templateKey]) {
-                        this.template = _.template($(this.viewOptions[this.viewOptions.templateKey]).html());
+                    var templateKey = this.viewOptions.view + 'TemplateSelector';
+                    if (this.viewOptions[templateKey]) {
+                        this.template = _.template($(this.viewOptions[templateKey]).html());
                     }
 
                     return ExtendedView.__super__.initialize.apply(this, arguments);
                 },
 
                 render: function() {
+                    var templateKey = this.viewOptions.view + 'TemplateSelector';
+                    var hideKey = this.viewOptions.view + 'Hide';
                     if (this.viewOptions.className) {
                         this.$el.addClass(this.viewOptions.className);
                     }
-                    if (this.viewOptions.templateKey && this.template) {
+                    if (this.viewOptions[hideKey]) {
+                        return this;
+                    }
+                    if (this.viewOptions[templateKey] && this.template) {
                         this.$el.html(this.template({
                             model: this.model ? this.model.attributes : {}
                         }));

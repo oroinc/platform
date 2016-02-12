@@ -27,6 +27,7 @@ define([
         headerCell: HeaderCell,
 
         viewOptions: {
+            view: 'header',
             className: 'grid-header',
             childViews: ['row']
         },

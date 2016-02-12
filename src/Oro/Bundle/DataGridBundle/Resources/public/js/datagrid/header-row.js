@@ -10,6 +10,7 @@ define([
 
     HeaderRow = Backgrid.HeaderRow.extend({
         viewOptions: {
+            view: 'headerRow',
             className: 'grid-header-row'
         },
 

@@ -26,6 +26,7 @@ define([
         rowClassName: undefined,
 
         viewOptions: {
+            view: 'body',
             className: 'grid-body',
             childViews: ['row']
         },

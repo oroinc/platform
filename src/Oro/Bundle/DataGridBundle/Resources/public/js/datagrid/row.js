@@ -32,8 +32,8 @@ define([
         DOUBLE_CLICK_WAIT_TIMEOUT: 170,
 
         viewOptions: {
-            className: 'grid-body-row',
-            templateKey: 'rowTemplateSelector'
+            view: 'row',
+            className: 'grid-body-row'
         },
 
         /**

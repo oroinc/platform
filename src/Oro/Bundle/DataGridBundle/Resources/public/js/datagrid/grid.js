@@ -112,6 +112,7 @@ define(function(require) {
         DEFAULT_COLUMN_START_INDEX: 1000,
 
         viewOptions: {
+            view: 'grid',
             childViews: ['header', 'body', 'footer']
         },
 
