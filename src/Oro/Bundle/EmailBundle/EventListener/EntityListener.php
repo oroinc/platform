@@ -170,7 +170,10 @@ class EntityListener
 
         array_map([$em, 'persist'], $jobs);
         $this->possibleEntitiesOwnedByEmails = [];
-        $em->flush();
+
+        if ($jobs) {
+            $em->flush();
+        }
     }
 
     /**
