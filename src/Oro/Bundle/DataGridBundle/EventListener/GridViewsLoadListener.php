@@ -61,7 +61,7 @@ class GridViewsLoadListener
         if (!$gridViews) {
             return;
         }
-        $views   = [];
+        $views = $event->getGridViews();
         foreach ($gridViews as $gridView) {
             $view = $gridView->createView();
             $view->setEditable($this->securityFacade->isGranted('EDIT', $gridView));
@@ -73,10 +73,7 @@ class GridViewsLoadListener
             $views[]   = $view->getMetadata();
         }
 
-        /** @var array $newGridViews */
-        $newGridViews            = $event->getGridViews();
-        $newGridViews['views']   = array_merge($newGridViews['views'], $views);
-        $event->setGridViews($newGridViews);
+        $event->setGridViews($views);
     }
 
     /**
