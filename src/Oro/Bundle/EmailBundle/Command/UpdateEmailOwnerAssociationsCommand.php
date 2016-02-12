@@ -4,12 +4,14 @@ namespace Oro\Bundle\EmailBundle\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 
@@ -26,8 +28,12 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
         $this
             ->setName('oro:email:update-email-owner-associations')
             ->setDescription('Updates emails for email owner')
-            ->addArgument(static::OWNER_CLASS_ARGUMENT, InputArgument::REQUIRED)
-            ->addArgument(static::OWNER_ID_ARGUMENT, InputArgument::REQUIRED);
+            ->addArgument(static::OWNER_CLASS_ARGUMENT, InputArgument::REQUIRED, 'Email owner class')
+            ->addArgument(
+                static::OWNER_ID_ARGUMENT,
+                InputArgument::REQUIRED | InputArgument::IS_ARRAY,
+                'Email owner id[s]'
+            );
     }
 
     /**
@@ -35,27 +41,30 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $owner = $this->findOwner(
+        $qb = $this->createOwnerQb(
             $input->getArgument(static::OWNER_CLASS_ARGUMENT),
             $input->getArgument(static::OWNER_ID_ARGUMENT)
         );
 
-        if (!$owner) {
-            $output->writeln('<info>Object not found for given input.</info>');
+        $owners = (new BufferedQueryResultIterator($qb))
+            ->setBufferSize(1)
+            ->setPageCallback(function () {
+                $this->getEmailEntityManager()->flush();
+                $this->getEmailEntityManager()->clear();
+            });
 
-            return;
+        foreach ($owners as $owner) {
+            $emails = $this->getEmailOwnersProvider()->getEmailsByOwnerEntity($owner);
+            foreach ($emails as $email) {
+                $this->getEmailActivityManager()->addAssociation($email, $owner);
+            }
+
+            $output->writeln(sprintf(
+                '<info>Associated %d emails with object with id %d.</info>',
+                count($emails),
+                $owner->getId()
+            ));
         }
-
-        $emails = $this->getEmailOwnersProvider()->getEmailsByOwnerEntity($owner);
-        foreach ($emails as $email) {
-            $this->getEmailActivityManager()->addAssociation($email, $owner);
-        }
-
-        if ($emails) {
-            $this->getEmailEntityManager()->flush();
-        }
-
-        $output->writeln(sprintf('<info>Associated %d emails with given object.</info>', count($emails)));
     }
 
     /**
@@ -84,13 +93,19 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
 
     /**
      * @param string $class
-     * @param mixed $id
+     * @param array $ids
      *
-     * @return object|null
+     * @return QueryBuilder
      */
-    protected function findOwner($class, $id)
+    public function createOwnerQb($class, array $ids)
     {
-        return $this->getRegistry()->getRepository($class)->find($id);
+        /* @var $qb QueryBuilder */
+        $qb = $this->getRegistry()->getRepository($class)
+            ->createQueryBuilder('o');
+
+        return $qb
+            ->andWhere($qb->expr()->in('o.id', ':ids'))
+            ->setParameter('ids', $ids);
     }
 
     /**
