@@ -14,7 +14,7 @@ define(function(require) {
     ImapGmailComponent = BaseComponent.extend({
         ViewType: ImapGmailView,
 
-        scopes: ['https://mail.google.com/'],
+        scopes: ['https://mail.google.com/', 'https://www.googleapis.com/auth/userinfo.email'],
 
         /**
          * @constructor
