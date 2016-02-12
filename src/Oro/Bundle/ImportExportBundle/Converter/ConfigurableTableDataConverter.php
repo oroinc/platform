@@ -175,7 +175,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             }
         }
 
-        $event = $this->dispatchEntityRulesEvent($entityName, $backendHeaders, $rules);
+        $event = $this->dispatchEntityRulesEvent($entityName, $backendHeaders, $rules, $fullData);
 
         return [$this->sortData($rules), $this->sortData($backendHeaders)];
     }
@@ -444,19 +444,22 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     }
 
     /**
-     * @param $entityName
-     * @param $backendHeaders
-     * @param $rules
+     * @param string $entityName
+     * @param array $backendHeaders
+     * @param array $rules
+     * @param bool $fullData
+     *
      * @return LoadEntityRulesAndBackendHeadersEvent
      */
-    protected function dispatchEntityRulesEvent($entityName, $backendHeaders, $rules)
+    protected function dispatchEntityRulesEvent($entityName, $backendHeaders, array $rules, $fullData)
     {
         $event = new LoadEntityRulesAndBackendHeadersEvent(
             $entityName,
             $backendHeaders,
             $rules,
             $this->convertDelimiter,
-            $this->getConversionType()
+            $this->getConversionType(),
+            $fullData
         );
         if ($this->dispatcher && $this->dispatcher->hasListeners(Events::LOAD_ENTITY_RULES_AND_BACKEND_HEADERS)) {
             $this->dispatcher->dispatch(Events::LOAD_ENTITY_RULES_AND_BACKEND_HEADERS, $event);

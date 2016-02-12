@@ -10,6 +10,7 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\ImportExportBundle\Event\ReadEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
@@ -48,6 +49,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            Events::READ_ENTITY => 'readEntity',
             Events::NORMALIZE_ENTITY => 'normalizeEntity',
             Events::DENORMALIZE_ENTITY => 'denormalizeEntity',
             Events::LOAD_ENTITY_RULES_AND_BACKEND_HEADERS => 'loadEntityRulesAndBackendHeaders',
@@ -89,6 +91,17 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         $this->pendingTaggedObjects[spl_object_hash($event->getEntity())] = $event->getEntity();
 
         $this->importedEntity = null;
+    }
+
+    /**
+     * @param ReadEntityEvent $event
+     */
+    public function readEntity(ReadEntityEvent $event)
+    {
+        $entity = $event->getObject();
+        if ($entity instanceof Taggable) {
+            $this->getTagImportManager()->loadTags($entity);
+        }
     }
 
     /**
@@ -154,14 +167,13 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
      */
     public function normalizeEntity(NormalizeEntityEvent $event)
     {
-        $event->getObject();
-        if (!$event->getObject() instanceof Taggable) {
+        if (!$event->isFullData() || !$event->getObject() instanceof Taggable) {
             return;
         }
 
         $event->setResultField(
             TagImportManager::TAGS_FIELD,
-            $this->getTagImportManager()->normalizeTags((array) $event->getObject()->getTags())
+            $this->getTagImportManager()->normalizeTags($event->getObject()->getTags())
         );
     }
 
@@ -170,7 +182,9 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
      */
     public function loadEntityRulesAndBackendHeaders(LoadEntityRulesAndBackendHeadersEvent $event)
     {
-        if (!in_array('Oro\Bundle\TagBundle\Entity\Taggable', class_implements($event->getEntityName()))) {
+        if (!$event->isFullData() ||
+            !in_array('Oro\Bundle\TagBundle\Entity\Taggable', class_implements($event->getEntityName()))
+        ) {
             return;
         }
 
@@ -207,6 +221,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
                         'autocomplete' => [],
                         'all' => [
                             new Tag('custom tag'),
+                            new Tag('second tag'),
                         ],
                         'owner' => [],
                     ]);

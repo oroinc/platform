@@ -230,6 +230,3 @@ services:
         class: %oro_tag.tag_import.manager.class%
         arguments:
             - @oro_tag.tag.manager
-        calls:
-            - [addTaggableRelationCalculator, [data, @oro_tag.data_converter.taggable.relation_calculator]]
-            - [addTaggableRelationCalculator, [fixtures, @oro_tag.data_converter.template_fixture_taggable.relation_calculator]]

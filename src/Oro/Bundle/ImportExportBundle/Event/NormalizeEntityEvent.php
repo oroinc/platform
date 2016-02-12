@@ -12,14 +12,19 @@ class NormalizeEntityEvent extends Event
     /** @var array result */
     protected $result;
 
+    /** @var bool */
+    protected $fullData;
+
     /**
      * @param object $object
      * @param array $result
+     * @param bool $fullData
      */
-    public function __construct($object, array $result)
+    public function __construct($object, array $result, $fullData = false)
     {
         $this->object = $object;
         $this->result = $result;
+        $this->fullData = $fullData;
     }
 
     /**
@@ -36,6 +41,14 @@ class NormalizeEntityEvent extends Event
     public function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFullData()
+    {
+        return $this->fullData;
     }
 
     /**

@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\TagBundle\Manager;
 
-use Oro\Bundle\ImportExportBundle\Converter\RelationCalculatorInterface;
+use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager as TagStorage;
 
 class TagImportManager
 {
-    const TAGS_ORDER = 500;
     const TAGS_FIELD = 'tags';
 
     /** @var TagStorage */
     protected $tagStorage;
-
-    /** @var RelationCalculatorInterface[] */
-    protected $taggableRelatioCalculators;
 
     /**
      * @param TagStorage $tagStorage
@@ -33,20 +30,20 @@ class TagImportManager
      */
     public function denormalizeTags(array $data)
     {
-        if (empty($data[static::TAGS_FIELD])) {
+        if (empty($data[static::TAGS_FIELD]) || !array_key_exists('name', $data[static::TAGS_FIELD])) {
             return;
         }
 
-        $tags = array_filter(
+        $tags = array_map(
+            function ($tag) {
+                return new Tag($tag);
+            },
             array_map(
-                function ($tagsData) {
-                    if (!isset($tagsData['name'])) {
-                        return null;
-                    }
-
-                    return new Tag($tagsData['name']);
-                },
-                $data[static::TAGS_FIELD]
+                'trim',
+                explode(
+                    ',',
+                    $data[static::TAGS_FIELD]['name']
+                )
             )
         );
 
@@ -58,22 +55,27 @@ class TagImportManager
     }
 
     /**
-     * @param array $tags
+     * @param array|Collection|null $tags
      *
      * @return array
      */
-    public function normalizeTags(array $tags)
+    public function normalizeTags($tags)
     {
-        if (empty($tags['all'])) {
-            return [];
+        if (!$tags || (is_array($tags) && empty($tags['all']))) {
+            return ['name' => ''];
         }
 
-        return array_map(
-            function (Tag $tag) {
-                return ['name' => $tag->getName()];
-            },
-            $tags['all']
-        );
+        return [
+            'name' => implode(
+                ', ',
+                array_map(
+                    function (Tag $tag) {
+                        return $tag->getName();
+                    },
+                    is_array($tags) ? $tags['all'] : $tags->toArray()
+                )
+            )
+        ];
     }
 
     /**
@@ -84,10 +86,10 @@ class TagImportManager
     public function createTagRule($convertDelimiter)
     {
         return [
-            'Tags (\d+) Name',
+            'Tags',
             [
-                'value' => sprintf('tags%1$s(\d+)%1$sname', $convertDelimiter),
-                'order' => static::TAGS_ORDER,
+                'value' => sprintf('tags%sname', $convertDelimiter),
+                'order' => PHP_INT_MAX,
             ]
         ];
     }
@@ -101,14 +103,12 @@ class TagImportManager
      */
     public function createTagHeaders($entityName, $convertDelimiter, $conversionType)
     {
-        $headers = [];
-        $count = $this->getTaggableRelationCalculator($conversionType)
-            ->getMaxRelatedEntities($entityName, static::TAGS_FIELD);
-        for ($i = 0; $i < $count; $i++) {
-            $headers[] = $this->createTagHeader($convertDelimiter, $i);
-        }
-
-        return $headers;
+        return [
+            [
+                'value' => sprintf('tags%sname', $convertDelimiter),
+                'order' => PHP_INT_MAX,
+            ]
+        ];
     }
 
     /**
@@ -120,37 +120,10 @@ class TagImportManager
     }
 
     /**
-     * @param string $conversionType
-     * @param RelationCalculatorInterface $relationCalculator
+     * @param Taggable $taggable
      */
-    public function addTaggableRelationCalculator($conversionType, RelationCalculatorInterface $relationCalculator)
+    public function loadTags(Taggable $taggable)
     {
-        $this->taggableRelatioCalculators[$conversionType] = $relationCalculator;
-    }
-
-    /**
-     * @param string $convertDelimiter
-     * @param int $n
-     *
-     * @return array
-     */
-    protected function createTagHeader($convertDelimiter, $n)
-    {
-        return [
-            'value' => sprintf('tags%1$s%2$d%1$sname', $convertDelimiter, $n),
-            'order' => static::TAGS_ORDER,
-        ];
-    }
-
-    /**
-     * @param string $conversionType
-     *
-     * @return RelationCalculatorInterface
-     */
-    protected function getTaggableRelationCalculator($conversionType)
-    {
-        return isset($this->taggableRelatioCalculators[$conversionType])
-            ? $this->taggableRelatioCalculators[$conversionType]
-            : reset($this->taggableRelatioCalculators);
+        $this->tagStorage->loadTagging($taggable);
     }
 }

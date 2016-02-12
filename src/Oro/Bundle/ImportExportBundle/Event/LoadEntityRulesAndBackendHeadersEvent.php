@@ -21,25 +21,31 @@ class LoadEntityRulesAndBackendHeadersEvent extends Event
     /** @var string */
     protected $conversionType;
 
+    /** @var bool */
+    protected $fullData;
+
     /**
      * @param string $entityName
      * @param array $headers
      * @param array $rules
      * @param string $convertDelimiter
      * @param string $conversionType
+     * @param bool $fullData
      */
     public function __construct(
         $entityName,
         array $headers,
         array $rules,
         $convertDelimiter,
-        $conversionType
+        $conversionType,
+        $fullData = false
     ) {
         $this->entityName = $entityName;
         $this->headers = $headers;
         $this->rules = $rules;
         $this->convertDelimiter = $convertDelimiter;
         $this->conversionType = $conversionType;
+        $this->fullData = $fullData;
     }
 
     /**
@@ -97,5 +103,13 @@ class LoadEntityRulesAndBackendHeadersEvent extends Event
     public function getConversionType()
     {
         return $this->conversionType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFullData()
+    {
+        return $this->fullData;
     }
 }

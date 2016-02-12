@@ -123,4 +123,14 @@ class OAuthProvider extends HWIOAuthProvider
 
         return $organization;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports(TokenInterface $token)
+    {
+        return
+            $token instanceof OAuthToken
+            && $this->resourceOwnerMap->hasResourceOwnerByName($token->getResourceOwnerName());
+    }
 }

@@ -7,9 +7,12 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\ReadEntityEvent;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -17,15 +20,14 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class EntityReader extends IteratorBasedReader
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var OwnershipMetadataProvider
-     */
+    /** @var OwnershipMetadataProvider */
     protected $ownershipMetadata;
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
 
     /**
      * @param ContextRegistry           $contextRegistry
@@ -41,6 +43,22 @@ class EntityReader extends IteratorBasedReader
 
         $this->ownershipMetadata = $ownershipMetadata;
         $this->registry = $registry;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function read()
+    {
+        $object = parent::read();
+        if ($object && $this->dispatcher && $this->dispatcher->hasListeners(Events::READ_ENTITY)) {
+            $event = new ReadEntityEvent($object);
+            $this->dispatcher->dispatch(Events::READ_ENTITY, $event);
+
+            return $event->getObject();
+        }
+
+        return $object;
     }
 
     /**
@@ -109,6 +127,14 @@ class EntityReader extends IteratorBasedReader
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
 
         $this->setSourceQueryBuilder($queryBuilder);
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**

@@ -162,7 +162,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $result[$fieldName] = $fieldValue;
         }
 
-        return $this->dispatchNormalize($object, $result);
+        return $this->dispatchNormalize($object, $result, $context);
     }
 
     /**
@@ -244,12 +244,14 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * @param $object
      * @param $result
+     * @param array $context
+     *
      * @return array
      */
-    protected function dispatchNormalize($object, $result)
+    protected function dispatchNormalize($object, $result, array $context)
     {
         if ($this->dispatcher && $this->dispatcher->hasListeners(Events::NORMALIZE_ENTITY)) {
-            $event = new NormalizeEntityEvent($object, $result);
+            $event = new NormalizeEntityEvent($object, $result, $this->getMode($context) === static::FULL_MODE);
             $this->dispatcher->dispatch(Events::NORMALIZE_ENTITY, $event);
 
             return $event->getResult();
