@@ -28,6 +28,9 @@ class View
     /** @var bool */
     protected $default = false;
 
+    /** @var string|null */
+    protected $sharedBy;
+
     /**
      * @var array
      *
@@ -218,6 +221,22 @@ class View
     }
 
     /**
+     * @return null|string
+     */
+    public function getSharedBy()
+    {
+        return $this->sharedBy;
+    }
+
+    /**
+     * @param null|string $sharedBy
+     */
+    public function setSharedBy($sharedBy)
+    {
+        $this->sharedBy = $sharedBy;
+    }
+
+    /**
      * Convert to view data
      *
      * @return array
@@ -233,7 +252,8 @@ class View
             'columns'    => $this->columnsData,
             'editable'   => $this->editable,
             'deletable'  => $this->deletable,
-            'is_default' => $this->default
+            'is_default' => $this->default,
+            'shared_by'  => $this->sharedBy
         ];
     }
 }
