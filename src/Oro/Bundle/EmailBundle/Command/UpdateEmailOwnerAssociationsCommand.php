@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
@@ -62,7 +63,7 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
             $output->writeln(sprintf(
                 '<info>Associated %d emails with object with id %d.</info>',
                 count($emails),
-                $owner->getId()
+                $this->getDoctrineHelper()->getSingleEntityIdentifier($owner)
             ));
         }
     }
@@ -88,7 +89,7 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
      */
     protected function getEmailEntityManager()
     {
-        return $this->getRegistry()->getManagerForClass('OroEmailBundle:Email');
+        return $this->getDoctrineHelper()->getEntityManagerForClass('OroEmailBundle:Email');
     }
 
     /**
@@ -97,22 +98,24 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
      *
      * @return QueryBuilder
      */
-    public function createOwnerQb($class, array $ids)
+    protected function createOwnerQb($class, array $ids)
     {
-        /* @var $qb QueryBuilder */
-        $qb = $this->getRegistry()->getRepository($class)
+        $qb = $this->getDoctrineHelper()->getEntityRepositoryForClass($class)
             ->createQueryBuilder('o');
 
         return $qb
-            ->andWhere($qb->expr()->in('o.id', ':ids'))
+            ->andWhere($qb->expr()->in(
+                sprintf('o.%s', $this->getDoctrineHelper()->getSingleEntityIdentifierFieldName($class)),
+                ':ids'
+            ))
             ->setParameter('ids', $ids);
     }
 
     /**
-     * @return Registry
+     * @return DoctrineHelper
      */
-    protected function getRegistry()
+    protected function getDoctrineHelper()
     {
-        return $this->getContainer()->get('doctrine');
+        return $this->getContainer()->get('oro_entity.doctrine_helper');
     }
 }
