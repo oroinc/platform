@@ -31,5 +31,7 @@ services:
         class: %oro_importexport.serializer.configurable_entity_normalizer.class%
         arguments:
             - @oro_importexport.field.field_helper
+        calls:
+            - [setDispatcher, [@event_dispatcher]]
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }

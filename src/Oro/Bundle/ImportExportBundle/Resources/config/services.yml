@@ -6,6 +6,8 @@ parameters:
 services:
     oro_importexport.template_fixture.entity_registry:
         class: %oro_importexport.template_fixture.entity_registry.class%
+        calls:
+            - [setDispatcher, [@event_dispatcher]]
 
     oro_importexport.template_fixture.manager:
         class: %oro_importexport.template_fixture.manager.class%

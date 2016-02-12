@@ -1,0 +1,12 @@
+parameters:
+    oro_tag.data_converter.taggable.relation_calculator.class: Oro\Bundle\TagBundle\Converter\TaggableRelationCalculator
+    oro_tag.data_converter.template_fixture_taggable.relation_calculator.class: Oro\Bundle\TagBundle\Converter\TemplateFixtureTaggableRelationCalculator
+
+services:
+    oro_tag.data_converter.taggable.relation_calculator:
+        class: %oro_tag.data_converter.taggable.relation_calculator.class%
+
+    oro_tag.data_converter.template_fixture_taggable.relation_calculator:
+        class: %oro_tag.data_converter.template_fixture_taggable.relation_calculator.class%
+        arguments:
+            - @oro_importexport.template_fixture.manager
