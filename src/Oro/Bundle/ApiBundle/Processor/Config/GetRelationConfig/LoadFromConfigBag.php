@@ -80,7 +80,7 @@ class LoadFromConfigBag implements ProcessorInterface
     protected function loadConfig($entityClass, $version)
     {
         $config = $this->configBag->getRelationConfig($entityClass, $version);
-        if (null === $config || ConfigUtil::isInherit($config)) {
+        if (empty($config) || ConfigUtil::isInherit($config)) {
             $parentClasses = $this->entityHierarchyProvider->getHierarchyForClassName($entityClass);
             foreach ($parentClasses as $parentClass) {
                 $parentConfig = $this->configBag->getRelationConfig($parentClass, $version);
@@ -93,7 +93,7 @@ class LoadFromConfigBag implements ProcessorInterface
             }
         }
 
-        return $config;
+        return !empty($config) ? $config : null;
     }
 
     /**
