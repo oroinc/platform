@@ -11,6 +11,8 @@ use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
+use Oro\Bundle\DashboardBundle\Helper\DateHelper;
+
 class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
 {
     const MIN_DATE = '1900-01-01';
@@ -24,16 +26,25 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var DateHelper */
+    protected $dateHelper;
+
     /**
      * @param DateTimeFormatter   $formatter
      * @param Compiler            $dateCompiler
      * @param TranslatorInterface $translator
+     * @param DateHelper          $dateHelper
      */
-    public function __construct(DateTimeFormatter $formatter, Compiler $dateCompiler, TranslatorInterface $translator)
-    {
+    public function __construct(
+        DateTimeFormatter $formatter,
+        Compiler $dateCompiler,
+        TranslatorInterface $translator,
+        DateHelper $dateHelper
+    ) {
         $this->formatter    = $formatter;
         $this->dateCompiler = $dateCompiler;
         $this->translator   = $translator;
+        $this->dateHelper   = $dateHelper;
     }
 
     /**
@@ -44,15 +55,17 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
         if (is_null($value)
             || ($value['value']['start'] === null && $value['value']['end'] === null)
         ) {
-            $end   = new DateTime('now', new \DateTimeZone('UTC'));
-            $start = clone $end;
-            $start = $start->sub(new \DateInterval('P1M'));
+            list($start, $end) = $this->dateHelper->getDateTimeInterval('P1M');
+
             $type  = AbstractDateFilterType::TYPE_BETWEEN;
         } else {
             list($startValue, $endValue, $type) = $this->getPeriodValues($value);
 
             $start = $startValue instanceof DateTime ? $startValue : $this->dateCompiler->compile($startValue);
-            $end   = $endValue instanceof DateTime ? $endValue : $this->dateCompiler->compile($endValue);
+            $start->setTime(0, 0, 0);
+
+            $end = $endValue instanceof DateTime ? $endValue : $this->dateCompiler->compile($endValue);
+            $end->setTime(23, 59, 59);
         }
 
         return [

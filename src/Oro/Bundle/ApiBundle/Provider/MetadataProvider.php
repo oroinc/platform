@@ -12,9 +12,6 @@ class MetadataProvider
     /** @var MetadataProcessor */
     protected $processor;
 
-    /** @var array */
-    protected $cache = [];
-
     /**
      * @param MetadataProcessor $processor
      */
@@ -40,11 +37,6 @@ class MetadataProvider
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $cacheKey = implode('', $requestType) . $version . $className;
-        if (array_key_exists($cacheKey, $this->cache)) {
-            return $this->cache[$cacheKey];
-        }
-
         /** @var MetadataContext $context */
         $context = $this->processor->createContext();
         $context->setVersion($version);
@@ -61,8 +53,6 @@ class MetadataProvider
         if ($context->hasResult()) {
             $result = $context->getResult();
         }
-
-        $this->cache[$cacheKey] = $result;
 
         return $result;
     }

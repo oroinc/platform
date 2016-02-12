@@ -154,9 +154,7 @@ class ObjectNormalizer
                 if (ConfigUtil::isExclude($fieldConfig)) {
                     continue;
                 }
-                $propertyPath = !empty($fieldConfig[ConfigUtil::PROPERTY_PATH])
-                    ? $fieldConfig[ConfigUtil::PROPERTY_PATH]
-                    : $fieldName;
+                $propertyPath = ConfigUtil::getPropertyPath($fieldConfig, $fieldName);
                 if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {
                     $childFields = isset($fieldConfig[ConfigUtil::FIELDS])
                         ? $fieldConfig[ConfigUtil::FIELDS]

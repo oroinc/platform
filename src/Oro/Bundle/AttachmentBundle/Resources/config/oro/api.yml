@@ -1,0 +1,4 @@
+oro_api:
+    entities:
+        Oro\Bundle\AttachmentBundle\Entity\Attachment: ~
+        Oro\Bundle\AttachmentBundle\Entity\File: ~
