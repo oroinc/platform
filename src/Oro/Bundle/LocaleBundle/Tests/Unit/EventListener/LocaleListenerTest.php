@@ -25,6 +25,9 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
+
     /** @var string */
     protected $defaultLocale;
 
@@ -33,6 +36,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->translator =  $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $this->transListener = $this->getMock('Gedmo\Translatable\TranslatableListener');
         $this->router = $this->getMock('Symfony\Component\Routing\RequestContextAwareInterface');
 
@@ -54,6 +58,9 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
                     }
                     if ($serviceName === 'router') {
                         return $this->router;
+                    }
+                    if ($serviceName === 'translator') {
+                        return $this->translator;
                     }
                 }
             );
@@ -79,7 +86,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request->setDefaultLocale($this->defaultLocale);
 
         if ($isSetLocale) {
-            $this->localeSettings->expects($this->exactly(3))->method('getLanguage')
+            $this->localeSettings->expects($this->once())->method('getLanguage')
                 ->will($this->returnValue($customLanguage));
             $this->localeSettings->expects($this->once())->method('getLocale')
                 ->will($this->returnValue($customLocale));
