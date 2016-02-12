@@ -31,7 +31,7 @@ class MetadataProvider
      *
      * @return EntityMetadata|null
      */
-    public function getMetadata($className, $version, array $requestType, array $extras = [], $config = null)
+    public function getMetadata($className, $version, array $requestType = [], array $extras = [], $config = null)
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
@@ -39,10 +39,14 @@ class MetadataProvider
 
         /** @var MetadataContext $context */
         $context = $this->processor->createContext();
-        $context->setVersion($version);
-        $context->setRequestType($requestType);
         $context->setClassName($className);
-        $context->setExtras($extras);
+        $context->setVersion($version);
+        if (!empty($requestType)) {
+            $context->setRequestType($requestType);
+        }
+        if (!empty($extras)) {
+            $context->setExtras($extras);
+        }
         if (!empty($config)) {
             $context->setConfig($config);
         }

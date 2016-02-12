@@ -5,7 +5,6 @@ define(['jquery', 'jquery-ui'], function($) {
     (function() {
 
         var original = {
-            _updateDatepicker: $.datepicker.constructor.prototype._updateDatepicker,
             _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker
         };
 
@@ -134,12 +133,6 @@ define(['jquery', 'jquery-ui'], function($) {
             _hideDatepicker.apply(this, arguments);
 
             $input.trigger('datepicker:dialogHide');
-        };
-
-        $.datepicker.constructor.prototype._updateDatepicker = function(inst) {
-            original._updateDatepicker.apply(this, arguments);
-            // for possibility detecting relatedTarget in focusout handlers make prev and next button focusable
-            inst.dpDiv.find('.ui-datepicker-prev, .ui-datepicker-next').attr('tabindex', '-1');
         };
 
         $.datepicker.constructor.prototype._destroyDatepicker = function() {
