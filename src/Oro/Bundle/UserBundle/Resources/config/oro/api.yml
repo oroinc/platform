@@ -1,0 +1,6 @@
+oro_api:
+    entities:
+        Oro\Bundle\UserBundle\Entity\Email: ~
+        Oro\Bundle\UserBundle\Entity\Group: ~
+        Oro\Bundle\UserBundle\Entity\Role: ~
+        Oro\Bundle\UserBundle\Entity\User: ~

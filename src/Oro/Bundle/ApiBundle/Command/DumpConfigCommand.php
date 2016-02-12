@@ -70,7 +70,7 @@ class DumpConfigCommand extends ContainerAwareCommand
         /** @var EntityClassNameHelper $entityClassNameHelper */
         $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
 
-        $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'));
+        $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'), true);
         $requestType = $input->getOption('request-type');
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');

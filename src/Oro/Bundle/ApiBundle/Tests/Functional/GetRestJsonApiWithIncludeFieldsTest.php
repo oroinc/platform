@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Symfony\Component\Yaml\Parser;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
 {
@@ -10,13 +10,6 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
      * FQCN of the entity being used for testing.
      */
     const ENTITY_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
-
-    /**
-     * Local cache for expectations
-     *
-     * @var array
-     */
-    protected $expectations = [];
 
     /**
      * {@inheritdoc}
@@ -32,6 +25,14 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
         );
 
         parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequestType()
+    {
+        return [RequestType::REST, RequestType::JSON_API];
     }
 
     /**
@@ -125,24 +126,5 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                 'expects' => $this->loadExpectation('output_4.yml')
             ]
         ];
-    }
-
-    /**
-     * @param $filename
-     *
-     * @return array
-     */
-    protected function loadExpectation($filename)
-    {
-        if (!isset($this->expectations[$filename])) {
-            $expectedContent = file_get_contents(
-                __DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $filename
-            );
-            $ymlParser       = new Parser();
-
-            $this->expectations[$filename] = $ymlParser->parse($expectedContent);
-        }
-
-        return $this->expectations[$filename];
     }
 }
