@@ -13,7 +13,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class DebugCommand extends ContainerAwareCommand
 {
