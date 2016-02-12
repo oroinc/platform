@@ -153,7 +153,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpEncryption' => 'ssl',
                     'accessTokenExpiresAt' =>new \DateTime(),
                     'accessToken' => '1',
-                    'googleAuthCode' => '111'
+                    'refreshToken' => '111'
                 ),
                 array(
                     'user'=>'test',
@@ -165,7 +165,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpEncryption' => 'ssl',
                     'accessTokenExpiresAt' =>new \DateTime(),
                     'accessToken' => '1',
-                    'googleAuthCode' => '111'
+                    'refreshToken' => '111'
                 ),
                 array(
                     'user'=>'test',
@@ -177,7 +177,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpEncryption' => 'ssl',
                     'accessTokenExpiresAt' =>new \DateTime(),
                     'accessToken' => '1',
-                    'googleAuthCode' => '111'
+                    'refreshToken' => '111'
                 ),
             ),
         );
