@@ -62,9 +62,7 @@ class SetMaxRelatedEntities implements ProcessorInterface
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
             foreach ($definition[ConfigUtil::FIELDS] as $fieldName => &$fieldConfig) {
                 if (is_array($fieldConfig)) {
-                    $propertyPath = !empty($fieldConfig[ConfigUtil::PROPERTY_PATH])
-                        ? $fieldConfig[ConfigUtil::PROPERTY_PATH]
-                        : $fieldName;
+                    $propertyPath = ConfigUtil::getPropertyPath($fieldConfig, $fieldName);
                     $path         = ConfigUtil::explodePropertyPath($propertyPath);
                     if (count($path) === 1) {
                         $this->setFieldLimit($fieldConfig, $metadata, $propertyPath, $limit);

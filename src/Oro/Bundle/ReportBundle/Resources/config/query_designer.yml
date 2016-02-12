@@ -26,3 +26,7 @@ query_designer:
                 - { name: Min,   expr: MIN($column) }
                 - { name: Max,   expr: MAX($column) }
             query_type: [report]
+
+    filters:
+        boolean:
+            placeholder: oro.query_designer.filter.boolean.select_value.label

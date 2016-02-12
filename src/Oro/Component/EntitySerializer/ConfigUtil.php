@@ -48,9 +48,24 @@ class ConfigUtil
      */
     public static function getArrayValue(array $config, $key)
     {
-        return isset($config[$key])
-            ? $config[$key]
-            : [];
+        if (!isset($config[$key])) {
+            return [];
+        }
+
+        $value = $config[$key];
+        if (is_string($value)) {
+            return [$value => null];
+        }
+        if (is_array($value)) {
+            return $value;
+        }
+
+        throw new \UnexpectedValueException(
+            sprintf(
+                'Expected value of type "array, string or nothing", "%s" given.',
+                is_object($value) ? get_class($value) : gettype($value)
+            )
+        );
     }
 
     /**

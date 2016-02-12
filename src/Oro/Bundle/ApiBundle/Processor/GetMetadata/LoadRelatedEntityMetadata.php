@@ -65,10 +65,6 @@ class LoadRelatedEntityMetadata implements ProcessorInterface
                 // a configuration of an association fields does not exist
                 continue;
             }
-            if (is_string($config[ConfigUtil::FIELDS][$associationName][ConfigUtil::FIELDS])) {
-                // a single field association
-                continue;
-            }
 
             $relatedEntityMetadata = $this->metadataProvider->getMetadata(
                 $association->getTargetClassName(),

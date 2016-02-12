@@ -60,6 +60,7 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
      */
     protected function registerProcessors(ContainerBuilder $container, Definition $processorBagServiceDef)
     {
+        $isDebug        = $container->getParameter('kernel.debug');
         $taggedServices = $container->findTaggedServiceIds($this->processorTagName);
         foreach ($taggedServices as $id => $taggedAttributes) {
             foreach ($taggedAttributes as $attributes) {
@@ -77,7 +78,10 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
                     );
                 }
 
-                unset($attributes['action'], $attributes['group'], $attributes['priority']);
+                unset($attributes['action'], $attributes['group']);
+                if (!$isDebug) {
+                    unset($attributes['priority']);
+                }
                 $attributes = array_map(
                     function ($val) {
                         return is_string($val) && strpos($val, '&') ? explode('&', $val) : $val;

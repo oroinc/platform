@@ -1,0 +1,6 @@
+oro_api:
+    entities:
+        Oro\Bundle\CalendarBundle\Entity\Calendar: ~
+        Oro\Bundle\CalendarBundle\Entity\CalendarEvent: ~
+        Oro\Bundle\CalendarBundle\Entity\CalendarProperty: ~
+        Oro\Bundle\CalendarBundle\Entity\SystemCalendar: ~
