@@ -8,8 +8,8 @@ The main idea of this bundle is to provide some default implementation of API wh
 To achieve this this bundle is implemented based on two ORO components: [ChainProcessor](../../Component/ChainProcessor/) and [EntitySerializer](../../Component/EntitySerializer/). The ChainProcessor component is responsible to organize data processing flow. The EntitySerializer component provides the fast access to data.
 
 **Notes**:
-	- for now only GET requests for REST and JSON.API are implemented
-	- this documentation is not full and it will be completed soon
+ - for now only GET requests for REST and JSON.API are implemented
+ - this documentation is not full and it will be completed soon
 
 Table of Contents
 -----------------
