@@ -191,12 +191,11 @@ define(function(require) {
         },
 
         onTimepickerShow: function(e) {
-            var $list = $(e.currentTarget).data('timepicker-list');
+            var $list = this.view.getTimePickerWidget();
             var isBelow = !$list.hasClass('ui-timepicker-positioned-top');
             this.toggleDropdownBelowClass(isBelow);
-            $list.find('.ui-timepicker-list')
-                .off(this.eventNamespace())
-                .bindFirst('mousedown' + this.eventNamespace(), 'li', _.bind(function(e) {
+            $list.off(this.eventNamespace())
+                .on('mousedown' + this.eventNamespace(), _.bind(function(e) {
                     // adds flag that blur event was as sequence of time selection in dropdown
                     this._isTimeSelection = true;
                 }, this));

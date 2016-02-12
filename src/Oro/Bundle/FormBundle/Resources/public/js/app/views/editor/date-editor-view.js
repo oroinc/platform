@@ -101,7 +101,7 @@ define(function(require) {
             if (this.options.value) {
                 this.setFormState(this.options.value);
             }
-            this.view.getPickerWidget().on('mousedown' + this.eventNamespace(), _.bind(function() {
+            this.view.getDatePickerWidget().on('mousedown' + this.eventNamespace(), _.bind(function() {
                 this._isDateSelection = true;
             }, this));
             // fix enter behaviour
@@ -145,7 +145,7 @@ define(function(require) {
                 return;
             }
             this.$('.hasDatepicker').off(this.eventNamespace());
-            this.view.getPickerWidget().off(this.eventNamespace());
+            this.view.getDatePickerWidget().off(this.eventNamespace());
             this.view.dispose();
             DateEditorView.__super__.dispose.call(this);
         },

@@ -138,7 +138,7 @@ define(function(require) {
          *
          * @returns {JQuery}
          */
-        getPickerWidget: function() {
+        getDatePickerWidget: function() {
             return this.$frontDateField.datepicker('widget');
         },
 
