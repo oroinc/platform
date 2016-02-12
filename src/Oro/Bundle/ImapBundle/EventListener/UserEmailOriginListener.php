@@ -69,13 +69,6 @@ class UserEmailOriginListener
 
             $this->createImapEmailFolders($folders, $manager);
         }
-
-        if ($origin instanceof UserEmailOrigin) {
-            if ($origin->getAccessToken() && $origin->getRefreshToken() === null) {
-                $response = $this->imapEmailGoogleOauth2Manager->getAccessTokenByAuthCode($origin->getGoogleAuthCode());
-                $origin->setRefreshToken($response['refresh_token']);
-            }
-        }
     }
 
     /**

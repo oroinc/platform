@@ -99,10 +99,8 @@ define(function(require) {
             if (response.error === 'access_denied') {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.access_deny'));
                 this.view.render();
-                mediator.execute('hideLoading');
             } else {
-                this.view.setGoogleAuthCode(response.code);
-                this.view.render();
+                mediator.execute('showLoading');
                 this.requestAccessToken(response.code);
             }
         },
@@ -111,12 +109,10 @@ define(function(require) {
          * Request to google API to get token
          */
         requestAccessToken: function(code) {
-            var data = this.view.getData();
-
             $.ajax({
                 url: this.getUrlGetAccessToken(),
                 method: 'POST',
-                data: data,
+                data: {code: code},
                 success: _.bind(this.prepareAuthorization, this),
                 error:  _.bind(this.requestError, this)
             });
@@ -163,7 +159,8 @@ define(function(require) {
                 this.view.render();
             } else if (response) {
                 this.view.setEmail(response.email_address);
-                this.view.setToken(response.access_token);
+                this.view.setAccessToken(response.access_token);
+                this.view.setRefreshToken(response.refresh_token);
                 this.view.setExpiredAt(response.expires_in);
                 this.view.render();
                 mediator.trigger('change:systemMailBox:email', {email: response.email_address});

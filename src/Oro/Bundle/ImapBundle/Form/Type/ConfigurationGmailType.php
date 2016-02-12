@@ -67,8 +67,8 @@ class ConfigurationGmailType extends AbstractType
                 'attr' => ['class' => 'btn btn-primary']
             ])
             ->add('accessToken', 'hidden')
+            ->add('refreshToken', 'hidden')
             ->add('accessTokenExpiresAt', 'hidden')
-            ->add('googleAuthCode', 'hidden')
             ->add('imapHost', 'hidden', [
                 'required' => true,
                 'data' => GmailImap::DEFAULT_GMAIL_HOST

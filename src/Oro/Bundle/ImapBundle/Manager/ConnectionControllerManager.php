@@ -165,6 +165,7 @@ class ConnectionControllerManager
         } else {
             $response = [
                 'access_token' => $accessToken['access_token'],
+                'refresh_token' => $accessToken['refresh_token'],
                 'expires_in' => $accessToken['expires_in'],
                 'email_address' => $userInfo->getEmail()
             ];

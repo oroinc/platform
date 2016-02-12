@@ -34,7 +34,6 @@ class GmailOAuthSubscriber implements EventSubscriberInterface
         ];
     }
 
-
     /**
      * @param FormEvent $formEvent
      */
@@ -52,6 +51,9 @@ class GmailOAuthSubscriber implements EventSubscriberInterface
             }
             $emailOrigin = new UserEmailOrigin();
             $emailOrigin->setAccessToken($data['accessToken']);
+            if (array_key_exists('setRefreshToken', $data) && $data['setRefreshToken'] !== '') {
+                $emailOrigin->setRefreshToken($data['setRefreshToken']);
+            }
         }
 
         if ($emailOrigin instanceof UserEmailOrigin) {
