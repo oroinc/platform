@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\FieldConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -39,10 +39,10 @@ class CompleteDefinition implements ProcessorInterface
         ConfigProvider $configProvider,
         FieldConfigProvider $fieldConfigProvider
     ) {
-        $this->doctrineHelper         = $doctrineHelper;
-        $this->exclusionProvider      = $exclusionProvider;
-        $this->configProvider         = $configProvider;
-        $this->fieldConfigProvider    = $fieldConfigProvider;
+        $this->doctrineHelper      = $doctrineHelper;
+        $this->exclusionProvider   = $exclusionProvider;
+        $this->configProvider      = $configProvider;
+        $this->fieldConfigProvider = $fieldConfigProvider;
     }
 
     /**
@@ -170,18 +170,18 @@ class CompleteDefinition implements ProcessorInterface
                 continue;
             }
 
-            $config[ConfigUtil::DEFINITION] = [
-                ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_ALL,
-                ConfigUtil::FIELDS           => null
-            ];
-            $config[ConfigUtil::DEFINITION][ConfigUtil::EXCLUSION_POLICY] = ConfigUtil::EXCLUSION_POLICY_ALL;
-
             $identifierFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass(
                 $mapping['targetEntity']
             );
-            $config[ConfigUtil::DEFINITION][ConfigUtil::FIELDS] = count($identifierFieldNames) === 1
-                ? reset($identifierFieldNames)
-                : array_fill_keys($identifierFieldNames, null);
+
+            $config = [
+                ConfigUtil::DEFINITION => [
+                    ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_ALL,
+                    ConfigUtil::FIELDS           => count($identifierFieldNames) === 1
+                        ? reset($identifierFieldNames)
+                        : array_fill_keys($identifierFieldNames, null)
+                ]
+            ];
 
             if (isset($definition[$fieldName]) && is_array($definition[$fieldName])) {
                 $config = array_merge_recursive($config, [ConfigUtil::DEFINITION => $definition[$fieldName]]);

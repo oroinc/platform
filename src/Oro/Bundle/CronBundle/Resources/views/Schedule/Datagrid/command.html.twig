@@ -1,0 +1,3 @@
+<code>
+    {{ record.getValue('command') }} {{ record.getValue('arguments')|jms_job_queue_args|truncate }}
+</code>

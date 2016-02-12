@@ -30,6 +30,7 @@ class EntityMetadataFactory
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setClassName($classMetadata->name);
         $entityMetadata->setIdentifierFieldNames($classMetadata->getIdentifierFieldNames());
+        $entityMetadata->setInheritedType($classMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE);
 
         return $entityMetadata;
     }
@@ -70,6 +71,12 @@ class EntityMetadataFactory
             $associationMetadata->setDataType($targetMetadata->getTypeOfField(reset($targetIdFields)));
         } else {
             $associationMetadata->setDataType(DataType::STRING);
+        }
+
+        if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+            $associationMetadata->setAcceptableTargetClassNames($targetMetadata->subClasses);
+        } else {
+            $associationMetadata->addAcceptableTargetClassName($targetClass);
         }
 
         return $associationMetadata;

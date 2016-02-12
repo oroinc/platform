@@ -4,13 +4,15 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Parser;
 
 use Oro\Bundle\ApiBundle\Request\JsonApi\EntityClassTransformer;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
+use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class ApiTestCase extends WebTestCase
+abstract class ApiTestCase extends WebTestCase
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -19,16 +21,28 @@ class ApiTestCase extends WebTestCase
     protected $entityClassTransformer;
 
     /**
+     * Local cache for expectations
+     *
+     * @var array
+     */
+    private $expectations = [];
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         /** @var ContainerInterface $container */
-        $container                    = $this->getContainer();
+        $container = $this->getContainer();
 
         $this->entityClassTransformer = $container->get('oro_api.json_api.entity_class_transformer');
         $this->doctrineHelper         = $container->get('oro_api.doctrine_helper');
     }
+
+    /**
+     * @return string[]
+     */
+    abstract protected function getRequestType();
 
     /**
      * @return array
@@ -36,21 +50,14 @@ class ApiTestCase extends WebTestCase
     public function getEntities()
     {
         $this->initClient();
-        $entities                = [];
-        $container               = $this->getContainer();
-        $entityManagers          = $container->get('oro_entity_config.entity_manager_bag')->getEntityManagers();
-        $entityExclusionProvider = $container->get('oro_api.entity_exclusion_provider');
-        foreach ($entityManagers as $em) {
-            $allMetadata = $em->getMetadataFactory()->getAllMetadata();
-            foreach ($allMetadata as $metadata) {
-                if ($metadata->isMappedSuperclass) {
-                    continue;
-                }
-                if ($entityExclusionProvider->isIgnoredEntity($metadata->name)) {
-                    continue;
-                }
-                $entities[$metadata->name] = [$metadata->name];
-            }
+        $entities        = [];
+        $container       = $this->getContainer();
+        $resourcesLoader = $container->get('oro_api.public_resources_loader');
+        $resources       = $resourcesLoader->getResources(Version::LATEST, $this->getRequestType());
+        foreach ($resources as $resource) {
+            $entityClass = $resource->getEntityClass();
+
+            $entities[$entityClass] = [$entityClass];
         }
 
         return $entities;
@@ -80,6 +87,26 @@ class ApiTestCase extends WebTestCase
 
             return [implode(RestRequest::ARRAY_DELIMITER, $requirements), $recordExist];
         }
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @return array
+     */
+    protected function loadExpectation($filename)
+    {
+        if (!isset($this->expectations[$filename])) {
+            $expectedContent = file_get_contents(
+                __DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $filename
+            );
+
+            $ymlParser = new Parser();
+
+            $this->expectations[$filename] = $ymlParser->parse($expectedContent);
+        }
+
+        return $this->expectations[$filename];
     }
 
     /**
