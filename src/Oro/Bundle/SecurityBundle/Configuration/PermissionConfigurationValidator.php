@@ -23,7 +23,7 @@ class PermissionConfigurationValidator
      */
     protected function validateName($name)
     {
-        if (!preg_match('/^\w[\w\-:]*$/D', $name)) {
+        if (!preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name)) {
             throw new InvalidConfigurationException(
                 sprintf(
                     'The permission name "%s" contains illegal characters. ' .

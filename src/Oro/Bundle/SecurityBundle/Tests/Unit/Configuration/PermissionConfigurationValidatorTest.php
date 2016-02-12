@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationValidator;
 
 class PermissionConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
@@ -25,19 +23,17 @@ class PermissionConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $config
-     * @param InvalidConfigurationException|null $expectedException
+     * @param string|null $expectedException
      * @param string|null $expectedExceptionMessage
      *
      * @dataProvider validateProvider
      */
-    public function testValidate(
-        array $config,
-        $expectedException = null,
-        $expectedExceptionMessage = null
-    ) {
+    public function testValidate(array $config, $expectedException = null, $expectedExceptionMessage = null)
+    {
         if ($expectedException) {
             $this->setExpectedException($expectedException, $expectedExceptionMessage);
         }
+
         $this->validator->validate($config);
     }
 
