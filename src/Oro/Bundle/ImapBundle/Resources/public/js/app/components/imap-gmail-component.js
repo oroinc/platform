@@ -161,6 +161,7 @@ define(function(require) {
             if (response.code !== undefined) {
                 this.view.setErrorMessage(response.message);
                 this.view.render();
+                mediator.execute('hideLoading');
             } else if (response) {
                 this.view.setEmail(response.email_address);
                 this.view.setAccessToken(response.access_token);
@@ -210,7 +211,6 @@ define(function(require) {
                 mediator.execute('hideLoading');
             } else {
                 this.view.setHtml(response.html);
-                //this.view.render();
                 this.view.autoRetrieveFolders();
             }
         },

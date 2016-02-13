@@ -45,15 +45,11 @@ class GmailOAuthSubscriber implements EventSubscriberInterface
 
         if (null === $emailOrigin || null === $emailOrigin->getAccessToken()) {
             $data = $formEvent->getData();
-
-            if (null == $data) {
+            if (null === $data) {
                 return;
             }
             $emailOrigin = new UserEmailOrigin();
             $emailOrigin->setAccessToken($data['accessToken']);
-            if (array_key_exists('setRefreshToken', $data) && $data['setRefreshToken'] !== '') {
-                $emailOrigin->setRefreshToken($data['setRefreshToken']);
-            }
         }
 
         if ($emailOrigin instanceof UserEmailOrigin) {

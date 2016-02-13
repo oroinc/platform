@@ -98,6 +98,40 @@ class ImapEmailGoogleOauth2Manager
     /**
      * @param UserEmailOrigin $origin
      *
+     * @return mixed
+     */
+    public function getAccessToken(UserEmailOrigin $origin)
+    {
+        $utcTimeZone = new \DateTimeZone('UTC');
+        $parameters = [
+            'refresh_token' => $origin->getRefreshToken(),
+            'grant_type' => 'refresh_token'
+        ];
+
+        $attemptNumber = 0;
+        do {
+            $attemptNumber++;
+            $response = $this->doHttpRequest($parameters);
+
+            if (!empty($response['access_token'])) {
+                $token = $response['access_token'];
+                $origin->setAccessToken($token);
+                $newExpireDate = new \DateTime('+' . ((int)$response['expires_in'] - 5) . ' seconds', $utcTimeZone);
+                $origin->setAccessTokenExpiresAt($newExpireDate);
+
+                $this->doctrine->getManager()->persist($origin);
+                $this->doctrine->getManager()->flush();
+
+                return $token;
+            }
+        } while ($attemptNumber <= self::RETRY_TIMES && empty($response['access_token']));
+
+        throw new \Exception('Cannot refresh OAuth2 token for origin.');
+    }
+
+    /**
+     * @param UserEmailOrigin $origin
+     *
      * @return string
      */
     public function getAccessTokenWithCheckingExpiration(UserEmailOrigin $origin)
@@ -109,27 +143,12 @@ class ImapEmailGoogleOauth2Manager
         $token = $origin->getAccessToken();
 
         //if token had been expired, the new one must be generated and saved to DB
-        if ($now > $expiresAt && $this->configManager->get('oro_imap.enable_google_imap')) {
-            $parameters = [
-                'refresh_token' => $origin->getRefreshToken(),
-                'grant_type'    => 'refresh_token'
-            ];
-
-            $attemptNumber = 0;
-            do {
-                $attemptNumber++;
-                $response = $this->doHttpRequest($parameters);
-
-                if (!empty($response['access_token'])) {
-                    $token = $response['access_token'];
-                    $origin->setAccessToken($token);
-                    $newExpireDate = new \DateTime('+' . $response['expires_in'] . ' seconds', $utcTimeZone);
-                    $origin->setAccessTokenExpiresAt($newExpireDate);
-
-                    $this->doctrine->getManager()->persist($origin);
-                    $this->doctrine->getManager()->flush();
-                }
-            } while ($attemptNumber <= self::RETRY_TIMES && empty($response['access_token']));
+        if (
+            $now > $expiresAt
+            && $this->configManager->get('oro_imap.enable_google_imap')
+            && $origin->getRefreshToken()
+        ) {
+            $token = $this->getAccessToken($origin);
         }
 
         return $token;

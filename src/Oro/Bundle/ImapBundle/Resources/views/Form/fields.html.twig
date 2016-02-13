@@ -113,7 +113,7 @@
 
             <div class="control-group">
                 <div class="controls">
-                    <div class="google-alert connection-status alert alert-error" style="display: none"></div>
+                    <div class="google-alert google-connection-status alert alert-error" style="display: none"></div>
                 </div>
             </div>
 
@@ -140,16 +140,16 @@
     <div data-page-component-module="oroimap/js/app/components/google-sync-checkbox-component"
         data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">
         {{ block('checkbox_widget') }}
-        <div class="alert connection-status alert-warning" style="display: none">
+        <div class="alert google-connection-status alert-warning" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.warning.label'|trans }}
         </div>
-        <div class="google-alert connection-status alert alert-error" style="display: none">
+        <div class="google-alert google-connection-status alert alert-error" style="display: none">
 
         </div>
-        <div class="default-alert connection-status alert alert-error" style="display: none">
+        <div class="default-alert google-connection-status alert alert-error" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.error.label'|trans }}
         </div>
-        <div class="alert connection-status alert-success" style="display: none">
+        <div class="alert google-connection-status alert-success" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.success.label'|trans }}
         </div>
     </div>

@@ -45,10 +45,8 @@ class GmailConnectionController extends Controller
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
-        $code = $request->get('code');
-
         try {
-            $response = $connectionControllerManager->getAccessToken($code);
+            $response = $connectionControllerManager->getAccessToken($request->get('code'));
         } catch (\Exception $e) {
             $response = [
                 'error' => $e->getMessage()
