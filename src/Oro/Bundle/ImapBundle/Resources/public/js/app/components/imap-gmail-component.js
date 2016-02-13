@@ -211,6 +211,7 @@ define(function(require) {
                 mediator.execute('hideLoading');
             } else {
                 this.view.setHtml(response.html);
+                this.view.render();
                 this.view.autoRetrieveFolders();
             }
         },
