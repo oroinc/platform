@@ -216,12 +216,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         $result = self::ACCESS_DENIED;
 
         if ($group === null || !$this->groupProvider || !$this->object || $group === $this->groupProvider->getGroup()) {
-            $result = self::ACCESS_ABSTAIN;
-        }
-
-        if ($result !== self::ACCESS_DENIED) {
             $permissions = $this->extension->getPermissions(null, false, true);
 
+            $result = self::ACCESS_ABSTAIN;
             foreach ($attributes as $attribute) {
                 if (!$this->supportsAttribute($attribute)) {
                     continue;

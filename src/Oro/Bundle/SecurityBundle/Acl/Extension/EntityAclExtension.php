@@ -762,7 +762,7 @@ class EntityAclExtension extends AbstractAclExtension
 
     /**
      * @param bool $byCurrentGroup
-     * @return array|\int[]
+     * @return array|int[]
      */
     protected function getPermissionsToIdentityMap($byCurrentGroup = false)
     {
@@ -777,7 +777,6 @@ class EntityAclExtension extends AbstractAclExtension
 
         return $map;
     }
-
 
     /**
      * @param int $pk

@@ -31,10 +31,6 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->permissionManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->voter = new AclVoter(
             $this->getMock('Symfony\Component\Security\Acl\Model\AclProviderInterface'),
             $this->getMock('Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface'),
