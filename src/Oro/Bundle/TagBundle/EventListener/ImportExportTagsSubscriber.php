@@ -18,7 +18,6 @@ use Oro\Bundle\ImportExportBundle\Event\LoadTemplateFixturesEvent;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Oro\Bundle\TagBundle\Manager\TagImportManager;
 use Oro\Bundle\TagBundle\Entity\Tag;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 
 class ImportExportTagsSubscriber implements EventSubscriberInterface
@@ -26,10 +25,10 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     /** @var ServiceLink */
     protected $tagManagerLink;
 
-    /** @var Taggable[] */
+    /** @var object[] */
     protected $pendingTaggedObjects = [];
 
-    /** @var Taggable[] */
+    /** @var object[] */
     protected $preparedTaggedObjects = [];
 
     /** @var object */
@@ -79,14 +78,14 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     {
         if (!$this->pendingTaggedObjects ||
             $event->getEntity() === $this->importedEntity ||
-            !$event->getEntity() instanceof Taggable
+            !$this->getTagImportManager()->isTaggable($event->getEntity())
         ) {
             $this->importedEntity = null;
 
             return;
         }
 
-        $event->getEntity()->setTags($this->importedEntity->getTags());
+        $this->getTagImportManager()->moveTags($this->importedEntity, $event->getEntity());
         unset($this->pendingTaggedObjects[spl_object_hash($this->importedEntity)]);
         $this->pendingTaggedObjects[spl_object_hash($event->getEntity())] = $event->getEntity();
 
@@ -99,7 +98,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     public function readEntity(ReadEntityEvent $event)
     {
         $entity = $event->getObject();
-        if ($entity instanceof Taggable) {
+        if ($this->getTagImportManager()->isTaggable($event->getEntity())) {
             $this->getTagImportManager()->loadTags($entity);
         }
     }
@@ -111,13 +110,13 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     {
         $object = $event->getObject();
         $data = $event->getData();
-        if (!$object instanceof Taggable) {
+        if (!$this->getTagImportManager()->isTaggable($object)) {
             return;
         }
 
         $tags = $this->getTagImportManager()->denormalizeTags($data);
         if ($tags) {
-            $object->setTags($tags);
+            $this->getTagImportManager()->setTags($object, $tags);
             $this->pendingTaggedObjects[spl_object_hash($object)] = $object;
         }
     }
@@ -136,7 +135,12 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         $uow = $args->getEntityManager()->getUnitOfWork();
         $this->preparedTaggedObjects = array_merge(
             $this->preparedTaggedObjects,
-            array_filter($this->pendingTaggedObjects, [$uow, 'isInIdentityMap'])
+            array_filter(
+                $this->pendingTaggedObjects,
+                function ($object) use ($uow) {
+                    return $uow->isEntityScheduled($object) || $uow->isInIdentityMap($object);
+                }
+            )
         );
         $this->pendingTaggedObjects = array_diff_key($this->pendingTaggedObjects, $this->preparedTaggedObjects);
     }
@@ -162,13 +166,13 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
      */
     public function normalizeEntity(NormalizeEntityEvent $event)
     {
-        if (!$event->isFullData() || !$event->getObject() instanceof Taggable) {
+        if (!$event->isFullData() || !$this->getTagImportManager()->isTaggable($event->getObject())) {
             return;
         }
 
         $event->setResultField(
             TagImportManager::TAGS_FIELD,
-            $this->getTagImportManager()->normalizeTags($event->getObject()->getTags())
+            $this->getTagImportManager()->normalizeTags($this->getTagImportManager()->getTags($event->getObject()))
         );
     }
 
@@ -178,7 +182,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     public function loadEntityRulesAndBackendHeaders(LoadEntityRulesAndBackendHeadersEvent $event)
     {
         if (!$event->isFullData() ||
-            !in_array('Oro\Bundle\TagBundle\Entity\Taggable', class_implements($event->getEntityName()))
+            !$this->getTagImportManager()->isTaggable($event->getEntityName())
         ) {
             return;
         }
@@ -204,22 +208,26 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         foreach ($event->getEntities() as $entityRecords) {
             foreach ($entityRecords as $record) {
                 $entity = $record['entity'];
-                if (!$entity instanceof Taggable ||
-                    (($entity->getTags() instanceof Countable || is_array($entity->getTags())) &&
-                        count($entity->getTags()))
-                ) {
+                if (!$this->getTagImportManager()->isTaggable($entity)) {
                     continue;
                 }
 
-                $entity
-                    ->setTags([
+                $tags = $this->getTagImportManager()->getTags($entity);
+                if (($tags instanceof Countable || is_array($tags)) && count($tags)) {
+                    continue;
+                }
+
+                $this->getTagImportManager()->setTags(
+                    $entity,
+                    [
                         'autocomplete' => [],
                         'all' => [
                             new Tag('custom tag'),
                             new Tag('second tag'),
                         ],
                         'owner' => [],
-                    ]);
+                    ]
+                );
             }
         }
     }

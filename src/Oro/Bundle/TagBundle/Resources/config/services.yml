@@ -230,3 +230,4 @@ services:
         class: %oro_tag.tag_import.manager.class%
         arguments:
             - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\TagBundle\Manager;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\TagBundle\Entity\Tag;
-use Oro\Bundle\TagBundle\Entity\Taggable;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager as TagStorage;
 
 class TagImportManager
@@ -15,12 +16,20 @@ class TagImportManager
     /** @var TagStorage */
     protected $tagStorage;
 
+    /** @var TaggableHelper */
+    protected $taggableHelper;
+
+    /** @var array */
+    protected $pendingTags = [];
+
     /**
      * @param TagStorage $tagStorage
+     * @param TaggableHelper $taggableHelper
      */
-    public function __construct(TagStorage $tagStorage)
+    public function __construct(TagStorage $tagStorage, TaggableHelper $taggableHelper)
     {
         $this->tagStorage = $tagStorage;
+        $this->taggableHelper = $taggableHelper;
     }
 
     /**
@@ -34,24 +43,13 @@ class TagImportManager
             return;
         }
 
-        $tags = array_map(
-            function ($tag) {
-                return new Tag($tag);
-            },
-            array_map(
-                'trim',
-                explode(
-                    ',',
-                    $data[static::TAGS_FIELD]['name']
-                )
+        return $this->tagStorage->loadOrCreateTags(array_map(
+            'trim',
+            explode(
+                ',',
+                $data[static::TAGS_FIELD]['name']
             )
-        );
-
-        return !$tags ? null : [
-            'autocomplete' => [],
-            'all' => $tags,
-            'owner'=> $tags,
-        ];
+        ));
     }
 
     /**
@@ -112,17 +110,70 @@ class TagImportManager
     }
 
     /**
-     * @param Taggable $taggable
+     * @param object $source
+     * @param object $dest
      */
-    public function saveTags(Taggable $taggable)
+    public function moveTags($source, $dest)
     {
-        $this->tagStorage->saveTagging($taggable);
+        $this->setTags($dest, $this->getTags($source));
+        $key = spl_object_hash($source);
+        if (isset($this->pendingTags[$key])) {
+            unset($this->pendingTags[$key]);
+        }
     }
 
     /**
-     * @param Taggable $taggable
+     * @param object $entity
      */
-    public function loadTags(Taggable $taggable)
+    public function saveTags($entity)
+    {
+        $key = spl_object_hash($entity);
+        if (isset($this->pendingTags[$key])) {
+            $tags = $this->pendingTags[$key] ? new ArrayCollection($this->pendingTags[$key]) : $this->pendingTags[$key];
+            $this->tagStorage->setTags($entity, $tags);
+            unset($this->pendingTags[$key]);
+        }
+
+        $this->tagStorage->saveTagging($entity);
+    }
+
+    /**
+     * @param object $entity
+     * @return Collection|Tag[]
+     */
+    public function getTags($entity)
+    {
+        $key = spl_object_hash($entity);
+        if (isset($this->pendingTags[$key])) {
+            return $this->pendingTags[$key];
+        }
+
+        return $this->tagStorage->getTags($entity);
+    }
+
+    /**
+     * @param object $entity
+     * @param Collection|Tag[] $tags
+     */
+    public function setTags($entity, $tags)
+    {
+        $this->pendingTags[spl_object_hash($entity)] = $tags;
+    }
+
+    /**
+     * @param object|string $entity
+     *
+     * @return bool
+     */
+    public function isTaggable($entity)
+    {
+        return $this->taggableHelper->isTaggable($entity);
+    }
+
+    /**
+     * @param object $taggable
+     */
+    public function loadTags($taggable)
     {
         $this->tagStorage->loadTagging($taggable);
     }

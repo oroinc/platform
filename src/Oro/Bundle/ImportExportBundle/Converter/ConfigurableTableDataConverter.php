@@ -177,7 +177,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
         $event = $this->dispatchEntityRulesEvent($entityName, $backendHeaders, $rules, $fullData);
 
-        return [$this->sortData($rules), $this->sortData($backendHeaders)];
+        return [$this->sortData($event->getRules()), $this->sortData($event->getHeaders())];
     }
 
     /**
