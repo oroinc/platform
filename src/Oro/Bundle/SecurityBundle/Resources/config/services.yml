@@ -80,7 +80,6 @@ parameters:
 
     oro_security.configuration.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration
     oro_security.configuration.permission_list_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration
-    oro_security.configuration.validator.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationValidator
     oro_security.configuration.provider.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
     oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
 
@@ -623,17 +622,14 @@ services:
         arguments:
             - @oro_security.configuration.permission_configuration
 
-    oro_security.configuration.validator.permission_configuration:
-        class: %oro_security.configuration.validator.permission_configuration.class%
-
     oro_security.configuration.provider.permission_configuration:
         class: %oro_security.configuration.provider.permission_configuration.class%
         arguments:
             - @oro_security.configuration.permission_list_configuration
-            - @oro_security.configuration.validator.permission_configuration
             - %kernel.bundles%
 
     oro_security.configuration.builder.permission_configuration:
         class: %oro_security.configuration.builder.permission_configuration.class%
         arguments:
             - @oro_entity.doctrine_helper
+            - @validator

@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationValidator;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1\TestBundle1;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle2\TestBundle2;
@@ -64,7 +63,6 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->provider = new PermissionConfigurationProvider(
             new PermissionListConfiguration(new PermissionConfiguration()),
-            new PermissionConfigurationValidator(),
             $bundles
         );
     }
@@ -81,16 +79,6 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testIncorrectConfiguration()
     {
         $this->loadConfig('permissionsIncorrect.yml');
-        $this->provider->getPermissionConfiguration();
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The permission name "PERMISSION.BAD.NAME" contains illegal characters
-     */
-    public function testValidateConfiguration()
-    {
-        $this->loadConfig('permissionsValidation.yml');
         $this->provider->getPermissionConfiguration();
     }
 

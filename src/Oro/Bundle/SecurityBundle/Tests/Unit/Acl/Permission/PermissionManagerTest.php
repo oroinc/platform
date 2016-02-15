@@ -5,12 +5,14 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Permission;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationValidator;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
@@ -52,7 +54,6 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->configurationProvider = new PermissionConfigurationProvider(
             new PermissionListConfiguration(new PermissionConfiguration()),
-            new PermissionConfigurationValidator(),
             $bundles
         );
 
@@ -82,7 +83,14 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->with('OroSecurityBundle:Permission')
             ->willReturn($em);
 
-        $this->configurationBuilder = new PermissionConfigurationBuilder($this->doctrineHelper);
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ValidatorInterface $validator */
+        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $validator->expects($this->any())
+            ->method('validate')
+            ->with($this->isInstanceOf('Oro\Bundle\SecurityBundle\Entity\Permission'))
+            ->willReturn(new ConstraintViolationList());
+
+        $this->configurationBuilder = new PermissionConfigurationBuilder($this->doctrineHelper, $validator);
 
         $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->setMethods(['fetch', 'save', 'flushAll'])
