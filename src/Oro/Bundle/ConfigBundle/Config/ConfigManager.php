@@ -283,9 +283,14 @@ class ConfigManager
     {
         $value    = null;
         $managers = $this->getScopeManagersToGetValue($default);
-        foreach ($managers as $manager) {
+        foreach ($managers as $scopeName => $manager) {
             $value = $manager->getSettingValue($name, $full);
             if (null !== $value) {
+                // in case if we get value not from current scope,
+                // we should mark value that it was get from another scope
+                if ($full && $this->scope !== $scopeName) {
+                    $value['use_parent_scope_value'] = true;
+                }
                 break;
             }
         }

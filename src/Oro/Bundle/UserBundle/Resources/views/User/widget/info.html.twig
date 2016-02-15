@@ -17,7 +17,7 @@
             {{ 'oro.user.api.label'|trans }}
         </label>
         <div class="controls">
-            <div style="padding-top: 2px">
+            <div class="control-label html-content">
                 <span class="api-key">{{ userApi ? userApi.apiKey|escape : '' }}</span>
                 {% if viewProfile or resource_granted('EDIT', user) %}
                     <a class="btn btn-mini no-hash" id="btn-apigen" href="{{ path('oro_user_apigen', { id: user.id }) }}"

@@ -58,7 +58,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     private $permissionManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
-    protected $groupProvider;
+    private $groupProvider;
 
     protected function setUp()
     {

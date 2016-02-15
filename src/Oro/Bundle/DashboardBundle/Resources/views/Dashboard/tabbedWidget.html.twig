@@ -40,6 +40,8 @@
                 }
 
                 loadingMask.show();
+                // add style like on standard tabs realization through tabs-component
+                $el.addClass('widget-component-processing');
                 $.ajax({
                     url: $el.data('url'),
                     dataType: 'html',
@@ -48,6 +50,7 @@
                         $currentTab.removeClass('active');
                         $prevTab.addClass('active');
                         error.handle({}, jqXHR, {enforce: true});
+                        $el.removeClass('widget-component-processing');
                     },
                     success: function(data) {
                         $tabContent.find('.content')
@@ -55,6 +58,7 @@
                             .html(data)
                             .trigger('content:changed');
                         loadingMask.hide();
+                        $el.removeClass('widget-component-processing');
                     }
                 });
             });

@@ -95,3 +95,12 @@
 .hide-overlays .ui-widget-overlay{
     display: none;
 }
+
+.dialog-single-iframe-container {
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+.dialog-single-iframe-container .widget-content, .dialog-single-iframe-container .widget-content iframe{
+    width: 100%;
+    height: 100%;
+}

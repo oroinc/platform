@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
@@ -46,11 +47,18 @@ class LoadEntityMetadata implements ProcessorInterface
             return;
         }
 
+        // filter excluded fields on this stage though there is another processor doing the same
+        // it is done due to performance reasons
+        $allowedFields = $this->getAllowedFields($context->getConfig());
+
         $classMetadata  = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $entityMetadata = $this->entityMetadataFactory->createEntityMetadata($classMetadata);
 
         $fields = $classMetadata->getFieldNames();
         foreach ($fields as $fieldName) {
+            if (!isset($allowedFields[$fieldName])) {
+                continue;
+            }
             $entityMetadata->addField(
                 $this->entityMetadataFactory->createFieldMetadata($classMetadata, $fieldName)
             );
@@ -58,11 +66,38 @@ class LoadEntityMetadata implements ProcessorInterface
 
         $associations = $classMetadata->getAssociationNames();
         foreach ($associations as $associationName) {
+            if (!isset($allowedFields[$associationName])) {
+                continue;
+            }
             $entityMetadata->addAssociation(
                 $this->entityMetadataFactory->createAssociationMetadata($classMetadata, $associationName)
             );
         }
 
         $context->setResult($entityMetadata);
+    }
+
+    /**
+     * @param array|null $config
+     *
+     * @return array
+     */
+    protected function getAllowedFields($config)
+    {
+        $fields = [];
+        if (!empty($config[ConfigUtil::FIELDS])) {
+            if (is_array($config[ConfigUtil::FIELDS])) {
+                foreach ($config[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
+                    if (!is_array($fieldConfig) || !ConfigUtil::isExclude($fieldConfig)) {
+                        $propertyPath          = ConfigUtil::getPropertyPath($fieldConfig, $fieldName);
+                        $fields[$propertyPath] = $fieldName;
+                    }
+                }
+            } elseif (is_string($config[ConfigUtil::FIELDS])) {
+                $fields[$config[ConfigUtil::FIELDS]] = $config[ConfigUtil::FIELDS];
+            }
+        }
+
+        return $fields;
     }
 }

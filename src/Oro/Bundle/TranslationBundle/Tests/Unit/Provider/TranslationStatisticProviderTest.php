@@ -51,29 +51,36 @@ class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getProvider
      *
-     * @param mixed $cachedData
-     * @param array $resultExpected
-     * @param bool  $fetchExpected
-     * @param array $fetchedResult
-     * @param bool  $isException
+     * @param mixed      $cachedData
+     * @param array      $resultExpected
+     * @param bool       $fetchExpected
+     * @param array      $fetchedResult
+     * @param \Exception $exception
+     *
      */
-    public function testGet($cachedData, $resultExpected, $fetchExpected, $fetchedResult = [], $isException = false)
-    {
+    public function testGet(
+        $cachedData,
+        $resultExpected,
+        $fetchExpected,
+        $fetchedResult = [],
+        \Exception $exception = null
+    ) {
         $this->cache->expects($this->once())->method('fetch')
             ->with($this->equalTo(TranslationStatisticProvider::CACHE_KEY))
             ->will($this->returnValue($cachedData));
 
         if ($fetchExpected) {
-            if ($isException) {
+            if (null !== $exception) {
                 $this->adapter->expects($this->once())->method('fetchStatistic')
-                    ->will($this->throwException($fetchedResult));
+                    ->will($this->throwException($exception));
             } else {
                 $this->adapter->expects($this->once())->method('fetchStatistic')
                     ->will($this->returnValue($fetchedResult));
             }
-
-            $this->cache->expects($this->once())->method('save')
-                ->with($this->equalTo(TranslationStatisticProvider::CACHE_KEY));
+            if (!empty($fetchedResult)) {
+                $this->cache->expects($this->once())->method('save')
+                    ->with($this->equalTo(TranslationStatisticProvider::CACHE_KEY));
+            }
         } else {
             $this->adapter->expects($this->never())->method('fetchStatistic');
         }
@@ -90,9 +97,9 @@ class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
         $testDataSet = [['code' => 'en']];
 
         return [
-            'no cache data, fetch expected'      => [false, $testDataSet, true, $testDataSet],
-            'cache data found , no fetch needed' => [$testDataSet, $testDataSet, false],
-            'exception should be caught'         => [false, [], true, new \Exception(), true]
+            'no cache data, fetch expected'            => [false, $testDataSet, true, $testDataSet],
+            'cache data found , no fetch needed'       => [$testDataSet, $testDataSet, false],
+            'exception should be caught no data saved' => [false, [], true, [], new \Exception()]
         ];
     }
 }

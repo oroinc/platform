@@ -36,6 +36,9 @@ oro:
                     name: Max
                     hint: Maximum value
 
+        filter:
+            boolean.select_value.label: Select Value
+
     report:
         menu:
             manage_reports.label:   Manage Custom Reports
