@@ -73,10 +73,9 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(GridViewsLoadEvent::EVENT_NAME)
             ->will($this->returnValue(true));
 
-        $expectedViews = [
-            'views' => [
-                (new View('name', ['k' => 'v'], ['k2' => 'v2']))->getMetadata(),
-            ],
+        $views          = [(new View('name', ['k' => 'v'], ['k2' => 'v2']))->getMetadata()];
+        $expectedViews  = [
+            'views' => $views,
             'permissions' => [
                 'CREATE' => true,
                 'EDIT' => true,
@@ -87,14 +86,15 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'gridName' => 'grid',
         ];
+
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
             ->with(GridViewsLoadEvent::EVENT_NAME)
             ->will(
                 $this->returnCallback(
-                    function ($eventName, GridViewsLoadEvent $event) use ($expectedViews) {
-                        $event->setGridViews($expectedViews);
+                    function ($eventName, GridViewsLoadEvent $event) use ($views) {
+                        $event->setGridViews($views);
 
                         return $event;
                     }
