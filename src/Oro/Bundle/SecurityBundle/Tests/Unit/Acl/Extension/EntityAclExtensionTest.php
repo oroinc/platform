@@ -708,7 +708,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                     'entityConfig' => ['VIEW', 'CREATE', 'ASSIGN', 'SHARE', 'PERMISSION'],
                     'permissions' => [],
                 ],
-                'expected' => ['VIEW', 'CREATE', 'PERMISSION'],
+                'expected' => ['VIEW', 'CREATE', 4 => 'PERMISSION'],
             ],
             'TestEntity1 + config + owner' => [
                 'input' => [
@@ -731,7 +731,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                         $this->getPermission(4, 'PERMISSION1'),
                     ],
                 ],
-                'expected' => ['VIEW', 'PERMISSION1'],
+                'expected' => ['VIEW', 3 => 'PERMISSION1'],
             ],
         ];
     }

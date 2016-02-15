@@ -399,7 +399,7 @@ class EntityAclExtension extends AbstractAclExtension
             }
         }
 
-        return array_values($result);
+        return $result;
     }
 
     /**
