@@ -1,0 +1,4 @@
+oro_api:
+    entities:
+        Oro\Bundle\OrganizationBundle\Entity\BusinessUnit: ~
+        Oro\Bundle\OrganizationBundle\Entity\Organization: ~

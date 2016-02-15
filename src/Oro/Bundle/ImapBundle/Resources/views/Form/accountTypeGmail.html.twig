@@ -21,6 +21,12 @@
                 </div>
             {% endif %}
 
+            <div class="control-group">
+                <div class="controls">
+                    <div class="google-alert google-connection-status alert alert-error" style="display: none"></div>
+                </div>
+            </div>
+
             {{- form_rest(form.imapAccountType.userEmailOrigin) -}}
         </div>
     {% endif %}
