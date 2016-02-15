@@ -35,25 +35,29 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
         $bundleIncorrect = new TestBundleIncorrect();
-        $bundles = [$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)];
 
-        CumulativeResourceManager::getInstance()->clear()->setBundles(
-            array_merge($bundles, [$bundleIncorrect->getName() => get_class($bundleIncorrect)])
-        );
+        $bundles = [
+            $bundle1->getName() => get_class($bundle1),
+            $bundle2->getName() => get_class($bundle2),
+            $bundleIncorrect->getName() => get_class($bundleIncorrect)
+        ];
+
+        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
 
         $this->provider = $this->getContainer()->get('oro_security.configuration.provider.permission_configuration');
 
         $this->setObjectProperty($this->provider, 'kernelBundles', $bundles);
     }
 
-    public function testExecuteIncorrect()
+    public function testExecuteWithInvalidConfiguration()
     {
         $bundle = new TestBundleIncorrect();
         $bundles = [$bundle->getName() => get_class($bundle)];
 
         $this->setObjectProperty($this->provider, 'kernelBundles', $bundles);
         $result = $this->runCommand(LoadPermissionConfigurationCommand::NAME);
-        $this->assertContains('The permission name "PERMISSION.BAD.NAME" contains illegal characters', $result);
+
+        $this->assertContains('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
     }
 
     /**
