@@ -161,15 +161,11 @@ class PermissionConfigurationBuilder
 
         /** @var ConstraintViolationInterface $violation */
         foreach ($violations as $violation) {
-            $errors .= sprintf('    %s%s', $violation->getMessage(), "\n");
+            $errors .= sprintf('    %s%s', $violation->getMessage(), PHP_EOL);
         }
 
         return new ValidatorException(
-            $constraints = sprintf(
-                'Configuration of permission %s is invalid:%s',
-                $name,
-                "\n" . $errors
-            )
+            sprintf('Configuration of permission %s is invalid:%s%s', $name, PHP_EOL, $errors)
         );
     }
 }

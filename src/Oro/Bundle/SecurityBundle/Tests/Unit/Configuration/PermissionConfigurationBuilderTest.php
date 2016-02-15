@@ -112,7 +112,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             '\Symfony\Component\Validator\Exception\ValidatorException',
-            "Configuration of permission test_permission is invalid:\n    Test message"
+            sprintf('Configuration of permission test_permission is invalid:%s    Test message', PHP_EOL)
         );
 
         $this->builder->buildPermissions(

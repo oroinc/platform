@@ -39,10 +39,11 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         $bundles = [
             $bundle1->getName() => get_class($bundle1),
             $bundle2->getName() => get_class($bundle2),
-            $bundleIncorrect->getName() => get_class($bundleIncorrect)
         ];
 
-        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
+        CumulativeResourceManager::getInstance()->clear()->setBundles(
+            array_merge($bundles, [$bundleIncorrect->getName() => get_class($bundleIncorrect)])
+        );
 
         $this->provider = $this->getContainer()->get('oro_security.configuration.provider.permission_configuration');
 
