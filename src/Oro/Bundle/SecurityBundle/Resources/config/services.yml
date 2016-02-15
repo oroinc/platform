@@ -404,7 +404,6 @@ services:
         class: %oro_security.twig.acl.permission_extension.class%
         arguments:
             - @oro_security.acl.permission_manager
-            - @oro_entity.doctrine_helper
         tags:
             - { name: twig.extension }
 

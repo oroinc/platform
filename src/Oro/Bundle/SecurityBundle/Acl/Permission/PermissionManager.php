@@ -37,6 +37,9 @@ class PermissionManager
     /** @var array */
     protected $permissions;
 
+    /** @var Permission[] */
+    protected $loadedPermissions = [];
+
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param PermissionConfigurationProvider $configurationProvider
@@ -120,6 +123,27 @@ class PermissionManager
         $ids = $groupName ? $this->findGroupPermissions($groupName) : null;
 
         return $this->getRepository()->findByEntityClassAndIds($this->doctrineHelper->getEntityClass($entity), $ids);
+    }
+
+    /**
+     * @param string $name
+     * @return Permission
+     */
+    public function getPermissionByName($name)
+    {
+        if (!array_key_exists($name, $this->loadedPermissions)) {
+            $this->loadedPermissions[$name] = null;
+
+            $map = $this->getPermissionsMap();
+            if (!isset($map[$name])) {
+                return;
+            }
+
+            $this->loadedPermissions[$name] = $this->getEntityManager()
+                ->getReference('OroSecurityBundle:Permission', $map[$name]);
+        }
+
+        return $this->loadedPermissions[$name];
     }
 
     /**

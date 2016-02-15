@@ -8,6 +8,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInt
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
@@ -68,6 +69,7 @@ class TestHelper
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @param PermissionManager $permissionManager
+     * @param AclGroupProviderInterface $groupProvider
      * @return EntityAclExtension
      */
     public function createEntityAclExtension(
@@ -75,7 +77,8 @@ class TestHelper
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
-        PermissionManager $permissionManager = null
+        PermissionManager $permissionManager = null,
+        AclGroupProviderInterface $groupProvider = null
     ) {
         if ($idAccessor === null) {
             $idAccessor = new ObjectIdAccessor();
@@ -161,7 +164,8 @@ class TestHelper
             $entityMetadataProvider,
             $metadataProvider,
             $decisionMaker,
-            $permissionManager ?: $this->getPermissionManagerMock($this->testCase)
+            $permissionManager ?: $this->getPermissionManagerMock($this->testCase),
+            $groupProvider ?: $this->getGroupProviderMock($this->testCase)
         );
     }
 
@@ -187,5 +191,17 @@ class TestHelper
             ]);
 
         return $permissionManager;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_TestCase $testCase
+     *
+     * @return AclGroupProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getGroupProviderMock(\PHPUnit_Framework_TestCase $testCase)
+    {
+        $provider = $testCase->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+
+        return $provider;
     }
 }
