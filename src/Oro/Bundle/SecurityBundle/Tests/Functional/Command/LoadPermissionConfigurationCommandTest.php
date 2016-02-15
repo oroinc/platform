@@ -9,10 +9,12 @@ use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle1\TestBundle1;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle2\TestBundle2;
+use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundleIncorrect\TestBundleIncorrect;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\CumulativeResourceManager;
 
@@ -21,19 +23,42 @@ use Oro\Component\Config\CumulativeResourceManager;
  */
 class LoadPermissionConfigurationCommandTest extends WebTestCase
 {
+    /**
+     * @var PermissionConfigurationProvider
+     */
+    protected $provider;
+
     protected function setUp()
     {
         $this->initClient();
 
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
-        $bundles = [$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)];
+        $bundleIncorrect = new TestBundleIncorrect();
 
-        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
+        $bundles = [
+            $bundle1->getName() => get_class($bundle1),
+            $bundle2->getName() => get_class($bundle2),
+        ];
 
-        $provider = $this->getContainer()->get('oro_security.configuration.provider.permission_configuration');
+        CumulativeResourceManager::getInstance()->clear()->setBundles(
+            array_merge($bundles, [$bundleIncorrect->getName() => get_class($bundleIncorrect)])
+        );
 
-        $this->setObjectProperty($provider, 'kernelBundles', $bundles);
+        $this->provider = $this->getContainer()->get('oro_security.configuration.provider.permission_configuration');
+
+        $this->setObjectProperty($this->provider, 'kernelBundles', $bundles);
+    }
+
+    public function testExecuteWithInvalidConfiguration()
+    {
+        $bundle = new TestBundleIncorrect();
+        $bundles = [$bundle->getName() => get_class($bundle)];
+
+        $this->setObjectProperty($this->provider, 'kernelBundles', $bundles);
+        $result = $this->runCommand(LoadPermissionConfigurationCommand::NAME);
+
+        $this->assertContains('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
     }
 
     /**

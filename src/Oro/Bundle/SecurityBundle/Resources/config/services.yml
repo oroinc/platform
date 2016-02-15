@@ -633,3 +633,4 @@ services:
         class: %oro_security.configuration.builder.permission_configuration.class%
         arguments:
             - @oro_entity.doctrine_helper
+            - @validator

@@ -5,6 +5,10 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
@@ -12,6 +16,11 @@ use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
 class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ValidatorInterface
+     */
+    protected $validator;
+
     /**
      * @var PermissionConfigurationBuilder
      */
@@ -42,12 +51,14 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 ['EntityNotManageable', false],
             ]);
 
-        $this->builder = new PermissionConfigurationBuilder($doctrineHelper);
+        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+
+        $this->builder = new PermissionConfigurationBuilder($doctrineHelper, $this->validator);
     }
 
     protected function tearDown()
     {
-        unset($this->builder);
+        unset($this->builder, $this->validator);
     }
 
     /**
@@ -71,6 +82,11 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildPermissions(array $configuration, array $expected)
     {
+        $this->validator->expects($this->any())
+            ->method('validate')
+            ->with($this->isInstanceOf('Oro\Bundle\SecurityBundle\Entity\Permission'))
+            ->willReturn(new ConstraintViolationList());
+
         $permissions = $this->builder->buildPermissions($configuration);
 
         $this->assertSameSize($expected, $permissions);
@@ -79,6 +95,34 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey($permission->getName(), $expected);
             $this->assertDefinitionConfiguration($expected[$permission->getName()], $permission);
         }
+    }
+
+    public function testBuildPermissionsException()
+    {
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->isInstanceOf('Oro\Bundle\SecurityBundle\Entity\Permission'))
+            ->willReturn(
+                new ConstraintViolationList(
+                    [
+                        new ConstraintViolation('Test message', 'Test template', [], 'root', 'name', 'data')
+                    ]
+                )
+            );
+
+        $this->setExpectedException(
+            '\Symfony\Component\Validator\Exception\ValidatorException',
+            sprintf('Configuration of permission test_permission is invalid:%s    Test message', PHP_EOL)
+        );
+
+        $this->builder->buildPermissions(
+            [
+                'test_permission' => [
+                    'name' => 'minimum_name',
+                    'label' => 'My Label',
+                ]
+            ]
+        );
     }
 
     /**
