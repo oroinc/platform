@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
@@ -86,13 +87,21 @@ class ConnectionControllerManager
     }
 
     /**
-     * @param $request
+     * @param Request $request
      * $param sting $formParentName
+     *
      * @return FormInterface
      */
     public function getCheckGmailConnectionForm($request, $formParentName)
     {
+        $data = null;
+        $id = $request->get('id', false);
+        if (false !== $id) {
+            $data = $this->doctrine->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
+        }
+
         $form = $this->formFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
+        $form->setData($data);
         $form->submit($request);
 
         if (!$form->isValid()) {

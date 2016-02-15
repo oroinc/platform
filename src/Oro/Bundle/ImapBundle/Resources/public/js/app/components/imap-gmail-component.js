@@ -25,6 +25,7 @@ define(function(require) {
             this.routeAccessToken = _.result(options, 'routeAccessToken') || '';
             this.routeGetFolders = _.result(options, 'routeGetFolders') || '';
             this.formParentName = _.result(options, 'formParentName') || '';
+            this.originId = _.result(options, 'id') || null;
 
             var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
@@ -258,7 +259,8 @@ define(function(require) {
         prepareDataForForm: function(values) {
             var data = {
                 oro_imap_configuration_gmail: {},
-                formParentName: this.formParentName
+                formParentName: this.formParentName,
+                id: this.originId
             };
 
             for (var i in values) {
