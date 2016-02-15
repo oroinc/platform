@@ -63,11 +63,6 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityManager = $this
-            ->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -78,20 +73,18 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->entityRepository);
 
         $this->doctrineHelper->expects($this->any())
-            ->method('getEntityManagerForClass')
-            ->willReturn($this->entityManager);
-
-        $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
             ->with('OroSecurityBundle:PermissionEntity')
             ->willReturn($this->entityRepository);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManagerForClass')
             ->with('OroSecurityBundle:Permission')
-            ->willReturn($em);
+            ->willReturn($this->entityManager);
 
         $this->configurationBuilder = new PermissionConfigurationBuilder($this->doctrineHelper);
 
@@ -230,16 +223,14 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->with(PermissionManager::CACHE_PERMISSIONS)
             ->willReturn($inputData['cache']);
 
-        $this->doctrineHelper->expects($inputData['permission'] ? $this->once() : $this->never())
-            ->method('getEntityManagerForClass')
-            ->with('OroSecurityBundle:Permission')
-            ->willReturn($this->entityManager);
-
         $this->entityManager->expects($inputData['permission'] ? $this->once() : $this->never())
             ->method('getReference')
             ->with('OroSecurityBundle:Permission', $inputData['id'])
             ->willReturn($inputData['permission']);
 
+        $this->assertEquals($expectedData, $this->manager->getPermissionByName($inputData['name']));
+
+        // data from local cache
         $this->assertEquals($expectedData, $this->manager->getPermissionByName($inputData['name']));
     }
 
@@ -444,9 +435,14 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $cache = ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3];
 
-        $permissions = [
-            $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
-        ];
+        $permission = $this->getPermission(
+            1,
+            'PERMISSION1',
+            true,
+            ['entity1', 'entity2'],
+            ['entity10', 'entity11'],
+            ['group1']
+        );
 
         return [
             'empty cache' => [
@@ -472,9 +468,9 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                     'cache' => $cache,
                     'name' => 'PERMISSION1',
                     'id' => 1,
-                    'permission' => $permissions[0],
+                    'permission' => $permission,
                 ],
-                'expected' => $permissions[0],
+                'expected' => $permission,
             ],
         ];
     }

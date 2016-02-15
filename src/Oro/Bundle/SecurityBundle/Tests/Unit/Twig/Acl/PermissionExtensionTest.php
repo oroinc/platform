@@ -33,14 +33,12 @@ class PermissionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_security_acl_permission_extension', $this->twigExtension->getName());
+        $this->assertEquals(PermissionExtension::NAME, $this->twigExtension->getName());
     }
 
     public function testGetFunctions()
     {
-        $expectedFunctions = array(
-            'acl_permission' => 'getPermission',
-        );
+        $expectedFunctions = ['acl_permission' => 'getPermission'];
 
         $actualFunctions = $this->twigExtension->getFunctions();
         $this->assertSameSize($expectedFunctions, $actualFunctions);
