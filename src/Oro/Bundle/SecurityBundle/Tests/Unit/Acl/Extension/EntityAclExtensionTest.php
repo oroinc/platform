@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
-use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -15,7 +13,10 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
@@ -48,8 +49,11 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
 
-    /** @var PermissionManager */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|PermissionManager */
     private $permissionManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
+    private $groupProvider;
 
     protected function setUp()
     {
@@ -131,12 +135,18 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'SHARE'  => 6
             ]);
 
+        $this->groupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $this->groupProvider->expects($this->any())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
+
         $this->extension = TestHelper::get($this)->createEntityAclExtension(
             $this->metadataProvider,
             $this->tree,
             new ObjectIdAccessor(),
             $this->decisionMaker,
-            $this->permissionManager
+            $this->permissionManager,
+            $this->groupProvider
         );
 
         $this->extension->setEntityOwnerAccessor($entityOwnerAccessor);
@@ -1007,7 +1017,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $entityMetadataProvider,
             $this->metadataProvider,
             $this->decisionMaker,
-            $this->permissionManager
+            $this->permissionManager,
+            $this->groupProvider
         );
 
         $this->assertEquals($expected, $extension->supports($type, $id));

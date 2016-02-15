@@ -10,7 +10,6 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
-use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 
 class AclVoterTest extends \PHPUnit_Framework_TestCase
@@ -20,9 +19,6 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|AclExtensionSelector */
     private $extensionSelector;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|PermissionManager */
-    private $permissionManager;
 
     /** @var AclVoter */
     private $voter;
@@ -46,23 +42,22 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
             $this->permissionMap
         );
         $this->voter->setAclExtensionSelector($this->extensionSelector);
-        $this->voter->setPermissionManager($this->permissionManager);
     }
 
     protected function tearDown()
     {
-        unset($this->voter, $this->permissionMap, $this->extensionSelector, $this->permissionManager);
+        unset($this->voter, $this->permissionMap, $this->extensionSelector);
     }
 
     /**
      * @dataProvider voteDataProvider
      *
      * @param mixed $object
-     * @param string $expectedGroup
      * @param mixed $expectedObject
      * @param int $expected
+     * @param array $permissions
      */
-    public function testVote($object, $expectedGroup, $expectedObject, $expected)
+    public function testVote($object, $expectedObject, $expected, array $permissions = ['test'])
     {
         /** @var TokenInterface $token */
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
@@ -71,8 +66,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         $inVoteObject = null;
         $inVoteExtension = null;
 
-        $this->assertPermissionManagerCalled($expectedGroup);
-        $extension = $this->assertAclExtensionCalled($expectedObject);
+        $extension = $this->assertAclExtensionCalled($expectedObject, $permissions);
 
         $this->permissionMap
             ->expects($this->atLeast(2))
@@ -95,7 +89,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
                         }
                     );
 
-            $extension->expects($expected === AclVoter::ACCESS_DENIED ? $this->never() : $this->once())
+            $extension->expects($this->once())
                 ->method('getAccessLevel')
                 ->with(1)
                 ->willReturn(AccessLevel::LOCAL_LEVEL);
@@ -131,40 +125,39 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'object' => new \stdClass(),
-                'expectedGroup' => null,
                 'expectedObject' => new \stdClass(),
-                'expected' => AclVoter::ACCESS_ABSTAIN,
-                'permissionManagerCalls' => 0
+                'expected' => AclVoter::ACCESS_ABSTAIN
             ],
             [
                 'object' => new ObjectIdentity('stdClass', 'entity'),
-                'expectedGroup' => '',
                 'expectedObject' => new ObjectIdentity('stdClass', 'entity'),
                 'expected' => AclVoter::ACCESS_ABSTAIN
             ],
             [
                 'object' => new ObjectIdentity('stdClass', 'test_group@entity'),
-                'expectedGroup' => 'test_group',
                 'expectedObject' => new ObjectIdentity('stdClass', 'entity'),
                 'expected' => AclVoter::ACCESS_ABSTAIN
             ],
             [
                 'object' => new ObjectIdentity('stdClass', 'test_group@entity'),
-                'expectedGroup' => 'new_group',
                 'expectedObject' => new ObjectIdentity('stdClass', 'entity'),
                 'expected' => AclVoter::ACCESS_DENIED,
-                'permissionManagerCalls' => 0
+                'permissions' => ['new_test']
             ]
         ];
     }
 
     /**
      * @param mixed $object
-     * @return \PHPUnit_Framework_MockObject_MockObject|AclExtensionInterface
+     * @param array $permissions
+     * @return AclExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function assertAclExtensionCalled($object)
+    protected function assertAclExtensionCalled($object, array $permissions)
     {
         $extension = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
+        $extension->expects($this->any())
+            ->method('getPermissions')
+            ->willReturn($permissions);
 
         $this->extensionSelector->expects($this->exactly(2))
             ->method('select')
@@ -185,19 +178,5 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
             ->with(AccessLevel::LOCAL_LEVEL);
 
         $this->voter->addOneShotIsGrantedObserver($isGrantedObserver);
-    }
-
-    /**
-     * @param string $expectedGroup
-     */
-    protected function assertPermissionManagerCalled($expectedGroup)
-    {
-        $this->permissionManager->expects($this->any())
-            ->method('getPermissionsMap')
-            ->willReturnCallback(
-                function ($group) use ($expectedGroup) {
-                    return $group === $expectedGroup ? ['test' => 1] : [];
-                }
-            );
     }
 }

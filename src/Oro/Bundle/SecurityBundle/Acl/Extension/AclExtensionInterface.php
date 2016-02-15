@@ -161,9 +161,10 @@ interface AclExtensionInterface
      * @param int|null $mask The bitmask
      * @param bool $setOnly Determines whether all permissions can be encoded in the given mask should be returned
      *                      or only permissions are set in the given mask.
+     * @param bool $byCurrentGroup
      * @return string[]
      */
-    public function getPermissions($mask = null, $setOnly = false);
+    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false);
 
     /**
      * Gets all permissions allowed for a domain object represented by te given object identity.
