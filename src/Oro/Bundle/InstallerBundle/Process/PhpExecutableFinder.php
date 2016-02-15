@@ -5,7 +5,9 @@ namespace Oro\Bundle\InstallerBundle\Process;
 use Symfony\Component\Process\PhpExecutableFinder as BasePhpExecutableFinder;
 
 /**
- * @deprecated since 1.9
+ * @deprecated since 1.9 use PHP_PATH instead
+ *
+ * @see \Symfony\Component\Process\PhpExecutableFinder
  */
 class PhpExecutableFinder
 {
