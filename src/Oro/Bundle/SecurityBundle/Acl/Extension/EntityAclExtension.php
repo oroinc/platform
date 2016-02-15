@@ -18,6 +18,7 @@ use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
@@ -386,9 +387,10 @@ class EntityAclExtension extends AbstractAclExtension
             $config = $this->entityMetadataProvider->getMetadata($oid->getType());
             $result = $config->getPermissions();
             if (empty($result)) {
-                $result = $this->getPermissionsForEntityClass($oid->getType());
+                $result = array_keys($this->getPermissionsToIdentityMap());
             }
 
+            $result = array_intersect($result, $this->getPermissionsForEntityClass($oid->getType()));
             $metadata = $this->getMetadata($oid);
             if (!$metadata->hasOwner()) {
                 foreach ($result as $key => $value) {
@@ -399,7 +401,7 @@ class EntityAclExtension extends AbstractAclExtension
             }
         }
 
-        return $result;
+        return array_values($result);
     }
 
     /**
@@ -408,14 +410,12 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function getPermissionsForEntityClass($class)
     {
-        $permissions = $this->permissionManager->getPermissionsForEntity($class, $this->groupProvider->getGroup());
-
-        $result = [];
-        foreach ($permissions as $permission) {
-            $result[] = $permission->getName();
-        }
-
-        return $result;
+        return array_map(
+            function (Permission $permission) {
+                return $permission->getName();
+            },
+            $this->permissionManager->getPermissionsForEntity($class, $this->groupProvider->getGroup())
+        );
     }
 
     /**

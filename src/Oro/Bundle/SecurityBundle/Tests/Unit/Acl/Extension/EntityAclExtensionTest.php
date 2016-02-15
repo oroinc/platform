@@ -412,10 +412,24 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             );
         }
 
+        $this->permissionManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->permissionManager->expects($this->any())
             ->method('getPermissionsForEntity')
             ->with($inputData['type'], AclGroupProviderInterface::DEFAULT_SECURITY_GROUP)
             ->willReturn($inputData['permissions']);
+        $this->permissionManager->expects($this->any())
+            ->method('getPermissionsMap')
+            ->willReturn([
+                'VIEW'   => 1,
+                'CREATE' => 2,
+                'EDIT'   => 3,
+                'DELETE' => 4,
+                'ASSIGN' => 5,
+                'SHARE'  => 6,
+                'PERMISSION' => 7
+            ]);
 
         /* @var $entityClassResolver EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject  */
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
@@ -699,23 +713,35 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                     'entityConfig' => [],
                     'permissions' => null,
                 ],
-                'expected' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE'],
+                'expected' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE', 'PERMISSION'],
             ],
             'TestEntity1 + config' => [
                 'input' => [
                     'type' => 'TestEntity1',
                     'owner' => false,
                     'entityConfig' => ['VIEW', 'CREATE', 'ASSIGN', 'SHARE', 'PERMISSION'],
-                    'permissions' => [],
+                    'permissions' => [
+                        $this->getPermission(1, 'VIEW'),
+                        $this->getPermission(2, 'CREATE'),
+                        $this->getPermission(3, 'ASSIGN'),
+                        $this->getPermission(4, 'SHARE'),
+                        $this->getPermission(5, 'PERMISSION')
+                    ],
                 ],
-                'expected' => ['VIEW', 'CREATE', 4 => 'PERMISSION'],
+                'expected' => ['VIEW', 'CREATE', 'PERMISSION'],
             ],
             'TestEntity1 + config + owner' => [
                 'input' => [
                     'type' => 'TestEntity1',
                     'owner' => true,
                     'entityConfig' => ['VIEW', 'CREATE', 'ASSIGN', 'SHARE', 'PERMISSION'],
-                    'permissions' => [],
+                    'permissions' => [
+                        $this->getPermission(1, 'VIEW'),
+                        $this->getPermission(2, 'CREATE'),
+                        $this->getPermission(3, 'ASSIGN'),
+                        $this->getPermission(4, 'SHARE'),
+                        $this->getPermission(5, 'PERMISSION')
+                    ],
                 ],
                 'expected' => ['VIEW', 'CREATE', 'ASSIGN', 'SHARE', 'PERMISSION'],
             ],
@@ -728,10 +754,10 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                         $this->getPermission(1, 'VIEW'),
                         $this->getPermission(2, 'ASSIGN'),
                         $this->getPermission(3, 'SHARE'),
-                        $this->getPermission(4, 'PERMISSION1'),
+                        $this->getPermission(4, 'PERMISSION'),
                     ],
                 ],
-                'expected' => ['VIEW', 3 => 'PERMISSION1'],
+                'expected' => ['VIEW', 'PERMISSION'],
             ],
         ];
     }

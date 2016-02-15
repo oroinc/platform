@@ -127,20 +127,18 @@ class PermissionManager
 
     /**
      * @param string $name
-     * @return Permission
+     * @return Permission|null
      */
     public function getPermissionByName($name)
     {
         if (!array_key_exists($name, $this->loadedPermissions)) {
-            $this->loadedPermissions[$name] = null;
-
             $map = $this->getPermissionsMap();
-            if (!isset($map[$name])) {
-                return;
+            if (isset($map[$name])) {
+                $this->loadedPermissions[$name] = $this->getEntityManager()
+                    ->getReference('OroSecurityBundle:Permission', $map[$name]);
+            } else {
+                $this->loadedPermissions[$name] = null;
             }
-
-            $this->loadedPermissions[$name] = $this->getEntityManager()
-                ->getReference('OroSecurityBundle:Permission', $map[$name]);
         }
 
         return $this->loadedPermissions[$name];

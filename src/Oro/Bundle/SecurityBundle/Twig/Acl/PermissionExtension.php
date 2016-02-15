@@ -26,9 +26,9 @@ class PermissionExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             'acl_permission' => new \Twig_Function_Method($this, 'getPermission'),
-        );
+        ];
     }
 
     /**
