@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Permission;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
@@ -28,6 +29,9 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var PermissionRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityRepository;
+
+    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $entityManager;
 
     /** @var PermissionConfigurationProvider */
     protected $configurationProvider;
@@ -59,6 +63,11 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityManager = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -67,6 +76,10 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityRepository')
             ->with('OroSecurityBundle:Permission')
             ->willReturn($this->entityRepository);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManagerForClass')
+            ->willReturn($this->entityManager);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
@@ -202,6 +215,32 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             $expectedData,
             $this->manager->getPermissionsForEntity($inputData['entity'], $inputData['group'])
         );
+    }
+
+    /**
+     * @param array $inputData
+     * @param $expectedData
+     *
+     * @dataProvider getPermissionByNameProvider
+     */
+    public function testGetPermissionByName(array $inputData, $expectedData)
+    {
+        $this->cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with(PermissionManager::CACHE_PERMISSIONS)
+            ->willReturn($inputData['cache']);
+
+        $this->doctrineHelper->expects($inputData['permission'] ? $this->once() : $this->never())
+            ->method('getEntityManagerForClass')
+            ->with('OroSecurityBundle:Permission')
+            ->willReturn($this->entityManager);
+
+        $this->entityManager->expects($inputData['permission'] ? $this->once() : $this->never())
+            ->method('getReference')
+            ->with('OroSecurityBundle:Permission', $inputData['id'])
+            ->willReturn($inputData['permission']);
+
+        $this->assertEquals($expectedData, $this->manager->getPermissionByName($inputData['name']));
     }
 
     /**
@@ -394,6 +433,48 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     $permissions[2],
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissionByNameProvider()
+    {
+        $cache = ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3];
+
+        $permissions = [
+            $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
+        ];
+
+        return [
+            'empty cache' => [
+                'input' => [
+                    'cache' => [],
+                    'name' => 'name1',
+                    'id' => null,
+                    'permission' => null,
+                ],
+                'expected' => null,
+            ],
+            'unknown name' => [
+                'input' => [
+                    'cache' => $cache,
+                    'name' => 'unknown name',
+                    'id' => null,
+                    'permission' => null,
+                ],
+                'expected' => null,
+            ],
+            'PERMISSION1' => [
+                'input' => [
+                    'cache' => $cache,
+                    'name' => 'PERMISSION1',
+                    'id' => 1,
+                    'permission' => $permissions[0],
+                ],
+                'expected' => $permissions[0],
             ],
         ];
     }
