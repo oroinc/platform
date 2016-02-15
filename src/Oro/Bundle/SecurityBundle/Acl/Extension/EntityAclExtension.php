@@ -14,6 +14,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -51,6 +52,9 @@ class EntityAclExtension extends AbstractAclExtension
     /** @var PermissionManager */
     protected $permissionManager;
 
+    /** @var AclGroupProviderInterface */
+    protected $groupProvider;
+
     /**
      * key = Permission
      * value = The identity of a permission mask builder
@@ -76,7 +80,8 @@ class EntityAclExtension extends AbstractAclExtension
         EntitySecurityMetadataProvider $entityMetadataProvider,
         MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
-        PermissionManager $permissionManager
+        PermissionManager $permissionManager,
+        AclGroupProviderInterface $groupProvider
     ) {
         $this->objectIdAccessor       = $objectIdAccessor;
         $this->entityClassResolver    = $entityClassResolver;
@@ -84,6 +89,7 @@ class EntityAclExtension extends AbstractAclExtension
         $this->metadataProvider       = $metadataProvider;
         $this->decisionMaker          = $decisionMaker;
         $this->permissionManager      = $permissionManager;
+        $this->groupProvider          = $groupProvider;
     }
 
     /**
@@ -400,7 +406,7 @@ class EntityAclExtension extends AbstractAclExtension
             $config = $this->entityMetadataProvider->getMetadata($oid->getType());
             $result = $config->getPermissions();
             if (empty($result)) {
-                $result = array_keys($this->map);
+                $result = $this->getPermissionsForEntityClass($oid->getType());
             }
 
             $metadata = $this->getMetadata($oid);
@@ -411,6 +417,22 @@ class EntityAclExtension extends AbstractAclExtension
                     }
                 }
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $class
+     * @return array
+     */
+    protected function getPermissionsForEntityClass($class)
+    {
+        $permissions = $this->permissionManager->getPermissionsForEntity($class, $this->groupProvider->getGroup());
+
+        $result = [];
+        foreach ($permissions as $permission) {
+            $result[] = $permission->getName();
         }
 
         return $result;

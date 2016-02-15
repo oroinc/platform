@@ -49,6 +49,7 @@ parameters:
 
     oro_security.twig.security_extension.class:                Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
     oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
+    oro_security.twig.acl.permission_extension.class:          Oro\Bundle\SecurityBundle\Twig\Acl\PermissionExtension
 
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
@@ -159,6 +160,7 @@ services:
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.owner.ownership_decision_maker.chain
             - @oro_security.acl.permission_manager
+            - @oro_security.acl.group_provider.chain
         calls:
             - [setEntityOwnerAccessor, [@oro_security.owner.entity_owner_accessor]]
         tags:
@@ -395,6 +397,14 @@ services:
         class: %oro_security.twig.security_organization_extension%
         arguments:
             - @security.context
+        tags:
+            - { name: twig.extension }
+
+    oro_security.twig.acl.permission_extension:
+        class: %oro_security.twig.acl.permission_extension.class%
+        arguments:
+            - @oro_security.acl.permission_manager
+            - @oro_entity.doctrine_helper
         tags:
             - { name: twig.extension }
 

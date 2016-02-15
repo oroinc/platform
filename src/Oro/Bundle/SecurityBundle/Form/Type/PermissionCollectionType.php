@@ -8,6 +8,8 @@ use Symfony\Component\Form\FormView;
 
 class PermissionCollectionType extends AbstractType
 {
+    const NAME = 'oro_acl_permission_collection';
+
     /**
      * {@inheritdoc}
      */
@@ -25,7 +27,7 @@ class PermissionCollectionType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_acl_permission_collection';
+        return self::NAME;
     }
 
     /**
