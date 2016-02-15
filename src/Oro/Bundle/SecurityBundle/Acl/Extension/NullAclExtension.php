@@ -120,7 +120,7 @@ final class NullAclExtension implements AclExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getPermissions($mask = null, $setOnly = false)
+    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
         return array();
     }

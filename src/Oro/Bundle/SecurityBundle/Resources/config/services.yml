@@ -159,6 +159,7 @@ services:
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.owner.ownership_decision_maker.chain
             - @oro_security.acl.permission_manager
+            - @oro_security.acl.group_provider.chain
         calls:
             - [setEntityOwnerAccessor, [@oro_security.owner.entity_owner_accessor]]
         tags:
