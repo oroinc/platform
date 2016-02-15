@@ -219,7 +219,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $inputData
-     * @param $expectedData
+     * @param mixed $expectedData
      *
      * @dataProvider getPermissionByNameProvider
      */

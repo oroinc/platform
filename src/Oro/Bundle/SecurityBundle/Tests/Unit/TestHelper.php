@@ -204,6 +204,7 @@ class TestHelper
         $mock->expects($testCase->any())
             ->method('getGroup')
             ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
+
         return $mock;
     }
 }
