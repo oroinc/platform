@@ -51,7 +51,6 @@ class EmailActivityUpdates
         $jobsArgs = $this->createJobsArgs($entities);
 
         return $this->createJobEntities($jobsArgs);
-
     }
 
     /**
