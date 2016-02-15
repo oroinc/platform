@@ -37,6 +37,7 @@ class PermissionRepository extends EntityRepository
                     )
                 )
             )
+            ->orderBy($queryBuilder->expr()->asc('p.id'))
             ->setParameter('class', $class);
 
         if ($ids) {
