@@ -17,7 +17,8 @@ define([
         listen: {
             'add collection': 'onAdd',
             'remove collection': 'onRemove',
-            'pagestate:change mediator': 'onPageStateChange'
+            'pagestate:change mediator': 'onPageStateChange',
+            'page:afterChange mediator': 'onPageAfterChange'
         },
 
         _createSubViews: function() {
@@ -128,6 +129,17 @@ define([
                 url = mediator.execute('currentUrl');
                 if (model.get('url') !== url) {
                     model.set('url', url);
+                    model.save();
+                }
+            }
+        },
+
+        onPageAfterChange: function() {
+            var model = this.collection.getCurrentModel();
+            if (model) {
+                model.set(this.button.getItemAttrs());
+                // if title changed (template and/or it's parameters) -- update it
+                if (model.hasChanged('title')) {
                     model.save();
                 }
             }

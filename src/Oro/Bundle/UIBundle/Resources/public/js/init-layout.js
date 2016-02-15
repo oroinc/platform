@@ -429,6 +429,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(document).on('click', '.add-list-item', function(e) {
         e.preventDefault();
+        if ($(this).attr('disabled')) {
+            return;
+        }
         var containerSelector = $(this).data('container') || '.collection-fields-list';
         var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
         var rowCountAdd = $(containerSelector).data('row-count-add') || 1;
@@ -447,6 +450,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(document).on('click', '.addAfterRow', function(e) {
         e.preventDefault();
+        if ($(this).attr('disabled')) {
+            return;
+        }
         var $item = $(this).closest('.row-oro').parent();
         var $listContainer = $item.parent();
         var collectionInfo = getOroCollectionInfo($listContainer);
@@ -462,6 +468,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(document).on('click', '.removeRow', function(e) {
         e.preventDefault();
+        if ($(this).attr('disabled')) {
+            return;
+        }
         $(this).closest('*[data-content]')
             .trigger('content:remove')
             .remove();
