@@ -53,3 +53,8 @@ Also the following permissions are supported:
 - [Custom listeners] (./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
 
+Permissions
+-----------
+
+The `OroSecurityBundle` provides possibility to use custom permissions for entities.
+See [Permissions](./Resources/doc/permissions.md) for details.

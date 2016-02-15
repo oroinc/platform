@@ -5,6 +5,8 @@ Table of Contents
 -----------------
  - [Entities](#entities)
  - [Configuration](#configuration)
+ - [Configuration Merging](#configuration-merging)
+ - [Configuration Replacing](#configuration-replacing)
  - [Configuration Load](#configuration-load)
 
 User can define custom Permissions and apply it to any manageable Entity. 
