@@ -58,7 +58,7 @@ class UserScopeManager extends AbstractScopeManager
      */
     protected function ensureScopeIdInitialized()
     {
-        if (!$this->scopeId) {
+        if (null === $this->scopeId) {
             $scopeId = 0;
 
             $token = $this->securityContext->getToken();
