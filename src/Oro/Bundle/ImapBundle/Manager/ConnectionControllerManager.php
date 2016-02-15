@@ -49,12 +49,16 @@ class ConnectionControllerManager
     /** @var string */
     protected $emailMailboxFormType;
 
+    /** @var ImapEmailGoogleOauth2Manager */
+    protected $imapEmailGoogleOauth2Manager;
+
     /**
      * @param FormInterface $formUser
      * @param FormFactory $formFactory
      * @param Mcrypt $mcrypt
      * @param ManagerRegistry $doctrineHelper
      * @param ImapConnectorFactory $imapConnectorFactory
+     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
      * @param string $userFormName
      * @param string $emailMailboxFormName
      * @param string $emailMailboxFormType
@@ -65,6 +69,7 @@ class ConnectionControllerManager
         Mcrypt $mcrypt,
         ManagerRegistry $doctrineHelper,
         ImapConnectorFactory $imapConnectorFactory,
+        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager,
         $userFormName,
         $emailMailboxFormName,
         $emailMailboxFormType
@@ -74,6 +79,7 @@ class ConnectionControllerManager
         $this->mcrypt = $mcrypt;
         $this->doctrine = $doctrineHelper;
         $this->imapConnectorFactory = $imapConnectorFactory;
+        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
         $this->userFormName = $userFormName;
         $this->emailMailboxFormName = $emailMailboxFormName;
         $this->emailMailboxFormType = $emailMailboxFormType;
@@ -140,6 +146,32 @@ class ConnectionControllerManager
         $accountTypeModel = $this->createAccountModel($type, $oauthEmailOrigin);
 
         return $this->prepareForm($formParentName, $accountTypeModel);
+    }
+
+    /**
+     * Get oauth2 access token by security code
+     *
+     * @param $code
+     *
+     * @return array
+     */
+    public function getAccessToken($code)
+    {
+        $accessToken = $this->imapEmailGoogleOauth2Manager->getAccessTokenByAuthCode($code);
+        $userInfo = $this->imapEmailGoogleOauth2Manager->getUserInfo($accessToken['access_token']);
+        $userInfoResponse = $userInfo->getResponse();
+        if (array_key_exists('error', $userInfoResponse)) {
+            $response = $userInfoResponse['error'];
+        } else {
+            $response = [
+                'access_token' => $accessToken['access_token'],
+                'refresh_token' => $accessToken['refresh_token'],
+                'expires_in' => $accessToken['expires_in'],
+                'email_address' => $userInfo->getEmail()
+            ];
+        }
+
+        return $response;
     }
 
     /**

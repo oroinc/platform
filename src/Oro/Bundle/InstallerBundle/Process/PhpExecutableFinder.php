@@ -4,11 +4,14 @@ namespace Oro\Bundle\InstallerBundle\Process;
 
 use Symfony\Component\Process\PhpExecutableFinder as BasePhpExecutableFinder;
 
+/**
+ * @deprecated since 1.9 use PHP_PATH instead
+ *
+ * @see \Symfony\Component\Process\PhpExecutableFinder
+ */
 class PhpExecutableFinder
 {
-    /**
-     * @var BasePhpExecutableFinder
-     */
+    /** @var BasePhpExecutableFinder */
     protected $finder;
 
     public function __construct()
@@ -17,18 +20,13 @@ class PhpExecutableFinder
     }
 
     /**
-     * Finds The PHP executable.
-     *
-     * @param bool $includeArgs Whether or not include command arguments
-     *
-     * @return string|false The PHP executable path or false if it cannot be found
+     * @see \Symfony\Component\Process\PhpExecutableFinder::find
      */
     public function find($includeArgs = true)
     {
-        if ($php = getenv('ORO_PHP_PATH')) {
-            if (is_executable($php)) {
-                return $php;
-            }
+        $php = getenv('ORO_PHP_PATH');
+        if ($php && is_executable($php)) {
+            return $php;
         }
 
         return $this->finder->find($includeArgs);
