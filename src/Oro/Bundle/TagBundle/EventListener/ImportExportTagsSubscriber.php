@@ -98,7 +98,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     public function readEntity(ReadEntityEvent $event)
     {
         $entity = $event->getObject();
-        if ($this->getTagImportManager()->isTaggable($event->getEntity())) {
+        if ($this->getTagImportManager()->isTaggable($entity)) {
             $this->getTagImportManager()->loadTags($entity);
         }
     }
