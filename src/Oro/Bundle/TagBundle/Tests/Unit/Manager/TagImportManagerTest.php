@@ -17,8 +17,22 @@ class TagImportManagerTest extends \PHPUnit_Framework_TestCase
         $tagStorage = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $tagStorage->expects($this->any())
+            ->method('loadOrCreateTags')
+            ->will($this->returnCallback(function (array $tagNames) {
+                return array_map(
+                    function ($tagName) {
+                        return new Tag($tagName);
+                    },
+                    $tagNames
+                );
+            }));
 
-        $this->tagImportManager = new TagImportManager($tagStorage);
+        $taggableHelper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->tagImportManager = new TagImportManager($tagStorage, $taggableHelper);
     }
 
     /**
@@ -92,17 +106,9 @@ class TagImportManagerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 [
-                    'autocomplete' => [],
-                    'owner' => [
-                        new Tag('1'),
-                        new Tag('2'),
-                        new Tag('3'),
-                    ],
-                    'all' => [
-                        new Tag('1'),
-                        new Tag('2'),
-                        new Tag('3'),
-                    ],
+                    new Tag('1'),
+                    new Tag('2'),
+                    new Tag('3'),
                 ]
             ],
         ];
