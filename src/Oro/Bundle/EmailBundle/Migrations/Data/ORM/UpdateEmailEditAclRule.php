@@ -11,9 +11,12 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
-class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class UpdateEmailEditAclRule extends AbstractFixture implements
+    ContainerAwareInterface,
+    DependentFixtureInterface,
+    VersionedFixtureInterface
 {
     /**
      * @var ContainerInterface
@@ -31,6 +34,14 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
     public function getDependencies()
     {
         return ['Oro\Bundle\SecurityBundle\Migrations\Data\ORM\LoadAclRoles'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.1';
     }
 
     /**
@@ -64,11 +75,10 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
      */
     protected function updateUserRole(AclManager $manager)
     {
-        $role = $this->getRole(LoadRolesData::ROLE_ADMINISTRATOR);
-        if ($role) {
+        $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
+        $roles = $this->getRoles();
+        foreach ($roles as $role) {
             $sid = $manager->getSid($role);
-
-            $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
             $maskBuilder = $manager->getMaskBuilder($oid)
                 ->add('VIEW_SYSTEM')
                 ->add('CREATE_SYSTEM')
@@ -81,8 +91,8 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
      * @param string $roleName
      * @return Role|null
      */
-    protected function getRole($roleName)
+    protected function getRoles()
     {
-        return $this->objectManager->getRepository('OroUserBundle:Role')->findOneBy(['role' => $roleName]);
+        return $this->objectManager->getRepository('OroUserBundle:Role')->findAll();
     }
 }

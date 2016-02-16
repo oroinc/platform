@@ -97,7 +97,7 @@ class EmailController extends RestController
      *      description="Update email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_edit")
+     * @AclAncestor("oro_email_email_user_edit")
      * @return Response
      */
     public function putAction($id)
@@ -112,7 +112,7 @@ class EmailController extends RestController
      *      description="Create new email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_edit")
+     * @AclAncestor("oro_email_email_user_edit")
      */
     public function postAction()
     {
