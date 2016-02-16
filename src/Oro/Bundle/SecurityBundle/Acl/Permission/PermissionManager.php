@@ -165,7 +165,7 @@ class PermissionManager
             }
         }
 
-        $this->cache->flushAll();
+        $this->cache->deleteAll();
         foreach ($cache as $key => $value) {
             $this->cache->save($key, $value);
         }
