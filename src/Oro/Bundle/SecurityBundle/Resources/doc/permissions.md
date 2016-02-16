@@ -16,7 +16,7 @@ Entities
 Permission consists of 2 related entities.
 
 * **Permission** - main entity that contains information about specific permission. It contains the most important
-information like Permission name, label, permission and the list of PermissionEntities for what Permission can be
+information like Permission name, label, groups, the list of PermissionEntities for what Permission can be
 applied and the list of PermissionEntities that can't use this Permission.
 
 * **PermissionEntity** - stored entity classes for using in Permission entity.
