@@ -1,0 +1,239 @@
+<?php
+
+namespace Oro\Component\EntitySerializer\Tests\Unit;
+
+use Oro\Component\EntitySerializer\ConfigConverter;
+
+class ConfigConverterTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @dataProvider convertConfigProvider
+     */
+    public function testConvertConfig($config, $expectedConfig)
+    {
+        $configConverter = new ConfigConverter();
+
+        $this->assertEquals(
+            $expectedConfig,
+            $configConverter->convertConfig($config)->toArray()
+        );
+    }
+
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function convertConfigProvider()
+    {
+        return [
+            'with all fields'            => [
+                'config'         => [
+                    'exclusion_policy'     => 'all',
+                    'disable_partial_load' => true,
+                    'hints'                => [
+                        'hint1',
+                        ['name' => 'hint2', 'value' => 'val']
+                    ],
+                    'order_by'             => ['field1' => 'DESC'],
+                    'max_results'          => 123,
+                    'post_serialize'       => [get_class($this), 'postSerialize1'],
+                    'fields'               => [
+                        'field1' => [
+                            'property_path'        => 'field1_path',
+                            'exclude'              => true,
+                            'collapse'             => true,
+                            'data_transformer'     => [
+                                'service_id',
+                                [get_class($this), 'dataTransformer1']
+                            ],
+                            'exclusion_policy'     => 'all',
+                            'disable_partial_load' => true,
+                            'hints'                => [
+                                'hint3',
+                                ['name' => 'hint4', 'value' => 'val']
+                            ],
+                            'order_by'             => ['field2' => 'DESC'],
+                            'max_results'          => 456,
+                            'post_serialize'       => [get_class($this), 'postSerialize2'],
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'exclusion_policy'     => 'all',
+                    'disable_partial_load' => true,
+                    'hints'                => [
+                        'hint1',
+                        ['name' => 'hint2', 'value' => 'val']
+                    ],
+                    'order_by'             => ['field1' => 'DESC'],
+                    'max_results'          => 123,
+                    'post_serialize'       => [get_class($this), 'postSerialize1'],
+                    'fields'               => [
+                        'field1' => [
+                            'property_path'        => 'field1_path',
+                            'exclude'              => true,
+                            'collapse'             => true,
+                            'data_transformer'     => [
+                                'service_id',
+                                [get_class($this), 'dataTransformer1']
+                            ],
+                            'exclusion_policy'     => 'all',
+                            'disable_partial_load' => true,
+                            'hints'                => [
+                                'hint3',
+                                ['name' => 'hint4', 'value' => 'val']
+                            ],
+                            'order_by'             => ['field2' => 'DESC'],
+                            'max_results'          => 456,
+                            'post_serialize'       => [get_class($this), 'postSerialize2'],
+                        ]
+                    ]
+                ],
+            ],
+            'exclusion_policy=none'      => [
+                'config'         => [
+                    'exclusion_policy' => 'none',
+                    'fields'           => [
+                        'field1' => [
+                            'exclusion_policy' => 'none',
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+            'disable_partial_load=false' => [
+                'config'         => [
+                    'disable_partial_load' => false,
+                    'fields'               => [
+                        'field1' => [
+                            'disable_partial_load' => false,
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+            'empty order_by'             => [
+                'config'         => [
+                    'order_by' => [],
+                    'fields'   => [
+                        'field1' => [
+                            'order_by' => [],
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+            'max_results=null'           => [
+                'config'         => [
+                    'max_results' => null,
+                    'fields'      => [
+                        'field1' => [
+                            'max_results' => null,
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+            'post_serialize=null'        => [
+                'config'         => [
+                    'post_serialize' => null,
+                    'fields'         => [
+                        'field1' => [
+                            'post_serialize' => null,
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+            'empty property_path'        => [
+                'config'         => [
+                    'fields' => [
+                        'field1' => [
+                            'property_path' => '',
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+            'exclude=false'              => [
+                'config'         => [
+                    'fields' => [
+                        'field1' => [
+                            'exclude' => false,
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+            'collapse=false'             => [
+                'config'         => [
+                    'fields' => [
+                        'field1' => [
+                            'collapse' => false,
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+            'data_transformer=null'      => [
+                'config'         => [
+                    'fields' => [
+                        'field1' => [
+                            'data_transformer' => null,
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ],
+            ],
+        ];
+    }
+
+    public static function postSerialize1(array $item)
+    {
+    }
+
+    public static function postSerialize2(array $item)
+    {
+    }
+
+    public static function dataTransformer1($class, $property, $value, $config)
+    {
+    }
+}

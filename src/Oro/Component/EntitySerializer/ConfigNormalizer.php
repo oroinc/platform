@@ -170,6 +170,7 @@ class ConfigNormalizer
     {
         $field = $config[ConfigUtil::FIELDS];
 
+        $config[ConfigUtil::COLLAPSE]         = true;
         $config[ConfigUtil::EXCLUSION_POLICY] = ConfigUtil::EXCLUSION_POLICY_ALL;
         $config[ConfigUtil::PROPERTY_PATH]    = $field;
         $config[ConfigUtil::FIELDS]           = [$field => null];

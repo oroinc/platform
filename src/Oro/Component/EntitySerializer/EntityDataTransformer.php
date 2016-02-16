@@ -28,8 +28,8 @@ class EntityDataTransformer implements DataTransformerInterface
      */
     public function transform($class, $property, $value, $config)
     {
-        if (isset($config[ConfigUtil::DATA_TRANSFORMER])) {
-            foreach ((array)$config[ConfigUtil::DATA_TRANSFORMER] as $transformer) {
+        if (isset($config[FieldConfig::DATA_TRANSFORMER])) {
+            foreach ($config[FieldConfig::DATA_TRANSFORMER] as $transformer) {
                 $value = $this->transformByCustomTransformer($transformer, $class, $property, $value, $config);
             }
         }
@@ -73,13 +73,17 @@ class EntityDataTransformer implements DataTransformerInterface
         if ($transformer instanceof FormDataTransformerInterface) {
             return $transformer->transform($value);
         }
+        if (is_callable($transformer)) {
+            return call_user_func($transformer, $class, $property, $value, $config);
+        }
 
         throw new \InvalidArgumentException(
             sprintf(
-                'Unexpected type of data transformer "%s". Expected "%s" or "%s". Class: %s. Property: %s.',
+                'Unexpected type of data transformer "%s". Expected "%s", "%s" or "%s". Class: %s. Property: %s.',
                 is_object($transformer) ? get_class($transformer) : gettype($transformer),
                 'Oro\Component\EntitySerializer\DataTransformerInterface',
                 'Symfony\Component\Form\DataTransformerInterface',
+                'callable',
                 $class,
                 $property
             )
