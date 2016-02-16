@@ -187,7 +187,7 @@ class FieldConfig
     }
 
     /**
-     * Gets the path of the field value.
+     * Gets a list of data transformers that should be applied to the field value.
      *
      * @return array Each item of the array can be the id of a service in DIC, an instance of
      *               "Oro\Component\EntitySerializer\DataTransformerInterface" or
