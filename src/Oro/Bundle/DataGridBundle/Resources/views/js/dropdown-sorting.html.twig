@@ -1,0 +1,19 @@
+<script type="text/html" id="template-datagrid-toolbar-sorting">
+    <select>
+        <% if (currentDirection === null) { %>
+            <option value="not-selected" selected="selected">
+                <%= _.__('oro.datagrid.sorters.not_selected') %>
+            </option>
+        <% } %>
+        <% _.each(columns, function (column) { %>
+            <% var direction = 'ascending' %>
+            <option value="<%= getColumnValue(column, direction) %>" <% if (column === currentColumn && direction === currentDirection) { %>selected="selected"<% } %>>
+                    <% if (_.isUndefined(column.get('label'))) { %><%= column %><% } else { %><%= column.get('label')%><% } %>&nbsp(<%= _.__('oro.datagrid.sorters.' + column.get('sortingType')+ '.' + direction) %>)
+            </option>
+            <% var direction = 'descending' %>
+            <option value="<%= getColumnValue(column, direction) %>" <% if (column === currentColumn && direction === currentDirection) { %>selected="selected"<% } %>>
+                <% if (_.isUndefined(column.get('label'))) { %><%= column %><% } else { %><%= column.get('label')%><% } %>&nbsp(<%= _.__('oro.datagrid.sorters.' + column.get('sortingType')+ '.' + direction) %>)
+            </option>
+        <% }); %>
+    </select>
+</script>

@@ -110,7 +110,8 @@ define(function(require) {
                 columnManager: {}
             },
             rowClickAction:         undefined,
-            multipleSorting:        true,
+            multipleSorting:        false,
+            toolbarSorting:         false,
             rowActions:             [],
             massActions:            new Backbone.Collection(),
             enableFullScreenLayout: false
@@ -178,6 +179,7 @@ define(function(require) {
             _.extend(this.exportOptions, opts.exportOptions);
 
             this.collection.multipleSorting = this.multipleSorting;
+            this.collection.toolbarSorting = this.toolbarSorting;
 
             this._initRowActions();
 
@@ -373,7 +375,9 @@ define(function(require) {
             var toolbarOptions = {
                 collection:   this.collection,
                 actions:      this._getToolbarActions(),
-                extraActions: this._getToolbarExtraActions()
+                extraActions: this._getToolbarExtraActions(),
+                columns:      this.columns,
+                addSorting:   this.toolbarSorting
             };
             _.defaults(toolbarOptions, options);
 

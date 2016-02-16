@@ -112,7 +112,7 @@ class OrmSorterExtension extends AbstractExtension
                     continue;
                 }
                 $data->offsetSetByPath(
-                    sprintf('[columns][%s][sortable_type]', $key),
+                    sprintf('[columns][%s][sortingType]', $key),
                     $sorters[$column['name']][PropertyInterface::TYPE_KEY]
                 );
             }

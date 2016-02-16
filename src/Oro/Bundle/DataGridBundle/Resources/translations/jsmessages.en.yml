@@ -111,3 +111,17 @@ oro:
                     Are you sure you want to delete them?
                 restricted_access_empty_message: >
                     You don't have permissions to delete any of the selected records.
+        sorters:
+            not_selected: 'No sorting'
+            undefined:
+                ascending: High to Low
+                descending: Low to High
+            string:
+                ascending: A to Z
+                descending: Z to A
+            number:
+                ascending: High to Low
+                descending: Low to High
+            currency:
+                ascending: High to Low
+                descending: Low to High

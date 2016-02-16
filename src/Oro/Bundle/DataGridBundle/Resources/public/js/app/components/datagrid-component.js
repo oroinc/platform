@@ -244,7 +244,7 @@ define(function(require) {
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
-                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align',
+                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'sortingType', 'align',
                     'order', 'manageable', 'required'];
                 var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
                 var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
@@ -283,6 +283,7 @@ define(function(require) {
                 massActions: new Backbone.Collection(massActions),
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
+                toolbarSorting: metadata.options.toolbarSorting || false,
                 entityHint: metadata.options.entityHint,
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,

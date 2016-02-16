@@ -4,8 +4,9 @@ define([
     'orotranslation/js/translator',
     './pagination-input',
     './page-size',
-    './actions-panel'
-], function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
+    './actions-panel',
+    './sorting/dropdown'
+], function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel, DropdownSorting) {
     'use strict';
 
     var Toolbar;
@@ -27,6 +28,9 @@ define([
 
         /** @property */
         pageSize: PageSize,
+
+        /** @property */
+        dropdownSorting: DropdownSorting,
 
         /** @property */
         actionsPanel: ActionsPanel,
@@ -55,7 +59,12 @@ define([
                 pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination)),
                 pageSize: new this.pageSize(_.defaults({collection: this.collection}, options.pageSize)),
                 actionsPanel: new this.actionsPanel(_.extend({className: ''}, options.actionsPanel)),
-                extraActionsPanel: new this.extraActionsPanel()
+                extraActionsPanel: new this.extraActionsPanel(),
+                dropdownSorting: new this.dropdownSorting({
+                    collection: this.collection,
+                    columns: options.columns,
+                    enabled: options.addSorting
+                })
             };
 
             if (options.actions) {
@@ -127,6 +136,8 @@ define([
             this.$('.pagination').replaceWith($pagination);
             this.$('.page-size').append(this.subviews.pageSize.render().$el);
             this.$('.actions-panel').append(this.subviews.actionsPanel.render().$el);
+            this.$('.sorting').append(this.subviews.dropdownSorting.render().$el);
+
             if (this.subviews.extraActionsPanel.haveActions()) {
                 this.$('.extra-actions-panel').append(this.subviews.extraActionsPanel.render().$el);
             } else {
