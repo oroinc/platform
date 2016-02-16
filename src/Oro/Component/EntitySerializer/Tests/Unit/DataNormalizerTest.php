@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Oro\Component\EntitySerializer\ConfigConverter;
 use Oro\Component\EntitySerializer\DataNormalizer;
 
 class DataNormalizerTest extends \PHPUnit_Framework_TestCase
@@ -11,10 +12,14 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeData($config, $data, $expectedData)
     {
-        $normalizer = new DataNormalizer();
+        $configConverter = new ConfigConverter();
+        $normalizer      = new DataNormalizer();
+
+        $configObject = $configConverter->convertConfig($config);
+
         $this->assertEquals(
             $expectedData,
-            $normalizer->normalizeData($data, $config)
+            $normalizer->normalizeData($data, $configObject)
         );
     }
 
@@ -448,6 +453,48 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'deep_property_path_with_relation'                        => [
+                'config'       => [
+                    'fields' => [
+                        'id'      => null,
+                        'contact' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'id'      => null,
+                                'name'    => null,
+                                'account' => [
+                                    'exclusion_policy' => 'all',
+                                    'fields'           => ['id' => null],
+                                    'property_path'    => 'id',
+                                    'collapse'         => true
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'      => 123,
+                        'contact' => [
+                            'id'      => 456,
+                            'name'    => 'contact_name',
+                            'account' => [
+                                'id' => 789
+                            ],
+                        ]
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'      => 123,
+                        'contact' => [
+                            'id'      => 456,
+                            'name'    => 'contact_name',
+                            'account' => 789
+                        ]
+                    ]
+                ]
+            ],
             'deep_property_path_with_excluded_relation'               => [
                 'config'       => [
                     'fields' => [
@@ -459,9 +506,10 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'name'    => null,
                                 'account' => [
                                     'exclusion_policy' => 'all',
-                                    'fields'           => 'id',
+                                    'fields'           => ['id' => null],
                                     'property_path'    => 'id',
-                                    'exclude'          => true
+                                    'exclude'          => true,
+                                    'collapse'         => true
                                 ]
                             ]
                         ]

@@ -55,7 +55,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unexpected type of data transformer "stdClass". Expected "Oro\Component\EntitySerializer\DataTransformerInterface" or "Symfony\Component\Form\DataTransformerInterface". Class: Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group. Property: name.
+     * @expectedExceptionMessage Unexpected type of data transformer "stdClass". Expected "Oro\Component\EntitySerializer\DataTransformerInterface", "Symfony\Component\Form\DataTransformerInterface" or "callable". Class: Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group. Property: name.
      */
     // @codingStandardsIgnoreEnd
     public function testInvalidDataTransformerType()
@@ -126,7 +126,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group',
                 'name',
                 'group_name',
-                ['data_transformer' => 'data_transformer_service_id']
+                ['data_transformer' => ['data_transformer_service_id']]
             )
             ->willReturn('transformed_group_name');
 
@@ -243,7 +243,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group',
                 'name',
                 'group_name',
-                ['data_transformer' => 'data_transformer_service_id']
+                ['data_transformer' => ['data_transformer_service_id']]
             )
             ->willReturn('transformed_group_name');
 
@@ -314,7 +314,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User',
                 'name',
                 'user_name',
-                ['data_transformer' => 'data_transformer_service_id']
+                ['data_transformer' => ['data_transformer_service_id']]
             )
             ->willReturn('transformed_user_name');
 
