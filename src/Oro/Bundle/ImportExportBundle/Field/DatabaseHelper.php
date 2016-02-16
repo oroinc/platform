@@ -46,6 +46,11 @@ class DatabaseHelper
     protected $ownershipMetadataProviderLink;
 
     /**
+     * @var array
+     */
+    protected $organizationLimitsByEntity = [];
+
+    /**
      * @param ManagerRegistry $registry
      * @param DoctrineHelper $doctrineHelper
      * @param ServiceLink $fieldHelperLink
@@ -282,18 +287,28 @@ class DatabaseHelper
     public function onClear()
     {
         $this->entities = [];
+        $this->organizationLimitsByEntity = [];
     }
 
     /**
      * We should limit data with current organization
      *
-     * @param $entityName
+     * @param string $entityName
      * @return bool
      */
     protected function shouldBeAddedOrganizationLimits($entityName)
     {
-        return $this->securityFacadeLink->getService()->getOrganization()
-            && $this->ownershipMetadataProviderLink->getService()->getMetadata($entityName)->getOrganizationFieldName();
+        if (!array_key_exists($entityName, $this->organizationLimitsByEntity)) {
+            $this->organizationLimitsByEntity[$entityName] = $this->securityFacadeLink
+                    ->getService()
+                    ->getOrganization()
+                && $this->ownershipMetadataProviderLink
+                    ->getService()
+                    ->getMetadata($entityName)
+                    ->getOrganizationFieldName();
+        }
+
+        return $this->organizationLimitsByEntity[$entityName];
     }
 
     /**

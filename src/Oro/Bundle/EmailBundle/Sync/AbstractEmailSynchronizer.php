@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -220,9 +221,15 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     protected function doSyncOrigin(EmailOrigin $origin)
     {
         $this->impersonateOrganization($origin->getOrganization());
-        $processor = $this->createSynchronizationProcessor($origin);
-        if ($processor instanceof LoggerAwareInterface) {
-            $processor->setLogger($this->logger);
+        try {
+            $processor = $this->createSynchronizationProcessor($origin);
+            if ($processor instanceof LoggerAwareInterface) {
+                $processor->setLogger($this->logger);
+            }
+        } catch (\Exception $ex) {
+            $this->logger->error(sprintf('Skip origin synchronization. Error: %s', $ex->getMessage()));
+
+            throw $ex;
         }
 
         try {
@@ -244,13 +251,13 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             } catch (\Exception $innerEx) {
                 // ignore any exception here
                 $this->logger->error(
-                    sprintf('Cannot set the fail state. Error: %s.', $innerEx->getMessage()),
+                    sprintf('Cannot set the fail state. Error: %s', $innerEx->getMessage()),
                     ['exception' => $innerEx]
                 );
             }
 
             $this->logger->error(
-                sprintf('The synchronization failed. Error: %s.', $ex->getMessage()),
+                sprintf('The synchronization failed. Error: %s', $ex->getMessage()),
                 ['exception' => $ex]
             );
 

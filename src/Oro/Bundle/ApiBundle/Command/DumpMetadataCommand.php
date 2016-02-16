@@ -9,9 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
+use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
@@ -42,8 +42,7 @@ class DumpMetadataCommand extends ContainerAwareCommand
                 'request-type',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'API request type',
-                [RequestType::REST, RequestType::JSON_API]
+                'API request type'
             );
     }
 
@@ -55,11 +54,15 @@ class DumpMetadataCommand extends ContainerAwareCommand
         /** @var EntityClassNameHelper $entityClassNameHelper */
         $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
 
-        $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'));
+        $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'), true);
         $requestType = $input->getOption('request-type');
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
+
+        /** @var ProcessorBag $processorBag */
+        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
+        $processorBag->addApplicableChecker(new RequestTypeApplicableChecker());
 
         $metadata = $this->getMetadata($entityClass, $version, $requestType);
         $output->write(Yaml::dump($metadata, 100, 4, true, true));

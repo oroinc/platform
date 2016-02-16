@@ -18,6 +18,7 @@ define([
 
         listen: {
             'change:url model': 'render',
+            'change:title_rendered_short model': 'render',
             'page:afterChange mediator': 'onPageUpdated'
         },
 
