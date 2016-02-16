@@ -50,6 +50,13 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         $this->setObjectProperty($this->provider, 'kernelBundles', $bundles);
     }
 
+    protected function tearDown()
+    {
+        $this->getContainer()->get('oro_security.cache.provider.permission')->flushAll();
+
+        parent::tearDown();
+    }
+
     public function testExecuteWithInvalidConfiguration()
     {
         $bundle = new TestBundleIncorrect();
