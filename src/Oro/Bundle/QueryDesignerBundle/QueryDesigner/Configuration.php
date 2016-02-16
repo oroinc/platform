@@ -96,6 +96,7 @@ class Configuration implements ConfigurationInterface
                         ->requiresAtLeastOneElement()
                         ->prototype('scalar')->cannotBeEmpty()->end()
                     ->end()
+                    ->scalarNode('placeholder')->end()
                 ->end()
                 ->validate()
                     ->always(

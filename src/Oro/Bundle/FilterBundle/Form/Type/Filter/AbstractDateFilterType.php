@@ -83,8 +83,9 @@ abstract class AbstractDateFilterType extends AbstractType
     {
         $resolver->setDefaults(
             [
-            'date_parts' => $this->getDateParts(),
-            'date_vars'  => $this->getDateVariables(),
+            'date_parts'   => $this->getDateParts(),
+            'date_vars'    => $this->getDateVariables(),
+            'compile_date' => true
             ]
         );
     }
@@ -153,6 +154,8 @@ abstract class AbstractDateFilterType extends AbstractType
         }
 
         $builder->add('part', 'choice', ['choices' => $options['date_parts']]);
-        $builder->addEventSubscriber($this->subscriber);
+        if ($options['compile_date']) {
+            $builder->addEventSubscriber($this->subscriber);
+        }
     }
 }

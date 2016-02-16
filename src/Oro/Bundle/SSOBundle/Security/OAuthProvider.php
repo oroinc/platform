@@ -48,6 +48,7 @@ class OAuthProvider extends HWIOAuthProvider
         ResourceOwnerMap $resourceOwnerMap,
         UserCheckerInterface $userChecker
     ) {
+        parent::__construct($userProvider, $resourceOwnerMap, $userChecker);
         $this->userProvider = $userProvider;
         $this->resourceOwnerMap = $resourceOwnerMap;
         $this->userChecker = $userChecker;
@@ -121,15 +122,5 @@ class OAuthProvider extends HWIOAuthProvider
         }
 
         return $organization;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function supports(TokenInterface $token)
-    {
-        return
-            $token instanceof OAuthToken
-            && $this->resourceOwnerMap->hasResourceOwnerByName($token->getResourceOwnerName());
     }
 }

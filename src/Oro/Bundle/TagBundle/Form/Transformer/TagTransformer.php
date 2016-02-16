@@ -2,28 +2,25 @@
 
 namespace Oro\Bundle\TagBundle\Form\Transformer;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Form\DataTransformerInterface;
 
-use Oro\Bundle\TagBundle\Entity\Taggable;
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class TagTransformer implements DataTransformerInterface
 {
     /**  @var TagManager */
-    protected $manager;
+    protected $tagManager;
 
-    /** @var Taggable */
-    protected $entity;
+    /**  @var PropertyAccessor */
+    protected $propertyAccessor;
 
-    /** @var Organization|null */
-    protected $organization;
-
-    public function __construct(TagManager $manager)
+    public function __construct(TagManager $tagManager)
     {
-        $this->manager = $manager;
+        $this->tagManager = $tagManager;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -31,7 +28,24 @@ class TagTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        return $value;
+        if (!$value) {
+            return new ArrayCollection();
+        }
+
+        $tags  = explode(';;', $value);
+        $names = [];
+        foreach ($tags as $tag) {
+            $tag = json_decode($tag, true);
+            if ($tag && array_key_exists('name', $tag) === true) {
+                $names[] = $tag['name'];
+            }
+        }
+
+        if (!empty($names)) {
+            return new ArrayCollection($this->tagManager->loadOrCreateTags($names));
+        }
+
+        return new ArrayCollection();
     }
 
     /**
@@ -39,38 +53,23 @@ class TagTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        // transform to JSON if we have array of entities
-        // needed to correct rendering form if validation not passed
+        $result = [];
         if (is_array($value)) {
-            $result = array();
-            if ($this->entity) {
-                $result = $this->manager->getPreparedArray(
-                    $this->entity,
-                    new ArrayCollection($value),
-                    $this->organization
-                );
-            }
-            $value = json_encode($result);
+            $result = array_map(
+                function ($tag) {
+                    return json_encode(
+                        [
+
+                            'id'   => $this->propertyAccessor->getValue($tag, 'id'),
+                            'name' => $this->propertyAccessor->getValue($tag, 'name'),
+                        ]
+                    );
+                },
+                $value
+            );
+            $result = implode(';;', $result);
         }
 
-        return $value;
-    }
-
-    /**
-     * Setter for entity object
-     *
-     * @param Taggable $entity
-     */
-    public function setEntity(Taggable $entity)
-    {
-        $this->entity = $entity;
-    }
-
-    /**
-     * @param Organization $organization
-     */
-    public function setOrganization(Organization $organization = null)
-    {
-        $this->organization = $organization;
+        return $result;
     }
 }

@@ -63,6 +63,7 @@ services:
             - @oro_entity_merge.metadata.factory
             - @oro_entity_merge.doctrine_helper
             - @event_dispatcher
+            - @oro_entity_config.provider.extend
 
     oro_entity_merge.metadata.factory:
         class: %oro_entity_merge.metadata.factory.class%

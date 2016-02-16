@@ -127,14 +127,17 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->with($className, $fieldName)
             ->will($this->returnValue($extendConfig));
 
-        $extendConfig->expects($this->once())
+        $extendConfig->expects($this->any())
             ->method('is')
             ->with('is_extend')
             ->will($this->returnValue(true));
 
-        $fieldMetadata->expects($this->once())
+        $fieldMetadata->expects($this->exactly(2))
             ->method('set')
-            ->with('property_path', $fieldName);
+            ->withConsecutive(
+                ['property_path', $fieldName],
+                ['display', true]
+            );
 
         $this->helper->prepareFieldMetadataPropertyPath($fieldMetadata);
     }

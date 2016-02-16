@@ -76,6 +76,7 @@ class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $this->setId($account2, 2);
         $entityMetadata = new EntityMetadata(['type' => ClassUtils::getRealClass($account1)]);
         $entityData = new EntityData($entityMetadata, [$account1, $account2]);
+        $entityData->setMasterEntity($account1);
         $fieldData = new FieldData($entityData, new FieldMetadata());
         $fieldData->setMode(MergeModes::ACTIVITY_REPLACE);
         $fieldData->setSourceEntity($account2);
