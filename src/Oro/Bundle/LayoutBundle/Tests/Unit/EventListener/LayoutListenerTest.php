@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\LayoutBuilderInterface;
@@ -20,7 +22,7 @@ use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
  */
 class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutManager;
 
     /** @var LayoutListener */
@@ -28,9 +30,6 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
     /** @var LayoutHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutHelper;
-
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $container;
 
     protected function setUp()
     {
@@ -41,9 +40,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->layoutHelper = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Request\LayoutHelper')
             ->disableOriginalConstructor()->getMock();
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
-        $this->listener = new LayoutListener($this->container);
+        $this->listener = new LayoutListener($this->layoutHelper, $this->layoutManager);
     }
 
     public function testShouldNotModifyResponseWithoutLayoutAnnotation()
@@ -136,6 +133,19 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         );
         $this->listener->onKernelView($responseEvent);
         $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The @Template() annotation cannot be used together with the @Layout() annotation.
+     */
+    public function testShouldThrowExceptionIfBothLayoutAndTemplateAreUsed()
+    {
+        $responseEvent = $this->createResponseForControllerResultEvent(
+            ['_layout' => new LayoutAnnotation([]), '_template' => new Template([])],
+            []
+        );
+        $this->listener->onKernelView($responseEvent);
     }
 
     /**
@@ -314,21 +324,9 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createResponseForControllerResultEvent(array $attributes, $controllerResult)
     {
-        $this->container->expects($this->at(0))
-            ->method('get')
-            ->with('oro_layout.helper')
-            ->willReturn($this->layoutHelper);
-
         $annotation = null;
         if (array_key_exists('_layout', $attributes)) {
             $annotation = $attributes['_layout'];
-
-            if (is_array($controllerResult) || $controllerResult instanceof ContextInterface) {
-                $this->container->expects($this->at(1))
-                    ->method('get')
-                    ->with('oro_layout.layout_manager')
-                    ->willReturn($this->layoutManager);
-            }
         }
 
         $this->layoutHelper->expects($this->once())

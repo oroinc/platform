@@ -28,7 +28,7 @@ class UserAgentContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getResolver()
             ->setRequired(['user_agent'])
-            ->setAllowedTypes(['user_agent' => ['null', 'Oro\Bundle\UIBundle\Provider\UserAgentInterface']]);
+            ->setAllowedTypes(['user_agent' => ['Oro\Bundle\UIBundle\Provider\UserAgentInterface']]);
 
         $context->set('user_agent', $this->userAgentProvider->getUserAgent());
     }

@@ -39,7 +39,7 @@ class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $optionResolver->expects($this->once())
             ->method('setAllowedTypes')
-            ->with(['user_agent' => ['null', 'Oro\Bundle\UIBundle\Provider\UserAgentInterface']])
+            ->with(['user_agent' => ['Oro\Bundle\UIBundle\Provider\UserAgentInterface']])
             ->willReturn($optionResolver);
 
         /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */

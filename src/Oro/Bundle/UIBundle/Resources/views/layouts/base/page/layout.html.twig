@@ -14,25 +14,9 @@
         config_extend: requirejs_config_extend
     } %}
     {% placeholder scripts_after %}
-    <script>
-        require({
-            config: {
-                'oro/datagrid/cell/action-cell': {showCloseButton: true},
-                'orodatagrid/js/app/plugins/grid/column-manager-plugin': {icon: 'gear'},
-                'orodatagrid/js/datagrid/action-launcher': {iconHideText: false},
-                'oro/filter/abstract-filter': {
-                    placeholder: null,
-                    labelPrefix: '{{ 'oro.ui.filter.by'|trans  }} '
-                },
-                'orofilter/js/filter-hint': {inline: false}
-            }
-        });
-    </script>
     {{ block_widget(block) }}
 {% endblock %}
 
 {% block _require_modules_widget %}
-    <script type="text/javascript">
-        require(['oroui/js/app']);
-    </script>
+    {{ block_widget(block) }}
 {% endblock %}

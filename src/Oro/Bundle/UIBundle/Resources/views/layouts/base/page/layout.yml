@@ -28,7 +28,11 @@ layout:
                 require_js:
                     blockType: container
                 require_modules:
-                    blockType: block
+                    blockType: container
+                app_script:
+                    blockType: script
+                    options:
+                        content: 'require(['oroui/js/app'])'
             tree:
                 root:
                     head:
@@ -37,5 +41,6 @@ layout:
                         styles: ~
                         scripts_before: ~
                         require_js: ~
-                        require_modules: ~
+                        require_modules:
+                            app_script: ~
                     body: ~

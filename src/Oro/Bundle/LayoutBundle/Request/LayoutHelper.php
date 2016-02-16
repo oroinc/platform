@@ -5,7 +5,6 @@ namespace Oro\Bundle\LayoutBundle\Request;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-use Oro\Component\Layout\Exception\LogicException;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 
 class LayoutHelper
@@ -42,19 +41,7 @@ class LayoutHelper
      */
     public function isLayoutRequest(Request $request = null)
     {
-        if ($request === null) {
-            $request = $this->requestStack->getCurrentRequest();
-        }
-
-        $layoutAnnotation = $this->getLayoutAnnotation($request);
-
-        if ($layoutAnnotation && $request->attributes->get('_template')) {
-            throw new LogicException(
-                'The @Template() annotation cannot be used together with the @Layout() annotation.'
-            );
-        }
-
-        return $layoutAnnotation !== null;
+        return $this->getLayoutAnnotation($request) !== null;
     }
 
     /**

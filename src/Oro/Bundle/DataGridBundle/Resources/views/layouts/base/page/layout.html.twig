@@ -1,30 +1,57 @@
-{% block _datagrid_toolbar_mass_actions_widget %}
-    <div class="pull-left grid-toolbar-mass-actions">{{ block_widget(block) }}</div>
+{% block _datagrid_toolbar_actions_container_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-toolbar-mass-actions pull-left"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
 {% endblock %}
 
-{% block _datagrid_toolbar_mass_actions_panel_widget %}
-    <div class="mass-actions-panel btn-group icons-holder">{{ block_widget(block) }}</div>
+{% block _datagrid_toolbar_mass_actions_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " mass-actions-panel btn-group icons-holder"
+    }) %}
+    <div {{ block('block_attributes') }}>{{ block_widget(block) }}</div>
 {% endblock %}
 
 {% block _datagrid_toolbar_extra_actions_widget %}
-    <div class="extra-actions-panel">{{ block_widget(block) }}</div>
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " extra-actions-panel"
+    }) %}
+    <div {{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_tools_container_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-toolbar-tools pull-right"
+    }) %}
+    <div {{ block('block_attributes') }}>{{ block_widget(block) }}</div>
 {% endblock %}
 
 {% block _datagrid_toolbar_actions_widget %}
-    <div class="pull-right grid-toolbar-tools">
-        <div class="actions-panel pull-right form-horizontal">{{ block_widget(block) }}</div>
-        <div class="page-size pull-right form-horizontal"></div>
-    </div>
+    {% set attr = attr|merge({
+    class: attr.class|default('') ~ " actions-panel pull-right form-horizontal"
+    }) %}
+    <div {{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_page_size_widget %}
+    {% set attr = attr|merge({
+    class: attr.class|default('') ~ " page-size pull-right form-horizontal"
+    }) %}
+    <div {{ block('block_attributes') }}></div>
 {% endblock %}
 
 {% block _datagrid_toolbar_pagination_widget %}
-    <div class="pagination pagination-centered"></div>
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " pagination pagination-centered"
+    }) %}
+    <div {{ block('block_attributes') }}></div>
 {% endblock %}
 
 {% block _datagrid_toolbar_widget %}
     <script type="text/html" id="template-datagrid-toolbar">
-        <div class="grid-toolbar">
-            {{ block_widget(block) }}
-        </div>
+        {% set attr = attr|merge({
+            class: attr.class|default('') ~ " grid-toolbar"
+        }) %}
+        <div {{ block('block_attributes') }}>{{ block_widget(block) }}</div>
     </script>
 {% endblock %}

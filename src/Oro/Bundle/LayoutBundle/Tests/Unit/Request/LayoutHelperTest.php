@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 
-class LayoutRequestTest extends \PHPUnit_Framework_TestCase
+class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var LayoutHelper
@@ -89,36 +89,6 @@ class LayoutRequestTest extends \PHPUnit_Framework_TestCase
         \PHPUnit_Framework_MockObject_MockObject $annotation = null
     ) {
         $this->setUpRequestStack($request, $annotation);
-        $this->assertEquals(!(bool)$annotation, $this->helper->isTemplateRequest($request));
-    }
-
-    /**
-     * @dataProvider layoutHelperExceptionDataProvider
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The @Template() annotation cannot be used together with the @Layout() annotation.
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject|null $annotation
-     */
-    public function testIsLayoutRequestException(
-        \PHPUnit_Framework_MockObject_MockObject $request = null,
-        \PHPUnit_Framework_MockObject_MockObject $annotation = null
-    ) {
-        $this->setUpRequestStack($request, $annotation, true);
-        $this->assertEquals(!(bool)$annotation, $this->helper->isLayoutRequest($request));
-    }
-
-    /**
-     * @dataProvider layoutHelperExceptionDataProvider
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The @Template() annotation cannot be used together with the @Layout() annotation.
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject|null $annotation
-     */
-    public function testIsTemplateRequestException(
-        \PHPUnit_Framework_MockObject_MockObject $request = null,
-        \PHPUnit_Framework_MockObject_MockObject $annotation = null
-    ) {
-        $this->setUpRequestStack($request, $annotation, true);
         $this->assertEquals(!(bool)$annotation, $this->helper->isTemplateRequest($request));
     }
 

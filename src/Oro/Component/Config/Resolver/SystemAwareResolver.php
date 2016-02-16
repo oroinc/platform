@@ -153,7 +153,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function getContextValue($name)
     {
-        return array_key_exists($name, $this->context) ? $this->context[$name] : null;
+        return isset($this->context[$name]) ? $this->context[$name] : null;
     }
 
     /**
