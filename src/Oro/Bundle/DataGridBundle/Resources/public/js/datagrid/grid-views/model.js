@@ -87,7 +87,7 @@ define([
         /**
          * @returns {string}
          */
-        getLabel: function () {
+        getLabel: function() {
             var label = this.get('label');
             var sharedBy = this.get('shared_by');
             return null === sharedBy ? label : label + '(' + __(this.sharedByLabel, {name: sharedBy}) + ')';
