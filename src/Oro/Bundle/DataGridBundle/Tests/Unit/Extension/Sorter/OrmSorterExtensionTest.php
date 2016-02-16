@@ -172,12 +172,12 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                         [
                             'name' => 'name',
                             'sortable' => true,
-                            'sortable_type' => 'string',
+                            'sortingType' => 'string',
                         ],
                         [
                             'name' => 'age',
                             'sortable' => true,
-                            'sortable_type' => 'number',
+                            'sortingType' => 'number',
                         ],
                         ['name' => 'createdAt']
                     ],
