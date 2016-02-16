@@ -9,6 +9,9 @@
     vertical-align: middle;
     float: left;
 }
+.integration-icon {
+    margin-top: 1px;
+}
 
 .select2-results .select2-result-label .aware-icon-block {
     position: relative;

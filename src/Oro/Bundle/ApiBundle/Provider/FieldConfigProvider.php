@@ -34,7 +34,7 @@ class FieldConfigProvider
      *
      * @return array|null
      */
-    public function getFieldConfig($className, $fieldName, $version, array $requestType, array $extras = [])
+    public function getFieldConfig($className, $fieldName, $version, array $requestType = [], array $extras = [])
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
@@ -50,11 +50,15 @@ class FieldConfigProvider
 
         /** @var FieldConfigContext $context */
         $context = $this->processor->createContext();
-        $context->setVersion($version);
-        $context->setRequestType($requestType);
-        $context->setExtras($extras);
         $context->setClassName($className);
         $context->setFieldName($fieldName);
+        $context->setVersion($version);
+        if (!empty($requestType)) {
+            $context->setRequestType($requestType);
+        }
+        if (!empty($extras)) {
+            $context->setExtras($extras);
+        }
 
         $this->processor->process($context);
 

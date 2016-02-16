@@ -12,3 +12,6 @@ oro.imap:
             error:
                 emptyClientId: Parameter Client id is empty in Google Integration Settings. You need configure google settings in Configuration.
                 access_deny: Access deny
+                request: Something has gone wrong.
+                closed_auth: Something has gone wrong. Please address your administrator to check the google API key settings.
+                blocked_popup: Something has gone wrong. Please make sure that pop-ups are enabled.

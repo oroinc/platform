@@ -69,12 +69,17 @@
 
     {% set options = form.vars.options|default({})|merge({
         'route': 'oro_imap_change_account_type',
+        'routeAccessToken': "oro_imap_gmail_access_token",
         'routeGetFolders': "oro_imap_gmail_connection_check",
         'formSelector': '#'~formSelector|default(form.vars.id),
         'googleErrorMessage': '.google-alert',
         'formParentName' : form.parent.parent.vars.name,
         'type': constant('Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel::ACCOUNT_TYPE_GMAIL'),
-        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null,
+        'user': form.parent.userEmailOrigin.user.vars.value,
+        'accessToken': form.parent.userEmailOrigin.accessToken.vars.value,
+        'accessTokenExpiresAt': form.parent.userEmailOrigin.accessTokenExpiresAt.vars.value,
+        'id': form.vars.value and form.vars.value.id is defined ? form.vars.value.id : null,
     }) %}
 
     <div class="container-imap-gmail-container"
@@ -109,7 +114,7 @@
 
             <div class="control-group">
                 <div class="controls">
-                    <div class="google-alert connection-status alert alert-error" style="display: none"></div>
+                    <div class="google-alert google-connection-status alert alert-error" style="display: none"></div>
                 </div>
             </div>
 
@@ -136,16 +141,16 @@
     <div data-page-component-module="oroimap/js/app/components/google-sync-checkbox-component"
         data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">
         {{ block('checkbox_widget') }}
-        <div class="alert connection-status alert-warning" style="display: none">
+        <div class="alert google-connection-status alert-warning" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.warning.label'|trans }}
         </div>
-        <div class="google-alert connection-status alert alert-error" style="display: none">
+        <div class="google-alert google-connection-status alert alert-error" style="display: none">
 
         </div>
-        <div class="default-alert connection-status alert alert-error" style="display: none">
+        <div class="default-alert google-connection-status alert alert-error" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.error.label'|trans }}
         </div>
-        <div class="alert connection-status alert-success" style="display: none">
+        <div class="alert google-connection-status alert-success" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.success.label'|trans }}
         </div>
     </div>

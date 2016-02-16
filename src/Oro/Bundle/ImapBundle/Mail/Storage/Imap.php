@@ -7,6 +7,7 @@ use Zend\Mail\Storage\Exception as BaseException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 
 /**
  * Class Imap
@@ -389,6 +390,9 @@ class Imap extends \Zend\Mail\Storage\Imap
         return $message;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getRawContent($id, $part = null)
     {
         if ($part !== null) {
@@ -433,6 +437,8 @@ class Imap extends \Zend\Mail\Storage\Imap
     /**
      * @param string $email
      * @param string $accessToken
+     *
+     * @throws OAuth2ConnectException
      */
     protected function oauth2Authenticate($email, $accessToken)
     {
@@ -446,7 +452,9 @@ class Imap extends \Zend\Mail\Storage\Imap
                 $this->protocol->sendRequest('');
             } else {
                 if (preg_match('/^NO /i', $response) || preg_match('/^BAD /i', $response)) {
-                    throw new BaseException\RuntimeException('cannot login with XOAuth2, user or token wrong');
+                    throw new OAuth2ConnectException(
+                        "Cannot login with XOAuth2, user or token wrong.\nResponse: " . $response
+                    );
                 } elseif (preg_match("/^OK /i", $response)) {
                     return;
                 }
