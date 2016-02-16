@@ -19,14 +19,14 @@ Permission consists of 2 related entities.
 information like Permission name, label, groups, the list of PermissionEntities for what Permission can be
 applied and the list of PermissionEntities that can't use this Permission.
 
-* **PermissionEntity** - stored entity classes for using in Permission entity.
+* **PermissionEntity** - stored entity class names for using with Permission entity.
 
 Configuration
 -------------
 
 All custom Permissions are described in configuration file ``permissions.yml`` corresponded bundle. For now there is not
 possible to add Permission globally - for all groups (applications) - needed groups should be listed manually. So for
-every application needed permissions should be added \ updated  by creating corresponded ``permissions.yml``.
+every application needed permissions should be added\updated by creating corresponded ``permissions.yml``.
 
 Look at the example of simple permission configuration.
 
@@ -53,10 +53,8 @@ permissions:
 ```
 
 This configuration describes 2 Permissions:
-    1) Permission PERMISSION1 will apply only to entities `MyEntity1` and `MyEntity2` with allowed groups` default`
-    and `frontend`
-    2) Permission PERMISSION2 will apply for all manageable entities except only `MyEntity2` and `MyEntity3` with
-    allowed group` default`
+    1) Permission PERMISSION1 will apply only to entities `MyEntity1` and `MyEntity2`. Allowed groups for that permission are `default` and `frontend`.
+    2) Permission PERMISSION2 will apply for all manageable entities except only `MyEntity2` and `MyEntity3`. Allowed groups for that permission is only `default`.
 
 Configuration Merging
 =====================
@@ -78,4 +76,4 @@ To load permissions configuration to DB execute a command:
 security:permission:configuration:load [--permissions [PERMISSIONS]]
 ```
 
-Optional option `--permissions` allows to load only listed Permissions
+Optional option `--permissions` allows to load only listed Permissions.
