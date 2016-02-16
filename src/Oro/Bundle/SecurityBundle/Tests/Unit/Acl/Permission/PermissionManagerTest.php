@@ -99,7 +99,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
         $this->configurationBuilder = new PermissionConfigurationBuilder($this->doctrineHelper, $validator);
 
         $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods(['fetch', 'save', 'flushAll'])
+            ->setMethods(['fetch', 'save', 'deleteAll'])
             ->getMockForAbstractClass();
 
         $this->manager = new PermissionManager(
@@ -182,7 +182,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($inputData['cache']);
 
         if ($expectedCacheData) {
-            $this->cacheProvider->expects($this->once())->method('flushAll');
+            $this->cacheProvider->expects($this->once())->method('deleteAll');
             $this->cacheProvider->expects($this->exactly(count($expectedCacheData)))
                 ->method('save')
                 ->willReturnMap($expectedCacheData);
