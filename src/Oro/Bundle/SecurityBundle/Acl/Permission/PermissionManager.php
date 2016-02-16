@@ -150,7 +150,7 @@ class PermissionManager
     protected function buildCache()
     {
         /** @var Permission[] $permissions */
-        $permissions = $this->getRepository()->findAll();
+        $permissions = $this->getRepository()->findBy([], ['id' => 'ASC']);
 
         $cache = [
             static::CACHE_GROUPS => [],
