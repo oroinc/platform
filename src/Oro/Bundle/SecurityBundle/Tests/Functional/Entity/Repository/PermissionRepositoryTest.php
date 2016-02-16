@@ -30,6 +30,13 @@ class PermissionRepositoryTest extends WebTestCase
         $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroSecurityBundle:Permission');
     }
 
+    protected function tearDown()
+    {
+        $this->getContainer()->get('oro_security.cache.provider.permission')->flushAll();
+
+        parent::tearDown();
+    }
+
     /**
      * @param mixed $inputData
      * @param mixed $expectedData
