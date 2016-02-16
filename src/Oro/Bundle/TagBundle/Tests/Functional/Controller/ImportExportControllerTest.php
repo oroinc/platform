@@ -41,8 +41,8 @@ class ImportExportControllerTest extends WebTestCase
         }
         $this->assertCount(2, $lines);
         $result = array_combine($lines[0], $lines[1]);
-        $this->assertArrayHasKey('Tags 1 Name', $result);
-        $this->assertEquals($result['Tags 1 Name'], 'custom tag');
+        $this->assertArrayHasKey('Tags', $result);
+        $this->assertEquals($result['Tags'], 'custom tag, second tag');
     }
 
     public function testValidateExportTemplate()
