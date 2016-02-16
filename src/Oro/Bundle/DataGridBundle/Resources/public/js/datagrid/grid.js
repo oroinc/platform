@@ -179,7 +179,6 @@ define(function(require) {
             _.extend(this.exportOptions, opts.exportOptions);
 
             this.collection.multipleSorting = this.multipleSorting;
-            this.collection.toolbarSorting = this.toolbarSorting;
 
             this._initRowActions();
 
