@@ -31,7 +31,6 @@ class AclConfigurationPass implements CompilerPassInterface
     const SECURITY_FACADE_SERVICE = 'oro_security.security_facade';
 
     const ACL_GROUP_PROVIDER_CHAIN_PROVIDER = 'oro_security.acl.group_provider.chain';
-    const PERMISSION_MANAGER = 'oro_security.acl.permission_manager';
 
     /**
      * {@inheritDoc}
@@ -145,10 +144,6 @@ class AclConfigurationPass implements CompilerPassInterface
                         'setAclGroupProvider',
                         [new Reference(self::ACL_GROUP_PROVIDER_CHAIN_PROVIDER)]
                     );
-                }
-
-                if ($container->hasDefinition(self::PERMISSION_MANAGER)) {
-                    $voterDef->addMethodCall('setPermissionManager', [new Reference(self::PERMISSION_MANAGER)]);
                 }
             }
             // substitute the ACL Provider and set the default ACL Provider as a base provider for new ACL Provider

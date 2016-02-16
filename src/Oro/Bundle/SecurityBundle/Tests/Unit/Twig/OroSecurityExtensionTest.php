@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Tests\Twig;
+namespace Oro\Bundle\SecurityBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
 

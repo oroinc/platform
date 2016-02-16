@@ -23,6 +23,7 @@ UPGRADE FROM 1.8 to 1.9
 - `oro_calendar.calendar_provider.user` service was marked as private
 - `oro_calendar.calendar_provider.system` service was marked as private
 - `oro_calendar.calendar_provider.public` service was marked as private
+- Added `@create_calendar_event` workflow action. See [workflowAction.md](./src/Oro/Bundle/CalendarBundle/Resources/doc/workflowAction.md) for documentation
 
 ####CommentBundle
 - The `Oro\Bundle\CommentBundle\Model\CommentProviderInterface` changed. The `hasComments` method removed. The `isCommentsEnabled` method added. The signature of the old method was `hasComments(ConfigManager $configManager, $entityName)`. The signature of the new method is `isCommentsEnabled($entityClass)`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\CommentBundle\Model\CommentProviderInterface`.

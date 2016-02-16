@@ -13,7 +13,6 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
-use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 
 /**
  * This voter uses ACL to determine whether the access to the particular resource is granted or not.
@@ -62,11 +61,6 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $groupProvider;
 
     /**
-     * @var PermissionManager
-     */
-    protected $permissionManager;
-
-    /**
      * Sets the ACL extension selector
      *
      * @param AclExtensionSelector $selector
@@ -82,14 +76,6 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     public function setAclGroupProvider(AclGroupProviderInterface $provider)
     {
         $this->groupProvider = $provider;
-    }
-
-    /**
-     * @param PermissionManager $permissionManager
-     */
-    public function setPermissionManager(PermissionManager $permissionManager)
-    {
-        $this->permissionManager = $permissionManager;
     }
 
     /**
@@ -136,8 +122,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         }
 
         //check acl group
-        $result = $this->checkAclGroup($group);
-        $result = $this->checkAttributesGroup($attributes, $group, $result);
+        $result = $this->checkAclGroup($attributes, $group);
 
         if ($result !== self::ACCESS_DENIED) {
             $result = parent::vote($token, $this->object, $attributes);
@@ -222,40 +207,27 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     }
 
     /**
-     * @param string $group
-     * @return int
-     */
-    protected function checkAclGroup($group)
-    {
-        if ($group === null || !$this->groupProvider || !$this->object) {
-            return self::ACCESS_ABSTAIN;
-        }
-
-        return $group === $this->groupProvider->getGroup() ? self::ACCESS_ABSTAIN : self::ACCESS_DENIED;
-    }
-
-    /**
      * @param array $attributes
      * @param string $group
-     * @param int $result
      * @return int
      */
-    protected function checkAttributesGroup(array $attributes, $group, $result)
+    protected function checkAclGroup(array $attributes, $group)
     {
-        if ($group === null || $result === self::ACCESS_DENIED) {
-            return $result;
-        }
+        $result = self::ACCESS_DENIED;
 
-        $permissions = array_keys($this->permissionManager->getPermissionsMap($group));
+        if ($group === null || !$this->groupProvider || !$this->object || $group === $this->groupProvider->getGroup()) {
+            $permissions = $this->extension->getPermissions(null, false, true);
 
-        foreach ($attributes as $attribute) {
-            if (!$this->supportsAttribute($attribute)) {
-                continue;
-            }
+            $result = self::ACCESS_ABSTAIN;
+            foreach ($attributes as $attribute) {
+                if (!$this->supportsAttribute($attribute)) {
+                    continue;
+                }
 
-            if (!in_array($attribute, $permissions, true)) {
-                $result = self::ACCESS_DENIED;
-                break;
+                if (!in_array($attribute, $permissions, true)) {
+                    $result = self::ACCESS_DENIED;
+                    break;
+                }
             }
         }
 

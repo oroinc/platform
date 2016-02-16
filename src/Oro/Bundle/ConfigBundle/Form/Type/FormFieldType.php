@@ -4,25 +4,23 @@ namespace Oro\Bundle\ConfigBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormFieldType extends AbstractType
 {
     /**
-     * Pass target field options to field form type
-     *
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'target_field_options' => array(),
+            [
+                'target_field_options' => [],
                 'target_field_type'    => 'text',
                 'resettable'           => true,
                 'cascade_validation'   => true,
                 'parent_checkbox_label' => ''
-            )
+            ]
         );
     }
 

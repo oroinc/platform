@@ -74,6 +74,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The child node "label" at path "permissions.PERMISSION1" must be configured
      */
     public function testIncorrectConfiguration()
     {

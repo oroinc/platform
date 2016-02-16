@@ -1,0 +1,9 @@
+Oro\Bundle\SecurityBundle\Entity\Permission:
+    properties:
+        name:
+            - Regex:
+                pattern: '/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D'
+                message: oro.security.permission.constraints.name_contains_illegal_characters
+            - Length:
+                min:        3
+                max:        255

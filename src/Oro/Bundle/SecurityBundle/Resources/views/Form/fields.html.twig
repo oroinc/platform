@@ -99,16 +99,21 @@
 {% block oro_acl_permission_collection_widget %}
     {% for field in privileges_config['permissions'] %}
         <tr {% if form.parent.vars.value.identity.name == "(default)" %}class="default-field"{% endif %}>
-            <td class="span8">
-                {% if privileges_config.view_type == 'grid' %}{{ field|trans }}{% endif %}
-            </td>
-            <td>
-                {% for permission in form %}
-                    {% if permission.vars.value.name == field %}
+            {% for permission in form %}
+                {% if permission.vars.value.name == field %}
+                    <td class="span8">
+                        {% if privileges_config.view_type == 'grid' %}
+                            {% set aclPermission = acl_permission(permission.vars.value) %}
+
+                            {{ aclPermission.label|default(field)|trans }}
+                            {% if aclPermission.description %} ({{ aclPermission.description|trans }}){% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
                         {{ form_widget(permission) }}
-                    {% endif %}
-                {% endfor %}
-            </td>
+                    </td>
+                {% endif %}
+            {% endfor %}
         </tr>
     {% endfor %}
 {% endblock %}

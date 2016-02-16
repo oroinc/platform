@@ -5,6 +5,11 @@ namespace Oro\Bundle\SecurityBundle\Configuration;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
@@ -19,16 +24,23 @@ class PermissionConfigurationBuilder
     private $doctrineHelper;
 
     /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    /**
      * @var array
      */
     private $processedEntities = [];
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param ValidatorInterface $validator
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, ValidatorInterface $validator)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->validator = $validator;
     }
 
     /**
@@ -39,7 +51,14 @@ class PermissionConfigurationBuilder
     {
         $permissions = new ArrayCollection();
         foreach ($configuration as $name => $permissionConfiguration) {
-            $permissions->add($this->buildPermission($name, $permissionConfiguration));
+            $permission = $this->buildPermission($name, $permissionConfiguration);
+
+            $violations = $this->validator->validate($permission);
+            if ($violations->count() > 0) {
+                throw $this->createValidationException($name, $violations);
+            }
+
+            $permissions->add($permission);
         }
 
         $this->processedEntities = [];
@@ -129,5 +148,24 @@ class PermissionConfigurationBuilder
         }
 
         return $default;
+    }
+
+    /**
+     * @param string $name
+     * @param ConstraintViolationListInterface $violations
+     * @return ValidatorException
+     */
+    protected function createValidationException($name, ConstraintViolationListInterface $violations)
+    {
+        $errors = '';
+
+        /** @var ConstraintViolationInterface $violation */
+        foreach ($violations as $violation) {
+            $errors .= sprintf('    %s%s', $violation->getMessage(), PHP_EOL);
+        }
+
+        return new ValidatorException(
+            sprintf('Configuration of permission %s is invalid:%s%s', $name, PHP_EOL, $errors)
+        );
     }
 }

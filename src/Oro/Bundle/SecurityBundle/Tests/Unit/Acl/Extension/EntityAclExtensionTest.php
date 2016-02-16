@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
-use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -15,7 +13,12 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
@@ -39,6 +42,9 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var EntityAclExtension */
     private $extension;
 
+    /** @var EntitySecurityMetadataProvider|\PHPUnit_Framework_MockObject_MockObject */
+    private $securityMetadataProvider;
+
     /** @var OwnershipMetadataProviderStub */
     private $metadataProvider;
 
@@ -48,12 +54,20 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
 
-    /** @var PermissionManager */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|PermissionManager */
     private $permissionManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
+    private $groupProvider;
 
     protected function setUp()
     {
         $this->tree = new OwnerTree();
+
+        $this->securityMetadataProvider = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->metadataProvider = new OwnershipMetadataProviderStub($this);
         $this->metadataProvider->setMetadata(
@@ -131,12 +145,18 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'SHARE'  => 6
             ]);
 
+        $this->groupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $this->groupProvider->expects($this->any())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
+
         $this->extension = TestHelper::get($this)->createEntityAclExtension(
             $this->metadataProvider,
             $this->tree,
             new ObjectIdAccessor(),
             $this->decisionMaker,
-            $this->permissionManager
+            $this->permissionManager,
+            $this->groupProvider
         );
 
         $this->extension->setEntityOwnerAccessor($entityOwnerAccessor);
@@ -364,12 +384,71 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
     }
 
-    public function testGetAllPermissions()
+    public function testGetPermissions()
     {
         $this->assertEquals(
             ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE'],
             $this->extension->getPermissions()
         );
+    }
+
+    /**
+     * @param array $inputData
+     * @param array $expectedData
+     *
+     * @dataProvider getAllowedPermissionsProvider
+     */
+    public function testGetAllowedPermissions(array $inputData, array $expectedData)
+    {
+        $this->securityMetadataProvider->expects($this->any())
+            ->method('getMetadata')
+            ->with($inputData['type'])
+            ->willReturn(new EntitySecurityMetadata('', '', '', '', $inputData['entityConfig']));
+
+        if ($inputData['owner']) {
+            $this->metadataProvider->setMetadata(
+                'TestEntity1',
+                new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
+            );
+        }
+
+        $this->permissionManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->permissionManager->expects($this->any())
+            ->method('getPermissionsForEntity')
+            ->with($inputData['type'], AclGroupProviderInterface::DEFAULT_SECURITY_GROUP)
+            ->willReturn($inputData['permissions']);
+        $this->permissionManager->expects($this->any())
+            ->method('getPermissionsMap')
+            ->willReturn([
+                'VIEW'   => 1,
+                'CREATE' => 2,
+                'EDIT'   => 3,
+                'DELETE' => 4,
+                'ASSIGN' => 5,
+                'SHARE'  => 6,
+                'PERMISSION' => 7
+            ]);
+
+        /* @var $entityClassResolver EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject  */
+        $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $extension = new EntityAclExtension(
+            new ObjectIdAccessor(),
+            $entityClassResolver,
+            $this->securityMetadataProvider,
+            $this->metadataProvider,
+            $this->decisionMaker,
+            $this->permissionManager,
+            $this->groupProvider
+        );
+
+        $this->assertEquals($expectedData, $extension->getAllowedPermissions(
+            new ObjectIdentity('entity', $inputData['type'])
+        ));
     }
 
     /**
@@ -617,6 +696,68 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                     0 => 'NONE',
                     4 => 'GLOBAL',
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedPermissionsProvider()
+    {
+        return [
+            '(root)' => [
+                'input' => [
+                    'type' => ObjectIdentityFactory::ROOT_IDENTITY_TYPE,
+                    'owner' => false,
+                    'entityConfig' => [],
+                    'permissions' => null,
+                ],
+                'expected' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE', 'PERMISSION'],
+            ],
+            'TestEntity1 + config' => [
+                'input' => [
+                    'type' => 'TestEntity1',
+                    'owner' => false,
+                    'entityConfig' => ['VIEW', 'CREATE', 'ASSIGN', 'SHARE', 'PERMISSION'],
+                    'permissions' => [
+                        $this->getPermission(1, 'VIEW'),
+                        $this->getPermission(2, 'CREATE'),
+                        $this->getPermission(3, 'ASSIGN'),
+                        $this->getPermission(4, 'SHARE'),
+                        $this->getPermission(5, 'PERMISSION')
+                    ],
+                ],
+                'expected' => ['VIEW', 'CREATE', 'PERMISSION'],
+            ],
+            'TestEntity1 + config + owner' => [
+                'input' => [
+                    'type' => 'TestEntity1',
+                    'owner' => true,
+                    'entityConfig' => ['VIEW', 'CREATE', 'ASSIGN', 'SHARE', 'PERMISSION'],
+                    'permissions' => [
+                        $this->getPermission(1, 'VIEW'),
+                        $this->getPermission(2, 'CREATE'),
+                        $this->getPermission(3, 'ASSIGN'),
+                        $this->getPermission(4, 'SHARE'),
+                        $this->getPermission(5, 'PERMISSION')
+                    ],
+                ],
+                'expected' => ['VIEW', 'CREATE', 'ASSIGN', 'SHARE', 'PERMISSION'],
+            ],
+            'TestEntity1 + empty owner' => [
+                'input' => [
+                    'type' => 'TestEntity1',
+                    'owner' => false,
+                    'entityConfig' => [],
+                    'permissions' => [
+                        $this->getPermission(1, 'VIEW'),
+                        $this->getPermission(2, 'ASSIGN'),
+                        $this->getPermission(3, 'SHARE'),
+                        $this->getPermission(4, 'PERMISSION'),
+                    ],
+                ],
+                'expected' => ['VIEW', 'PERMISSION'],
             ],
         ];
     }
@@ -1007,7 +1148,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $entityMetadataProvider,
             $this->metadataProvider,
             $this->decisionMaker,
-            $this->permissionManager
+            $this->permissionManager,
+            $this->groupProvider
         );
 
         $this->assertEquals($expected, $extension->supports($type, $id));
@@ -1112,5 +1254,24 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
             ]
         ];
+    }
+
+    /**
+     * @param string $id
+     * @param string $name
+     * @return Permission
+     */
+    protected function getPermission($id, $name)
+    {
+        $permission = new Permission();
+
+        $reflection = new \ReflectionClass('Oro\Bundle\SecurityBundle\Entity\Permission');
+        $reflectionProperty = $reflection->getProperty('id');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($permission, $id);
+
+        $permission->setName($name);
+
+        return $permission;
     }
 }
