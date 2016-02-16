@@ -6,7 +6,6 @@ Table of Contents
  - [Entities](#entities)
  - [Configuration](#configuration)
  - [Configuration Merging](#configuration-merging)
- - [Configuration Replacing](#configuration-replacing)
  - [Configuration Load](#configuration-load)
 
 User can define custom Permissions and apply it to any manageable Entity.
@@ -62,30 +61,13 @@ This configuration describes 2 Permissions:
 Configuration Merging
 =====================
 
-All configurations merge in the boot bundles order. There are two steps of merging process: overriding and extending.
-
-**Overriding**
-
-On this step application collects configurations of all permissions with the same name and merge their to one
-configuration.
+All configurations merge in the boot bundles order. Application collects configurations of all permissions with the same
+name and merge their to one configuration.
 Merging uses simple rules:
  * if node value is scalar - value will be replaced
  * if node value is array - this array will be complemented by values from the second configuration
 
-After first step application knows about all permissions and have only one configuration for each permission.
-
-**Extending**
-On this step application collects configurations for all permissions which contain `extends`. Then main permission
-configuration, which specified in `extends`, copied and merged with configuration of original permission. Merging use
-the same rules as for `overriding` step.
-
-Configuration Replacing
-=======================
-
-In merge process we can replace any node on any level of our configuration. If node `replace` exists and contains
-some nodes which located on the same level of node `replace` - values of these nodes will be replaced by values from
-the last configuration from queue.
-
+After this step application knows about all permissions and have only one configuration for each permission.
 
 Configuration Load
 ------------------
