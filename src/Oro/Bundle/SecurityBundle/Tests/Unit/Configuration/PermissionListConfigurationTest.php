@@ -40,9 +40,7 @@ class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
         return [
             'permissions list 1' => [
                 'input' => [
-                    'permission1' => [
-                        'label' => 'Test Label',
-                    ],
+                    'permission1' => [],
                     'permission2' => [
                         'label' => 'Test Label',
                         'apply_to_all' => false,
@@ -54,7 +52,7 @@ class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'permission1' => [
-                        'label' => 'Test Label',
+                        'label' => 'permission1',
                         'apply_to_all' => true,
                         'group_names' => ['default'],
                         'exclude_entities' => [],

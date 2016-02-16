@@ -41,7 +41,21 @@ class PermissionListConfiguration implements ConfigurationInterface
     {
         $builder = new TreeBuilder();
         $root = $builder->root(static::ROOT_NODE_NAME);
-        $root->useAttributeAsKey('name');
+        $root->useAttributeAsKey('name')
+            ->beforeNormalization()
+            ->always(
+                function ($configs) {
+                    foreach ($configs as $name => &$config) {
+                        if (!isset($config['label'])) {
+                            $config['label'] = $name;
+                        }
+                    }
+
+                    return $configs;
+                }
+            )
+            ->end();
+
         $this->configuration->addNodes($root->prototype('array'));
 
         return $builder;
