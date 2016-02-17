@@ -23,4 +23,3 @@ layout:
             siblingId: datagrid_toolbar_pagination
     conditions:
         @eq: [ $context.user_agent.mobile, true ]
-

@@ -82,4 +82,18 @@ class UserAgentProviderTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    public function testGetUserAgentCache()
+    {
+        $this->requestStack->expects($this->exactly(2))
+            ->method('getMasterRequest')
+            ->willReturn(null);
+
+        $userAgent = $this->userAgentProvider->getUserAgent();
+
+        $userAgentName = UserAgentProvider::UNKNOWN_USER_AGENT;
+
+        $this->assertEquals($userAgentName, $userAgent->getUserAgent());
+        $this->assertSame($userAgent, $this->userAgentProvider->getUserAgent());
+    }
 }
