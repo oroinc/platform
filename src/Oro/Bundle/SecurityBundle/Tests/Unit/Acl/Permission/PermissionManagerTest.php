@@ -233,7 +233,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->with(PermissionManager::CACHE_GROUPS)
             ->willReturn($inputData['cache']);
 
-        $this->entityRepository->expects($this->once())
+        $this->entityRepository->expects($expectedData ? $this->once() : $this->never())
             ->method('findBy')
             ->with(['id' => $inputData['ids']], ['id' => 'ASC'])
             ->willReturn($inputData['permissions']);

@@ -133,7 +133,9 @@ class PermissionManager
     {
         $this->normalizeGroupName($groupName);
 
-        return $this->getRepository()->findBy(['id' => $this->findGroupPermissions($groupName)], ['id' => 'ASC']);
+        $ids = $this->findGroupPermissions($groupName);
+
+        return $ids ? $this->getRepository()->findBy(['id' => $ids], ['id' => 'ASC']) : [];
     }
 
     /**
