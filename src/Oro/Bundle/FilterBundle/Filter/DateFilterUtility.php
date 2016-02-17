@@ -96,7 +96,7 @@ class DateFilterUtility
      *
      * @return array
      */
-    protected function applyDatePart($data)
+    protected function applyDatePart(array $data)
     {
         $field = $this->modifyFieldToDayWithMonth($data['field'], $data);
 
@@ -138,21 +138,21 @@ class DateFilterUtility
      * @param array $data
      * @return string
      */
-    protected function modifyFieldToDayWithMonth($sqlField, &$data)
+    protected function modifyFieldToDayWithMonth($sqlField, array &$data)
     {
         $isModifyAllowed = false;
         $fields = ['date_start', 'date_end'];
         foreach ($fields as $field) {
             $originalKey = $field.'_original';
-            if ($data[$originalKey] && $this->allowToModifyFieldToDayWithMonth($data, $originalKey, $field)) {
+            if ($this->allowToModifyFieldToDayWithMonth($data, $originalKey, $field)) {
                     $data[$field] = $data[$field]->format('md');
                     $isModifyAllowed = true;
             }
         }
 
         if ($isModifyAllowed) {
-            $sqlField = $this->modifyFieldToCorrectTimezone($sqlField);
-            $sqlField = sprintf('MONTH(%s) * 100 + DAY(%s)', $sqlField, $sqlField);
+            $sqlField = $this->applyTimezoneConvert($sqlField);
+            $sqlField = sprintf('MONTH(%1$s) * 100 + DAY(%1$s)', $sqlField);
         }
 
         return $sqlField;
@@ -168,16 +168,15 @@ class DateFilterUtility
      */
     protected function allowToModifyFieldToDayWithMonth($data, $originalKey, $field)
     {
-        $expression = $this->expressionCompiler->compile($data[$originalKey], true);
-        if ($expression instanceof ExpressionResult && $data[$field] instanceof \DateTime) {
-            if ($expression->getVariableType() == DateModifierInterface::VAR_THIS_DAY_W_Y) {
-                return true;
-            } elseif ($expression->getSourceType() == ExpressionResult::TYPE_DAYMONTH) {
-                return true;
-            }
+        if (!$data[$originalKey]) {
+            return false;
         }
-
-        return false;
+        $expression = $this->expressionCompiler->compile($data[$originalKey], true);
+        return
+            $expression instanceof ExpressionResult &&
+            $data[$field] instanceof \DateTime &&
+            ($expression->getVariableType() == DateModifierInterface::VAR_THIS_DAY_W_Y ||
+             $expression->getSourceType() == ExpressionResult::TYPE_DAYMONTH);
     }
 
     /**
@@ -190,7 +189,7 @@ class DateFilterUtility
      */
     private function getEnforcedTimezoneFunction($functionName, $fieldName)
     {
-        $result = sprintf('%s(%s)', $functionName, $this->modifyFieldToCorrectTimezone($fieldName));
+        $result = sprintf('%s(%s)', $functionName, $this->applyTimezoneConvert($fieldName));
 
         return $result;
     }
@@ -201,7 +200,7 @@ class DateFilterUtility
      * @param string $fieldName
      * @return string
      */
-    protected function modifyFieldToCorrectTimezone($fieldName)
+    protected function applyTimezoneConvert($fieldName)
     {
         if ('UTC' !== $this->localeSettings->getTimeZone()) {
             $fieldName = sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());

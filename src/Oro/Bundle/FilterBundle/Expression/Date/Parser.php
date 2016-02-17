@@ -22,7 +22,6 @@ class Parser
      * @param array $tokens
      * @param bool $returnRawToken
      * @return mixed
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function parse($tokens, $returnRawToken = false)
     {
@@ -51,11 +50,11 @@ class Parser
             }
         }
 
-        if ($returnRawToken) {
+        if ($returnRawToken || $result === null) {
             return $result;
         }
 
-        return $result === null ? $result : $result->getValue();
+        return $result->getValue();
     }
 
     /**

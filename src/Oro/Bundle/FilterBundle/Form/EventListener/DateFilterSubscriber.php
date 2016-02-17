@@ -50,7 +50,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
      *
      * @param FormEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity) many cases in switch - have no sense to refactor this.
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function preSubmit(FormEvent $event)
     {
@@ -67,10 +66,8 @@ class DateFilterSubscriber implements EventSubscriberInterface
         }
 
         $children = array_keys($form->get('value')->all());
-        if (isset($data['part']) && isset($data['type'])) {
-            $this->modifyDateForEqualType($data);
-            $this->modifyPartByVariable($data);
-        }
+        $this->modifyDateForEqualType($data);
+        $this->modifyPartByVariable($data);
         // compile expressions
         $this->mapValues(
             $children,
@@ -188,6 +185,10 @@ class DateFilterSubscriber implements EventSubscriberInterface
      */
     private function modifyDateForEqualType(&$data)
     {
+        if (!isset($data['part'], $data['type'])) {
+            return;
+        }
+
         $validType =
             $data['type'] == AbstractDateFilterType::TYPE_EQUAL ||
             $data['type'] == AbstractDateFilterType::TYPE_NOT_EQUAL;
@@ -237,6 +238,10 @@ class DateFilterSubscriber implements EventSubscriberInterface
      */
     protected function modifyPartByVariable(&$data)
     {
+        if (!isset($data['part'], $data['type'])) {
+            return;
+        }
+
         foreach ($data['value'] as $field) {
             if ($field) {
                 $result = $this->expressionCompiler->compile($field, true);
