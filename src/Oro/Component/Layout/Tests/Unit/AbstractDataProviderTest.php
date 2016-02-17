@@ -10,7 +10,6 @@ class AbstractDataProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetIdentifier()
     {
-        /** @var AbstractDataProvider $dataProvider */
         $dataProvider = $this->getMockForAbstractClass('Oro\Component\Layout\AbstractDataProvider');
         $dataProvider->getIdentifier();
     }
