@@ -61,7 +61,7 @@ class PermissionRepositoryTest extends WebTestCase
      */
     public function testFindByIds($inputData, $expectedData)
     {
-        $permissions = $this->repository->findByEntityClassAndIds(
+        $permissions = $this->repository->findByIds(
             $this->getPermissionsIds($inputData['ids'])
         );
 
@@ -186,13 +186,6 @@ class PermissionRepositoryTest extends WebTestCase
         $permissions = ['TEST_PERMISSION1', 'TEST_PERMISSION2', 'TEST_PERMISSION3', 'TEST_PERMISSION4'];
 
         return [
-            'null ids' => [
-                'input' => [
-                    'ids' => null,
-                    'permissions' => $permissions,
-                ],
-                'expected' => [],
-            ],
             'empty ids' => [
                 'input' => [
                     'ids' => [],
@@ -202,7 +195,7 @@ class PermissionRepositoryTest extends WebTestCase
             ],
             'empty ids' => [
                 'input' => [
-                    'ids' => ['TEST_PERMISSION1', 'TEST_PERMISSION4', 'UNKNOWN'],
+                    'ids' => ['TEST_PERMISSION1', 'TEST_PERMISSION4'],
                     'permissions' => $permissions,
                 ],
                 'expected' => ['TEST_PERMISSION1', 'TEST_PERMISSION4'],
