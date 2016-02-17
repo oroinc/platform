@@ -57,6 +57,19 @@ define(function(require) {
             this.$('[href^="#' + tabName + '-"]').tab('show');
         },
 
+        updateTabsVisibility: function() {
+            var visibleTabShown = false;
+            _.each(this.data.tabs, function(tab) {
+                var visible = !_.isFunction(tab.isVisible) || tab.isVisible();
+                this.setTabVisibility(tab.name, visible);
+
+                if (visible && !visibleTabShown) {
+                    this.show(tab.name);
+                    visibleTabShown = true;
+                }
+            }, this);
+        },
+
         /**
          * @param {String} tabName
          * @param {Boolean} visible

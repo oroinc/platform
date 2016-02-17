@@ -25,9 +25,15 @@ oro:
                     You can also use them to create expressions.<br/>
                     For example:<br/>
                     "today - 2" will be evaluated as the day before yesterday.
+            days:
+                title: Days
+            months:
+                title: Months
             tab:
                 calendar: Calendar
                 variables: Variables
+                days: Days
+                months: Months
             placeholder:
                 value: Choose a date
                 dayofweek: Choose a day

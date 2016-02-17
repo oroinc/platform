@@ -8,7 +8,9 @@ define(function(require) {
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
     var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     var moment = require('moment');
+    var localeSettings = require('orolocale/js/locale-settings');
     require('orofilter/js/datevariables-widget');
+    require('orofilter/js/itemizedpicker-widget');
 
     function isBetween(value, min, max) {
         value = parseInt(value);
@@ -16,17 +18,19 @@ define(function(require) {
         return !_.isNaN(value) && value >= min && value <= max;
     }
 
-    VariableDatePickerView = DatePickerView.extend({
-        defaultTabs: [
-            {
-                name: 'calendar',
-                label: __('oro.filter.date.tab.calendar')
-            },
-            {
-                name: 'variables',
-                label: __('oro.filter.date.tab.variables')
+    function findKey(map, value) {
+        var foundKey;
+        _.each(map, function(item, key) {
+            if (item === value) {
+                foundKey = key;
             }
-        ],
+        });
+
+        return foundKey;
+    }
+
+    VariableDatePickerView = DatePickerView.extend({
+        defaultTabs: [],
 
         partsDateValidation: {
             value: function (date) {
@@ -35,7 +39,7 @@ define(function(require) {
             },
             dayofweek: function(date) {
                 return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 7);
+                    || findKey(localeSettings.getCalendarDayOfWeekNames('wide'), date);
             },
             week: function(date) {
                 return this.dateVariableHelper.isDateVariable(date)
@@ -47,7 +51,7 @@ define(function(require) {
             },
             month: function(date) {
                 return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 12);
+                    || findKey(localeSettings.getCalendarMonthNames('wide'), date);
             },
             quarter: function(date) {
                 return this.dateVariableHelper.isDateVariable(date)
@@ -68,6 +72,34 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
+            this.defaultTabs = [
+                {
+                    name: 'calendar',
+                    label: __('oro.filter.date.tab.calendar'),
+                    isVisible: _.bind(function() {
+                        return this.$variables.dateVariables('getPart') === 'value';
+                    }, this)
+                },
+                {
+                    name: 'days',
+                    label: __('oro.filter.date.tab.days'),
+                    isVisible: _.bind(function() {
+                        return this.$variables.dateVariables('getPart') === 'dayofweek';
+                    }, this)
+                },
+                {
+                    name: 'months',
+                    label: __('oro.filter.date.tab.months'),
+                    isVisible: _.bind(function() {
+                        return this.$variables.dateVariables('getPart') === 'month';
+                    }, this)
+                },
+                {
+                    name: 'variables',
+                    label: __('oro.filter.date.tab.variables')
+                }
+            ];
+
             _.extend(this, _.pick(options, ['backendFormat']));
             this.dateVariableHelper = new DateVariableHelper(options.datePickerOptions.dateVars);
             VariableDatePickerView.__super__.initialize.apply(this, arguments);
@@ -95,6 +127,24 @@ define(function(require) {
             this.initTabsView(options);
             this.initDatePicker(options);
             this.initVariablePicker(options);
+            this.initItemizedPicker(
+                'days',
+                __('oro.filter.date.days.title'),
+                localeSettings.getCalendarDayOfWeekNames('wide')
+            );
+            this.initItemizedPicker(
+                'months',
+                __('oro.filter.date.months.title'),
+                localeSettings.getCalendarMonthNames('wide')
+            );
+        },
+
+        initItemizedPicker: function(tabName, title, items) {
+            this.$dropdown.find('#' + tabName + '-' + this.cid).itemizedPicker({
+                title: title,
+                items: items,
+                onSelect: _.bind(this.onSelect, this)
+            });
         },
 
         /**
@@ -210,10 +260,21 @@ define(function(require) {
         getBackendFormattedValue: function() {
             var value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
-                value = this.dateVariableHelper.formatRawValue(value);
-            } else {
-                value = VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
+                return this.dateVariableHelper.formatRawValue(value);
             }
+
+            var part = this.$variables.dateVariables('getPart');
+            if (part === 'value') {
+                return VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
+            }
+
+            switch (part) {
+                case 'dayofweek':
+                    return findKey(localeSettings.getCalendarDayOfWeekNames('wide'), value);
+                case 'month':
+                    return findKey(localeSettings.getCalendarMonthNames('wide'), value);
+            }
+
             return value;
         },
 
@@ -242,10 +303,8 @@ define(function(require) {
                 this.$calendar.datepicker('setDate', value);
             }
 
-            var calendarVisible = this.$variables.dateVariables('getPart') === 'value';
-            this.subview('tabs').setTabVisibility('calendar', calendarVisible);
-
-            if (this.dateVariableHelper.isDateVariable(value) || !calendarVisible) {
+            this.subview('tabs').updateTabsVisibility();
+            if (this.dateVariableHelper.isDateVariable(value)) {
                 this.subview('tabs').show('variables');
             }
             this.$calendar.datepicker('refresh');
