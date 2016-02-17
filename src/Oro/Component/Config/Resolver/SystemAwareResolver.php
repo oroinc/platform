@@ -263,7 +263,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
 
                 $classMethod = [$class, $method];
                 if (is_callable($classMethod)) {
-                    $params = array_key_exists(3, $match) ? $this->getMethodCallParameters($match[3]) : [];
+                    $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : [];
                     $val    = $this->replaceValue($val, $this->callStaticMethod($class, $method, $params), $match[0]);
                 } elseif (defined(implode('::', $classMethod))) {
                     $val = $this->replaceValue(
@@ -289,7 +289,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         if (strpos($val, '->') === false && preg_match('#@([\w\.]+)#', $val, $match)) {
             $val = $this->getService($match[1]);
         } elseif (preg_match('#@([\w\.]+)->([\w\.]+)(\([^\)]*\))?#', $val, $match)) {
-            $params = array_key_exists(3, $match) ? $this->getMethodCallParameters($match[3]) : [];
+            $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : [];
             $val    = $this->replaceValue(
                 $val,
                 $this->callServiceMethod($match[1], $match[2], $params),

@@ -37,7 +37,6 @@ class UserAgentProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUserAgent($isRequest, $userAgentName)
     {
-        $count = 2;
         $request = null;
         if ($isRequest) {
             /** @var HeaderBag|\PHPUnit_Framework_MockObject_MockObject $request */
@@ -45,13 +44,13 @@ class UserAgentProviderTest extends \PHPUnit_Framework_TestCase
             /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
             $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
             $request->headers = $headers;
-            $headers->expects($this->exactly($count))
+            $headers->expects($this->once())
                 ->method('get')
                 ->with('User-Agent')
                 ->willReturn($userAgentName);
         }
 
-        $this->requestStack->expects($this->exactly($count))
+        $this->requestStack->expects($this->once())
             ->method('getMasterRequest')
             ->willReturn($request);
 
@@ -61,7 +60,6 @@ class UserAgentProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($userAgentName, $userAgent->getUserAgent());
-        $this->assertSame($userAgent, $this->userAgentProvider->getUserAgent());
     }
 
     /**

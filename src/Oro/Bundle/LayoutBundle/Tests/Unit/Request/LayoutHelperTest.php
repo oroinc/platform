@@ -93,23 +93,6 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return array
-     */
-    public function layoutHelperExceptionDataProvider()
-    {
-        return [
-            [
-                'request' => null,
-                'annotation' => $this->getLayoutAnnotationMock(),
-            ],
-            [
-                'request' => $this->getMock('Symfony\Component\HttpFoundation\Request'),
-                'annotation' => $this->getLayoutAnnotationMock(),
-            ],
-        ];
-    }
-
-    /**
      * @return LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getLayoutAnnotationMock()
