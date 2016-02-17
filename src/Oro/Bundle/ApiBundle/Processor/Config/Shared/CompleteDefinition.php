@@ -116,7 +116,7 @@ class CompleteDefinition implements ProcessorInterface
                 continue;
             }
 
-            $config = [ConfigUtil::DEFINITION => []];
+            $config = [ConfigUtil::DEFINITION => null];
             if ($this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                 $config[ConfigUtil::DEFINITION][ConfigUtil::EXCLUDE] = true;
             }
