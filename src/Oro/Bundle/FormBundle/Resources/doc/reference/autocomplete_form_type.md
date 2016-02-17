@@ -107,7 +107,7 @@ class ProductType extends AbstractType
 **autocomplete_alias**
 
 This option refers to a service configured with tag "oro_form.autocomplete.search_handler". Details of service configuration
-described [here](#search-handler-configuration). If this option is set next options will be inited if they are empty:
+described [here](#search-handler-service). If this option is set next options will be inited if they are empty:
 *entity_class*, *configs.properties*, *converter*, *configs.extra_config* ("autocomplete")
 
 **entity_class**
