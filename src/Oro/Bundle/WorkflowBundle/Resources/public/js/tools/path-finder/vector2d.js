@@ -1,10 +1,5 @@
 define(['./point2d', './line2d', './interval2d', './util'], function(Point2d, Line2d, Interval2d, util) {
     'use strict';
-    var sign = Math.hasOwnProperty('sign') ? Math.sign : function(x) {
-        if (+x === x) {
-            return x > 0 ? 1 : (x < 0 ? -1 : 0);
-        }
-    };
 
     /**
      * Constructs vector. Vector is specified by start point and direction
@@ -83,8 +78,8 @@ define(['./point2d', './line2d', './interval2d', './util'], function(Point2d, Li
         var intersectionPoint = this.line.intersection(interval.line);
         if (!isNaN(intersectionPoint.x) && Math.abs(intersectionPoint.x) !== Infinity) {
             var relativePoint = intersectionPoint.sub(this.start);
-            if ((sign(relativePoint.x) === sign(this.direction.x)) &&
-                (sign(relativePoint.y) === sign(this.direction.y))) {
+            if ((Math.sign(relativePoint.x) === Math.sign(this.direction.x)) &&
+                (Math.sign(relativePoint.y) === Math.sign(this.direction.y))) {
                 if (interval.a.x !== interval.b.x) {
                     if (util.between(intersectionPoint.x, interval.a.x, interval.b.x)) {
                         return intersectionPoint;
