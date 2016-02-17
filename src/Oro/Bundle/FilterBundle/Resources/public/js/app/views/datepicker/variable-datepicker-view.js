@@ -170,8 +170,12 @@ define(function(require) {
             var value = this.$frontDateField.val();
             if (!this.dateVariableHelper.isDateVariable(value)) {
                 this.$calendar.datepicker('setDate', value);
-            } else {
-                // open variable tab
+            }
+
+            var calendarVisible = this.$variables.dateVariables('getPart') === 'value';
+            this.subview('tabs').setTabVisibility('calendar', calendarVisible);
+
+            if (this.dateVariableHelper.isDateVariable(value) || !calendarVisible) {
                 this.subview('tabs').show('variables');
             }
             this.$calendar.datepicker('refresh');

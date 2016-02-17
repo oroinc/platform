@@ -30,7 +30,9 @@ define(function(require) {
          */
         updateTimeFieldState: function() {
             var value = this.$el.val();
-            if (this.dateVariableHelper.isDateVariable(value)) {
+            if ((!this.$variables || this.$variables.dateVariables('getPart') !== 'value') ||
+                this.dateVariableHelper.isDateVariable(value)
+            ) {
                 this.$frontTimeField.val('').attr('disabled', 'disabled');
             } else {
                 this.$frontTimeField.removeAttr('disabled');

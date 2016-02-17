@@ -45,6 +45,10 @@ define([
             this.render();
         },
 
+        getPart: function() {
+            return this.options.part;
+        },
+
         onSelectVar: function(e) {
             var variable = e.target.text;
             this.options.onSelect(variable);

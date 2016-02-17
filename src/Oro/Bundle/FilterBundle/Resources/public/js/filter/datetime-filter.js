@@ -153,6 +153,22 @@ define(function(require) {
                 }
                 this.trigger('update');
             }
+        },
+
+        _renderSubViews: function() {
+            DatetimeFilter.__super__._renderSubViews.apply(this, arguments);
+            var value = this._readDOMValue();
+            this._updateDateTimePickerSubView('start', value);
+            this._updateDateTimePickerSubView('end', value);
+        },
+
+        _updateDateTimePickerSubView: function(subViewName, viewValue) {
+            var subView = this.subview(subViewName);
+            if (!subView || !subView.updateFront) {
+                return;
+            }
+
+            subView.updateFront();
         }
     });
 

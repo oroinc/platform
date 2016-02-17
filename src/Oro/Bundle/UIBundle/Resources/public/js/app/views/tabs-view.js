@@ -55,6 +55,15 @@ define(function(require) {
          */
         show: function(tabName) {
             this.$('[href^="#' + tabName + '-"]').tab('show');
+        },
+
+        /**
+         * @param {String} tabName
+         * @param {Boolean} visible
+         */
+        setTabVisibility: function(tabName, visible) {
+            var method = visible ? 'show' : 'hide';
+            this.$('li:has(a.' + tabName + ')')[method]();
         }
     });
 
