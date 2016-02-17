@@ -80,6 +80,7 @@ define(function(require) {
          */
         setPart: function(part) {
             this.$variables.dateVariables('setPart', part);
+            this.$frontDateField.attr('placeholder', __('oro.filter.date.placeholder.' + part));
         },
 
         /**
@@ -171,6 +172,10 @@ define(function(require) {
             });
             this.$variables = this.$dropdown.find('#variables-' + this.cid);
             this.$variables.dateVariables(widgetOptions);
+            this.$frontDateField.attr(
+                'placeholder',
+                __('oro.filter.date.placeholder.' + this.$variables.dateVariables('getPart'))
+            );
             this.$variables.addClass(widgetOptions.className);
         },
 

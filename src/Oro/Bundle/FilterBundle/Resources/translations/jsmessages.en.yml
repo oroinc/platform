@@ -28,6 +28,15 @@ oro:
             tab:
                 calendar: Calendar
                 variables: Variables
+            placeholder:
+                value: Choose a date
+                dayofweek: Choose a day
+                week: Type a week
+                day: Type a day
+                month: Type a month
+                quarter: Type a quarter
+                dayofyear: Type a day of year
+                year: Type a year
         embedded:
             choice:
                 field_to_value: field value
