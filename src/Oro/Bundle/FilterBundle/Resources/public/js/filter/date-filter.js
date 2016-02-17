@@ -427,6 +427,9 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
+            this.subview('start').checkConsistency();
+            this.subview('end').checkConsistency();
+
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.date_type),
                 //empty default parts value if parts not exist

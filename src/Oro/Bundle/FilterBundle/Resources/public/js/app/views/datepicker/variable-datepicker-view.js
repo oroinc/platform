@@ -7,7 +7,14 @@ define(function(require) {
     var TabsView = require('oroui/js/app/views/tabs-view');
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
     var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
+    var moment = require('moment');
     require('orofilter/js/datevariables-widget');
+
+    function isBetween(value, min, max) {
+        value = parseInt(value);
+
+        return !_.isNaN(value) && value >= min && value <= max;
+    }
 
     VariableDatePickerView = DatePickerView.extend({
         defaultTabs: [
@@ -20,6 +27,41 @@ define(function(require) {
                 label: __('oro.filter.date.tab.variables')
             }
         ],
+
+        partsDateValidation: {
+            value: function (date) {
+                return this.dateVariableHelper.isDateVariable(date)
+                    || moment(date, this.getDateFormat(), true).isValid();
+            },
+            dayofweek: function(date) {
+                return this.dateVariableHelper.isDateVariable(date)
+                    || isBetween(date, 1, 7);
+            },
+            week: function(date) {
+                return this.dateVariableHelper.isDateVariable(date)
+                    || isBetween(date, 1, 53);
+            },
+            day: function(date) {
+                return this.dateVariableHelper.isDateVariable(date)
+                    || isBetween(date, 1, 31);
+            },
+            month: function(date) {
+                return this.dateVariableHelper.isDateVariable(date)
+                    || isBetween(date, 1, 12);
+            },
+            quarter: function(date) {
+                return this.dateVariableHelper.isDateVariable(date)
+                    || isBetween(date, 1, 4);
+            },
+            dayofyear: function(date) {
+                return this.dateVariableHelper.isDateVariable(date)
+                    || isBetween(date, 1, 365);
+            },
+            year: function(date) {
+                return this.dateVariableHelper.isDateVariable(date)
+                    || !_.isNaN(parseInt(date));
+            }
+        },
 
         /**
          * Initializes variable-date-picker view
@@ -92,6 +134,29 @@ define(function(require) {
                 .click(function(e) {
                     e.stopImmediatePropagation();
                 });
+        },
+
+        /**
+         * Check if both frontend fields (date && time) have consistent value
+         *
+         * @param target
+         */
+        checkConsistency: function(target) {
+            var date = this.$frontDateField.val();
+
+            if (!target && !this._isDateValid(date)) {
+                this.$frontDateField.val('');
+            }
+        },
+
+        _isDateValid: function(date) {
+            var part = this.$variables.dateVariables('getPart');
+            var validator = this.partsDateValidation[part];
+            if (!validator) {
+                return false;
+            }
+
+            return validator.call(this, date);
         },
 
         /**

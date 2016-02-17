@@ -7,51 +7,17 @@ define(function(require) {
     var dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
     var moment = require('moment');
 
-    function isBetween(value, min, max) {
-        value = parseInt(value);
-
-        return !_.isNaN(value) && value >= min && value <= max;
-    }
-
     VariableDateTimePickerView = VariableDatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
         /**
          * Default options
          */
         defaults: _.extend({}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
-        partsValidation: {
+        partsDateTimeValidation: {
             value: function (date, time) {
                 return this.dateVariableHelper.isDateVariable(date)
                     || (moment(date, this.getDateFormat(), true).isValid()
                         && moment(time, this.getTimeFormat(), true).isValid());
-            },
-            dayofweek: function(date, time) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 7);
-            },
-            week: function(date, time) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 53);
-            },
-            day: function(date, time) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 31);
-            },
-            month: function(date, time) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 12);
-            },
-            quarter: function(date, time) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 4);
-            },
-            dayofyear: function(date, time) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 365);
-            },
-            year: function(date, time) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || !_.isNaN(parseInt(date));
             }
         },
 
@@ -88,21 +54,22 @@ define(function(require) {
          */
         checkConsistency: function(target) {
             dateTimePickerViewMixin.checkConsistency.apply(this, arguments);
+            VariableDateTimePickerView.__super__.checkConsistency.apply(this, arguments);
 
             var date = this.$frontDateField.val();
             var time = this.$frontTimeField.val();
 
-            if (!target && !this._isValid(date, time)) {
+            if (!target && !this._isDateTimeValid(date, time)) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }
         },
 
-        _isValid: function(date, time) {
+        _isDateTimeValid: function(date, time) {
             var part = this.$variables.dateVariables('getPart');
-            var validator = this.partsValidation[part];
+            var validator = this.partsDateTimeValidation[part];
             if (!validator) {
-                return false;
+                return true;
             }
 
             return validator.call(this, date, time);

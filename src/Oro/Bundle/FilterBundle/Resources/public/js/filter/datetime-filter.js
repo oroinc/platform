@@ -132,15 +132,6 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _readDOMValue: function() {
-            this.subview('start').checkConsistency();
-            this.subview('end').checkConsistency();
-            return DatetimeFilter.__super__._readDOMValue.apply(this, arguments);
-        },
-
-        /**
-         * @inheritDoc
-         */
         _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
                 var start = this.subview('start');
