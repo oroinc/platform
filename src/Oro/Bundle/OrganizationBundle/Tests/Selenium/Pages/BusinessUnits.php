@@ -44,7 +44,8 @@ class BusinessUnits extends AbstractPageFilteredGrid
                 "[contains(@class,'dropdown-menu__floating')]//a[@title= '{$contextName}']");
         } else {
             $result = $this->assertElementNotPresent(
-                "//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
+                "//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']"
+            );
         }
         return $result;
     }
