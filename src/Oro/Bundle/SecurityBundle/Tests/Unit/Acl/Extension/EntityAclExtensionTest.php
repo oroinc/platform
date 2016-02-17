@@ -412,12 +412,18 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             );
         }
 
+        $isRootType = $inputData['type'] === ObjectIdentityFactory::ROOT_IDENTITY_TYPE;
+
         $this->permissionManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->permissionManager->expects($this->any())
+        $this->permissionManager->expects($isRootType ? $this->never() : $this->once())
             ->method('getPermissionsForEntity')
             ->with($inputData['type'], AclGroupProviderInterface::DEFAULT_SECURITY_GROUP)
+            ->willReturn($inputData['permissions']);
+        $this->permissionManager->expects($isRootType ? $this->once() : $this->never())
+            ->method('getPermissionsForGroup')
+            ->with(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP)
             ->willReturn($inputData['permissions']);
         $this->permissionManager->expects($this->any())
             ->method('getPermissionsMap')
@@ -428,7 +434,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'DELETE' => 4,
                 'ASSIGN' => 5,
                 'SHARE'  => 6,
-                'PERMISSION' => 7
+                'PERMISSION' => 7,
+                'UNKNOWN' => 8,
             ]);
 
         /* @var $entityClassResolver EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject  */
@@ -711,7 +718,15 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                     'type' => ObjectIdentityFactory::ROOT_IDENTITY_TYPE,
                     'owner' => false,
                     'entityConfig' => [],
-                    'permissions' => null,
+                    'permissions' => [
+                        $this->getPermission(1, 'VIEW'),
+                        $this->getPermission(2, 'CREATE'),
+                        $this->getPermission(3, 'EDIT'),
+                        $this->getPermission(4, 'DELETE'),
+                        $this->getPermission(5, 'ASSIGN'),
+                        $this->getPermission(6, 'SHARE'),
+                        $this->getPermission(7, 'PERMISSION')
+                    ],
                 ],
                 'expected' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE', 'PERMISSION'],
             ],

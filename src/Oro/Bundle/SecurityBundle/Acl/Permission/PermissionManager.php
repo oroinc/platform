@@ -126,6 +126,17 @@ class PermissionManager
     }
 
     /**
+     * @param string $groupName
+     * @return Permission[]
+     */
+    public function getPermissionsForGroup($groupName)
+    {
+        $this->normalizeGroupName($groupName);
+
+        return $this->getRepository()->findBy(['id' => $this->findGroupPermissions($groupName)], ['id' => 'ASC']);
+    }
+
+    /**
      * @param string $name
      * @return Permission|null
      */
