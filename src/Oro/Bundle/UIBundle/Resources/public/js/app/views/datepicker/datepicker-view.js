@@ -59,12 +59,12 @@ define(function(require) {
             this.createFrontField(opts);
 
             this.$el.wrap('<span style="display:none"></span>');
-            if (this.$el.val() && this.$el.val().length) {
-                this.updateFront();
-            }
-
             if (!this.nativeMode) {
                 this.initPickerWidget(opts);
+            }
+
+            if (this.$el.val() && this.$el.val().length) {
+                this.updateFront();
             }
 
             DatePickerView.__super__.initialize.apply(this, arguments);

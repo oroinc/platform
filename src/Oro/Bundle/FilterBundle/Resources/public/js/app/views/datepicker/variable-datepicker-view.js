@@ -287,9 +287,20 @@ define(function(require) {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
-            } else {
+            }
+
+            var part = this.$variables.dateVariables('getPart');
+            if (part === 'value') {
                 value = VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
             }
+
+            switch (part) {
+                case 'dayofweek':
+                    return localeSettings.getCalendarDayOfWeekNames('wide')[value];
+                case 'month':
+                    return localeSettings.getCalendarMonthNames('wide')[value];
+            }
+
             return value;
         },
 
