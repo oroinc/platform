@@ -92,15 +92,13 @@ class OrmFilterExtension extends AbstractExtension
                 }
 
                 if ($form->isValid()) {
-
-                    $originalValues=[];
+                    $data = $form->getData();
                     if (isset($value['value']['start'])) {
-                        $originalValues['value']['start_original'] = $value['value']['start'];
+                        $data['value']['start_original'] = $value['value']['start'];
                     }
                     if (isset($value['value']['end'])) {
-                        $originalValues['value']['end_original'] = $value['value']['end'];
+                        $data['value']['end_original'] = $value['value']['end'];
                     }
-                    $data = array_merge_recursive($form->getData(), $originalValues);
                     $filter->apply($datasourceAdapter, $data);
                 }
             }
