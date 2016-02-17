@@ -58,6 +58,7 @@ class ConfigurationGmailType extends AbstractType
         $builder->addEventSubscriber(new DecodeFolderSubscriber());
         $this->addOwnerOrganizationEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);
+        $this->addPrepopulateRefreshTokenEventListener($builder);
         $builder->addEventSubscriber(new OriginFolderSubscriber());
         $builder->addEventSubscriber(new ApplySyncSubscriber());
 
@@ -67,8 +68,8 @@ class ConfigurationGmailType extends AbstractType
                 'attr' => ['class' => 'btn btn-primary']
             ])
             ->add('accessToken', 'hidden')
+            ->add('refreshToken', 'hidden')
             ->add('accessTokenExpiresAt', 'hidden')
-            ->add('googleAuthCode', 'hidden')
             ->add('imapHost', 'hidden', [
                 'required' => true,
                 'data' => GmailImap::DEFAULT_GMAIL_HOST
@@ -206,6 +207,38 @@ class ConfigurationGmailType extends AbstractType
                 }
             },
             3
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addPrepopulateRefreshTokenEventListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = (array) $event->getData();
+                /** @var UserEmailOrigin|null $entity */
+                $entity = $event->getForm()->getData();
+                $filtered = array_filter(
+                    $data,
+                    function ($item) {
+                        return !empty($item);
+                    }
+                );
+                if (count($filtered) > 0) {
+                    $refreshToken = $event->getForm()->get('refreshToken')->getData();
+                    if (empty($data['refreshToken']) && $refreshToken) {
+                        // populate refreshToken
+                        $data['refreshToken'] = $refreshToken;
+                    }
+                    $event->setData($data);
+                } elseif ($entity instanceof UserEmailOrigin) {
+                    $event->getForm()->setData(null);
+                }
+            },
+            4
         );
     }
 }

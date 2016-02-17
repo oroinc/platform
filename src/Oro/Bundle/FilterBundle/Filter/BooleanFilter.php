@@ -3,12 +3,16 @@
 namespace Oro\Bundle\FilterBundle\Filter;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class BooleanFilter extends AbstractFilter
 {
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * {@inheritdoc}
      */
@@ -71,6 +75,10 @@ class BooleanFilter extends AbstractFilter
         $metadata            = parent::getMetadata();
         $metadata['choices'] = $choices;
 
+        if (!empty($metadata['placeholder'])) {
+            $metadata['placeholder'] = $this->translator->trans($metadata['placeholder']);
+        }
+
         return $metadata;
     }
 
@@ -112,5 +120,13 @@ class BooleanFilter extends AbstractFilter
             default:
                 return $ds->expr()->neq($fieldName, 'true');
         }
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
     }
 }

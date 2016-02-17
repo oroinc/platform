@@ -141,46 +141,46 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
      */
     public function setDataProvider()
     {
-        return array(
-            'should bind correct data' => array(
-                array(
-                    'user'=>'test',
+        return [
+            'should bind correct data' => [
+                [
+                    'user' => 'test',
                     'imapHost' => 'imap.gmail.com',
                     'imapPort' => '993',
                     'imapEncryption' => 'ssl',
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' =>new \DateTime(),
+                    'accessTokenExpiresAt' => new \DateTime(),
                     'accessToken' => '1',
-                    'googleAuthCode' => '111'
-                ),
-                array(
-                    'user'=>'test',
+                    'refreshToken' => '111'
+                ],
+                [
+                    'user' => 'test',
                     'imapHost' => 'imap.gmail.com',
                     'imapPort' => '993',
                     'imapEncryption' => 'ssl',
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' =>new \DateTime(),
+                    'accessTokenExpiresAt' => new \DateTime(),
                     'accessToken' => '1',
-                    'googleAuthCode' => '111'
-                ),
-                array(
-                    'user'=>'test',
+                    'refreshToken' => '111'
+                ],
+                [
+                    'user' => 'test',
                     'imapHost' => 'imap.gmail.com',
                     'imapPort' => '993',
                     'imapEncryption' => 'ssl',
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' =>new \DateTime(),
+                    'accessTokenExpiresAt' => new \DateTime(),
                     'accessToken' => '1',
-                    'googleAuthCode' => '111'
-                ),
-            ),
-        );
+                    'refreshToken' => '111'
+                ],
+            ],
+        ];
     }
 
     /**

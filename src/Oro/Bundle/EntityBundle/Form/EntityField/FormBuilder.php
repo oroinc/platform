@@ -17,7 +17,8 @@ class FormBuilder
         'string' => 'text',
         'datetime' => 'oro_datetime',
         'date' => 'oro_date',
-        'boolean' => 'checkbox'
+        'boolean' => 'checkbox',
+        'float' => 'number'
     ];
 
     /** @var FormFactory */
