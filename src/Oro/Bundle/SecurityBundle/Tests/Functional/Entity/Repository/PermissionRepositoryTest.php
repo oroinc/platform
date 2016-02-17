@@ -54,21 +54,6 @@ class PermissionRepositoryTest extends WebTestCase
     }
 
     /**
-     * @param mixed $inputData
-     * @param mixed $expectedData
-     *
-     * @dataProvider findByIdsProvider
-     */
-    public function testFindByIds($inputData, $expectedData)
-    {
-        $permissions = $this->repository->findByIds(
-            $this->getPermissionsIds($inputData['ids'])
-        );
-
-        $this->assertEquals($expectedData, $this->getPermissionsNames($permissions, $inputData['permissions']));
-    }
-
-    /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
@@ -171,31 +156,6 @@ class PermissionRepositoryTest extends WebTestCase
                 'input' => [
                     'class' => 'TestEntity13',
                     'ids' => null,
-                    'permissions' => $permissions,
-                ],
-                'expected' => ['TEST_PERMISSION1', 'TEST_PERMISSION4'],
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function findByIdsProvider()
-    {
-        $permissions = ['TEST_PERMISSION1', 'TEST_PERMISSION2', 'TEST_PERMISSION3', 'TEST_PERMISSION4'];
-
-        return [
-            'empty ids' => [
-                'input' => [
-                    'ids' => [],
-                    'permissions' => $permissions,
-                ],
-                'expected' => [],
-            ],
-            'empty ids' => [
-                'input' => [
-                    'ids' => ['TEST_PERMISSION1', 'TEST_PERMISSION4'],
                     'permissions' => $permissions,
                 ],
                 'expected' => ['TEST_PERMISSION1', 'TEST_PERMISSION4'],

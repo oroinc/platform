@@ -46,20 +46,4 @@ class PermissionRepository extends EntityRepository
 
         return $queryBuilder->getQuery()->getResult();
     }
-
-    /**
-     * @param array $ids
-     * @return Permission[]
-     */
-    public function findByIds(array $ids)
-    {
-        if (empty($ids)) {
-            return [];
-        }
-
-        $queryBuilder = $this->createQueryBuilder('p');
-        $queryBuilder->where($queryBuilder->expr()->in('p.id', $ids));
-
-        return $queryBuilder->getQuery()->getResult();
-    }
 }

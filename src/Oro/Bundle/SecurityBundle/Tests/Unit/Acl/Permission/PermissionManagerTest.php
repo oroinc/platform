@@ -234,8 +234,8 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($inputData['cache']);
 
         $this->entityRepository->expects($this->once())
-            ->method('findByIds')
-            ->with($inputData['ids'])
+            ->method('findBy')
+            ->with(['id' => $inputData['ids']], ['id' => 'ASC'])
             ->willReturn($inputData['permissions']);
 
         $this->assertEquals(
