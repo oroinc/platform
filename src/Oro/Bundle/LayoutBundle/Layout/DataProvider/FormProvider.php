@@ -69,12 +69,7 @@ class FormProvider extends AbstractDataProvider implements FormProviderInterface
     public function getData(ContextInterface $context)
     {
         if (!$this->formAccessor) {
-            $action = $this->actionRoute ? FormAction::createByRoute($this->actionRoute) : null;
-            $options = $this->buildFormOptionsByContext($context);
-            $this->formAccessor = new FormAccessor(
-                $this->getForm(null, $options),
-                $action
-            );
+            $this->formAccessor = $this->createFormAccessor($context);
         }
 
         return $this->formAccessor;
@@ -85,24 +80,47 @@ class FormProvider extends AbstractDataProvider implements FormProviderInterface
      */
     public function getForm($data = null, array $options = [])
     {
-        if (!$this->formType) {
-            throw new \RuntimeException(sprintf('%s::formType should be defined', __CLASS__));
-        }
         if (!$this->form) {
-            $this->form = $this->formFactory->create($this->formType, $data, $options);
+            $this->form = $this->createForm($data, $options);
         }
 
         return $this->form;
     }
 
     /**
-     * Use $options['data'] for setting up form data.
      *
+     * @param ContextInterface $context
+     * @return FormAccessor
+     */
+    protected function createFormAccessor(ContextInterface $context)
+    {
+        $this->buildFormOptionsByContext($context);
+        $action = $this->actionRoute ? FormAction::createByRoute($this->actionRoute) : null;
+        return new FormAccessor(
+            $this->getForm(null, []),
+            $action
+        );
+    }
+
+    /**
      * @param ContextInterface $context
      * @return array
      */
     protected function buildFormOptionsByContext(ContextInterface $context)
     {
         return [];
+    }
+
+    /**
+     * @param mixed $data
+     * @param array $options
+     * @return FormInterface
+     */
+    protected function createForm($data = null, array $options = [])
+    {
+        if (!$this->formType) {
+            throw new \RuntimeException(sprintf('%s::formType should be defined', __CLASS__));
+        }
+        return $this->formFactory->create($this->formType, $data, $options);
     }
 }

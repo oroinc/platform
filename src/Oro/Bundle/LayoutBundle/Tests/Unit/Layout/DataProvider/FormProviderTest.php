@@ -59,7 +59,7 @@ class FormProviderTest extends \PHPUnit_Framework_TestCase
             ->with(self::FORM_TYPE, null, [])
             ->willReturn($this->form);
 
-        $form = $this->provider->getForm([]);
+        $form = $this->provider->getForm();
         $this->assertEquals($this->form, $form);
     }
 
