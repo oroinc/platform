@@ -40,7 +40,7 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            this.themeOptions = options.themeOptions || {};
+            _.extend(this, _.pick(options, ['themeOptions']));
             var state;
 
             this.rows = [];

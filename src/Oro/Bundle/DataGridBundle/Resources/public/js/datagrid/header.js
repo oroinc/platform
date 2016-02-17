@@ -35,7 +35,7 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            this.themeOptions = options.themeOptions || {};
+            _.extend(this, _.pick(options, ['themeOptions']));
             if (!options.collection) {
                 throw new TypeError('"collection" is required');
             }
