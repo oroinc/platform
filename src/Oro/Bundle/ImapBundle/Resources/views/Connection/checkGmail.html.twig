@@ -21,6 +21,7 @@
 
 {{ form_row(form.imapAccountType.userEmailOrigin.user) }}
 {{ form_row(form.imapAccountType.userEmailOrigin.accessToken) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.refreshToken) }}
 {{ form_row(form.imapAccountType.userEmailOrigin.clientId) }}
 {{ form_row(form.imapAccountType.userEmailOrigin.imapPort) }}
 {{ form_row(form.imapAccountType.userEmailOrigin.imapHost) }}
@@ -29,4 +30,9 @@
 {{ form_row(form.imapAccountType.userEmailOrigin.smtpHost) }}
 {{ form_row(form.imapAccountType.userEmailOrigin.smtpEncryption) }}
 {{ form_row(form.imapAccountType.userEmailOrigin.accessTokenExpiresAt) }}
-{{ form_row(form.imapAccountType.userEmailOrigin.googleAuthCode) }}
+
+<div class="control-group">
+    <div class="controls">
+        <div class="google-alert google-connection-status alert alert-error" style="display: none"></div>
+    </div>
+</div>

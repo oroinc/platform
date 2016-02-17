@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
+use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -25,6 +26,11 @@ class InsertFromSelectQueryExecutorTest extends WebTestCase
      */
     protected $queryExecutor;
 
+    /**
+     * @var NativeQueryExecutorHelper
+     */
+    protected $helper;
+
     public function setUp()
     {
         $this->initClient();
@@ -34,8 +40,9 @@ class InsertFromSelectQueryExecutorTest extends WebTestCase
         ]);
 
         $this->registry = $this->getContainer()->get('doctrine');
+        $this->helper = $this->getContainer()->get('oro_entity.orm.native_query_executor_helper');
 
-        $this->queryExecutor = new InsertFromSelectQueryExecutor($this->registry);
+        $this->queryExecutor = new InsertFromSelectQueryExecutor($this->helper);
     }
 
     public function testExecute()

@@ -17,12 +17,25 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var bool */
+    protected $excludeHiddenEntities;
+
+    /** @var bool */
+    protected $excludeHiddenFields;
+
     /**
      * @param ConfigManager $configManager
+     * @param bool          $excludeHiddenEntities
+     * @param bool          $excludeHiddenFields
      */
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
+    public function __construct(
+        ConfigManager $configManager,
+        $excludeHiddenEntities = false,
+        $excludeHiddenFields = false
+    ) {
+        $this->configManager         = $configManager;
+        $this->excludeHiddenEntities = $excludeHiddenEntities;
+        $this->excludeHiddenFields   = $excludeHiddenFields;
     }
 
     /**
@@ -38,7 +51,7 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
 
         return
             !ExtendHelper::isEntityAccessible($extendConfig)
-            || $this->configManager->isHiddenModel($className);
+            || ($this->excludeHiddenEntities && $this->configManager->isHiddenModel($className));
     }
 
     /**
@@ -54,7 +67,7 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
 
         return
             !ExtendHelper::isFieldAccessible($extendFieldConfig)
-            || $this->configManager->isHiddenModel($metadata->name, $fieldName);
+            || ($this->excludeHiddenFields && $this->configManager->isHiddenModel($metadata->name, $fieldName));
     }
 
     /**
@@ -68,14 +81,22 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
 
         $extendFieldConfig = $this->configManager->getFieldConfig('extend', $metadata->name, $associationName);
 
-        return
-            !ExtendHelper::isFieldAccessible($extendFieldConfig)
-            || $this->configManager->isHiddenModel($metadata->name, $associationName)
-            || (
-                $extendFieldConfig->has('target_entity')
-                && !ExtendHelper::isEntityAccessible(
-                    $this->configManager->getEntityConfig('extend', $extendFieldConfig->get('target_entity'))
-                )
-            );
+        if (!ExtendHelper::isFieldAccessible($extendFieldConfig)) {
+            return true;
+        }
+        if ($this->excludeHiddenFields && $this->configManager->isHiddenModel($metadata->name, $associationName)) {
+            return true;
+        }
+        if ($extendFieldConfig->has('target_entity')) {
+            $targetEntity = $extendFieldConfig->get('target_entity');
+            if (!ExtendHelper::isEntityAccessible($this->configManager->getEntityConfig('extend', $targetEntity))) {
+                return true;
+            }
+            if ($this->excludeHiddenEntities && $this->configManager->isHiddenModel($targetEntity)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

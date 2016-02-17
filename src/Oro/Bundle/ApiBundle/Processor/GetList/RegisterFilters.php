@@ -52,7 +52,7 @@ class RegisterFilters implements ProcessorInterface
                 continue;
             }
             $filter = $this->createFilter(
-                !empty($fieldConfig[ConfigUtil::PROPERTY_PATH]) ? $fieldConfig[ConfigUtil::PROPERTY_PATH] : $field,
+                ConfigUtil::getPropertyPath($fieldConfig, $field),
                 $fieldConfig
             );
             if (null !== $filter) {

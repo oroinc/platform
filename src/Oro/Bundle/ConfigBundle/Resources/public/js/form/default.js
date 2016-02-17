@@ -35,16 +35,13 @@ define([
             var checkboxEls = $('.parent-scope-checkbox input');
             checkboxEls.on('change', function() {
                 value = $(this).is(':checked');
-                valueEls = $(this).parents('.controls').find(':input').not(checkboxEls);
+                valueEls = $(this).parents('.controls').find(':input, a.btn, button').not(checkboxEls);
                 valueEls.each(function(i, el) {
                     $(el)
                         .prop('disabled', value)
                         .data('disabled', value)
+                        .attr('disabled', value)
                         .trigger(value ? 'disable' : 'enable');
-
-                    if (value && $(el).hasClass('select2')) {
-                        $(el).select2('val', null, true);
-                    }
 
                     if (!_.isUndefined($.uniform) && _.contains($.uniform.elements, el)) {
                         $(el).uniform('update');
