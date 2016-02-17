@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\FieldConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -21,17 +20,15 @@ class CompleteDefinitionByConfig extends CompleteDefinition
      * @param DoctrineHelper             $doctrineHelper
      * @param ExclusionProviderInterface $exclusionProvider
      * @param ConfigProvider             $configProvider
-     * @param FieldConfigProvider        $fieldConfigProvider
      * @param RelationConfigProvider     $relationConfigProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ExclusionProviderInterface $exclusionProvider,
         ConfigProvider $configProvider,
-        FieldConfigProvider $fieldConfigProvider,
         RelationConfigProvider $relationConfigProvider
     ) {
-        parent::__construct($doctrineHelper, $exclusionProvider, $configProvider, $fieldConfigProvider);
+        parent::__construct($doctrineHelper, $exclusionProvider, $configProvider);
 
         $this->relationConfigProvider = $relationConfigProvider;
     }

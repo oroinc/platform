@@ -8,7 +8,6 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\FieldConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
@@ -24,25 +23,19 @@ class CompleteDefinition implements ProcessorInterface
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /** @var FieldConfigProvider */
-    protected $fieldConfigProvider;
-
     /**
      * @param DoctrineHelper             $doctrineHelper
      * @param ExclusionProviderInterface $exclusionProvider
      * @param ConfigProvider             $configProvider
-     * @param FieldConfigProvider        $fieldConfigProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ExclusionProviderInterface $exclusionProvider,
-        ConfigProvider $configProvider,
-        FieldConfigProvider $fieldConfigProvider
+        ConfigProvider $configProvider
     ) {
-        $this->doctrineHelper      = $doctrineHelper;
-        $this->exclusionProvider   = $exclusionProvider;
-        $this->configProvider      = $configProvider;
-        $this->fieldConfigProvider = $fieldConfigProvider;
+        $this->doctrineHelper    = $doctrineHelper;
+        $this->exclusionProvider = $exclusionProvider;
+        $this->configProvider    = $configProvider;
     }
 
     /**
@@ -102,7 +95,7 @@ class CompleteDefinition implements ProcessorInterface
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $definition = $this->getFields($definition, $metadata, $version, $requestType, $extras);
+        $definition = $this->getFields($definition, $metadata);
         $definition = $this->getAssociations($definition, $metadata, $version, $requestType, $extras);
 
         return $definition;
@@ -111,19 +104,11 @@ class CompleteDefinition implements ProcessorInterface
     /**
      * @param array         $definition
      * @param ClassMetadata $metadata
-     * @param string        $version
-     * @param string[]      $requestType
-     * @param array         $extras
      *
      * @return array
      */
-    protected function getFields(
-        array $definition,
-        ClassMetadata $metadata,
-        $version,
-        array $requestType,
-        array $extras
-    ) {
+    protected function getFields(array $definition, ClassMetadata $metadata)
+    {
         $fieldNames = $metadata->getFieldNames();
         foreach ($fieldNames as $fieldName) {
             if (array_key_exists($fieldName, $definition)) {
@@ -131,14 +116,7 @@ class CompleteDefinition implements ProcessorInterface
                 continue;
             }
 
-            $config = $this->fieldConfigProvider->getFieldConfig(
-                $metadata->name,
-                $fieldName,
-                $version,
-                $requestType,
-                $extras
-            );
-
+            $config = [ConfigUtil::DEFINITION => []];
             if ($this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                 $config[ConfigUtil::DEFINITION][ConfigUtil::EXCLUDE] = true;
             }
