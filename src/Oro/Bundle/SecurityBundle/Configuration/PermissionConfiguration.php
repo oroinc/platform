@@ -43,8 +43,8 @@ class PermissionConfiguration implements ConfigurationInterface
         $nodeDefinition
             ->children()
                 ->scalarNode('label')
-                    ->isRequired()
-                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('description')
                 ->end()
                 ->arrayNode('group_names')
                     ->defaultValue([static::DEFAULT_GROUP_NAME])
@@ -75,8 +75,6 @@ class PermissionConfiguration implements ConfigurationInterface
                 ->arrayNode('exclude_entities')
                     ->prototype('scalar')
                     ->end()
-                ->end()
-                ->scalarNode('description')
                 ->end()
             ->end();
 

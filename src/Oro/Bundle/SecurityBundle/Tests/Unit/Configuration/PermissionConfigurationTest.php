@@ -39,12 +39,9 @@ class PermissionConfigurationTest extends \PHPUnit_Framework_TestCase
         return [
             'minimum data' => [
                 'configuration' => [
-                    'permission1' => [
-                        'label' => 'My Label',
-                    ],
+                    'permission1' => []
                 ],
                 'expected' => [
-                    'label' => 'My Label',
                     'apply_to_all' => true,
                     'group_names' => ['default'],
                     'exclude_entities' => [],
@@ -87,23 +84,5 @@ class PermissionConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The child node "label" at path "permission" must be configured.
-     */
-    public function testProcessNoLabel()
-    {
-        $this->configuration->processConfiguration(['permission1' => []]);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The path "permission.label" cannot contain an empty value, but got "".
-     */
-    public function testProcessEmptyLabel()
-    {
-        $this->configuration->processConfiguration(['permission1' => ['label' => '']]);
     }
 }
