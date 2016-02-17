@@ -6,11 +6,11 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 class GroupNode
 {
-    const TYPE_COMPUTED = 'computed';
+    const TYPE_COMPUTED   = 'computed';
     const TYPE_UNCOMPUTED = 'uncomputed';
-    const TYPE_MIXED = 'mixed';
+    const TYPE_MIXED      = 'mixed';
 
-    /** @var string*/
+    /** @var string */
     protected $condition;
 
     /** @var GroupNode[]|Restriction[] */
@@ -63,7 +63,7 @@ class GroupNode
     }
 
     /**
-     * @param GroupNode[]|Restriction[] $node
+     * @return GroupNode[]|Restriction[]
      */
     public function getChildren()
     {
@@ -83,47 +83,48 @@ class GroupNode
      */
     public function getType()
     {
-        $mixed = ArrayUtil::some(
-            function ($node) {
-                if ($node instanceof GroupNode) {
-                    return $node->getType() === GroupNode::TYPE_MIXED;
-                }
-
-                return false;
-            },
-            $this->nodes
-        );
+        $mixed = $this->typedNodesExists(GroupNode::TYPE_MIXED);
 
         if ($mixed) {
             return GroupNode::TYPE_MIXED;
         }
 
-        $computed = ArrayUtil::some(
-            function ($node) {
-                if ($node instanceof GroupNode) {
-                    return $node->getType() === GroupNode::TYPE_COMPUTED;
-                }
-
-                return $node->isComputed();
-            },
-            $this->nodes
-        );
-
-        $unComputed = ArrayUtil::some(
-            function ($node) {
-                if ($node instanceof GroupNode) {
-                    return $node->getType() === GroupNode::TYPE_UNCOMPUTED;
-                }
-
-                return !$node->isComputed();
-            },
-            $this->nodes
-        );
+        $computed   = $this->typedNodesExists(GroupNode::TYPE_COMPUTED);
+        $unComputed = $this->typedNodesExists(GroupNode::TYPE_UNCOMPUTED);
 
         if ($computed && $unComputed) {
             return static::TYPE_MIXED;
         }
 
         return $computed ? static::TYPE_COMPUTED : static::TYPE_UNCOMPUTED;
+    }
+
+    /**
+     * @param $type
+     *
+     * @return bool
+     */
+    protected function typedNodesExists($type)
+    {
+        return ArrayUtil::some(
+            function ($node) use ($type) {
+                $exists = false;
+
+                if ($node instanceof GroupNode) {
+                    $exists = $node->getType() === $type;
+                } else {
+                    switch ($type) {
+                        case GroupNode::TYPE_COMPUTED:
+                            $exists = $node->isComputed();
+                            break;
+                        case GroupNode::TYPE_UNCOMPUTED:
+                            $exists = !$node->isComputed();
+                    }
+                }
+
+                return $exists;
+            },
+            $this->nodes
+        );
     }
 }

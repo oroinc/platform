@@ -48,7 +48,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.dateInputAttrs - Attributes for date HTML input element
      * @param {Object} options.datePickerOptions - See [documentation here](http://goo.gl/pddxZU)
@@ -74,7 +73,9 @@ define(function(require) {
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
                 placeholder: __('oro.form.choose_date'),
-                'data-validation': JSON.stringify({Date: {}})
+                name: 'date',
+                autocomplete: 'off',
+                'data-validation': JSON.stringify({Date: {}}),
             },
             datePickerOptions: {
                 altFormat: 'yy-mm-dd',
@@ -94,15 +95,23 @@ define(function(require) {
 
         render: function() {
             DateEditorView.__super__.render.call(this);
+            var $input;
             var View = this.view;
             this.view = new View(this.getViewOptions());
+            if (this.options.value) {
+                this.setFormState(this.options.value);
+            }
+            this.view.getDatePickerWidget().on('mousedown' + this.eventNamespace(), _.bind(function() {
+                this._isDateSelection = true;
+            }, this));
             // fix enter behaviour
-            this.$('.hasDatepicker').bindFirst('keydown' + this.eventNamespace(),
+            $input = this.$('.hasDatepicker');
+            $input.bindFirst('keydown' + this.eventNamespace(),
                 _.bind(this.onGenericEnterKeydown, this));
             // fix esc behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
+            $input.on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
             // fix arrows behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
+            $input.on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
         },
 
         onGenericEnterKeydown: function(e) {
@@ -136,6 +145,7 @@ define(function(require) {
                 return;
             }
             this.$('.hasDatepicker').off(this.eventNamespace());
+            this.view.getDatePickerWidget().off(this.eventNamespace());
             this.view.dispose();
             DateEditorView.__super__.dispose.call(this);
         },
@@ -156,21 +166,29 @@ define(function(require) {
             this.$('input.hasDatepicker').setCursorToEnd().focus();
         },
 
-        getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
+        onFocusout: function(e) {
+            if (this._isFocused && this._isDateSelection) {
+                delete this._isDateSelection;
+                this.focus();
+            } else {
+                DateEditorView.__super__.onFocusout.call(this, e);
+            }
+        },
+
+        parseRawValue: function(value) {
             try {
-                return datetimeFormatter.getMomentForBackendDate(raw);
+                return datetimeFormatter.getMomentForBackendDate(value);
             } catch (e) {
                 try {
-                    return datetimeFormatter.getMomentForBackendDateTime(raw);
+                    return datetimeFormatter.getMomentForBackendDateTime(value);
                 } catch (e2) {
                     return null;
                 }
             }
         },
 
-        getFormattedValue: function() {
-            var value = this.getModelValue();
+        formatRawValue: function(value) {
+            value = this.parseRawValue(value);
             if (value === null) {
                 return '';
             }

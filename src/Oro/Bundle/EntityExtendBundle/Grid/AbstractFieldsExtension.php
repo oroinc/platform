@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfiguration;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -107,7 +108,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $qb->leftJoin(sprintf('%s.%s', $alias, $fieldName), $joinAlias);
                     $columnDataName = $fieldName;
                     $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
-                    $selectExpr     = sprintf('%s as %s', $sorterDataName, $fieldName);
+                    $selectExpr     = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
                     break;
                 case 'multiEnum':
                     $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
@@ -173,9 +174,19 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     {
         $fieldName = $field->getFieldName();
 
+        // if field is "visible as mandatory" it is required in grid settings and rendered
+        // if field is just "visible" it's rendered by default and manageable in grid settings
+        // otherwise - not required and hidden by default.
+        $gridVisibilityValue = $this->getFieldConfig('datagrid', $field)->get('is_visible');
+
+        $isRequired   = $gridVisibilityValue === DatagridScope::IS_VISIBLE_MANDATORY;
+        $isRenderable = $isRequired ? : $gridVisibilityValue === DatagridScope::IS_VISIBLE_TRUE;
+
         $columnOptions = [
             DatagridGuesser::FORMATTER => [
-                'label' => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName
+                'label'      => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName,
+                'renderable' => $isRenderable,
+                'required'   => $isRequired
             ],
             DatagridGuesser::SORTER    => [
                 'data_name' => $fieldName

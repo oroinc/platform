@@ -21,7 +21,7 @@ class DateEarlierThanValidator extends ConstraintValidator
         $root = $this->context->getRoot();
 
         if ($root instanceof FormInterface) {
-            $valueCompare = $root->get($constraint->field)->getData();
+            $valueCompare = $root->has($constraint->field) ? $root->get($constraint->field)->getData() : false;
         } else {
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
             $valueCompare = $propertyAccessor->getValue($root, $constraint->field);

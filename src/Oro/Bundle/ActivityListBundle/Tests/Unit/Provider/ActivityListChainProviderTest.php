@@ -62,6 +62,74 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->addProvider($this->testActivityProvider);
     }
 
+    public function testIsApplicableTarget()
+    {
+        $targetClassName   = TestActivityProvider::SUPPORTED_TARGET_CLASS_NAME;
+        $activityClassName = TestActivityProvider::ACTIVITY_CLASS_NAME;
+
+        $this->configManager->expects($this->any())
+            ->method('hasConfig')
+            ->with($targetClassName)
+            ->willReturn(true);
+        $this->configManager->expects($this->any())
+            ->method('getId')
+            ->with('entity', $targetClassName)
+            ->willReturn(new EntityConfigId('entity', $targetClassName));
+
+        $this->assertTrue(
+            $this->provider->isApplicableTarget($targetClassName, $activityClassName)
+        );
+    }
+
+    public function testIsApplicableTargetForNotSupportedTargetEntity()
+    {
+        $targetClassName   = 'Test\NotSupportedTargetEntity';
+        $activityClassName = TestActivityProvider::ACTIVITY_CLASS_NAME;
+
+        $this->configManager->expects($this->any())
+            ->method('hasConfig')
+            ->with($targetClassName)
+            ->willReturn(true);
+        $this->configManager->expects($this->any())
+            ->method('getId')
+            ->with('entity', $targetClassName)
+            ->willReturn(new EntityConfigId('entity', $targetClassName));
+
+        $this->assertFalse(
+            $this->provider->isApplicableTarget($targetClassName, $activityClassName)
+        );
+    }
+
+    public function testIsApplicableTargetForNotRegisteredActivityEntity()
+    {
+        $targetClassName   = TestActivityProvider::SUPPORTED_TARGET_CLASS_NAME;
+        $activityClassName = 'Test\NotRegisteredActivityEntity';
+
+        $this->configManager->expects($this->never())
+            ->method('hasConfig');
+
+        $this->assertFalse(
+            $this->provider->isApplicableTarget($targetClassName, $activityClassName)
+        );
+    }
+
+    public function testIsApplicableTargetForNotConfigurableTargetEntity()
+    {
+        $targetClassName   = 'Test\NotConfigurableTargetEntity';
+        $activityClassName = TestActivityProvider::ACTIVITY_CLASS_NAME;
+
+        $this->configManager->expects($this->any())
+            ->method('hasConfig')
+            ->with($targetClassName)
+            ->willReturn(false);
+        $this->configManager->expects($this->never())
+            ->method('getId');
+
+        $this->assertFalse(
+            $this->provider->isApplicableTarget($targetClassName, $activityClassName)
+        );
+    }
+
     public function testGetSupportedActivities()
     {
         $this->assertEquals(

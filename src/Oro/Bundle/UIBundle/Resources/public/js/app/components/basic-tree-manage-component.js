@@ -40,6 +40,11 @@ define(function(require) {
         /**
          * @property {String}
          */
+        onRootSelectRoute: '',
+
+        /**
+         * @property {String}
+         */
         onMoveRoute: '',
 
         /**
@@ -55,6 +60,7 @@ define(function(require) {
             this.reloadWidget = options.reloadWidget;
             this.onSelectRoute = options.onSelectRoute;
             this.onMoveRoute = options.onMoveRoute;
+            this.onRootSelectRoute = options.onRootSelectRoute;
 
             this.$tree.on('select_node.jstree', _.bind(this.onSelect, this));
             this.$tree.on('move_node.jstree', _.bind(this.onMove, this));
@@ -79,15 +85,19 @@ define(function(require) {
         /**
          * Triggers after node selection in tree
          *
-         * @param {Object} node
+         * @param {Event} e
          * @param {Object} selected
          */
-        onSelect: function(node, selected) {
+        onSelect: function(e, selected) {
             if (this.initialization || !this.updateAllowed) {
                 return;
             }
-
-            var url = routing.generate(this.onSelectRoute, {id: selected.node.id});
+            var url;
+            if (this.onRootSelectRoute && selected.node.parent === '#') {
+                url = routing.generate(this.onRootSelectRoute, {id: selected.node.id});
+            } else {
+                url = routing.generate(this.onSelectRoute, {id: selected.node.id});
+            }
             mediator.execute('redirectTo', {url: url});
         },
 

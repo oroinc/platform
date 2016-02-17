@@ -5,11 +5,12 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
@@ -17,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
 {
@@ -112,15 +114,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $config        = $entityProvider->getConfig($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
 
-            if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
-                $text = [];
-                foreach ($fields as $field) {
-                    $text[] = $this->mapper->getFieldValue($target, $field);
-                }
-                $item['title'] = implode(' ', $text);
-            } else {
-                $item['title'] = $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
-            }
+            $item = $this->prepareItemTitle($item, $targetClass, $target, $targetId);
 
             $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);
             $item['entityId']           = $id;
@@ -130,6 +124,8 @@ class ActivityContextApiEntityManager extends ApiEntityManager
 
             $item['icon'] = $config->get('icon');
             $item['link'] = $this->getContextLink($targetClass, $targetId);
+
+            $item = $this->dispatchContextTitle($item, $targetClass);
 
             $result[] = $item;
         }
@@ -169,5 +165,47 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         }
 
         return $link;
+    }
+
+    /**
+     * @param $item
+     * @param $targetClass
+     * @return array
+     */
+    protected function dispatchContextTitle($item, $targetClass)
+    {
+        if ($this->eventDispatcher) {
+            $event = new PrepareContextTitleEvent($item, $targetClass);
+            $this->eventDispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
+            $item = $event->getItem();
+        }
+
+        return $item;
+    }
+
+    /**
+     * @param $item
+     * @param $targetClass
+     * @param $target
+     * @param $targetId
+     *
+     * @return mixed
+     */
+    protected function prepareItemTitle($item, $targetClass, $target, $targetId)
+    {
+        if (!array_key_exists('title', $item) || !$item['title']) {
+            if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
+                $text = [];
+                foreach ($fields as $field) {
+                    $text[] = $this->mapper->getFieldValue($target, $field);
+                }
+                $item['title'] = implode(' ', $text);
+                return $item;
+            } else {
+                $item['title'] = $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
+                return $item;
+            }
+        }
+        return $item;
     }
 }

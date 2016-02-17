@@ -10,12 +10,14 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -23,11 +25,9 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 
 /**
  * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
@@ -77,16 +77,26 @@ class EmailActivityListProvider implements
     /** @var ServiceLink */
     protected $mailboxProcessStorageLink;
 
+    /** @var ActivityAssociationHelper */
+    protected $activityAssociationHelper;
+
+    /** @var CommentAssociationHelper */
+    protected $commentAssociationHelper;
+
     /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param ServiceLink           $doctrineRegistryLink
-     * @param EntityNameResolver    $entityNameResolver
-     * @param Router                $router
-     * @param ConfigManager         $configManager
-     * @param EmailThreadProvider   $emailThreadProvider
-     * @param HtmlTagHelper         $htmlTagHelper
-     * @param ServiceLink           $securityFacadeLink
-     * @param ServiceLink           $mailboxProcessStorageLink
+     * @param DoctrineHelper            $doctrineHelper
+     * @param ServiceLink               $doctrineRegistryLink
+     * @param EntityNameResolver        $entityNameResolver
+     * @param Router                    $router
+     * @param ConfigManager             $configManager
+     * @param EmailThreadProvider       $emailThreadProvider
+     * @param HtmlTagHelper             $htmlTagHelper
+     * @param ServiceLink               $securityFacadeLink
+     * @param ServiceLink               $mailboxProcessStorageLink
+     * @param ActivityAssociationHelper $activityAssociationHelper
+     * @param CommentAssociationHelper  $commentAssociationHelper
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -97,17 +107,21 @@ class EmailActivityListProvider implements
         EmailThreadProvider $emailThreadProvider,
         HtmlTagHelper $htmlTagHelper,
         ServiceLink $securityFacadeLink,
-        ServiceLink $mailboxProcessStorageLink
+        ServiceLink $mailboxProcessStorageLink,
+        ActivityAssociationHelper $activityAssociationHelper,
+        CommentAssociationHelper $commentAssociationHelper
     ) {
-        $this->doctrineHelper        = $doctrineHelper;
-        $this->doctrineRegistryLink  = $doctrineRegistryLink;
-        $this->entityNameResolver    = $entityNameResolver;
-        $this->router                = $router;
-        $this->configManager         = $configManager;
-        $this->emailThreadProvider   = $emailThreadProvider;
-        $this->htmlTagHelper         = $htmlTagHelper;
-        $this->securityFacadeLink    = $securityFacadeLink;
+        $this->doctrineHelper            = $doctrineHelper;
+        $this->doctrineRegistryLink      = $doctrineRegistryLink;
+        $this->entityNameResolver        = $entityNameResolver;
+        $this->router                    = $router;
+        $this->configManager             = $configManager;
+        $this->emailThreadProvider       = $emailThreadProvider;
+        $this->htmlTagHelper             = $htmlTagHelper;
+        $this->securityFacadeLink        = $securityFacadeLink;
         $this->mailboxProcessStorageLink = $mailboxProcessStorageLink;
+        $this->activityAssociationHelper = $activityAssociationHelper;
+        $this->commentAssociationHelper  = $commentAssociationHelper;
     }
 
     /**
@@ -121,13 +135,13 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
+    public function isApplicableTarget($entityClass, $accessible = true)
     {
-        $provider = $configManager->getProvider('activity');
-
-        return $provider->hasConfigById($configId)
-            && $provider->getConfigById($configId)->has('activities')
-            && in_array(self::ACTIVITY_CLASS, $provider->getConfigById($configId)->get('activities'));
+        return $this->activityAssociationHelper->isActivityAssociationEnabled(
+            $entityClass,
+            self::ACTIVITY_CLASS,
+            $accessible
+        );
     }
 
     /**
@@ -338,11 +352,9 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function hasComments(ConfigManager $configManager, $entity)
+    public function isCommentsEnabled($entityClass)
     {
-        $config = $configManager->getProvider('comment')->getConfig($entity);
-
-        return $config->is('enabled');
+        return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
     }
 
     /**

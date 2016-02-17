@@ -8,11 +8,11 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper;
 
 class NoteActivityListProvider implements
     ActivityListProviderInterface,
@@ -29,26 +29,36 @@ class NoteActivityListProvider implements
     /** @var ServiceLink */
     protected $entityOwnerAccessorLink;
 
+    /** @var NoteAssociationHelper */
+    protected $noteAssociationHelper;
+
+    /** @var CommentAssociationHelper */
+    protected $commentAssociationHelper;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ServiceLink    $entityOwnerAccessorLink
+     * @param DoctrineHelper           $doctrineHelper
+     * @param ServiceLink              $entityOwnerAccessorLink
+     * @param NoteAssociationHelper    $noteAssociationHelper
+     * @param CommentAssociationHelper $commentAssociationHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ServiceLink $entityOwnerAccessorLink)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->entityOwnerAccessorLink = $entityOwnerAccessorLink;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ServiceLink $entityOwnerAccessorLink,
+        NoteAssociationHelper $noteAssociationHelper,
+        CommentAssociationHelper $commentAssociationHelper
+    ) {
+        $this->doctrineHelper           = $doctrineHelper;
+        $this->entityOwnerAccessorLink  = $entityOwnerAccessorLink;
+        $this->noteAssociationHelper    = $noteAssociationHelper;
+        $this->commentAssociationHelper = $commentAssociationHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
+    public function isApplicableTarget($entityClass, $accessible = true)
     {
-        $provider = $configManager->getProvider('note');
-
-        return $provider->hasConfigById($configId)
-            && $provider->getConfigById($configId)->has('enabled')
-            && $provider->getConfigById($configId)->get('enabled');
+        return $this->noteAssociationHelper->isNoteAssociationEnabled($entityClass, $accessible);
     }
 
     /**
@@ -189,11 +199,9 @@ class NoteActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function hasComments(ConfigManager $configManager, $entity)
+    public function isCommentsEnabled($entityClass)
     {
-        $config = $configManager->getProvider('comment')->getConfig($entity);
-
-        return $config->is('enabled');
+        return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
     }
 
     /**

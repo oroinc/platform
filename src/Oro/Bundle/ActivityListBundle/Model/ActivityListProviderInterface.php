@@ -2,24 +2,25 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 interface ActivityListProviderInterface
 {
     /**
-     * Returns true if given target $configId is supported by activity
+     * Checks whether the activity list can contain a given entity
      *
-     * @param ConfigIdInterface $configId
-     * @param ConfigManager     $configManager
+     * @param string $entityClass The target entity class
+     * @param bool   $accessible  Whether only targets are ready to be used in a business logic should be returned.
+     *                            It means that an association with the target entity should exist
+     *                            and should not be marked as deleted.
+     *
      *
      * @return bool
      */
-    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager);
+    public function isApplicableTarget($entityClass, $accessible = true);
 
     /**
      * @param object $entity

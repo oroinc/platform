@@ -134,7 +134,6 @@ class DateModifierProvider implements DateModifierInterface
     public function getDateParts()
     {
         return [
-            self::PART_SOURCE  => 'oro.filter.form.label_date_part.' . self::PART_SOURCE,
             self::PART_VALUE   => 'oro.filter.form.label_date_part.' . self::PART_VALUE,
             self::PART_DOW     => 'oro.filter.form.label_date_part.' . self::PART_DOW,
             self::PART_WEEK    => 'oro.filter.form.label_date_part.' . self::PART_WEEK,

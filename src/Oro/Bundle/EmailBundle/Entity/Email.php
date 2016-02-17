@@ -41,6 +41,10 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *              "acl"="oro_email_email_view",
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
+ *          },
+ *          "grid"={
+ *              "default"="email-grid",
+ *              "context"="email-for-context-grid"
  *          }
  *      }
  * )
@@ -229,6 +233,12 @@ class Email extends ExtendEmail
      * @ORM\Column(type="text", nullable=true)
      */
     protected $acceptLanguageHeader;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="body_synced", type="boolean", nullable=true, options={"default"=false})
+     */
+    protected $bodySynced;
 
     public function __construct()
     {
@@ -824,5 +834,25 @@ class Email extends ExtendEmail
     public function __toString()
     {
         return (string)$this->getSubject();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBodySynced()
+    {
+        return $this->bodySynced;
+    }
+
+    /**
+     * @param $bodySynced
+     *
+     * @return Email
+     */
+    public function setBodySynced($bodySynced)
+    {
+        $this->bodySynced = $bodySynced;
+
+        return $this;
     }
 }

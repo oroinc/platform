@@ -567,6 +567,7 @@
                     {% set urlParts = {
                         grid: {
                             route: form.vars.grid_widget_route|default('oro_datagrid_widget'),
+                            gridWidgetView: form.vars.grid_view_widget_route|default('oro_datagrid_widget'),
                             parameters: {
                                 gridName     : form.vars.grid_name,
                                 params       : form.vars.grid_parameters,

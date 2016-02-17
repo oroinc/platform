@@ -32,8 +32,7 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
         $resolver->expects($this->at(0))
             ->method('setDefaults')
             ->with([
-                'type' => 'oro_email_email_folder',
-                'allow_add' => true,
+                'allow_extra_fields' => true
             ]);
 
         $this->emailFolderTreeType->setDefaultOptions($resolver);
@@ -41,7 +40,7 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('collection', $this->emailFolderTreeType->getParent());
+        $this->assertEquals('form', $this->emailFolderTreeType->getParent());
     }
 
     public function testGetName()

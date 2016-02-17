@@ -56,7 +56,7 @@ class FieldAccessor
         if (ConfigUtil::isExcludeAll($config)) {
             if (!empty($config[ConfigUtil::FIELDS])) {
                 foreach ($config[ConfigUtil::FIELDS] as $field => $fieldConfig) {
-                    if (null === $fieldConfig || !ConfigUtil::isExclude($fieldConfig)) {
+                    if (!$this->isExcludedField($fieldConfig)) {
                         $result[] = $field;
                     }
                 }
@@ -67,11 +67,15 @@ class FieldAccessor
             foreach ($fields as $field) {
                 if (ConfigUtil::hasFieldConfig($config, $field)) {
                     $fieldConfig = $config[ConfigUtil::FIELDS][$field];
-                    if (null === $fieldConfig || !ConfigUtil::isExclude($fieldConfig)) {
+                    if (!$this->isExcludedField($fieldConfig)) {
                         $result[] = $field;
                     }
                 } elseif ($this->isApplicableField($entityClass, $field)) {
-                    $result[] = $field;
+                    // @todo: ignore not configured relations to avoid infinite loop
+                    // it is a temporary fix until the identifier field will not be used by default for them
+                    if (!$entityMetadata->isAssociation($field)) {
+                        $result[] = $field;
+                    }
                 }
             }
             if (!empty($config[ConfigUtil::FIELDS])) {
@@ -185,5 +189,15 @@ class FieldAccessor
         return null !== $this->entityFieldFilter
             ? $this->entityFieldFilter->isApplicableField($entityClass, $field)
             : true;
+    }
+
+    /**
+     * @param mixed $fieldConfig
+     *
+     * @return bool
+     */
+    protected function isExcludedField($fieldConfig)
+    {
+        return null !== $fieldConfig && ConfigUtil::isExclude($fieldConfig);
     }
 }

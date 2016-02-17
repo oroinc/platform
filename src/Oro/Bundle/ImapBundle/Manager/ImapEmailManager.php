@@ -152,6 +152,16 @@ class ImapEmailManager
     }
 
     /**
+     * Returns UIDs for currently selected folder
+     *
+     * @return array
+     */
+    public function getEmailUIDs()
+    {
+        return $this->connector->findUIDs('ALL');
+    }
+
+    /**
      * Retrieve email by its UID
      *
      * @param int $uid The UID of an email message

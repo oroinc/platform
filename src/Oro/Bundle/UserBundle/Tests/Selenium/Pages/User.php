@@ -378,7 +378,7 @@ class User extends AbstractPageEntity
     public function setImap($imapSetting)
     {
         $this->test->byXpath(
-            "//div[@class='control-group imap-config check-connection']" .
+            "//div[@class='control-group imap-config check-connection control-group-checkbox']" .
             "//input[@data-ftid='oro_user_user_form_imapConfiguration_useImap']"
         )->click();
         $this->waitForAjax();
@@ -400,7 +400,10 @@ class User extends AbstractPageEntity
         $this->test->byXPath("//button[@id='oro_user_user_form_imapConfiguration_check_connection']")->click();
         $this->waitForAjax();
         $this->waitPageToLoad();
-        $this->test->byXPath("//div[@class='control-group folder-tree']//input[@id='check-all']")->click();
+        $this->test->byXPath(
+            "//div[@class='control-group folder-tree "
+            . "control-group-oro_email_email_folder_tree']//input[@class='check-all']"
+        )->click();
 
         return $this;
     }

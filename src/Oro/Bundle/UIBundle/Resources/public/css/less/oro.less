@@ -112,7 +112,7 @@ label, input, button, select, textarea { font-size:13px;}
     label.control-label {
       float:left;
       width:160px;
-      padding-top:7px;
+      padding-top: 7px;
       color: #777;
       font-weight: normal;
       font-size: 13px;
@@ -141,7 +141,7 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
-        padding-top:7px;
+        padding-top: 7px;
         width: 100%;
         word-wrap: break-word;
         padding-left: 5px; // to get nice hover background
@@ -377,24 +377,10 @@ body .select2-container {
 .label-info,
 .badge-info { background:#92b2d6; }
 
-// FontAwesome
-[class^="icon-"],
-[class*=" icon-"] {
-  display:inline-block !important;
+.widget-content > .label-info:first-child {
+  margin-bottom: 10px;
 }
-[class^='icon-'].hide-text:after,
-[class^='icon-'].hide-text:before {
-  padding:0;
-  text-indent:0;
-  font-size:14px;
-  line-height:1.3em;
-  color:#666;
-  font-family: 'FontAwesome';
-}
-.icon-resize-vertical {
-  // because resize-vertical icon is too thin
-  padding: 0 3px;
-}
+
 .ui-sortable-handle {
   cursor: move;
   cursor: -moz-grab;
@@ -2332,6 +2318,12 @@ div.selector.disabled span {
 .row-fluid.row-fluid-divider {
   background: url("../../img/vertical-separator.png") repeat-y 50% 0;
 }
+/* fix incorrect aligment of fluid divider line in Firefox */
+@-moz-document url-prefix() {
+  .row-fluid.row-fluid-divider {
+    background-position: calc(~"50% - 1px") 0;
+  }
+}
 h5.user-fieldset {
   font-weight:bold;
   font-size:15px;
@@ -2829,7 +2821,7 @@ span.validation-failed {
     .nav-tabs > .active > a,
     .nav-tabs > .active > a:hover,
     .nav-tabs > .active > a:focus{
-      background: none;
+      background: #fff;
     }
   }
 }
@@ -2913,6 +2905,12 @@ span.validation-failed {
   font-style: normal;
 }
 .oro-tabs {
+  .nav-tabs {
+    padding-left: 1px; // compensate tabs margin-left: -1px
+    margin-bottom: -1px; // should overlay tab-content's top border
+    border-bottom: 1px solid #ddd;
+    float: left;
+  }
   .nav-tabs > li > a,
   .nav-tabs > li > a:hover,
   .nav-tabs > li > a:focus,
@@ -2922,9 +2920,11 @@ span.validation-failed {
     border-bottom: 1px solid #ddd;
     border-top: 1px solid #ddd;
     border-right: 1px solid #ddd;
-    border-left: none;
+    border-left: 1px solid #ddd;
     border-radius: 0px;
     margin-right: 0px;
+    margin-left: -1px;
+    height: 38px;
   }
 
   .nav-tabs-dropdown {
@@ -2953,41 +2953,37 @@ span.validation-failed {
     border-bottom: 1px solid #fff;
     border-right-color: #ddd;
     border-top-color: #ddd;
-    background-color: transparent;
-  }
-
-  .nav-tabs > li:first-child > a,
-  .nav-tabs > li:first-child > a:hover,
-  .nav-tabs > li:first-child > a:focus {
-    border-left: 1px solid #ddd;
-  }
-
-  .nav-tabs {
-    margin-bottom: 0px;
-    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    outline: none;
   }
 
   .tab-content {
     overflow: initial;
-    border-bottom: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-left: 1px solid #ddd;
+    border: 1px solid #ddd;
+    clear: both;
   }
 
   .tab-pane {
     min-height: 104px;
   }
 }
-.tab-content{
-  .oro-tabs{
-    .nav-tabs{
-      & > li{
-        & > a{
-          margin-top: -1px;
-        }
-      }
-    }
-  }
+
+.nav-tabs {
+  padding-left: 1px; // compensate tabs margin-left: -1px
+  margin-bottom: -1px; // should overlay tab-content's top border
+  border-bottom: 1px solid #ddd;
+  float: left;
+}
+.tab-content {
+  border-top: 1px solid #ddd;
+  clear: both;
+}
+.nav-tabs > li > a.widget-component-processing{
+  background: #ccc !important;
+  border-bottom: 1px solid transparent !important;
+  /* following two lines allow this tab handle overlay .tab-content while it is loading */
+  position: relative;
+  z-index: 1;
 }
 // capitalize buttons, labels, titles, breadcrumb for English language
 .lang-en {

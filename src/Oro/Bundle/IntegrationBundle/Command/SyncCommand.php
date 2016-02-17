@@ -131,7 +131,7 @@ class SyncCommand extends AbstractSyncCronCommand
         /* @var Integration $integration */
         foreach ($integrations as $integration) {
             try {
-                $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
+                $logger->info(sprintf('Run sync for "%s" integration.', $integration->getName()));
                 $this->updateToken($integration);
                 if ($batchSize) {
                     $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
@@ -146,7 +146,7 @@ class SyncCommand extends AbstractSyncCronCommand
             }
         }
 
-        $logger->notice('Completed');
+        $logger->info('Completed');
 
         return $exitCode;
     }

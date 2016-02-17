@@ -50,6 +50,38 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getConfigsProvider
+     */
+    public function testGetConfigs($version, $expectedConfig)
+    {
+        $this->assertEquals(
+            $expectedConfig,
+            $this->configBag->getConfigs($version)
+        );
+    }
+
+    public function getConfigsProvider()
+    {
+        return [
+            /* @todo: API version is not supported for now. Add data to test versioning here */
+            [
+                '1.0',
+                [
+                    'Test\Class1' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]],
+                    'Test\Class2' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]],
+                ]
+            ],
+            [
+                Version::LATEST,
+                [
+                    'Test\Class1' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]],
+                    'Test\Class2' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]],
+                ]
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider noConfigProvider
      */
     public function testNoConfig($className, $version)

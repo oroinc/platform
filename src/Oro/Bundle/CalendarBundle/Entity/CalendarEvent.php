@@ -58,6 +58,10 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "grid"={
+ *              "default"="calendar-event-grid",
+ *              "context"="calendar-event-for-context-grid"
  *          }
  *      }
  * )

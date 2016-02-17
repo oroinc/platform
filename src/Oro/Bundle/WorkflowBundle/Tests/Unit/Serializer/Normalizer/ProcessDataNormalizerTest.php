@@ -55,7 +55,7 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $normalizedData = array('serialized', 'data');
 
-        if ($triggerEvent == ProcessTrigger::EVENT_DELETE) {
+        if (!$entity || $triggerEvent == ProcessTrigger::EVENT_DELETE) {
             $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifier');
         } else {
             $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity)
@@ -66,7 +66,7 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
             ->with($object->getValues(), $format, $context)->will($this->returnValue($normalizedData));
 
         $this->assertEquals($normalizedData, $this->normalizer->normalize($object, $format, $context));
-        if ($triggerEvent == ProcessTrigger::EVENT_DELETE) {
+        if (!$entity || $triggerEvent == ProcessTrigger::EVENT_DELETE) {
             $this->assertNull($processJob->getEntityId());
         } else {
             $this->assertEquals($entityId, $processJob->getEntityId());
@@ -90,6 +90,10 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
             'delete' => array(
                 'object' => new ProcessData(array('data' => new \stdClass())),
                 'context' => array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE)),
+            ),
+            'cron' => array(
+                'object' => new ProcessData(),
+                'context' => array('processJob' => $this->createProcessJob()),
             ),
         );
     }
@@ -124,12 +128,6 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
                 'context'   => array('processJob' => new \stdClass()),
                 'exception' => '\LogicException',
                 'message'   => 'Invalid process job entity',
-            ),
-            'no entity' => array(
-                'object'    => new ProcessData(),
-                'context'   => array('processJob' => new ProcessJob()),
-                'exception' => '\LogicException',
-                'message'   => 'Process entity is not specified',
             ),
         );
     }
@@ -193,7 +191,7 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
      * @param string $event
      * @return ProcessJob
      */
-    protected function createProcessJob($event)
+    protected function createProcessJob($event = null)
     {
         $definition = new ProcessDefinition();
         $definition->setRelatedEntity('Test\Entity');

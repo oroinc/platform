@@ -117,7 +117,6 @@ services:
         arguments:
             - @oro_dashboard.config_provider
             - @form.factory
-            - @oro_form.validator.constraint_factory
 
     oro_dashboard.datetime.helper:
         class: %oro_dashboard.datetime.helper.class%
@@ -194,15 +193,13 @@ services:
             - @oro_locale.formatter.date_time
             - @oro_filter.expression.date.compiler
             - @translator
+            - @oro_dashboard.datetime.helper
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_date_range" }
 
     oro_dashboard.widget_config_value.previous_date_range.converter:
           class: %oro_dashboard.widget_config_value.previous_date_range.converter.class%
-          arguments:
-              - @oro_locale.formatter.date_time
-              - @oro_filter.expression.date.compiler
-              - @translator
+          parent: oro_dashboard.widget_config_value.date_range.converter
           tags:
               - { name: oro_dashboard.value.converter, alias: "oro_type_widget_previous_date_range" }
 
@@ -245,6 +242,8 @@ services:
 
     oro_dashboard.widget_config_value.widget_business_unit_select.converter:
         class: %oro_dashboard.widget_config_value.widget_business_unit_select.converter.class%
+        arguments:
+            - @=service('doctrine.orm.entity_manager').getRepository(parameter('oro_organization.business_unit.entity.class'))
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_business_unit_select" }
 
@@ -265,3 +264,4 @@ services:
         arguments:
             - @doctrine
             - @oro_security.acl_helper
+            - @oro_locale.settings

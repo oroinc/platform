@@ -30,27 +30,27 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
     /**
      * @var array
      */
-    protected $localFormatMap = array(
-        array(null,                       null,                       self::LOCALE_EN, "MMM d, y h:mm a"),
-        array(\IntlDateFormatter::LONG,   \IntlDateFormatter::MEDIUM, self::LOCALE_EN, "MMMM d, y h:mm:ss a"),
-        array(\IntlDateFormatter::LONG,   \IntlDateFormatter::NONE,   self::LOCALE_EN, "MMMM d, y"),
-        array(\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT,  self::LOCALE_EN, "MMM d, y h:mm a"),
-        array(\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE,   self::LOCALE_EN, "MMM d, y"),
-        array(null,                       \IntlDateFormatter::NONE,   self::LOCALE_EN, "MMM d, y"),
-        array(\IntlDateFormatter::NONE,   \IntlDateFormatter::MEDIUM, self::LOCALE_EN, "h:mm:ss a"),
-        array(\IntlDateFormatter::NONE,   \IntlDateFormatter::SHORT,  self::LOCALE_EN, "h:mm a"),
-        array(\IntlDateFormatter::NONE,   null,                       self::LOCALE_EN, "h:mm a"),
+    protected $localFormatMap = [
+        [null, null, self::LOCALE_EN, null, "MMM d, y h:mm a"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_EN, null, "MMMM d, y h:mm:ss a"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_EN, null, "MMMM d, y"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_EN, null, "MMM d, y h:mm a"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_EN, null, "MMM d, y"],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_EN, null, "MMM d, y"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_EN, null, "h:mm:ss a"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_EN, null, "h:mm a"],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_EN, null, "h:mm a"],
 
-        array(null,                       null,                       self::LOCALE_RU, "dd.MM.yyyy H:mm"),
-        array(\IntlDateFormatter::LONG,   \IntlDateFormatter::MEDIUM, self::LOCALE_RU, "d MMMM y 'г.' H:mm:ss"),
-        array(\IntlDateFormatter::LONG,   \IntlDateFormatter::NONE,   self::LOCALE_RU, "d MMMM y 'г.'"),
-        array(\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT,  self::LOCALE_RU, "dd.MM.yyyy H:mm"),
-        array(\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE,   self::LOCALE_RU, "dd.MM.yyyy"),
-        array(null,                       \IntlDateFormatter::NONE,   self::LOCALE_RU, "dd.MM.yyyy"),
-        array(\IntlDateFormatter::NONE,   \IntlDateFormatter::MEDIUM, self::LOCALE_RU, "H:mm:ss"),
-        array(\IntlDateFormatter::NONE,   \IntlDateFormatter::SHORT,  self::LOCALE_RU, "H:mm"),
-        array(\IntlDateFormatter::NONE,   null,                       self::LOCALE_RU, "H:mm"),
-    );
+        [null, null, self::LOCALE_RU, null, "dd.MM.yyyy H:mm"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_RU, null, "d MMMM y 'г.' H:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_RU, null, "d MMMM y 'г.'"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_RU, null, "dd.MM.yyyy H:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_RU, null, "dd.MM.yyyy"],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_RU, null, "dd.MM.yyyy"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_RU, null, "H:mm:ss"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_RU, null, "H:mm"],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_RU, null, "H:mm"],
+    ];
 
     /**
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
@@ -59,7 +59,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
     {
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
-            ->setMethods(array('getPattern'))
+            ->setMethods(['getPattern'])
             ->getMock();
 
         $this->formatter->expects($this->any())
@@ -103,8 +103,9 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
 
     /**
      * @param string $expected
-     * @param int $dateFormat
+     * @param int    $dateFormat
      * @param string $locale
+     *
      * @dataProvider getDateFormatDataProvider
      */
     public function testGetDateFormat($expected, $dateFormat, $locale)
@@ -119,8 +120,9 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
 
     /**
      * @param string $expected
-     * @param int $timeFormat
+     * @param int    $timeFormat
      * @param string $locale
+     *
      * @dataProvider getTimeFormatDataProvider
      */
     public function testGetTimeFormat($expected, $timeFormat, $locale)
@@ -135,9 +137,10 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
 
     /**
      * @param string $expected
-     * @param int $dateFormat
-     * @param int $timeFormat
+     * @param int    $dateFormat
+     * @param int    $timeFormat
      * @param string $locale
+     *
      * @dataProvider getDateTimeFormatDataProvider
      */
     public function testGetDateTimeFormat($expected, $dateFormat, $timeFormat, $locale)
@@ -153,6 +156,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
     /**
      * @param string $expected
      * @param string $locale
+     *
      * @dataProvider getDateFormatDayProvider
      */
     public function testGetDayFormat($expected, $locale)

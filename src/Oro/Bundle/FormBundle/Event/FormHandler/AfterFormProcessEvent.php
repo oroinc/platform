@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Event\FormHandler;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormInterface;
 
-class AfterFormProcessEvent extends Event
+class AfterFormProcessEvent extends Event implements FormAwareInterface
 {
     /**
      * @var mixed

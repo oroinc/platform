@@ -13,3 +13,8 @@ oro:
             helpMessage: "Double click on cell to edit"
             loadingError: "Cannot load component or view for inline grid editor"
             saving_progress: "Inline edits are being saved"
+            action:
+                save: Save changes
+                cancel: Cancel
+            multi_checkbox_editor:
+                filter.placeholder: Filter values...

@@ -59,10 +59,6 @@ class ProcessHandler
             new ProcessHandleEvent($processTrigger, $processData)
         );
 
-        if (!$processData['data']) {
-            throw new InvalidParameterException('Invalid process data. Entity can not be empty.');
-        }
-
         $process = $this->getProcess($processTrigger);
         $process->execute($processData);
 

@@ -33,7 +33,7 @@ class RelationConfigProvider
      *
      * @return array|null
      */
-    public function getRelationConfig($className, $version, array $requestType, array $extras = [])
+    public function getRelationConfig($className, $version, array $requestType = [], array $extras = [])
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
@@ -46,10 +46,14 @@ class RelationConfigProvider
 
         /** @var RelationConfigContext $context */
         $context = $this->processor->createContext();
-        $context->setVersion($version);
-        $context->setRequestType($requestType);
-        $context->setExtras($extras);
         $context->setClassName($className);
+        $context->setVersion($version);
+        if (!empty($requestType)) {
+            $context->setRequestType($requestType);
+        }
+        if (!empty($extras)) {
+            $context->setExtras($extras);
+        }
 
         $this->processor->process($context);
 

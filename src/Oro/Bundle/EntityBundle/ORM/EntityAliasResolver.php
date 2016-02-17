@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 
@@ -11,6 +10,7 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
 class EntityAliasResolver implements WarmableInterface
 {
@@ -306,8 +306,7 @@ class EntityAliasResolver implements WarmableInterface
             return;
         }
 
-        /** @var ClassMetadata[] $allMetadata */
-        $allMetadata = $this->doctrine->getManager()->getMetadataFactory()->getAllMetadata();
+        $allMetadata = SafeDatabaseChecker::getAllMetadata($this->doctrine->getManager());
         foreach ($allMetadata as $metadata) {
             if (!$metadata->isMappedSuperclass && !isset($this->aliases[$metadata->name])) {
                 $this->findEntityAlias($metadata->name);

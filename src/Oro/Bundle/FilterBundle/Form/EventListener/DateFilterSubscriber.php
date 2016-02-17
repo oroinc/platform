@@ -86,19 +86,19 @@ class DateFilterSubscriber implements EventSubscriberInterface
         switch ($data['part']) {
             case DateModifierInterface::PART_MONTH:
                 $this->mapValues($children, $data, $this->getDatePartAccessorClosure('m'));
-                $this->replaceValueFields($form->get('value'), range(1, 12));
+                $this->replaceValueFields($form->get('value'), $this->getChoices(1, 12));
                 break;
             case DateModifierInterface::PART_DOW:
                 $this->mapValues($children, $data, $this->getDatePartAccessorClosure('N'));
-                $this->replaceValueFields($form->get('value'), range(1, 7));
+                $this->replaceValueFields($form->get('value'), $this->getChoices(1, 7));
                 break;
             case DateModifierInterface::PART_WEEK:
                 $this->mapValues($children, $data, $this->getDatePartAccessorClosure('W'));
-                $this->replaceValueFields($form->get('value'), range(1, 53));
+                $this->replaceValueFields($form->get('value'), $this->getChoices(1, 53));
                 break;
             case DateModifierInterface::PART_DAY:
                 $this->mapValues($children, $data, $this->getDatePartAccessorClosure('d'));
-                $this->replaceValueFields($form->get('value'), range(1, 31));
+                $this->replaceValueFields($form->get('value'), $this->getChoices(1, 31));
                 break;
             case DateModifierInterface::PART_QUARTER:
                 $this->mapValues(
@@ -121,17 +121,16 @@ class DateFilterSubscriber implements EventSubscriberInterface
                         return $quarter;
                     }
                 );
-                $this->replaceValueFields($form->get('value'), range(1, 4));
+                $this->replaceValueFields($form->get('value'), $this->getChoices(1, 4));
                 break;
             case DateModifierInterface::PART_DOY:
                 $this->mapValues($children, $data, $this->getDatePartAccessorClosure('z'));
-                $this->replaceValueFields($form->get('value'), range(1, 366));
+                $this->replaceValueFields($form->get('value'), $this->getChoices(1, 366));
                 break;
             case DateModifierInterface::PART_YEAR:
                 $this->mapValues($children, $data, $this->getDatePartAccessorClosure('Y'));
-                $this->replaceValueFields($form->get('value'), array_flip(range(date('Y') - 50, date('Y') + 50)));
+                $this->replaceValueFields($form->get('value'), array_flip(range(date('Y') - 100, date('Y') + 50)));
                 break;
-            case DateModifierInterface::PART_SOURCE:
             case DateModifierInterface::PART_VALUE:
             default:
                 $this->mapValues(
@@ -147,6 +146,21 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
         $event->setData($data);
         $this->processed[$oid] = true;
+    }
+
+    /**
+     * Returns array combined by range of $min and $max for keys and for values
+     *
+     * @param integer $min
+     * @param integer $max
+     *
+     * @return array
+     */
+    protected function getChoices($min, $max)
+    {
+        $range = range((int)$min, (int)$max);
+
+        return array_combine($range, $range);
     }
 
     /**

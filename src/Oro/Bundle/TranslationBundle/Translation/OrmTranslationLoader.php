@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
@@ -55,24 +56,17 @@ class OrmTranslationLoader implements LoaderInterface
     }
 
     /**
-     * Check if translations table exists in db
+     * Checks whether the translations table exists in the database
      *
      * @return bool
      */
     protected function checkDatabase()
     {
         if (null === $this->dbCheck) {
-            $this->dbCheck = false;
-
-            $em = $this->getEntityManager();
-            try {
-                $conn = $em->getConnection();
-                $conn->connect();
-                $this->dbCheck = $conn->getSchemaManager()->tablesExist(
-                    [$em->getClassMetadata(Translation::ENTITY_NAME)->getTableName()]
-                );
-            } catch (\PDOException $e) {
-            }
+            $this->dbCheck = SafeDatabaseChecker::tablesExist(
+                $this->getEntityManager()->getConnection(),
+                SafeDatabaseChecker::getTableName($this->doctrine, Translation::ENTITY_NAME)
+            );
         }
 
         return $this->dbCheck;

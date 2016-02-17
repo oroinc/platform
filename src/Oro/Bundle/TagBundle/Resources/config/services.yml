@@ -96,6 +96,7 @@ services:
         class: %oro_tag.provider.virtual_relation.tags.class%
         arguments:
             - @oro_tag.helper.taggable_helper
+            - @oro_entity.doctrine_helper
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
@@ -103,6 +104,7 @@ services:
         class: Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider
         arguments:
             - @oro_tag.helper.taggable_helper
+            - @oro_entity.doctrine_helper
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 150 }
 

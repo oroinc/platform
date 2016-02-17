@@ -244,6 +244,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
+    oro_navigation.event.js_routing_dump_listener:
+        class: Oro\Bundle\NavigationBundle\Event\JsRoutingDumpListener
+        arguments:
+            - @oro_ui.dynamic_asset_version_manager
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+
     oro_navigation.content.topic_sender:
         class: %oro_navigation.content.topic_sender.class%
         arguments:

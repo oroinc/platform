@@ -11,6 +11,7 @@ use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineConfigurationPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 
 class OroPlatformBundle extends Bundle
@@ -32,6 +33,7 @@ class OroPlatformBundle extends Bundle
                 'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
             )
         );
+        $container->addCompilerPass(new UpdateDoctrineConfigurationPass());
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new UpdateDoctrineEventHandlersPass());
             $container->moveCompilerPassBefore(

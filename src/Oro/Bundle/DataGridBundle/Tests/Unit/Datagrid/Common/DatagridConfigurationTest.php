@@ -15,6 +15,126 @@ class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $params
+     * @param bool $expected
+     * @dataProvider getAclResourceDataProvider
+     */
+    public function testGetAclResource(array $params, $expected)
+    {
+        $this->configuration->merge($params);
+        $this->assertEquals($expected, $this->configuration->getAclResource());
+    }
+
+    public function getAclResourceDataProvider()
+    {
+        return [
+            [
+                'params' => [
+                    'acl_resource' => false,
+                    'source' => ['acl_resource' => false],
+                ],
+                'expected' => false,
+            ],
+            [
+                'params' => [
+                    'acl_resource' => false,
+                    'source' => ['acl_resource' => true],
+                ],
+                'expected' => false,
+            ],
+            [
+                'params' => [
+                    'acl_resource' => true,
+                    'source' => ['acl_resource' => false],
+                ],
+                'expected' => true,
+            ],
+            [
+                'params' => [
+                    'acl_resource' => true,
+                    'source' => ['acl_resource' => true],
+                ],
+                'expected' => true,
+            ],
+            [
+                'params' => ['acl_resource' => true],
+                'expected' => true,
+            ],
+            [
+                'params' => [
+                    'acl_resource' => false,
+                ],
+                'expected' => false,
+            ],
+            [
+                'params' => [
+                    'source' => ['acl_resource' => false],
+                ],
+                'expected' => false,
+            ],
+            [
+                'params' => [
+                    'source' => ['acl_resource' => true],
+                ],
+                'expected' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @param array $params
+     * @param bool $expected
+     * @dataProvider isDatasourceSkipAclApplyDataProvider
+     */
+    public function testIsDatasourceSkipAclApply(array $params, $expected)
+    {
+        $this->configuration->merge($params);
+        $this->assertEquals($expected, $this->configuration->isDatasourceSkipAclApply());
+    }
+
+    public function isDatasourceSkipAclApplyDataProvider()
+    {
+        return [
+            [
+                'params' => [
+                    'source' => [
+                        'skip_acl_apply' => false,
+                        'skip_acl_check' => false,
+                    ],
+                ],
+                'expected' => false,
+            ],
+            [
+                'params' => [
+                    'source' => [
+                        'skip_acl_apply' => false,
+                        'skip_acl_check' => true,
+                    ],
+                ],
+                'expected' => false,
+            ],
+            [
+                'params' => [
+                    'source' => [
+                        'skip_acl_apply' => true,
+                        'skip_acl_check' => false,
+                    ],
+                ],
+                'expected' => true,
+            ],
+            [
+                'params' => [
+                    'source' => [
+                        'skip_acl_apply' => true,
+                        'skip_acl_check' => true,
+                    ],
+                ],
+                'expected' => true,
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider addColumnDataProvider
      *
      * @param array  $expected

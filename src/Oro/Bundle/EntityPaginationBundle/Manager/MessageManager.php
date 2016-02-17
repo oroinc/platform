@@ -150,19 +150,15 @@ class MessageManager
     {
         switch ($scope) {
             case EntityPaginationManager::VIEW_SCOPE:
-                $message =
+                return
                     'oro.entity_pagination.message.' .
                     'stats_number_view_%count%_record|stats_number_view_%count%_records';
-                break;
             case EntityPaginationManager::EDIT_SCOPE:
-                $message =
+                return
                     'oro.entity_pagination.message.' .
                     'stats_number_edit_%count%_record|stats_number_edit_%count%_records';
-                break;
-            default:
-                throw new \LogicException(sprintf('Scope "%s" is not available.', $scope));
         }
 
-        return $message;
+        throw new \LogicException(sprintf('Scope "%s" is not available.', $scope));
     }
 }

@@ -51,6 +51,9 @@ class LayoutTestCase extends WebTestCase
 
         $html = rtrim($html);
 
+        // remove asset version from HTML attributes
+        $html = preg_replace('/\?version=.*?"/', '"', $html);
+
         return $html;
     }
 }

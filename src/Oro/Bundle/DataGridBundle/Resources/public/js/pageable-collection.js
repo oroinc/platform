@@ -1,5 +1,10 @@
-define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tools'
-    ], function(_, Backbone, BackbonePageableCollection, tools) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'backbone-pageable-collection',
+    'oroui/js/tools'
+], function($, _, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
     var PageableCollection;
@@ -645,7 +650,33 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * Fetch collection data
          */
         fetch: function(options) {
+            options = options || {};
+            options.waitForPromises = [];
+
             this.trigger('beforeFetch', this, options);
+
+            if (options.waitForPromises.length) {
+                var deferredFetch = $.Deferred();
+                $.when.apply($, options.waitForPromises).done(_.bind(function() {
+                    this._fetch(options)
+                        .done(function() {
+                            deferredFetch.resolveWith(this, arguments);
+                        })
+                        .fail(function() {
+                            deferredFetch.rejectWith(this, arguments);
+                        });
+                }, this)).fail(function() {
+                    deferredFetch.rejectWith(this, arguments);
+                });
+
+                return deferredFetch.promise();
+
+            } else {
+                return this._fetch(options);
+            }
+        },
+
+        _fetch: function(options) {
             var BBColProto = Backbone.Collection.prototype;
 
             options = _.defaults(options || {}, {reset: true});
@@ -905,18 +936,33 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
 
         /**
          *
-         * @param {Integer} pageSize
+         * @param {number} pageSize
          * @param {Object} options
          * @returns {Object}
          */
         setPageSize: function(pageSize, options) {
+            var result;
+            // make state clone
+            var oldState = _.extend({}, this.state);
+
             this.state.pageSize = pageSize;
             if (this.mode === 'server') {
-                this.fetch({reset: true});
-                return this.getPage(this.state.currentPage, options);
+                options = _.extend(options || {}, {reset: true});
+                result = this.getPage(this.state.currentPage, options);
             } else {
-                return PageableCollection.__super__.setPageSize.call(this, pageSize, options);
+                result = PageableCollection.__super__.setPageSize.call(this, pageSize, options);
             }
+
+            // getPage has inconsistent return value: collection or promise,
+            // so we have to check it's a promise
+            if (_.isFunction(result.fail)) {
+                result.fail(_.bind(function() {
+                    // revert state if page change fail
+                    this.state = this._checkState(oldState);
+                }, this));
+            }
+
+            return result;
         },
 
         /**

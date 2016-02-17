@@ -25,7 +25,6 @@ parameters:
     oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
     oro_email.form.handler.mailbox.class:                 Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
-    oro_email.form.type.email_folder.class:               Oro\Bundle\EmailBundle\Form\Type\EmailFolderType
     oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
     oro_email.form.type.filter.originfolder.class:        Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType
     oro_email.form.type.email_address_from.class:         Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType
@@ -209,6 +208,7 @@ services:
         arguments:
             - @oro_email.mailbox.process_storage
             - @oro_security.encoder.mcrypt
+            - @oro_config.user
         tags:
             - { name: form.type, alias: oro_email_mailbox }
 
@@ -224,11 +224,6 @@ services:
 
     oro_email.form.factory:
         class: %oro_email.form.factory.class%
-
-    oro_email.form.type.email_folder:
-        class: %oro_email.form.type.email_folder.class%
-        tags:
-            - { name: form.type, alias: oro_email_email_folder }
 
     oro_email.form.type.email_folder_tree:
         class: %oro_email.form.type.email_folder_tree.class%
@@ -246,6 +241,7 @@ services:
         arguments:
             - @oro_security.security_facade
             - @oro_email.related_emails.provider
+            - @oro_email.mailbox.manager
         tags:
             - { name: form.type, alias: oro_email_email_address_from }
 

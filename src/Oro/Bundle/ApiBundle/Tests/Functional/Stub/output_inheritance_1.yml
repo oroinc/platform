@@ -1,0 +1,12 @@
+data:
+  0:
+    type: "auditfields"
+    id: auto
+    attributes:
+      oldText: "old_value"
+      newText: "new_value"
+    relationships:
+      audit:
+        data:
+          type: "audits"
+          id: auto

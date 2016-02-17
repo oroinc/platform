@@ -135,6 +135,15 @@ define(function(require) {
         },
 
         /**
+         * Returns datepicker popup
+         *
+         * @returns {JQuery}
+         */
+        getDatePickerWidget: function() {
+            return this.$frontDateField.datepicker('widget');
+        },
+
+        /**
          * Destroys picker widget
          */
         destroyPickerWidget: function() {

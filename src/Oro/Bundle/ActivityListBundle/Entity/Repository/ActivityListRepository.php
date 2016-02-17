@@ -54,7 +54,7 @@ class ActivityListRepository extends EntityRepository
 
     /**
      * @param string  $entityClass
-     * @param integer $entityId
+     * @param integer|integer[] $entityIds
      * @param string  $orderField
      * @param string  $orderDirection
      * @param boolean $grouping
@@ -63,16 +63,27 @@ class ActivityListRepository extends EntityRepository
      */
     public function getBaseActivityListQueryBuilder(
         $entityClass,
-        $entityId,
+        $entityIds,
         $orderField = 'updatedAt',
         $orderDirection = 'DESC',
         $grouping = false
     ) {
+        if (is_scalar($entityIds)) {
+            $entityIds = [$entityIds];
+        }
         $queryBuilder = $this->createQueryBuilder('activity')
             ->leftJoin('activity.' . $this->getAssociationName($entityClass), 'r')
-            ->leftJoin('activity.activityOwners', 'ao')
-            ->where('r.id = :entityId')
-            ->setParameter('entityId', $entityId)
+            ->leftJoin('activity.activityOwners', 'ao');
+        if (count($entityIds) > 1) {
+            $queryBuilder
+                ->where('r.id IN (:entityIds)')
+                ->setParameter('entityIds', $entityIds);
+        } else {
+            $queryBuilder
+                ->where('r.id = :entityId')
+                ->setParameter('entityId', reset($entityIds));
+        }
+        $queryBuilder
             ->orderBy('activity.' . $orderField, $orderDirection)
             ->groupBy('activity.id');
 

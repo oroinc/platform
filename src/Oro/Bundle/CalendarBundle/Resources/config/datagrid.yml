@@ -466,3 +466,84 @@ datagrid:
                 link:          delete_link
         action_configuration: @oro_calendar.listener.datagrid.system_calendar->getActionConfigurationClosure
 
+
+    calendar-event-for-context-grid:
+        extended_entity_name: %oro_calendar.calendar_event.entity.class%
+        acl_resource: oro_calendar_event_view
+        options:
+            entityHint: calendar_events
+            entity_pagination: true
+            toolbarOptions:
+                pageSize:
+                    default_per_page: 10
+            routerEnabled: false
+        source:
+            type: orm
+            query:
+                select:
+                    - event.id
+                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT(owner.firstName, ' ',owner.lastName) END, '') AS name
+                    - event.title
+                    - event.start
+                    - event.end
+                    - parent.id as parentId
+                    - owner.id as ownerId
+                    - COUNT(children.id) as childrenCount
+                from:
+                    - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
+                join:
+                    left:
+                        - { join: event.parent, alias: parent }
+                        - { join:  %oro_calendar.calendar_event.entity.class%, alias: children, conditionType: WITH, condition: 'children.parent = event' }
+                    inner:
+                        - { join: event.calendar, alias: calendar }
+                        - { join: calendar.owner, alias: owner }
+                        -
+                            join: %oro_calendar.calendar_property.entity.class%
+                            alias: connection
+                            conditionType: WITH
+                            condition: "connection.calendarAlias = 'user' AND connection.calendar = calendar.id AND connection.visible = true"
+                        - { join: connection.targetCalendar, alias: targetCalendar }
+                where:
+                    and:
+                        - targetCalendar.owner = @oro_security.security_facade->getLoggedUserId
+                groupBy: event.id, calendar.name, owner.firstName, owner.lastName, parentId, ownerId
+        columns:
+            id:
+                label: oro.calendar.calendarevent.id.label
+            title:
+                label: oro.calendar.calendarevent.title.label
+            name:
+                label: oro.calendar.calendarevent.calendar.label
+            start:
+                label: oro.calendar.calendarevent.start.label
+                frontend_type: datetime
+            end:
+                label: oro.calendar.calendarevent.end.label
+                frontend_type: datetime
+        sorters:
+            columns:
+                title:
+                    data_name: event.title
+                name:
+                    data_name: name
+                start:
+                    data_name: event.start
+                end:
+                    data_name: event.end
+            default:
+                start: ASC
+        filters:
+            columns:
+                title:
+                    type: string
+                    data_name: event.title
+                name:
+                    type: string
+                    data_name: name
+                start:
+                    type: datetime
+                    data_name: event.start
+                end:
+                    type: datetime
+                    data_name: event.end

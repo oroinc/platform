@@ -37,13 +37,13 @@
             {%- set showLabels = (usernameLabel|length <= 9) and (passwordLabel|trans <= 9) %}
             <div class="input-prepend">
                 {% if showLabels %}
-                <span class="add-on">{{ usernameLabel }}</span>
+                <label for="prependedInput" class="add-on">{{ usernameLabel }}</label>
                 {% endif %}
                 <input type="text" id="prependedInput" class="span2" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
             </div>
             <div class="input-prepend">
                 {% if showLabels %}
-                <span class="add-on">{{ passwordLabel }}</span>
+                <label for="prependedInput2" class="add-on">{{ passwordLabel }}</label>
                 {% endif %}
                 <input type="password" id="prependedInput2" class="span2" name="_password" required="required" placeholder="{{ 'Password'|trans }}" autocomplete="off" />
             </div>

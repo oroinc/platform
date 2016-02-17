@@ -53,7 +53,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      * @param {Object} options.dateInputAttrs - Attributes for date HTML input element
      * @param {Object} options.datePickerOptions - See [documentation here](http://goo.gl/pddxZU)
@@ -79,6 +78,8 @@ define(function(require) {
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
                 placeholder: __('oro.form.choose_date'),
+                name: 'date',
+                autocomplete: 'off',
                 'data-validation': JSON.stringify({Date: {}})
             },
             datePickerOptions: {
@@ -90,6 +91,8 @@ define(function(require) {
             },
             timeInputAttrs: {
                 placeholder: __('oro.form.choose_time'),
+                name: 'time',
+                autocomplete: 'off',
                 'class': 'input-small timepicker-input',
                 'data-validation': JSON.stringify({Time: {}})
             },
@@ -100,6 +103,8 @@ define(function(require) {
         events: {
             'keydown .hasDatepicker': 'onDateEditorKeydown',
             'keydown .timepicker-input': 'onTimeEditorKeydown',
+            'change .hasDatepicker': 'onDateEditorKeydown',
+            'change .timepicker-input': 'onTimeEditorKeydown',
             'showTimepicker .ui-timepicker-input': 'onTimepickerShow',
             'hideTimepicker .ui-timepicker-input': 'onTimepickerHide'
         },
@@ -118,6 +123,7 @@ define(function(require) {
             });
             // fix arrows behaviour
             this.$('.timepicker-input').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
+
             return this;
         },
 
@@ -144,11 +150,20 @@ define(function(require) {
             }
         },
 
-        getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
+        onFocusout: function(e) {
+            // if blur event was as sequence of time selection in dropdown, returns focus back
+            if (this._isTimeSelection) {
+                delete this._isTimeSelection;
+                this.focus(1);
+            } else {
+                DatetimeEditorView.__super__.onFocusout.call(this, e);
+            }
+        },
+
+        parseRawValue: function(value) {
             var parsed;
             try {
-                parsed = datetimeFormatter.getMomentForBackendDateTime(raw);
+                parsed = datetimeFormatter.getMomentForBackendDateTime(value);
             } catch (e) {
                 return null;
             }
@@ -176,8 +191,14 @@ define(function(require) {
         },
 
         onTimepickerShow: function(e) {
-            var isBelow = !$(e.currentTarget).data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+            var $list = this.view.getTimePickerWidget();
+            var isBelow = !$list.hasClass('ui-timepicker-positioned-top');
             this.toggleDropdownBelowClass(isBelow);
+            $list.off(this.eventNamespace())
+                .on('mousedown' + this.eventNamespace(), _.bind(function(e) {
+                    // adds flag that blur event was as sequence of time selection in dropdown
+                    this._isTimeSelection = true;
+                }, this));
         }
     });
 

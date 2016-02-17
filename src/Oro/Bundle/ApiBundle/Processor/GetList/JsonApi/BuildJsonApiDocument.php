@@ -37,7 +37,7 @@ class BuildJsonApiDocument implements ProcessorInterface
 
         try {
             if ($context->hasErrors()) {
-                $documentBuilder->setErrors($context->getErrors());
+                $documentBuilder->setErrorCollection($context->getErrors());
                 // remove errors from the Context to avoid processing them by other processors
                 $context->resetErrors();
             } elseif ($context->hasResult()) {

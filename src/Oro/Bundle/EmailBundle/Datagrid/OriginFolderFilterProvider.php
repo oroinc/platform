@@ -53,6 +53,7 @@ class OriginFolderFilterProvider
     {
         $criteria = [
             'owner' => $this->securityFacade->getLoggedUser(),
+            'organization' => $this->securityFacade->getOrganization(),
             'isActive' => true,
         ];
 

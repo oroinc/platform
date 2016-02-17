@@ -172,6 +172,7 @@ define(function(require) {
          * @protected
          */
         _onFilterUpdated: function(filter) {
+            this._resetHintContainer();
             this.trigger('updateFilter', filter);
         },
 
@@ -311,8 +312,7 @@ define(function(require) {
                 this.template({filters: this.filters})
             );
             this.dropdownContainer = this.$el.find('.filter-container');
-
-            var fragment = document.createDocumentFragment();
+            var $filterItems = this.dropdownContainer.find('.filter-items');
 
             _.each(this.filters, function(filter) {
                 if (_.isFunction(filter.setDropdownContainer)) {
@@ -322,7 +322,8 @@ define(function(require) {
                 if (!filter.enabled) {
                     filter.hide();
                 }
-                fragment.appendChild(filter.$el.get(0));
+                $filterItems.append(filter.$el);
+                filter.rendered();
             }, this);
 
             this.trigger('rendered');
@@ -330,11 +331,26 @@ define(function(require) {
             if (_.isEmpty(this.filters)) {
                 this.$el.hide();
             } else {
-                this.dropdownContainer.append(fragment);
                 this._initializeSelectWidget();
             }
 
             return this;
+        },
+
+        _resetHintContainer: function() {
+            var $container = this.dropdownContainer.find('.filter-items-hint');
+            var show = false;
+            $container.children('span').each(function() {
+                if (this.style.display !== 'none') {
+                    show = true;
+                    return false;
+                }
+            });
+            if (show) {
+                $container.show();
+            } else {
+                $container.hide();
+            }
         },
 
         /**

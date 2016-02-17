@@ -71,8 +71,7 @@ define([
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter',
-            'click .reset-filter': '_onClickResetFilter'
+            'click .disable-filter': '_onClickDisableFilter'
         },
 
         /**
@@ -269,28 +268,6 @@ define([
             return {
                 value: this._getInputValue(this.criteriaValueSelectors.value)
             };
-        },
-
-        /**
-         * @inheritDoc
-         */
-        _onValueUpdated: function(newValue, oldValue) {
-            TextFilter.__super__._onValueUpdated.apply(this, arguments);
-            this._updateCriteriaHint();
-        },
-
-        /**
-         * Updates criteria hint element with actual criteria hint value
-         *
-         * @protected
-         * @return {*}
-         */
-        _updateCriteriaHint: function() {
-            this.$(this.criteriaHintSelector)
-                .html(_.escape(this._getCriteriaHint()))
-                .closest('.filter-criteria-selector')
-                .toggleClass('filter-default-value', this.isEmptyValue());
-            return this;
         },
 
         /**

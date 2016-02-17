@@ -56,7 +56,6 @@ inline_editing.editor.permissions.oro_tag_unassign_global | Allows user to edit 
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
 | options.fieldName | <code>string</code> | Field name to edit in model |
-| options.metadata | <code>string</code> | Editor metadata |
 | options.permissions | <code>string</code> | Permissions object |
 | options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 

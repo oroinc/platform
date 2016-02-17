@@ -1,0 +1,18 @@
+data:
+  0:
+    type: "auditfields"
+    id: auto
+    attributes:
+      oldText: "old_value"
+      newText: "new_value"
+    relationships:
+      audit:
+        data:
+          type: "audits"
+          id: auto
+included:
+  0:
+    type: "audits"
+    id: auto
+    attributes:
+      objectClass: "Oro\Bundle\UserBundle\Entity\User"

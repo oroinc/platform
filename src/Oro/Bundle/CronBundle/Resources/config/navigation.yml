@@ -8,6 +8,14 @@ oro_menu_config:
                 description: 'Cron job queue'
                 routes:      ['oro_cron_job_*']
 
+        oro_cron_schedule:
+            label: 'oro.cron.menu.cron_schedule.label'
+            route: 'oro_cron_schedule_index'
+            extras:
+                position:    70
+                description: 'oro.cron.menu.cron_schedule.description'
+                routes:      ['oro_cron_schedule_index']
+
         oro_cron_job_shortcut:
             label: 'oro.cron.menu.cron_job_shortcut.label'
             route: 'oro_cron_job_index'
@@ -20,6 +28,7 @@ oro_menu_config:
                 system_tab:
                     children:
                         oro_cron_job: ~
+                        oro_cron_schedule: ~
 
         shortcuts:
             children:
@@ -28,3 +37,4 @@ oro_menu_config:
 oro_titles:
     oro_cron_job_index: ~
     oro_cron_job_view: 'Job %%command%% (ID: %%id%%)'
+    oro_cron_schedule_index: ~

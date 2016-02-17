@@ -29,11 +29,8 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
         /** @var ProcessData $object */
         $processJob = $this->getProcessJob($context);
         $entity = $object['data'];
-        if (!$entity) {
-            throw new \LogicException('Process entity is not specified');
-        }
 
-        if ($processJob->getProcessTrigger()->getEvent() == ProcessTrigger::EVENT_DELETE) {
+        if (!$entity || $processJob->getProcessTrigger()->getEvent() == ProcessTrigger::EVENT_DELETE) {
             $processJob->setEntityId(null);
         } else {
             $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);

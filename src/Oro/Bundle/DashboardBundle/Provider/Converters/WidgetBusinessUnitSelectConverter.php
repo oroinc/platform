@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
+use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 
 /**
@@ -10,6 +12,41 @@ use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
  */
 class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
 {
+    /** @var EntityRepository */
+    protected $businessUnitRepository;
+
+    /**
+     * @param EntityRepository $businessUnitRepository
+     */
+    public function __construct(EntityRepository $businessUnitRepository)
+    {
+        $this->businessUnitRepository = $businessUnitRepository;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
+    {
+        if ($value === null) {
+            return $this->businessUnitRepository->findAll();
+        }
+
+        return parent::getConvertedValue($widgetConfig, $value, $config, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormValue(array $converterAttributes, $value)
+    {
+        if ($value === null) {
+            return $this->businessUnitRepository->findAll();
+        }
+
+        return parent::getFormValue($converterAttributes, $value);
+    }
+
     /**
      * @param mixed $value
      * @return mixed

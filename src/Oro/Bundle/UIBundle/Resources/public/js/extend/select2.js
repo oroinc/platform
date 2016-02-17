@@ -211,7 +211,9 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
         var resizeSearch = prototype.resizeSearch;
 
         prototype.resizeSearch = function() {
+            this.selection.addClass('select2-search-resize');
             resizeSearch.apply(this, arguments);
+            this.selection.removeClass('select2-search-resize');
             this.search.width(Math.floor($(this.search).width()) - 1);
         };
     }(Select2['class'].multi.prototype));

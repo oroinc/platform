@@ -498,6 +498,48 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider findProvider
+     */
+    public function testFind(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertSame($expectedResult, ArrayUtil::find($callback, $array));
+    }
+
+    public function findProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item === 1;
+                },
+                [0, 1, 2, 3, 4],
+                1,
+            ],
+            [
+                function ($item) {
+                    return $item === 0;
+                },
+                [0, 1, 2, 3, 4],
+                0,
+            ],
+            [
+                function ($item) {
+                    return $item === 4;
+                },
+                [0, 1, 2, 3, 4],
+                4,
+            ],
+            [
+                function ($item) {
+                    return $item === 5;
+                },
+                [0, 1, 2, 3, 4],
+                null,
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider dropWhileProvider
      */
     public function testDropWhile(callable $callback, array $array, $expectedResult)

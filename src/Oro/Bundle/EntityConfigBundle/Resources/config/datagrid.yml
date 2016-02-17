@@ -65,6 +65,7 @@ datagrid:
     # Entity field datagrid
     entityfields-grid:
         options:
+            mode: client
             entityHint: fields
             toolbarOptions:
                 pageSize:
@@ -120,6 +121,10 @@ datagrid:
             columns:
                 fieldName:
                     data_name: cf.fieldName
+                type:
+                    data_name: cf.type
+            default:
+                fieldName: ASC
         filters: ~
 
     # Audit entity log grid

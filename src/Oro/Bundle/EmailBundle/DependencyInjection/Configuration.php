@@ -50,7 +50,9 @@ class Configuration implements ConfigurationInterface
                 'default_button_reply' => ['value' => true],
                 'use_threads_in_emails' => ['value' => true],
                 'minimum_input_length' => ['value' => 2],
-                'show_recent_emails_in_user_bar' => ['value' => true]
+                'show_recent_emails_in_user_bar' => ['value' => true],
+                'attachment_sync_enable' => ['value' => true],
+                'attachment_sync_max_size' => ['value' => 0]
             ]
         );
 

@@ -8,6 +8,9 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_DEFINITION_NAME = 'test_definition';
@@ -56,6 +59,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected['queued'], $trigger->isQueued());
         $this->assertEquals($expected['priority'], $trigger->getPriority());
         $this->assertSame($expected['time_shift'], $trigger->getTimeShift());
+        $this->assertSame($expected['cron'], $trigger->getCron());
         $this->assertSame($definition, $trigger->getDefinition());
     }
 
@@ -186,6 +190,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'priority'   => Job::PRIORITY_DEFAULT,
                     'queued'     => false,
                     'time_shift' => null,
+                    'cron' => null
                 ),
             ),
             'integer time shift' => array(
@@ -194,14 +199,16 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'field'      => 'status',
                     'priority'   => Job::PRIORITY_HIGH,
                     'queued'     => true,
-                    'time_shift' => 12345
+                    'time_shift' => 12345,
+                    'cron' => null
                 ),
                 'expected' => array(
                     'event'      => ProcessTrigger::EVENT_UPDATE,
                     'field'      => 'status',
                     'priority'   => Job::PRIORITY_HIGH,
                     'queued'     => true,
-                    'time_shift' => 12345
+                    'time_shift' => 12345,
+                    'cron' => null
                 ),
             ),
             'date interval time shift' => array(
@@ -216,8 +223,22 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'priority'   => Job::PRIORITY_DEFAULT,
                     'queued'     => true,
                     'time_shift' => 24 * 3600,
+                    'cron' => null
                 ),
             ),
+            'cron expression' => [
+                'configuration' => [
+                    'cron' => '* * * * *'
+                ],
+                'expected' => [
+                    'event' => null,
+                    'field' => null,
+                    'priority' => Job::PRIORITY_DEFAULT,
+                    'queued' => false,
+                    'time_shift' => null,
+                    'cron' => '* * * * *'
+                ]
+            ]
         );
     }
 
@@ -262,6 +283,21 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 'exception' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
                 'message'   => 'Field is only allowed for update event'
             ),
+            'invalid cron expression' => [
+                'configuration' => [
+                    'cron' => 'invalid string'
+                ],
+                'exception' => 'InvalidArgumentException',
+                'message'   => 'invalid string is not a valid CRON expression'
+            ],
+            'event and cron expression' => [
+                'configuration' => [
+                    'event' => ProcessTrigger::EVENT_CREATE,
+                    'cron' => '* * * * *'
+                ],
+                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'message'   => 'Only one parameter "event" or "cron" must be configured.'
+            ]
         );
     }
 

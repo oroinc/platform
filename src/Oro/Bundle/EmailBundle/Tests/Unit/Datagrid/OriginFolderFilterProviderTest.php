@@ -9,6 +9,8 @@ use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailFolder;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
@@ -118,9 +120,11 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testMailboxOrigins()
     {
+        $user1 = new TestUser();
         $mailbox1 = new TestMailbox();
-        $origin1 = new TestEmailOrigin(1);
+        $origin1 = new TestUserEmailOrigin(1);
         $origin1->setMailboxName('testName1');
+        $origin1->setUser($user1);
         $folder1 = new TestEmailFolder(1);
         $folder2 = new TestEmailFolder(2);
         $folder3 = new TestEmailFolder(3);
@@ -136,8 +140,9 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
 
         $mailbox2 = new TestMailbox();
         $mailbox2->setLabel('Box2');
-        $origin2 = new TestEmailOrigin(2);
+        $origin2 = new TestUserEmailOrigin(2);
         $origin2->setMailboxName('testName2');
+        $origin2->setUser($user1);
         $origin2->setActive(false);
         $folder3 = new TestEmailFolder(3);
         $folder3->setSyncEnabled(true);

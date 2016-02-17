@@ -1,32 +1,73 @@
-@import "./multi-checkbox-editor";
 .oro-datagrid.grid-editable .grid {
   .number-cell, .integer-cell, .align-right, .editable {
     padding-right: 28px;
   }
   .row-edit-mode {
-    background: #FFFCEC;
+    background: @rowHighlightBackground;
   }
-  .view-mode > .icon-edit {
+  .view-mode > .inline-editor__edit-action {
     display: none !important;
   }
   .editable {
     &.save-success {
-      background: #F4FEE2;
+      background: @cellSuccessBackground;
+      position: relative;
+      &:before {
+        position: absolute;
+        font-family: 'FontAwesome';
+        content: '\f00c';
+        font-size: 14px;
+        top: 4px;
+        right: 6px;
+        color: @cellSuccessColor;
+      }
+      &:hover:before {
+        display: none;
+      }
     }
     &.save-fail {
-      background: #FFEEEE;
+      background: @cellErrorBackground;
     }
     &.edit-mode {
       position: relative;
-      background: @rowSelectedBackground;
-      > .icon-edit {
+      > .inline-editor__edit-action {
         display: none !important;
+      }
+      &:before {
+        content: '';
+        position: absolute;
+        background-color: inherit;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    }
+    &.view-mode.has-error{
+      position: relative;
+      background: @cellErrorBackground;
+      &:hover {
+        background: @cellErrorBackground;
+        > .inline-editor__edit-action {
+          &:before{
+            color: @errorMessageBalloonBackground;
+          }
+        }
+      }
+      &:before{
+        content: '';
+        display: inline-block;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #eea19f;
+        position: absolute;
+        top: 0;
+        left: 0;
       }
     }
     &.view-mode:hover {
-      background: @rowSelectedBackground;
+      background: @cellSelectedBackground;
       position: relative;
-      > .icon-edit {
+      > .inline-editor__edit-action {
         display: block !important;
         position: absolute;
         top: 2px;
@@ -34,23 +75,20 @@
         width: 25px;
         height: 25px;
         line-height: 35px;
-        background: #fff;
         text-align: center;
-        border: solid 1px #ddd;
-        border-radius: 4px;
         padding-left: 2px;
-        &:hover {
-          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        &:before{
+          color: @inlineActionColor;
         }
       }
     }
     &.loading{
-      background: #f5f5f5;
-      &.view-mode > .icon-edit {
+      background: @cellLoadingBackground;
+      &.view-mode > .inline-editor__edit-action {
         display: none !important;
       }
       &:before {
-        background: url('../../../oroui/img/loader-16.gif') no-repeat center center rgba(245, 245, 245, 0.7);
+        background: url('../../../oroui/img/loader-16.gif') no-repeat center center transparent;
         display: block !important;
         content: "";
         position: absolute;
@@ -59,42 +97,68 @@
         width: 29px;
         height: 29px;
       }
-      &:hover:before {
-        background-color: rgba(244, 239, 212, 0.7);;
-      }
-    }
-  }
-  tr.mouse-down{
-    // allow user to select text under icon
-    .editable.view-mode > .icon-edit {
-      display: none !important;
     }
   }
 }
 .grid thead th.header-cell-highlight {
-  background-color: #FFFCEC;
-  background: -webkit-linear-gradient(top, #FFFCEC, @rowSelectedBackground);
-  background: -o-linear-gradient(top, #FFFCEC, @rowSelectedBackground);
-  background: -ms-linear-gradient(top, #FFFCEC, @rowSelectedBackground);
-  background: linear-gradient(to bottom, #FFFCEC, @rowSelectedBackground);
+  #gradient > .vertical(@rowHighlightBackground, @rowSelectedBackground);
 }
 .icon-times:before {
   content: "\f00d";
 }
 
+.inline-editor__actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 4px;
+}
+.inline-editor__action-item {
+  display: block;
+  float: left;
+  width: 22px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #636363;
+  &[disabled] {
+    cursor: auto;
+    color: #b7b7b7;
+  }
+  &:focus, &:active, &:hover {
+    outline: none;
+    box-shadow: none;
+  }
+}
+.inline-editor__fields {
+  input[type=text] {
+    width: 100%;
+    box-sizing: border-box;
+    height: 30px;
+    margin: 0;
+    border-radius: 0;
+    font-size: 13px;
+    line-height: 19px;
+    .box-shadow(none);
+    &:focus {
+      .box-shadow(none);
+    }
+    &:first-child {
+      padding-left: 9px;
+    }
+    &:last-child {
+      padding-right: 52px;
+    }
+  }
+}
 .inline-editor-wrapper {
   position: absolute;
-  padding: 3px;
-  background-color: white;
-  border-radius: 3px;
-  border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-  .input-append {
-    margin: 0;
-    width: 100%;
-    > input[type=text] {
-      width: calc(~"100% - 73px");
-    }
+  min-width: 150px;
+  .select2-chosen {
+    padding-left: 9px !important;
   }
   .icon-check:before {
     content: "\f00c";
@@ -110,76 +174,33 @@
     }
   }
   &.date-editor {
-    min-width: 176px;
     .hasDatepicker {
-      width: calc(~"100% - 73px");
+      padding-left: 9px;
     }
   }
   &.datetime-editor {
-    min-width: 251px;
-    .fields-row {
-      display: inline-block;
-      width: calc(~"100% - 59px");
-    }
+    min-width: 225px;
+    width: auto !important;
     .hasDatepicker {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
       border-right: none;
-      width: 95px;
+      padding-left: 9px;
+      width: 105px;
     }
     .timepicker-input {
-      border-radius: 0;
-      width: calc(~"100% - 122px");
+      width: 121px;
     }
   }
   &.select-editor {
     min-width: 180px;
-    .select2-container {
-      width: calc(~"100% - 61px")
+    .select2-choice {
+      width: calc(~"100% - 52px");
+      border-right: 1px solid #ddd;
     }
-  }
-  &.tags-column-editor {
-    width: auto!important; // ignore cell width
-    .select2-choices {
-      max-width: 20vw;
+    .select2-dropdown-open .select2-choice {
+      border-right-color: #aaa;
     }
     .select2-container {
-      width: auto !important;
-    }
-  }
-  &.tags-select-editor {
-    min-width: 100px; // ignore min-width
-    .select2-container {
-      height: auto;
-    }
-    .select2-choices {
-      max-height: 40vh;
-      min-width: 130px;
-      overflow: auto;
-      .select2-search-choice {
-        font-size: 11px;
-        line-height: 12px;
-        padding: 5px 20px 5px 8px;
-        color: @tagItemColor;
-        background: @tagItemBackground;
-        border: 0 none;
-        border-radius: 10px;
-        box-shadow: none;
-        margin-left: 4px;
-        margin-bottom: 0;
-        .select2-search-choice-close {
-          top: 6px;
-          &:before {
-            color: @tagItemColor;
-          }
-        }
-        &.select2-locked {
-          padding: 4px 5px 3px 6px !important;
-        }
-      }
-    }
-    &.inline-view-editor .select2-choices {
-      width: 100% !important;
+      border-radius: 0;
     }
   }
   &.multi-select-editor, &.multi-relation-editor{
@@ -195,5 +216,20 @@
       min-width: 130px;
       overflow: auto;
     }
+  }
+}
+
+.inline-editor__select2-drop.select2-drop {
+  border-radius: 0;
+}
+.datepicker-focusser {
+  background: transparent;
+  border: 0px;
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  &:focus{
+    outline: none;
+    box-shadow: none;
   }
 }

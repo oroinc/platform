@@ -83,13 +83,23 @@ class EmailBodyAddListener
 
     /**
      * @param EmailBodyAdded $event
+     *
+     * @throws \Exception
      */
     public function updateActivityDescription(EmailBodyAdded $event)
     {
-        $email = $event->getEmail();
-        $activityList = $this->chainProvider->getUpdatedActivityList($email, $this->entityManager);
-        if ($activityList) {
-            $this->entityManager->persist($activityList);
+        $this->entityManager->beginTransaction();
+        try {
+            $email = $event->getEmail();
+            $activityList = $this->chainProvider->getUpdatedActivityList($email, $this->entityManager);
+            if ($activityList) {
+                $this->entityManager->persist($activityList);
+                $this->entityManager->flush();
+            }
+            $this->entityManager->commit();
+        } catch (\Exception $e) {
+            $this->entityManager->rollback();
+            throw $e;
         }
     }
 }

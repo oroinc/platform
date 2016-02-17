@@ -35,7 +35,6 @@ class EntityPaginationExtension extends AbstractExtension
             throw new \LogicException('Entity pagination is not boolean');
         }
 
-        $pagination = $pagination ? true : false;
-        $config->offsetSetByPath(self::ENTITY_PAGINATION_PATH, $pagination);
+        $config->offsetSetByPath(self::ENTITY_PAGINATION_PATH, (bool)$pagination);
     }
 }

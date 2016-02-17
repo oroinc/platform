@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -109,12 +110,16 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
 
     /**
      * @param User         $user
-     * @param Organization $organization
+     * @param Organization $organization|null
      */
-    protected function setSecurityContext(User $user, Organization $organization)
+    protected function setSecurityContext(User $user, Organization $organization = null)
     {
         $securityContext = $this->container->get('security.context');
-        $token           = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
+        if ($organization) {
+            $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
+        } else {
+            $token = new UsernamePasswordToken($user, $user->getUsername(), 'main');
+        }
         $securityContext->setToken($token);
     }
 }

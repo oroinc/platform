@@ -48,6 +48,17 @@ services:
         scope: request
         arguments: [@request, @router, @oro_security.security_facade]
 
+    oro_ui.dynamic_asset_version_manager:
+        class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager
+        arguments:
+            - @oro_ui.dynamic_asset_version.cache
+
+    oro_ui.dynamic_asset_version.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_dynamic_asset_version' ] ]
+
     oro_ui.view.listener:
         class: %oro_ui.view.listener.class%
         arguments:

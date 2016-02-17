@@ -38,8 +38,13 @@ class WidgetConfigurationLoadListener
         }
         $gridName = $configuration['route_parameters']['gridName'];
 
+        // pass gridParams, grid may depend on them to be successfully built
+        $gridParams = empty($configuration['route_parameters']['params'])
+            ? []
+            : $configuration['route_parameters']['params'];
+
         $gridConfiguration = $this->datagridManagerLink->getService()->getConfigurationForGrid($gridName);
-        $datagrid = $this->datagridBuilder->build($gridConfiguration, new ParameterBag());
+        $datagrid = $this->datagridBuilder->build($gridConfiguration, new ParameterBag($gridParams));
         $metadata = $datagrid->getMetadata();
 
         $choices = $metadata->offsetGetByPath('[gridViews][choices]', []);

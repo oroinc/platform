@@ -188,7 +188,7 @@ class DictionaryHelperTest extends \PHPUnit_Framework_TestCase
                 'expected'            => null
             ],
             'representation field is not exist in fields list' => [
-                'fieldNames'          => ['name'],
+                'fieldNames'          => ['name_test'],
                 'representationField' => 'title',
                 'expected'            => null
             ],

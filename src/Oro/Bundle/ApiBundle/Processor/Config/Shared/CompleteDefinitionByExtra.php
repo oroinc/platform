@@ -37,7 +37,7 @@ class CompleteDefinitionByExtra extends CompleteDefinition
                 continue;
             }
 
-            if (!in_array($fieldName, $expandRelations)) {
+            if (!in_array($fieldName, $expandRelations, true)) {
                 continue;
             }
 

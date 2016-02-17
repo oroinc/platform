@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension;
@@ -12,33 +12,58 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ConfigProviderMock */
-    protected $extendConfigProvider;
-
-    /** @var  RelationEntityConfigDumperExtension */
+    /** @var RelationEntityConfigDumperExtension */
     protected $extension;
 
-    /** @var FieldTypeHelper */
-    protected $fieldTypeHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
+    /** @var array */
+    protected $configs = [];
 
     public function setUp()
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
-
-        $configManager
-            ->expects($this->once())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($this->extendConfigProvider));
-
         $this->extension = new RelationEntityConfigDumperExtension(
-            $configManager,
+            $this->configManager,
             new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
         );
+
+        // will be filled by addEntityConfig and addConfigNewField
+        $this->configs = [];
+
+        $this->configManager->expects($this->any())
+            ->method('getConfigs')
+            ->with('extend')
+            ->willReturnCallback(
+                function ($scope, $className, $withHidden) {
+                    return isset($this->configs[$className])
+                        ? $this->configs[$className]
+                        : [];
+                }
+            );
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->with('extend')
+            ->willReturnCallback(
+                function ($scope, $className) {
+                    $result = null;
+                    if (isset($this->configs[null])) {
+                        foreach ($this->configs[null] as $config) {
+                            if ($config->getId()->getClassName() === $className) {
+                                $result = $config;
+                                break;
+                            }
+                        }
+
+                    }
+
+                    return $result;
+                }
+            );
     }
 
     public function testSupportsPreUpdate()
@@ -825,12 +850,12 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             $resultValues = array_merge($resultValues, $values);
         }
 
-        return $this->extendConfigProvider->addFieldConfig(
-            $className,
-            $fieldName,
-            $type,
-            $resultValues
-        );
+        $config = new Config(new FieldConfigId('extend', $className, $fieldName, $type));
+        $config->setValues($resultValues);
+
+        $this->configs[$className][] = $config;
+
+        return $config;
     }
 
     /**
@@ -856,10 +881,12 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             $resultValues = array_merge($resultValues, $values);
         }
 
-        return $this->extendConfigProvider->addEntityConfig(
-            $className,
-            $resultValues
-        );
+        $config = new Config(new EntityConfigId('extend', $className));
+        $config->setValues($resultValues);
+
+        $this->configs[null][] = $config;
+
+        return $config;
     }
 
     /**

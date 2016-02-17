@@ -62,13 +62,13 @@
                     {% if email.emailBody and email.emailBody.hasAttachments %}
                         <i class="icon-paper-clip email-has-attachment"></i>
                     {% endif %}
-                    {{ EA.date_smart_format(email.sentAt|oro_format_datetime) }}<br />
+                    {{ EA.date_smart_format(email.sentAt) }}<br />
                 </div>
             </div>
             <div class="email-participants">
                 <div class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</div>
                 <span class="email-recipients">{{ 'To'|trans }}: {{ EA.email_participants_name(email.recipients, true) }}</span>
-                <div class="email-detailed-info-table dropdown{% if isMobileVersion() %} mobile{% endif %}">
+                <div class="email-detailed-info-table dropdown">
                     <span class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.email.show_details.tooltip'|trans }}">
                         <i class="fa fa-caret-square-o-down"></i>
                     </span>

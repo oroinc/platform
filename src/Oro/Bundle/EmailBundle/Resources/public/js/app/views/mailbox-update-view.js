@@ -30,6 +30,8 @@ define([
             var passwordHolderField = $('input[name="oro_email_mailbox[passwordHolder]"]');
             var passwordField = $('input[name="oro_email_mailbox[origin][password]"]');
             passwordField.val(passwordHolderField.val());
+
+            this.listenTo(mediator, 'change:systemMailBox:email', _.bind(this.onChangeEmail, this));
         },
 
         changeHandler: function(event) {
@@ -39,6 +41,16 @@ define([
 
             data.push({name: this.RELOAD_MARKER, value: true});
             mediator.execute('submitPage', {url: url, type: method, data: $.param(data)});
+        },
+
+        onChangeEmail: function(data) {
+            var $oroEmailMailBoxEmail = this.$el.find('input[name="oro_email_mailbox[email]"]');
+            if (data && data.email) {
+                $oroEmailMailBoxEmail.val(data.email);
+                $oroEmailMailBoxEmail.attr('readonly', 'readonly');
+            } else {
+                $oroEmailMailBoxEmail.removeAttr('readonly');
+            }
         }
     });
 });

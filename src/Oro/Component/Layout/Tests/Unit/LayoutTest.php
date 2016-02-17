@@ -6,7 +6,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutRendererRegistry;
 
-class LayoutTest extends \PHPUnit_Framework_TestCase
+class LayoutTest extends LayoutTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
@@ -108,6 +108,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
 
         $childView                  = new BlockView($view);
         $view->children['child_id'] = $childView;
+        $this->setLayoutBlocks(['root' => $view]);
 
         $this->renderer->expects($this->once())
             ->method('setBlockTheme')

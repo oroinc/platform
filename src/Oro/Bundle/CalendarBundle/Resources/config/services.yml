@@ -203,7 +203,8 @@ services:
         class: %oro_calendar.activity_list.provider.class%
         arguments:
            - @oro_entity.doctrine_helper
-           - @doctrine
+           - @oro_activity.association_helper
+           - @oro_comment.association_helper
         tags:
            - {name: oro_activity_list.provider, priority: 50}
 
@@ -253,4 +254,12 @@ services:
         class: %oro_calendar.system_calendar_event.datagrid_helper.class%
         arguments:
             - @oro_security.security_facade
+
+    oro_calendar.workflow.action.create_calendar_event:
+        class: Oro\Bundle\CalendarBundle\Workflow\Action\CreateCalendarEventAction
+        arguments:
+            - @oro_workflow.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_workflow.action, alias: create_calendar_event }
 

@@ -53,7 +53,7 @@ define(function(require) {
         listen: {
             'adoptedFormResetClick': 'remove',
             'widgetRender': 'onWidgetRender',
-            'contentLoad': 'onContentUpdated',
+            'widgetReady': 'onContentUpdated',
             'page:request mediator': 'onPageChange'
         },
 

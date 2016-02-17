@@ -11,6 +11,7 @@ define(function(require) {
     WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 3,
         TEXTAREA_UI_HEIGHT: 22,
+        TINYMCE_TIMEOUT: 1000, //after this time view promise will be resolved anyway
 
         autoRender: true,
         firstRender: true,
@@ -92,17 +93,6 @@ define(function(require) {
             }
             this.$el.tinymce(_.extend({
                 'init_instance_callback': function(editor) {
-                    /**
-                     * fix of https://magecore.atlassian.net/browse/BAP-7130
-                     * "WYSWING editor does not work with IE"
-                     * Please check if it's still required after tinyMCE update
-                     */
-                    setTimeout(function() {
-                        var focusedElement = $(':focus');
-                        editor.focus();
-                        focusedElement.focus();
-                    }, 0);
-
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
                     _.defer(function() {
@@ -115,6 +105,23 @@ define(function(require) {
                 }
             }, options));
             this.tinymceConnected = true;
+
+            /**
+             * In case when TinyMCE in some reason wasn't initialized we resolve the view anyway
+             */
+            _.delay(function() {
+                if ('deferredRender' in self === false) {
+                    return;
+                }
+                if (window.console && window.console.warn) {
+                    window.console.warn('TinyMCE initialization fault');
+                }
+                self.removeSubview('loadingMask');
+                self.tinymceInstance = null;
+                self.tinymceConnected = false;
+                self.$el.css('visibility', '');
+                self._resolveDeferredRender();
+            }, this.TINYMCE_TIMEOUT);
         },
 
         setEnabled: function(enabled) {

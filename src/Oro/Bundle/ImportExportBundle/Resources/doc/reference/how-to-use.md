@@ -29,7 +29,7 @@ Generally you should implement both interfaces if you need to add both import an
 
 **Example of simple normalizer**
 
-```
+```php
 <?php
 
 namespace OroCRM\Bundle\ContactBundle\ImportExport\Serializer\Normalizer;
@@ -72,7 +72,7 @@ configuration:
 
 **Example of normalizer service configuration**
 
-```
+```yml
 parameters:
     orocrm_contact.importexport.normalizer.group.class: OroCRM\Bundle\ContactBundle\ImportExport\Serializer\Normalizer\GroupNormalizer
 services:
@@ -125,7 +125,7 @@ class GroupDataConverter extends AbstractTableDataConverter
 
 **Service**
 
-```
+```yml
 services:
     orocrm_contact.importexport.data_converter.group:
         parent: oro_importexport.data_converter.configurable
@@ -141,7 +141,7 @@ Export Processor
 At this point after normalizers are registered and data converter is available export can be already configured using
 DI configuration.
 
-```
+```yml
 services:
     orocrm_contact.importexport.processor.export_group:
         parent: oro_importexport.processor.export_abstract
@@ -157,7 +157,7 @@ OroImportExportBundle:ImportExport:instantExport (route **oro_importexport_expor
 Now if you'll send a request to URL **/export/instant/orocrm_contact_group** you will receive a response with URL
 of result exported file and some additional information:
 
-```
+```json
 {
     "success":true,
     "url":"/export/download/orocrm_contact_group_2013_10_03_13_44_53_524d4aa53ffb9.csv",
@@ -204,7 +204,7 @@ class ContactAddOrReplaceStrategy extends ConfigurableAddOrReplaceStrategy
 
 **Service**
 
-```
+```yml
 services:
     orocrm_contact.importexport.strategy.group.add_or_replace:
         class: %orocrm_contact.importexport.strategy.group.class%
@@ -217,7 +217,7 @@ Import Processor
 At this point after normalizers are registered, data converter is available and strategy is implemented import can be
 already configured using DI configuration.
 
-```
+```yml
 services:
     # Import processor
     orocrm_contact.importexport.processor.import_group:
@@ -294,7 +294,7 @@ class ContactFixture implements TemplateFixtureInterface
 
 **Define a service:**
 
-```
+```yml
 parameters:
     orocrm_contact.importexport.template_fixture.contact.class: OroCRM\Bundle\ContactBundle\ImportExport\TemplateFixture\ContactFixture
 
@@ -307,13 +307,13 @@ services:
 ```
 
 **Define fixture converter:**
-```
+```yml
     orocrm_contact.importexport.template_fixture.data_converter.contact:
         parent: oro_importexport.data_converter.template_fixture.configurable
 ```
 
 **Define export processor:**
-```
+```yml
     orocrm_contact.importexport.processor.export_template:
         parent: oro_importexport.processor.export_abstract
         calls:

@@ -11,10 +11,6 @@ liip_imagine:
                 thumbnail:    { size: [16, 16], mode: outbound }
                 strip:        ~
 
-twig:
-    globals:
-        assets_version:       "%assets_version%"
-
 assetic:
     assets:
         jstree:

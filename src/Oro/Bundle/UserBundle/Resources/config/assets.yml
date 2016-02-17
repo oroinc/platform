@@ -1,0 +1,3 @@
+css:
+    orouser:
+        - 'bundles/orouser/css/less/main.less'

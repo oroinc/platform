@@ -4,9 +4,9 @@ namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
-use Symfony\Component\DependencyInjection\Reference;
 
 class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,6 +38,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
 
         $processorBag = new Definition('Test\ProcessorBag');
 
@@ -175,6 +176,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
     public function testProcessWithInvalidConfigurationOfCommonProcessor()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
 
         $processorBag = new Definition('Test\ProcessorBag');
 

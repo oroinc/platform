@@ -472,7 +472,7 @@ span.icon.grid .icon-paperclip {
   }
   .dropdown-menu {
     padding: 8px 10px 2px 0px;
-    margin-left: -20px;
+    margin-left: -16px;
     margin-top: 3px;
     &:before {
       content: '';
@@ -494,6 +494,9 @@ span.icon.grid .icon-paperclip {
       position: absolute;
       top: -6px;
       left: 20px;
+    }
+    &.fixed-width .controls {
+      white-space: normal;
     }
     ul {
       margin: 0;
@@ -664,9 +667,7 @@ a.attachment .icon .icon-link {
   background-color: orange;
   color: white;
   border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  padding: 2px 2px 2px 3px;
+  padding: 2px 3px;
   font-size: 12px;
 }
 .oro-email-user-emails .email-count {
@@ -710,12 +711,14 @@ a.sync-btn span.dots {
     margin-left: 20px;
   }
 
-  #folder-list {
-    margin-left: 20px;
-  }
+  .folder-tree-widget {
+    .folder-list {
+      margin-left: 20px;
+    }
 
-  #check-all {
-    margin: 0;
+    input[type="checkbox"] {
+      margin: 0;
+    }
   }
 }
 .check-connection-messages .alert {
@@ -724,5 +727,11 @@ a.sync-btn span.dots {
 
 #oro_email_mailbox_origin_check_connection,
 .check-connection-messages {
-    width: 294px;
+  width: 294px;
+}
+
+.container-fluid {
+  .email-activity-widget {
+    margin-bottom: 20px;
+  }
 }

@@ -1,5 +1,5 @@
 .tags-container {
-  line-height: 24px;
+  line-height: 23px;
 }
 
 .table td.tags-container {
@@ -11,16 +11,50 @@
   color: @tagItemColor;
   background-color: @tagItemBackground;
   border-radius: 10px;
-  margin-right: 0px;
-  font-size: 11px;
-  line-height: 20px;
-  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 12px;
+  padding: 5px 8px;
+  margin: 0 0 3px 0;
   display: inline-block;
-  vertical-align: baseline;
+  vertical-align: bottom;
   &:hover, &:focus {
     color: @tagItemColor;
+    outline-style: none;
   }
 }
 .tags-container__tag-entry_is-my {
   background-color: @tagItemBackground;
+}
+
+.tags-form-select-editor {
+  min-width: 100px; // ignore min-width
+  .select2-container {
+    height: auto;
+  }
+  .select2-choices {
+    max-height: 40vh;
+    min-width: 130px;
+    overflow: auto;
+    .select2-search-choice {
+      font-size: 11px;
+      line-height: 12px;
+      padding: 5px 20px 5px 8px;
+      color: @tagItemColor;
+      background: @tagItemBackground;
+      border: 0 none;
+      border-radius: 10px;
+      box-shadow: none;
+      margin-left: 4px;
+      margin-bottom: 0;
+      .select2-search-choice-close {
+        top: 6px;
+        &:before {
+          color: @tagItemColor;
+        }
+      }
+      &.select2-locked {
+        padding: 4px 5px 3px 6px !important;
+      }
+    }
+  }
 }

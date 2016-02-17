@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
@@ -135,8 +136,8 @@ class Object implements \ArrayAccess, \IteratorAggregate
     /**
      * Try to get property using PropertyAccessor
      *
-     * @param string $path
-     * @param null   $default
+     * @param string|PropertyPathInterface $path
+     * @param null                         $default
      *
      * @return mixed
      */
@@ -156,6 +157,25 @@ class Object implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Check property existence using PropertyAccessor
+     *
+     * @param string|PropertyPathInterface $path
+     *
+     * @return mixed
+     */
+    public function offsetExistByPath($path)
+    {
+        try {
+            $value = $this->accessor->getValue($this, $path);
+        } catch (NoSuchPropertyException $e) {
+            return false;
+        }
+
+        // If NULL then result is FALSE, same behavior as function isset() has
+        return $value !== null;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function offsetSet($offset, $value)
@@ -168,8 +188,8 @@ class Object implements \ArrayAccess, \IteratorAggregate
     /**
      * Set property using PropertyAccessor
      *
-     * @param string $path
-     * @param mixed  $value
+     * @param string|PropertyPathInterface $path
+     * @param mixed                        $value
      *
      * @return $this
      */
@@ -191,9 +211,11 @@ class Object implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Expects data format for array data
+     * Unset property using PropertyAccessor
      *
-     * {@inheritDoc}
+     * @param string|PropertyPathInterface $path
+     *
+     * @return $this
      */
     public function offsetUnsetByPath($path)
     {
@@ -220,7 +242,7 @@ class Object implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * @param string $path
+     * @param string|PropertyPathInterface $path
      * @return array
      */
     protected function explodeArrayPath($path)
@@ -270,8 +292,8 @@ class Object implements \ArrayAccess, \IteratorAggregate
     /**
      * Merge value to array property, if property not isset creates new one
      *
-     * @param  string $path
-     * @param array   $value
+     * @param string|PropertyPathInterface $path
+     * @param array                        $value
      *
      * @return $this
      */

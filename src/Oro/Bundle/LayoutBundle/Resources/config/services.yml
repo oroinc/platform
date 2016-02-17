@@ -152,3 +152,10 @@ services:
         arguments:
             - @oro_layout.expression.assembler
             - @oro_layout.expression.encoder_registry
+
+    oro_layout.config_expression.asset:
+        class: Oro\Bundle\LayoutBundle\ConfigExpression\Asset
+        arguments:
+            - @assets.packages
+        tags:
+            - { name: oro_layout.expression, alias: asset }

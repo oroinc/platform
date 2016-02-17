@@ -129,6 +129,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
 
+    oro_datagrid.event_listener.mixin:
+        class: Oro\Bundle\DataGridBundle\EventListener\MixinListener
+        arguments:
+            - @oro_datagrid.mixin_configuration.helper
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre, method: onPreBuild, priority: 255 }
+
     oro_datagrid.event_listener.grid_views_load:
         class: %oro_datagrid.event_listener.grid_views_load.class%
         arguments:
@@ -231,3 +238,8 @@ services:
         class: Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper
         arguments:
             - @oro_entity.orm.entity_class_resolver
+
+    oro_datagrid.mixin_configuration.helper:
+        class: Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper
+        arguments:
+             - @oro_datagrid.configuration.provider

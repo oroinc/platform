@@ -12,7 +12,7 @@
 
 <span class="nowrap">
 {% if folders is not null %}
-    {% if folders[0].type == 'sent' or folders[0].type == 'drafts' %}
+    {% if record.getValue('outgoing') %}
         <span class="icon grid">
             <i class="icon-signout"></i>
         </span>

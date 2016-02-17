@@ -71,7 +71,7 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
     public function execute(LoggerInterface $logger)
     {
         foreach ($this->queries as $query) {
-            $logger->notice($query);
+            $logger->info($query);
             $this->connection->executeUpdate($query);
         }
     }

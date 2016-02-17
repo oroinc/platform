@@ -9,6 +9,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class DateHelperTest extends OrmTestCase
 {
     /** @var DateHelper */
@@ -31,13 +34,13 @@ class DateHelperTest extends OrmTestCase
         $this->settings->expects($this->any())
             ->method('getTimeZone')
             ->willReturn('UTC');
-        $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+        $this->doctrine  = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->helper = new DateHelper($this->settings, $this->doctrine, $this->aclHelper);
+        $this->helper    = new DateHelper($this->settings, $this->doctrine, $this->aclHelper);
     }
 
     /**
@@ -211,37 +214,37 @@ class DateHelperTest extends OrmTestCase
                 '2007-01-01',
                 '2011-01-01',
                 'SELECT id, YEAR(t.createdAt) as yearCreated '
-                    . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
-                    . 'GROUP BY yearCreated'
+                . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
+                . 'GROUP BY yearCreated'
             ],
             'month' => [
                 '2000-01-01',
                 '2000-05-01',
                 'SELECT id, YEAR(t.createdAt) as yearCreated, MONTH(t.createdAt) as monthCreated '
-                    . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
-                    . 'GROUP BY yearCreated, monthCreated'
+                . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
+                . 'GROUP BY yearCreated, monthCreated'
             ],
             'week'  => [
                 '2000-03-01',
                 '2000-05-01',
                 'SELECT id, YEAR(t.createdAt) as yearCreated, WEEK(t.createdAt) as weekCreated '
-                    . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
-                    . 'GROUP BY yearCreated, weekCreated'
+                . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
+                . 'GROUP BY yearCreated, weekCreated'
             ],
             'day'   => [
                 '2000-03-01',
                 '2000-03-04',
                 'SELECT id, YEAR(t.createdAt) as yearCreated, MONTH(t.createdAt) as monthCreated, '
-                    . 'DAY(t.createdAt) as dayCreated '
-                    . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
-                    . 'GROUP BY yearCreated, monthCreated, dayCreated'
+                . 'DAY(t.createdAt) as dayCreated '
+                . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
+                . 'GROUP BY yearCreated, monthCreated, dayCreated'
             ],
             'hour'  => [
                 '2000-03-01',
                 '2000-03-02',
                 'SELECT id, DATE(t.createdAt) as dateCreated, HOUR(t.createdAt) as hourCreated '
-                    . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
-                    . 'GROUP BY dateCreated, hourCreated'
+                . 'FROM Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity t '
+                . 'GROUP BY dateCreated, hourCreated'
             ]
         ];
     }
@@ -262,9 +265,9 @@ class DateHelperTest extends OrmTestCase
     public function testConvertToCurrentPeriod()
     {
         $from = new DateTime('2015-05-10');
-        $to = new DateTime('2015-05-15');
+        $to   = new DateTime('2015-05-15');
 
-        $data = [
+        $data         = [
             [
                 'yearCreated'  => '2015',
                 'monthCreated' => '05',
@@ -305,28 +308,81 @@ class DateHelperTest extends OrmTestCase
         $this->assertSame([], $result);
     }
 
-    public function testCombinePreviousDataWithCurrentPeriod()
+    public function combinePreviousDataWithCurrentPeriodDataProvider()
     {
-        $previousFrom = new DateTime('2015-05-05');
-        $previousTo = new DateTime('2015-05-10');
-
-        $data = [
-            [
-                'yearCreated'  => '2015',
-                'monthCreated' => '05',
-                'dayCreated'   => '07',
-                'cnt'          => 5,
+        return [
+            'general'                         => [
+                new DateTime('2015-05-05'),
+                new DateTime('2015-05-10'),
+                [
+                    [
+                        'yearCreated'  => '2015',
+                        'monthCreated' => '05',
+                        'dayCreated'   => '07',
+                        'cnt'          => 5,
+                    ]
+                ],
+                [
+                    ['date' => '2015-05-10'],
+                    ['date' => '2015-05-11'],
+                    ['date' => '2015-05-12', 'count' => 5],
+                    ['date' => '2015-05-13'],
+                    ['date' => '2015-05-14'],
+                    ['date' => '2015-05-15'],
+                ]
             ],
+            'empty_data_returns_empty_array'  => [
+                new DateTime(),
+                new DateTime(),
+                [],
+                []
+            ],
+            'long_period_last_days_of_month'  => [
+                new DateTime('2015-05-19 23:00:00'),
+                new DateTime('2015-08-30 00:00:00'),
+                [
+                    [
+                        'yearCreated'  => '2015',
+                        'monthCreated' => '07',
+                        'dayCreated'   => '12',
+                        'cnt'          => 5,
+                    ]
+                ],
+                [
+                    ['date' => '2015-08-01'],
+                    ['date' => '2015-09-01'],
+                    ['date' => '2015-10-01'],
+                    ['date' => '2015-11-01', 'count' => 5],
+                    ['date' => '2015-12-01'],
+                ]
+            ],
+            'long_period_first_days_of_month' => [
+                new DateTime('2015-03-02 22:00:00'),
+                new DateTime('2015-08-01 00:00:00'),
+                [
+                    [
+                        'yearCreated'  => '2015',
+                        'monthCreated' => '07',
+                        'dayCreated'   => '12',
+                        'cnt'          => 5,
+                    ]
+                ],
+                [
+                    ['date' => '2015-08-01'],
+                    ['date' => '2015-09-01'],
+                    ['date' => '2015-10-01'],
+                    ['date' => '2015-11-01', 'count' => 5],
+                    ['date' => '2015-12-01'],
+                ]
+            ]
         ];
-        $expectedData = [
-            ['date' => '2015-05-10'],
-            ['date' => '2015-05-11'],
-            ['date' => '2015-05-12', 'count' => 5],
-            ['date' => '2015-05-13'],
-            ['date' => '2015-05-14'],
-            ['date' => '2015-05-15'],
-        ];
+    }
 
+    /**
+     * @dataProvider combinePreviousDataWithCurrentPeriodDataProvider
+     */
+    public function testCombinePreviousDataWithCurrentPeriod($previousFrom, $previousTo, $data, $expectedData)
+    {
         $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(
             $previousFrom,
             $previousTo,
@@ -336,5 +392,39 @@ class DateHelperTest extends OrmTestCase
         );
 
         $this->assertEquals($expectedData, $actualData);
+    }
+
+    /**
+     * @dataProvider getPreviousDateTimeIntervalDataProvider
+     *
+     * @param Datetime $from
+     * @param Datetime $to
+     * @param Datetime $expectedStart
+     * @param Datetime $expectedEnd
+     */
+    public function testGetPreviousDateTimeInterval(
+        \Datetime $from,
+        \Datetime $to,
+        \Datetime $expectedStart,
+        \Datetime $expectedEnd
+    ) {
+        list($start, $end) = $this->helper->getPreviousDateTimeInterval($from, $to);
+
+        $this->assertEquals($start, $expectedStart);
+        $this->assertEquals($end, $expectedEnd);
+    }
+
+    public function getPreviousDateTimeIntervalDataProvider()
+    {
+        $timezone = new \DateTimeZone('UTC');
+
+        return [
+            [
+                'from'          => new \DateTime('2014-01-01 00:00:00', $timezone),
+                'to'            => new \DateTime('2014-01-02 23:59:59', $timezone),
+                'expectedStart' => new \DateTime('2013-12-30 00:00:00', $timezone),
+                'expectedEnd'   => new \DateTime('2013-12-31 23:59:59', $timezone),
+            ]
+        ];
     }
 }

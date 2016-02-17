@@ -102,7 +102,9 @@ class ActivityListListener
     {
         if (!empty($entities)) {
             foreach ($entities as $hash => $entity) {
-                if ($this->activityListManager->isSupportedEntity($entity) && empty($this->deletedEntities[$hash])) {
+                if (empty($this->deletedEntities[$hash])
+                    && $this->activityListManager->isSupportedEntity($entity)
+                ) {
                     $this->deletedEntities[$hash] = [
                         'class' => $this->doctrineHelper->getEntityClass($entity),
                         'id'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
@@ -121,8 +123,9 @@ class ActivityListListener
     {
         $entities = $uof->getScheduledEntityUpdates();
         foreach ($entities as $hash => $entity) {
-            if ($this->activityListManager->isSupportedEntity($entity)
-                && empty($this->updatedEntities[$hash])) {
+            if (empty($this->updatedEntities[$hash])
+                && $this->activityListManager->isSupportedEntity($entity)
+            ) {
                 $this->updatedEntities[$hash] = $entity;
             }
         }
@@ -134,9 +137,9 @@ class ActivityListListener
             /** @var $collection PersistentCollection */
             $ownerEntity = $collection->getOwner();
             $entityHash  = spl_object_hash($ownerEntity);
-            if ($this->activityListManager->isSupportedEntity($ownerEntity)
+            if (empty($this->updatedEntities[$entityHash])
+                && $this->activityListManager->isSupportedEntity($ownerEntity)
                 && $this->doctrineHelper->getSingleEntityIdentifier($ownerEntity) !== null
-                && empty($this->updatedEntities[$entityHash])
             ) {
                 $this->updatedEntities[$entityHash] = $ownerEntity;
             }
@@ -182,8 +185,9 @@ class ActivityListListener
     protected function collectInsertedEntities(array $entities)
     {
         foreach ($entities as $hash => $entity) {
-            if ($this->activityListManager->isSupportedEntity($entity)
-                && empty($this->insertedEntities[$hash])) {
+            if (empty($this->insertedEntities[$hash])
+                && $this->activityListManager->isSupportedEntity($entity)
+            ) {
                 $this->insertedEntities[$hash] = $entity;
             }
         }

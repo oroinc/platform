@@ -138,6 +138,13 @@
     {% endset %}
     {% set actions = actions|merge([action]) %}
 
+    {% set action %}
+        <a href="<%= routing.generate('oro_email_thread_view', {'id': relatedActivityId}) %>"
+           title="{{ 'oro.email.view'|trans|raw }}"><i
+                class="icon-eye-open hide-text">{{ 'oro.email.view'|trans|raw }}</i></a>
+    {% endset %}
+    {% set actions = actions|merge([action]) %}
+
     {{ parent() }}
 {% endblock %}
 

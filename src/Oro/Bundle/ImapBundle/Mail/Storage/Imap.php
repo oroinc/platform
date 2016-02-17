@@ -7,6 +7,7 @@ use Zend\Mail\Storage\Exception as BaseException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 
 /**
  * Class Imap
@@ -108,9 +109,15 @@ class Imap extends \Zend\Mail\Storage\Imap
 
         $this->protocol = new ProtocolImap();
         $this->protocol->connect($host, $port, $ssl);
-        if (!$this->protocol->login($params->user, $password)) {
-            throw new BaseException\RuntimeException('cannot login, user or password wrong');
+
+        if ($params->accessToken === null) {
+            if (!$this->protocol->login($params->user, $password)) {
+                throw new BaseException\RuntimeException('cannot login, user or password wrong');
+            }
+        } else {
+            $this->oauth2Authenticate($params->user, $params->accessToken);
         }
+
         $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
 
         $this->postInit();
@@ -383,6 +390,9 @@ class Imap extends \Zend\Mail\Storage\Imap
         return $message;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getRawContent($id, $part = null)
     {
         if ($part !== null) {
@@ -422,5 +432,33 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         return in_array(self::CAPABILITY_IMAP4, $this->capability(), true)
             || in_array(self::CAPABILITY_IMAP4_REV_1, $this->capability(), true);
+    }
+
+    /**
+     * @param string $email
+     * @param string $accessToken
+     *
+     * @throws OAuth2ConnectException
+     */
+    protected function oauth2Authenticate($email, $accessToken)
+    {
+        $authenticateParams = ['XOAUTH2', base64_encode("user=$email\1auth=Bearer $accessToken\1\1")];
+        $this->protocol->sendRequest('AUTHENTICATE', $authenticateParams);
+        while (true) {
+            $response = "";
+            $isExtraServerChallenge = $this->protocol->readLine($response, '+', true);
+            if ($isExtraServerChallenge) {
+                // Send empty client response.
+                $this->protocol->sendRequest('');
+            } else {
+                if (preg_match('/^NO /i', $response) || preg_match('/^BAD /i', $response)) {
+                    throw new OAuth2ConnectException(
+                        "Cannot login with XOAuth2, user or token wrong.\nResponse: " . $response
+                    );
+                } elseif (preg_match("/^OK /i", $response)) {
+                    return;
+                }
+            }
+        }
     }
 }

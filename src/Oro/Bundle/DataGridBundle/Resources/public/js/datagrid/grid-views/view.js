@@ -596,7 +596,7 @@ define(function(require) {
                             currentView.get('deletable')
                 },
                 {
-                    label: __('oro.datagrid.action.use_as_default_grid_view'),
+                    label: __('oro.datagrid.action.set_as_default_grid_view'),
                     name: 'use_as_default',
                     enabled: typeof currentView !== 'undefined' && !currentView.get('is_default')
                 }

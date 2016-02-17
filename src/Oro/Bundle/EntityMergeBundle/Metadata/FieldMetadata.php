@@ -153,8 +153,10 @@ class FieldMetadata extends Metadata implements MetadataInterface
     {
         if (!$this->hasMergeMode($mergeMode)) {
             $mergeModes = $this->getMergeModes();
-            $mergeModes[] = $mergeMode;
-            $this->set('merge_modes', $mergeModes);
+
+            //add to the front of the array, because target strategy must be the first
+            array_unshift($mergeModes, $mergeMode);
+            $this->set('merge_modes', array_unique($mergeModes));
         }
     }
 

@@ -7,6 +7,12 @@ parameters:
     oro_comment.placeholder.filter.class:             Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter
 
 services:
+    oro_comment.association_helper:
+        class: Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+
     oro_comment.migration.extension.comment:
         class: %oro_comment.migration.extension.comment.class%
         tags:
@@ -51,8 +57,7 @@ services:
     oro_comment.placeholder.filter:
         class: %oro_comment.placeholder.filter.class%
         arguments:
-            - @oro_entity_config.provider.comment
-            - @oro_entity_config.provider.entity
+            - @oro_comment.association_helper
             - @oro_entity.doctrine_helper
             - @oro_security.security_facade
 

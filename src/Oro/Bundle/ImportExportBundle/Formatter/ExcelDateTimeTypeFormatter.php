@@ -54,7 +54,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
         }
 
         if ($value) {
-            $formatter = $this->getFormatter($dateType, $timeType, $locale, $timeZone, $pattern);
+            $formatter = $this->getFormatter($dateType, $timeType, $locale, $timeZone, $pattern, $value);
             $timestamp = $formatter->parse($value);
             if (intl_get_error_code() === 0) {
                 return $this->getDateTime($timestamp);
@@ -97,11 +97,11 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
     /**
      * {@inheritdoc}
      */
-    public function getPattern($dateType, $timeType, $locale = null)
+    public function getPattern($dateType, $timeType, $locale = null, $value = null)
     {
         $pattern = parent::getPattern($dateType, $timeType, $locale);
 
-        return $this->modifyPattern($pattern, $dateType, $timeType);
+        return $this->modifyPattern($pattern, $dateType, $timeType, $value);
     }
 
     /**
@@ -110,13 +110,15 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
      *
      * @link http://userguide.icu-project.org/formatparse/datetime
      *
-     * @param string $pattern
-     * @param int    $timeType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
-     * @param int    $dateType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
+     * @param string      $pattern
+     * @param int         $dateType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
+     *
+     * @param int         $timeType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
+     * @param string|null $value
      *
      * @return string
      */
-    protected function modifyPattern($pattern, $dateType, $timeType)
+    protected function modifyPattern($pattern, $dateType, $timeType, $value = null)
     {
         $patternParts = [];
 
@@ -129,7 +131,11 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
         }
 
         if ($timeType !== \IntlDateFormatter::NONE) {
-            $patternParts[] = 'HH:mm:ss';
+            $timePattern = 'HH:mm:ss';
+            if ($value !== null && substr_count($value, ':') < 2) {
+                $timePattern = 'HH:mm';
+            }
+            $patternParts[] = $timePattern;
         }
 
         return implode(' ', $patternParts);

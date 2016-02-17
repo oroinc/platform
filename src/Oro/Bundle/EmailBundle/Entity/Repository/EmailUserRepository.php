@@ -124,6 +124,7 @@ class EmailUserRepository extends EntityRepository
 
         return $qb->update()->set('email_user.seen', ':seen')
             ->where($qb->expr()->in('email_user.id', ':ids'))
+            ->andWhere('email_user.unsyncedFlagCount = 0')
             ->setParameter('seen', $seen)
             ->setParameter('ids', $ids)
             ->getQuery()->execute();
