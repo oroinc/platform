@@ -263,12 +263,17 @@ define(function(require) {
                 return this.dateVariableHelper.formatRawValue(value);
             }
 
-            var part = this.$variables.dateVariables('getPart');
-            if (part === 'value') {
+            if (this.$variables.dateVariables('getPart') === 'value') {
                 return VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
             }
 
-            switch (part) {
+            return this.getBackendPartFormattedValue();
+        },
+
+        getBackendPartFormattedValue: function() {
+            var value = this.$frontDateField.val();
+
+            switch (this.$variables.dateVariables('getPart')) {
                 case 'dayofweek':
                     return findKey(localeSettings.getCalendarDayOfWeekNames('wide'), value);
                 case 'month':
@@ -289,12 +294,16 @@ define(function(require) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
             }
 
-            var part = this.$variables.dateVariables('getPart');
-            if (part === 'value') {
-                value = VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
+            if (this.$variables.dateVariables('getPart') === 'value') {
+                return VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
             }
 
-            switch (part) {
+            return this.getFrontendPartFormattedDate();
+        },
+
+        getFrontendPartFormattedDate: function() {
+            var value = this.$el.val();
+            switch (this.$variables.dateVariables('getPart')) {
                 case 'dayofweek':
                     return localeSettings.getCalendarDayOfWeekNames('wide')[value];
                 case 'month':

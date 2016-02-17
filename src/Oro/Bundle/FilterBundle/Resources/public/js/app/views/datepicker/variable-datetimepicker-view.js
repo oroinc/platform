@@ -83,11 +83,14 @@ define(function(require) {
         getBackendFormattedValue: function() {
             var value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
-                value = this.dateVariableHelper.formatRawValue(value);
-            } else {
-                value = dateTimePickerViewMixin.getBackendFormattedValue.call(this);
+                return this.dateVariableHelper.formatRawValue(value);
             }
-            return value;
+
+            if (this.$variables.dateVariables('getPart') === 'value') {
+                return dateTimePickerViewMixin.getBackendFormattedValue.call(this);
+            }
+
+            return this.getBackendPartFormattedValue();
         },
 
         /**
@@ -98,11 +101,14 @@ define(function(require) {
         getFrontendFormattedDate: function() {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
-                value = this.dateVariableHelper.formatDisplayValue(value);
-            } else {
-                value = dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
+                return this.dateVariableHelper.formatDisplayValue(value);
             }
-            return value;
+
+            if (this.$variables.dateVariables('getPart') === 'value') {
+                return dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
+            }
+
+            return this.getFrontendPartFormattedDate();
         }
     }));
 
