@@ -428,15 +428,15 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->permissionManager->expects($this->any())
             ->method('getPermissionsMap')
             ->willReturn([
-            'VIEW'   => 1,
-            'CREATE' => 2,
-            'EDIT'   => 3,
-            'DELETE' => 4,
-            'ASSIGN' => 5,
-            'SHARE'  => 6,
-            'PERMISSION' => 7,
-            'UNKNOWN' => 8,
-        ]);
+                'VIEW'   => 1,
+                'CREATE' => 2,
+                'EDIT'   => 3,
+                'DELETE' => 4,
+                'ASSIGN' => 5,
+                'SHARE'  => 6,
+                'PERMISSION' => 7,
+                'UNKNOWN' => 8,
+            ]);
 
         /* @var $entityClassResolver EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject  */
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
