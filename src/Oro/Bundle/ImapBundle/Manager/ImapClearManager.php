@@ -104,7 +104,7 @@ class ImapClearManager implements LoggerAwareInterface
     protected function clearOrigin($origin)
     {
         $this->listener->setEnabled(false);
-        
+
         $folders          = $origin->getFolders();
         $folderRepository = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
 
