@@ -11,6 +11,9 @@ use Buzz\Message\Request;
 use Buzz\Message\RequestInterface;
 use Buzz\Message\Response;
 
+use HWI\Bundle\OAuthBundle\OAuth\Response\PathUserResponse;
+use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
@@ -19,9 +22,13 @@ class ImapEmailGoogleOauth2Manager
     const OAUTH2_ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
     const OAUTH2_GMAIL_SCOPE = 'https://mail.google.com/';
     const RETRY_TIMES = 3;
+    const RESOURCE_OWNER_GOOGLE = 'google';
 
     /** @var Curl */
     protected $httpClient;
+
+    /** @var ResourceOwnerMap */
+    protected $resourceOwnerMap;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -31,15 +38,18 @@ class ImapEmailGoogleOauth2Manager
 
     /**
      * @param ClientInterface $httpClient
+     * @param ResourceOwnerMap $resourceOwnerMap
      * @param ConfigManager $configManager
      * @param Registry $doctrine
      */
     public function __construct(
         ClientInterface $httpClient,
+        ResourceOwnerMap $resourceOwnerMap,
         ConfigManager $configManager,
         Registry $doctrine
     ) {
         $this->httpClient = $httpClient;
+        $this->resourceOwnerMap = $resourceOwnerMap;
         $this->configManager = $configManager;
         $this->doctrine = $doctrine;
     }
@@ -74,6 +84,52 @@ class ImapEmailGoogleOauth2Manager
     }
 
     /**
+     * @param string $accessToken
+     *
+     * @return PathUserResponse
+     */
+    public function getUserInfo($accessToken)
+    {
+        $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName(self::RESOURCE_OWNER_GOOGLE);
+
+        return $resourceOwner->getUserInformation(['access_token' => $accessToken]);
+    }
+
+    /**
+     * @param UserEmailOrigin $origin
+     *
+     * @return mixed
+     */
+    public function getAccessToken(UserEmailOrigin $origin)
+    {
+        $utcTimeZone = new \DateTimeZone('UTC');
+        $parameters = [
+            'refresh_token' => $origin->getRefreshToken(),
+            'grant_type' => 'refresh_token'
+        ];
+
+        $attemptNumber = 0;
+        do {
+            $attemptNumber++;
+            $response = $this->doHttpRequest($parameters);
+
+            if (!empty($response['access_token'])) {
+                $token = $response['access_token'];
+                $origin->setAccessToken($token);
+                $newExpireDate = new \DateTime('+' . ((int)$response['expires_in'] - 5) . ' seconds', $utcTimeZone);
+                $origin->setAccessTokenExpiresAt($newExpireDate);
+
+                $this->doctrine->getManager()->persist($origin);
+                $this->doctrine->getManager()->flush();
+
+                return $token;
+            }
+        } while ($attemptNumber <= self::RETRY_TIMES && empty($response['access_token']));
+
+        throw new \Exception('Cannot refresh OAuth2 token for origin.');
+    }
+
+    /**
      * @param UserEmailOrigin $origin
      *
      * @return string
@@ -87,27 +143,11 @@ class ImapEmailGoogleOauth2Manager
         $token = $origin->getAccessToken();
 
         //if token had been expired, the new one must be generated and saved to DB
-        if ($now > $expiresAt && $this->configManager->get('oro_imap.enable_google_imap')) {
-            $parameters = [
-                'refresh_token' => $origin->getRefreshToken(),
-                'grant_type'    => 'refresh_token'
-            ];
-
-            $attemptNumber = 0;
-            do {
-                $attemptNumber++;
-                $response = $this->doHttpRequest($parameters);
-
-                if (!empty($response['access_token'])) {
-                    $token = $response['access_token'];
-                    $origin->setAccessToken($token);
-                    $newExpireDate = new \DateTime('+' . $response['expires_in'] . ' seconds', $utcTimeZone);
-                    $origin->setAccessTokenExpiresAt($newExpireDate);
-
-                    $this->doctrine->getManager()->persist($origin);
-                    $this->doctrine->getManager()->flush();
-                }
-            } while ($attemptNumber <= self::RETRY_TIMES && empty($response['access_token']));
+        if ($now > $expiresAt
+            && $this->configManager->get('oro_imap.enable_google_imap')
+            && $origin->getRefreshToken()
+        ) {
+            $token = $this->getAccessToken($origin);
         }
 
         return $token;

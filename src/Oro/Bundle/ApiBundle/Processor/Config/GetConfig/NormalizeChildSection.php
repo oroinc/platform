@@ -57,9 +57,7 @@ abstract class NormalizeChildSection implements ProcessorInterface
         $this->updatePropertyPath($childSectionConfig, $definition);
         $fields = ConfigUtil::getArrayValue($childSectionConfig, ConfigUtil::FIELDS);
         foreach ($fields as $fieldName => $config) {
-            $fieldPath = !empty($config[ConfigUtil::PROPERTY_PATH])
-                ? $config[ConfigUtil::PROPERTY_PATH]
-                : $fieldName;
+            $fieldPath = ConfigUtil::getPropertyPath($config, $fieldName);
 
             $field = $fieldPrefix . $fieldName;
             if (!isset($sectionConfig[ConfigUtil::FIELDS][$field])) {

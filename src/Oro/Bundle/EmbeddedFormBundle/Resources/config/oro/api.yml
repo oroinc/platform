@@ -1,0 +1,3 @@
+oro_api:
+    entities:
+        Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm: ~

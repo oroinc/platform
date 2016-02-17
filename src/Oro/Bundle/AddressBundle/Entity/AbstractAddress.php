@@ -768,7 +768,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
 
     /**
      * @param ExecutionContextInterface $context
-     * @deprecated Use \Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator instead
+     * @deprecated since 1.9  Use \Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator instead
      */
     public function isRegionValid(ExecutionContextInterface $context)
     {

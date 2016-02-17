@@ -118,4 +118,19 @@ class ConfigUtil extends BaseConfigUtil
 
         return $result;
     }
+
+    /**
+     * Returns the property path to the field.
+     *
+     * @param array|null $fieldConfig
+     * @param string     $fieldName
+     *
+     * @return string
+     */
+    public static function getPropertyPath($fieldConfig, $fieldName)
+    {
+        return !empty($fieldConfig[ConfigUtil::PROPERTY_PATH])
+            ? $fieldConfig[ConfigUtil::PROPERTY_PATH]
+            : $fieldName;
+    }
 }

@@ -1,4 +1,7 @@
 oro_api:
+    entities:
+        Oro\Bundle\AddressBundle\Entity\Address: ~
+
     relations:
         Oro\Bundle\AddressBundle\Entity\AbstractAddress:
             definition:

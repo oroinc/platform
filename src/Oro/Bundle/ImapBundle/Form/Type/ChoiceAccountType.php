@@ -174,10 +174,6 @@ class ChoiceAccountType extends AbstractType
             $userEmailOrigin->setAccessTokenExpiresAt($newExpireDate);
         }
 
-        if (isset($imapGmailConfiguration['googleAuthCode'])) {
-            $userEmailOrigin->setGoogleAuthCode($imapGmailConfiguration['googleAuthCode']);
-        }
-
         $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
 
         return $accountTypeModel;

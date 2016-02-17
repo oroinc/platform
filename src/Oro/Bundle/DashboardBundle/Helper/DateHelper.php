@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Helper;
 
 use \DateTime;
+use \DateInterval;
 
 use Doctrine\ORM\QueryBuilder;
 
@@ -306,6 +307,58 @@ class DateHelper
             $start = new \DateTime($start, new \DateTimeZone('UTC'));
             $start = $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
+
+        return [$start, $end];
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCurrentDateTime()
+    {
+        $now = new DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
+
+        return $now;
+    }
+
+    /**
+     * Gets date interval, depends on the user timezone and $interval.
+     *
+     * @param string $interval
+     *
+     * @return array
+     */
+    public function getDateTimeInterval($interval = 'P1M')
+    {
+        $start = $this->getCurrentDateTime();
+        $start->setTime(0, 0, 0);
+
+        $end = $this->getCurrentDateTime();
+        $end->setTime(23, 59, 59);
+
+        $start = $start->sub(new DateInterval($interval));
+
+        return [$start, $end];
+    }
+
+    /**
+     * Gets previous date interval
+     *
+     * @param DateTime $from
+     * @param DateTime $to
+     *
+     * @return array
+     */
+    public function getPreviousDateTimeInterval(DateTime $from, DateTime $to)
+    {
+        $interval = $from->diff($to);
+        $start    = clone $from;
+        $start    = $start->sub($interval);
+        $start    = $start->sub(new DateInterval('PT1S'));
+
+        $end = clone $to;
+        $end = $end->sub($interval);
+        $end = $end->sub(new DateInterval('PT1S'));
 
         return [$start, $end];
     }

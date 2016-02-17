@@ -90,6 +90,8 @@ define(function(require) {
          *  @return {Promise}
          */
         openWidget: function() {
+            var $element = this.$element;
+            $element.addClass('widget-component-processing');
             var deferredOpen = $.Deferred();
             var widgetModuleName;
             if (!this.widget) {
@@ -102,7 +104,9 @@ define(function(require) {
             } else {
                 this._openWidget(deferredOpen);
             }
-            return deferredOpen.promise();
+            return deferredOpen.then(function() {
+                $element.removeClass('widget-component-processing');
+            }).promise();
         },
 
         /**
@@ -118,6 +122,7 @@ define(function(require) {
 
             if (!this.options.multiple && this.opened) {
                 // single instance is already opened
+                deferredOpen.resolve();
                 return;
             }
 
