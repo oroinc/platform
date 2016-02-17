@@ -2,24 +2,34 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\EventListener;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\LayoutBuilderInterface;
 
+use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutManager;
 
     /** @var LayoutListener */
     protected $listener;
+
+    /** @var LayoutHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $layoutHelper;
 
     protected function setUp()
     {
@@ -27,13 +37,10 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->any())
-            ->method('get')
-            ->with('oro_layout.layout_manager')
-            ->will($this->returnValue($this->layoutManager));
+        $this->layoutHelper = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Request\LayoutHelper')
+            ->disableOriginalConstructor()->getMock();
 
-        $this->listener = new LayoutListener($container);
+        $this->listener = new LayoutListener($this->layoutHelper, $this->layoutManager);
     }
 
     public function testShouldNotModifyResponseWithoutLayoutAnnotation()
@@ -196,9 +203,10 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage The empty @Layout() annotation must be used when the controller returns an instance of "Oro\Component\Layout\Layout".
+     * @param array $options
      */
     // @codingStandardsIgnoreEnd
-    public function testShouldThrowExceptionWhenAlreadyBuiltLayoutReturnedAndLayoutAnnotationIsNotEmpty($options)
+    public function testShouldThrowExceptionWhenAlreadyBuiltLayoutReturnedAndLayoutAnnotationIsNotEmpty(array $options)
     {
         $attributes    = ['_layout' => new LayoutAnnotation($options)];
         $layout        = $this->getMockBuilder('Oro\Component\Layout\Layout')
@@ -208,6 +216,9 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
+    /**
+     * @return array
+     */
     public function getNotEmptyAnnotationDataProvider()
     {
         return [
@@ -267,7 +278,11 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    protected function setupLayoutExpectations($builder = null, $assertContextCallback = null)
+    /**
+     * @param LayoutBuilderInterface|null $builder
+     * @param \Closure|null $assertContextCallback
+     */
+    protected function setupLayoutExpectations($builder = null, \Closure $assertContextCallback = null)
     {
         if (null === $builder) {
             $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
@@ -309,8 +324,20 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createResponseForControllerResultEvent(array $attributes, $controllerResult)
     {
+        $annotation = null;
+        if (array_key_exists('_layout', $attributes)) {
+            $annotation = $attributes['_layout'];
+        }
+
+        $this->layoutHelper->expects($this->once())
+            ->method('getLayoutAnnotation')
+            ->willReturn($annotation);
+
+        /** @var HttpKernelInterface|\PHPUnit_Framework_MockObject_MockObject $kernel */
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+
         return new GetResponseForControllerResultEvent(
-            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $kernel,
             new Request([], [], $attributes),
             HttpKernelInterface::MASTER_REQUEST,
             $controllerResult

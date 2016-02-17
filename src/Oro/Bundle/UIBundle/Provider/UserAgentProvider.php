@@ -2,41 +2,46 @@
 
 namespace Oro\Bundle\UIBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class UserAgentProvider implements UserAgentProviderInterface
 {
+    const UNKNOWN_USER_AGENT = 'unknown_user_agent';
 
-    /** @var ContainerInterface */
-    protected $container;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var UserAgent[] */
     protected $cache = [];
 
     /**
-     * @param ContainerInterface $container
+     * @param RequestStack $requestStack
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->container = $container;
+        $this->requestStack = $requestStack;
     }
 
     /**
-     * @return UserAgent
+     * {@inheritdoc}
      */
     public function getUserAgent()
     {
-        $request   = $this->container->get('request');
-        $userAgent = $request->headers->get('User-Agent');
+        $userAgentName = self::UNKNOWN_USER_AGENT;
 
-        if (isset($this->cache[$userAgent])) {
-            $agent = $this->cache[$userAgent];
-        } else {
-            $agent = new UserAgent($userAgent);
-
-            $this->cache[$userAgent] = $agent;
+        $request = $this->requestStack->getMasterRequest();
+        if ($request) {
+            /** @var string $userAgentName */
+            $userAgentHeader = $request->headers->get('User-Agent');
+            if ($userAgentHeader) {
+                $userAgentName = $userAgentHeader;
+            }
         }
 
-        return $agent;
+        if (!array_key_exists($userAgentName, $this->cache)) {
+            $this->cache[$userAgentName] = new UserAgent($userAgentName);
+        }
+
+        return $this->cache[$userAgentName];
     }
 }

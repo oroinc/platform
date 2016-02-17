@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -12,6 +11,7 @@ use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\LogicException;
 
+use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 
 /**
@@ -19,15 +19,24 @@ use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
  */
 class LayoutListener
 {
-    /** @var ContainerInterface */
-    protected $container;
+    /**
+     * @var LayoutHelper
+     */
+    protected $layoutHelper;
 
     /**
-     * @param ContainerInterface $container The service container instance
+     * @var LayoutManager
      */
-    public function __construct(ContainerInterface $container)
+    protected $layoutManager;
+
+    /**
+     * @param LayoutHelper $layoutHelper
+     * @param LayoutManager $layoutManager
+     */
+    public function __construct(LayoutHelper $layoutHelper, LayoutManager $layoutManager)
     {
-        $this->container = $container;
+        $this->layoutHelper = $layoutHelper;
+        $this->layoutManager = $layoutManager;
     }
 
     /**
@@ -42,8 +51,7 @@ class LayoutListener
     {
         $request = $event->getRequest();
 
-        /** @var LayoutAnnotation|null $layoutAnnotation */
-        $layoutAnnotation = $request->attributes->get('_layout');
+        $layoutAnnotation = $this->layoutHelper->getLayoutAnnotation($request);
         if (!$layoutAnnotation) {
             return;
         }
@@ -91,9 +99,7 @@ class LayoutListener
      */
     protected function getLayout(ContextInterface $context, LayoutAnnotation $layoutAnnotation)
     {
-        /** @var LayoutManager $layoutManager */
-        $layoutManager = $this->container->get('oro_layout.layout_manager');
-        $layoutBuilder = $layoutManager->getLayoutBuilder();
+        $layoutBuilder = $this->layoutManager->getLayoutBuilder();
         // TODO discuss adding root automatically
         $layoutBuilder->add('root', null, 'root');
 

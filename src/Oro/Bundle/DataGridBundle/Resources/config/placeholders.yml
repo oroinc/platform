@@ -18,21 +18,22 @@ placeholders:
             template_datagrid_view_name_modal: ~
 
 items:
-   template_datagrid_toolbar:
-       template: OroDataGridBundle:js:toolbar.html.twig
-   template_datagrid_toolbar_pagination:
-       template: OroDataGridBundle:js:pagination.html.twig
-   template_datagrid_toolbar_pagination_input:
-       template: OroDataGridBundle:js:pagination-input.html.twig
-   template_datagrid_toolbar_page_size:
-       template: OroDataGridBundle:js:page-size.html.twig
-   template_datagrid_select_all_header_cell:
-       template: OroDataGridBundle:js:select-all-header-cell.html.twig
-   template_datagrid_action_header_cell:
-       template: OroDataGridBundle:js:action-header-cell.html.twig
-   template_datagrid_gridview:
-       template: OroDataGridBundle:js:grid-view.html.twig
-   template_datagrid_gridview_label:
-       template: OroDataGridBundle:js:grid-view-label.html.twig
-   template_datagrid_view_name_modal:
-       template: OroDataGridBundle:js:view-name-modal.html.twig
+    template_datagrid_toolbar:
+        applicable: @oro_layout.helper->isTemplateRequest()
+        template: OroDataGridBundle:js:toolbar.html.twig
+    template_datagrid_toolbar_pagination:
+        template: OroDataGridBundle:js:pagination.html.twig
+    template_datagrid_toolbar_pagination_input:
+        template: OroDataGridBundle:js:pagination-input.html.twig
+    template_datagrid_toolbar_page_size:
+        template: OroDataGridBundle:js:page-size.html.twig
+    template_datagrid_select_all_header_cell:
+        template: OroDataGridBundle:js:select-all-header-cell.html.twig
+    template_datagrid_action_header_cell:
+        template: OroDataGridBundle:js:action-header-cell.html.twig
+    template_datagrid_gridview:
+        template: OroDataGridBundle:js:grid-view.html.twig
+    template_datagrid_gridview_label:
+        template: OroDataGridBundle:js:grid-view-label.html.twig
+    template_datagrid_view_name_modal:
+        template: OroDataGridBundle:js:view-name-modal.html.twig

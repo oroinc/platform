@@ -11,3 +11,10 @@ services:
         public: false
         tags:
             - { name: layout.resource.path_provider, priority: -10 }
+
+    oro_ui.layout_context_configurator.user_agent:
+        class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
+        arguments:
+            - @oro_ui.user_agent_provider
+        tags:
+            - { name: layout.context_configurator }
