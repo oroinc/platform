@@ -222,6 +222,30 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $inputData
+     * @param array $expectedData
+     *
+     * @dataProvider getPermissionsForGroupProvider
+     */
+    public function testGetPermissionsForGroup(array $inputData, array $expectedData)
+    {
+        $this->cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with(PermissionManager::CACHE_GROUPS)
+            ->willReturn($inputData['cache']);
+
+        $this->entityRepository->expects($this->once())
+            ->method('findByIds')
+            ->with($inputData['ids'])
+            ->willReturn($inputData['permissions']);
+
+        $this->assertEquals(
+            $expectedData,
+            $this->manager->getPermissionsForGroup($inputData['group'])
+        );
+    }
+
+    /**
+     * @param array $inputData
      * @param mixed $expectedData
      *
      * @dataProvider getPermissionByNameProvider
@@ -395,7 +419,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
                     $permissions[0],
                 ],
             ],
-            'entity1 and unknown group1' => [
+            'entity1 and unknown group' => [
                 'input' => [
                     'entity' => 'entity1',
                     'group' => 'unknown',
@@ -424,6 +448,72 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             'entity1 and group2' => [
                 'input' => [
                     'entity' => 'entity1',
+                    'group' => 'group2',
+                    'cache' => $cache,
+                    'ids' => ['PERMISSION3' => 3],
+                    'permissions' => [
+                        $permissions[2],
+                    ],
+                ],
+                'expected' => [
+                    $permissions[2],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissionsForGroupProvider()
+    {
+        $cache = [
+            'group1' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
+            'group2' => ['PERMISSION3' => 3],
+        ];
+
+        $permissions = [
+            $this->getPermission(1, 'PERMISSION1', true, ['entity1', 'entity2'], ['entity10', 'entity11'], ['group1']),
+            $this->getPermission(2, 'PERMISSION2', false, ['entity2', 'entity3'], ['entity11', 'entity12'], ['group1']),
+            $this->getPermission(3, 'PERMISSION3', true, ['entity3', 'entity4'], ['entity12', 'entity13'], ['group2']),
+        ];
+
+        return [
+            'empty group' => [
+                'input' => [
+                    'group' => null,
+                    'cache' => [],
+                    'ids' => [],
+                    'permissions' => [],
+                ],
+                'expected' => [],
+            ],
+            'unknown group' => [
+                'input' => [
+                    'group' => 'unknown',
+                    'cache' => $cache,
+                    'ids' => [],
+                    'permissions' => [],
+                ],
+                'expected' => [],
+            ],
+            'group1' => [
+                'input' => [
+                    'group' => 'group1',
+                    'cache' => $cache,
+                    'ids' => ['PERMISSION1' => 1, 'PERMISSION2' => 2],
+                    'permissions' => [
+                        $permissions[0],
+                        $permissions[1],
+                    ],
+                ],
+                'expected' => [
+                    $permissions[0],
+                    $permissions[1],
+                ],
+            ],
+            'group2' => [
+                'input' => [
                     'group' => 'group2',
                     'cache' => $cache,
                     'ids' => ['PERMISSION3' => 3],
