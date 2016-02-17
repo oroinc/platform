@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
@@ -29,6 +30,9 @@ class LocaleListener implements EventSubscriberInterface
 
     /** @var RequestContextAwareInterface */
     private $router = false;
+
+    /** @var TranslatorInterface */
+    private $translator = false;
 
     /** @var ContainerInterface */
     private $container;
@@ -51,20 +55,19 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         if ($this->getIsInstalled()) {
+            $language = $this->getLocaleSettings()->getLanguage();
+            $locale   = $this->getLocaleSettings()->getLocale();
+
             if (!$request->attributes->get('_locale')) {
-                $request->setLocale($this->getLocaleSettings()->getLanguage());
+                $request->setLocale($language);
                 if (null !== $this->getRouter()) {
-                    $this->getRouter()->getContext()->setParameter(
-                        '_locale',
-                        $this->getLocaleSettings()->getLanguage()
-                    );
+                    $this->getRouter()->getContext()->setParameter('_locale', $language);
                 }
             }
-            $this->setPhpDefaultLocale($this->getLocaleSettings()->getLocale());
+            $this->setPhpDefaultLocale($locale);
 
-            $this->getTranslatableListener()->setTranslatableLocale(
-                $this->getLocaleSettings()->getLanguage()
-            );
+            $this->getTranslatableListener()->setTranslatableLocale($language);
+            $this->getTranslator()->setLocale($language);
         }
     }
 
@@ -99,7 +102,7 @@ class LocaleListener implements EventSubscriberInterface
 
         if ($this->getIsInstalled()) {
             try {
-                $locale = $this->getLocaleSettings()->getLocale();
+                $locale   = $this->getLocaleSettings()->getLocale();
                 $language = $this->getLocaleSettings()->getLanguage();
             } catch (DBALException $exception) {
                 // application is not installed
@@ -116,11 +119,11 @@ class LocaleListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            // must be registered before Symfony's original LocaleListener
-            KernelEvents::REQUEST  => array(array('onKernelRequest', 17)),
-            ConsoleEvents::COMMAND => array(array('onConsoleCommand')),
-        );
+        return [
+            // must be registered after authentication
+            KernelEvents::REQUEST  => [['onKernelRequest', 7]],
+            ConsoleEvents::COMMAND => [['onConsoleCommand']],
+        ];
     }
 
     /**
@@ -169,5 +172,17 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         return $this->router;
+    }
+
+    /**
+     * @return TranslatorInterface
+     */
+    protected function getTranslator()
+    {
+        if ($this->translator === false) {
+            $this->translator = $this->container->get('translator');
+        }
+
+        return $this->translator;
     }
 }

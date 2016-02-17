@@ -1,0 +1,4 @@
+oro_api:
+    entities:
+        Oro\Bundle\SidebarBundle\Entity\SidebarState: ~
+        Oro\Bundle\SidebarBundle\Entity\Widget: ~

@@ -454,7 +454,7 @@ class Item
      */
     public function setTitle($title)
     {
-        $this->title = $title;
+        $this->title = substr($title, 0, 255);
 
         return $this;
     }
