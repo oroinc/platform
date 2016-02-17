@@ -25,10 +25,9 @@ define([
         /** @property {String} */
         rowClassName: undefined,
 
-        viewOptions: {
-            view: 'body',
-            className: 'grid-body',
-            childViews: ['row']
+        themeOptions: {
+            optionPrefix: 'body',
+            className: 'grid-body'
         },
 
         /**
@@ -45,7 +44,28 @@ define([
                 this.rowClassName = opts.rowClassName;
             }
 
-            Body.__super__.initialize.apply(this, arguments);
+            this.columns = opts.columns;
+
+            this.row = opts.row || Row;
+            this.rows = this.collection.map(function(model) {
+                var rowOptions = {
+                    columns: this.columns,
+                    model: model
+                };
+                this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
+                return new this.row(rowOptions);
+            }, this);
+
+            this.emptyText = opts.emptyText;
+            this._unshiftEmptyRowMayBe();
+
+            var collection = this.collection;
+            this.listenTo(collection, 'add', this.insertRow);
+            this.listenTo(collection, 'remove', this.removeRow);
+            this.listenTo(collection, 'sort', this.refresh);
+            this.listenTo(collection, 'reset', this.refresh);
+            this.listenTo(collection, 'backgrid:sort', this.sort);
+            this.listenTo(collection, 'backgrid:edited', this.moveToNextCell);
 
             this._listenToRowsEvents(this.rows);
         },

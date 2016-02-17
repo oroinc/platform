@@ -111,9 +111,8 @@ define(function(require) {
          */
         DEFAULT_COLUMN_START_INDEX: 1000,
 
-        viewOptions: {
-            view: 'grid',
-            childViews: ['header', 'body', 'footer']
+        themeOptions: {
+            optionPrefix: 'grid'
         },
 
         /**
@@ -188,15 +187,61 @@ define(function(require) {
             this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
                 this.trigger('afterMakeCell', row, cell);
             });
+            if (this.themeOptionsConfigurator) {
+                this.listenTo(this.columns, 'configureInitializeOptions', this.themeOptionsConfigurator);
+            }
 
             this.trigger('beforeBackgridInitialize');
-            Grid.__super__.initialize.apply(this, arguments);
+            this.backgridInitialize(options);
             this.trigger('afterBackgridInitialize');
 
             // Listen and proxy events
             this._listenToCollectionEvents();
             this._listenToContentEvents();
             this._listenToCommands();
+        },
+
+        backgridInitialize: function(options) {
+            this.columns = options.columns;
+
+            var filteredOptions = _.omit(
+                options,
+                ['el', 'id', 'attributes', 'className', 'tagName', 'events', 'themeOptions']
+            );
+
+            this.header = options.header || this.header;
+            var headerOptions = _.extend({}, filteredOptions);
+            this.columns.trigger('configureInitializeOptions', this.header, headerOptions);
+
+            this.body = options.body || this.body;
+            var bodyOptions = _.extend({}, filteredOptions);
+            this.columns.trigger('configureInitializeOptions', this.body, bodyOptions);
+
+            this.footer = options.footer || this.footer;
+            var footerOptions = _.extend({}, filteredOptions);
+            this.columns.trigger('configureInitializeOptions', this.footer, footerOptions);
+
+            // must construct body first so it listens to backgrid:sort first
+            this.body = new this.body(bodyOptions);
+
+            if (this.header) {
+                this.header = new this.header(headerOptions);
+            }
+
+            if (this.footer) {
+                this.footer = new this.footer(footerOptions);
+            }
+
+            this.listenTo(this.columns, 'reset', function() {
+                if (this.header) {
+                    this.header = new (this.header.remove().constructor)(headerOptions);
+                }
+                this.body = new (this.body.remove().constructor)(bodyOptions);
+                if (this.footer) {
+                    this.footer = new (this.footer.remove().constructor)(footerOptions);
+                }
+                this.render();
+            });
         },
 
         /**
@@ -609,21 +654,21 @@ define(function(require) {
             });
         },
 
-        setTemplate: function() {
+        getTemplate: function() {
             var tag = 'table';
-            if (this.viewOptions.tableView === false) {
+            if (this.themeOptions.tableView === false) {
                 tag = 'div';
             }
             return _.template(
                 '<div class="toolbar"></div>' +
                 '<div class="other-scroll-container">' +
-                    '<div class="other-scroll"><div></div></div>' +
-                    '<div class="container-fluid grid-scrollable-container">' +
-                        '<div class="grid-container">' +
-                            '<' + tag + ' class="grid table-hover table table-bordered table-condensed"></' + tag + '>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="no-data"></div>' +
+                '<div class="other-scroll"><div></div></div>' +
+                '<div class="container-fluid grid-scrollable-container">' +
+                '<div class="grid-container">' +
+                '<' + tag + ' class="grid table-hover table table-bordered table-condensed"></' + tag + '>' +
+                '</div>' +
+                '</div>' +
+                '<div class="no-data"></div>' +
                 '</div>'
             );
         },
@@ -635,7 +680,7 @@ define(function(require) {
          */
         render: function() {
             if (this.template === null) {
-                this.template = this.setTemplate();
+                this.template = this.getTemplate();
             }
             this.$el.html(this.template());
             this.$grid = this.$(this.selectors.grid);
@@ -708,7 +753,7 @@ define(function(require) {
                 entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
             };
             var message = _.isEmpty(this.collection.state.filters) ?
-                        'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
+                'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
             message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({

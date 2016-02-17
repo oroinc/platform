@@ -26,16 +26,16 @@ define([
         /** @property */
         headerCell: HeaderCell,
 
-        viewOptions: {
-            view: 'header',
-            className: 'grid-header',
-            childViews: ['row']
+        themeOptions: {
+            optionPrefix: 'header',
+            className: 'grid-header'
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
+            this.themeOptions = options.themeOptions || {};
             if (!options.collection) {
                 throw new TypeError('"collection" is required');
             }
@@ -48,11 +48,13 @@ define([
                 this.columns = new Backgrid.Columns(this.columns);
             }
 
-            this.row = new this.row({
+            var rowOptions = {
                 columns: this.columns,
                 collection: this.collection,
                 headerCell: this.headerCell
-            });
+            };
+            this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
+            this.row = new this.row(rowOptions);
 
             this.subviews = [this.row];
         },
@@ -71,6 +73,13 @@ define([
             delete this.row;
             delete this.columns;
             Header.__super__.dispose.apply(this, arguments);
+        },
+
+        render: function() {
+            if (this.themeOptions.hide) {
+                return this;
+            }
+            return Header.__super__.render.apply(this, arguments);
         }
     });
 

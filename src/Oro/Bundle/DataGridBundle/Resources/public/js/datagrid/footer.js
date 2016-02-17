@@ -31,16 +31,16 @@ define([
 
         renderable: false,
 
-        viewOptions: {
-            view: 'footer',
-            className: 'grid-footer',
-            childViews: ['row']
+        themeOptions: {
+            optionPrefix: 'footer',
+            className: 'grid-footer'
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
+            this.themeOptions = options.themeOptions || {};
             var state;
 
             this.rows = [];
@@ -89,6 +89,9 @@ define([
          * Renders this table footer with a single row of footer cells.
          */
         render: function() {
+            if (this.themeOptions.hide) {
+                return this;
+            }
             if (this.renderable) {
                 _.each(this.rows, function(row) {
                     this.$el.append(row.render().$el);

@@ -1,16 +1,14 @@
 define([
-    'underscore',
     'backgrid',
-    './row',
-    'orodatagrid/js/datagrid-view-options'
-], function(_, Backgrid, Row, DataGridViewOptions) {
+    './row'
+], function(Backgrid, Row) {
     'use strict';
 
     var HeaderRow;
 
     HeaderRow = Backgrid.HeaderRow.extend({
-        viewOptions: {
-            view: 'headerRow',
+        themeOptions: {
+            optionPrefix: 'headerRow',
             className: 'grid-header-row'
         },
 
@@ -22,14 +20,15 @@ define([
 
         makeCell: function(column, options) {
             var HeaderCell = column.get('headerCell') || options.headerCell || Backgrid.HeaderCell;
-            var viewOptions = _.extend({
-                className: 'grid-header-cell'
-            }, this.sourceViewOptions);
-            HeaderCell = new (DataGridViewOptions.extend(HeaderCell, viewOptions))({
+            var cellOptions = {
                 column: column,
-                collection: this.collection
-            });
-            return HeaderCell;
+                collection: this.collection,
+                themeOptions: {
+                    className: 'grid-header-cell'
+                }
+            };
+            this.columns.trigger('configureInitializeOptions', HeaderCell, cellOptions);
+            return new HeaderCell(cellOptions);
         },
 
         updateCellsOrder: Row.prototype.updateCellsOrder
