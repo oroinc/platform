@@ -327,11 +327,15 @@ abstract class AbstractPageGrid extends AbstractPage
                 "td[contains(@class,'action-cell')]//a[contains(., '...')]"
             ));
             $this->test->moveto($element);
+            $this->test->byXpath("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title='{$actionName}']")->click();
+        } else {
+            $entity->element(
+                $this->test->using('xpath')
+                    ->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
+            )->click();
         }
 
-        $entity->element(
-            $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
-        )->click();
         if ($confirmation) {
             $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[contains(., 'Yes')]")->click();
         }
@@ -496,8 +500,11 @@ abstract class AbstractPageGrid extends AbstractPage
             $actionMenu =  $this->test->byXPath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
             $this->test->moveto($actionMenu);
             $this->waitForAjax();
+            $this->assertElementNotPresent("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title= '{$actionName}']");
+        } else {
+            $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
         }
-        $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
 
         return $this;
     }
