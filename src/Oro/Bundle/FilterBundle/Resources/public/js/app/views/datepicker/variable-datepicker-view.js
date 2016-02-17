@@ -194,7 +194,6 @@ define(function(require) {
          */
         checkConsistency: function(target) {
             var date = this.$frontDateField.val();
-
             if (!target && !this._isDateValid(date)) {
                 this.$frontDateField.val('');
             }
@@ -291,7 +290,7 @@ define(function(require) {
         getFrontendFormattedDate: function() {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
-                value = this.dateVariableHelper.formatDisplayValue(value);
+                return this.dateVariableHelper.formatDisplayValue(value);
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
