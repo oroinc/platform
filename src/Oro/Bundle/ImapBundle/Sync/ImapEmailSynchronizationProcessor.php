@@ -481,6 +481,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function checkOnOldEmailForMailbox(EmailFolder $folder, Email $email, $mailbox)
     {
+        /**
+         * @description Will select max of those dates because emails in folder `sent` could have no received date
+         *              or same date.
+         */
         $dateForCheck = max($email->getReceivedAt(), $email->getSentAt());
 
         if ($mailbox && $folder->getSynchronizedAt() > $dateForCheck) {
