@@ -186,7 +186,7 @@ define([
                 column: column,
                 model: this.model,
                 themeOptions: {
-                    className: 'grid-body-cell'
+                    className: 'grid-cell grid-body-cell'
                 }
             };
             var Cell = column.get('cell');

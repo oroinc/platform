@@ -24,7 +24,7 @@ define([
                 column: column,
                 collection: this.collection,
                 themeOptions: {
-                    className: 'grid-header-cell'
+                    className: 'grid-cell grid-header-cell'
                 }
             };
             this.columns.trigger('configureInitializeOptions', HeaderCell, cellOptions);

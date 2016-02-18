@@ -677,7 +677,7 @@ define(function(require) {
          */
         render: function() {
             this.$el.html(this.template({
-                tableTagName: this.themeOptions.tableView ? 'table' : 'div'
+                tableTagName: this.themeOptions.tagName || 'table'
             }));
             this.$grid = this.$(this.selectors.grid);
 

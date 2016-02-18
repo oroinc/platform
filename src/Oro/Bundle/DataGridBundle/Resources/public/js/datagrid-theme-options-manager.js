@@ -8,7 +8,7 @@ define(function(require) {
     DataGridThemeOptionsManager = {
         defaults: {
             optionPrefix: '',
-            tableView: true,
+            tagName: '',
             className: '',
             hide: false,
             template: null,
@@ -52,8 +52,8 @@ define(function(require) {
             }, this));
         },
 
-        tableViewOption: function(view, options, tableView) {
-            if (tableView === false) {
+        tagNameOption: function(view, options, tagName) {
+            if (tagName) {
                 options.tagName = 'div';
             }
         },
