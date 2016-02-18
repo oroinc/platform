@@ -76,21 +76,19 @@ class EmailActivityUpdates
      */
     protected function createJobsArgs(array $entitiesOwnedByEmails)
     {
-        return array_values(
-            array_reduce(
-                $entitiesOwnedByEmails,
-                function ($jobsArgsByClass, $emailOwner) {
-                    $class = ClassUtils::getClass($emailOwner);
-                    if (!isset($jobsArgsByClass[$class])) {
-                        $jobsArgsByClass[$class] = [$class];
-                    }
+        return array_reduce(
+            $entitiesOwnedByEmails,
+            function ($jobsArgsByClass, $emailOwner) {
+                $class = ClassUtils::getClass($emailOwner);
+                if (!isset($jobsArgsByClass[$class])) {
+                    $jobsArgsByClass[$class] = [$class];
+                }
 
-                    $jobsArgsByClass[$class][] = $this->doctrineHelper->getSingleEntityIdentifier($emailOwner);
+                $jobsArgsByClass[$class][] = $this->doctrineHelper->getSingleEntityIdentifier($emailOwner);
 
-                    return $jobsArgsByClass;
-                },
-                []
-            )
+                return $jobsArgsByClass;
+            },
+            []
         );
     }
 
