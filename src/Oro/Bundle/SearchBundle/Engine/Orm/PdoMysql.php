@@ -80,7 +80,7 @@ class PdoMysql extends BaseDriver
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
         }
 
-        return $whereExpr;
+        return '(' . $whereExpr . ')';
     }
 
     /**
@@ -170,7 +170,6 @@ class PdoMysql extends BaseDriver
     ) {
         $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
-        $fieldValue     = $searchCondition['fieldValue'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
 
