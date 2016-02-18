@@ -9,10 +9,15 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 
 class FieldAclExtension extends EntityAclExtension
 {
     const EXTENSION_KEY = 'field';
+
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /**
      * {@inheritdoc}
@@ -22,7 +27,8 @@ class FieldAclExtension extends EntityAclExtension
         EntityClassResolver $entityClassResolver,
         EntitySecurityMetadataProvider $entityMetadataProvider,
         MetadataProviderInterface $metadataProvider,
-        AccessLevelOwnershipDecisionMakerInterface $decisionMaker
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
+        DoctrineHelper $doctrineHelper
     ) {
         parent::__construct(
             $objectIdAccessor,
@@ -31,6 +37,8 @@ class FieldAclExtension extends EntityAclExtension
             $metadataProvider,
             $decisionMaker
         );
+
+        $this->doctrineHelper = $doctrineHelper;
 
         // override permission map for fields
         $this->permissionToMaskBuilderIdentity = [
@@ -123,6 +131,24 @@ class FieldAclExtension extends EntityAclExtension
         }
 
         return $levelNames;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
+    {
+        $result = parent::getAllowedPermissions($oid);
+
+        // return only 'VIEW' permission for identifier field
+        $isNonRoot = $oid->getType() != ObjectIdentityFactory::ROOT_IDENTITY_TYPE;
+        if ($oid->getIdentifier() == self::EXTENSION_KEY && $isNonRoot) {
+            if ($fieldName == $this->doctrineHelper->getSingleEntityIdentifierFieldName($oid->getType(), false)) {
+                $result = ['VIEW'];
+            }
+        }
+
+        return $result;
     }
 
     /**

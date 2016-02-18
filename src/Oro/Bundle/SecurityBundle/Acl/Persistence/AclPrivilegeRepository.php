@@ -538,7 +538,7 @@ class AclPrivilegeRepository
         AclInterface $rootAcl = null,
         $field = null
     ) {
-        $allowedPermissions = $extension->getAllowedPermissions($oid);
+        $allowedPermissions = $extension->getAllowedPermissions($oid, $field);
         $acl = $this->findAclByOid($acls, $oid);
         if ($rootAcl !== null) {
             $this->addAclPermissions($sid, $field, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);

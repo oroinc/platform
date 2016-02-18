@@ -15,6 +15,7 @@ use Oro\Bundle\EntityBundle\ORM\QueryHintResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 /**
  * @todo: This is draft implementation of the entity serializer.
@@ -155,6 +156,12 @@ class EntitySerializer
     /** @var AuthorizationCheckerInterface Optional authentication checker */
     protected $authChecker;
 
+    /** @var bool */
+    protected $isFieldACLEnabled = false;
+
+    /** @var bool */
+    protected $showRestrictedFields = false;
+
     /**
      * @param ManagerRegistry          $doctrine
      * @param ConfigManager            $configManager
@@ -213,6 +220,16 @@ class EntitySerializer
     {
         if (empty($entities)) {
             return [];
+        }
+
+        try {
+            $securityConfig  = $this->configManager->getProvider('security')->getConfig($entityClass);
+
+            $this->isFieldACLEnabled = $securityConfig->get('field_acl_enabled');
+            $this->showRestrictedFields = $securityConfig->get('show_restricted_fields');
+        } catch (RuntimeException $e) {
+            $this->isFieldACLEnabled = false;
+            $this->showRestrictedFields = true;
         }
 
         $result = [];
@@ -304,12 +321,17 @@ class EntitySerializer
         $resultFields   = $this->getFieldsToSerialize($entityClass, $config);
 
         foreach ($resultFields as $field) {
-            if (false === $this->isAllowedField($entity, $entityClass, $field)) {
+            $isFieldAllowed = $this->isFieldACLEnabled ? $this->isAllowedField($entity, $entityClass, $field) : true;
+            if (!$this->showRestrictedFields && !$isFieldAllowed) {
                 continue;
             }
 
             $targetFieldConfig = $this->getFieldConfig($config, $field);
-            $value = $this->serializeItemField($entity, $field, $entityClass, $entityMetadata, $targetFieldConfig);
+
+            $value = $isFieldAllowed ?
+                $this->serializeItemField($entity, $field, $entityClass, $entityMetadata, $targetFieldConfig) :
+                null;
+
             $resultFieldName = $this->getResultFieldName($field, $targetFieldConfig);
             $result[$resultFieldName] = $value;
         }
