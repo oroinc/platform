@@ -27,6 +27,14 @@ class InsertFromSelectWriter extends AbstractNativeQueryWriter
     }
 
     /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function write(array $items)
@@ -38,7 +46,7 @@ class InsertFromSelectWriter extends AbstractNativeQueryWriter
 
             $this->insertFromSelectQueryExecutor->execute(
                 $this->entityName,
-                $this->fields,
+                $this->getFields(),
                 $this->getQueryBuilder($item)
             );
         }
