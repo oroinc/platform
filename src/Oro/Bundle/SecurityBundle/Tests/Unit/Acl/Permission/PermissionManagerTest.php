@@ -144,7 +144,8 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->entityRepository->expects($this->once())
-            ->method('findAll')
+            ->method('findBy')
+            ->with([], ['id' => 'ASC'])
             ->willReturn($permissions);
 
         $this->entityRepository->expects($this->exactly(count($permissions)))
@@ -173,7 +174,8 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetPermissionsMap(array $inputData, array $expectedData, array $expectedCacheData = [])
     {
         $this->entityRepository->expects($inputData['cache'] ? $this->never() : $this->once())
-            ->method('findAll')
+            ->method('findBy')
+            ->with([], ['id' => 'ASC'])
             ->willReturn($inputData['permissions']);
 
         $this->cacheProvider->expects($this->once())
