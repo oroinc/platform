@@ -379,7 +379,7 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAllowedPermissions(ObjectIdentity $oid)
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
     {
         if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             $result = array_keys($this->getPermissionsToIdentityMap());

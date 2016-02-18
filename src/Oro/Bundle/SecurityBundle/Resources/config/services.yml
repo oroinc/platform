@@ -86,7 +86,8 @@ parameters:
     oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
 
     oro_security.form.extension.aclprotected_fields_type.class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
-    oro_security.field_filter.class:                            Oro\Bundle\SecurityBundle\Filter\FieldFilter
+    oro_security.serializer.filter_chain.class:                Oro\Component\EntitySerializer\Filter\EntityAwareFilterChain
+    oro_security.serializer.acl_filter:                        Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
 
 services:
     oro_security.security_facade:
@@ -132,7 +133,7 @@ services:
         arguments:
             - @oro_security.acl.manager
             - @translator
-            - @doctrine
+            - @oro_entity.entity_field_provider
 
     oro_security.acl.sid_manager:
         class: %oro_security.acl.sid_manager.class%
@@ -667,8 +668,10 @@ services:
             - @oro_security.security_facade
             - @oro_entity.orm.entity_class_resolver
             - @oro_entity.doctrine_helper
+            - @oro_entity_config.provider.security
         tags:
             - { name: form.type_extension, alias: form }
+
 
     oro_security.acl.extension.field:
         public: false
@@ -679,7 +682,20 @@ services:
             - @oro_security.entity_security_metadata_provider
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.owner.ownership_decision_maker.chain
+            - @oro_entity.doctrine_helper
         calls:
             - [setEntityOwnerAccessor, [@oro_security.owner.entity_owner_accessor]]
         tags:
             - { name: oro_security.acl.extension, priority: 15 } # should be before EntityAclExtension
+
+    oro_security.serializer.acl_filter:
+        class: %oro_security.serializer.acl_filter%
+        arguments:
+            - @security.authorization_checker
+            - @oro_entity_config.provider.security
+            - @oro_api.entity_serializer.doctrine_helper
+
+    oro_security.serializer.filter_chain:
+        class: %oro_security.serializer.filter_chain.class%
+        calls:
+            - ["addFilter", [@oro_security.serializer.acl_filter]]

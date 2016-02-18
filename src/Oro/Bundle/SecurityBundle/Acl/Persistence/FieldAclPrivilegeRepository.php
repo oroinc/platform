@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -13,22 +13,26 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
 class FieldAclPrivilegeRepository extends AclPrivilegeRepository
 {
-    /** @var Registry */
-    protected $doctrine;
+    /** @var EntityFieldProvider */
+    protected $fieldProvider;
 
     /**
      * @param AclManager          $manager
      * @param TranslatorInterface $translator
-     * @param Registry            $doctrine
+     * @param EntityFieldProvider $fieldProvider
      */
-    public function __construct(AclManager $manager, TranslatorInterface $translator, Registry $doctrine)
-    {
+    public function __construct(
+        AclManager $manager,
+        TranslatorInterface $translator,
+        EntityFieldProvider $fieldProvider
+    ) {
         parent::__construct($manager, $translator);
 
-        $this->doctrine = $doctrine;
+        $this->fieldProvider = $fieldProvider;
     }
 
     /**
@@ -50,6 +54,23 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
     }
 
     /**
+     * @param string $className
+     *
+     * @return array
+     */
+    protected function getFieldList($className)
+    {
+        $fieldList = array_map(
+            function ($fieldArray) {
+                return $fieldArray['name'];
+            },
+            $this->fieldProvider->getFields($className, true)
+        );
+
+        return $fieldList;
+    }
+
+    /**
      * @param SID    $sid
      * @param string $className
      *
@@ -67,9 +88,7 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
         $oids[] = $entityRootOid = $this->manager->getRootOid('entity');
         $oids[] = $fieldRootOid = new OID('entity', $className);
 
-        // get class level field ACL
         $objectIdentity = new OID($extensionKey, $className);
-
         $oids[] = $objectIdentity;
         $acls = $this->findAcls($sid, $oids);
 
@@ -92,9 +111,8 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
             $rootAcl = $this->findAclByOid($acls, $entityRootOid);
         }
 
-        // loop through the class fields
-        $fields = $this->doctrine->getManagerForClass($className)->getClassMetadata($className)->getFieldNames();
         $privileges = new ArrayCollection();
+        $fields = $this->getFieldList($className);
         foreach ($fields as $fieldName) {
             $privilege = new AclPrivilege();
             $privilege->setIdentity(

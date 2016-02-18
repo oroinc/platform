@@ -7,3 +7,21 @@ oro_entity_config:
                         auditable: false
                 permissions: ~
                 group_name: ~
+                field_acl_enabled:
+                    options:
+                        default_value: false
+                    form:
+                        type:               checkbox
+                        options:
+                            block:          other
+                            required:       false
+                            label:          oro.security.field_acl.is_enabled.label
+                show_restricted_fields:
+                    options:
+                        default_value: false
+                    form:
+                        type:               checkbox
+                        options:
+                            block:          other
+                            required:       false
+                            label:          oro.security.field_acl.show_restricted_fields.label

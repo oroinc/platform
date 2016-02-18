@@ -81,7 +81,8 @@ services:
             - @oro_soap.entity_data_transformer
             - @oro_entity.query_hint_resolver
         calls:
-            - [setAuthenticationChecker, [@security.authorization_checker]]
+            # TODO: replace to compiler pass injection
+            - ["setFieldsFilter", [@oro_security.serializer.filter_chain]]
 
     oro_soap.entity_accessor:
         class: %oro_soap.entity_accessor.class%
