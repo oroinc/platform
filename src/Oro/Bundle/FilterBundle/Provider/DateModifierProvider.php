@@ -35,14 +35,12 @@ class DateModifierProvider implements DateModifierInterface
             ],
             self::PART_DOW     => [
                 self::VAR_THIS_DAY,
-                self::VAR_FDQ,
             ],
             self::PART_WEEK    => [
                 self::VAR_THIS_WEEK
             ],
             self::PART_DAY     => [
                 self::VAR_THIS_DAY,
-                self::VAR_FDQ
             ],
             self::PART_MONTH   => [
                 self::VAR_THIS_MONTH,
