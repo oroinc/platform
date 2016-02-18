@@ -8,7 +8,7 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroWindowsBundle implements Installation
+class OroWindowsBundleInstaller implements Installation
 {
     /** {@inheritdoc} */
     public function getMigrationVersion()
