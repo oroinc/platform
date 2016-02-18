@@ -212,6 +212,9 @@ define(function(require) {
             this.header = options.header || this.header;
             var headerOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.header, headerOptions);
+            if (headerOptions.themeOptions.hide) {
+                this.header = null;
+            }
 
             this.body = options.body || this.body;
             var bodyOptions = _.extend({}, filteredOptions);
@@ -220,6 +223,9 @@ define(function(require) {
             this.footer = options.footer || this.footer;
             var footerOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.footer, footerOptions);
+            if (footerOptions.themeOptions.hide) {
+                this.footer = null;
+            }
 
             // must construct body first so it listens to backgrid:sort first
             this.body = new this.body(bodyOptions);
@@ -266,8 +272,10 @@ define(function(require) {
 
             subviews = ['header', 'body', 'footer', 'toolbar', 'loadingMask'];
             _.each(subviews, function(viewName) {
-                this[viewName].dispose();
-                delete this[viewName];
+                if (this[viewName]) {
+                    this[viewName].dispose();
+                    delete this[viewName];
+                }
             }, this);
 
             Grid.__super__.dispose.call(this);
@@ -390,8 +398,10 @@ define(function(require) {
          * @returns {{selectedModels: *, inset: boolean}}
          */
         getSelectionState: function() {
-            var selectAllHeader = this.header.row.cells[0];
-            return selectAllHeader.getSelectionState();
+            if (this.header) {
+                var selectAllHeader = this.header.row.cells[0];
+                return selectAllHeader.getSelectionState();
+            }
         },
 
         /**
@@ -587,11 +597,13 @@ define(function(require) {
             this.listenTo(this.columns, 'change:renderable', function() {
                 this.trigger('content:update');
             });
-            this.listenTo(this.header.row, 'columns:reorder', function() {
-                // triggers content:update event in separate process
-                // to give time body's rows to finish reordering
-                _.defer(_.bind(this.trigger, this, 'content:update'));
-            });
+            if (this.header) {
+                this.listenTo(this.header.row, 'columns:reorder', function() {
+                    // triggers content:update event in separate process
+                    // to give time body's rows to finish reordering
+                    _.defer(_.bind(this.trigger, this, 'content:update'));
+                });
+            }
         },
 
         /**
@@ -717,7 +729,9 @@ define(function(require) {
          * Renders the grid's header, then footer, then finally the body.
          */
         renderGrid: function() {
-            this.$grid.append(this.header.render().$el);
+            if (this.header) {
+                this.$grid.append(this.header.render().$el);
+            }
             if (this.footer) {
                 this.$grid.append(this.footer.render().$el);
             }
@@ -934,6 +948,9 @@ define(function(require) {
          * @return {Backgrid.Cell}
          */
         findHeaderCellByIndex: function(columnI) {
+            if (!this.header) {
+                return null;
+            }
             try {
                 return _.findWhere(this.header.row.cells, {
                     column: this.columns.at(columnI)

@@ -89,9 +89,6 @@ define([
          * Renders this table footer with a single row of footer cells.
          */
         render: function() {
-            if (this.themeOptions.hide) {
-                return this;
-            }
             if (this.renderable) {
                 _.each(this.rows, function(row) {
                     this.$el.append(row.render().$el);

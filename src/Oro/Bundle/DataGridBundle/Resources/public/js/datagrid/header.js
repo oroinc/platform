@@ -73,13 +73,6 @@ define([
             delete this.row;
             delete this.columns;
             Header.__super__.dispose.apply(this, arguments);
-        },
-
-        render: function() {
-            if (this.themeOptions.hide) {
-                return this;
-            }
-            return Header.__super__.render.apply(this, arguments);
         }
     });
 
