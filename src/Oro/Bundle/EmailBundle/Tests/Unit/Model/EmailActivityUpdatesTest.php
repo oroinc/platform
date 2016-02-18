@@ -4,14 +4,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use SebastianBergmann\Comparator\Factory;
-
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmail;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestThread;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\TestFrameworkBundle\PHPUnit\Comparator\PartialObjectComparator;
 
 class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,14 +18,8 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
     /** @var array */
     protected $fixtures;
 
-    /** @var PartialObjectComparator */
-    protected $jobComparator;
-
     public function setUp()
     {
-        $this->jobComparator = new PartialObjectComparator('JMS\JobQueueBundle\Entity\Job', ['command', 'args']);
-        Factory::getInstance()->register($this->jobComparator);
-
         $this->fixtures = [
             'ownersWithEmails' => [1, 2],
         ];
@@ -52,18 +43,15 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function tearDown()
-    {
-        Factory::getInstance()->unregister($this->jobComparator);
-    }
-
     /**
      * @dataProvider testProvider
      */
     public function test(array $entities, array $expectedJobs)
     {
         $this->emailActivityUpdates->processCreatedEntities($entities);
-        $this->assertEquals($expectedJobs, $this->emailActivityUpdates->createJobs());
+        $actualJobs = $this->emailActivityUpdates->createJobs();
+        $this->assertCount(count($actualJobs), $expectedJobs);
+        array_map([$this, 'assertJobs'], $expectedJobs, $actualJobs);
     }
 
     public function testProvider()
@@ -124,5 +112,15 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param Job $expected
+     * @param Job $actual
+     */
+    protected function assertJobs(Job $expected, Job $actual)
+    {
+        $this->assertEquals($expected->getCommand(), $actual->getCommand());
+        $this->assertEquals($expected->getArgs(), $actual->getArgs());
     }
 }
