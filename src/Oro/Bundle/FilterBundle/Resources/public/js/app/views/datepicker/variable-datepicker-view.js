@@ -33,37 +33,37 @@ define(function(require) {
         defaultTabs: [],
 
         partsDateValidation: {
-            value: function (date) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || moment(date, this.getDateFormat(), true).isValid();
+            value: function(date) {
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    moment(date, this.getDateFormat(), true).isValid();
             },
             dayofweek: function(date) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || findKey(localeSettings.getCalendarDayOfWeekNames('wide'), date);
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    findKey(localeSettings.getCalendarDayOfWeekNames('wide'), date);
             },
             week: function(date) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 53);
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    isBetween(date, 1, 53);
             },
             day: function(date) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 31);
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    isBetween(date, 1, 31);
             },
             month: function(date) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || findKey(localeSettings.getCalendarMonthNames('wide'), date);
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    findKey(localeSettings.getCalendarMonthNames('wide'), date);
             },
             quarter: function(date) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 4);
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    isBetween(date, 1, 4);
             },
             dayofyear: function(date) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || isBetween(date, 1, 365);
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    isBetween(date, 1, 365);
             },
             year: function(date) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || !_.isNaN(parseInt(date));
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    !_.isNaN(parseInt(date));
             }
         },
 

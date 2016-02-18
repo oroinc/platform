@@ -14,10 +14,10 @@ define(function(require) {
         defaults: _.extend({}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         partsDateTimeValidation: {
-            value: function (date, time) {
-                return this.dateVariableHelper.isDateVariable(date)
-                    || (moment(date, this.getDateFormat(), true).isValid()
-                        && moment(time, this.getTimeFormat(), true).isValid());
+            value: function(date, time) {
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    (moment(date, this.getDateFormat(), true).isValid() &&
+                     moment(time, this.getTimeFormat(), true).isValid());
             }
         },
 
