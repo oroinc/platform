@@ -390,31 +390,36 @@ class EntityAclExtension extends AbstractAclExtension
                 $result = array_keys($this->getPermissionsToIdentityMap());
             }
 
-            $result = array_intersect($result, $this->getPermissionsForEntityClass($oid->getType()));
             $metadata = $this->getMetadata($oid);
             if (!$metadata->hasOwner()) {
-                foreach ($result as $key => $value) {
-                    if (in_array($value, ['ASSIGN', 'SHARE'])) {
-                        unset($result[$key]);
-                    }
-                }
+                $result = array_diff($result, ['ASSIGN', 'SHARE']);
             }
         }
 
-        return array_values($result);
+        $allowed = $this->getPermissionsForType($oid->getType());
+
+        return array_values(array_intersect($result, $allowed));
     }
 
     /**
-     * @param string $class
+     * @param string $type
      * @return array
      */
-    protected function getPermissionsForEntityClass($class)
+    protected function getPermissionsForType($type)
     {
+        $group = $this->groupProvider->getGroup();
+
+        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+            $permissions = $this->permissionManager->getPermissionsForGroup($group);
+        } else {
+            $permissions = $this->permissionManager->getPermissionsForEntity($type, $group);
+        }
+
         return array_map(
             function (Permission $permission) {
                 return $permission->getName();
             },
-            $this->permissionManager->getPermissionsForEntity($class, $this->groupProvider->getGroup())
+            $permissions
         );
     }
 

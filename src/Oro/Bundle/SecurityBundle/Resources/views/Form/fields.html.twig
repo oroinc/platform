@@ -47,7 +47,7 @@
 {% block oro_acl_collection_widget %}
     <div data-page-component-module="{{ page_component_module|escape }}" data-page-component-options="{{ page_component_options|json_encode|escape }}">
         {% if privileges_config.view_type == 'grid' %}
-            <table class="table table-striped acl-table">
+            <table class="table acl-table">
                 <tbody>
                 <tr>
                     <th class="span6">&nbsp;</th>
