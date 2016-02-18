@@ -3,21 +3,23 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
+    var DataGridThemeOptionsManager;
 
-    var DataGridThemeOptionsConfigurator = function(gridThemeOptions) {
-        this.gridThemeOptions = gridThemeOptions || {};
-        return _.bind(this.configure, this);
-    };
-
-    _.extend(DataGridThemeOptionsConfigurator.prototype, {
+    DataGridThemeOptionsManager = {
         defaults: {
             optionPrefix: '',
             tableView: true,
             className: '',
             hide: false,
             template: null,
-            templateSelector: null,
-            templateAsset: null
+            templateSelector: null
+        },
+
+        createConfigurator: function(gridThemeOptions) {
+            var configurator = _.extend({
+                gridThemeOptions: gridThemeOptions
+            }, this);
+            return _.bind(configurator.configure, configurator);
         },
 
         configure: function(view, options) {
@@ -81,24 +83,18 @@ define(function(require) {
             }
         },
 
-        templateSelectorOption: function(view, options, template) {
-            if (template) {
-                options.template = _.template($(template).html());
-            }
-        },
-
-        templateAssetOption: function(view, options, template) {
-            if (template) {
-                options.template = require('tpl!' + template);
-            }
-        },
-
         templateOption: function(view, options, template) {
             if (template) {
                 options.template = _.template(template);
             }
-        }
-    });
+        },
 
-    return DataGridThemeOptionsConfigurator;
+        templateSelectorOption: function(view, options, template) {
+            if (template) {
+                options.template = _.template($(template).html());
+            }
+        }
+    };
+
+    return DataGridThemeOptionsManager;
 });

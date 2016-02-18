@@ -47,9 +47,6 @@ define(function(require) {
         className: 'oro-datagrid',
 
         /** @property */
-        template: null,
-
-        /** @property */
         noDataTemplate: _.template('<span><%= hint %><span>'),
 
         /** @property {Object} */
@@ -111,8 +108,11 @@ define(function(require) {
          */
         DEFAULT_COLUMN_START_INDEX: 1000,
 
+        /** @property */
+        template: require('tpl!orodatagrid/templates/datagrid/grid.html'),
+
         themeOptions: {
-            optionPrefix: 'grid'
+            optionPrefix: 'grid',
         },
 
         /**
@@ -201,6 +201,10 @@ define(function(require) {
             this._listenToCommands();
         },
 
+        /**
+         * Create this function instead of original Grid.__super__.initialize to customize options for subviews
+         * @param options
+         */
         backgridInitialize: function(options) {
             this.columns = options.columns;
 
@@ -666,35 +670,15 @@ define(function(require) {
             });
         },
 
-        getTemplate: function() {
-            var tag = 'table';
-            if (this.themeOptions.tableView === false) {
-                tag = 'div';
-            }
-            return _.template(
-                '<div class="toolbar"></div>' +
-                '<div class="other-scroll-container">' +
-                '<div class="other-scroll"><div></div></div>' +
-                '<div class="container-fluid grid-scrollable-container">' +
-                '<div class="grid-container">' +
-                '<' + tag + ' class="grid table-hover table table-bordered table-condensed"></' + tag + '>' +
-                '</div>' +
-                '</div>' +
-                '<div class="no-data"></div>' +
-                '</div>'
-            );
-        },
-
         /**
          * Renders the grid, no data block and loading mask
          *
          * @return {*}
          */
         render: function() {
-            if (this.template === null) {
-                this.template = this.getTemplate();
-            }
-            this.$el.html(this.template());
+            this.$el.html(this.template({
+                tableTagName: this.themeOptions.tableView ? 'table' : 'div'
+            }));
             this.$grid = this.$(this.selectors.grid);
 
             this.renderToolbar();

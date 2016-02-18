@@ -44,9 +44,17 @@ define([
                 this.rowClassName = opts.rowClassName;
             }
 
-            this.columns = opts.columns;
+            this.backgridInitialize(opts);
+        },
 
-            this.row = opts.row || Row;
+        /**
+         * Create this function instead of original Body.__super__.initialize to customize options for subviews
+         * @param options
+         */
+        backgridInitialize: function(options) {
+            this.columns = options.columns;
+
+            this.row = options.row || Row;
             this.rows = this.collection.map(function(model) {
                 var rowOptions = {
                     columns: this.columns,
@@ -56,7 +64,7 @@ define([
                 return new this.row(rowOptions);
             }, this);
 
-            this.emptyText = opts.emptyText;
+            this.emptyText = options.emptyText;
             this._unshiftEmptyRowMayBe();
 
             var collection = this.collection;

@@ -18,7 +18,7 @@ define(function(require) {
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
     var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
-    var DataGridThemeOptionsConfigurator = require('orodatagrid/js/datagrid-theme-options-configurator');
+    var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
 
     helpers = {
         cellType: function(type) {
@@ -293,7 +293,7 @@ define(function(require) {
                 metadata: this.metadata,
                 metadataModel: this.metadataModel,
                 plugins: plugins,
-                themeOptionsConfigurator: new DataGridThemeOptionsConfigurator(this.themeOptions)
+                themeOptionsConfigurator: DataGridThemeOptionsManager.createConfigurator(this.themeOptions)
             };
         },
 
