@@ -71,6 +71,10 @@ class UpdateEmailEditAclRule extends AbstractFixture implements
     }
 
     /**
+     * Email permissions are added for all roles, as EmailUser is checked anyway by EmailVoter.
+     * In Order to remove this permission entirely, parent acl should be set (but it's not currently implemented).
+     * @link https://github.com/laboro/platform/pull/6833/files#r53224943
+     *
      * @param AclManager $manager
      */
     protected function updateUserRole(AclManager $manager)
