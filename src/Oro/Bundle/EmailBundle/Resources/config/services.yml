@@ -137,7 +137,7 @@ parameters:
     oro_email.listener.prepare_result_item_listener.class: Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener
     oro_email.listener.prepare_context_title_listener.class: Oro\Bundle\EmailBundle\EventListener\PrepareContextTitleListener
     oro_email.listener.activity_list_pre_query_build_listener.class: Oro\Bundle\EmailBundle\EventListener\ActivityListPreQueryBuildListener
-    oro_email.model.emmail_activity_updates.class: Oro\Bundle\EmailBundle\Model\EmailActivityUpdates
+    oro_email.model.email_activity_updates.class: Oro\Bundle\EmailBundle\Model\EmailActivityUpdates
 
 services:
     oro_email.entity.cache.warmer:
@@ -287,7 +287,7 @@ services:
             - @oro_email.email.owner.manager
             - @oro_email.link.email.activity.manager
             - @oro_email.link.email.thread.manager
-            - @oro_email.model.emmail_activity_updates
+            - @oro_email.model.email_activity_updates
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -1023,8 +1023,8 @@ services:
         calls:
             - [setLogger, [@logger]]
 
-    oro_email.model.emmail_activity_updates:
-        class: %oro_email.model.emmail_activity_updates.class%
+    oro_email.model.email_activity_updates:
+        class: %oro_email.model.email_activity_updates.class%
         arguments:
             - @oro_email.provider.emailowners.provider
             - @oro_entity.doctrine_helper

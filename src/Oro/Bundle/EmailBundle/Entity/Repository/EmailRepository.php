@@ -207,14 +207,14 @@ class EmailRepository extends EntityRepository
                 ->createQueryBuilder('e')
                 ->join('e.recipients', 'r')
                 ->join('r.emailAddress', 'ea')
-                ->andWhere("ea.$ownerColumnName = :contactId")
+                ->andWhere(sprintf('ea.%s = :contactId', $ownerColumnName))
                 ->andWhere('ea.hasOwner = :hasOwner')
                 ->setParameter('contactId', $entity->getId())
                 ->setParameter('hasOwner', true),
             $this
                 ->createQueryBuilder('e')
                 ->join('e.fromEmailAddress', 'ea')
-                ->andWhere("ea.$ownerColumnName = :contactId")
+                ->andWhere(sprintf('ea.%s = :contactId', $ownerColumnName))
                 ->andWhere('ea.hasOwner = :hasOwner')
                 ->setParameter('contactId', $entity->getId())
                 ->setParameter('hasOwner', true),
