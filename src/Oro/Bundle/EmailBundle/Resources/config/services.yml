@@ -18,6 +18,7 @@ parameters:
     oro_email.email_body_loader_selector.class:   Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector
     oro_email.email_flag_manager_loader_selector.class: Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector
     oro_email.listener.entity_listener.class:     Oro\Bundle\EmailBundle\EventListener\EntityListener
+    oro_email.listener.role_subscriber.class:     Oro\Bundle\EmailBundle\EventListener\RoleSubscriber
     oro_email.listener.auto_response_listener.class: Oro\Bundle\EmailBundle\EventListener\AutoResponseListener
     oro_email.manager.autoresponserule.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_email.autoresponserule_manager.class:     Oro\Bundle\EmailBundle\Manager\AutoResponseManager
@@ -291,6 +292,17 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: postRemove }
+
+    oro_email.acl.manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_security.acl.manager }
+
+    oro_email.listener.role_subscriber:
+        class: %oro_email.listener.role_subscriber.class%
+        arguments:
+            - @oro_email.acl.manager.link
+        tags:
+            - { name: doctrine.event_subscriber }
 
     oro_email.listener.auto_response_listener:
         class: %oro_email.listener.auto_response_listener.class%
