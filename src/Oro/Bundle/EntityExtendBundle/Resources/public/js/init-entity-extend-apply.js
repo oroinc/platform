@@ -8,10 +8,11 @@ require([
             var el = $(this);
             var title = __('Schema update confirmation');
             var content = '<p>' + __('Your config changes will be applied to schema.') + '</p>' +
-                    '</p>' + __('It may take few minutes...') + '</p>';
+                    '<p>' + __('It may take few minutes...') + '</p>';
             /** @type oro.Modal */
             var confirmUpdate = new Modal({
                 allowCancel: true,
+                className: 'modal modal-primary',
                 cancelText: __('Cancel'),
                 okText: __('Yes, Proceed'),
                 title: title,
@@ -25,6 +26,7 @@ require([
 
                 var modal = new Modal({
                     allowCancel: false,
+                    className: 'modal modal-primary',
                     title: title,
                     content: content
                 });

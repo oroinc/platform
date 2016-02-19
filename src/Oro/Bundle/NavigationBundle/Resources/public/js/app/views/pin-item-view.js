@@ -22,32 +22,32 @@ define([
         },
 
         outdatedContentHandler: function(event) {
-            var $noteEl;
-            var self = this;
-            var $el = this.$el;
             var url = this.model.get('url');
-            var refreshHandler = function() {
-                if (self.checkCurrentUrl()) {
-                    $noteEl = $el.find('.pin-status.outdated');
-                    self.markNormal($noteEl);
-                    mediator.off('page:afterRefresh', refreshHandler);
-                }
-            };
-            if (!event.isCurrentPage && mediator.execute('compareUrl', url, event.path)) {
-                $noteEl = $el.find('.pin-status');
-                if (!$noteEl.is('.outdated')) {
-                    this.markOutdated($noteEl);
-                    mediator.on('page:afterRefresh', refreshHandler);
+            if (mediator.execute('compareUrl', url, event.path)) {
+                if (!this.getPinStatusIcon().is('.outdated')) {
+                    this.markOutdated();
+                    this.listenTo(mediator, 'page:afterRefresh', this.onPageRefresh);
                 }
             }
         },
 
-        markOutdated: function($el) {
-            $el.addClass('outdated').attr('title', __('Content of pinned page is outdated'));
+        onPageRefresh: function() {
+            if (this.checkCurrentUrl()) {
+                this.markNormal();
+                this.stopListening(mediator, 'page:afterRefresh');
+            }
         },
 
-        markNormal: function($el) {
-            $el.removeClass('outdated').removeAttr('title');
+        markOutdated: function() {
+            this.getPinStatusIcon().addClass('outdated').attr('title', __('Content of pinned page is outdated'));
+        },
+
+        markNormal: function() {
+            this.getPinStatusIcon().removeClass('outdated').removeAttr('title');
+        },
+
+        getPinStatusIcon: function() {
+            return this.$('.pin-status');
         }
     });
 

@@ -31,6 +31,18 @@ class ConfigBag
     }
 
     /**
+     * Gets a configuration for all entities for the given version
+     *
+     * @param string $version The version of a config
+     *
+     * @return array [entity class => config, ...]
+     */
+    public function getConfigs($version)
+    {
+        return $this->findConfigs('entities', $version);
+    }
+
+    /**
      * Gets a configuration for the given version of a class
      *
      * @param string $className The FQCN of an entity
@@ -54,6 +66,24 @@ class ConfigBag
     public function getRelationConfig($className, $version)
     {
         return $this->findConfig('relations', $className, $version);
+    }
+
+    /**
+     * @param string $section
+     * @param string $version
+     *
+     * @return array
+     */
+    protected function findConfigs($section, $version)
+    {
+        if (!isset($this->config[$section])) {
+            return [];
+        }
+        $result = $this->config[$section];
+
+        // @todo: API version is not supported for now. Implement filtering by the version here
+
+        return $result;
     }
 
     /**

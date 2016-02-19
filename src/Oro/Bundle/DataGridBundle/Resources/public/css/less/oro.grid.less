@@ -161,7 +161,10 @@ table.grid {
       cursor: pointer;
   }
   tbody tr.row-selected {
-    background-color: #FDF8E4;
+    background-color: @rowHighlightBackground;
+    &:hover {
+      background-color: @rowSelectedBackground;
+    }
   }
   .string-cell,
   .uri-cell,

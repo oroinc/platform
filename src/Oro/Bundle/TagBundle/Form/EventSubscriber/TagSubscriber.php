@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TagBundle\Form\EventSubscriber;
 
-use Oro\Component\Layout\ArrayCollection;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

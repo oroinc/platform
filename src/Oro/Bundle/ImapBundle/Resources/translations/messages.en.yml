@@ -24,7 +24,7 @@ oro.imap:
         smtp_encryption.label: Encryption
         use_imap:
             label: Enable IMAP
-            tooltip: Enable imap sync with your mailbox to send and receive emails from OroCRM. If you don't know your imap credentials, contact your administrator.
+            tooltip: Enable imap sync with your mailbox to receive emails on OroCRM. If you don't know your imap credentials, contact your administrator.
         use_smtp:
             label: Enable SMTP
             tooltip: Enable smtp sync to synchronize emails sent from OroCRM to your mailbox so you can see them in other email clients.

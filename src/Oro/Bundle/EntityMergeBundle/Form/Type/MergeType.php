@@ -41,7 +41,7 @@ class MergeType extends AbstractType
         $fields = $builder->get('fields');
 
         foreach ($metadata->getFieldsMetadata() as $fieldMetadata) {
-            if ($fieldMetadata->is('is_extend', true) || $fieldMetadata->is('display', true)) {
+            if ($fieldMetadata->is('display')) {
                 $fields->add(
                     $fieldMetadata->getFieldName(),
                     'oro_entity_merge_field',

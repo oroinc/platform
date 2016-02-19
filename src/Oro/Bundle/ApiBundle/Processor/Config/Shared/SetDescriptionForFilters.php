@@ -71,7 +71,7 @@ class SetDescriptionForFilters implements ProcessorInterface
     protected function findFieldConfig($entityClass, $filterKey, $filterConfig)
     {
         $path = ConfigUtil::explodePropertyPath(
-            isset($filterConfig[ConfigUtil::PROPERTY_PATH]) ? $filterConfig[ConfigUtil::PROPERTY_PATH] : $filterKey
+            ConfigUtil::getPropertyPath($filterConfig, $filterKey)
         );
         if (count($path) === 1) {
             return $this->getFieldConfig($entityClass, reset($path));

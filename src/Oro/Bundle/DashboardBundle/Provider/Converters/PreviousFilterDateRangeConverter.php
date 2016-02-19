@@ -31,17 +31,13 @@ class PreviousFilterDateRangeConverter extends FilterDateTimeRangeConverter
             }
 
             if ($currentDateRange['type'] !== AbstractDateFilterType::TYPE_LESS_THAN) {
-                /**
-                 * @var \DateTime $from
-                 * @var \DateTime $to
-                 */
-                $from = $currentDateRange['start'];
-                $to   = $currentDateRange['end'];
+                list($start, $end) = $this->dateHelper->getPreviousDateTimeInterval(
+                    $currentDateRange['start'],
+                    $currentDateRange['end']
+                );
 
-                $interval        = $from->diff($to);
-                $fromDate        = clone $from;
-                $result['start'] = $fromDate->sub($interval);
-                $result['end']   = clone $from;
+                $result['start'] = $start;
+                $result['end']   = $end;
                 $result['type']  = AbstractDateFilterType::TYPE_BETWEEN;
             }
         }

@@ -71,19 +71,21 @@ class DoctrineHelper extends BaseHelper
      * Gets ORDER BY expression that can be used to sort a collection by entity identifier.
      *
      * @param string $entityClass
+     * @param bool   $desc
      *
      * @return array|null
      */
-    public function getOrderByIdentifier($entityClass)
+    public function getOrderByIdentifier($entityClass, $desc = false)
     {
-        $ids = $this->getEntityMetadata($entityClass)->getIdentifierFieldNames();
-        if (empty($ids)) {
+        $idFieldNames = $this->getEntityIdentifierFieldNamesForClass($entityClass);
+        if (empty($idFieldNames)) {
             return null;
         }
 
         $orderBy = [];
-        foreach ($ids as $pk) {
-            $orderBy[$pk] = Criteria::ASC;
+        $order   = $desc ? Criteria::DESC : Criteria::ASC;
+        foreach ($idFieldNames as $idFieldName) {
+            $orderBy[$idFieldName] = $order;
         }
 
         return $orderBy;
@@ -102,7 +104,9 @@ class DoctrineHelper extends BaseHelper
 
         $idFieldNames = $metadata->getIdentifierFieldNames();
         if (count($idFieldNames) > 0) {
-            $indexedColumns[reset($idFieldNames)] = true;
+            $mapping = $metadata->getFieldMapping(reset($idFieldNames));
+
+            $indexedColumns[$mapping['columnName']] = true;
         }
 
         if (isset($metadata->table['indexes'])) {

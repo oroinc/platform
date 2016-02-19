@@ -48,6 +48,10 @@ class ConfigurationController extends Controller
                 $sender       = $this->get('oro_navigation.content.topic_sender');
 
                 $sender->send($sender->getGenerator()->generate($taggableData));
+
+                // recreate form to drop values for fields with use_parent_scope_value
+                $form = $provider->getForm($activeSubGroup);
+                $form->setData($this->get('oro_config.manager')->getSettingsByForm($form));
             }
         }
 

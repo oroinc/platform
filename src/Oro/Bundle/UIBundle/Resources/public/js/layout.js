@@ -70,7 +70,7 @@ define(function(require) {
                 if (devToolbarComposition &&
                     devToolbarComposition.view &&
                     devToolbarComposition.view.$('.sf-toolbarreset').is(':visible')) {
-                    this.devToolbarHeight = devToolbarComposition.view.$('.sf-toolbarreset').height();
+                    this.devToolbarHeight = devToolbarComposition.view.$('.sf-toolbarreset').outerHeight();
                 } else {
                     this.devToolbarHeight = 0;
                 }

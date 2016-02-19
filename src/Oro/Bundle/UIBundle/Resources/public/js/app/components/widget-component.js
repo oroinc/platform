@@ -91,6 +91,13 @@ define(function(require) {
          */
         openWidget: function() {
             var deferredOpen = $.Deferred();
+            var $element = this.$element;
+            if ($element) {
+                $element.addClass('widget-component-processing');
+                deferredOpen.then(function() {
+                    $element.removeClass('widget-component-processing');
+                });
+            }
             var widgetModuleName;
             if (!this.widget) {
                 // defines module name and load the module, before open widget
@@ -118,6 +125,7 @@ define(function(require) {
 
             if (!this.options.multiple && this.opened) {
                 // single instance is already opened
+                deferredOpen.resolve();
                 return;
             }
 

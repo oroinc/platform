@@ -123,6 +123,7 @@ class ActivityListManager
         $pager->setQueryBuilder($qb);
         $pager->setPage($page);
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
+        $pager->setSkipAclCheck(true);
         $pager->init();
 
         $targetEntityData = [

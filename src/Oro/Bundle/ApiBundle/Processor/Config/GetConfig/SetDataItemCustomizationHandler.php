@@ -55,14 +55,13 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
      */
     protected function setCustomizationHandler(array &$definition, ConfigContext $context)
     {
-        if (isset($definition[ConfigUtil::POST_SERIALIZE])) {
-            // a customization handler already exists
-            return;
-        }
-
         $entityClass = $context->getClassName();
 
-        $definition[ConfigUtil::POST_SERIALIZE] = $this->getRootCustomizationHandler($context, $entityClass);
+        $definition[ConfigUtil::POST_SERIALIZE] = $this->getRootCustomizationHandler(
+            $context,
+            $entityClass,
+            isset($definition[ConfigUtil::POST_SERIALIZE]) ? $definition[ConfigUtil::POST_SERIALIZE] : null
+        );
 
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // we can set customization handlers for associations only for manageable entity,
@@ -147,14 +146,13 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
             && is_array($fieldConfig[ConfigUtil::FIELDS])
             && $metadata->hasAssociation($fieldName)
         ) {
-            if (!isset($definition[ConfigUtil::POST_SERIALIZE])) {
-                $fieldConfig[ConfigUtil::POST_SERIALIZE] = $this->getCustomizationHandler(
-                    $context,
-                    $rootEntityClass,
-                    $fieldPath,
-                    $metadata->getAssociationTargetClass($fieldName)
-                );
-            }
+            $fieldConfig[ConfigUtil::POST_SERIALIZE] = $this->getCustomizationHandler(
+                $context,
+                $rootEntityClass,
+                $fieldPath,
+                $metadata->getAssociationTargetClass($fieldName),
+                isset($fieldConfig[ConfigUtil::POST_SERIALIZE]) ? $fieldConfig[ConfigUtil::POST_SERIALIZE] : null
+            );
             $this->processFields(
                 $context,
                 $fieldConfig[ConfigUtil::FIELDS],
@@ -196,15 +194,23 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
     /**
      * @param ConfigContext $context
      * @param string        $entityClass
+     * @param callable|null $previousHandler
      *
      * @return callable
      */
-    protected function getRootCustomizationHandler(ConfigContext $context, $entityClass)
-    {
-        return function (array $dataItem) use ($context, $entityClass) {
+    protected function getRootCustomizationHandler(
+        ConfigContext $context,
+        $entityClass,
+        $previousHandler
+    ) {
+        return function (array $item) use ($context, $entityClass, $previousHandler) {
+            if (null !== $previousHandler) {
+                $item = call_user_func($previousHandler, $item);
+            }
+
             $customizationContext = $this->createCustomizationContext($context);
             $customizationContext->setClassName($entityClass);
-            $customizationContext->setResult($dataItem);
+            $customizationContext->setResult($item);
             $this->customizationProcessor->process($customizationContext);
 
             return $customizationContext->getResult();
@@ -216,17 +222,27 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
      * @param string        $rootEntityClass
      * @param string        $propertyPath
      * @param string        $entityClass
+     * @param callable|null $previousHandler
      *
      * @return callable
      */
-    protected function getCustomizationHandler(ConfigContext $context, $rootEntityClass, $propertyPath, $entityClass)
-    {
-        return function (array $dataItem) use ($context, $rootEntityClass, $propertyPath, $entityClass) {
+    protected function getCustomizationHandler(
+        ConfigContext $context,
+        $rootEntityClass,
+        $propertyPath,
+        $entityClass,
+        $previousHandler
+    ) {
+        return function (array $item) use ($context, $rootEntityClass, $propertyPath, $entityClass, $previousHandler) {
+            if (null !== $previousHandler) {
+                $item = call_user_func($previousHandler, $item);
+            }
+
             $customizationContext = $this->createCustomizationContext($context);
             $customizationContext->setRootClassName($rootEntityClass);
             $customizationContext->setPropertyPath($propertyPath);
             $customizationContext->setClassName($entityClass);
-            $customizationContext->setResult($dataItem);
+            $customizationContext->setResult($item);
             $this->customizationProcessor->process($customizationContext);
 
             return $customizationContext->getResult();

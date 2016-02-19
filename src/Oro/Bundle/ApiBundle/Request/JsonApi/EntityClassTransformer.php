@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 
 use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class EntityClassTransformer implements EntityClassTransformerInterface
@@ -21,16 +22,32 @@ class EntityClassTransformer implements EntityClassTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($entityClass)
+    public function transform($entityClass, $throwException = true)
     {
-        return $this->entityAliasResolver->getPluralAlias($entityClass);
+        try {
+            return $this->entityAliasResolver->getPluralAlias($entityClass);
+        } catch (EntityAliasNotFoundException $e) {
+            if ($throwException) {
+                throw $e;
+            }
+        }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($entityType)
+    public function reverseTransform($entityType, $throwException = true)
     {
-        return $this->entityAliasResolver->getClassByPluralAlias($entityType);
+        try {
+            return $this->entityAliasResolver->getClassByPluralAlias($entityType);
+        } catch (EntityAliasNotFoundException $e) {
+            if ($throwException) {
+                throw $e;
+            }
+        }
+
+        return null;
     }
 }
