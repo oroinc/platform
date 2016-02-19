@@ -12,7 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
 use Oro\Bundle\EmailBundle\Model\Recipient;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -23,8 +23,8 @@ class RelatedEmailsProvider
     /** @var Registry */
     protected $registry;
 
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var SecurityFacade */
     protected $securityFacade;
@@ -43,7 +43,7 @@ class RelatedEmailsProvider
 
     /**
      * @param Registry $registry
-     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigManager $configManager
      * @param SecurityFacade $securityFacade
      * @param NameFormatter $nameFormatter
      * @param EmailAddressHelper $emailAddressHelper
@@ -51,14 +51,14 @@ class RelatedEmailsProvider
      */
     public function __construct(
         Registry $registry,
-        ConfigProvider $entityConfigProvider,
+        ConfigManager $configManager,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         EmailAddressHelper $emailAddressHelper,
         EmailRecipientsHelper $emailRecipientsHelper
     ) {
         $this->registry = $registry;
-        $this->entityConfigProvider = $entityConfigProvider;
+        $this->configManager = $configManager;
         $this->securityFacade = $securityFacade;
         $this->nameFormatter = $nameFormatter;
         $this->emailAddressHelper = $emailAddressHelper;
@@ -202,18 +202,25 @@ class RelatedEmailsProvider
      */
     protected function getFieldAttributes(ClassMetadata $metadata)
     {
-        $attributes = [];
+        $attributes           = [];
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $entityConfigProvider = $this->configManager->getProvider('entity');
         foreach ($metadata->fieldNames as $fieldName) {
             if (false !== stripos($fieldName, 'email')) {
-                $attributes[] = new EmailAttribute($fieldName);
+                if ($extendConfigProvider->hasConfig($metadata->name, $fieldName)) {
+                    $config = $extendConfigProvider->getConfig($metadata->name, $fieldName);
+                    if (!$config->is('is_deleted')) {
+                        $attributes[] = new EmailAttribute($fieldName);
+                    }
+                }
                 continue;
             }
 
-            if (!$this->entityConfigProvider->hasConfig($metadata->name, $fieldName)) {
+            if (!$entityConfigProvider->hasConfig($metadata->name, $fieldName)) {
                 continue;
             }
 
-            $fieldConfig = $this->entityConfigProvider->getConfig($metadata->name, $fieldName);
+            $fieldConfig = $entityConfigProvider->getConfig($metadata->name, $fieldName);
             if ($fieldConfig->get('contact_information') === 'email') {
                 $attributes[] = new EmailAttribute($fieldName);
             }
