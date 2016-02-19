@@ -38,6 +38,11 @@ class EntityMetadata extends MergeableClassMetadata
     public $defaultValues;
 
     /**
+     * @var array
+     */
+    public $routes = [];
+
+    /**
      * {@inheritdoc}
      */
     public function merge(MergeableInterface $object)
@@ -50,6 +55,7 @@ class EntityMetadata extends MergeableClassMetadata
             $this->routeName     = $object->routeName;
             $this->routeView     = $object->routeView;
             $this->routeCreate   = $object->routeCreate;
+            $this->routes        = $object->routes;
             $this->mode          = $object->mode;
         }
     }
@@ -66,6 +72,7 @@ class EntityMetadata extends MergeableClassMetadata
                 $this->routeName,
                 $this->routeView,
                 $this->routeCreate,
+                $this->routes,
                 $this->mode,
                 parent::serialize(),
             )
@@ -83,6 +90,7 @@ class EntityMetadata extends MergeableClassMetadata
             $this->routeName,
             $this->routeView,
             $this->routeCreate,
+            $this->routes,
             $this->mode,
             $parentStr
             ) = unserialize($str);
@@ -98,7 +106,7 @@ class EntityMetadata extends MergeableClassMetadata
      */
     public function getRoute($routeType = 'view', $strict = false)
     {
-        if (in_array($routeType, ['view', 'name', 'create'])) {
+        if (in_array($routeType, ['view', 'name', 'create'], true)) {
             $propertyName = 'route' . ucfirst($routeType);
 
             if ($this->{$propertyName}) {
@@ -106,6 +114,8 @@ class EntityMetadata extends MergeableClassMetadata
             } elseif (false === $strict) {
                 return $this->generateDefaultRoute($routeType);
             }
+        } elseif (!$strict && array_key_exists($routeType, $this->routes)) {
+            return $this->routes[$routeType];
         }
 
         throw new \LogicException(sprintf('No route "%s" found for entity "%s"', $routeType, $this->name));

@@ -40,11 +40,14 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $metadata->routeView   = 'test_route_view';
         $metadata->routeName   = 'test_route_name';
         $metadata->routeCreate = 'test_route_create';
+        $metadata->routeEdit   = 'test_route_edit';
+        $metadata->routeDelete = 'test_route_delete';
+        $metadata->routes      = ['custom' => 'test_route_custom'];
 
         $this->assertEquals('test_route_view', $metadata->getRoute());
         $this->assertEquals('test_route_view', $metadata->getRoute('view'));
         $this->assertEquals('test_route_name', $metadata->getRoute('name'));
-        $this->assertEquals('test_route_create', $metadata->getRoute('create'));
+        $this->assertEquals('test_route_custom', $metadata->getRoute('custom'));
     }
 
     public function testGetRouteGeneratedAutomaticallyInNonStrictMode()
@@ -57,13 +60,28 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage No route "view" found for entity
+     * @dataProvider getRouteThrowExceptionProvider
+     *
+     * @param string $name
      */
-    public function testGetRouteThrowExceptionInStrictMode()
+    public function testGetRouteThrowExceptionInStrictMode($name)
     {
-        $metadata = new EntityMetadata('Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity');
+        $this->setExpectedException('\LogicException', sprintf('No route "%s" found for entity', $name));
 
-        $this->assertEquals('oro_demoentity_view', $metadata->getRoute('view', true));
+        $metadata = new EntityMetadata('Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity');
+        $metadata->routes = ['custom' => 'test_route_custom'];
+
+        $metadata->getRoute($name, true);
+    }
+
+    /**
+     * @return array
+     */
+    public function getRouteThrowExceptionProvider()
+    {
+        return [
+            ['view'],
+            ['custom']
+        ];
     }
 }
