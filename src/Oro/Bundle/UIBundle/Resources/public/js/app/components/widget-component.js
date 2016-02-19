@@ -90,9 +90,14 @@ define(function(require) {
          *  @return {Promise}
          */
         openWidget: function() {
-            var $element = this.$element;
-            $element.addClass('widget-component-processing');
             var deferredOpen = $.Deferred();
+            var $element = this.$element;
+            if ($element) {
+                $element.addClass('widget-component-processing');
+                deferredOpen.then(function() {
+                    $element.removeClass('widget-component-processing');
+                });
+            }
             var widgetModuleName;
             if (!this.widget) {
                 // defines module name and load the module, before open widget
@@ -104,9 +109,7 @@ define(function(require) {
             } else {
                 this._openWidget(deferredOpen);
             }
-            return deferredOpen.then(function() {
-                $element.removeClass('widget-component-processing');
-            }).promise();
+            return deferredOpen.promise();
         },
 
         /**

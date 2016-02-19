@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 use Oro\Bundle\EmailBundle\EventListener\EntityListener;
@@ -26,9 +28,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $emailThreadManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $emailOwnersProvider;
-
     /** @var EmailOwnerProviderStorage */
     private $emailOwnerStorage;
 
@@ -37,6 +36,9 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $userEmailOwnerProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $emailActivityUpdates;
 
     /** @var ActivityListChainProvider */
     private $chainProvider;
@@ -70,16 +72,15 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->emailOwnerStorage = new EmailOwnerProviderStorage();
         $this->emailOwnerStorage->addProvider($this->userEmailOwnerProvider);
 
-        $this->emailOwnersProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider')
-            ->setConstructorArgs([$this->chainProvider, $this->emailOwnerStorage, $this->registry])
-            ->setMethods(['supportOwnerProvider'])
+        $this->emailActivityUpdates = $this->getMockBuilder('Oro\Bundle\EmailBundle\Model\EmailActivityUpdates')
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->listener = new EntityListener(
             $this->emailOwnerManager,
             new ServiceLink($this->emailActivityManager),
             new ServiceLink($this->emailThreadManager),
-            $this->emailOwnersProvider
+            $this->emailActivityUpdates
         );
     }
 
@@ -141,10 +142,10 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->will($this->returnValue($em));
 
-        $this->emailOwnersProvider
-            ->expects($this->exactly(3))
-            ->method('supportOwnerProvider')
-            ->will($this->returnValue(true));
+        $this->emailActivityUpdates
+            ->expects($this->once())
+            ->method('createJobs')
+            ->will($this->returnValue([new Job('command')]));
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
@@ -223,10 +224,13 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('getEmailsByOwnerEntity')
             ->will($this->returnValue($createdEmailsArray));
-        $this->emailOwnersProvider
-            ->expects($this->exactly(6))
-            ->method('supportOwnerProvider')
-            ->will($this->returnValue(true));
+        $this->emailActivityUpdates
+                ->expects($this->once())
+                ->method('processCreatedEntities')
+                ->with($uow->getScheduledEntityInsertions());
+        $this->emailActivityUpdates->expects($this->once())
+            ->method('createJobs')
+            ->will($this->returnValue([new Job('command')]));
         $this->userEmailOwnerProvider
             ->expects($this->never())
             ->method('getEmailOwnerClass')
