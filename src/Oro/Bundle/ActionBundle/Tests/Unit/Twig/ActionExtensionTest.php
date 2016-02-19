@@ -119,6 +119,10 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 ->method('getEntityIdentifier')
                 ->with($context['entity'])
                 ->willReturn(['id' => $context['entity']->id]);
+
+            $this->doctrineHelper->expects($this->any())
+                ->method('isManageableEntity')
+                ->willReturn(true);
         }
 
         $this->assertEquals($expected, $this->extension->getWidgetParameters($context));
