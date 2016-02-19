@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\FormatName;
+use Oro\Component\ConfigExpression\Action\FormatName;
 
 class FormatNameTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')

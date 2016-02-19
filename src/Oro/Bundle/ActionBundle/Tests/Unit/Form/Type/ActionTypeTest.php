@@ -9,9 +9,9 @@ use Oro\Bundle\ActionBundle\Form\Type\ActionType;
 use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
-use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeManager;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 
 class ActionTypeTest extends FormIntegrationTestCase
@@ -286,7 +286,7 @@ class ActionTypeTest extends FormIntegrationTestCase
     protected function createAction($noAttributes = false)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeManager $attributeManager */
-        $attributeManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeManager')
+        $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
             ->disableOriginalConstructor()
             ->getMock();
         $attributeManager->expects($this->any())

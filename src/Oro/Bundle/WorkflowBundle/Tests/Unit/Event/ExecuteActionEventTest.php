@@ -23,7 +23,7 @@ class ExecuteActionEventTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+        $this->action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
             ->getMock();
 
         $this->context = new \stdClass();

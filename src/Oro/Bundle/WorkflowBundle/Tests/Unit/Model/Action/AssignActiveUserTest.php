@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\AssignActiveUser;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 

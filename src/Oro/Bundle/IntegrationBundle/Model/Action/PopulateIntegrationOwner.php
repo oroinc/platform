@@ -4,9 +4,9 @@ namespace Oro\Bundle\IntegrationBundle\Model\Action;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper;
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
+use Oro\Component\ConfigExpression\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 /**
  * Set owner for entity based on integration settings.

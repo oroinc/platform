@@ -33,7 +33,7 @@ To add custom action add a service to DIC with tag "oro_workflow.action", for ex
 
 ```
 parameters:
-    oro_workflow.action.close_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\CloseWorkflow
+    oro_workflow.action.close_workflow.class: Oro\Component\ConfigExpression\Action\CloseWorkflow
 services:
     oro_workflow.action.close_workflow:
         class: %oro_workflow.action.close_workflow.class%
@@ -42,7 +42,7 @@ services:
 ```
 
 Symbol "|" in alias can be used to have several aliases. Note that service class must implement
-Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface.
+Oro\Component\ConfigExpression\Action\ActionInterface.
 
 Configuration Syntax
 --------------------
@@ -77,7 +77,7 @@ See syntax examples:
 Assign Value
 ------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\AssignValue
+**Class:** Oro\Component\ConfigExpression\Action\AssignValue
 
 **Alias:** assign_value
 
@@ -108,7 +108,7 @@ OR
 Assign Active User
 ------------------
 
-**Class** Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
+**Class** Oro\Component\ConfigExpression\Action\AssignActiveUser
 
 **Alias** assign_active_user or get_active_user
 
@@ -131,7 +131,7 @@ OR
 Unset Value
 ------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\UnsetValue
+**Class:** Oro\Component\ConfigExpression\Action\UnsetValue
 
 **Alias:** unset_value
 
@@ -160,7 +160,7 @@ OR
 Create Object
 -------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateObject
+**Class:** Oro\Component\ConfigExpression\Action\CreateObject
 
 **Alias:** create_object
 
@@ -192,7 +192,7 @@ OR
 Create Entity
 -------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity
+**Class:** Oro\Component\ConfigExpression\Action\CreateEntity
 
 **Alias:** create_entity
 
@@ -236,7 +236,7 @@ OR
 Remove Entity
 -------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity
+**Class:** Oro\Component\ConfigExpression\Action\RemoveEntity
 
 **Alias:** remove_entity
 
@@ -254,7 +254,7 @@ Remove Entity
 Create Related Entity
 ---------------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
+**Class:** Oro\Component\ConfigExpression\Action\CreateRelatedEntity
 
 **Alias:** create_related_entity
 
@@ -289,7 +289,7 @@ OR
 Find Entity
 -----------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity
+**Class:** Oro\Component\ConfigExpression\Action\RequestEntity
 
 **Alias:** find_entity|request_entity
 
@@ -335,7 +335,7 @@ OR
 Format Name
 -----------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\FormatName
+**Class:** Oro\Component\ConfigExpression\Action\FormatName
 
 **Alias:** format_name
 
@@ -355,7 +355,7 @@ Format Name
 Format String
 -------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\FormatString
+**Class:** Oro\Component\ConfigExpression\Action\FormatString
 
 **Alias:** format_string
 
@@ -379,7 +379,7 @@ Format String
 Call Method
 -----------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CallMethod
+**Class:** Oro\Component\ConfigExpression\Action\CallMethod
 
 **Alias:** call_method
 
@@ -416,7 +416,7 @@ OR
 Create Date
 -----------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateDate
+**Class:** Oro\Component\ConfigExpression\Action\CreateDate
 
 **Alias:** create_date
 
@@ -444,7 +444,7 @@ OR
 Create Date Time
 ----------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateDate
+**Class:** Oro\Component\ConfigExpression\Action\CreateDate
 
 **Alias:** create_datetime
 
@@ -552,7 +552,7 @@ OR
 Redirect
 --------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\Redirect
+**Class:** Oro\Component\ConfigExpression\Action\Redirect
 
 **Alias:** redirect
 
@@ -585,7 +585,7 @@ OR
 Tree Executor
 -------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\TreeExecutor
+**Class:** Oro\Component\ConfigExpression\Action\TreeExecutor
 
 **Alias:** tree
 
@@ -617,7 +617,7 @@ OR
 Foreach
 -------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\Traverse
+**Class:** Oro\Component\ConfigExpression\Action\Traverse
 
 **Alias:** traverse|foreach
 
@@ -645,7 +645,7 @@ OR
 Configurable
 ------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\Configurable
+**Class:** Oro\Component\ConfigExpression\Action\Configurable
 
 **Alias:** configurable
 
@@ -680,7 +680,7 @@ $configurableAction->execute($context); // build list of actions and execute the
 Flash Message
 -------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage
+**Class:** Oro\Component\ConfigExpression\Action\FlashMessage
 
 **Alias:** flash_message
 

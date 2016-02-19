@@ -5,8 +5,8 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\ActionInterface;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
 {

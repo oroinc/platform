@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
+use Oro\Component\ConfigExpression\Action\ActionInterface;
 
 class ArrayAction extends ArrayCollection implements ActionInterface
 {

@@ -12,7 +12,7 @@ class FunctionPass extends AbstractPass
     const FUNCTION_FACTORY_SERVICE_ID = 'oro_action.function_factory';
 
     const EVENT_DISPATCHER_SERVICE = 'event_dispatcher';
-    const EVENT_DISPATCHER_AWARE_ACTION = 'Oro\Bundle\WorkflowBundle\Model\Action\EventDispatcherAwareActionInterface';
+    const EVENT_DISPATCHER_AWARE_ACTION = 'Oro\Component\ConfigExpression\Action\EventDispatcherAwareActionInterface';
 
     /**
      * {@inheritDoc}

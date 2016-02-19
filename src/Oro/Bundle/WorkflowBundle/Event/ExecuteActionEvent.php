@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
+use Oro\Component\ConfigExpression\Action\ActionInterface;
 
 class ExecuteActionEvent extends Event
 {

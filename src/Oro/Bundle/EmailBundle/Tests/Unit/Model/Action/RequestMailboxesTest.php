@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Model\Action\RequestMailboxes;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class RequestMailboxesTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +30,7 @@ class RequestMailboxesTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->contextAccessor = $this->getMock('Oro\Bundle\WorkflowBundle\Model\ContextAccessor');
+        $this->contextAccessor = $this->getMock('Oro\Bundle\ActionBundle\Model\ContextAccessor');
 
         $this->mailboxProcessStorage = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage')
             ->disableOriginalConstructor()

@@ -11,11 +11,11 @@ use Symfony\Component\OptionsResolver\Options;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
-use Oro\Bundle\WorkflowBundle\Model\AttributeGuesser;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class WorkflowAttributesType extends AbstractType
 {
@@ -269,7 +269,7 @@ class WorkflowAttributesType extends AbstractType
                 'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
                 'attribute_fields' => 'array',
                 'attribute_default_values' => 'array',
-                'init_actions' => 'Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface',
+                'init_actions' => 'Oro\Component\ConfigExpression\Action\ActionInterface',
             )
         );
     }

@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
-use Oro\Bundle\WorkflowBundle\Model\Action\AssignConstantValue;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\ActionInterface;
+use Oro\Component\ConfigExpression\Action\AssignConstantValue;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class AssignConstantValueTest extends \PHPUnit_Framework_TestCase
 {

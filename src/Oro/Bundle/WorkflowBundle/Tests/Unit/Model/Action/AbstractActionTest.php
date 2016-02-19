@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\AbstractAction;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action\Stub\ArrayCondition;
 
 class AbstractActionTest extends \PHPUnit_Framework_TestCase
@@ -15,7 +15,7 @@ class AbstractActionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction')
+        $this->action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\AbstractAction')
             ->setConstructorArgs(array(new ContextAccessor()))
             ->getMockForAbstractClass();
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')

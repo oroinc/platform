@@ -10,14 +10,14 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
-use Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition;
+use Oro\Component\ConfigExpression\Condition\AbstractConfigurableCondition;
 
 /**
  * Check For Active integration of given type
  * Usage:
  * @has_active_integration: 'some_type'
  */
-class HasActiveIntegration extends AbstractCondition implements ContextAccessorAwareInterface
+class HasActiveIntegration extends AbstractConfigurableCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
 

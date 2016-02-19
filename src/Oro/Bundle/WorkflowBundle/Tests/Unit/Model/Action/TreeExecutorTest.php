@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\TreeExecutor;
+use Oro\Component\ConfigExpression\Action\TreeExecutor;
 
 class TreeExecutorTest extends \PHPUnit_Framework_TestCase
 {
@@ -69,7 +69,7 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
     public function testBreakOnFailureEnabledException()
     {
         $actionError = $this->getExceptionAction();
-        $action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+        $action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
             ->getMockForAbstractClass();
         $action->expects($this->never())
             ->method('execute');
@@ -86,7 +86,7 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
     public function testBreakOnFailureDisabledException()
     {
         $actionError = $this->getExceptionAction();
-        $action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+        $action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
             ->getMockForAbstractClass();
         $action->expects($this->once())
             ->method('execute');
@@ -119,7 +119,7 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
 
     protected function getExceptionAction()
     {
-        $action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+        $action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
             ->setMethods(array('execute'))
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
@@ -142,7 +142,7 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
     {
         if (!$this->actionBuilder) {
             $this->actionBuilder =
-                $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+                $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
                     ->setMethods(array('execute'))
                     ->disableOriginalConstructor();
         }

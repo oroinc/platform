@@ -68,7 +68,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')

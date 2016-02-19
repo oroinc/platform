@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory;
+use Oro\Component\ConfigExpression\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class ActionFactoryTest extends \PHPUnit_Framework_TestCase
@@ -76,7 +76,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreate($type, $id, $options = array(), $isCondition = false)
     {
-        $action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+        $action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $action->expects($this->once())

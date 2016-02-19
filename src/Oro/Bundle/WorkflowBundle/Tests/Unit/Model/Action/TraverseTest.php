@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action\Stub\StubStorage;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\Traverse;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\Traverse;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class TraverseTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class TraverseTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configurableAction = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\Configurable')
+        $this->configurableAction = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
 

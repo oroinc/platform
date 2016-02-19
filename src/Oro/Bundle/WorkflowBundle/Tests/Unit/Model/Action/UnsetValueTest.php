@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\AssignValue;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
-use Oro\Bundle\WorkflowBundle\Model\Action\UnsetValue;
+use Oro\Component\ConfigExpression\Action\AssignValue;
+use Oro\Component\ConfigExpression\Action\ActionInterface;
+use Oro\Component\ConfigExpression\Action\UnsetValue;
 
 class UnsetValueTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class UnsetValueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->assignValue = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\AssignValue')
+        $this->assignValue = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\AssignValue')
             ->disableOriginalConstructor()
             ->getMock();
 

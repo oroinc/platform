@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Model\Action;
 
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
+use Oro\Component\ConfigExpression\Action\AbstractAction;
 
 abstract class AbstractFieldsChangesAction extends AbstractAction
 {

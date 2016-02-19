@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity;
+use Oro\Component\ConfigExpression\Action\RequestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class RequestEntityTest extends \PHPUnit_Framework_TestCase
 {

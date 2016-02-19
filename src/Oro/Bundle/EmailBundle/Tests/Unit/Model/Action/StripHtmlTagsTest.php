@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\Action;
 
 use Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class StripHtmlTagsTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class StripHtmlTagsTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->contextAccessor = $this->getMock('Oro\Bundle\WorkflowBundle\Model\ContextAccessor');
+        $this->contextAccessor = $this->getMock('Oro\Bundle\ActionBundle\Model\ContextAccessor');
 
         $this->helper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
             ->disableOriginalConstructor()

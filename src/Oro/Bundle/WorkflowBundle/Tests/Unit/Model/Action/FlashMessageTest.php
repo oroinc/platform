@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\FlashMessage;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class FlashMessageTest extends \PHPUnit_Framework_TestCase
 {

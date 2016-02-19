@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
-use Oro\Bundle\WorkflowBundle\Model\Action\CallMethod;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\CallMethod;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 
 class CallMethodTest extends \PHPUnit_Framework_TestCase
@@ -56,7 +56,7 @@ class CallMethodTest extends \PHPUnit_Framework_TestCase
             'attribute' => 'test'
         );
         $this->assertInstanceOf(
-            'Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface',
+            'Oro\Component\ConfigExpression\Action\ActionInterface',
             $this->action->initialize($options)
         );
         $this->assertAttributeEquals($options, 'options', $this->action);

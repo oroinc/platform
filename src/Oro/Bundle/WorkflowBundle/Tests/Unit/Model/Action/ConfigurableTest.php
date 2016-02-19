@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\Configurable;
+use Oro\Component\ConfigExpression\Action\Configurable;
 
 class ConfigurableTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->assembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler')
+        $this->assembler = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionAssembler')
             ->disableOriginalConstructor()
             ->setMethods(array('assemble'))
             ->getMock();
@@ -50,7 +50,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        $action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+        $action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $action->expects($this->exactly(2))

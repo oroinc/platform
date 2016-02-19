@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory;
-use Oro\Bundle\WorkflowBundle\Model\Action\Configurable as ConfigurableAction;
+use Oro\Component\ConfigExpression\Action\ActionFactory;
+use Oro\Component\ConfigExpression\Action\Configurable as ConfigurableAction;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 

@@ -201,7 +201,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function getAttributeMock($name)
     {
-        $attributeMock = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
+        $attributeMock = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
             ->disableOriginalConstructor()
             ->getMock();
         $attributeMock->expects($this->any())

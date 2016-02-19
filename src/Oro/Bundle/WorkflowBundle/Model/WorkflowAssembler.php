@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;

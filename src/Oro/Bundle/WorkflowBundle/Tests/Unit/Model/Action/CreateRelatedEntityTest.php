@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\CreateRelatedEntity;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class CreateRelatedEntityTest extends \PHPUnit_Framework_TestCase
 {

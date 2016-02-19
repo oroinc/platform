@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\FormatString;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\FormatString;
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 
 class FormatStringTest extends \PHPUnit_Framework_TestCase

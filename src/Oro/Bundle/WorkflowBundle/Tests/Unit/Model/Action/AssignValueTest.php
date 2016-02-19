@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\AssignValue;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
+use Oro\Component\ConfigExpression\Action\AssignValue;
+use Oro\Component\ConfigExpression\Action\ActionInterface;
 
 class AssignValueTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->action = new AssignValue($this->contextAccessor);
@@ -95,7 +95,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
     public function testInitialize($options)
     {
         $this->assertInstanceOf(
-            'Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface',
+            'Oro\Component\ConfigExpression\Action\ActionInterface',
             $this->action->initialize($options)
         );
 

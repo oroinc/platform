@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Condition;
 
-use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable;
+use Oro\Component\ConfigExpression\Condition\Configurable;
 
 class ConfigurableTest extends \PHPUnit_Framework_TestCase
 {

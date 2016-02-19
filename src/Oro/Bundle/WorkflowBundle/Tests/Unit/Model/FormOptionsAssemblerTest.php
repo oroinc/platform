@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\Configurable;
+use Oro\Component\ConfigExpression\Action\Configurable;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\Attribute;
 
 class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->actionFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory')
+        $this->actionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -64,7 +64,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
                 'attribute_one' => new PropertyPath('data.foo'),
                 'attribute_two' => new PropertyPath('data.bar'),
             ),
-            'init_actions' => $this->getMock('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+            'init_actions' => $this->getMock('Oro\Component\ConfigExpression\Action\ActionInterface')
         );
 
         $attributes = array(
