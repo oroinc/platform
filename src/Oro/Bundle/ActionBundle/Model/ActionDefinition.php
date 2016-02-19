@@ -409,16 +409,8 @@ class ActionDefinition
     }
 
     /**
-     * @return bool
-     */
-    public function isSubstituteAction()
-    {
-        return !empty($this->substituteAction);
-    }
-
-    /**
      * @param string $substituteAction
-     * @return static
+     * @return $this
      */
     public function setSubstituteAction($substituteAction)
     {
@@ -437,7 +429,7 @@ class ActionDefinition
 
     /**
      * @param array $groups
-     * @return static
+     * @return $this
      */
     public function setGroups(array $groups)
     {

@@ -112,7 +112,7 @@ Single action configuration has next properties:
     This value will be shown in the UI.
 * **substitute_action**
     *string*
-     
+    Name of action that can be replaced (e.g. [substituted](#substitution-of-named-action)) by current one.
 * **enabled**
     *boolean*
     Flag that define whether this action is enabled. Disabled action will not used in application.
@@ -124,7 +124,7 @@ Single action configuration has next properties:
     Action button will be shown on pages which route is in list.
 * **groups**
     *array*
-    
+    Define an array of groups to use in (todo...)
 * **datagrids**
     *array*
     Action icon will be shown as an datagrid-action in listed datagrids.
@@ -238,6 +238,10 @@ actions:
                 component_name: '[name$="[component]"]'
                 component_additional: '[name$="[additional]"]'
 ```
+
+Substitution Of Named Action
+============================
+todo
 
 Frontend Options Configuration
 ==============================

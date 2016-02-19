@@ -40,10 +40,6 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
                 'value' => true
             ],
             [
-                'method' => 'isSubstituteAction',
-                'value' => false
-            ],
-            [
                 'method' => 'getEntities',
                 'value' => []
             ],

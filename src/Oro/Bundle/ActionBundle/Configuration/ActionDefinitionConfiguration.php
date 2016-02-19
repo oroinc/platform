@@ -58,7 +58,6 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
                     ->cannotBeEmpty()
                 ->end()
                 ->scalarNode('substitute_action')
-                    ->defaultNull()
                 ->end()
                 ->arrayNode('applications')
                     ->prototype('scalar')

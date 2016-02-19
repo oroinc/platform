@@ -65,7 +65,6 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'replace' => [],
                     'label' => 'Test Label 1',
-                    'substitute_action' => null,
                     'applications' => [],
                     'entities' => [],
                     'routes' => [],
