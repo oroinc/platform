@@ -11,8 +11,8 @@ class FieldConfig
 
     /**
      * a flag indicates whether the target entity should be collapsed;
-     * it means that target entity should be returned a a value, instead of an array;
-     * usually it is used to get identifier of an entity
+     * it means that target entity should be returned as a value, instead of an array with values of entity fields;
+     * usually it is used to get identifier of the related entity
      */
     const COLLAPSE = 'collapse';
 
@@ -21,12 +21,6 @@ class FieldConfig
 
     /** the data transformer to be applies to the field value */
     const DATA_TRANSFORMER = 'data_transformer';
-
-    /** the property path of the field which can be used to get the discriminator value of the entity */
-    const METADATA_DISCRIMINATOR = '__discriminator__';
-
-    /** the property path of the field which can be used to get FQCN of the entity */
-    const METADATA_CLASS_NAME = '__class__';
 
     /** @var array */
     protected $items = [];
@@ -65,7 +59,7 @@ class FieldConfig
     }
 
     /**
-     * Gets the configuration of the target entity if the field represents an association with to another entity.
+     * Gets the configuration of the target entity if the field represents an association with another entity.
      *
      * @return EntityConfig|null
      */
@@ -75,13 +69,13 @@ class FieldConfig
     }
 
     /**
-     * Sets the configuration of the target entity if the field represents an association with to another entity.
+     * Sets the configuration of the target entity if the field represents an association with another entity.
      *
      * @param EntityConfig|null $targetEntity
      *
      * @return EntityConfig|null
      */
-    public function setTargetEntity(EntityConfig $targetEntity = null)
+    public function setTargetEntity($targetEntity = null)
     {
         $this->targetEntity = $targetEntity;
 
@@ -141,16 +135,6 @@ class FieldConfig
     }
 
     /**
-     * Indicates whether the path of the field value exists.
-     *
-     * @return string
-     */
-    public function hasPropertyPath()
-    {
-        return array_key_exists(self::PROPERTY_PATH, $this->items);
-    }
-
-    /**
      * Gets the path of the field value.
      *
      * @return string|null
@@ -174,16 +158,6 @@ class FieldConfig
         } else {
             unset($this->items[self::PROPERTY_PATH]);
         }
-    }
-
-    /**
-     * Checks whether the field represents some metadata property like '__class__' or '__discriminator__'
-     *
-     * @return bool
-     */
-    public function isMetadataProperty()
-    {
-        return strpos($this->getPropertyPath(), '__') === 0;
     }
 
     /**

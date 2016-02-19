@@ -4,6 +4,32 @@ namespace Oro\Component\EntitySerializer;
 
 class ConfigUtil
 {
+    /**
+     * The field name or property path of the field which can be used to get the discriminator value of the entity.
+     * Example of usage:
+     *  'fields' => [
+     *      'type' => ['property_path' => '__discriminator__']
+     *  ]
+     * or
+     *  'fields' => [
+     *      '__discriminator__' => null
+     *  ]
+     */
+    const DISCRIMINATOR = '__discriminator__';
+
+    /**
+     * The field name or property path of the field which can be used to get FQCN of the entity.
+     * Example of usage:
+     *  'fields' => [
+     *      'entity' => ['property_path' => '__class__']
+     *  ]
+     * or
+     *  'fields' => [
+     *      '__class__' => null
+     *  ]
+     */
+    const CLASS_NAME = '__class__';
+
     const FIELDS = 'fields';
 
     const EXCLUSION_POLICY      = EntityConfig::EXCLUSION_POLICY;
@@ -21,9 +47,6 @@ class ConfigUtil
     const EXCLUDE          = FieldConfig::EXCLUDE;
     const COLLAPSE         = FieldConfig::COLLAPSE;
     const DATA_TRANSFORMER = FieldConfig::DATA_TRANSFORMER;
-    const DISCRIMINATOR    = FieldConfig::METADATA_DISCRIMINATOR;
-    const CLASS_NAME       = FieldConfig::METADATA_CLASS_NAME;
-
 
     /**
      * @param array  $config A config

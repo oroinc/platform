@@ -1,36 +1,50 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\NormalizeFilters;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeFilters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class NormalizeFiltersTest extends ConfigProcessorTestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
     /** @var NormalizeFilters */
     protected $processor;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->processor = new NormalizeFilters();
+
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->processor = new NormalizeFilters($this->doctrineHelper);
     }
 
     /**
-     * @dataProvider processProvider
+     * @dataProvider processNotManageableEntityProvider
      */
-    public function testProcess($definition, $filters, $expectedFilters)
+    public function testProcessForNotManageableEntity($definition, $filters, $expectedFilters)
     {
-        $this->context->setResult($definition);
-        $this->context->setFilters($filters);
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setResult($this->createConfigObject($definition));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
         $this->processor->process($this->context);
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        $this->assertEquals($expectedFilters, $this->context->getFilters()->toArray());
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processProvider()
+    public function processNotManageableEntityProvider()
     {
         return [
             'empty'                                                          => [
@@ -224,6 +238,170 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             'data_type'     => 'string',
                             'property_path' => 'realField2.filterRealField21'
                         ]
+                    ]
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider processManageableEntityProvider
+     */
+    public function testProcessForManageableEntity($definition, $filters, $expectedFilters)
+    {
+        $rootMetadata           = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $toOne1Metadata         = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $toOne1toOne11Metadata  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $toOne1toMany11Metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $toMany1Metadata        = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $rootMetadata->expects($this->any())
+            ->method('hasAssociation')
+            ->willReturnMap(
+                [
+                    ['toOne1', true],
+                    ['toMany1', true],
+                ]
+            );
+        $rootMetadata->expects($this->any())
+            ->method('isCollectionValuedAssociation')
+            ->willReturnMap(
+                [
+                    ['toOne1', false],
+                    ['toMany1', true],
+                ]
+            );
+
+        $toOne1Metadata->expects($this->any())
+            ->method('hasAssociation')
+            ->willReturnMap(
+                [
+                    ['toOne1_toOne11', true],
+                    ['toOne1_toMany11', true],
+                ]
+            );
+        $toOne1Metadata->expects($this->any())
+            ->method('isCollectionValuedAssociation')
+            ->willReturnMap(
+                [
+                    ['toOne1_toOne11', false],
+                    ['toOne1_toMany11', true],
+                ]
+            );
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootMetadata);
+        $this->doctrineHelper->expects($this->any())
+            ->method('findEntityMetadataByPath')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, ['toOne1'], $toOne1Metadata],
+                    [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toOne11'], $toOne1toOne11Metadata],
+                    [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toMany11'], $toOne1toMany11Metadata],
+                    [self::TEST_CLASS_NAME, ['toMany1'], $toMany1Metadata],
+                ]
+            );
+
+        $this->context->setResult($this->createConfigObject($definition));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+        $this->assertEquals($expectedFilters, $this->context->getFilters()->toArray());
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function processManageableEntityProvider()
+    {
+        return [
+            'child filters' => [
+                'definition'      => [
+                    'fields' => [
+                        'toOne1'  => [
+                            'definition' => [
+                                'fields' => [
+                                    'toOne1_toOne11'  => [
+                                        'filters' => [
+                                            'fields' => [
+                                                'toOne1_toOne11_field111' => [
+                                                    'data_type' => 'string'
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                    'toOne1_toMany11' => [
+                                        'filters' => [
+                                            'fields' => [
+                                                'toOne1_toMany11_field111' => [
+                                                    'data_type' => 'string'
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            'filters'    => [
+                                'fields' => [
+                                    'toOne1_field1'   => [
+                                        'data_type' => 'string'
+                                    ],
+                                    'toOne1_toOne11'  => [
+                                        'data_type' => 'string'
+                                    ],
+                                    'toOne1_toMany11' => [
+                                        'data_type' => 'string'
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'toMany1' => [
+                            'filters' => [
+                                'fields' => [
+                                    'toMany1_field1' => [
+                                        'data_type' => 'string'
+                                    ]
+                                ]
+                            ]
+                        ],
+                    ]
+                ],
+                'filters'         => [
+                    'fields' => [
+                        'field1' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+                'expectedFilters' => [
+                    'fields' => [
+                        'field1'                                        => [
+                            'data_type' => 'string'
+                        ],
+                        'toOne1.toOne1_field1'                          => [
+                            'data_type' => 'string'
+                        ],
+                        'toOne1.toOne1_toOne11'                         => [
+                            'data_type' => 'string'
+                        ],
+                        'toOne1.toOne1_toOne11.toOne1_toOne11_field111' => [
+                            'data_type' => 'string'
+                        ],
                     ]
                 ]
             ],

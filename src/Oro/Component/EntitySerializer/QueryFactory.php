@@ -96,7 +96,7 @@ class QueryFactory
     public function getRelatedItemsIds($associationMapping, $entityIds, EntityConfig $config)
     {
         $limit = $config->getMaxResults();
-        if ($limit > 0 && count($entityIds) > 1) {
+        if (null !== $limit && count($entityIds) > 1) {
             $selectStmt = null;
             $subQueries = [];
             foreach ($entityIds as $id) {
@@ -165,9 +165,7 @@ class QueryFactory
     public function getQuery(QueryBuilder $qb, EntityConfig $config)
     {
         $query = $qb->getQuery();
-        if ($config->hasHints()) {
-            $this->queryHintResolver->resolveHints($query, $config->getHints());
-        }
+        $this->queryHintResolver->resolveHints($query, $config->getHints());
 
         return $query;
     }

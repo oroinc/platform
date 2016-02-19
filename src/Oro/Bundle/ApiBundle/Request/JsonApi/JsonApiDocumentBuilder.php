@@ -282,11 +282,13 @@ class JsonApiDocumentBuilder
         $idOnly           = false;
         $targetEntityType = null;
         if (is_array($object) || is_object($object)) {
-            if (null !== $targetMetadata && $targetMetadata->isInheritedType()) {
-                $targetEntityType = $this->getEntityType(
-                    $this->objectAccessor->getClassName($object),
-                    $targetClassName
-                );
+            if (null !== $targetMetadata) {
+                if ($targetMetadata->isInheritedType()) {
+                    $targetEntityType = $this->getEntityType(
+                        $this->objectAccessor->getClassName($object),
+                        $targetClassName
+                    );
+                }
 
                 $data = $this->objectAccessor->toArray($object);
                 if ($this->isIdentity($data, $targetMetadata)) {

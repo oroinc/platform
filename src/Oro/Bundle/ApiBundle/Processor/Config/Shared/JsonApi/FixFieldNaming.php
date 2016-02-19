@@ -4,14 +4,14 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Tries to rename fields if they are equal to reserved words.
- * * 'type' field is renamed to 'short class name' + 'Type'
- * * 'id' field is renamed to 'short class name' + 'Id' in case if it is not an identifier of an entity
+ * * "type" field is renamed to {short class name} + "Type"
+ * * "id" field is renamed to {short class name} + "Id" in case if it is not an identifier of an entity
  */
 class FixFieldNaming implements ProcessorInterface
 {
@@ -34,34 +34,30 @@ class FixFieldNaming implements ProcessorInterface
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
-        if (null === $definition
-            || !isset($definition[ConfigUtil::FIELDS])
-            || !is_array($definition[ConfigUtil::FIELDS])
-        ) {
-            // a configuration of fields does not exist or a fix is not needed
+        if (!$definition->hasFields()) {
+            // nothing to fix
             return;
         }
 
         $entityClass        = $context->getClassName();
-        $reservedFieldNames = array_intersect(array_keys($definition[ConfigUtil::FIELDS]), ['id', 'type']);
+        $reservedFieldNames = array_intersect(array_keys($definition->getFields()), ['id', 'type']);
         foreach ($reservedFieldNames as $fieldName) {
             if ('type' === $fieldName
                 || ('id' === $fieldName && !$this->isIdentifierField($entityClass, $fieldName))
             ) {
-                $this->renameReservedField($definition[ConfigUtil::FIELDS], $entityClass, $fieldName);
+                $this->renameReservedField($definition, $entityClass, $fieldName);
             }
         }
-        $context->setResult($definition);
     }
 
     /**
-     * @param array       $fields
-     * @param string|null $entityClass
-     * @param string      $fieldName
+     * @param EntityDefinitionConfig $definition
+     * @param string|null            $entityClass
+     * @param string                 $fieldName
      *
      * @throws \RuntimeException if a field cannot be renamed
      */
-    protected function renameReservedField(array &$fields, $entityClass, $fieldName)
+    protected function renameReservedField(EntityDefinitionConfig $definition, $entityClass, $fieldName)
     {
         if (!$entityClass) {
             throw new \RuntimeException(
@@ -73,7 +69,7 @@ class FixFieldNaming implements ProcessorInterface
         }
 
         $newFieldName = lcfirst($this->getShortClassName($entityClass)) . ucfirst($fieldName);
-        if (array_key_exists($newFieldName, $fields)) {
+        if ($definition->hasField($newFieldName)) {
             throw new \RuntimeException(
                 sprintf(
                     'The "%s" reserved word cannot be used as a field name'
@@ -85,18 +81,12 @@ class FixFieldNaming implements ProcessorInterface
         }
 
         // do renaming
-        $fieldConfig = $fields[$fieldName];
-        if (null === $fieldConfig) {
-            $fieldConfig = [];
+        $field = $definition->getField($fieldName);
+        if (!$field->hasPropertyPath()) {
+            $field->setPropertyPath($fieldName);
         }
-        if (empty($fieldConfig[ConfigUtil::DEFINITION][ConfigUtil::PROPERTY_PATH])) {
-            $fieldConfig[ConfigUtil::DEFINITION][ConfigUtil::PROPERTY_PATH] =
-                array_key_exists(ConfigUtil::PROPERTY_PATH, $fieldConfig)
-                    ? $fieldConfig[ConfigUtil::PROPERTY_PATH]
-                    : $fieldName;
-        }
-        unset($fields[$fieldName]);
-        $fields[$newFieldName] = $fieldConfig;
+        $definition->removeField($fieldName);
+        $definition->addField($newFieldName, $field);
     }
 
     /**

@@ -40,7 +40,7 @@ class EntityConfigTest extends \PHPUnit_Framework_TestCase
         $entityConfig->setExcludeNone();
         $this->assertTrue($entityConfig->isEmpty());
 
-        $entityConfig->addField('test', new FieldConfig());
+        $entityConfig->addField('test');
         $this->assertFalse($entityConfig->isEmpty());
 
         $entityConfig->removeField('test');
@@ -107,16 +107,13 @@ class EntityConfigTest extends \PHPUnit_Framework_TestCase
     public function testOrderBy()
     {
         $entityConfig = new EntityConfig();
-        $this->assertFalse($entityConfig->hasOrderBy());
         $this->assertEquals([], $entityConfig->getOrderBy());
 
         $entityConfig->setOrderBy(['test' => 'ASC']);
-        $this->assertTrue($entityConfig->hasOrderBy());
         $this->assertEquals(['test' => 'ASC'], $entityConfig->getOrderBy());
         $this->assertEquals(['order_by' => ['test' => 'ASC']], $entityConfig->toArray());
 
         $entityConfig->setOrderBy();
-        $this->assertFalse($entityConfig->hasOrderBy());
         $this->assertEquals([], $entityConfig->getOrderBy());
         $this->assertEquals([], $entityConfig->toArray());
     }
@@ -138,32 +135,26 @@ class EntityConfigTest extends \PHPUnit_Framework_TestCase
     public function testHints()
     {
         $entityConfig = new EntityConfig();
-        $this->assertFalse($entityConfig->hasHints());
         $this->assertEquals([], $entityConfig->getHints());
 
         $entityConfig->addHint('hint1');
         $entityConfig->addHint('hint2', 'val');
-        $this->assertTrue($entityConfig->hasHints());
         $this->assertEquals(['hint1', ['name' => 'hint2', 'value' => 'val']], $entityConfig->getHints());
         $this->assertEquals(['hints' => ['hint1', ['name' => 'hint2', 'value' => 'val']]], $entityConfig->toArray());
 
         $entityConfig->removeHint('hint1', 'val');
-        $this->assertTrue($entityConfig->hasHints());
         $this->assertEquals(['hint1', ['name' => 'hint2', 'value' => 'val']], $entityConfig->getHints());
         $this->assertEquals(['hints' => ['hint1', ['name' => 'hint2', 'value' => 'val']]], $entityConfig->toArray());
 
         $entityConfig->removeHint('hint1');
-        $this->assertTrue($entityConfig->hasHints());
         $this->assertEquals([['name' => 'hint2', 'value' => 'val']], $entityConfig->getHints());
         $this->assertEquals(['hints' => [['name' => 'hint2', 'value' => 'val']]], $entityConfig->toArray());
 
         $entityConfig->removeHint('hint2');
-        $this->assertTrue($entityConfig->hasHints());
         $this->assertEquals([['name' => 'hint2', 'value' => 'val']], $entityConfig->getHints());
         $this->assertEquals(['hints' => [['name' => 'hint2', 'value' => 'val']]], $entityConfig->toArray());
 
         $entityConfig->removeHint('hint2', 'val');
-        $this->assertFalse($entityConfig->hasHints());
         $this->assertEquals([], $entityConfig->getHints());
         $this->assertEquals([], $entityConfig->toArray());
     }

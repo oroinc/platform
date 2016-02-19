@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 
 /**
- * Provides an interface for different kind of filters of requested by API data.
+ * Provides an interface for different kind of data filters.
  */
 interface FilterInterface
 {

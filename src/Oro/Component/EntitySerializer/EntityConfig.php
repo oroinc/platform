@@ -106,13 +106,17 @@ class EntityConfig
     /**
      * Adds the configuration of a field.
      *
-     * @param string      $fieldName
-     * @param FieldConfig $field
+     * @param string           $fieldName
+     * @param FieldConfig|null $field
      *
      * @return FieldConfig
      */
-    public function addField($fieldName, FieldConfig $field)
+    public function addField($fieldName, $field = null)
     {
+        if (null === $field) {
+            $field = new FieldConfig();
+        }
+
         $this->fields[$fieldName] = $field;
 
         return $field;
@@ -209,16 +213,6 @@ class EntityConfig
     }
 
     /**
-     * Indicates whether the ordering of the result is required.
-     *
-     * @return bool
-     */
-    public function hasOrderBy()
-    {
-        return array_key_exists(self::ORDER_BY, $this->items);
-    }
-
-    /**
      * Gets the ordering of the result.
      * The direction can be "ASC" or "DESC".
      * The Doctrine\Common\Collections\Criteria::ASC and Doctrine\Common\Collections\Criteria::DESC constants
@@ -253,7 +247,7 @@ class EntityConfig
     /**
      * Gets the maximum number of items in the result.
      *
-     * @return int|null The requested maximum number of items in the result or NULL if not limited
+     * @return int|null The requested maximum number of items or NULL if not limited
      */
     public function getMaxResults()
     {
@@ -265,25 +259,15 @@ class EntityConfig
     /**
      * Sets the maximum number of items in the result.
      *
-     * @param int|null $maxResults The maximum number of items in the result or NULL to set unlimited
+     * @param int|null $maxResults The maximum number of items or NULL to set unlimited
      */
     public function setMaxResults($maxResults = null)
     {
-        if (null !== $maxResults) {
-            $this->items[self::MAX_RESULTS] = $maxResults;
-        } else {
+        if (null === $maxResults || $maxResults < 0) {
             unset($this->items[self::MAX_RESULTS]);
+        } else {
+            $this->items[self::MAX_RESULTS] = $maxResults;
         }
-    }
-
-    /**
-     * Indicates whether Doctrine query hints exist.
-     *
-     * @return bool
-     */
-    public function hasHints()
-    {
-        return array_key_exists(self::HINTS, $this->items);
     }
 
     /**
@@ -307,10 +291,11 @@ class EntityConfig
      */
     public function addHint($name, $value = null)
     {
-        $hints                    = $this->getHints();
-        $hints[]                  = null === $value
+        $hints   = $this->getHints();
+        $hints[] = null === $value
             ? $name
             : ['name' => $name, 'value' => $value];
+
         $this->items[self::HINTS] = $hints;
     }
 

@@ -89,6 +89,10 @@ services:
         arguments:
             - []
 
+    oro_api.config_loader_factory:
+        class: Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory
+        public: false
+
     oro_api.config_provider:
         class: Oro\Bundle\ApiBundle\Provider\ConfigProvider
         arguments:

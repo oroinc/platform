@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\Version;
 
 /**
- * Sets API version to "latest" if not specified otherwise.
+ * Sets Data API version to "latest" if not specified otherwise.
  * Removes meaningless prefix, e.g. "v", from a version number.
  */
 class NormalizeVersion implements ProcessorInterface

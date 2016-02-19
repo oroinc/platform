@@ -102,7 +102,7 @@ class RestDocHandler implements HandlerInterface
         $entityClass = $this->getEntityClass($route);
         if ($entityClass) {
             $config = $this->getConfig($action, $entityClass);
-            $this->setDescription($annotation, $action, (array)$config->getConfig(), $entityClass);
+            $this->setDescription($annotation, $action, $config->getConfig()->toArray(), $entityClass);
             if ($this->hasAttribute($route, RestRouteOptionsResolver::ID_PLACEHOLDER)) {
                 $this->addIdRequirement(
                     $annotation,

@@ -15,4 +15,11 @@ interface ConfigExtraSectionInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Gets the configuration type that can be loaded into this section.
+     *
+     * @return mixed
+     */
+    public function getConfigType();
 }

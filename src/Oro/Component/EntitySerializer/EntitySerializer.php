@@ -316,12 +316,15 @@ class EntitySerializer
                     $value = $this->transformValue($entityClass, $field, $value, $fieldConfig);
                 }
                 $result[$field] = $value;
-            } elseif (null !== $fieldConfig && $fieldConfig->isMetadataProperty()) {
-                $result[$field] = $this->fieldAccessor->getMetadataProperty(
-                    $entity,
-                    $fieldConfig->getPropertyPath(),
-                    $entityMetadata
-                );
+            } elseif (null !== $fieldConfig) {
+                $propertyPath = $fieldConfig->getPropertyPath() ?: $field;
+                if (ConfigUtil::isMetadataProperty($propertyPath)) {
+                    $result[$field] = $this->fieldAccessor->getMetadataProperty(
+                        $entity,
+                        $propertyPath,
+                        $entityMetadata
+                    );
+                }
             }
         }
 
@@ -473,7 +476,7 @@ class EntitySerializer
     protected function isSingleStepLoading($entityClass, EntityConfig $config)
     {
         return
-            (null === $config->getMaxResults() || $config->getMaxResults() < 0)
+            null === $config->getMaxResults()
             && !$this->hasAssociations($entityClass, $config);
     }
 
@@ -558,12 +561,12 @@ class EntitySerializer
     protected function loadRelatedItemsForSimpleEntity($entityIds, $mapping, EntityConfig $config)
     {
         $qb = $this->queryFactory->getToManyAssociationQueryBuilder($mapping, $entityIds);
-        if ($config->hasOrderBy()) {
-            $orderBy = $config->getOrderBy();
-            foreach ($orderBy as $field => $direction) {
-                $qb->addOrderBy(sprintf('r.%s', $field), $direction);
-            }
+
+        $orderBy = $config->getOrderBy();
+        foreach ($orderBy as $field => $direction) {
+            $qb->addOrderBy(sprintf('r.%s', $field), $direction);
         }
+
         $fields = $this->fieldAccessor->getFieldsToSerialize($mapping['targetEntity'], $config);
         foreach ($fields as $field) {
             $qb->addSelect(sprintf('r.%s', $field));

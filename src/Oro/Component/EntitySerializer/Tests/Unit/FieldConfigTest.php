@@ -90,33 +90,15 @@ class FieldConfigTest extends \PHPUnit_Framework_TestCase
     public function testPropertyPath()
     {
         $fieldConfig = new FieldConfig();
-        $this->assertFalse($fieldConfig->hasPropertyPath());
         $this->assertNull($fieldConfig->getPropertyPath());
 
         $fieldConfig->setPropertyPath('test');
-        $this->assertTrue($fieldConfig->hasPropertyPath());
         $this->assertEquals('test', $fieldConfig->getPropertyPath());
         $this->assertEquals(['property_path' => 'test'], $fieldConfig->toArray());
 
         $fieldConfig->setPropertyPath();
-        $this->assertFalse($fieldConfig->hasPropertyPath());
         $this->assertNull($fieldConfig->getPropertyPath());
         $this->assertEquals([], $fieldConfig->toArray());
-    }
-
-    public function testMetadataProperty()
-    {
-        $fieldConfig = new FieldConfig();
-        $this->assertFalse($fieldConfig->isMetadataProperty());
-
-        $fieldConfig->setPropertyPath('test');
-        $this->assertFalse($fieldConfig->isMetadataProperty());
-
-        $fieldConfig->setPropertyPath(FieldConfig::METADATA_DISCRIMINATOR);
-        $this->assertTrue($fieldConfig->isMetadataProperty());
-
-        $fieldConfig->setPropertyPath(FieldConfig::METADATA_CLASS_NAME);
-        $this->assertTrue($fieldConfig->isMetadataProperty());
     }
 
     public function testDataTransformers()

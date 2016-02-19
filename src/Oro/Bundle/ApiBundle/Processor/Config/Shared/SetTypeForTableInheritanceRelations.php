@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -35,10 +36,7 @@ class SetTypeForTableInheritanceRelations implements ProcessorInterface
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
-        if (!isset($definition[ConfigUtil::FIELDS])
-            || !is_array($definition[ConfigUtil::FIELDS])
-            || !ConfigUtil::isExcludeAll($definition)
-        ) {
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
             // expected normalized configs
             return;
         }
@@ -49,30 +47,19 @@ class SetTypeForTableInheritanceRelations implements ProcessorInterface
             return;
         }
 
-        if ($this->updateRelations($definition, $entityClass)) {
-            $context->setResult($definition);
-        }
+        $this->updateRelations($definition, $entityClass);
     }
 
     /**
-     * @param array  $definition
-     * @param string $entityClass
-     *
-     * @return bool
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
      */
-    protected function updateRelations(array &$definition, $entityClass)
+    protected function updateRelations(EntityDefinitionConfig $definition, $entityClass)
     {
-        $hasChanges = false;
-
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        foreach ($definition[ConfigUtil::FIELDS] as $fieldName => &$fieldConfig) {
-            if (!is_array($fieldConfig) || empty($fieldConfig[ConfigUtil::DEFINITION][ConfigUtil::FIELDS])) {
-                continue;
-            }
-
-            $fieldDefinition = $fieldConfig[ConfigUtil::DEFINITION];
-
-            $propertyPath = ConfigUtil::getPropertyPath($fieldDefinition, $fieldName);
+        $fields   = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $propertyPath = $field->getPropertyPath() ?: $fieldName;
             if (!$metadata->hasAssociation($propertyPath)) {
                 continue;
             }
@@ -83,19 +70,10 @@ class SetTypeForTableInheritanceRelations implements ProcessorInterface
                 continue;
             }
 
-            if (!is_array($fieldDefinition[ConfigUtil::FIELDS])) {
-                $fieldDefinition[ConfigUtil::FIELDS] = [
-                    $fieldDefinition[ConfigUtil::FIELDS] => null
-                ];
+            $targetEntity = $field->getOrCreateTargetEntity();
+            if (!$targetEntity->hasField(ConfigUtil::CLASS_NAME)) {
+                $targetEntity->addField(ConfigUtil::CLASS_NAME);
             }
-
-            $fieldDefinition[ConfigUtil::FIELDS][ConfigUtil::CLASS_NAME] = null;
-
-            $fieldConfig[ConfigUtil::DEFINITION] = $fieldDefinition;
-
-            $hasChanges = true;
         }
-
-        return $hasChanges;
     }
 }
