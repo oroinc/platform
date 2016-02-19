@@ -1,0 +1,63 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+
+{% set formAction = app.request.uri  %}
+{% set entity = context.data %}
+
+{% if entity %}
+    {% set className = oro_class_name(context.data) %}
+    {% set entityLabel = oro_entity_config_value(className, 'label')|trans %}
+
+    {% oro_title_set({
+        titleTemplate : "%entity% - %actionName% - %label% - %pluralLabel%",
+        params : {
+            "%entity%": entity.__toString,
+            "%actionName%": action.definition.label|trans,
+            "%label%": entityLabel,
+            "%pluralLabel%": oro_entity_config_value(className, 'plural_label')|trans
+        }
+    }) %}
+{% else %}
+    {% oro_title_set({titleTemplate : action.definition.label|trans}) %}
+{% endif %}
+
+{% block pageHeader %}
+    {% if entity %}
+        {% set breadcrumbs = {
+            'entity':      entity,
+            'indexPath':   fromUrl,
+            'indexLabel':  entityLabel,
+            'entityTitle': entity|default('N/A'|trans)
+        } %}
+
+        {{ parent() }}
+    {% else %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: action.definition.label|trans } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(fromUrl) }}
+
+    {{ UI.dropdownSaveButton({'html': UI.saveAndStayButton('Submit')}) }}
+{% endblock navButtons %}
+
+{% block content_data %}
+    {% set id = 'action-page-' ~ action.name %}
+
+    {% set dataBlocks = [{
+        'title': action.definition.label|trans,
+        'class': 'active',
+        'subblocks': [{
+            'data': [
+                form_widget(form)
+            ]
+        }]
+    }] %}
+
+    {% set data = {
+        'formErrors': form_errors(form),
+        'dataBlocks': dataBlocks
+    }%}
+
+    {{ parent() }}
+{% endblock content_data %}

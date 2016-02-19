@@ -1,0 +1,260 @@
+parameters:
+    oro_action.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
+    oro_action.function_factory.class: Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory
+    oro_action.function_assembler.class: Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler
+
+    oro_action.function.tree.class: Oro\Bundle\WorkflowBundle\Model\Action\TreeExecutor
+    oro_action.function.configurable.class: Oro\Bundle\WorkflowBundle\Model\Action\Configurable
+    oro_action.function.create_datetime.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateDateTime
+    oro_action.function.call_method.class: Oro\Bundle\WorkflowBundle\Model\Action\CallMethod
+    oro_action.function.assign_value.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignValue
+    oro_action.function.unset_value.class: Oro\Bundle\WorkflowBundle\Model\Action\UnsetValue
+    oro_action.function.create_object.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateObject
+    oro_action.function.create_date.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateDate
+    oro_action.function.create_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity
+    oro_action.function.create_related_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
+    oro_action.function.request_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity
+    oro_action.function.redirect.class: Oro\Bundle\WorkflowBundle\Model\Action\Redirect
+    oro_action.function.format_string.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatString
+    oro_action.function.assign_active_user.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
+    oro_action.function.format_name.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatName
+    oro_action.function.traverse.class: Oro\Bundle\WorkflowBundle\Model\Action\Traverse
+    oro_action.function.translate.class: Oro\Bundle\WorkflowBundle\Model\Action\TranslateAction
+    oro_action.function.flash_message.class: Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage
+    oro_action.function.remove_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity
+    oro_action.function.assign_constant_value.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignConstantValue
+    oro_action.function.copy_tagging.class: Oro\Bundle\WorkflowBundle\Model\Action\CopyTagging
+    oro_action.function.call_service_method.class: Oro\Bundle\ActionBundle\Action\CallServiceMethod
+    oro_action.function.refresh_grid.class: Oro\Bundle\ActionBundle\Action\RefreshGrid
+    oro_action.function.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction
+    oro_action.function.find_entities.class: Oro\Bundle\ActionBundle\Action\FindEntities
+
+services:
+    oro_action.context_accessor:
+        class: %oro_action.context_accessor.class%
+
+    oro_action.function_factory:
+        class: %oro_action.function_factory.class%
+        arguments:
+            - @service_container
+            - []
+
+    oro_action.function_assembler:
+        class: %oro_action.function_assembler.class%
+        arguments:
+            - @oro_action.function_factory
+            - @oro_action.expression.factory
+        calls:
+            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+
+    oro_action.function.tree:
+        class: %oro_action.function.tree.class%
+        arguments:
+            - @?logger
+        tags:
+            - { name: oro_action.function, alias: tree }
+
+    oro_action.function.configurable:
+        class: %oro_action.function.configurable.class%
+        arguments:
+            - @oro_action.function_assembler
+        tags:
+            - { name: oro_action.function, alias: configurable }
+
+    oro_action.function.create_datetime:
+        class: %oro_action.function.create_datetime.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.function, alias: create_datetime }
+
+    oro_action.function.call_method:
+        class: %oro_action.function.call_method.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.function, alias: call_method }
+
+    oro_action.function.assign_value:
+        class: %oro_action.function.assign_value.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.function, alias: assign_value }
+
+    oro_action.function.unset_value:
+        class: %oro_action.function.unset_value.class%
+        arguments:
+            - @oro_action.function.assign_value
+        tags:
+            - { name: oro_action.function, alias: unset_value }
+
+    oro_action.function.create_object:
+        class: %oro_action.function.create_object.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.function, alias: create_object }
+
+    oro_action.function.create_date:
+        class: %oro_action.function.create_date.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_locale.settings
+        tags:
+            - { name: oro_action.function, alias: create_date }
+
+    oro_action.function.create_entity:
+        class: %oro_action.function.create_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.function, alias: create_entity }
+
+    oro_action.function.create_related_entity:
+        class: %oro_action.function.create_related_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.function, alias: create_related_entity }
+
+    oro_action.function.request_entity:
+        class: %oro_action.function.request_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.function, alias: request_entity|find_entity }
+
+    oro_action.function.redirect:
+        class: %oro_action.function.redirect.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @router
+            - 'redirectUrl'
+        tags:
+            - { name: oro_action.function, alias: redirect }
+
+    oro_action.function.format_string:
+        class: %oro_action.function.format_string.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.function, alias: format_string }
+
+    oro_action.function.assign_active_user:
+        class: %oro_action.function.assign_active_user.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @security.context
+        tags:
+            - { name: oro_action.function, alias: assign_active_user|get_active_user }
+
+    oro_action.function.format_name:
+        class: %oro_action.function.format_name.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_entity.entity_name_resolver
+        tags:
+            - { name: oro_action.function, alias: format_name }
+
+    oro_action.function.traverse:
+        class: %oro_action.function.traverse.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_action.function.configurable
+        tags:
+            - { name: oro_action.function, alias: traverse|foreach }
+
+    oro_action.function.translate:
+        class: %oro_action.function.translate.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @translator
+        tags:
+            - { name: oro_action.function, alias: translate|trans }
+
+    oro_action.function.flash_message:
+        class: %oro_action.function.flash_message.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @translator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: oro_action.function, alias: flash_message }
+
+    oro_action.function.remove_entity:
+        class: %oro_action.function.remove_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.function, alias: remove_entity }
+
+    oro_action.function.assign_constant_value:
+        class: %oro_action.function.assign_constant_value.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.function, alias: assign_constant_value }
+
+    oro_action.function.copy_tagging:
+        class: %oro_action.function.copy_tagging.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_tag.tag.manager
+        tags:
+            - { name: oro_action.function, alias: copy_tagging }
+
+    oro_action.function.call_service_method:
+        class: %oro_action.function.call_service_method.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @service_container
+        tags:
+            - { name: oro_action.function, alias: call_service_method }
+            - { name: oro_workflow.action, alias: call_service_method }
+
+    oro_action.function.refresh_grid:
+        class: %oro_action.function.refresh_grid.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.function, alias: refresh_grid }
+
+    oro_action.function.run_action:
+        class: %oro_action.function.run_action.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_action.manager
+            - @oro_action.helper.context
+        tags:
+            - { name: oro_action.function, alias: run_action }
+            - { name: oro_workflow.action, alias: run_action }
+
+    oro_action.function.find_entities:
+        class: %oro_action.function.find_entities.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.function, alias: find_entities }
+            - { name: oro_workflow.action, alias: find_entities }
+
+    oro_action.function.send_email_template:
+        class: %oro_email.workflow.action.send_email_template.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_email.mailer.processor
+            - @oro_email.email.address.helper
+            - @oro_entity.entity_name_resolver
+            - @oro_email.email_renderer
+            - @doctrine.orm.entity_manager
+            - @validator
+        calls:
+            - [setLogger, [@logger]]
+        tags:
+            - { name: oro_action.function, alias: send_email_template }

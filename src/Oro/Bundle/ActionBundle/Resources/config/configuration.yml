@@ -1,0 +1,38 @@
+parameters:
+    oro_action.configuration.config.action_definition.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfiguration
+    oro_action.configuration.config.action_definition_list.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionListConfiguration
+    oro_action.configuration.validator.action_definition.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator
+    oro_action.configuration.provider.class: Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider
+    oro_action.configuration_pass.replace_property_path.class: Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath
+
+services:
+    oro_action.configuration.config.action_definition:
+        class: %oro_action.configuration.config.action_definition.class%
+
+    oro_action.configuration.config.action_definition_list:
+        class: %oro_action.configuration.config.action_definition_list.class%
+        arguments:
+            - @oro_action.configuration.config.action_definition
+
+    oro_action.configuration.validator.action_definition:
+        class: %oro_action.configuration.validator.action_definition.class%
+        arguments:
+            - @router
+            - @twig.loader
+            - @oro_entity.doctrine_helper
+            - @logger
+            - %kernel.debug%
+
+    oro_action.configuration.provider:
+        class: %oro_action.configuration.provider.class%
+        arguments:
+            - @oro_action.configuration.config.action_definition_list
+            - @oro_action.configuration.validator.action_definition
+            - @oro_action.cache.provider
+            - []
+            - %kernel.bundles%
+
+    oro_action.configuration_pass.replace_property_path:
+        class: %oro_action.configuration_pass.replace_property_path.class%
+        arguments:
+            - "data"

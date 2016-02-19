@@ -1,0 +1,14 @@
+placeholders:
+    index_navButtons_before:
+        items:
+            actions_buttons: ~
+    view_navButtons_before:
+        items:
+            actions_buttons: ~
+    update_navButtons_before:
+        items:
+            actions_buttons: ~
+
+items:
+    actions_buttons:
+        template: OroActionBundle:Widget:buttons.html.twig

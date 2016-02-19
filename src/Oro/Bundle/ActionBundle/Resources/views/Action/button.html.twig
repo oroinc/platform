@@ -1,0 +1,36 @@
+{% set linkTitle = params.frontendOption.title|default(params.label)|trans %}
+{% set linkLabel = params.label %}
+
+{% block button %}
+    {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder">{% endif %}
+        {% block link %}
+            <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
+                href="{{ params.path|default('javascript:void(0);') }}"
+                class="{{ params.buttonOptions.class|default('back icons-holder-text action-button') }} {{ params.buttonOptions.aCss|default('') }}"
+                title="{{ linkTitle }}"
+                data-from-url="{{ fromUrl }}"
+                {% if params.frontendOptions.show_dialog is defined and not params.frontendOptions.show_dialog %}
+                    data-page-url="{{ params.actionUrl }}"
+                {% else %}
+                    {% set dialogOptions = {
+                        'title': params.frontendOptions.title is defined ? params.frontendOptions.title|trans : linkTitle,
+                        'dialogOptions': params.frontendOptions.options|default({}),
+                    } %}
+                    data-dialog-url="{{ params.actionUrl }}"
+                    data-dialog-options="{{ dialogOptions|json_encode }}"
+                {% endif %}
+                data-confirmation="{{ params.frontendOptions.confirmation|default('') }}"
+                {% if params.buttonOptions.page_component_module is defined %}data-page-component-module={{ params.buttonOptions.page_component_module }}{% endif %}
+                {% if params.buttonOptions.page_component_options is defined %}data-page-component-options={{ params.buttonOptions.page_component_options|json_encode }}{% endif %}
+                {% if params.buttonOptions.data is defined %}
+                    {% for dataName,dataValue in params.buttonOptions.data %}
+                        data-{{ dataName }}="{{ dataValue|e('html_attr')|raw }}" {{ dataName }}
+                    {% endfor %}
+                {% endif %}
+            >
+                <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text">{{ linkLabel }}</i>
+                {{ linkLabel|trim }}
+            </a>
+        {% endblock %}
+    {% if onlyLink is not defined %}</div>{% endif %}
+{% endblock %}

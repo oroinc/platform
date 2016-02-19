@@ -1,0 +1,13 @@
+parameters:
+    oro_action.twig.extension.action.class: Oro\Bundle\ActionBundle\Twig\ActionExtension
+
+services:
+    oro_action.twig.extension.action:
+        class: %oro_action.twig.extension.action.class%
+        arguments:
+            - @oro_action.manager
+            - @oro_action.helper.applications
+            - @oro_entity.doctrine_helper
+            - @request_stack
+        tags:
+            - { name: twig.extension }

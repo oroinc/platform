@@ -1,0 +1,116 @@
+parameters:
+    oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
+    oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
+    oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
+    oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
+    oro_action.attribute_assembler.class: Oro\Bundle\ActionBundle\Model\AttributeAssembler
+    oro_action.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
+    oro_action.form_options_assembler.class: Oro\Bundle\ActionBundle\Model\FormOptionsAssembler
+    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
+    oro_action.datagrid.action_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension
+    oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
+    oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
+
+services:
+    oro_action.helper.context:
+            class: %oro_action.helper.context.class%
+            arguments:
+                - @oro_entity.doctrine_helper
+                - @request_stack
+
+    oro_action.helper.applications:
+            class: %oro_action.helper.applications.class%
+            arguments:
+                - @security.token_storage
+
+    oro_action.manager:
+        class: %oro_action.manager.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_action.helper.context
+            - @oro_action.configuration.provider
+            - @oro_action.assembler
+            - @oro_action.helper.applications
+
+    oro_action.assembler:
+        class: %oro_action.assembler.class%
+        arguments:
+            - @oro_action.function_factory
+            - @oro_action.expression.factory
+            - @oro_action.attribute_assembler
+            - @oro_action.form_options_assembler
+
+    oro_action.attribute_assembler:
+        class: %oro_action.attribute_assembler.class%
+        arguments:
+            - @oro_action.attribute_guesser
+
+    oro_action.attribute_guesser:
+        class: %oro_action.attribute_guesser.class%
+        arguments:
+            - @form.registry
+            - @doctrine
+            - @oro_entity_config.provider.entity
+            - @oro_entity_config.provider.form
+        calls:
+            # mapping from doctrine type to attribute parameters
+            - [addDoctrineTypeMapping, ["string", "string"]]
+            - [addDoctrineTypeMapping, ["integer", "integer"]]
+            - [addDoctrineTypeMapping, ["smallint", "integer"]]
+            - [addDoctrineTypeMapping, ["bigint", "integer"]]
+            - [addDoctrineTypeMapping, ["boolean", "boolean"]]
+            - [addDoctrineTypeMapping, ["decimal", "float"]]
+            - [addDoctrineTypeMapping, ["date", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["time", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["datetime", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["datetimetz", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["text", "string"]]
+            - [addDoctrineTypeMapping, ["array", "array"]]
+            - [addDoctrineTypeMapping, ["simple_array", "array"]]
+            - [addDoctrineTypeMapping, ["json_array", "array"]]
+            - [addDoctrineTypeMapping, ["float", "float"]]
+            - [addDoctrineTypeMapping, ["guid", "string"]]
+            # custom types
+            - [addDoctrineTypeMapping, ["percent", "float"]]
+            - [addDoctrineTypeMapping, ["money", "float"]]
+            # mapping from attribute type to form parameters
+            - [addFormTypeMapping, ["string", "text"]]
+            - [addFormTypeMapping, ["int", "integer", { precision: 0 }]]
+            - [addFormTypeMapping, ["integer", "integer", { precision: 0 }]]
+            - [addFormTypeMapping, ["bool", "checkbox"]]
+            - [addFormTypeMapping, ["boolean", "checkbox"]]
+            - [addFormTypeMapping, ["float", "number"]]
+
+    oro_action.form_options_assembler:
+        class: %oro_action.form_options_assembler.class%
+        calls:
+            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+
+    oro_action.form_manager:
+        class: %oro_action.form_manager.class%
+        arguments:
+            - @form.factory
+            - @oro_action.manager
+            - @oro_action.helper.context
+
+    oro_action.datagrid.extension.action:
+        class: %oro_action.datagrid.action_extension.class%
+        arguments:
+            - @oro_action.manager
+            - @oro_action.helper.context
+            - @oro_action.helper.applications
+            - @oro_action.datagrid.mass_action_provider.registry
+        tags:
+            - { name: oro_datagrid.extension }
+        lazy: true
+
+    oro_action.datagrid.action.action_widget_action:
+        class: %oro_action.datagrid.action.action_widget_action.class%
+        arguments:
+            - @translator
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: action-widget }
+
+    oro_action.datagrid.mass_action_provider.registry:
+        class: %oro_action.datagrid.mass_action_provider.registry.class%
