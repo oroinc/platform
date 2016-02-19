@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-class PublicResource
+class ApiResource
 {
     /** @var string */
     protected $entityClass;

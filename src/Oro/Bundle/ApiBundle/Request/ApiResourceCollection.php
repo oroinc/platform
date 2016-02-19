@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-class PublicResourceCollection extends ArrayCollection
+class ApiResourceCollection extends ArrayCollection
 {
     /**
      * This array is used to prevent adding duplicates

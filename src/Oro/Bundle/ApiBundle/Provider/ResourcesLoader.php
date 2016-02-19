@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\CollectPublicResourcesContext;
-use Oro\Bundle\ApiBundle\Processor\CollectPublicResourcesProcessor;
-use Oro\Bundle\ApiBundle\Request\PublicResource;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
+use Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 
-class PublicResourcesLoader
+class ResourcesLoader
 {
-    /** @var CollectPublicResourcesProcessor */
+    /** @var CollectResourcesProcessor */
     protected $processor;
 
     /**
-     * @param CollectPublicResourcesProcessor $processor
+     * @param CollectResourcesProcessor $processor
      */
-    public function __construct(CollectPublicResourcesProcessor $processor)
+    public function __construct(CollectResourcesProcessor $processor)
     {
         $this->processor = $processor;
     }
@@ -25,11 +25,11 @@ class PublicResourcesLoader
      * @param string   $version     The version of API
      * @param string[] $requestType The type of API request, for example "rest", "soap", "odata", etc.
      *
-     * @return PublicResource[]
+     * @return ApiResource[]
      */
     public function getResources($version, array $requestType)
     {
-        /** @var CollectPublicResourcesContext $context */
+        /** @var CollectResourcesContext $context */
         $context = $this->processor->createContext();
         $context->setVersion($version);
         $context->setRequestType($requestType);

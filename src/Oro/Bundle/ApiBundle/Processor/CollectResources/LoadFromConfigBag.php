@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\CollectPublicResources;
+namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
-use Oro\Bundle\ApiBundle\Request\PublicResource;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 
 /**
  * Collects resources for all entities configured in 'Resources/config/oro/api.yml'.
@@ -28,12 +28,12 @@ class LoadFromConfigBag implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var CollectPublicResourcesContext $context */
+        /** @var CollectResourcesContext $context */
 
         $resources = $context->getResult();
         $configs   = $this->configBag->getConfigs($context->getVersion());
         foreach ($configs as $entityClass => $config) {
-            $resources->add(new PublicResource($entityClass));
+            $resources->add(new ApiResource($entityClass));
         }
     }
 }

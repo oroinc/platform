@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
-use Oro\Bundle\ApiBundle\Request\PublicResource;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 
-class PublicResourceTest extends \PHPUnit_Framework_TestCase
+class ApiResourceTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetEntityClass()
     {
         $className = 'Test\Class';
 
-        $resource = new PublicResource($className);
+        $resource = new ApiResource($className);
         $this->assertEquals($className, $resource->getEntityClass());
     }
 
@@ -18,7 +18,7 @@ class PublicResourceTest extends \PHPUnit_Framework_TestCase
     {
         $className = 'Test\Class';
 
-        $resource = new PublicResource($className);
+        $resource = new ApiResource($className);
         $this->assertEquals($className, (string)$resource);
     }
 }

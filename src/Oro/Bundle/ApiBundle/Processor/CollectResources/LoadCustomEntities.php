@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\CollectPublicResources;
+namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Request\PublicResource;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
@@ -29,13 +29,13 @@ class LoadCustomEntities implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var CollectPublicResourcesContext $context */
+        /** @var CollectResourcesContext $context */
 
         $resources = $context->getResult();
         $configs   = $this->configManager->getConfigs('extend', null, true);
         foreach ($configs as $config) {
             if ($config->is('is_extend') && $config->is('owner', ExtendScope::OWNER_CUSTOM)) {
-                $resources->add(new PublicResource($config->getId()->getClassName()));
+                $resources->add(new ApiResource($config->getId()->getClassName()));
             }
         }
     }
