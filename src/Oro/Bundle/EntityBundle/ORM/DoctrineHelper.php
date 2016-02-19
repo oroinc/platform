@@ -362,4 +362,18 @@ class DoctrineHelper
 
         return $criteria;
     }
+
+    /**
+     * Gets the name of the single id column.
+     *
+     * @param object|string $entityOrClass An entity object, entity class name or entity proxy class name
+     *
+     * @return string
+     */
+    public function getSingleIdentifierColumnName($entityOrClass)
+    {
+        return $this
+            ->getEntityMetadata($entityOrClass)
+            ->getSingleIdentifierColumnName();
+    }
 }
