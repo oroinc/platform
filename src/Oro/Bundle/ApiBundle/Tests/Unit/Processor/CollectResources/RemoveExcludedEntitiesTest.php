@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectPublicResources;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectResources;
 
-use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\CollectPublicResourcesContext;
-use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\RemoveExcludedEntities;
-use Oro\Bundle\ApiBundle\Request\PublicResource;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\RemoveExcludedEntities;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\Version;
 
 class RemoveExcludedEntitiesTest extends \PHPUnit_Framework_TestCase
@@ -24,11 +24,11 @@ class RemoveExcludedEntitiesTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $context = new CollectPublicResourcesContext();
+        $context = new CollectResourcesContext();
         $context->setVersion(Version::LATEST);
 
-        $context->getResult()->add(new PublicResource('Test\Entity1'));
-        $context->getResult()->add(new PublicResource('Test\Entity2'));
+        $context->getResult()->add(new ApiResource('Test\Entity1'));
+        $context->getResult()->add(new ApiResource('Test\Entity2'));
 
         $this->entityExclusionProvider->expects($this->exactly(2))
             ->method('isIgnoredEntity')
@@ -43,7 +43,7 @@ class RemoveExcludedEntitiesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                1 => new PublicResource('Test\Entity2'),
+                1 => new ApiResource('Test\Entity2'),
             ],
             $context->getResult()->toArray()
         );

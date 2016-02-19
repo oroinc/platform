@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectPublicResources;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectResources;
 
-use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\CollectPublicResourcesContext;
-use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\LoadFromConfigBag;
-use Oro\Bundle\ApiBundle\Request\PublicResource;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\LoadFromConfigBag;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\Version;
 
 class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
@@ -26,7 +26,7 @@ class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $context = new CollectPublicResourcesContext();
+        $context = new CollectResourcesContext();
         $context->setVersion(Version::LATEST);
 
         $this->configBag->expects($this->once())
@@ -43,8 +43,8 @@ class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                new PublicResource('Test\Entity1'),
-                new PublicResource('Test\Entity2'),
+                new ApiResource('Test\Entity1'),
+                new ApiResource('Test\Entity2'),
             ],
             $context->getResult()->toArray()
         );

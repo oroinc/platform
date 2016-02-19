@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Oro\Bundle\ApiBundle\Request\PublicResource;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,11 +9,14 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\ApiBundle\Provider\PublicResourcesLoader;
+use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
-class DumpPublicResourcesCommand extends ContainerAwareCommand
+class DumpCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
@@ -24,8 +24,8 @@ class DumpPublicResourcesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:api:resources:dump')
-            ->setDescription('Dumps all public API resources.')
+            ->setName('oro:api:dump')
+            ->setDescription('Dumps all resources available through Data API.')
             // @todo: API version is not supported for now
             //->addArgument(
             //    'version',
@@ -37,7 +37,7 @@ class DumpPublicResourcesCommand extends ContainerAwareCommand
                 'request-type',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'API request type',
+                'The request type',
                 [RequestType::REST, RequestType::JSON_API]
             );
     }
@@ -52,8 +52,8 @@ class DumpPublicResourcesCommand extends ContainerAwareCommand
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
 
-        /** @var PublicResourcesLoader $resourcesLoader */
-        $resourcesLoader = $this->getContainer()->get('oro_api.public_resources_loader');
+        /** @var ResourcesLoader $resourcesLoader */
+        $resourcesLoader = $this->getContainer()->get('oro_api.resources_loader');
         $resources       = $resourcesLoader->getResources($version, $requestType);
 
         $table = new Table($output);
@@ -77,11 +77,11 @@ class DumpPublicResourcesCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param PublicResource $resource
+     * @param ApiResource $resource
      *
      * @return array
      */
-    protected function getResourceAttributes(PublicResource $resource)
+    protected function getResourceAttributes(ApiResource $resource)
     {
         $result = [];
 

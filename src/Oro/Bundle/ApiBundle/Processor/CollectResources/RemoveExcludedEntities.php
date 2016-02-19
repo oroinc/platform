@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\CollectPublicResources;
+namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Request\PublicResource;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
@@ -28,11 +28,11 @@ class RemoveExcludedEntities implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var CollectPublicResourcesContext $context */
+        /** @var CollectResourcesContext $context */
 
         $context->setResult(
             $context->getResult()->filter(
-                function (PublicResource $resource) {
+                function (ApiResource $resource) {
                     return !$this->entityExclusionProvider->isIgnoredEntity($resource->getEntityClass());
                 }
             )

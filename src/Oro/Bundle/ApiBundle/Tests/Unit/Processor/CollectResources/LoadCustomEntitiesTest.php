@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectPublicResources;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectResources;
 
-use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\CollectPublicResourcesContext;
-use Oro\Bundle\ApiBundle\Processor\CollectPublicResources\LoadCustomEntities;
-use Oro\Bundle\ApiBundle\Request\PublicResource;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\LoadCustomEntities;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -28,7 +28,7 @@ class LoadCustomEntitiesTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $context = new CollectPublicResourcesContext();
+        $context = new CollectResourcesContext();
 
         $this->configManager->expects($this->once())
             ->method('getConfigs')
@@ -45,7 +45,7 @@ class LoadCustomEntitiesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                new PublicResource('Test\Entity1'),
+                new ApiResource('Test\Entity1'),
             ],
             $context->getResult()->toArray()
         );
