@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
+use Doctrine\ORM\Mapping\MappingException;
+
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -18,6 +20,9 @@ class FieldAclExtension extends EntityAclExtension
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var array */
+    protected $metadataCache = [];
 
     /**
      * {@inheritdoc}
@@ -140,12 +145,29 @@ class FieldAclExtension extends EntityAclExtension
     {
         $result = parent::getAllowedPermissions($oid);
 
-        // return only 'VIEW' permission for identifier field
-        $isNonRoot = $oid->getType() != ObjectIdentityFactory::ROOT_IDENTITY_TYPE;
-        if ($oid->getIdentifier() == self::EXTENSION_KEY && $isNonRoot) {
-            if ($fieldName == $this->doctrineHelper->getSingleEntityIdentifierFieldName($oid->getType(), false)) {
-                $result = ['VIEW'];
-            }
+        $className = $oid->getType();
+
+        $isRoot = $className == ObjectIdentityFactory::ROOT_IDENTITY_TYPE;
+        if ($isRoot || $oid->getIdentifier() != self::EXTENSION_KEY) {
+            return $result;
+        }
+
+        $isIdentifier = $fieldName == $this->doctrineHelper
+                ->getSingleEntityIdentifierFieldName($className, false);
+
+        $entityMetadata = empty($this->metadataCache[$className]) ?
+            $this->doctrineHelper->getEntityMetadata($className) :
+            $this->metadataCache[$oid->getType()];
+
+        try {
+            $isNullable = $entityMetadata->isNullable($fieldName);
+        } catch (MappingException $e) {
+            $isNullable = true;
+        }
+
+        // return only 'VIEW' permission for identifier and required fields
+        if ($isIdentifier || !$isNullable) {
+            $result = ['VIEW'];
         }
 
         return $result;
