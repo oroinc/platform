@@ -134,7 +134,6 @@ define(function(require) {
          */
         initialize: function(options) {
             var opts = options || {};
-            this.subviews = [];
             this.pluginManager = new PluginManager(this);
             if (options.plugins) {
                 this.pluginManager.enable(options.plugins);
@@ -145,25 +144,58 @@ define(function(require) {
                 this.$el.addClass(_.result(this, 'className'));
             }
 
-            // Check required options
+            this._validateOptions(opts);
+
+            this._initProperties(opts);
+
+            // use columns collection as event bus since there is no alternatives
+            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
+                this.trigger('afterMakeCell', row, cell);
+            });
+            if (this.themeOptionsConfigurator) {
+                this.listenTo(this.columns, 'configureInitializeOptions', this.themeOptionsConfigurator);
+            }
+
+            this.trigger('beforeBackgridInitialize');
+            this.backgridInitialize(options);
+            this.trigger('afterBackgridInitialize');
+
+            // Listen and proxy events
+            this._listenToCollectionEvents();
+            this._listenToContentEvents();
+            this._listenToCommands();
+        },
+
+        /**
+         * @param {Object} options
+         * @private
+         */
+        _validateOptions: function(opts) {
             if (!opts.collection) {
                 throw new TypeError('"collection" is required');
             }
-            this.collection = opts.collection;
-
             if (!opts.columns) {
                 throw new TypeError('"columns" is required');
             }
+            if (!opts.metadataModel) {
+                throw new TypeError('"metadataModel" is required');
+            }
+        },
+
+        /**
+         * Init properties values based on options and defaults
+         *
+         * @param {Object} opts
+         * @private
+         */
+        _initProperties: function(opts) {
+            this.subviews = [];
+            this.collection = opts.collection;
 
             if (opts.columns.length === 0) {
                 this.noColumnsFlag = true;
             }
 
-            if (!opts.metadataModel) {
-                throw new TypeError('"metadataModel" is required');
-            }
-
-            // Init properties values based on options and defaults
             _.extend(this, this.defaults, opts);
             this.toolbarOptions = {};
             _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
@@ -182,23 +214,6 @@ define(function(require) {
             this._initColumns(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
-
-            // use columns collection as event bus since there is no alternatives
-            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
-                this.trigger('afterMakeCell', row, cell);
-            });
-            if (this.themeOptionsConfigurator) {
-                this.listenTo(this.columns, 'configureInitializeOptions', this.themeOptionsConfigurator);
-            }
-
-            this.trigger('beforeBackgridInitialize');
-            this.backgridInitialize(options);
-            this.trigger('afterBackgridInitialize');
-
-            // Listen and proxy events
-            this._listenToCollectionEvents();
-            this._listenToContentEvents();
-            this._listenToCommands();
         },
 
         /**
