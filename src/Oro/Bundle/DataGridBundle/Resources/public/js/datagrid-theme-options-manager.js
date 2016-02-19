@@ -54,7 +54,7 @@ define(function(require) {
 
         tagNameOption: function(view, options, tagName) {
             if (tagName) {
-                options.tagName = 'div';
+                options.tagName = tagName;
             }
         },
 
