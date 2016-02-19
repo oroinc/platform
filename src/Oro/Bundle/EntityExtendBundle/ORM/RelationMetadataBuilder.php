@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\ORM;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -20,16 +21,23 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
      * @param ConfigManager                   $configManager
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param DoctrineHelper                  $doctrineHelper
+     *
      */
     public function __construct(
         ConfigManager $configManager,
-        ExtendDbIdentifierNameGenerator $nameGenerator
+        ExtendDbIdentifierNameGenerator $nameGenerator,
+        DoctrineHelper $doctrineHelper
     ) {
-        $this->configManager = $configManager;
-        $this->nameGenerator = $nameGenerator;
+        $this->configManager  = $configManager;
+        $this->nameGenerator  = $nameGenerator;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -76,18 +84,18 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         FieldConfigId $fieldId,
         array $relation
     ) {
-        $targetEntity = $relation['target_entity'];
-
-        $cascade   = !empty($relation['cascade']) ? $relation['cascade'] : [];
-        $cascade[] = 'detach';
+        $targetEntity   = $relation['target_entity'];
+        $targetIdColumn = $this->doctrineHelper->getSingleIdentifierColumnName($targetEntity);
+        $cascade        = !empty($relation['cascade']) ? $relation['cascade'] : [];
+        $cascade[]      = 'detach';
 
         $builder = $metadataBuilder->createManyToOne($fieldId->getFieldName(), $targetEntity);
         if (!empty($relation['target_field_id'])) {
             $builder->inversedBy($relation['target_field_id']->getFieldName());
         }
         $builder->addJoinColumn(
-            $this->getManyToOneColumnName($fieldId),
-            'id',
+            $this->getManyToOneColumnName($fieldId, $targetIdColumn),
+            $targetIdColumn,
             true,
             false,
             'SET NULL'
@@ -245,17 +253,19 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
 
     /**
      * @param FieldConfigId $fieldId
+     * @param string        $targetIdColumn
      *
      * @return string
      */
-    protected function getManyToOneColumnName(FieldConfigId $fieldId)
+    protected function getManyToOneColumnName(FieldConfigId $fieldId, $targetIdColumn)
     {
         $columnName = null;
         if ($this->configManager->hasConfig($fieldId->getClassName(), $fieldId->getFieldName())) {
             $columnName = $this->getFieldConfig($fieldId)->get('column_name');
         }
         if (!$columnName) {
-            $columnName = $this->nameGenerator->generateRelationColumnName($fieldId->getFieldName());
+            $columnName =
+                $this->nameGenerator->generateRelationColumnName($fieldId->getFieldName(), '_' . $targetIdColumn);
         }
 
         return $columnName;
