@@ -59,7 +59,7 @@ class ActivityController extends Controller
         $entity        = $routingHelper->getEntity($activity, $id);
         $entityClass   = $routingHelper->resolveEntityClass($activity);
 
-        if (!$this->isGranted('VIEW', $entity)) {
+        if (!$this->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
         }
 
