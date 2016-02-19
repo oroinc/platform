@@ -209,7 +209,8 @@ define([
         render: function() {
             if (this.template) {
                 this.$el.html(this.template({
-                    model: this.model ? this.model.attributes : {}
+                    model: this.model ? this.model.attributes : {},
+                    themeOptions: this.themeOptions ? this.themeOptions : {}
                 }));
                 return this;
             }
