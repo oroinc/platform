@@ -61,47 +61,19 @@ class GridViewsLoadListener
         if (!$gridViews) {
             return;
         }
-
-        $choices = [];
-        $views   = [];
+        $views = $event->getGridViews();
         foreach ($gridViews as $gridView) {
             $view = $gridView->createView();
             $view->setEditable($this->securityFacade->isGranted('EDIT', $gridView));
             $view->setDeletable($this->securityFacade->isGranted('DELETE', $gridView));
             $view->setDefault($defaultGridView === $gridView);
+            if ($gridView->getOwner()->getId() !== $currentUser->getId()) {
+                $view->setSharedBy($gridView->getOwner()->getUsername());
+            }
             $views[]   = $view->getMetadata();
-            $choices[] = [
-                'label' => $this->createGridViewLabel($currentUser, $gridView),
-                'value' => $gridView->getId(),
-            ];
         }
 
-        /** @var array $newGridViews */
-        $newGridViews            = $event->getGridViews();
-        $newGridViews['choices'] = array_merge($newGridViews['choices'], $choices);
-        $newGridViews['views']   = array_merge($newGridViews['views'], $views);
-        $event->setGridViews($newGridViews);
-    }
-
-    /**
-     * @param User $currentUser
-     * @param GridView $gridView
-     *
-     * @return string
-     */
-    protected function createGridViewLabel(User $currentUser, GridView $gridView)
-    {
-        if ($gridView->getOwner()->getId() === $currentUser->getId()) {
-            return $gridView->getName();
-        }
-
-        return $this->translator->trans(
-            'oro.datagrid.gridview.shared_by',
-            [
-                '%name%'  =>  $gridView->getName(),
-                '%owner%' => $gridView->getOwner()->getUsername(),
-            ]
-        );
+        $event->setGridViews($views);
     }
 
     /**

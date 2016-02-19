@@ -111,6 +111,8 @@ oro:
                     Are you sure you want to delete them?
                 restricted_access_empty_message: >
                     You don't have permissions to delete any of the selected records.
+        grid_views:
+            shared_by.label: Shared by {{ name }}
         sorters:
             not_selected: 'No sorting'
             undefined:

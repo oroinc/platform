@@ -18,6 +18,7 @@ define(function(require) {
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
     var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
+    var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
 
     helpers = {
         cellType: function(type) {
@@ -114,6 +115,7 @@ define(function(require) {
                 rowActions: {},
                 massActions: {}
             });
+            this.themeOptions = options.themeOptions || {};
             this.metadataModel = new MetadataModel(this.metadata);
             this.modules = {};
 
@@ -182,6 +184,7 @@ define(function(require) {
 
             this.$el.hide();
             options.el = this.$el[0];
+            options.themeOptionsConfigurator(Grid, options);
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
@@ -290,7 +293,8 @@ define(function(require) {
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || massActions.length,
                 metadata: this.metadata,
                 metadataModel: this.metadataModel,
-                plugins: plugins
+                plugins: plugins,
+                themeOptionsConfigurator: DataGridThemeOptionsManager.createConfigurator(this.themeOptions)
             };
         },
 

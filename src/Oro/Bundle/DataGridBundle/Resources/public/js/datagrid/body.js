@@ -25,6 +25,11 @@ define([
         /** @property {String} */
         rowClassName: undefined,
 
+        themeOptions: {
+            optionPrefix: 'body',
+            className: 'grid-body'
+        },
+
         /**
          * @inheritDoc
          */
@@ -39,7 +44,36 @@ define([
                 this.rowClassName = opts.rowClassName;
             }
 
-            Body.__super__.initialize.apply(this, arguments);
+            this.backgridInitialize(opts);
+        },
+
+        /**
+         * Create this function instead of original Body.__super__.initialize to customize options for subviews
+         * @param options
+         */
+        backgridInitialize: function(options) {
+            this.columns = options.columns;
+
+            this.row = options.row || Row;
+            this.rows = this.collection.map(function(model) {
+                var rowOptions = {
+                    columns: this.columns,
+                    model: model
+                };
+                this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
+                return new this.row(rowOptions);
+            }, this);
+
+            this.emptyText = options.emptyText;
+            this._unshiftEmptyRowMayBe();
+
+            var collection = this.collection;
+            this.listenTo(collection, 'add', this.insertRow);
+            this.listenTo(collection, 'remove', this.removeRow);
+            this.listenTo(collection, 'sort', this.refresh);
+            this.listenTo(collection, 'reset', this.refresh);
+            this.listenTo(collection, 'backgrid:sort', this.sort);
+            this.listenTo(collection, 'backgrid:edited', this.moveToNextCell);
 
             this._listenToRowsEvents(this.rows);
         },
@@ -64,6 +98,11 @@ define([
          */
         refresh: function() {
             this._stopListeningToRowsEvents(this.rows);
+            _.each(this.rows, function(row) {
+                // to trigger properly dispose flow for all nested views, instead of just removing rows
+                row.dispose();
+            });
+            this.rows = [];
             Body.__super__.refresh.apply(this, arguments);
             this._listenToRowsEvents(this.rows);
             return this;

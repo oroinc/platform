@@ -84,6 +84,16 @@ h1, h2, h3, h4, h5, h6 {
     }
   }
 }
+.dropdown-menu__floating {
+  margin-top: 0;
+  > li > a, > li > button {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-size: 12px;
+    color: #444;
+    text-transform: capitalize;
+  }
+}
 .dark {
   background-color: #f6f5f5;
 }
@@ -1280,8 +1290,24 @@ footer {
   .nav-pills {
     padding:0 10px;
   }
-  .launchers-dropdown-menu{
-    min-width: 35px;
+  /* fix for IE10 in Win8, otherwise breaks actions column */
+  .dropdown:not(.open) {
+    .launchers-dropdown-menu {
+      min-width: 0;
+      display: block;
+      height: 0;
+      width: 0;
+      overflow: hidden;
+      border-width: 0;
+    }
+  }
+}
+.launchers-dropdown-menu {
+  min-width: 35px;
+}
+.launchers-list {
+  &.nav > li:first-child > a {
+    margin-left: 2px;
   }
   .launcher-item {
     [class^='icon-']:before {
@@ -1301,17 +1327,6 @@ footer {
       &:focus {
         background:#fff;
       }
-    }
-  }
-  /* fix for IE10 in Win8, otherwise breaks actions column */
-  .dropdown:not(.open) {
-    .launchers-dropdown-menu {
-      min-width: 0;
-      display: block;
-      height: 0;
-      width: 0;
-      overflow: hidden;
-      border-width: 0;
     }
   }
 }

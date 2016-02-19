@@ -57,6 +57,7 @@ config:
         'orodatagrid/js/datagrid/footer': 'bundles/orodatagrid/js/datagrid/footer.js'
         'orodatagrid/js/datagrid/footer/footer-row': 'bundles/orodatagrid/js/datagrid/footer/footer-row.js'
         'orodatagrid/js/datagrid/footer/footer-cell': 'bundles/orodatagrid/js/datagrid/footer/footer-cell.js'
+        'orodatagrid/js/datagrid-theme-options-manager': 'bundles/orodatagrid/js/datagrid-theme-options-manager.js'
 
         'orodatagrid/js/datagrid/listener/abstract-listener': 'bundles/orodatagrid/js/datagrid/listener/abstract-listener.js'
         'orodatagrid/js/datagrid/listener/abstract-grid-change-listener': 'bundles/orodatagrid/js/datagrid/listener/abstract-grid-change-listener.js'

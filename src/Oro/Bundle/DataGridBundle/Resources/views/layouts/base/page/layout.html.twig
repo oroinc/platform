@@ -1,0 +1,57 @@
+{% block _datagrid_toolbar_actions_container_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " pull-left grid-toolbar-mass-actions"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_mass_actions_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " mass-actions-panel btn-group icons-holder"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_extra_actions_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " extra-actions-panel"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_tools_container_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-toolbar-tools pull-right"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_actions_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " actions-panel pull-right form-horizontal"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_page_size_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " page-size pull-right form-horizontal"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_pagination_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " pagination pagination-centered"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block _datagrid_toolbar_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-toolbar"
+    }) %}
+    <script type="text/html" id="template-datagrid-toolbar">
+        <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+    </script>
+{% endblock %}
