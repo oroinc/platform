@@ -12,6 +12,11 @@ class Configuration implements ConfigurationInterface
     const DEFAULT_LAYOUT_TWIG_RESOURCE = 'OroLayoutBundle:Layout:div_layout.html.twig';
 
     /**
+     * @var string[]
+     */
+    private static $mandatoryImageTypes = ['main', 'additional', 'thumbnail'];
+
+    /**
      * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
@@ -175,6 +180,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $assetsNode = $treeBuilder->root('assets');
+        $imagesNode = $treeBuilder->root('images');
 
         $assetsNode
             ->useAttributeAsKey('asset-identifier')
@@ -195,6 +201,30 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $imagesNode
+            ->children()
+                ->arrayNode('types')
+                ->useAttributeAsKey('image-type-identifier')
+                ->validate()
+                    ->ifTrue(function($config) {
+                        return count(array_diff(array_keys($config), self::$mandatoryImageTypes));
+                    })
+                    ->thenInvalid(sprintf(
+                        'Following image types have to be configured: %s',
+                        implode(', ', self::$mandatoryImageTypes)
+                    ))
+                ->end()
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('label')->cannotBeEmpty()->end()
+                            ->scalarNode('dimensions')->defaultNull()->end()
+                            ->scalarNode('max_number')->defaultNull()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
         $dataNode->append($assetsNode);
+        $dataNode->append($imagesNode);
     }
 }
