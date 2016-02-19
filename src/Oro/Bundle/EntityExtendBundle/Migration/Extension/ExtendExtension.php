@@ -679,12 +679,15 @@ class ExtendExtension implements NameGeneratorAwareInterface
     ) {
         $this->ensureExtendFieldSet($options);
 
-        $selfTableName  = $this->getTableName($table);
-        $selfTable      = $this->getTable($table, $schema);
-        $selfColumnName = $this->nameGenerator->generateRelationColumnName($associationName);
-
-        $targetTableName = $this->getTableName($targetTable);
-        $targetTable     = $this->getTable($targetTable, $schema);
+        $selfTableName        = $this->getTableName($table);
+        $selfTable            = $this->getTable($table, $schema);
+        $targetTableName      = $this->getTableName($targetTable);
+        $targetTable          = $this->getTable($targetTable, $schema);
+        $primaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
+        $selfColumnName       = $this->nameGenerator->generateRelationColumnName(
+            $associationName,
+            '_' . $primaryKeyColumnName
+        );
 
         $this->checkColumnsExist($targetTable, [$targetColumnName]);
 
@@ -898,16 +901,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     protected function addRelationColumn(Table $table, $columnName, Column $targetColumn, array $options = [])
     {
-        if ($targetColumn->getName() !== 'id') {
-            throw new SchemaException(
-                sprintf(
-                    'The target column name must be "id". Relation column: "%s::%s". Target column name: "%s".',
-                    $table->getName(),
-                    $columnName,
-                    $targetColumn->getName()
-                )
-            );
-        }
         $columnTypeName = $targetColumn->getType()->getName();
         if (!in_array($columnTypeName, [Type::INTEGER, Type::STRING, Type::SMALLINT, Type::BIGINT], true)) {
             throw new SchemaException(

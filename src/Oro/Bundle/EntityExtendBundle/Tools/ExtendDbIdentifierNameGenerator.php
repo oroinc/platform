@@ -107,15 +107,13 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      * Builds a column name for a relation
      *
      * @param string $associationName
+     * @param string $suffix
+     *
      * @return string
      */
-    public function generateRelationColumnName($associationName)
+    public function generateRelationColumnName($associationName, $suffix = self::RELATION_COLUMN_SUFFIX)
     {
-        return sprintf(
-            '%s%s',
-            $associationName,
-            self::RELATION_COLUMN_SUFFIX
-        );
+        return sprintf('%s%s', $associationName, $suffix);
     }
 
     /**
