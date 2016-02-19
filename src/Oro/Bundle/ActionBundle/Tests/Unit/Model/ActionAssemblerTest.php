@@ -81,8 +81,10 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition2
             ->setName('maximum_name')
             ->setLabel('My Label')
+            ->setSubstituteAction('test_action_to_substitute')
             ->setEntities(['My\Entity'])
             ->setRoutes(['my_route'])
+            ->setGroups(['my_group'])
             ->setEnabled(false)
             ->setApplications(['application1'])
             ->setAttributes(['config_attr'])
@@ -100,8 +102,10 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition3
             ->setName('maximum_name_and_acl')
             ->setLabel('My Label')
+            ->setSubstituteAction('test_action_to_substitute')
             ->setEntities(['My\Entity'])
             ->setRoutes(['my_route'])
+            ->setGroups(['my_group'])
             ->setEnabled(false)
             ->setApplications(['application1'])
             ->setAttributes(['config_attr'])
@@ -149,8 +153,10 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     'maximum_name' => [
                         'label' => 'My Label',
+                        'substitute_action' => 'test_action_to_substitute',
                         'entities' => ['My\Entity'],
                         'routes' => ['my_route'],
+                        'groups' => ['my_group'],
                         'enabled' => false,
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
@@ -178,8 +184,10 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     'maximum_name_and_acl' => [
                         'label' => 'My Label',
+                        'substitute_action' => 'test_action_to_substitute',
                         'entities' => ['My\Entity'],
                         'routes' => ['my_route'],
+                        'groups' => ['my_group'],
                         'enabled' => false,
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],

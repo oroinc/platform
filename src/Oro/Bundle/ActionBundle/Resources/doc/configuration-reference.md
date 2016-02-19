@@ -110,6 +110,9 @@ Single action configuration has next properties:
 * **label**
     *string*
     This value will be shown in the UI.
+* **substitute_action**
+    *string*
+     
 * **enabled**
     *boolean*
     Flag that define whether this action is enabled. Disabled action will not used in application.
@@ -119,6 +122,9 @@ Single action configuration has next properties:
 * **routes**
     *array*
     Action button will be shown on pages which route is in list.
+* **groups**
+    *array*
+    
 * **datagrids**
     *array*
     Action icon will be shown as an datagrid-action in listed datagrids.
