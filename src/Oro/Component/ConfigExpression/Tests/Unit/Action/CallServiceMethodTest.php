@@ -7,9 +7,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Tests\Unit\Action\Stub\TestService;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Action\CallServiceMethod;
+use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\TestService;
 
 class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
 {

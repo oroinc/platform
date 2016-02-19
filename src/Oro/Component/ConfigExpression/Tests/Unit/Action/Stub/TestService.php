@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Action\Stub;
+namespace Oro\Component\ConfigExpression\Tests\Unit\Action\Stub;
 
 class TestService
 {
