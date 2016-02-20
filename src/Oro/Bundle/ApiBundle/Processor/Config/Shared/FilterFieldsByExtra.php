@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
@@ -103,8 +103,11 @@ class FilterFieldsByExtra implements ProcessorInterface
 
         $associationsMapping = $metadata->getAssociationMappings();
         foreach ($associationsMapping as $associationName => $mapping) {
+            if (!array_key_exists($associationName, $filtersConfig)) {
+                continue;
+            }
             $field = $definition->getField($associationName);
-            if (!$field->hasTargetEntity()) {
+            if (null === $field || !$field->hasTargetEntity()) {
                 continue;
             }
 
