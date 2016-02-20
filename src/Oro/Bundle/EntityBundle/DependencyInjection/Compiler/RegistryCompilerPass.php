@@ -13,8 +13,6 @@ class RegistryCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $container->findDefinition('doctrine')
-            ->setClass('Oro\Bundle\EntityBundle\Manager\Registry')
-            ->addMethodCall('setDoctrineHelperLink', [new Reference('oro_entity.doctrine_helper.link')]);
+        $container->findDefinition('doctrine')->setClass('Oro\Bundle\EntityBundle\Manager\Registry');
     }
 }

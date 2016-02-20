@@ -1066,17 +1066,4 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper->createEntityInstance($class)
         );
     }
-
-    public function testManagersCache()
-    {
-        $this->registry
-            ->expects($this->exactly(2))
-            ->method('getManagerForClass')
-            ->willReturn($this->onConsecutiveCalls($this->em, null));
-
-        $this->doctrineHelper->getEntityManager('\stdClass');
-        $this->doctrineHelper->getEntityManager('\stdClass');
-        $this->doctrineHelper->getEntityManager(new TestEntity(), false);
-        $this->doctrineHelper->getEntityManager(new TestEntity(), false);
-    }
 }

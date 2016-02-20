@@ -21,16 +21,6 @@ class DoctrineHelper
     protected $registry;
 
     /**
-     * @var EntityManager[]
-     */
-    private $managers = [];
-
-    /**
-     * @var array
-     */
-    private $managersMap = [];
-
-    /**
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -323,7 +313,7 @@ class DoctrineHelper
      */
     public function getEntityManagerForClass($entityClass, $throwException = true)
     {
-        $manager = $this->getManagerForClass($entityClass);
+        $manager = $this->registry->getManagerForClass($entityClass);
         if (null === $manager && $throwException) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
@@ -447,15 +437,6 @@ class DoctrineHelper
     }
 
     /**
-     * Clears manager cache
-     */
-    public function clearManagerCache()
-    {
-        $this->managers = [];
-        $this->managersMap = [];
-    }
-
-    /**
      * @param object $entity
      */
     public function refreshIncludingUnitializedRelations($entity)
@@ -479,27 +460,5 @@ class DoctrineHelper
 
             array_map([$em, 'refresh'], $relatedEntities->toArray());
         }
-    }
-
-    /**
-     * @param string $entityClass The real class name of an entity
-     *
-     * @return EntityManager|null
-     */
-    private function getManagerForClass($entityClass)
-    {
-        if (!array_key_exists($entityClass, $this->managersMap)) {
-            $manager = $this->registry->getManagerForClass($entityClass);
-            if (null !== $manager) {
-                $hash = spl_object_hash($manager);
-                $this->managers[$hash] = $manager;
-                $this->managersMap[$entityClass] = $hash;
-            } else {
-                $this->managersMap[$entityClass] = null;
-            }
-            return $manager;
-        }
-
-        return $this->managersMap[$entityClass] ? $this->managers[$this->managersMap[$entityClass]] : null;
     }
 }
