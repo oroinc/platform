@@ -106,19 +106,33 @@ class EntityMetadata extends MergeableClassMetadata
      */
     public function getRoute($routeType = 'view', $strict = false)
     {
-        if (in_array($routeType, ['view', 'name', 'create'], true)) {
-            $propertyName = 'route' . ucfirst($routeType);
+        $propertyName = 'route' . ucfirst($routeType);
 
+        if (property_exists($this, $propertyName)) {
             if ($this->{$propertyName}) {
                 return $this->{$propertyName};
             } elseif (false === $strict) {
                 return $this->generateDefaultRoute($routeType);
             }
-        } elseif (!$strict && array_key_exists($routeType, $this->routes)) {
+        } elseif (array_key_exists($routeType, $this->routes)) {
             return $this->routes[$routeType];
         }
 
         throw new \LogicException(sprintf('No route "%s" found for entity "%s"', $routeType, $this->name));
+    }
+
+    /**
+     * @param string $routeType
+     * @param bool $strict
+     * @return bool
+     */
+    public function hasRoute($routeType = 'view', $strict = false)
+    {
+        $propertyName = 'route' . ucfirst($routeType);
+
+        return (property_exists($this, $propertyName) && !$strict) ||
+            (property_exists($this, $propertyName) && $strict && $this->{$propertyName}) ||
+            array_key_exists($routeType, $this->routes);
     }
 
     /**

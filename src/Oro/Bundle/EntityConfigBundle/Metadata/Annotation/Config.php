@@ -88,7 +88,7 @@ class Config
     protected function collectRoutes(array $data)
     {
         foreach ($data as $name => $value) {
-            if (strpos($name, 'route') !== 0) {
+            if (strpos($name, 'route') !== 0 || property_exists($this, $name)) {
                 continue;
             }
 

@@ -92,6 +92,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                     'routeName'     => 'test_route_name',
                     'routeView'     => 'test_route_view',
                     'routeCreate'   => 'test_route_create',
+                    'routeCustom'   => 'test_route_custom',
                     'defaultValues' => [
                         'test' => 'test_val'
                     ]
@@ -104,9 +105,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                     'test' => 'test_val'
                 ],
                 [
-                    'name'   => 'test_route_name',
-                    'view'   => 'test_route_view',
-                    'create' => 'test_route_create'
+                    'custom' => 'test_route_custom'
                 ]
             ],
         ];
