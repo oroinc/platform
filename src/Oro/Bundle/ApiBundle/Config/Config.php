@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class Config implements \IteratorAggregate
 {
+    use Traits\ConfigTrait;
+
     /** @var array */
     protected $items = [];
 
@@ -134,46 +136,5 @@ class Config implements \IteratorAggregate
     public function setSorters(SortersConfig $sorters = null)
     {
         $this->set(ConfigUtil::SORTERS, $sorters);
-    }
-
-    /**
-     * Checks whether the configuration of a given section exists.
-     *
-     * @param string $sectionName
-     *
-     * @return bool
-     */
-    public function has($sectionName)
-    {
-        return isset($this->items[$sectionName]);
-    }
-
-    /**
-     * Gets the configuration of a given section.
-     *
-     * @param string $sectionName
-     *
-     * @return mixed
-     */
-    public function get($sectionName)
-    {
-        return isset($this->items[$sectionName])
-            ? $this->items[$sectionName]
-            : null;
-    }
-
-    /**
-     * Sets the configuration of a given section.
-     *
-     * @param string $sectionName
-     * @param mixed  $config
-     */
-    public function set($sectionName, $config)
-    {
-        if (null !== $config) {
-            $this->items[$sectionName] = $config;
-        } else {
-            unset($this->items[$sectionName]);
-        }
     }
 }

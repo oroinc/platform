@@ -31,6 +31,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
         $result = parent::toArray();
         $this->removeItemWithDefaultValue($result, ConfigUtil::EXCLUSION_POLICY, ConfigUtil::EXCLUSION_POLICY_NONE);
         $this->removeItemWithDefaultValue($result, ConfigUtil::DISABLE_PARTIAL_LOAD);
+        $this->removeItemWithDefaultValue($result, self::COLLAPSE);
 
         $keys = array_keys($result);
         foreach ($keys as $key) {

@@ -114,17 +114,17 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /**
      * Sets the data transformers to be applies to the field value.
      *
-     * @param string|array $dataTransformers
+     * @param string|array|null $dataTransformers
      */
     public function setDataTransformers($dataTransformers)
     {
         if (empty($dataTransformers)) {
-            $dataTransformers = [];
+            unset($this->items[self::DATA_TRANSFORMER]);
+        } else {
+            if (is_string($dataTransformers)) {
+                $dataTransformers = [$dataTransformers];
+            }
+            $this->items[self::DATA_TRANSFORMER] = $dataTransformers;
         }
-        if (is_string($dataTransformers)) {
-            $dataTransformers = [$dataTransformers];
-        }
-
-        $this->items[self::DATA_TRANSFORMER] = $dataTransformers;
     }
 }

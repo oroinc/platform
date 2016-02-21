@@ -64,6 +64,8 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
                 $this->loadFilters($definition, $value);
             } elseif (ConfigUtil::SORTERS === $key) {
                 $this->loadSorters($definition, $value);
+            } elseif ($this->factory->hasLoader($key)) {
+                $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
             } else {
                 $this->setValue($definition, $key, $value);
             }
@@ -112,6 +114,34 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
             $sorters = $this->factory->getLoader(ConfigUtil::SORTERS)->load($config);
             if (!$sorters->isEmpty()) {
                 $this->setValue($definition, ConfigUtil::SORTERS, $sorters);
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ConfigLoaderInterface  $loader
+     * @param string                 $sectionName
+     * @param array|null             $config
+     */
+    protected function loadSection(
+        EntityDefinitionConfig $definition,
+        ConfigLoaderInterface $loader,
+        $sectionName,
+        $config
+    ) {
+        if (!empty($config)) {
+            $section = $loader->load($config);
+            $isEmpty = false;
+            if (is_object($section)) {
+                if (method_exists($section, 'isEmpty') && $section->isEmpty()) {
+                    $isEmpty = true;
+                }
+            } elseif (empty($section)) {
+                $isEmpty = true;
+            }
+            if (!$isEmpty) {
+                $this->setValue($definition, $sectionName, $section);
             }
         }
     }

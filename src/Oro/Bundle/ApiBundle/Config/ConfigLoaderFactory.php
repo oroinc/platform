@@ -10,6 +10,18 @@ class ConfigLoaderFactory
     private $loaders = [];
 
     /**
+     * Indicates whether a loader for a given configuration type exists.
+     *
+     * @param string $configType
+     *
+     * @return bool
+     */
+    public function hasLoader($configType)
+    {
+        return null !== $this->findLoader($configType);
+    }
+
+    /**
      * Returns the loader that can be used to load a given configuration type.
      *
      * @param string $configType
@@ -20,21 +32,12 @@ class ConfigLoaderFactory
      */
     public function getLoader($configType)
     {
-        if (isset($this->loaders[$configType])) {
-            return $this->loaders[$configType];
-        }
-
-        $loader = $this->createDefaultLoader($configType);
+        $loader = $this->findLoader($configType);
         if (null === $loader) {
             throw new \InvalidArgumentException(
                 sprintf('The loader for the "%s" configuration was not found.', $configType)
             );
         }
-
-        if ($loader instanceof ConfigLoaderFactoryAwareInterface) {
-            $loader->setConfigLoaderFactory($this);
-        }
-        $this->loaders[$configType] = $loader;
 
         return $loader;
     }
@@ -53,6 +56,26 @@ class ConfigLoaderFactory
             $loader->setConfigLoaderFactory($this);
         }
         $this->loaders[$configType] = $loader;
+    }
+
+    /**
+     * @param string $configType
+     *
+     * @return ConfigLoaderInterface|null
+     */
+    protected function findLoader($configType)
+    {
+        if (array_key_exists($configType, $this->loaders)) {
+            return $this->loaders[$configType];
+        }
+
+        $loader = $this->createDefaultLoader($configType);
+        if ($loader instanceof ConfigLoaderFactoryAwareInterface) {
+            $loader->setConfigLoaderFactory($this);
+        }
+        $this->loaders[$configType] = $loader;
+
+        return $loader;
     }
 
     /**
