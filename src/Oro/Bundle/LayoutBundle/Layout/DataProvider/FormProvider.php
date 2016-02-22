@@ -94,19 +94,30 @@ class FormProvider extends AbstractDataProvider implements FormProviderInterface
      */
     protected function createFormAccessor(ContextInterface $context)
     {
-        $this->buildFormOptionsByContext($context);
+        $data = $this->getFormData($context);
+        $options = $this->buildFormOptions($context);
         $action = $this->actionRoute ? FormAction::createByRoute($this->actionRoute) : null;
+
         return new FormAccessor(
-            $this->getForm(null, []),
+            $this->getForm($data, $options),
             $action
         );
     }
 
     /**
      * @param ContextInterface $context
+     * @return mixed
+     */
+    protected function getFormData(ContextInterface $context)
+    {
+        return null;
+    }
+
+    /**
+     * @param ContextInterface $context
      * @return array
      */
-    protected function buildFormOptionsByContext(ContextInterface $context)
+    protected function buildFormOptions(ContextInterface $context)
     {
         return [];
     }
@@ -121,6 +132,7 @@ class FormProvider extends AbstractDataProvider implements FormProviderInterface
         if (!$this->formType) {
             throw new \RuntimeException(sprintf('%s::formType should be defined', __CLASS__));
         }
+
         return $this->formFactory->create($this->formType, $data, $options);
     }
 }
