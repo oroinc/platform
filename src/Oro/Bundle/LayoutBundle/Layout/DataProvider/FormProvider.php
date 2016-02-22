@@ -64,7 +64,7 @@ class FormProvider extends AbstractDataProvider implements FormProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getData(ContextInterface $context)
     {
