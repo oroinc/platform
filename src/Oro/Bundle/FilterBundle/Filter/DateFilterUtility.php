@@ -102,7 +102,7 @@ class DateFilterUtility
                 $field = $this->getEnforcedTimezoneFunction('DAY', $field);
                 break;
             case DateModifierInterface::PART_QUARTER:
-                $field = $this->getEnforcedTimezoneFunction('QUARTER', $field);
+                $field = $this->getEnforcedTimezoneQuarter($field);
                 break;
             case DateModifierInterface::PART_DOY:
                 $field = $this->getEnforcedTimezoneFunction('DAYOFYEAR', $field);
@@ -119,6 +119,21 @@ class DateFilterUtility
     }
 
     /**
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    private function getEnforcedTimezoneQuarter($fieldName)
+    {
+        return sprintf(
+            'QUARTER(DATE_SUB(DATE_SUB(%s, %d, \'month\'), %d, \'day\'))',
+            $this->getEnforcedTimezone($fieldName),
+            $this->localeSettings->getFirstQuarterMonth() - 1,
+            $this->localeSettings->getFirstQuarterDay() - 1
+        );
+    }
+
+    /**
      * Check whenever user timezone not UTC then wrap field name with convert timezone func
      *
      * @param string $functionName
@@ -128,12 +143,21 @@ class DateFilterUtility
      */
     private function getEnforcedTimezoneFunction($functionName, $fieldName)
     {
-        if ('UTC' !== $this->localeSettings->getTimeZone()) {
-            $fieldName = sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());
-        }
-        $result = sprintf('%s(%s)', $functionName, $fieldName);
+        return sprintf('%s(%s)', $functionName, $this->getEnforcedTimezone($fieldName));
+    }
 
-        return $result;
+    /**
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    private function getEnforcedTimezone($fieldName)
+    {
+        if ('UTC' === $this->localeSettings->getTimeZone()) {
+            return $fieldName;
+        }
+
+        return sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());
     }
 
     /**
