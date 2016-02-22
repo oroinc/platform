@@ -70,16 +70,19 @@ class FilterFieldsByExtra implements ProcessorInterface
     {
         $entityAlias           = $this->entityClassTransformer->transform($entityClass);
         $rootEntityIdentifiers = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        if (in_array($entityAlias, array_keys($filterFieldsConfig))) {
+        if (array_key_exists($entityAlias, $filterFieldsConfig)) {
             $allowedFields = $filterFieldsConfig[$entityAlias];
             foreach ($fieldsDefinition as $name => &$def) {
                 if (isset($def[ConfigUtil::DEFINITION][ConfigUtil::FIELDS])
-                    && in_array($name, array_keys($filterFieldsConfig))
+                    && array_key_exists($name, $filterFieldsConfig)
                 ) {
                     continue;
                 }
 
-                if (!in_array($name, $allowedFields) && !in_array($name, $rootEntityIdentifiers)) {
+                if (!in_array($name, $allowedFields, true)
+                    && !in_array($name, $rootEntityIdentifiers, true)
+                    && !ConfigUtil::isMetadataProperty($name)
+                ) {
                     $def[ConfigUtil::DEFINITION][ConfigUtil::EXCLUDE] = true;
                 }
             }
@@ -113,11 +116,11 @@ class FilterFieldsByExtra implements ProcessorInterface
 
             $associationAllowedFields = $filterFieldsConfig[$fieldName];
             foreach ($fieldsDefinition[$fieldName][ConfigUtil::DEFINITION][ConfigUtil::FIELDS] as $name => &$def) {
-                if (in_array($name, $identifierFieldNames)) {
+                if (in_array($name, $identifierFieldNames, true)) {
                     continue;
                 }
 
-                if (!in_array($name, $associationAllowedFields)) {
+                if (!in_array($name, $associationAllowedFields, true) && !ConfigUtil::isMetadataProperty($name)) {
                     if (is_array($def)) {
                         $def = array_merge($def, [ConfigUtil::EXCLUDE => true]);
                     } else {

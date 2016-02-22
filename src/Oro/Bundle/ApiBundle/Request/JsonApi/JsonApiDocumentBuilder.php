@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\EntityIdAccessor;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ObjectAccessor;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ObjectAccessorInterface;
 
 class JsonApiDocumentBuilder
 {
@@ -27,6 +30,12 @@ class JsonApiDocumentBuilder
     /** @var EntityIdTransformerInterface */
     protected $entityIdTransformer;
 
+    /** @var ObjectAccessorInterface */
+    protected $objectAccessor;
+
+    /** @var EntityIdAccessor */
+    protected $entityIdAccessor;
+
     /** @var array */
     protected $result = [];
 
@@ -40,6 +49,12 @@ class JsonApiDocumentBuilder
     ) {
         $this->entityClassTransformer = $entityClassTransformer;
         $this->entityIdTransformer    = $entityIdTransformer;
+
+        $this->objectAccessor   = new ObjectAccessor();
+        $this->entityIdAccessor = new EntityIdAccessor(
+            $this->objectAccessor,
+            $this->entityIdTransformer
+        );
     }
 
     /**
@@ -90,12 +105,7 @@ class JsonApiDocumentBuilder
                 $this->result[self::DATA][] = $this->handleObject($object, $metadata);
             }
         } else {
-            throw new \UnexpectedValueException(
-                sprintf(
-                    'Expected argument of type "array or \Traversable", "%s" given',
-                    is_object($collection) ? get_class($collection) : gettype($collection)
-                )
-            );
+            throw $this->createUnexpectedValueException('array or \Traversable', $collection);
         }
 
         return $this;
@@ -124,7 +134,7 @@ class JsonApiDocumentBuilder
      *
      * @return self
      */
-    public function setErrors(array $errors)
+    public function setErrorCollection(array $errors)
     {
         $this->assertNoData();
 
@@ -145,7 +155,7 @@ class JsonApiDocumentBuilder
      *
      * @return self
      */
-    public function addRelatedObject($object, EntityMetadata $metadata = null)
+    protected function addRelatedObject($object, EntityMetadata $metadata = null)
     {
         $this->result[self::INCLUDED][] = $this->handleObject($object, $metadata);
 
@@ -160,35 +170,22 @@ class JsonApiDocumentBuilder
      */
     protected function handleObject($object, EntityMetadata $metadata = null)
     {
-        if (is_array($object)) {
-            $result = $this->handleArrayObject($object, $metadata);
-        } else {
-            throw new \UnexpectedValueException(
-                sprintf(
-                    'Expected argument of type "array", "%s" given',
-                    is_object($object) ? get_class($object) : gettype($object)
-                )
-            );
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array               $object
-     * @param EntityMetadata|null $metadata
-     *
-     * @return array
-     */
-    protected function handleArrayObject(array $object, EntityMetadata $metadata = null)
-    {
         $result = [];
         if (null === $metadata) {
-            $result[self::ATTRIBUTES] = $object;
+            $result[self::ATTRIBUTES] = $this->objectAccessor->toArray($object);
         } else {
-            $result[self::TYPE] = $this->getEntityType($metadata->getClassName());
-            $result[self::ID]   = $this->getEntityIdFromArrayObject($object, $metadata);
-            foreach ($object as $name => $value) {
+            $className  = $this->objectAccessor->getClassName($object);
+            $entityType = $className
+                ? $this->getEntityType($className, $metadata->getClassName())
+                : $this->getEntityType($metadata->getClassName());
+
+            $result = $this->getResourceIdObject(
+                $entityType,
+                $this->entityIdAccessor->getEntityId($object, $metadata)
+            );
+
+            $data = $this->objectAccessor->toArray($object);
+            foreach ($data as $name => $value) {
                 if (in_array($name, $metadata->getIdentifierFieldNames(), true)) {
                     continue;
                 }
@@ -196,8 +193,8 @@ class JsonApiDocumentBuilder
                     $associationMetadata = $metadata->getAssociation($name);
 
                     $result[self::RELATIONSHIPS][$name][self::DATA] = $associationMetadata->isCollection()
-                        ? $this->processRelatedArrayCollection($associationMetadata, $value)
-                        : $this->processRelatedArrayObject($associationMetadata, $value);
+                        ? $this->handleRelatedCollection($value, $associationMetadata)
+                        : $this->handleRelatedObject($value, $associationMetadata);
                 } else {
                     $result[self::ATTRIBUTES][$name] = $value;
                 }
@@ -208,121 +205,110 @@ class JsonApiDocumentBuilder
     }
 
     /**
+     * @param mixed               $object
      * @param AssociationMetadata $associationMetadata
-     * @param mixed               $value
      *
      * @return array|null
      */
-    protected function processRelatedArrayObject(AssociationMetadata $associationMetadata, $value)
+    protected function handleRelatedObject($object, AssociationMetadata $associationMetadata)
     {
-        $targetMetadata   = $associationMetadata->getTargetMetadata();
-        $targetEntityType = $this->getEntityType($associationMetadata->getTargetClassName());
-
-        $data = null;
-        if (null !== $value) {
-            if (null === $targetMetadata) {
-                $data = $this->getResourceIdObject($targetEntityType, $value);
-            } else {
-                $data = $this->getResourceIdObject(
-                    $targetEntityType,
-                    $this->getEntityIdFromArrayObject($value, $targetMetadata)
-                );
-                $this->addRelatedObject($value, $targetMetadata);
-            }
+        if (null === $object) {
+            return null;
         }
 
-        return $data;
+        return $this->processRelatedObject($object, $associationMetadata);
     }
 
     /**
+     * @param mixed               $collection
      * @param AssociationMetadata $associationMetadata
-     * @param mixed               $value
      *
      * @return array
      */
-    protected function processRelatedArrayCollection(AssociationMetadata $associationMetadata, $value)
+    protected function handleRelatedCollection($collection, AssociationMetadata $associationMetadata)
     {
-        $targetMetadata   = $associationMetadata->getTargetMetadata();
-        $targetEntityType = $this->getEntityType($associationMetadata->getTargetClassName());
+        if (null === $collection) {
+            return [];
+        }
 
         $data = [];
-        if (null !== $value) {
-            if (null === $targetMetadata) {
-                foreach ($value as $val) {
-                    $data[] = $this->getResourceIdObject($targetEntityType, $val);
-                }
-            } else {
-                foreach ($value as $val) {
-                    $data[] = $this->getResourceIdObject(
-                        $targetEntityType,
-                        $this->getEntityIdFromArrayObject($val, $targetMetadata)
-                    );
-                    $this->addRelatedObject($val, $targetMetadata);
-                }
-            }
+        foreach ($collection as $object) {
+            $data[] = $this->processRelatedObject($object, $associationMetadata);
         }
 
         return $data;
     }
 
     /**
-     * @param array          $object
-     * @param EntityMetadata $metadata
+     * @param mixed               $object
+     * @param AssociationMetadata $associationMetadata
      *
-     * @return string
+     * @return array The resource identifier
      */
-    protected function getEntityIdFromArrayObject(array $object, EntityMetadata $metadata)
+    protected function processRelatedObject($object, AssociationMetadata $associationMetadata)
     {
-        $result = null;
+        $targetMetadata = $associationMetadata->getTargetMetadata();
 
-        $idFieldNames      = $metadata->getIdentifierFieldNames();
-        $idFieldNamesCount = count($idFieldNames);
-        if ($idFieldNamesCount === 1) {
-            $fieldName = reset($idFieldNames);
-            if (!array_key_exists($fieldName, $object)) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'An object of the type "%s" does not have the identifier property "%s".',
-                        $metadata->getClassName(),
-                        $fieldName
-                    )
-                );
-            }
-            $result = $this->entityIdTransformer->transform($object[$fieldName]);
-        } elseif ($idFieldNamesCount > 1) {
-            $id = [];
-            foreach ($idFieldNames as $fieldName) {
-                if (!array_key_exists($fieldName, $object)) {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'An object of the type "%s" does not have the identifier property "%s".',
-                            $metadata->getClassName(),
-                            $fieldName
-                        )
-                    );
-                }
-                $id[$fieldName] = $object[$fieldName];
-            }
-            $result = $this->entityIdTransformer->transform($id);
+        $preparedValue = $this->prepareRelatedValue(
+            $object,
+            $associationMetadata->getTargetClassName(),
+            $targetMetadata
+        );
+        if ($preparedValue['idOnly']) {
+            $resourceId = $this->getResourceIdObject(
+                $preparedValue['entityType'],
+                $this->entityIdTransformer->transform($preparedValue['value'])
+            );
         } else {
-            throw new \RuntimeException(
-                sprintf(
-                    'The "%s" entity does not have an identifier.',
-                    $metadata->getClassName()
-                )
+            $resourceId = $this->getResourceIdObject(
+                $preparedValue['entityType'],
+                $this->entityIdAccessor->getEntityId($preparedValue['value'], $targetMetadata)
             );
+            $this->addRelatedObject($preparedValue['value'], $targetMetadata);
         }
 
-        if (empty($result)) {
-            throw new \RuntimeException(
-                sprintf(
-                    'The identifier value for "%s" entity must not be empty.',
-                    $metadata->getClassName()
-                )
-            );
+        return $resourceId;
+    }
+
+    /**
+     * @param mixed               $object
+     * @param string              $targetClassName
+     * @param EntityMetadata|null $targetMetadata
+     *
+     * @return array
+     */
+    protected function prepareRelatedValue($object, $targetClassName, EntityMetadata $targetMetadata = null)
+    {
+        $idOnly           = false;
+        $targetEntityType = null;
+        if (is_array($object) || is_object($object)) {
+            if (null !== $targetMetadata && $targetMetadata->isInheritedType()) {
+                $targetEntityType = $this->getEntityType(
+                    $this->objectAccessor->getClassName($object),
+                    $targetClassName
+                );
+
+                $data = $this->objectAccessor->toArray($object);
+                if ($this->isIdentity($data, $targetMetadata)) {
+                    $idOnly = true;
+
+                    $object = count($data) === 1
+                        ? reset($data)
+                        : $data;
+                }
+            }
+        } else {
+            $idOnly = true;
+        }
+        if (!$targetEntityType) {
+            $targetEntityType = $this->getEntityType($targetClassName);
         }
 
-        return $result;
+        return [
+            'value'      => $object,
+            'entityType' => $targetEntityType,
+            'idOnly'     => $idOnly
+        ];
     }
 
     /**
@@ -340,13 +326,41 @@ class JsonApiDocumentBuilder
     }
 
     /**
-     * @param string $entityClass
+     * @param string      $entityClass
+     * @param string|null $fallbackEntityClass
      *
      * @return string
      */
-    protected function getEntityType($entityClass)
+    protected function getEntityType($entityClass, $fallbackEntityClass = null)
     {
-        return $this->entityClassTransformer->transform($entityClass);
+        if (null === $fallbackEntityClass) {
+            $entityType = $this->entityClassTransformer->transform($entityClass);
+        } else {
+            $entityType = $this->entityClassTransformer->transform($entityClass, false);
+            if (!$entityType) {
+                $entityType = $this->entityClassTransformer->transform($fallbackEntityClass);
+            }
+        }
+
+        return $entityType;
+    }
+
+    /**
+     * Checks whether a given object has only identity property(s)
+     * or any other properties as well.
+     *
+     * @param array          $object
+     * @param EntityMetadata $metadata
+     *
+     * @return bool
+     */
+    protected function isIdentity(array $object, EntityMetadata $metadata)
+    {
+        $idFields = $metadata->getIdentifierFieldNames();
+
+        return
+            count($object) === count($idFields)
+            && count(array_diff_key($object, array_flip($idFields))) === 0;
     }
 
     /**
@@ -360,6 +374,23 @@ class JsonApiDocumentBuilder
     }
 
     /**
+     * @param string $expectedType
+     * @param mixed  $value
+     *
+     * @return \UnexpectedValueException
+     */
+    protected function createUnexpectedValueException($expectedType, $value)
+    {
+        return new \UnexpectedValueException(
+            sprintf(
+                'Expected argument of type "%s", "%s" given.',
+                $expectedType,
+                is_object($value) ? get_class($value) : gettype($value)
+            )
+        );
+    }
+
+    /**
      * @param Error $error
      *
      * @return array
@@ -368,7 +399,7 @@ class JsonApiDocumentBuilder
     {
         $result = [];
         if ($error->getStatusCode()) {
-            $result['code'] = (string) $error->getStatusCode();
+            $result['code'] = (string)$error->getStatusCode();
         }
         if ($error->getDetail()) {
             $result['detail'] = $error->getDetail();

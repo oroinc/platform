@@ -14,7 +14,7 @@ services:
     # initialize
     #
 
-    oro_api.get.json_api.check_request_type:
+    oro_api.get.check_request_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
@@ -46,14 +46,14 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 50 }
 
-    oro_api.get.normalize_include_parameter:
+    oro_api.get.json_api.normalize_include_parameter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludeParameter
         arguments:
             - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: 50 }
 
-    oro_api.get.normalize_fields_parameter:
+    oro_api.get.json_api.normalize_fields_parameter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFieldsParameter
         arguments:
             - @oro_api.value_normalizer
@@ -101,20 +101,24 @@ services:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
 
     #
-    # build_query
+    # normalize_input
     #
 
     oro_api.get.validate_entity_id_exists:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
         tags:
-            - { name: oro.api.processor, action: get, group: build_query, priority: 255 }
+            - { name: oro.api.processor, action: get, group: normalize_input, priority: -100 }
 
     oro_api.get.rest.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
             - @oro_api.rest.entity_id_transformer
         tags:
-            - { name: oro.api.processor, action: get, group: build_query, requestType: rest, priority: 250 }
+            - { name: oro.api.processor, action: get, group: normalize_input, requestType: rest, priority: -110 }
+
+    #
+    # build_query
+    #
 
     oro_api.get.complete_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria

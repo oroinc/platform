@@ -1,10 +1,5 @@
 define(['./settings', './path', './directions'], function(settings, Path, directions) {
     'use strict';
-    var sign = Math.hasOwnProperty('sign') ? Math.sign : function(x) {
-        if (+x === x) {
-            return x > 0 ? 1 : (x < 0 ? -1 : 0);
-        }
-    };
 
     var directionIds = [
         directions.BOTTOM_TO_TOP.id,
@@ -178,8 +173,8 @@ define(['./settings', './path', './directions'], function(settings, Path, direct
             if (Math.abs(midNodesDirection.y) < 0.00001) {
                 midNodesDirection.y = 0;
             }
-            midNodesDirection.x = sign(midNodesDirection.x);
-            midNodesDirection.y = sign(midNodesDirection.y);
+            midNodesDirection.x = Math.sign(midNodesDirection.x);
+            midNodesDirection.y = Math.sign(midNodesDirection.y);
             var newDirection = path.connection.directionFrom(path.fromNode);
             var toDirection = this.to[0].connection.directionFrom(to);
             if (newDirection.x === toDirection.x && newDirection.y === toDirection.y) {

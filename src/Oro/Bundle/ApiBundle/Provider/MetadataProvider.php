@@ -12,9 +12,6 @@ class MetadataProvider
     /** @var MetadataProcessor */
     protected $processor;
 
-    /** @var array */
-    protected $cache = [];
-
     /**
      * @param MetadataProcessor $processor
      */
@@ -34,23 +31,22 @@ class MetadataProvider
      *
      * @return EntityMetadata|null
      */
-    public function getMetadata($className, $version, array $requestType, array $extras = [], $config = null)
+    public function getMetadata($className, $version, array $requestType = [], array $extras = [], $config = null)
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $cacheKey = implode('', $requestType) . $version . $className;
-        if (array_key_exists($cacheKey, $this->cache)) {
-            return $this->cache[$cacheKey];
-        }
-
         /** @var MetadataContext $context */
         $context = $this->processor->createContext();
-        $context->setVersion($version);
-        $context->setRequestType($requestType);
         $context->setClassName($className);
-        $context->setExtras($extras);
+        $context->setVersion($version);
+        if (!empty($requestType)) {
+            $context->setRequestType($requestType);
+        }
+        if (!empty($extras)) {
+            $context->setExtras($extras);
+        }
         if (!empty($config)) {
             $context->setConfig($config);
         }
@@ -61,8 +57,6 @@ class MetadataProvider
         if ($context->hasResult()) {
             $result = $context->getResult();
         }
-
-        $this->cache[$cacheKey] = $result;
 
         return $result;
     }
