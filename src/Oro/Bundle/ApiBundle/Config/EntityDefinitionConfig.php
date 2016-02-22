@@ -17,21 +17,14 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     use Traits\DescriptionTrait;
 
     /**
-     * a flag indicates whether the target entity should be collapsed;
-     * it means that target entity should be returned as a value, instead of an array with values of entity fields;
-     * usually it is used to get identifier of the related entity
-     */
-    const COLLAPSE = 'collapse';
-
-    /**
      * {@inheritdoc}
      */
     public function toArray()
     {
         $result = parent::toArray();
-        $this->removeItemWithDefaultValue($result, ConfigUtil::EXCLUSION_POLICY, ConfigUtil::EXCLUSION_POLICY_NONE);
-        $this->removeItemWithDefaultValue($result, ConfigUtil::DISABLE_PARTIAL_LOAD);
-        $this->removeItemWithDefaultValue($result, self::COLLAPSE);
+        $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
+        $this->removeItemWithDefaultValue($result, self::DISABLE_PARTIAL_LOAD);
+        $this->removeItemWithDefaultValue($result, ConfigUtil::COLLAPSE);
 
         $keys = array_keys($result);
         foreach ($keys as $key) {
@@ -137,29 +130,31 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /**
      * Indicates whether the entity should be collapsed.
-     * Usually this property is set by "get_relation_config" processors.
+     * It means that target entity should be returned as a value, instead of an array with values of entity fields.
+     * Usually this property is set by "get_relation_config" processors to get identifier of the related entity.
      *
      * @return bool
      */
     public function isCollapsed()
     {
-        return array_key_exists(self::COLLAPSE, $this->items)
-            ? $this->items[self::COLLAPSE]
+        return array_key_exists(ConfigUtil::COLLAPSE, $this->items)
+            ? $this->items[ConfigUtil::COLLAPSE]
             : false;
     }
 
     /**
      * Sets a flag indicates whether the entity should be collapsed.
-     * Usually this property is set by "get_relation_config" processors.
+     * It means that target entity should be returned as a value, instead of an array with values of entity fields.
+     * Usually this property is set by "get_relation_config" processors to get identifier of the related entity.
      *
      * @param bool $collapse
      */
     public function setCollapsed($collapse = true)
     {
         if ($collapse) {
-            $this->items[self::COLLAPSE] = $collapse;
+            $this->items[ConfigUtil::COLLAPSE] = $collapse;
         } else {
-            unset($this->items[self::COLLAPSE]);
+            unset($this->items[ConfigUtil::COLLAPSE]);
         }
     }
 

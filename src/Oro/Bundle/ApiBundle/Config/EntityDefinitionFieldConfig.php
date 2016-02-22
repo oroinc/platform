@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\FieldConfig;
 
 /**
@@ -21,8 +20,8 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function toArray($excludeTargetEntity = false)
     {
         $result = parent::toArray($excludeTargetEntity);
-        $this->removeItemWithDefaultValue($result, ConfigUtil::EXCLUDE);
-        $this->removeItemWithDefaultValue($result, ConfigUtil::COLLAPSE);
+        $this->removeItemWithDefaultValue($result, self::EXCLUDE);
+        $this->removeItemWithDefaultValue($result, self::COLLAPSE);
 
         return $result;
     }
