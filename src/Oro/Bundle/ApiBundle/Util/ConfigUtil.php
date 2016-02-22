@@ -44,34 +44,4 @@ class ConfigUtil extends BaseConfigUtil
             !isset($config[self::INHERIT])
             || $config[self::INHERIT];
     }
-
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    public static function isRelationInitialized(array $config)
-    {
-        return
-            isset($config[self::FIELDS])
-            || (
-                isset($config[self::EXCLUSION_POLICY])
-                && $config[self::EXCLUSION_POLICY] !== self::EXCLUSION_POLICY_ALL
-            );
-    }
-
-    /**
-     * Returns the property path to the field.
-     *
-     * @param array|null $fieldConfig
-     * @param string     $fieldName
-     *
-     * @return string
-     */
-    public static function getPropertyPath($fieldConfig, $fieldName)
-    {
-        return !empty($fieldConfig[ConfigUtil::PROPERTY_PATH])
-            ? $fieldConfig[ConfigUtil::PROPERTY_PATH]
-            : $fieldName;
-    }
 }
