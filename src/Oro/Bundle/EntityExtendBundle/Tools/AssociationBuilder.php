@@ -153,6 +153,17 @@ class AssociationBuilder
     }
 
     /**
+     *
+     * @param string $entityClass
+     *
+     * @return string
+     */
+    public function getPrimaryKeyColumnName($entityClass)
+    {
+        return reset($this->getPrimaryKeyColumnNames($entityClass));
+    }
+
+    /**
      * @param string $entityClass
      *
      * @return string[]
