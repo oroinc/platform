@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\ORM;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -21,23 +20,16 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /**
      * @param ConfigManager                   $configManager
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param DoctrineHelper                  $doctrineHelper
-     *
      */
     public function __construct(
         ConfigManager $configManager,
-        ExtendDbIdentifierNameGenerator $nameGenerator,
-        DoctrineHelper $doctrineHelper
+        ExtendDbIdentifierNameGenerator $nameGenerator
     ) {
-        $this->configManager  = $configManager;
-        $this->nameGenerator  = $nameGenerator;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->configManager = $configManager;
+        $this->nameGenerator = $nameGenerator;
     }
 
     /**
@@ -85,7 +77,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         array $relation
     ) {
         $targetEntity   = $relation['target_entity'];
-        $targetIdColumn = $this->doctrineHelper->getSingleIdentifierColumnName($targetEntity);
+        $targetIdColumn = isset($relation['target_id_column']) ? $relation['target_id_column'] : 'id';
         $cascade        = !empty($relation['cascade']) ? $relation['cascade'] : [];
         $cascade[]      = 'detach';
 
