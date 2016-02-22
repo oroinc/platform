@@ -241,7 +241,7 @@ actions:
 
 Substitution Of Named Action
 ============================
-todo
+*todo when implementation will be ready - describe here exact behavior of the parameter*
 
 Frontend Options Configuration
 ==============================
