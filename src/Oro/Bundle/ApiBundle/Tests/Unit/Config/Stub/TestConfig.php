@@ -3,12 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub;
 
 use Oro\Bundle\ApiBundle\Config\Traits;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class TestConfig
 {
     use Traits\ConfigTrait;
     use Traits\ExclusionPolicyTrait;
+
+    const EXCLUSION_POLICY      = 'exclusion_policy';
+    const EXCLUSION_POLICY_ALL  = 'all';
+    const EXCLUSION_POLICY_NONE = 'none';
+    const LABEL                 = 'label';
 
     /** @var array */
     protected $items = [];
@@ -21,7 +25,7 @@ class TestConfig
     public function toArray()
     {
         $result = $this->items;
-        $this->removeItemWithDefaultValue($result, ConfigUtil::EXCLUSION_POLICY, ConfigUtil::EXCLUSION_POLICY_NONE);
+        $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
 
         return $result;
     }
@@ -41,8 +45,8 @@ class TestConfig
      */
     public function getLabel()
     {
-        return array_key_exists(ConfigUtil::LABEL, $this->items)
-            ? $this->items[ConfigUtil::LABEL]
+        return array_key_exists(self::LABEL, $this->items)
+            ? $this->items[self::LABEL]
             : null;
     }
 
@@ -52,9 +56,9 @@ class TestConfig
     public function setLabel($label)
     {
         if ($label) {
-            $this->items[ConfigUtil::LABEL] = $label;
+            $this->items[self::LABEL] = $label;
         } else {
-            unset($this->items[ConfigUtil::LABEL]);
+            unset($this->items[self::LABEL]);
         }
     }
 }

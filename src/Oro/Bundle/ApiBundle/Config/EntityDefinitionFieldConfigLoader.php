@@ -10,25 +10,25 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
 {
     /** @var array */
     protected $methodMap = [
-        ConfigUtil::EXCLUDE          => 'setExcluded',
-        ConfigUtil::COLLAPSE         => 'setCollapsed',
-        ConfigUtil::PROPERTY_PATH    => 'setPropertyPath',
-        ConfigUtil::DATA_TRANSFORMER => 'setDataTransformers',
-        ConfigUtil::LABEL            => 'setLabel',
-        ConfigUtil::DESCRIPTION      => 'setDescription',
+        EntityDefinitionFieldConfig::EXCLUDE          => 'setExcluded',
+        EntityDefinitionFieldConfig::COLLAPSE         => 'setCollapsed',
+        EntityDefinitionFieldConfig::PROPERTY_PATH    => 'setPropertyPath',
+        EntityDefinitionFieldConfig::DATA_TRANSFORMER => 'setDataTransformers',
+        EntityDefinitionFieldConfig::LABEL            => 'setLabel',
+        EntityDefinitionFieldConfig::DESCRIPTION      => 'setDescription',
     ];
 
     /** @var array */
     protected $targetEntityMethodMap = [
-        ConfigUtil::EXCLUSION_POLICY     => 'setExclusionPolicy',
-        ConfigUtil::DISABLE_PARTIAL_LOAD => ['disablePartialLoad', 'enablePartialLoad'],
-        ConfigUtil::ORDER_BY             => 'setOrderBy',
-        ConfigUtil::MAX_RESULTS          => 'setMaxResults',
-        ConfigUtil::HINTS                => 'setHints',
-        ConfigUtil::POST_SERIALIZE       => 'setPostSerializeHandler',
-        ConfigUtil::LABEL                => 'setLabel',
-        ConfigUtil::PLURAL_LABEL         => 'setPluralLabel',
-        ConfigUtil::DESCRIPTION          => 'setDescription',
+        EntityDefinitionConfig::EXCLUSION_POLICY     => 'setExclusionPolicy',
+        EntityDefinitionConfig::DISABLE_PARTIAL_LOAD => ['disablePartialLoad', 'enablePartialLoad'],
+        EntityDefinitionConfig::ORDER_BY             => 'setOrderBy',
+        EntityDefinitionConfig::MAX_RESULTS          => 'setMaxResults',
+        EntityDefinitionConfig::HINTS                => 'setHints',
+        EntityDefinitionConfig::POST_SERIALIZE       => 'setPostSerializeHandler',
+        EntityDefinitionConfig::LABEL                => 'setLabel',
+        EntityDefinitionConfig::PLURAL_LABEL         => 'setPluralLabel',
+        EntityDefinitionConfig::DESCRIPTION          => 'setDescription',
     ];
 
     /** @var ConfigLoaderFactory */
@@ -57,7 +57,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
      * @param EntityDefinitionFieldConfig $field
      * @param array|null                  $config
      */
-    protected function loadField(EntityDefinitionFieldConfig $field, $config)
+    protected function loadField(EntityDefinitionFieldConfig $field, array $config = null)
     {
         if (empty($config)) {
             return;
@@ -108,7 +108,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
      * @param EntityDefinitionFieldConfig $field
      * @param array|null                  $config
      */
-    protected function loadTargetFilters(EntityDefinitionFieldConfig $field, $config)
+    protected function loadTargetFilters(EntityDefinitionFieldConfig $field, array $config = null)
     {
         if (!empty($config)) {
             /** @var FiltersConfig $filters */
@@ -123,7 +123,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
      * @param EntityDefinitionFieldConfig $field
      * @param array|null                  $config
      */
-    protected function loadTargetSorters(EntityDefinitionFieldConfig $field, $config)
+    protected function loadTargetSorters(EntityDefinitionFieldConfig $field, array $config = null)
     {
         if (!empty($config)) {
             /** @var SortersConfig $sorters */

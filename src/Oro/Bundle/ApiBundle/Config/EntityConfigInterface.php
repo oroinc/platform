@@ -105,14 +105,14 @@ interface EntityConfigInterface
     /**
      * Gets the exclusion strategy that should be used for the entity.
      *
-     * @return string One of ConfigUtil::EXCLUSION_POLICY_* constant
+     * @return string One of EntityConfig::EXCLUSION_POLICY_* constant
      */
     public function getExclusionPolicy();
 
     /**
      * Sets the exclusion strategy that should be used for the entity.
      *
-     * @param string $exclusionPolicy One of ConfigUtil::EXCLUSION_POLICY_* constant
+     * @param string $exclusionPolicy One of EntityConfig::EXCLUSION_POLICY_* constant
      */
     public function setExclusionPolicy($exclusionPolicy);
 

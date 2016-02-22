@@ -10,15 +10,15 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
 {
     /** @var array */
     protected $methodMap = [
-        ConfigUtil::EXCLUSION_POLICY     => 'setExclusionPolicy',
-        ConfigUtil::DISABLE_PARTIAL_LOAD => ['disablePartialLoad', 'enablePartialLoad'],
-        ConfigUtil::ORDER_BY             => 'setOrderBy',
-        ConfigUtil::MAX_RESULTS          => 'setMaxResults',
-        ConfigUtil::HINTS                => 'setHints',
-        ConfigUtil::POST_SERIALIZE       => 'setPostSerializeHandler',
-        ConfigUtil::LABEL                => 'setLabel',
-        ConfigUtil::PLURAL_LABEL         => 'setPluralLabel',
-        ConfigUtil::DESCRIPTION          => 'setDescription',
+        EntityDefinitionConfig::EXCLUSION_POLICY     => 'setExclusionPolicy',
+        EntityDefinitionConfig::DISABLE_PARTIAL_LOAD => ['disablePartialLoad', 'enablePartialLoad'],
+        EntityDefinitionConfig::ORDER_BY             => 'setOrderBy',
+        EntityDefinitionConfig::MAX_RESULTS          => 'setMaxResults',
+        EntityDefinitionConfig::HINTS                => 'setHints',
+        EntityDefinitionConfig::POST_SERIALIZE       => 'setPostSerializeHandler',
+        EntityDefinitionConfig::LABEL                => 'setLabel',
+        EntityDefinitionConfig::PLURAL_LABEL         => 'setPluralLabel',
+        EntityDefinitionConfig::DESCRIPTION          => 'setDescription',
     ];
 
     /** @var ConfigLoaderFactory */
@@ -47,7 +47,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
      * @param EntityDefinitionConfig $definition
      * @param array|null             $config
      */
-    protected function loadDefinition(EntityDefinitionConfig $definition, $config)
+    protected function loadDefinition(EntityDefinitionConfig $definition, array $config = null)
     {
         if (empty($config)) {
             return;
@@ -76,7 +76,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
      * @param EntityDefinitionConfig $definition
      * @param array|null             $fields
      */
-    protected function loadFields(EntityDefinitionConfig $definition, $fields)
+    protected function loadFields(EntityDefinitionConfig $definition, array $fields = null)
     {
         if (!empty($fields)) {
             foreach ($fields as $name => $config) {
@@ -92,7 +92,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
      * @param EntityDefinitionConfig $definition
      * @param array|null             $config
      */
-    protected function loadFilters(EntityDefinitionConfig $definition, $config)
+    protected function loadFilters(EntityDefinitionConfig $definition, array $config = null)
     {
         if (!empty($config)) {
             /** @var FiltersConfig $filters */
@@ -107,7 +107,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
      * @param EntityDefinitionConfig $definition
      * @param array|null             $config
      */
-    protected function loadSorters(EntityDefinitionConfig $definition, $config)
+    protected function loadSorters(EntityDefinitionConfig $definition, array $config = null)
     {
         if (!empty($config)) {
             /** @var SortersConfig $sorters */
@@ -128,7 +128,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
         EntityDefinitionConfig $definition,
         ConfigLoaderInterface $loader,
         $sectionName,
-        $config
+        array $config = null
     ) {
         if (!empty($config)) {
             $section = $loader->load($config);

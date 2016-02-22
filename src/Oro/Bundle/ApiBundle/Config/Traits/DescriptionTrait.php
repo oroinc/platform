@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @property array $items
@@ -17,7 +17,7 @@ trait DescriptionTrait
      */
     public function hasDescription()
     {
-        return array_key_exists(ConfigUtil::DESCRIPTION, $this->items);
+        return array_key_exists(EntityDefinitionConfig::DESCRIPTION, $this->items);
     }
 
     /**
@@ -27,8 +27,8 @@ trait DescriptionTrait
      */
     public function getDescription()
     {
-        return array_key_exists(ConfigUtil::DESCRIPTION, $this->items)
-            ? $this->items[ConfigUtil::DESCRIPTION]
+        return array_key_exists(EntityDefinitionConfig::DESCRIPTION, $this->items)
+            ? $this->items[EntityDefinitionConfig::DESCRIPTION]
             : null;
     }
 
@@ -40,9 +40,9 @@ trait DescriptionTrait
     public function setDescription($description)
     {
         if ($description) {
-            $this->items[ConfigUtil::DESCRIPTION] = $description;
+            $this->items[EntityDefinitionConfig::DESCRIPTION] = $description;
         } else {
-            unset($this->items[ConfigUtil::DESCRIPTION]);
+            unset($this->items[EntityDefinitionConfig::DESCRIPTION]);
         }
     }
 }

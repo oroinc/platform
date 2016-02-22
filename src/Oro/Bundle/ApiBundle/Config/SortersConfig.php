@@ -2,12 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\EntityConfig;
 
+/**
+ * Represents a configuration of all sorters for an entity.
+ */
 class SortersConfig implements EntityConfigInterface
 {
     use Traits\ConfigTrait;
     use Traits\ExclusionPolicyTrait;
+
+    /** a type of the exclusion strategy that should be used for the sorters */
+    const EXCLUSION_POLICY = EntityConfig::EXCLUSION_POLICY;
+
+    /** exclude all fields are not configured explicitly */
+    const EXCLUSION_POLICY_ALL = EntityConfig::EXCLUSION_POLICY_ALL;
+
+    /** exclude only fields are marked as excluded */
+    const EXCLUSION_POLICY_NONE = EntityConfig::EXCLUSION_POLICY_NONE;
 
     /** @var array */
     protected $items = [];
@@ -23,7 +35,7 @@ class SortersConfig implements EntityConfigInterface
     public function toArray()
     {
         $result = $this->items;
-        $this->removeItemWithDefaultValue($result, ConfigUtil::EXCLUSION_POLICY, ConfigUtil::EXCLUSION_POLICY_NONE);
+        $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
 
         if (!empty($this->fields)) {
             foreach ($this->fields as $fieldName => $field) {

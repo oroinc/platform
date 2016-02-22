@@ -2,13 +2,34 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\FieldConfig;
 
+/**
+ * Represents a filter configuration for a field.
+ */
 class FilterFieldConfig implements FieldConfigInterface
 {
     use Traits\ConfigTrait;
     use Traits\FieldConfigTrait;
     use Traits\DescriptionTrait;
+
+    /** a flag indicates whether the field should be excluded */
+    const EXCLUDE = FieldConfig::EXCLUDE;
+
+    /** the path of the field value */
+    const PROPERTY_PATH = FieldConfig::PROPERTY_PATH;
+
+    /** the data type of the filter value */
+    const DATA_TYPE = 'data_type';
+
+    /** a flag indicates whether the filter value can be an array */
+    const ALLOW_ARRAY = 'allow_array';
+
+    /** the default value for the filter */
+    const DEFAULT_VALUE = 'default_value';
+
+    /** a human-readable description of the filter */
+    const DESCRIPTION = EntityDefinitionFieldConfig::DESCRIPTION;
 
     /** @var array */
     protected $items = [];
@@ -21,8 +42,8 @@ class FilterFieldConfig implements FieldConfigInterface
     public function toArray()
     {
         $result = $this->items;
-        $this->removeItemWithDefaultValue($result, ConfigUtil::EXCLUDE);
-        $this->removeItemWithDefaultValue($result, ConfigUtil::ALLOW_ARRAY);
+        $this->removeItemWithDefaultValue($result, self::EXCLUDE);
+        $this->removeItemWithDefaultValue($result, self::ALLOW_ARRAY);
 
         return $result;
     }
@@ -34,7 +55,7 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function hasDataType()
     {
-        return array_key_exists(ConfigUtil::DATA_TYPE, $this->items);
+        return array_key_exists(self::DATA_TYPE, $this->items);
     }
 
     /**
@@ -44,8 +65,8 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function getDataType()
     {
-        return array_key_exists(ConfigUtil::DATA_TYPE, $this->items)
-            ? $this->items[ConfigUtil::DATA_TYPE]
+        return array_key_exists(self::DATA_TYPE, $this->items)
+            ? $this->items[self::DATA_TYPE]
             : null;
     }
 
@@ -57,9 +78,9 @@ class FilterFieldConfig implements FieldConfigInterface
     public function setDataType($dataType)
     {
         if ($dataType) {
-            $this->items[ConfigUtil::DATA_TYPE] = $dataType;
+            $this->items[self::DATA_TYPE] = $dataType;
         } else {
-            unset($this->items[ConfigUtil::DATA_TYPE]);
+            unset($this->items[self::DATA_TYPE]);
         }
     }
 
@@ -70,7 +91,7 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function hasArrayAllowed()
     {
-        return array_key_exists(ConfigUtil::ALLOW_ARRAY, $this->items);
+        return array_key_exists(self::ALLOW_ARRAY, $this->items);
     }
 
     /**
@@ -80,8 +101,8 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function isArrayAllowed()
     {
-        return array_key_exists(ConfigUtil::ALLOW_ARRAY, $this->items)
-            ? $this->items[ConfigUtil::ALLOW_ARRAY]
+        return array_key_exists(self::ALLOW_ARRAY, $this->items)
+            ? $this->items[self::ALLOW_ARRAY]
             : false;
     }
 
@@ -92,7 +113,7 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function setArrayAllowed($allowArray = true)
     {
-        $this->items[ConfigUtil::ALLOW_ARRAY] = $allowArray;
+        $this->items[self::ALLOW_ARRAY] = $allowArray;
     }
 
     /**
@@ -102,8 +123,8 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function getDefaultValue()
     {
-        return array_key_exists(ConfigUtil::DEFAULT_VALUE, $this->items)
-            ? $this->items[ConfigUtil::DEFAULT_VALUE]
+        return array_key_exists(self::DEFAULT_VALUE, $this->items)
+            ? $this->items[self::DEFAULT_VALUE]
             : null;
     }
 
@@ -115,9 +136,9 @@ class FilterFieldConfig implements FieldConfigInterface
     public function setDefaultValue($defaultValue)
     {
         if (null !== $defaultValue) {
-            $this->items[ConfigUtil::DEFAULT_VALUE] = $defaultValue;
+            $this->items[self::DEFAULT_VALUE] = $defaultValue;
         } else {
-            unset($this->items[ConfigUtil::DEFAULT_VALUE]);
+            unset($this->items[self::DEFAULT_VALUE]);
         }
     }
 }

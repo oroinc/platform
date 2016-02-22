@@ -69,7 +69,8 @@ class FieldConfig
     }
 
     /**
-     * Sets the configuration of the target entity if the field represents an association with another entity.
+     * Sets the configuration of the target entity.
+     * Use this method only if the field represents an association with another entity.
      *
      * @param EntityConfig|null $targetEntity
      *

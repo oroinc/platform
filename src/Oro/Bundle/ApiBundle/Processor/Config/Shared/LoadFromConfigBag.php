@@ -77,13 +77,13 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     protected function loadConfig($entityClass, $version)
     {
         $config = $this->getConfig($entityClass, $version);
-        if (empty($config) || ConfigUtil::isInherit($config)) {
+        if (empty($config) || $this->isInherit($config)) {
             $parentClasses = $this->entityHierarchyProvider->getHierarchyForClassName($entityClass);
             foreach ($parentClasses as $parentClass) {
                 $parentConfig = $this->getConfig($parentClass, $version);
                 if (!empty($parentConfig)) {
                     $config = $this->mergeConfigs($parentConfig, $config);
-                    if (!ConfigUtil::isInherit($parentConfig)) {
+                    if (!$this->isInherit($parentConfig)) {
                         break;
                     }
                 }
@@ -93,6 +93,18 @@ abstract class LoadFromConfigBag implements ProcessorInterface
         return null !== $config
             ? $config
             : [];
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return bool
+     */
+    public static function isInherit(array $config)
+    {
+        return
+            !isset($config[ConfigUtil::INHERIT])
+            || $config[ConfigUtil::INHERIT];
     }
 
     /**

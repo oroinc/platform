@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\EntityConfig;
 
 /**
  * @property array $items
@@ -16,29 +16,29 @@ trait ExclusionPolicyTrait
      */
     public function hasExclusionPolicy()
     {
-        return array_key_exists(ConfigUtil::EXCLUSION_POLICY, $this->items);
+        return array_key_exists(EntityConfig::EXCLUSION_POLICY, $this->items);
     }
 
     /**
      * Gets the exclusion strategy that should be used for the entity.
      *
-     * @return string One of ConfigUtil::EXCLUSION_POLICY_* constant
+     * @return string One of self::EXCLUSION_POLICY_* constant
      */
     public function getExclusionPolicy()
     {
-        return array_key_exists(ConfigUtil::EXCLUSION_POLICY, $this->items)
-            ? $this->items[ConfigUtil::EXCLUSION_POLICY]
-            : ConfigUtil::EXCLUSION_POLICY_NONE;
+        return array_key_exists(EntityConfig::EXCLUSION_POLICY, $this->items)
+            ? $this->items[EntityConfig::EXCLUSION_POLICY]
+            : EntityConfig::EXCLUSION_POLICY_NONE;
     }
 
     /**
      * Sets the exclusion strategy that should be used for the entity.
      *
-     * @param string $exclusionPolicy One of ConfigUtil::EXCLUSION_POLICY_* constant
+     * @param string $exclusionPolicy One of self::EXCLUSION_POLICY_* constant
      */
     public function setExclusionPolicy($exclusionPolicy)
     {
-        $this->items[ConfigUtil::EXCLUSION_POLICY] = $exclusionPolicy;
+        $this->items[EntityConfig::EXCLUSION_POLICY] = $exclusionPolicy;
     }
 
     /**
@@ -48,7 +48,7 @@ trait ExclusionPolicyTrait
      */
     public function isExcludeAll()
     {
-        return ConfigUtil::EXCLUSION_POLICY_ALL === $this->getExclusionPolicy();
+        return EntityConfig::EXCLUSION_POLICY_ALL === $this->getExclusionPolicy();
     }
 
     /**
@@ -56,7 +56,7 @@ trait ExclusionPolicyTrait
      */
     public function setExcludeAll()
     {
-        $this->setExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_ALL);
+        $this->setExclusionPolicy(EntityConfig::EXCLUSION_POLICY_ALL);
     }
 
     /**
@@ -64,6 +64,6 @@ trait ExclusionPolicyTrait
      */
     public function setExcludeNone()
     {
-        $this->setExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_NONE);
+        $this->setExclusionPolicy(EntityConfig::EXCLUSION_POLICY_NONE);
     }
 }

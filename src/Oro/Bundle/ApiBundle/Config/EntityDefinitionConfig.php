@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\EntityConfig;
+use Oro\Component\EntitySerializer\FieldConfig;
 
 /**
  * @method EntityDefinitionFieldConfig[] getFields()
@@ -16,6 +16,15 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     use Traits\PluralLabelTrait;
     use Traits\DescriptionTrait;
 
+    /** a human-readable representation of the entity */
+    const LABEL = 'label';
+
+    /** a human-readable representation in plural of the entity */
+    const PLURAL_LABEL = 'plural_label';
+
+    /** a human-readable description of the entity */
+    const DESCRIPTION = 'description';
+
     /**
      * {@inheritdoc}
      */
@@ -24,7 +33,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
         $result = parent::toArray();
         $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
         $this->removeItemWithDefaultValue($result, self::DISABLE_PARTIAL_LOAD);
-        $this->removeItemWithDefaultValue($result, ConfigUtil::COLLAPSE);
+        $this->removeItemWithDefaultValue($result, FieldConfig::COLLAPSE);
 
         $keys = array_keys($result);
         foreach ($keys as $key) {
@@ -137,8 +146,8 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function isCollapsed()
     {
-        return array_key_exists(ConfigUtil::COLLAPSE, $this->items)
-            ? $this->items[ConfigUtil::COLLAPSE]
+        return array_key_exists(FieldConfig::COLLAPSE, $this->items)
+            ? $this->items[FieldConfig::COLLAPSE]
             : false;
     }
 
@@ -152,9 +161,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function setCollapsed($collapse = true)
     {
         if ($collapse) {
-            $this->items[ConfigUtil::COLLAPSE] = $collapse;
+            $this->items[FieldConfig::COLLAPSE] = $collapse;
         } else {
-            unset($this->items[ConfigUtil::COLLAPSE]);
+            unset($this->items[FieldConfig::COLLAPSE]);
         }
     }
 

@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Oro\Component\EntitySerializer\EntityConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ObjectNormalizer
@@ -131,8 +131,8 @@ class ObjectNormalizer
             throw new \RuntimeException(
                 sprintf(
                     'The "%s" must be "%s".',
-                    ConfigUtil::EXCLUSION_POLICY,
-                    ConfigUtil::EXCLUSION_POLICY_ALL
+                    EntityDefinitionConfig::EXCLUSION_POLICY,
+                    EntityDefinitionConfig::EXCLUSION_POLICY_ALL
                 )
             );
         }

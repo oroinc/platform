@@ -8,17 +8,17 @@ class FiltersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
 {
     /** @var array */
     protected $methodMap = [
-        ConfigUtil::EXCLUSION_POLICY => 'setExclusionPolicy',
+        FiltersConfig::EXCLUSION_POLICY => 'setExclusionPolicy',
     ];
 
     /** @var array */
     protected $fieldMethodMap = [
-        ConfigUtil::EXCLUDE       => 'setExcluded',
-        ConfigUtil::PROPERTY_PATH => 'setPropertyPath',
-        ConfigUtil::DATA_TYPE     => 'setDataType',
-        ConfigUtil::ALLOW_ARRAY   => 'setArrayAllowed',
-        ConfigUtil::DEFAULT_VALUE => 'setDefaultValue',
-        ConfigUtil::DESCRIPTION   => 'setDescription',
+        FilterFieldConfig::EXCLUDE       => 'setExcluded',
+        FilterFieldConfig::PROPERTY_PATH => 'setPropertyPath',
+        FilterFieldConfig::DATA_TYPE     => 'setDataType',
+        FilterFieldConfig::ALLOW_ARRAY   => 'setArrayAllowed',
+        FilterFieldConfig::DEFAULT_VALUE => 'setDefaultValue',
+        FilterFieldConfig::DESCRIPTION   => 'setDescription',
     ];
 
     /**
@@ -45,7 +45,7 @@ class FiltersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
      * @param FiltersConfig $filters
      * @param array|null    $fields
      */
-    protected function loadFields(FiltersConfig $filters, $fields)
+    protected function loadFields(FiltersConfig $filters, array $fields = null)
     {
         if (!empty($fields)) {
             foreach ($fields as $name => $config) {
@@ -59,7 +59,7 @@ class FiltersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
      *
      * @return FilterFieldConfig
      */
-    protected function loadField($config)
+    protected function loadField(array $config = null)
     {
         $filter = new FilterFieldConfig();
         if (!empty($config)) {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @property array $items
@@ -17,7 +17,7 @@ trait PluralLabelTrait
      */
     public function hasPluralLabel()
     {
-        return array_key_exists(ConfigUtil::PLURAL_LABEL, $this->items);
+        return array_key_exists(EntityDefinitionConfig::PLURAL_LABEL, $this->items);
     }
 
     /**
@@ -27,8 +27,8 @@ trait PluralLabelTrait
      */
     public function getPluralLabel()
     {
-        return array_key_exists(ConfigUtil::PLURAL_LABEL, $this->items)
-            ? $this->items[ConfigUtil::PLURAL_LABEL]
+        return array_key_exists(EntityDefinitionConfig::PLURAL_LABEL, $this->items)
+            ? $this->items[EntityDefinitionConfig::PLURAL_LABEL]
             : null;
     }
 
@@ -40,9 +40,9 @@ trait PluralLabelTrait
     public function setPluralLabel($pluralLabel)
     {
         if ($pluralLabel) {
-            $this->items[ConfigUtil::PLURAL_LABEL] = $pluralLabel;
+            $this->items[EntityDefinitionConfig::PLURAL_LABEL] = $pluralLabel;
         } else {
-            unset($this->items[ConfigUtil::PLURAL_LABEL]);
+            unset($this->items[EntityDefinitionConfig::PLURAL_LABEL]);
         }
     }
 }

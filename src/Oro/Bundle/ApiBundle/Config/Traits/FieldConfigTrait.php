@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\FieldConfig;
 
 /**
  * @property array $items
@@ -16,7 +16,7 @@ trait FieldConfigTrait
      */
     public function hasExcluded()
     {
-        return array_key_exists(ConfigUtil::EXCLUDE, $this->items);
+        return array_key_exists(FieldConfig::EXCLUDE, $this->items);
     }
 
     /**
@@ -26,8 +26,8 @@ trait FieldConfigTrait
      */
     public function isExcluded()
     {
-        return array_key_exists(ConfigUtil::EXCLUDE, $this->items)
-            ? $this->items[ConfigUtil::EXCLUDE]
+        return array_key_exists(FieldConfig::EXCLUDE, $this->items)
+            ? $this->items[FieldConfig::EXCLUDE]
             : false;
     }
 
@@ -38,7 +38,7 @@ trait FieldConfigTrait
      */
     public function setExcluded($exclude = true)
     {
-        $this->items[ConfigUtil::EXCLUDE] = $exclude;
+        $this->items[FieldConfig::EXCLUDE] = $exclude;
     }
 
     /**
@@ -48,7 +48,7 @@ trait FieldConfigTrait
      */
     public function hasPropertyPath()
     {
-        return array_key_exists(ConfigUtil::PROPERTY_PATH, $this->items);
+        return array_key_exists(FieldConfig::PROPERTY_PATH, $this->items);
     }
 
     /**
@@ -58,8 +58,8 @@ trait FieldConfigTrait
      */
     public function getPropertyPath()
     {
-        return array_key_exists(ConfigUtil::PROPERTY_PATH, $this->items)
-            ? $this->items[ConfigUtil::PROPERTY_PATH]
+        return array_key_exists(FieldConfig::PROPERTY_PATH, $this->items)
+            ? $this->items[FieldConfig::PROPERTY_PATH]
             : null;
     }
 
@@ -71,9 +71,9 @@ trait FieldConfigTrait
     public function setPropertyPath($propertyPath = null)
     {
         if ($propertyPath) {
-            $this->items[ConfigUtil::PROPERTY_PATH] = $propertyPath;
+            $this->items[FieldConfig::PROPERTY_PATH] = $propertyPath;
         } else {
-            unset($this->items[ConfigUtil::PROPERTY_PATH]);
+            unset($this->items[FieldConfig::PROPERTY_PATH]);
         }
     }
 }

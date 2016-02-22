@@ -14,6 +14,12 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     use Traits\LabelTrait;
     use Traits\DescriptionTrait;
 
+    /** a human-readable representation of the field */
+    const LABEL = 'label';
+
+    /** a human-readable description of the field */
+    const DESCRIPTION = 'description';
+
     /**
      * {@inheritdoc}
      */
@@ -38,8 +44,9 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Gets the configuration of the target entity if the field represents an association with another entity.
+     * Gets the configuration of the target entity.
      * If the configuration does not exist it is created automatically.
+     * Use this method only if the field represents an association with another entity.
      *
      * @return EntityDefinitionConfig
      */
@@ -54,8 +61,9 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Creates new instance of the target entity configuration and sets it to the field.
+     * Creates new instance of the target entity.
      * If the field already have the configuration of the target entity it will be overridden.
+     * Use this method only if the field represents an association with another entity.
      *
      * @return EntityDefinitionConfig
      */

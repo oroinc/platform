@@ -172,12 +172,14 @@ class DumpConfigCommand extends ContainerAwareCommand
         // add known sections in predefined order
         foreach ([ConfigUtil::DEFINITION, ConfigUtil::FILTERS, ConfigUtil::SORTERS] as $sectionName) {
             if (array_key_exists($sectionName, $data)) {
-                $result[$sectionName] = $data;
+                $result[$sectionName] = $data[$sectionName];
             }
         }
         // add other sections
         foreach ($data as $sectionName => $config) {
-            $result[$sectionName] = $config;
+            if (!array_key_exists($sectionName, $result)) {
+                $result[$sectionName] = $config;
+            }
         }
 
         return $result;

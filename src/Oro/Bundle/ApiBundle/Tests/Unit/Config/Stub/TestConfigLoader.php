@@ -4,14 +4,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub;
 
 use Oro\Bundle\ApiBundle\Config\AbstractConfigLoader;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderInterface;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class TestConfigLoader extends AbstractConfigLoader implements ConfigLoaderInterface
 {
     /** @var array */
     protected $methodMap = [
-        ConfigUtil::EXCLUSION_POLICY => 'setExclusionPolicy',
-        ConfigUtil::LABEL            => 'setLabel',
+        TestConfig::EXCLUSION_POLICY => 'setExclusionPolicy',
+        TestConfig::LABEL            => 'setLabel',
     ];
 
     /**

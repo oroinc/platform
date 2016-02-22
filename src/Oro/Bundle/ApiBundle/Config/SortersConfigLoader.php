@@ -8,13 +8,13 @@ class SortersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
 {
     /** @var array */
     protected $methodMap = [
-        ConfigUtil::EXCLUSION_POLICY => 'setExclusionPolicy',
+        SortersConfig::EXCLUSION_POLICY => 'setExclusionPolicy',
     ];
 
     /** @var array */
     protected $fieldMethodMap = [
-        ConfigUtil::EXCLUDE       => 'setExcluded',
-        ConfigUtil::PROPERTY_PATH => 'setPropertyPath',
+        SorterFieldConfig::EXCLUDE       => 'setExcluded',
+        SorterFieldConfig::PROPERTY_PATH => 'setPropertyPath',
     ];
 
     /**
@@ -41,7 +41,7 @@ class SortersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
      * @param SortersConfig $sorters
      * @param array|null    $fields
      */
-    protected function loadFields(SortersConfig $sorters, $fields)
+    protected function loadFields(SortersConfig $sorters, array $fields = null)
     {
         if (!empty($fields)) {
             foreach ($fields as $name => $config) {
@@ -55,7 +55,7 @@ class SortersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
      *
      * @return SorterFieldConfig
      */
-    protected function loadField($config)
+    protected function loadField(array $config = null)
     {
         $sorter = new SorterFieldConfig();
         if (!empty($config)) {

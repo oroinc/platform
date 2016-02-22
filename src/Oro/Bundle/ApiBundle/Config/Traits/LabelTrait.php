@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @property array $items
@@ -17,7 +17,7 @@ trait LabelTrait
      */
     public function hasLabel()
     {
-        return array_key_exists(ConfigUtil::LABEL, $this->items);
+        return array_key_exists(EntityDefinitionConfig::LABEL, $this->items);
     }
 
     /**
@@ -27,8 +27,8 @@ trait LabelTrait
      */
     public function getLabel()
     {
-        return array_key_exists(ConfigUtil::LABEL, $this->items)
-            ? $this->items[ConfigUtil::LABEL]
+        return array_key_exists(EntityDefinitionConfig::LABEL, $this->items)
+            ? $this->items[EntityDefinitionConfig::LABEL]
             : null;
     }
 
@@ -40,9 +40,9 @@ trait LabelTrait
     public function setLabel($label)
     {
         if ($label) {
-            $this->items[ConfigUtil::LABEL] = $label;
+            $this->items[EntityDefinitionConfig::LABEL] = $label;
         } else {
-            unset($this->items[ConfigUtil::LABEL]);
+            unset($this->items[EntityDefinitionConfig::LABEL]);
         }
     }
 }
