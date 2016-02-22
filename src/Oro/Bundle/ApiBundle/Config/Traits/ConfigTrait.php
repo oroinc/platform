@@ -16,7 +16,7 @@ trait ConfigTrait
      */
     public function has($key)
     {
-        return isset($this->items[$key]);
+        return array_key_exists($key, $this->items);
     }
 
     /**
@@ -28,7 +28,7 @@ trait ConfigTrait
      */
     public function get($key)
     {
-        return isset($this->items[$key])
+        return array_key_exists($key, $this->items)
             ? $this->items[$key]
             : null;
     }

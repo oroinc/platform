@@ -173,7 +173,7 @@ class EntityConfig
      */
     public function setExcludeAll()
     {
-        $this->items[self::EXCLUSION_POLICY] = self::EXCLUSION_POLICY_ALL;
+        $this->setExclusionPolicy(self::EXCLUSION_POLICY_ALL);
     }
 
     /**
@@ -181,7 +181,7 @@ class EntityConfig
      */
     public function setExcludeNone()
     {
-        unset($this->items[self::EXCLUSION_POLICY]);
+        $this->setExclusionPolicy(self::EXCLUSION_POLICY_NONE);
     }
 
     /**

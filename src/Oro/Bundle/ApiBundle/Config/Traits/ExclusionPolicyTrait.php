@@ -56,7 +56,7 @@ trait ExclusionPolicyTrait
      */
     public function setExcludeAll()
     {
-        $this->items[ConfigUtil::EXCLUSION_POLICY] = ConfigUtil::EXCLUSION_POLICY_ALL;
+        $this->setExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_ALL);
     }
 
     /**
@@ -64,6 +64,6 @@ trait ExclusionPolicyTrait
      */
     public function setExcludeNone()
     {
-        unset($this->items[ConfigUtil::EXCLUSION_POLICY]);
+        $this->setExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_NONE);
     }
 }

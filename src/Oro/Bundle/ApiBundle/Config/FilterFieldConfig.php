@@ -28,16 +28,6 @@ class FilterFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * Indicates whether the field does not have a configuration.
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return empty($this->items);
-    }
-
-    /**
      * Indicates whether the data type is set.
      *
      * @return bool

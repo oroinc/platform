@@ -28,11 +28,9 @@ class Config implements \IteratorAggregate
     {
         $result = [];
         foreach ($this->items as $sectionName => $config) {
-            if (!array_key_exists($sectionName, $result)) {
-                $result[$sectionName] = is_object($config) && method_exists($config, 'toArray')
-                    ? $config->toArray()
-                    : $config;
-            }
+            $result[$sectionName] = is_object($config) && method_exists($config, 'toArray')
+                ? $config->toArray()
+                : $config;
         }
 
         return $result;
@@ -71,7 +69,7 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of an entity.
      *
-     * @param EntityDefinitionConfig $definition
+     * @param EntityDefinitionConfig|null $definition
      */
     public function setDefinition(EntityDefinitionConfig $definition = null)
     {
@@ -101,7 +99,7 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of filters.
      *
-     * @param FiltersConfig $filters
+     * @param FiltersConfig|null $filters
      */
     public function setFilters(FiltersConfig $filters = null)
     {
@@ -131,7 +129,7 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of sorters.
      *
-     * @param SortersConfig $sorters
+     * @param SortersConfig|null $sorters
      */
     public function setSorters(SortersConfig $sorters = null)
     {
