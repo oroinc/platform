@@ -1,11 +1,3 @@
 {% set params = oro_action_widget_parameters() %}
 
-{% if has_actions(params) %}
-    <div class="pull-left">
-        {{ oro_widget_render({
-            'widgetType': 'block',
-            'url': path(oro_action_widget_route(), params),
-            'alias': 'action_buttons_widget',
-        }) }}
-    </div>
-{% endif %}
+{% include 'OroActionBundle:Widget:_widget.html.twig' %}
