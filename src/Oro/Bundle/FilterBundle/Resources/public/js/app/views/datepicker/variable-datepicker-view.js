@@ -130,7 +130,7 @@ define(function(require) {
             this.initItemizedPicker(
                 'days',
                 __('oro.filter.date.days.title'),
-                localeSettings.getCalendarDayOfWeekNames('wide')
+                localeSettings.getSortedDayOfWeekNames('wide')
             );
             this.initItemizedPicker(
                 'months',
