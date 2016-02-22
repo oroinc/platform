@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\ORM;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -30,25 +29,16 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var RelationMetadataBuilder */
     protected $builder;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
-
     protected function setUp()
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
-
 
         $this->builder = new RelationMetadataBuilder(
             $this->configManager,
-            $this->nameGenerator,
-            $this->doctrineHelper
+            $this->nameGenerator
         );
     }
 
@@ -112,7 +102,6 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->setDoctrineHelperIdColumn($targetEntityClass, 'id');
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -192,7 +181,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setDoctrineHelperIdColumn($targetEntityClass, 'id');
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -274,7 +263,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setDoctrineHelperIdColumn($targetEntityClass, 'id');
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -1186,18 +1175,5 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $config->setValues($values);
 
         return $config;
-    }
-
-    /**
-     * @param string $targetEntityClass
-     * @param string $returnId
-     */
-    protected function setDoctrineHelperIdColumn($targetEntityClass, $returnId)
-    {
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getSingleIdentifierColumnName')
-            ->with($targetEntityClass)
-            ->will($this->returnValue($returnId));
     }
 }
