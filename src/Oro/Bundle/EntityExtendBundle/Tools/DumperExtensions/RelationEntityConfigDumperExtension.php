@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -20,22 +20,22 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var AssociationBuilder */
+    protected $associationBuilder;
 
     /**
      * @param ConfigManager   $configManager
      * @param FieldTypeHelper $fieldTypeHelper
-     * @param DoctrineHelper  $doctrineHelper
+     * @param AssociationBuilder $associationBuilder
      */
     public function __construct(
         ConfigManager $configManager,
         FieldTypeHelper $fieldTypeHelper,
-        DoctrineHelper $doctrineHelper
+        AssociationBuilder $associationBuilder
     ) {
-        $this->configManager   = $configManager;
-        $this->fieldTypeHelper = $fieldTypeHelper;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->configManager      = $configManager;
+        $this->fieldTypeHelper    = $fieldTypeHelper;
+        $this->associationBuilder = $associationBuilder;
     }
 
     /**
@@ -144,7 +144,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
             'owner'            => $selfIsOwnerSide,
             'target_entity'    => $targetEntityClass,
             'target_field_id'  => $targetFieldId,
-            'target_id_column' => $this->doctrineHelper->getSingleIdentifierColumnName($targetEntityClass)
+            'target_id_column' => $this->associationBuilder->getPrimaryKeyColumnName($targetEntityClass)
         ];
         if ($fieldConfig->has('cascade')) {
             $selfRelation['cascade'] = $fieldConfig->get('cascade');
