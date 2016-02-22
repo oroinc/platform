@@ -20,10 +20,10 @@ class ResourcesLoader
     }
 
     /**
-     * Gets all public resources available for the requested API version.
+     * Gets all resources available through a given Data API version.
      *
-     * @param string   $version     The version of API
-     * @param string[] $requestType The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string   $version     The Data API version
+     * @param string[] $requestType The request type, for example "rest", "soap", etc.
      *
      * @return ApiResource[]
      */

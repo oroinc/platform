@@ -1,11 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
+namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
-class RemoveDuplicateFilters extends RemoveDuplicates
+/**
+ * Removes filters by identifier field if they duplicate a filter by related entity.
+ * For example if both "product" and "product.id" filters exist, the "product.id" filter will be removed.
+ */
+class RemoveDuplicatedFilters extends RemoveDuplicates
 {
     /**
      * {@inheritdoc}
@@ -14,18 +18,12 @@ class RemoveDuplicateFilters extends RemoveDuplicates
     {
         /** @var ConfigContext $context */
 
-        $filters = $context->getFilters();
-        if (null === $filters) {
-            // a filters' configuration does not exist
-            return;
-        }
-
         $entityClass = $context->getClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }
 
-        $context->setFilters($this->removeDuplicates($filters, $entityClass));
+        $this->removeDuplicatedFields($context->getFilters(), $context->getClassName());
     }
 }

@@ -34,7 +34,7 @@ class ConfigConverter
 
         if (!empty($config[ConfigUtil::FIELDS])) {
             foreach ($config[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
-                $field = $result->addField($fieldName, new FieldConfig());
+                $field = $result->addField($fieldName);
                 if (null !== $fieldConfig) {
                     $this->buildFieldConfig($field, $fieldConfig);
                 }

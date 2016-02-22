@@ -79,6 +79,44 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'field_name_equals_to_metadata_property_path'             => [
+                'config'       => [
+                    'fields' => [
+                        '__class__' => ['property_path' => '__class__'],
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'        => 123,
+                        '__class__' => 'Test\Class'
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'        => 123,
+                        '__class__' => 'Test\Class'
+                    ]
+                ]
+            ],
+            'metadata_field_name_with_property_path'                  => [
+                'config'       => [
+                    'fields' => [
+                        '__class__' => null,
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'        => 123,
+                        '__class__' => 'Test\Class'
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'        => 123,
+                        '__class__' => 'Test\Class'
+                    ]
+                ]
+            ],
             'property_path'                                           => [
                 'config'       => [
                     'fields' => [

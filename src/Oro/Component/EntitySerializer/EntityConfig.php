@@ -106,13 +106,17 @@ class EntityConfig
     /**
      * Adds the configuration of a field.
      *
-     * @param string      $fieldName
-     * @param FieldConfig $field
+     * @param string           $fieldName
+     * @param FieldConfig|null $field
      *
      * @return FieldConfig
      */
-    public function addField($fieldName, FieldConfig $field)
+    public function addField($fieldName, $field = null)
     {
+        if (null === $field) {
+            $field = new FieldConfig();
+        }
+
         $this->fields[$fieldName] = $field;
 
         return $field;
@@ -169,7 +173,7 @@ class EntityConfig
      */
     public function setExcludeAll()
     {
-        $this->items[self::EXCLUSION_POLICY] = self::EXCLUSION_POLICY_ALL;
+        $this->setExclusionPolicy(self::EXCLUSION_POLICY_ALL);
     }
 
     /**
@@ -177,7 +181,7 @@ class EntityConfig
      */
     public function setExcludeNone()
     {
-        unset($this->items[self::EXCLUSION_POLICY]);
+        $this->setExclusionPolicy(self::EXCLUSION_POLICY_NONE);
     }
 
     /**
@@ -206,16 +210,6 @@ class EntityConfig
     public function disablePartialLoad()
     {
         $this->items[self::DISABLE_PARTIAL_LOAD] = true;
-    }
-
-    /**
-     * Indicates whether the ordering of the result is required.
-     *
-     * @return bool
-     */
-    public function hasOrderBy()
-    {
-        return array_key_exists(self::ORDER_BY, $this->items);
     }
 
     /**
@@ -253,7 +247,7 @@ class EntityConfig
     /**
      * Gets the maximum number of items in the result.
      *
-     * @return int|null The requested maximum number of items in the result or NULL if not limited
+     * @return int|null The requested maximum number of items or NULL if not limited
      */
     public function getMaxResults()
     {
@@ -265,25 +259,15 @@ class EntityConfig
     /**
      * Sets the maximum number of items in the result.
      *
-     * @param int|null $maxResults The maximum number of items in the result or NULL to set unlimited
+     * @param int|null $maxResults The maximum number of items or NULL to set unlimited
      */
     public function setMaxResults($maxResults = null)
     {
-        if (null !== $maxResults) {
-            $this->items[self::MAX_RESULTS] = $maxResults;
-        } else {
+        if (null === $maxResults || $maxResults < 0) {
             unset($this->items[self::MAX_RESULTS]);
+        } else {
+            $this->items[self::MAX_RESULTS] = $maxResults;
         }
-    }
-
-    /**
-     * Indicates whether Doctrine query hints exist.
-     *
-     * @return bool
-     */
-    public function hasHints()
-    {
-        return array_key_exists(self::HINTS, $this->items);
     }
 
     /**
@@ -307,10 +291,11 @@ class EntityConfig
      */
     public function addHint($name, $value = null)
     {
-        $hints                    = $this->getHints();
-        $hints[]                  = null === $value
+        $hints   = $this->getHints();
+        $hints[] = null === $value
             ? $name
             : ['name' => $name, 'value' => $value];
+
         $this->items[self::HINTS] = $hints;
     }
 
