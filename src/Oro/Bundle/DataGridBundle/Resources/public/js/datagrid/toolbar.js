@@ -143,7 +143,6 @@ define([
                 this.$('.sorting').append(this.subviews.sortingDropdown.render().$el);
             }
 
-
             if (this.subviews.extraActionsPanel.haveActions()) {
                 this.$('.extra-actions-panel').append(this.subviews.extraActionsPanel.render().$el);
             } else {

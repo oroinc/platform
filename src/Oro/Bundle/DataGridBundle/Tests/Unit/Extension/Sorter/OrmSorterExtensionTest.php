@@ -121,7 +121,9 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                     'options' => [
                         'multipleSorting' => false,
-                        'toolbarSorting' => false,
+                        'toolbarOptions' => [
+                            'addSorting' => false,
+                        ],
                     ],
                     'initialState' => ['sorters' => ['name' => 'ASC',]],
                     'state' => ['sorters' => ['name' => 'ASC',]],
@@ -148,7 +150,9 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                     'options' => [
                         'multipleSorting' => true,
-                        'toolbarSorting' => false,
+                        'toolbarOptions' => [
+                            'addSorting' => false,
+                        ],
                     ],
                     'initialState' => ['sorters' => ['name' => 'ASC',]],
                     'state' => ['sorters' => ['name' => 'ASC',]],
@@ -182,7 +186,9 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                     'options' => [
                         'multipleSorting' => false,
-                        'toolbarSorting' => true,
+                        'toolbarOptions' => [
+                            'addSorting' => true,
+                        ],
                     ],
                     'initialState' => ['sorters' => ['name' => 'ASC',]],
                     'state' => ['sorters' => ['name' => 'ASC',]],
