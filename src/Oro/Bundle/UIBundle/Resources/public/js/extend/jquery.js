@@ -207,6 +207,22 @@ define(['jquery'], function($) {
                 });
                 return this;
             }
+        },
+
+        inputWidget: function(method) {
+            var input = this[0];
+
+            if (method === 'create' && arguments.length >= 2) {
+                var InputWidget = arguments[1];
+                return new InputWidget($(input));
+            }
+
+            if (arguments.length === 0 || !input.inputWidget) {
+                return input.inputWidget ? input.inputWidget : false;
+            }
+
+            var args = Array.prototype.slice.call(arguments, 1);
+            return input.inputWidget[method].apply(input.inputWidget, args);
         }
     });
 
