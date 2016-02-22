@@ -23,6 +23,9 @@ class ActionDefinition
     /** @var boolean */
     private $enabled = true;
 
+    /** @var string */
+    private $substituteAction = null;
+
     /** @var array */
     private $entities = [];
 
@@ -31,6 +34,9 @@ class ActionDefinition
 
     /** @var array */
     private $routes = [];
+
+    /** * @var array */
+    private $groups = [];
 
     /** @var array */
     private $applications = [];
@@ -391,6 +397,43 @@ class ActionDefinition
     {
         $this->conditions[$name] = $data;
 
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubstituteAction()
+    {
+        return $this->substituteAction;
+    }
+
+    /**
+     * @param string $substituteAction
+     * @return $this
+     */
+    public function setSubstituteAction($substituteAction)
+    {
+        $this->substituteAction = $substituteAction;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param array $groups
+     * @return $this
+     */
+    public function setGroups(array $groups)
+    {
+        $this->groups = $groups;
         return $this;
     }
 }
