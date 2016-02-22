@@ -7,16 +7,16 @@ define(function(require) {
     UniformSelectInputWidget = InputWidget.extend({
         widgetFunctionName: 'uniform',
 
-        initialize: function() {
-            UniformSelectInputWidget.__super__.initialize.apply(this, arguments);
+        widgetInitialize: function() {
+            UniformSelectInputWidget.__super__.widgetInitialize.apply(this, arguments);
             if (this.$input.is('.error:not([multiple])')) {
                 this.$input.removeClass('error').closest('.selector').addClass('error');
             }
         },
 
-        destroy: function() {
+        widgetDestroy: function() {
             this.$input.uniform.restore();
-            UniformSelectInputWidget.__super__.destroy.apply(this, arguments);
+            UniformSelectInputWidget.__super__.widgetDestroy.apply(this, arguments);
         }
     });
 

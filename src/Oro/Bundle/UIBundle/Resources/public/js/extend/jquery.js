@@ -214,7 +214,9 @@ define(['jquery'], function($) {
 
             if (method === 'create' && arguments.length >= 2) {
                 var InputWidget = arguments[1];
-                return new InputWidget($(input));
+                var options = arguments[2] || {};
+                options.$input = $(input);
+                return new InputWidget(options);
             }
 
             if (arguments.length === 0 || !input.inputWidget) {
@@ -222,6 +224,7 @@ define(['jquery'], function($) {
             }
 
             var args = Array.prototype.slice.call(arguments, 1);
+            method = 'widget' + method.charAt(0).toUpperCase() + method.slice(1);//ex: initialize > widgetInitialize
             return input.inputWidget[method].apply(input.inputWidget, args);
         }
     });

@@ -13,16 +13,16 @@ define(function(require) {
             fileButtonHtml: __('Choose File')
         },
 
-        initialize: function() {
-            UniformFileInputWidget.__super__.initialize.apply(this, arguments);
+        widgetInitialize: function() {
+            UniformFileInputWidget.__super__.widgetInitialize.apply(this, arguments);
             if (this.$input.is('.error')) {
                 this.$input.removeClass('error').closest('.uploader').addClass('error');
             }
         },
 
-        destroy: function() {
+        widgetDestroy: function() {
             this.$input.uniform.restore();
-            UniformFileInputWidget.__super__.destroy.apply(this, arguments);
+            UniformFileInputWidget.__super__.widgetDestroy.apply(this, arguments);
         }
     });
 

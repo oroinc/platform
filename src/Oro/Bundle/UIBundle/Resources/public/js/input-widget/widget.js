@@ -3,19 +3,9 @@ define(function(require) {
 
     var InputWidget;
     var _ = require('underscore');
-    var Backbone = require('backbone');
+    var BaseClass = require('oroui/js/base-class');
 
-    InputWidget = function($input) {
-        this.$input = $input;
-        this.input = $input[0];
-        this.input.inputWidget = this;
-
-        this.widgetFunction = _.bind(this.$input[this.widgetFunctionName], this.$input);
-
-        this.initialize();
-    };
-
-    _.extend(InputWidget.prototype, {
+    InputWidget = BaseClass.extend({
         /** @property {jQuery} */
         $input: null,
 
@@ -34,19 +24,18 @@ define(function(require) {
         /** @property {mixed} */
         destroyOptions: null,
 
-        initialize: function() {
-            if (this.initializeOptions) {
-                this.widgetFunction(this.initializeOptions);
-            } else {
-                this.widgetFunction();
-            }
+        initialize: function(options) {
+            _.extend(this, options || {});
+
+            this.input = this.$input[0];
+            this.input.inputWidget = this;
+
+            this.widgetFunction = _.bind(this.$input[this.widgetFunctionName], this.$input);
+
+            this.widgetInitialize();
         },
 
-        destroy: function() {
-            if (this.destroyOptions) {
-                this.widgetFunction(this.destroyOptions);
-            }
-
+        dispose: function() {
             delete this.input.inputWidget;
             for (var prop in this) {
                 if (this.hasOwnProperty(prop)) {
@@ -54,11 +43,25 @@ define(function(require) {
                 }
             }
 
-            return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
+            return InputWidget.__super__.dispose.apply(this, arguments);
+        },
+
+        widgetInitialize: function() {
+            if (this.initializeOptions) {
+                this.widgetFunction(this.initializeOptions);
+            } else {
+                this.widgetFunction();
+            }
+        },
+
+        widgetDestroy: function() {
+            if (this.destroyOptions) {
+                this.widgetFunction(this.destroyOptions);
+            }
+
+            this.dispose();
         }
     });
-
-    InputWidget.extend = Backbone.Model.extend;
 
     return InputWidget;
 });
