@@ -10,6 +10,7 @@ Table of Contents
  - [Configuration Replacing](#configuration-replacing)
  - [Defining an Action](#defining-an-action)
    - [Example](#example)
+ - [Substitution of Action](#substitution-of-action)
  - [Button Options Configuration](#button-options-configuration)
    - [Example](#example-1)
  - [Frontend Options Configuration](#frontend-options-configuration)
@@ -112,7 +113,7 @@ Single action configuration has next properties:
     This value will be shown in the UI.
 * **substitute_action**
     *string*
-    Name of action that can be replaced (e.g. [substituted](#substitution-of-named-action)) by current one.
+    Name of action that can be replaced (e.g. [substituted](#substitution-of-action)) by current one.
 * **enabled**
     *boolean*
     Flag that define whether this action is enabled. Disabled action will not used in application.
@@ -160,6 +161,7 @@ actions:                                             # root elements
     demo_action:                                     # name of action
         extends: demo_action_base                    # base action name
         label: aсme.demo.actions.myentity_action     # this value will be shown in UI for action button
+        substitute_action: some_action               # configuration of 'some_action' will be replaced by configuration of this action
         enabled: false                               # action is disabled, means not used in application
         entities:                                    # on view/edit pages of this entities action button will be shown
             - Acme\Bundle\DemoBundle\Entity\MyEntity # entity class name
@@ -190,11 +192,12 @@ actions:                                             # root elements
 ```
 
 
-Substitution Of Named Action
-============================
+Substitution of Action
+======================
 
-When parameter `substitute_action` is defined and it corresponds to action name that should be displayed by default substitution happens. 
-In other words, action that define substitution will be positioned in UI instead of action that defined in parameter.
+When parameter `substitute_action` is defined and it corresponds to action name that should be displayed by default
+substitution happens. In other words, action that define substitution will be positioned in UI instead of action that
+defined in parameter.
 
 Button Options Configuration
 ==============================
