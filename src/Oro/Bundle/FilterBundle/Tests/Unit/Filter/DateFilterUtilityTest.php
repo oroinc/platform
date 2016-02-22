@@ -15,11 +15,17 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
     {
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
-            ->setMethods(array('getTimezone'))
+            ->setMethods(array('getTimezone', 'getFirstQuarterMonth', 'getFirstQuarterDay'))
             ->getMock();
         $localeSettings->expects($this->any())
             ->method('getTimezone')
             ->will($this->returnValue('Asia/Tbilisi'));
+        $localeSettings->expects($this->any())
+            ->method('getFirstQuarterMonth')
+            ->will($this->returnValue(2));
+        $localeSettings->expects($this->any())
+            ->method('getFirstQuarterDay')
+            ->will($this->returnValue(15));
 
         $this->utility = new DateFilterUtility($localeSettings);
     }
@@ -176,7 +182,8 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                     'date_end'   => 2,
                     'type'       => DateRangeFilterType::TYPE_BETWEEN,
                     'part'       => DateModifierInterface::PART_QUARTER,
-                    'field'      => "QUARTER(CONVERT_TZ(field, '+00:00', '+04:00'))",
+                    'field'      =>
+                        "QUARTER(DATE_SUB(DATE_SUB(CONVERT_TZ(field, '+00:00', '+04:00'), 1, 'month'), 14, 'day'))",
                 ]
             ]
         ];
