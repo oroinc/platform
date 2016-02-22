@@ -77,12 +77,10 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFunctions('functions', [])
             ->setFormType(ActionType::NAME);
 
-        $definition2 = new ActionDefinition();
+        $definition2 = clone $definition1;
         $definition2
             ->setName('maximum_name')
-            ->setLabel('My Label')
             ->setSubstituteAction('test_action_to_substitute')
-            ->setEntities(['My\Entity'])
             ->setRoutes(['my_route'])
             ->setGroups(['my_group'])
             ->setEnabled(false)
@@ -95,34 +93,18 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFunctions('functions', ['config_post_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
-            ->setOrder(77)
-            ->setFormType(ActionType::NAME);
+            ->setOrder(77);
 
-        $definition3 = new ActionDefinition();
+        $definition3 = clone $definition2;
         $definition3
             ->setName('maximum_name_and_acl')
-            ->setLabel('My Label')
-            ->setSubstituteAction('test_action_to_substitute')
-            ->setEntities(['My\Entity'])
-            ->setRoutes(['my_route'])
-            ->setGroups(['my_group'])
-            ->setEnabled(false)
-            ->setApplications(['application1'])
-            ->setAttributes(['config_attr'])
             ->setConditions('preconditions', [
                 '@and' => [
                     ['@acl_granted' => 'test_acl'],
                     ['config_pre_cond']
                 ]
              ])
-            ->setConditions('conditions', ['config_cond'])
-            ->setFunctions('prefunctions', ['config_pre_func'])
-            ->setFunctions('form_init', ['config_form_init_func'])
-            ->setFunctions('functions', ['config_post_func'])
-            ->setFormOptions(['config_form_options'])
-            ->setFrontendOptions(['config_frontend_options'])
-            ->setOrder(77)
-            ->setFormType(ActionType::NAME);
+            ->setConditions('conditions', ['config_cond']);
 
         return [
             'no data' => [

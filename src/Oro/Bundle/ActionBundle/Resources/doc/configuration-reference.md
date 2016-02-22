@@ -124,7 +124,7 @@ Single action configuration has next properties:
     Action button will be shown on pages which route is in list.
 * **groups**
     *array*
-    Define an array of groups to use in (todo...)
+    Define an array of group names to use with current action. Behave like tagging of actions. Easiest way to pick needed group of actions for custom approaches.
 * **datagrids**
     *array*
     Action icon will be shown as an datagrid-action in listed datagrids.
@@ -189,6 +189,13 @@ actions:                                             # root elements
                                                      # ...
 ```
 
+
+Substitution Of Named Action
+============================
+
+When parameter `substitute_action` is defined and it corresponds to action name that should be displayed by default substitution happens. 
+In other words, action that define substitution will be positioned in UI instead of action that defined in parameter.
+
 Button Options Configuration
 ==============================
 
@@ -239,9 +246,6 @@ actions:
                 component_additional: '[name$="[additional]"]'
 ```
 
-Substitution Of Named Action
-============================
-*todo when implementation will be ready - describe here exact behavior of the parameter*
 
 Frontend Options Configuration
 ==============================
