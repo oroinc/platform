@@ -71,6 +71,7 @@ define([
             var original = this.get('original');
             var included = this.get('included');
             var excluded = this.get('excluded');
+            id = parseInt(id);
 
             var isActive = model.get(this.columnName);
             var originallyActive;
@@ -153,6 +154,7 @@ define([
         _restoreState: function() {
             var included = '';
             var excluded = '';
+            var columnName = this.columnName;
             if (this.selectors.included && $(this.selectors.included).length) {
                 included = this._explode($(this.selectors.included).val());
                 this.set('included', included);
@@ -161,6 +163,16 @@ define([
                 excluded = this._explode($(this.selectors.excluded).val());
                 this.set('excluded', excluded);
             }
+            _.each(this.grid.collection.models, function(model) {
+                var isActive = model.get(columnName);
+                var modelId = parseInt(model.id);
+                if (!isActive && _.contains(included, modelId)) {
+                    model.set(columnName, true);
+                }
+                if (isActive && _.contains(excluded, modelId)) {
+                    model.set(columnName, false);
+                }
+            });
             if (included || excluded) {
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_in', included);
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_not_in', excluded);

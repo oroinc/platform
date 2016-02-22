@@ -1,12 +1,6 @@
 define(function() {
     'use strict';
 
-    var sign = Math.hasOwnProperty('sign') ? Math.sign : function(x) {
-        if (+x === x) {
-            return x > 0 ? 1 : (x < 0 ? -1 : 0);
-        }
-    };
-
     /**
      * Constructs Points on 2d surface
      *
@@ -112,10 +106,10 @@ define(function() {
     Object.defineProperty(Point2d.prototype, 'unitVector', {
         get: function() {
             if (this.x === 0) {
-                return new Point2d(this.x, sign(this.y));
+                return new Point2d(this.x, Math.sign(this.y));
             }
             if (this.y === 0) {
-                return new Point2d(sign(this.x), this.y);
+                return new Point2d(Math.sign(this.x), this.y);
             }
             var len = this.length;
             return new Point2d(this.x / len, this.y / len);

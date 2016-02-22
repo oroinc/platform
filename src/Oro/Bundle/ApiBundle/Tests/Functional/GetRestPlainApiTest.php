@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
+
 class GetRestPlainApiTest extends ApiTestCase
 {
     /**
@@ -12,6 +14,14 @@ class GetRestPlainApiTest extends ApiTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
 
         parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequestType()
+    {
+        return [RequestType::REST];
     }
 
     /**

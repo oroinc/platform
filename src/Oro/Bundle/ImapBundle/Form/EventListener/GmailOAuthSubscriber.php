@@ -34,7 +34,6 @@ class GmailOAuthSubscriber implements EventSubscriberInterface
         ];
     }
 
-
     /**
      * @param FormEvent $formEvent
      */
@@ -46,8 +45,7 @@ class GmailOAuthSubscriber implements EventSubscriberInterface
 
         if (null === $emailOrigin || null === $emailOrigin->getAccessToken()) {
             $data = $formEvent->getData();
-
-            if (null == $data) {
+            if (null === $data) {
                 return;
             }
             $emailOrigin = new UserEmailOrigin();

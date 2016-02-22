@@ -17,7 +17,7 @@ define(function(require) {
      *        frontend_type: 'tags',
      *        value: oro_tag_get_list(entity),
      *        fieldName: 'tags',
-     *        insertEditorMethod: 'overlay', // Possible values are 'overlay' and all supported by containerMethod https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod
+     *        insertEditorMethod: 'overlay', // Possible values are 'overlay' or [any of supported by the containerMethod](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod)
      *        metadata: {
      *            inline_editing: {
      *                enable: resource_granted('oro_tag_assign_unassign'),
@@ -53,11 +53,12 @@ define(function(require) {
      *
      * @class
      * @param {Object} options - Options container
-     * @param {Object} options._sourceElement - Element where to connect this view (passed automatically when
+     * @param {Object} options._sourceElement - the element to which the view should be connected (passed automatically when
      *                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md))
      * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
      * @param {*} options.value - value to edit
      * @param {string} options.fieldName - field name to use when sending value to server
+     * @param {string} options.insertEditorMethod - 'overlay', // Possible values are 'overlay' or [any of supported by the containerMethod](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod)
      * @param {Object} options.metadata.inline_editing - inline-editing configuration
      *
      * @augments BaseComponent
@@ -127,7 +128,7 @@ define(function(require) {
             this.model.set(this.fieldName, options.value);
             var viewOptions = this.getViewOptions();
             if (this.inlineEditingOptions.enable) {
-                var ViewerWrapper = classes['viewerWrapper'] || InlineEditorWrapperView;
+                var ViewerWrapper = classes.viewerWrapper || InlineEditorWrapperView;
                 this.wrapper = new ViewerWrapper({
                     el: options._sourceElement,
                     autoRender: true

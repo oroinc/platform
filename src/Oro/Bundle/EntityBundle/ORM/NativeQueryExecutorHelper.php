@@ -9,7 +9,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
 
-abstract class AbstractNativeQueryExecutor
+class NativeQueryExecutorHelper
 {
     /**
      * @var ManagerRegistry
@@ -19,12 +19,12 @@ abstract class AbstractNativeQueryExecutor
     /**
      * @var array
      */
-    protected static $tablesNames;
+    protected $tablesNames = [];
 
     /**
      * @var array|ClassMetadata[]
      */
-    protected static $classesMetadata;
+    protected $classesMetadata = [];
 
     /**
      * @param ManagerRegistry $registry
@@ -44,7 +44,7 @@ abstract class AbstractNativeQueryExecutor
      * @return array
      * @throws QueryException
      */
-    protected function processParameterMappings(Query $query)
+    public function processParameterMappings(Query $query)
     {
         $parser = new Parser($query);
         $parseResult = $parser->parse();
@@ -97,7 +97,7 @@ abstract class AbstractNativeQueryExecutor
             }
         }
 
-        if (count($sqlParams) != count($types)) {
+        if (count($sqlParams) !== count($types)) {
             throw QueryException::parameterTypeMismatch();
         }
 
@@ -116,19 +116,19 @@ abstract class AbstractNativeQueryExecutor
      * @param string $className
      * @return string
      */
-    protected function getTableName($className)
+    public function getTableName($className)
     {
-        if (!isset(self::$tablesNames[$className])) {
-            self::$tablesNames[$className] = $this->getClassMetadata($className)->table['name'];
+        if (!array_key_exists($className, $this->tablesNames)) {
+            $this->tablesNames[$className] = $this->getClassMetadata($className)->table['name'];
         }
-        return self::$tablesNames[$className];
+        return $this->tablesNames[$className];
     }
 
     /**
      * @param string $className
      * @return EntityManager|null
      */
-    protected function getManager($className)
+    public function getManager($className)
     {
         return $this->registry->getManagerForClass($className);
     }
@@ -137,12 +137,12 @@ abstract class AbstractNativeQueryExecutor
      * @param string $className
      * @return ClassMetadata
      */
-    protected function getClassMetadata($className)
+    public function getClassMetadata($className)
     {
-        if (!isset(self::$classesMetadata[$className])) {
-            self::$classesMetadata[$className] = $this->getManager($className)->getClassMetadata($className);
+        if (!array_key_exists($className, $this->classesMetadata)) {
+            $this->classesMetadata[$className] = $this->getManager($className)->getClassMetadata($className);
         }
 
-        return self::$classesMetadata[$className];
+        return $this->classesMetadata[$className];
     }
 }

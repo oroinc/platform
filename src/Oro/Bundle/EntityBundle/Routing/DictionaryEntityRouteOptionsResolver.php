@@ -26,6 +26,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
+    /** @var array */
+    private $supportedEntities;
+
     /**
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param EntityAliasResolver              $entityAliasResolver
@@ -51,37 +54,50 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
         }
 
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
+            $entities = $this->getSupportedEntities();
+            if (!empty($entities)) {
+                $this->adjustRoutes($route, $routes, $entities);
+            }
+            $route->setRequirement(self::ENTITY_ATTRIBUTE, '\w+');
+
+            $route->setOption('hidden', true);
+        }
+    }
+
+    /**
+     * @return array [[entity plural alias, url safe class name], ...]
+     */
+    protected function getSupportedEntities()
+    {
+        if (null === $this->supportedEntities) {
             $entities = $this->dictionaryProvider->getSupportedEntityClasses();
 
-            if (!empty($entities)) {
-                $entities = $this->adjustRoutes($route, $routes, $entities);
-                if (!empty($entities)) {
-                    $route->setRequirement(self::ENTITY_ATTRIBUTE, implode('|', $entities));
-                }
+            $this->supportedEntities = [];
+            foreach ($entities as $className) {
+                $this->supportedEntities[] = [
+                    $this->entityAliasResolver->getPluralAlias($className),
+                    $this->entityClassNameHelper->getUrlSafeClassName($className)
+                ];
             }
         }
+
+        return $this->supportedEntities;
     }
 
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param string[]                $entities
-     *
-     * @return string[] Entity requirements for the default controller
+     * @param array                   $entities [[entity plural alias, url safe class name], ...]
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
-        $result    = [];
         $routeName = $routes->getName($route);
 
-        foreach ($entities as $className) {
-            $entity = $this->entityAliasResolver->getPluralAlias($className);
-
-            $result[] = $entity;
-            $result[] = $this->entityClassNameHelper->getUrlSafeClassName($className);
+        foreach ($entities as $entity) {
+            list($pluralAlias, $urlSafeClassName) = $entity;
 
             $existingRoute = $routes->getByPath(
-                str_replace(self::ENTITY_PLACEHOLDER, $entity, $route->getPath()),
+                str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $route->getPath()),
                 $route->getMethods()
             );
             if ($existingRoute) {
@@ -89,16 +105,12 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                 $existingRouteName = $routes->getName($existingRoute);
                 $routes->remove($existingRouteName);
                 $routes->insert($existingRouteName, $existingRoute, $routeName, true);
-                //additional route for entities which has api, but it not recognize urls like
+                // additional route for entities which has api, but it not recognize urls like
                 // /api/rest/latest/Oro_Bundle_AddressBundle_Entity_Country
-                //TODO: This should be removed in scope of https://magecore.atlassian.net/browse/BAP-8650
+                // TODO: This should be removed in scope of https://magecore.atlassian.net/browse/BAP-8650
                 $dictionaryRoute = $routes->cloneRoute($existingRoute);
                 $dictionaryRoute->setPath(
-                    str_replace(
-                        self::ENTITY_PLACEHOLDER,
-                        $this->entityClassNameHelper->getUrlSafeClassName($className),
-                        $route->getPath()
-                    )
+                    str_replace(self::ENTITY_PLACEHOLDER, $urlSafeClassName, $route->getPath())
                 );
                 $routes->insert(
                     $routes->generateRouteName($existingRouteName),
@@ -109,8 +121,10 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
-                $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $entity, $strictRoute->getPath()));
-                $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $entity);
+                $strictRoute->setPath(
+                    str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $strictRoute->getPath())
+                );
+                $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $pluralAlias);
                 $routes->insert(
                     $routes->generateRouteName($routeName),
                     $strictRoute,
@@ -119,8 +133,6 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                 );
             }
         }
-
-        return $result;
     }
 
     /**

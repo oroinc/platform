@@ -140,7 +140,8 @@ oro_entity_config:
                         options:
                             choices:
                                 0: 'No'
-                                1: 'Yes'
+                                1: oro.entity.entity_config.datagrid.field.items.is_visible.shown
+                                3: oro.entity.entity_config.datagrid.field.items.is_visible.hidden
                                 2: oro.entity.entity_config.datagrid.field.items.is_visible.mandatory
                             empty_value:    false
                             block:          other

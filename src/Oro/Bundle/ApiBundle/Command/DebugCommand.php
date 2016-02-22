@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -27,6 +28,12 @@ class DebugCommand extends ContainerAwareCommand
                 'action',
                 InputArgument::OPTIONAL,
                 'Shows a list of processors for a specified action in the order they are executed'
+            )
+            ->addOption(
+                'request-type',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'API request type'
             );
     }
 
@@ -39,7 +46,7 @@ class DebugCommand extends ContainerAwareCommand
         if (empty($action)) {
             $this->dumpActions($output);
         } else {
-            $this->dumpProcessors($output, $action);
+            $this->dumpProcessors($output, $action, $input->getOption('request-type'));
         }
     }
 
@@ -77,9 +84,12 @@ class DebugCommand extends ContainerAwareCommand
     /**
      * @param OutputInterface $output
      * @param string          $action
+     * @param string[]        $requestType
      */
-    protected function dumpProcessors(OutputInterface $output, $action)
+    protected function dumpProcessors(OutputInterface $output, $action, array $requestType)
     {
+        $output->writeln('The processors are displayed in order they are executed.');
+
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
 
@@ -88,8 +98,15 @@ class DebugCommand extends ContainerAwareCommand
 
         $context = new Context();
         $context->setAction($action);
+        if (!empty($requestType)) {
+            $context->set('requestType', $requestType);
+        }
         $processors = $processorBag->getProcessors($context);
-        $processors->setApplicableChecker(new ChainApplicableChecker());
+
+        $applicableChecker = new ChainApplicableChecker();
+        $applicableChecker->addChecker(new RequestTypeApplicableChecker());
+        $processors->setApplicableChecker($applicableChecker);
+
         $i = 0;
         foreach ($processors as $processor) {
             if ($i > 0) {
