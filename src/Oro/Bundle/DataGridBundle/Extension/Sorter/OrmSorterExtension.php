@@ -10,13 +10,14 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 class OrmSorterExtension extends AbstractExtension
 {
     /**
      * Query param
      */
-    const SORTERS_ROOT_PARAM     = '_sort_by';
+    const SORTERS_ROOT_PARAM = '_sort_by';
     const MINIFIED_SORTERS_PARAM = 's';
 
     /**
@@ -34,7 +35,7 @@ class OrmSorterExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $columns      = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
+        $columns = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         $isApplicable = $config->getDatasourceType() === OrmDatasource::TYPE
             && is_array($columns);
 
@@ -86,7 +87,9 @@ class OrmSorterExtension extends AbstractExtension
         $this->processColumns($config, $data);
 
         $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multiSort]);
-        $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['toolbarSorting' => $toolbarSort]);
+        $toolbarOptions = $data->offsetGetByPath(ToolbarExtension::TOOLBAR_OPTION_PATH, []);
+        $toolbarOptions['addSorting'] = $toolbarSort;
+        $data->offsetSetByPath(ToolbarExtension::TOOLBAR_OPTION_PATH, $toolbarOptions);
 
         $this->setMetadataStates($config, $data);
     }
@@ -107,10 +110,7 @@ class OrmSorterExtension extends AbstractExtension
             if (!array_key_exists('name', $column) || !array_key_exists($column['name'], $sorters)) {
                 continue;
             }
-            if ($toolbarSort) {
-                if (!array_key_exists(PropertyInterface::TYPE_KEY, $sorters[$column['name']])) {
-                    continue;
-                }
+            if ($toolbarSort && array_key_exists(PropertyInterface::TYPE_KEY, $sorters[$column['name']])) {
                 $data->offsetSetByPath(
                     sprintf('[columns][%s][sortingType]', $key),
                     $sorters[$column['name']][PropertyInterface::TYPE_KEY]
@@ -122,11 +122,9 @@ class OrmSorterExtension extends AbstractExtension
 
         $extraSorters = array_diff(array_keys($sorters), $proceed);
         if (count($extraSorters)) {
-            $message = 'Could not found column(s) "%s" for sorting';
-            if ($toolbarSort) {
-                $message = 'Could not found column type(s) "%s" for sorting';
-            }
-            throw new LogicException(sprintf($message, implode(', ', $extraSorters)));
+            throw new LogicException(
+                sprintf('Could not found column(s) "%s" for sorting', implode(', ', $extraSorters))
+            );
         }
     }
 
@@ -194,7 +192,7 @@ class OrmSorterExtension extends AbstractExtension
                 // remove disabled sorter
                 unset($sorters[$name]);
             } else {
-                $definition     = is_array($definition) ? $definition : [];
+                $definition = is_array($definition) ? $definition : [];
                 $sorters[$name] = $definition;
             }
         }
@@ -218,23 +216,23 @@ class OrmSorterExtension extends AbstractExtension
 
         $defaultSorters = $config->offsetGetByPath(Configuration::DEFAULT_SORTERS_PATH, []);
         if ($readParameters) {
-            $sortBy = $this->getParameters()->get(self::SORTERS_ROOT_PARAM) ? : $defaultSorters;
+            $sortBy = $this->getParameters()->get(self::SORTERS_ROOT_PARAM) ?: $defaultSorters;
         } else {
             $sortBy = $defaultSorters;
         }
 
         // if default sorter was not specified, just take first sortable column
         if (!$sortBy && $sorters) {
-            $names           = array_keys($sorters);
+            $names = array_keys($sorters);
             $firstSorterName = reset($names);
-            $sortBy          = [$firstSorterName => self::DIRECTION_ASC];
+            $sortBy = [$firstSorterName => self::DIRECTION_ASC];
         }
 
         foreach ($sortBy as $column => $direction) {
             $sorter = isset($sorters[$column]) ? $sorters[$column] : false;
 
             if ($sorter !== false) {
-                $direction       = $this->normalizeDirection($direction);
+                $direction = $this->normalizeDirection($direction);
                 $result[$column] = [$direction, $sorter];
             }
         }

@@ -158,7 +158,7 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                 'sorters' => [
                     'columns' => [
                         'name' => ['type' => 'string'],
-                        'age' => ['type' => 'number'],
+                        'age' => [],
                     ],
                     'toolbar_sorting' => true,
                 ],
@@ -177,7 +177,6 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                         [
                             'name' => 'age',
                             'sortable' => true,
-                            'sortingType' => 'number',
                         ],
                         ['name' => 'createdAt']
                     ],
@@ -238,34 +237,6 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'createdAt'],
                 ],
                 'expectedMessage' => 'Could not found column(s) "unknown" for sorting',
-            ],
-            'unknown column type' => [
-                'sorters' => [
-                    'columns' => [
-                        'name' => ['type' => 'string'],
-                        'age' => [],
-                    ],
-                    'toolbar_sorting' => true,
-                ],
-                'columns' => [
-                    ['name' => 'name'],
-                    ['name' => 'age'],
-                    ['name' => 'createdAt'],
-                ],
-                'expectedMessage' => 'Could not found column type(s) "age" for sorting',
-            ],
-            'unknown single column type' => [
-                'sorters' => [
-                    'columns' => [
-                        'age' => [],
-                    ],
-                    'toolbar_sorting' => true,
-                ],
-                'columns' => [
-                    ['name' => 'age'],
-                    ['name' => 'createdAt'],
-                ],
-                'expectedMessage' => 'Could not found column type(s) "age" for sorting',
             ],
         ];
     }

@@ -93,11 +93,11 @@ define(function(require) {
                 addResetAction: true,
                 addRefreshAction: true,
                 addColumnManager: true,
-                columnManager: {}
+                columnManager: {},
+                addSorting: false
             },
             rowClickAction:         undefined,
-            multipleSorting:        false,
-            toolbarSorting:         false,
+            multipleSorting:        true,
             rowActions:             [],
             massActions:            new Backbone.Collection(),
             enableFullScreenLayout: false
@@ -443,8 +443,7 @@ define(function(require) {
                 collection:   this.collection,
                 actions:      this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions(),
-                columns:      this.columns,
-                addSorting:   this.toolbarSorting
+                columns:      this.columns
             };
             _.defaults(toolbarOptions, options);
 
