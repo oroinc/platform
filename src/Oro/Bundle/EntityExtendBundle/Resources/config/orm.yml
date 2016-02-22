@@ -20,7 +20,6 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_entity_extend.db_id_name_generator
-            - @oro_entity.doctrine_helper
         tags:
             - { name: oro_entity_extend.entity_metadata_builder, priority: 10 }
 
