@@ -81,9 +81,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
         $extra2 = new TestConfigSection('test_section');
         $this->context->setExtras([$extra1, $extra2]);
 
-        $rootEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs([self::TEST_CLASS_NAME])
-            ->getMock();
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(

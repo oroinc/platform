@@ -158,9 +158,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $rootEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs([self::TEST_CLASS_NAME])
-            ->getMock();
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects($this->any())
             ->method('hasAssociation')
             ->willReturnMap([['field2', true]]);
@@ -169,9 +167,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ->with('field2')
             ->willReturn('Test\Field2Target');
 
-        $field2TargetEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Field2Target'])
-            ->getMock();
+        $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
         $field2TargetEntityMetadata->expects($this->any())
             ->method('hasAssociation')
             ->willReturnMap([['field22', true]]);
@@ -180,9 +176,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ->with('field22')
             ->willReturn('Test\Field22Target');
 
-        $field22TargetEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Field22Target'])
-            ->getMock();
+        $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -284,9 +278,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $rootEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs([self::TEST_CLASS_NAME])
-            ->getMock();
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects($this->any())
             ->method('hasAssociation')
             ->willReturnMap([['realField2', true]]);
@@ -295,9 +287,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ->with('realField2')
             ->willReturn('Test\Field2Target');
 
-        $field2TargetEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Field2Target'])
-            ->getMock();
+        $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
         $field2TargetEntityMetadata->expects($this->any())
             ->method('hasAssociation')
             ->willReturnMap([['realField22', true]]);
@@ -306,9 +296,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ->with('realField22')
             ->willReturn('Test\Field22Target');
 
-        $field22TargetEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Field22Target'])
-            ->getMock();
+        $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -409,13 +397,9 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $rootEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs([self::TEST_CLASS_NAME])
-            ->getMock();
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $field2TargetEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Field2Target'])
-            ->getMock();
+        $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
         $field2TargetEntityMetadata->expects($this->any())
             ->method('hasAssociation')
             ->willReturnMap([['field22', true]]);
@@ -424,9 +408,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ->with('field22')
             ->willReturn('Test\Field22Target');
 
-        $field22TargetEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Field22Target'])
-            ->getMock();
+        $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')

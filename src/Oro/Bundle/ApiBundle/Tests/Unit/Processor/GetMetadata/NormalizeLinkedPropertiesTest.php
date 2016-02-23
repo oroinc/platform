@@ -104,9 +104,7 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
         $association411->setName('association411');
         $metadata->addAssociation($association411);
 
-        $association41ClassMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association41Target'])
-            ->getMock();
+        $association41ClassMetadata = $this->getClassMetadataMock('Test\Association41Target');
         $association41ClassMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with('association411')
@@ -120,9 +118,7 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
             ->with('association411')
             ->willReturn(false);
 
-        $association411ClassMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association411Target'])
-            ->getMock();
+        $association411ClassMetadata = $this->getClassMetadataMock('Test\Association411Target');
         $association411ClassMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
@@ -131,9 +127,7 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
             ->with('id')
             ->willReturn('integer');
 
-        $association51ClassMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association51Target'])
-            ->getMock();
+        $association51ClassMetadata = $this->getClassMetadataMock('Test\Association51Target');
         $association51ClassMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with('field511')

@@ -59,9 +59,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
 
     public function testProcessForConfigurableEntityWithoutConfig()
     {
-        $classMetadata                  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs([self::TEST_CLASS_NAME])
-            ->getMock();
+        $classMetadata                  = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
@@ -141,9 +139,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             ]
         ];
 
-        $classMetadata                  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs([self::TEST_CLASS_NAME])
-            ->getMock();
+        $classMetadata                  = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
@@ -192,9 +188,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
                 ]
             );
 
-        $association1ClassMetadata                  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association1Target'])
-            ->getMock();
+        $association1ClassMetadata                  = $this->getClassMetadataMock('Test\Association1Target');
         $association1ClassMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
         $association1ClassMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
@@ -204,9 +198,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             ->with('id')
             ->willReturn('integer');
 
-        $association3ClassMetadata                  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association3Target'])
-            ->getMock();
+        $association3ClassMetadata                  = $this->getClassMetadataMock('Test\Association3Target');
         $association3ClassMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
         $association3ClassMetadata->subClasses      = [
             'Test\Association3Target1',

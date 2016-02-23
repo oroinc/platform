@@ -73,9 +73,7 @@ class CompleteDefinitionOfFieldsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $rootEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs([self::TEST_CLASS_NAME])
-            ->getMock();
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
         $this->exclusionProvider->expects($this->any())
             ->method('isIgnoredField')

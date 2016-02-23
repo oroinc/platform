@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -50,6 +52,26 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
         return is_object($config)
             ? $config->toArray()
             : $config;
+    }
+
+    /**
+     * @param string|null $className
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     */
+    protected function getClassMetadataMock($className = null)
+    {
+        if ($className) {
+            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+                ->setConstructorArgs([$className])
+                ->getMock();
+        } else {
+            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+                ->disableOriginalConstructor()
+                ->getMock();
+        }
+
+        return $classMetadata;
     }
 
     /**

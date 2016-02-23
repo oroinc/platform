@@ -114,21 +114,15 @@ class RemoveDuplicatedFiltersTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $association1Metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association1Target'])
-            ->getMock();
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
         $association1Metadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $association2Metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association2Target'])
-            ->getMock();
+        $association2Metadata = $this->getClassMetadataMock('Test\Association2Target');
         $association2Metadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $association3Metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association3Target'])
-            ->getMock();
+        $association3Metadata = $this->getClassMetadataMock('Test\Association3Target');
         $association3Metadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);

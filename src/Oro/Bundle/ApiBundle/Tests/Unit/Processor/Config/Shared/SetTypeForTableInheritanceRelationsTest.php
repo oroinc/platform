@@ -124,9 +124,7 @@ class SetTypeForTableInheritanceRelationsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $rootEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs([self::TEST_CLASS_NAME])
-            ->getMock();
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects($this->exactly(5))
             ->method('hasAssociation')
             ->willReturnMap(
@@ -148,19 +146,13 @@ class SetTypeForTableInheritanceRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $association1Metadata                  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association1Target'])
-            ->getMock();
+        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
         $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
 
-        $association2Metadata                  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association2Target'])
-            ->getMock();
+        $association2Metadata                  = $this->getClassMetadataMock('Test\Association2Target');
         $association2Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
 
-        $association3Metadata                  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(['Test\Association3Target'])
-            ->getMock();
+        $association3Metadata                  = $this->getClassMetadataMock('Test\Association3Target');
         $association3Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
 
         $this->doctrineHelper->expects($this->once())

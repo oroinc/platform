@@ -221,21 +221,11 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
      */
     public function testProcessForManageableEntity($definition, $sorters, $expectedSorters)
     {
-        $rootMetadata           = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $toOne1Metadata         = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $toOne1toOne11Metadata  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $toOne1toMany11Metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $toMany1Metadata        = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rootMetadata           = $this->getClassMetadataMock();
+        $toOne1Metadata         = $this->getClassMetadataMock();
+        $toOne1toOne11Metadata  = $this->getClassMetadataMock();
+        $toOne1toMany11Metadata = $this->getClassMetadataMock();
+        $toMany1Metadata        = $this->getClassMetadataMock();
 
         $rootMetadata->expects($this->any())
             ->method('hasAssociation')
