@@ -48,9 +48,13 @@ class FilterFieldsByExtra implements ProcessorInterface
         }
 
         $definition    = $context->getResult();
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
+            return;
+        }
+
         $filtersConfig = $context->get(FilterFieldsConfigExtra::NAME);
 
-        $definition->setExcludeAll();
         $filtersConfig = $this->filterFieldsForRootEntity($definition, $entityClass, $filtersConfig);
         $this->filterFieldsForRelatedEntities($definition, $entityClass, $filtersConfig);
     }
