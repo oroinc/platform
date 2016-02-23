@@ -54,7 +54,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
         $definition = $context->getResult();
         if (!$definition->isExcludeAll() || !$definition->hasFields()) {
-            // expected normalized configs
+            // expected completed configs
             return;
         }
 

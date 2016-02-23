@@ -35,6 +35,12 @@ class SetMaxRelatedEntities implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
+        $definition = $context->getResult();
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
+            return;
+        }
+
         $maxRelatedEntities = $context->getMaxRelatedEntities();
         if (null === $maxRelatedEntities || $maxRelatedEntities < 0) {
             // there is no limit to the number of related entities
@@ -47,7 +53,7 @@ class SetMaxRelatedEntities implements ProcessorInterface
             return;
         }
 
-        $this->setLimits($context->getResult(), $entityClass, $maxRelatedEntities);
+        $this->setLimits($definition, $entityClass, $maxRelatedEntities);
     }
 
     /**

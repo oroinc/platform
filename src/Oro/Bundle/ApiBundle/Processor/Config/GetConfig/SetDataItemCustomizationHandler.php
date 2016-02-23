@@ -46,6 +46,11 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
+            return;
+        }
+
         $this->setCustomizationHandler($definition, $context);
     }
 
