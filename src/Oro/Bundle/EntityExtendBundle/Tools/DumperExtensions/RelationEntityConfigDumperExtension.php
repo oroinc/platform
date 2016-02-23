@@ -120,9 +120,10 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
         $targetFieldId     = false;
         $targetEntityClass = $fieldConfig->get('target_entity');
+        $entityClass       = $selfFieldId->getClassName();
         if (in_array($selfFieldId->getFieldType(), RelationType::$toManyRelations, true)) {
             $relationFieldName = ExtendHelper::buildToManyRelationTargetFieldName(
-                $selfFieldId->getClassName(),
+                $entityClass,
                 $selfFieldId->getFieldName()
             );
             if ($selfFieldId->getFieldType() === RelationType::ONE_TO_MANY) {
@@ -139,7 +140,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
         $relationKey = $fieldConfig->get('relation_key');
 
-        $selfConfig   = $this->getEntityConfig($selfFieldId->getClassName());
+        $selfConfig   = $this->getEntityConfig($entityClass);
         $selfRelation = [
             'field_id'         => $selfFieldId,
             'owner'            => $selfIsOwnerSide,
@@ -157,10 +158,11 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
         $targetConfig                  = $this->getEntityConfig($targetEntityClass);
         $targetRelation                = [
-            'field_id'        => $targetFieldId,
-            'owner'           => !$selfIsOwnerSide,
-            'target_entity'   => $selfFieldId->getClassName(),
-            'target_field_id' => $selfFieldId,
+            'field_id'         => $targetFieldId,
+            'owner'            => !$selfIsOwnerSide,
+            'target_entity'    => $entityClass,
+            'target_field_id'  => $selfFieldId,
+            'target_id_column' => $this->associationBuilder->getPrimaryKeyColumnName($entityClass)
         ];
         $targetRelations               = $targetConfig->get('relation', false, []);
         $targetRelations[$relationKey] = $targetRelation;
