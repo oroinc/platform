@@ -36,7 +36,7 @@ class EntityConfigHelper
     /**
      * @param mixed $class
      * @param array $routes
-     * @parm string $groupName
+     * @param string $groupName
      * @return array
      */
     public function getRoutes($class, array $routes, $groupName = '')
