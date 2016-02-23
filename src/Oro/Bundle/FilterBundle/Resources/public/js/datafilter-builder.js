@@ -1,12 +1,47 @@
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
+    'routing',
     'oroui/js/tools',
     'oroui/js/mediator',
     './map-filter-module-name',
     './collection-filters-manager'
-], function($, _, tools, mediator, mapFilterModuleName, FiltersManager) {
+], function($, _, __, routing, tools, mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
+
+    var filterLoaders = [];
+
+    function createFilterLoader(filterName) {
+        return function(success) {
+            filterLoaders.push({
+                name: filterName,
+                success: success
+            });
+        };
+    }
+
+    function loadFilters(gridName) {
+        var filterNames = _.map(filterLoaders, _.property('name'));
+        if (!filterNames) {
+            return;
+        }
+
+        var url = routing.generate('oro_datagrid_filter_metadata', {
+            gridName: gridName,
+            filterNames: _.map(filterLoaders, _.property('name'))
+        });
+
+        $.get(url)
+            .done(function(data) {
+                _.each(filterLoaders, function (loader) {
+                    loader.success.call(this, data[loader.name]);
+                });
+            })
+            .fail(function() {
+                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+            });
+    }
 
     var methods = {
         /**
@@ -72,10 +107,15 @@ define([
                     if (options.type === 'selectrow') {
                         options.collection = collection;
                     }
+                    if (options.lazy) {
+                        options.loader = createFilterLoader(options.name);
+                    }
                     var Filter = modules[options.type].extend(options);
                     filters[options.name] = new Filter();
                 }
             });
+            loadFilters(this.metadata.options.gridName);
+
             return {
                 filters: filters
             };

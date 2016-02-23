@@ -194,7 +194,7 @@ class SystemAwareResolver implements ContainerAwareInterface
             return str_replace('\@', '@', $val);
         }
 
-        $serviceRegex = '@(?P<service>[\w\.]+)';
+        $serviceRegex = '@(?P<lazy>\??)(?P<service>[\w\.]+)';
         $methodRegex = '(?P<method>\w+)';
         $argumentsRegex = '(?P<arguments>\(.*?\))';
 
@@ -202,16 +202,19 @@ class SystemAwareResolver implements ContainerAwareInterface
         $method = null;
         $arguments = null;
         $matchedString = null;
+        $lazy = false;
         if (strpos($val, '->') !== false) {
             if (preg_match("~{$serviceRegex}->{$methodRegex}{$argumentsRegex}~six", $val, $matches)) {
                 // Match @service->method("argument")
                 $matchedString = $matches[0];
+                $lazy = (bool) $matches['lazy'];
                 $service = $matches['service'];
                 $method = $matches['method'];
                 $arguments = $this->getArguments($matches['arguments']);
             } elseif (preg_match("~{$serviceRegex}->{$methodRegex}~six", $val, $matches)) {
                 // Match @service->method
                 $matchedString = $matches[0];
+                $lazy = (bool) $matches['lazy'];
                 $service = $matches['service'];
                 $method = $matches['method'];
                 $arguments = [
@@ -233,6 +236,16 @@ class SystemAwareResolver implements ContainerAwareInterface
 
             // Perform method call
             if ($method) {
+                if ($lazy) {
+                    return function() use ($val, $matchedString, $service, $method, $arguments) {
+                        return $this->replaceValueInString(
+                            $val,
+                            $matchedString,
+                            call_user_func_array([$service, $method], $arguments)
+                        );
+                    };
+                }
+
                 return $this->replaceValueInString(
                     $val,
                     $matchedString,
