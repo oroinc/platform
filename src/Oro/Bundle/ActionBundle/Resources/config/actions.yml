@@ -87,7 +87,7 @@ actions:
                 message: oro.action.delete_message
                 type: 'info'
                 message_parameters:
-                    '%%entityLabel%%': $.translates[entityLabel]
+                    entityLabel: $.translates[entityLabel]
             - @tree:
                 conditions:
                     @not_blank: $.context[datagrid]

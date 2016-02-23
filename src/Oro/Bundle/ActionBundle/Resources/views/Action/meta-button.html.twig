@@ -3,7 +3,7 @@
 {% block button %}
     {% set entityLabel = actionData.entityLabel %}
     {% if entityLabel is defined %}
-        {% set linkTitle = params.frontendOptions.title|default(params.label)|trans({'%%entityLabel%%': entityLabel|trans}) %}
+        {% set linkTitle = params.frontendOptions.title|default(params.label)|trans({'%entityLabel%': entityLabel|trans}) %}
     {% endif %}
 
     {{ parent() }}
