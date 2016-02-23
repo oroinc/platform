@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -57,27 +60,69 @@ class LoadEntityMetadata implements ProcessorInterface
         $classMetadata  = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $entityMetadata = $this->entityMetadataFactory->createEntityMetadata($classMetadata);
 
-        $fields = $classMetadata->getFieldNames();
-        foreach ($fields as $fieldName) {
-            if (!isset($allowedFields[$fieldName])) {
-                continue;
-            }
-            $entityMetadata->addField(
-                $this->entityMetadataFactory->createFieldMetadata($classMetadata, $fieldName)
-            );
-        }
-
-        $associations = $classMetadata->getAssociationNames();
-        foreach ($associations as $associationName) {
-            if (!isset($allowedFields[$associationName])) {
-                continue;
-            }
-            $entityMetadata->addAssociation(
-                $this->entityMetadataFactory->createAssociationMetadata($classMetadata, $associationName)
-            );
-        }
+        $this->loadFields($entityMetadata, $classMetadata, $allowedFields, null !== $config);
+        $this->loadAssociations($entityMetadata, $classMetadata, $allowedFields, null !== $config);
 
         $context->setResult($entityMetadata);
+    }
+
+    /**
+     * @param EntityMetadata $entityMetadata
+     * @param ClassMetadata  $classMetadata
+     * @param array          $allowedFields
+     * @param bool           $hasConfig
+     */
+    protected function loadFields(
+        EntityMetadata $entityMetadata,
+        ClassMetadata $classMetadata,
+        array $allowedFields,
+        $hasConfig
+    ) {
+        $fields = $classMetadata->getFieldNames();
+        foreach ($fields as $fieldName) {
+            if ($hasConfig && !isset($allowedFields[$fieldName])) {
+                continue;
+            }
+            $field = $this->entityMetadataFactory->createFieldMetadata($classMetadata, $fieldName);
+            if ($hasConfig) {
+                $configFieldName = $allowedFields[$fieldName];
+                if ($fieldName !== $configFieldName) {
+                    $field->setName($configFieldName);
+                }
+            }
+            $entityMetadata->addField($field);
+        }
+    }
+
+    /**
+     * @param EntityMetadata $entityMetadata
+     * @param ClassMetadata  $classMetadata
+     * @param array          $allowedFields
+     * @param bool           $hasConfig
+     */
+    protected function loadAssociations(
+        EntityMetadata $entityMetadata,
+        ClassMetadata $classMetadata,
+        array $allowedFields,
+        $hasConfig
+    ) {
+        $associations = $classMetadata->getAssociationNames();
+        foreach ($associations as $associationName) {
+            if ($hasConfig && !isset($allowedFields[$associationName])) {
+                continue;
+            }
+            $association = $this->entityMetadataFactory->createAssociationMetadata(
+                $classMetadata,
+                $associationName
+            );
+            if ($hasConfig) {
+                $configFieldName = $allowedFields[$associationName];
+                if ($associationName !== $configFieldName) {
+                    $association->setName($configFieldName);
+                }
+            }
+            $entityMetadata->addAssociation($association);
+        }
     }
 
     /**

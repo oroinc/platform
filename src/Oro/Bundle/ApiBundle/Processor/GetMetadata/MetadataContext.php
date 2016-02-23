@@ -3,9 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
+/**
+ * @method EntityMetadata|null getResult()
+ */
 class MetadataContext extends ApiContext
 {
     /** FQCN of an entity */

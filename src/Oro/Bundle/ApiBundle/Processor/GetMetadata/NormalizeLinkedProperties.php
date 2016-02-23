@@ -54,7 +54,6 @@ class NormalizeLinkedProperties implements ProcessorInterface
             return;
         }
 
-        /** @var EntityMetadata $entityMetadata */
         $entityMetadata = $context->getResult();
         $this->normalizeMetadata($entityMetadata, $config);
     }
