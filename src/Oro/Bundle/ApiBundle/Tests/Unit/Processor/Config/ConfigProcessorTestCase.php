@@ -39,4 +39,28 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
     {
         return $this->configLoaderFactory->getLoader($configType)->load($config);
     }
+
+    /**
+     * @param object|array $config
+     *
+     * @return array
+     */
+    protected function convertConfigObjectToArray($config)
+    {
+        return is_object($config)
+            ? $config->toArray()
+            : $config;
+    }
+
+    /**
+     * @param array        $expected
+     * @param object|array $actual
+     */
+    protected function assertConfig(array $expected, $actual)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->convertConfigObjectToArray($actual)
+        );
+    }
 }
