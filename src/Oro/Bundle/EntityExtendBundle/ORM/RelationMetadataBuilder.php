@@ -128,7 +128,8 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             && RelationType::ONE_TO_MANY === ExtendHelper::getRelationType($relationKey)
             && $this->isDefaultRelationRequired($fieldId)
         ) {
-            $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
+            $targetIdColumn = isset($relation['target_id_column']) ? $relation['target_id_column'] : 'id';
+            $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity, $targetIdColumn);
         }
     }
 
@@ -147,7 +148,8 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         if ($relation['owner']) {
             $this->buildManyToManyOwningSideRelation($metadataBuilder, $fieldId, $relation);
             if ($this->isDefaultRelationRequired($fieldId)) {
-                $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
+                $targetIdColumn = isset($relation['target_id_column']) ? $relation['target_id_column'] : 'id';
+                $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity, $targetIdColumn);
             }
         } elseif (!empty($relation['target_field_id'])) {
             $this->buildManyToManyTargetSideRelation(
@@ -213,19 +215,23 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      * @param ClassMetadataBuilder $metadataBuilder
      * @param FieldConfigId        $fieldId
      * @param string               $targetEntity
+     * @param string               $targetIdColumn
+     *
      */
     protected function buildDefaultRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
-        $targetEntity
+        $targetEntity,
+        $targetIdColumn
     ) {
         $builder = $metadataBuilder->createOneToOne(
             ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName(),
             $targetEntity
         );
+
         $builder->addJoinColumn(
             $this->nameGenerator->generateRelationDefaultColumnName($fieldId->getFieldName()),
-            'id',
+            $targetIdColumn,
             true,
             false,
             'SET NULL'

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -15,15 +16,20 @@ class EntityRelationGridListener
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var Request */
     protected $request;
 
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigManager  $configManager
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, DoctrineHelper $doctrineHelper)
     {
         $this->configManager = $configManager;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -58,7 +64,7 @@ class EntityRelationGridListener
             $extendFieldConfig->get('target_title'),
             $extendFieldConfig->get('target_detailed')
         );
-
+        $targetIdField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityName);
         // build 'assigned' field expression
         if ($entityId) {
             $extendEntityConfig = $extendConfigProvider->getConfig($entityClassName);
@@ -67,17 +73,22 @@ class EntityRelationGridListener
             $targetFieldName    = $relation['target_field_id']->getFieldName();
             $fieldType          = $extendFieldConfig->getId()->getFieldType();
             $operator           = $fieldType === RelationType::ONE_TO_MANY ? '=' : 'MEMBER OF';
-            $whenExpr           = '(:relation ' . $operator . ' o.' . $targetFieldName . ' OR o.id IN (:data_in))'
-                . ' AND o.id NOT IN (:data_not_in)';
+            $whenExpr = sprintf(
+                '(:relation %s o.%s OR o.%s IN (:data_in)) AND o.%s NOT IN (:data_not_in)',
+                $operator,
+                $targetFieldName,
+                $targetIdField,
+                $targetFieldName
+            );
         } else {
-            $whenExpr = 'o.id IN (:data_in) AND o.id NOT IN (:data_not_in)';
+            $whenExpr = sprintf('o.%s IN (:data_in) AND o.%s NOT IN (:data_not_in)', $targetIdField, $targetIdField);
         }
         $assignedExpr = 'CASE WHEN ' . $whenExpr . ' THEN true ELSE false END';
 
         // build a query skeleton
         $query = [
             'select' => [
-                'o.id',
+                sprintf('o.%s AS id', $targetIdField),
                 $assignedExpr . ' as assigned'
             ],
             'from'   => [
@@ -89,6 +100,7 @@ class EntityRelationGridListener
         // enable AdditionalFieldsExtension to add all other fields
         $config->offsetSetByPath('[options][entity_name]', $targetEntityName);
         $config->offsetSetByPath('[options][additional_fields]', $targetFieldNames);
+        $config->offsetSetByPath('[options][rowSelection][dataField]', $targetIdField);
     }
 
     /**
