@@ -207,25 +207,6 @@ define(['jquery'], function($) {
                 });
                 return this;
             }
-        },
-
-        inputWidget: function(method) {
-            var input = this[0];
-
-            if (method === 'create' && arguments.length >= 2) {
-                var InputWidget = arguments[1];
-                var options = arguments[2] || {};
-                options.$input = $(input);
-                return new InputWidget(options);
-            }
-
-            if (arguments.length === 0 || !input.inputWidget) {
-                return input.inputWidget ? input.inputWidget : false;
-            }
-
-            var args = Array.prototype.slice.call(arguments, 1);
-            method = 'widget' + method.charAt(0).toUpperCase() + method.slice(1);//ex: initialize > widgetInitialize
-            return input.inputWidget[method].apply(input.inputWidget, args);
         }
     });
 

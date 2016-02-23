@@ -7,7 +7,6 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
-    var InputWidgetManager = require('oroui/js/input-widget/manager');
 
     require('bootstrap');
     require('jquery-ui');
@@ -164,7 +163,7 @@ define(function(require) {
          * @param {jQuery=} $container
          */
         styleForm: function($container) {
-            InputWidgetManager.initialize($container.find('input:file,select:not(.select2)'));
+            $container.find('input:file,select:not(.select2)').inputWidget('create');
             $container.one('content:changed', _.bind(this.styleForm, this, $container));
         },
 
@@ -174,7 +173,7 @@ define(function(require) {
          * @param {jQuery=} $container
          */
         unstyleForm: function($container) {
-            InputWidgetManager.destroy($container.find('input:file,select:not(.select2)'));
+            $container.find('input:file,select:not(.select2)').inputWidget('dispose');
 
             // removes select2 plugin from elements
             $container.find('.select2-container').each(function() {

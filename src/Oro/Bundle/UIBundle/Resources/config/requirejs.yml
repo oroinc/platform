@@ -198,10 +198,10 @@ config:
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
 
-        'oroui/js/input-widget/manager': 'bundles/oroui/js/input-widget/manager.js'
-        'oroui/js/input-widget/widget': 'bundles/oroui/js/input-widget/widget.js'
-        'oroui/js/input-widget/widgets/uniform-file': 'bundles/oroui/js/input-widget/widgets/uniform-file.js'
-        'oroui/js/input-widget/widgets/uniform-select': 'bundles/oroui/js/input-widget/widgets/uniform-select.js'
+        'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
+        'oroui/js/app/views/input-widget/abstract': 'bundles/oroui/js/app/views/input-widget/abstract.js'
+        'oroui/js/app/views/input-widget/uniform-file': 'bundles/oroui/js/app/views/input-widget/uniform-file.js'
+        'oroui/js/app/views/input-widget/uniform-select': 'bundles/oroui/js/app/views/input-widget/uniform-select.js'
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
 
