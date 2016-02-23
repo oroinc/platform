@@ -55,7 +55,7 @@ class PdoPgsql extends BaseDriver
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $stringQuery = '(TsvectorTsquery(' . $joinAlias . '.value, :non_value' . $index . ')) = TRUE';
+        $stringQuery = '(TsvectorTsquery(' . $joinAlias . '.value, :value' . $index . ')) = TRUE';
 
         if ($useFieldName) {
             $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
@@ -108,12 +108,9 @@ class PdoPgsql extends BaseDriver
             foreach ($searchArray as $key => $string) {
                 $searchArray[$key] = '!' . $string;
             }
-        }
-
-        $qb->setParameter('value' . $index, implode(' & ', $searchArray));
-
-        if (!$notContains) {
-            $qb->setParameter('non_value' . $index, implode(' | ', $searchArray));
+            $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+        } else {
+            $qb->setParameter('value' . $index, implode(' | ', $searchArray));
         }
     }
 

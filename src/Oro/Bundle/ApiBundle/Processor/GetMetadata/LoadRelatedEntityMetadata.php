@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Adds metadata for fields of related entities.
@@ -37,7 +37,7 @@ class LoadRelatedEntityMetadata implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        if (empty($config)) {
+        if (null === $config) {
             // a configuration does not exist
             return;
         }
@@ -46,13 +46,13 @@ class LoadRelatedEntityMetadata implements ProcessorInterface
     }
 
     /**
-     * @param EntityMetadata  $entityMetadata
-     * @param array           $config
-     * @param MetadataContext $context
+     * @param EntityMetadata         $entityMetadata
+     * @param EntityDefinitionConfig $definition
+     * @param MetadataContext        $context
      */
     protected function loadMetadataForRelatedEntities(
         EntityMetadata $entityMetadata,
-        array $config,
+        EntityDefinitionConfig $definition,
         MetadataContext $context
     ) {
         $associations = $entityMetadata->getAssociations();
@@ -61,7 +61,8 @@ class LoadRelatedEntityMetadata implements ProcessorInterface
                 // metadata for an associated entity is already loaded
                 continue;
             }
-            if (!isset($config[ConfigUtil::FIELDS][$associationName][ConfigUtil::FIELDS])) {
+            $field = $definition->getField($associationName);
+            if (null === $field || !$field->hasTargetEntity()) {
                 // a configuration of an association fields does not exist
                 continue;
             }
@@ -71,7 +72,7 @@ class LoadRelatedEntityMetadata implements ProcessorInterface
                 $context->getVersion(),
                 $context->getRequestType(),
                 $context->getExtras(),
-                $config[ConfigUtil::FIELDS][$associationName]
+                $field->getTargetEntity()
             );
             if (null !== $relatedEntityMetadata) {
                 $association->setTargetMetadata($relatedEntityMetadata);

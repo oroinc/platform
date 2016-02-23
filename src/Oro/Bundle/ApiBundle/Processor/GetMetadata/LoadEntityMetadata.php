@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -49,7 +49,10 @@ class LoadEntityMetadata implements ProcessorInterface
 
         // filter excluded fields on this stage though there is another processor doing the same
         // it is done due to performance reasons
-        $allowedFields = $this->getAllowedFields($context->getConfig());
+        $config        = $context->getConfig();
+        $allowedFields = null !== $config
+            ? $this->getAllowedFields($config)
+            : [];
 
         $classMetadata  = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $entityMetadata = $this->entityMetadataFactory->createEntityMetadata($classMetadata);
@@ -78,26 +81,21 @@ class LoadEntityMetadata implements ProcessorInterface
     }
 
     /**
-     * @param array|null $config
+     * @param EntityDefinitionConfig $definition
      *
      * @return array
      */
-    protected function getAllowedFields($config)
+    protected function getAllowedFields(EntityDefinitionConfig $definition)
     {
-        $fields = [];
-        if (!empty($config[ConfigUtil::FIELDS])) {
-            if (is_array($config[ConfigUtil::FIELDS])) {
-                foreach ($config[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
-                    if (!is_array($fieldConfig) || !ConfigUtil::isExclude($fieldConfig)) {
-                        $propertyPath          = ConfigUtil::getPropertyPath($fieldConfig, $fieldName);
-                        $fields[$propertyPath] = $fieldName;
-                    }
-                }
-            } elseif (is_string($config[ConfigUtil::FIELDS])) {
-                $fields[$config[ConfigUtil::FIELDS]] = $config[ConfigUtil::FIELDS];
+        $result = [];
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if (!$field->isExcluded()) {
+                $propertyPath          = $field->getPropertyPath() ?: $fieldName;
+                $result[$propertyPath] = $fieldName;
             }
         }
 
-        return $fields;
+        return $result;
     }
 }

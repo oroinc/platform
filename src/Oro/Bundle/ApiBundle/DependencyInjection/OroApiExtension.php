@@ -21,7 +21,7 @@ class OroApiExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('processors.normalize_value.yml');
-        $loader->load('processors.collect_public_resources.yml');
+        $loader->load('processors.collect_resources.yml');
         $loader->load('processors.get_config.yml');
         $loader->load('processors.get_metadata.yml');
         $loader->load('processors.get_list.yml');
