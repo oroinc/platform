@@ -1,6 +1,7 @@
 parameters:
     oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
+    oro_action.registry.class: Oro\Bundle\ActionBundle\Model\ActionRegistry
     oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
     oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
     oro_action.attribute_assembler.class: Oro\Bundle\ActionBundle\Model\AttributeAssembler
@@ -23,14 +24,19 @@ services:
             arguments:
                 - @security.token_storage
 
-    oro_action.manager:
-        class: %oro_action.manager.class%
+    oro_action.registry:
+        class: %oro_action.registry.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_action.helper.context
             - @oro_action.configuration.provider
             - @oro_action.assembler
             - @oro_action.helper.applications
+
+    oro_action.manager:
+        class: %oro_action.manager.class%
+        arguments:
+            - @oro_action.registry
+            - @oro_entity.doctrine_helper
+            - @oro_action.helper.context
 
     oro_action.assembler:
         class: %oro_action.assembler.class%

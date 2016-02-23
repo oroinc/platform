@@ -116,4 +116,72 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
             ]
         );
     }
+
+    /**
+     * @dataProvider hasContextFiltersProvider
+     *
+     * @param array $entities
+     * @param array $routes
+     * @param array $datagrids
+     * @param bool $expected
+     */
+    public function testHasContextFilters(array $entities, array $routes, array $datagrids, $expected)
+    {
+        $this->definition->setEntities($entities);
+        $this->definition->setRoutes($routes);
+        $this->definition->setDatagrids($datagrids);
+
+        $this->assertEquals($expected, $this->definition->hasContextFilters());
+    }
+
+    /**
+     * @return array
+     */
+    public function hasContextFiltersProvider()
+    {
+        return [
+            [
+                'entities' => [],
+                'routes' => [],
+                'datagrids' => [],
+                'expected' => false
+            ],
+            [
+                'entities' => ['TestEntity'],
+                'routes' => [],
+                'datagrids' => [],
+                'expected' => true
+            ],
+            [
+                'entities' => [],
+                'routes' => ['test_route'],
+                'datagrids' => [],
+                'expected' => true
+            ],
+            [
+                'entities' => [],
+                'routes' => [],
+                'datagrids' => ['test_datagrid'],
+                'expected' => true
+            ],
+            [
+                'entities' => ['TestEntity'],
+                'routes' => ['test_route'],
+                'datagrids' => [],
+                'expected' => true
+            ],
+            [
+                'entities' => [],
+                'routes' => ['test_route'],
+                'datagrids' => ['test_datagrid'],
+                'expected' => true
+            ],
+            [
+                'entities' => ['TestEntity'],
+                'routes' => [],
+                'datagrids' => ['test_datagrid'],
+                'expected' => true
+            ]
+        ];
+    }
 }

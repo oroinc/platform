@@ -436,4 +436,12 @@ class ActionDefinition
         $this->groups = $groups;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function hasContextFilters()
+    {
+        return $this->getEntities() || $this->getRoutes() || $this->getDatagrids();
+    }
 }
