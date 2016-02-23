@@ -1,0 +1,42 @@
+<?php
+
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata;
+
+use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
+class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
+{
+    const TEST_CLASS_NAME   = 'Test\Class';
+    const TEST_VERSION      = '1.1';
+    const TEST_REQUEST_TYPE = RequestType::REST;
+
+    /** @var MetadataContext */
+    protected $context;
+
+    /** @var ConfigLoaderFactory */
+    protected $configLoaderFactory;
+
+    protected function setUp()
+    {
+        $this->context = new MetadataContext();
+        $this->context->setClassName(self::TEST_CLASS_NAME);
+        $this->context->setVersion(self::TEST_VERSION);
+        $this->context->setRequestType(self::TEST_REQUEST_TYPE);
+
+        $this->configLoaderFactory = new ConfigLoaderFactory();
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return EntityDefinitionConfig
+     */
+    protected function createConfigObject(array $config)
+    {
+        return $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
+    }
+}
