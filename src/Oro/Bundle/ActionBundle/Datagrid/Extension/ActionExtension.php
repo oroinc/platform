@@ -90,13 +90,19 @@ class ActionExtension extends AbstractExtension
         $actionData = $this->contextHelper->getActionData([
             'entityId' => $record->getValue('id'),
             'entityClass' => $this->datagridContext['entityClass'],
+            'datagrid' => $this->datagridContext['datagrid'],
         ]);
 
         $actionsNew = [];
         foreach ($this->actions as $action) {
-            $actionsNew[$action->getName()] = $action->isAllowed($actionData);
+            if ($action->isAllowed($actionData)) {
+                $actionsNew[$action->getName()] = [
+                    'translates' => $actionData['translates']->toArray(),
+                ];
+            } else {
+                $actionsNew[$action->getName()] = false;
+            }
         }
-
         return array_merge($actionsOld, $actionsNew);
     }
 
@@ -128,7 +134,8 @@ class ActionExtension extends AbstractExtension
                     'dialogOptions' => [
                         'title' => $action->getDefinition()->getLabel(),
                         'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
-                    ]
+                    ],
+                    'translates' => [],
                 ]
             ];
         }

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\ActionTranslates;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ContextHelperTest extends \PHPUnit_Framework_TestCase
@@ -150,12 +151,20 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
             'without request' => [
                 'request' => null,
                 'requestStackCalls' => 4,
-                'expected' => new ActionData(['data' => null])
+                'expected' => new ActionData([
+                    'data' => null,
+                    'context' => ['route' => null, 'entityId' => null, 'entityClass' => null, 'datagrid' => null],
+                    'translates' => new ActionTranslates()
+                ])
             ],
             'empty request' => [
                 'request' => new Request(),
                 'requestStackCalls' => 4,
-                'expected' => new ActionData(['data' => null])
+                'expected' => new ActionData([
+                    'data' => null,
+                    'context' => ['route' => null, 'entityId' => null, 'entityClass' => null, 'datagrid' => null],
+                    'translates' => new ActionTranslates()
+                ])
             ],
             'route1 without entity id' => [
                 'request' => new Request(
@@ -165,12 +174,30 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     ]
                 ),
                 'requestStackCalls' => 4,
-                'expected' => new ActionData(['data' => new \stdClass()])
+                'expected' => new ActionData([
+                    'data' => new \stdClass(),
+                    'context' => [
+                        'route' => 'test_route',
+                        'entityId' => null,
+                        'entityClass' => 'stdClass',
+                        'datagrid' => null,
+                    ],
+                    'translates' => new ActionTranslates()
+                ])
             ],
             'entity' => [
                 'request' => new Request(),
                 'requestStackCalls' => 0,
-                'expected' => new ActionData(['data' => $entity]),
+                'expected' => new ActionData([
+                    'data' => $entity,
+                    'context' => [
+                        'route' => 'test_route',
+                        'entityId' => '42',
+                        'entityClass' => 'stdClass',
+                        'datagrid' => null
+                    ],
+                    'translates' => new ActionTranslates()
+                ]),
                 'context' => [
                     'route' => 'test_route',
                     'entityId' => '42',
@@ -180,7 +207,16 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
             'entity (id as array)' => [
                 'request' => new Request(),
                 'requestStackCalls' => 0,
-                'expected' => new ActionData(['data' => $entity]),
+                'expected' => new ActionData([
+                    'data' => $entity,
+                    'context' => [
+                        'route' => 'test_route',
+                        'entityId' => ['params' => ['id' => '42']],
+                        'entityClass' => 'stdClass',
+                        'datagrid' => null
+                    ],
+                    'translates' => new ActionTranslates()
+                ]),
                 'context' => [
                     'route' => 'test_route',
                     'entityId' => ['params' => ['id' => '42']],
@@ -218,7 +254,13 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityReference')
             ->willReturn($entity);
 
-        $actionData = new ActionData(['data' => $entity]);
+        $actionData = new ActionData([
+            'data' => $entity,
+            'context' => array_merge($context1, [
+                'datagrid' => null,
+            ]),
+            'translates' => new ActionTranslates(),
+        ]);
 
         $this->assertEquals($actionData, $this->helper->getActionData($context1));
 

@@ -1,0 +1,108 @@
+actions:
+    META_ACTION:
+        label: META
+        prefunctions:
+            - @call_service_method:
+                service: oro_action.helper.entity_config
+                method: getRoutes
+                method_parameters: [$.data, ['name', 'view', 'update', 'delete']]
+                attribute: $.routes
+            - @call_service_method:
+                service: oro_action.helper.entity_config
+                method: getConfigValue
+                method_parameters: [$.data, 'label']
+                attribute: $.entityLabel
+            - @trans:
+                id: $.entityLabel
+                attribute: $.translates[entityLabel]
+        button_options:
+            template: OroActionBundle:Action:meta-button.html.twig
+
+    EDIT:
+        extends: META_ACTION
+        acl_resource: [EDIT, $.data]
+        order: 10
+        preconditions:
+            @and:
+                - @not_blank: $.routes[update]
+                - @or:
+                    # datagrid
+                    - @not_blank: $.context[datagrid]
+                    # view page
+                    - @and:
+                        - @not_blank: $.routes[view]
+                        - @equal:
+                            - $.context[route]
+                            - $.routes[view]
+        functions:
+            - @redirect:
+                route: $.routes[update]
+                route_parameters: {id: $id}
+        label: oro.action.edit
+        frontend_options:
+            title: oro.action.edit_entity
+        button_options:
+            icon: icon-edit
+
+    DELETE:
+        extends: META_ACTION
+        acl_resource: [DELETE, $.data]
+        order: 20
+        preconditions:
+            @and:
+                - @not_blank: $.routes[name]
+                - @not_blank: $.routes[delete]
+                - @or:
+                    # datagrid
+                    - @not_blank: $.context[datagrid]
+                    # view page
+                    - @and:
+                        - @not_blank: $.routes[view]
+                        - @equal:
+                            - $.context[route]
+                            - $.routes[view]
+                    # update page
+                    - @and:
+                        - @not_blank: $.routes[update]
+                        - @equal:
+                            - $.context[route]
+                            - $.routes[update]
+        functions:
+            - @call_service_method:
+                service: service_container
+                method: get
+                method_parameters: ['oro_action.api_manager']
+                attribute: $.api_manager
+            - @call_method:
+                object: $.api_manager
+                method: setClass
+                method_parameters:
+                    - $.context[entityClass]
+            - @call_service_method:
+                service: oro_soap.handler.delete
+                method: handleDelete
+                method_parameters: [$id, $.api_manager]
+
+            - @flash_message:
+                message: oro.action.delete_message
+                type: 'info'
+                message_parameters:
+                    '%%entityLabel%%': $.translates[entityLabel]
+            - @tree:
+                conditions:
+                    @not_blank: $.context[datagrid]
+                actions:
+                    - @refresh_grid: $.context[datagrid]
+            - @tree:
+                conditions:
+                    @blank: $.context[datagrid]
+                actions:
+                    - @redirect: {route: $.routes[name]}
+        label: oro.action.delete
+        frontend_options:
+            title: oro.action.delete_entity
+            confirmation:
+                title: oro.action.delete_entity
+                message: oro.action.delete_confirm
+        button_options:
+            icon: icon-trash

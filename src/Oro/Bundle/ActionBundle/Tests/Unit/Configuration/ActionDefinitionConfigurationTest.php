@@ -193,7 +193,9 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                         'template' => 'template',
                         'title' => 'dialog title',
                         'options' => ['width' => 400],
-                        'confirmation' => 'Confirmation message',
+                        'confirmation' => [
+                            'message' => 'Confirmation message',
+                        ],
                         'show_dialog' => false
                     ],
                     'button_options' => [

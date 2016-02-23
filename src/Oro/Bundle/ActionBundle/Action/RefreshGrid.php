@@ -18,7 +18,13 @@ class RefreshGrid extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $this->contextAccessor->setValue($context, 'refreshGrid', $this->gridNames);
+        $gridNames = [];
+
+        foreach ($this->gridNames as $gridName) {
+            $gridNames[] = $this->contextAccessor->getValue($context, $gridName);
+        }
+
+        $this->contextAccessor->setValue($context, 'refreshGrid', $gridNames);
     }
 
     /**

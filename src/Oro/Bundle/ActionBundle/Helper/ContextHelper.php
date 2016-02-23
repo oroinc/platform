@@ -7,6 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\ActionTranslates;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ContextHelper
@@ -76,7 +77,11 @@ class ContextHelper
                 );
             }
 
-            $this->actionDatas[$hash] = new ActionData(['data' => $entity]);
+            $this->actionDatas[$hash] = new ActionData([
+                'data' => $entity,
+                'context' => $context,
+                'translates' => new ActionTranslates(),
+            ]);
         }
 
         return $this->actionDatas[$hash];
@@ -142,9 +147,31 @@ class ContextHelper
         foreach ($properties as $property) {
             $array[$property] = $this->getPropertyAccessor()->getValue($context, sprintf('[%s]', $property));
         }
-        array_multisort($array);
+        $this->multisort($array);
 
         return md5(json_encode($array, JSON_NUMERIC_CHECK));
+    }
+
+    /**
+     * @param array $data
+     */
+    protected function multisort(array &$data)
+    {
+        $sortByKeys = array_filter($data, function ($key) {
+            return is_string($key);
+        });
+
+        if ($sortByKeys) {
+            ksort($data);
+        } else {
+            sort($data);
+        }
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $this->multisort($data[$key]);
+            }
+        }
     }
 
     /**

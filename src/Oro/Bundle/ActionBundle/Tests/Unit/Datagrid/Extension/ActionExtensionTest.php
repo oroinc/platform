@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\ActionTranslates;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -38,7 +39,11 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $contextHelper->expects($this->any())
             ->method('getActionData')
-            ->willReturn(new ActionData(['data' => ['param']]));
+            ->willReturn(new ActionData([
+                'data' => ['param'],
+                'context' => [],
+                'translates' => new ActionTranslates()
+            ]));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper $applicationHelper */
         $applicationHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
@@ -186,12 +191,12 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             '2 allowed actions' => [
                 'record' => new ResultRecord(['id' => 2]),
                 'actions' => [$actionAllowed1, $actionAllowed2],
-                'expectedActions' => ['action1' => true, 'action2' => true],
+                'expectedActions' => ['action1' => ['translates' => []], 'action2' => ['translates' => []]],
             ],
             '1 allowed action' => [
                 'record' => new ResultRecord(['id' => 3]),
                 'actions' => [$actionAllowed1, $actionNotAllowed],
-                'expectedActions' => ['action1' => true, 'action3' => false],
+                'expectedActions' => ['action1' => ['translates' => []], 'action3' => false],
             ],
         ];
     }
