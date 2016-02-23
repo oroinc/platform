@@ -145,7 +145,9 @@ class DateFilterUtility
         foreach ($fields as $field) {
             $originalKey = $field.'_original';
             if ($this->allowToModifyFieldToDayWithMonth($data, $originalKey, $field)) {
-                    $data[$field] = $data[$field]->format('md');
+                    $data[$field] = $data[$field]
+                        ->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()))
+                        ->format('md');
                     $isModifyAllowed = true;
             }
         }
