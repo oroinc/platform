@@ -54,6 +54,12 @@ class NormalizeLinkedProperties implements ProcessorInterface
             return;
         }
 
+        $entityClass = $context->getClassName();
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // only manageable entities are supported
+            return;
+        }
+
         $entityMetadata = $context->getResult();
         $this->normalizeMetadata($entityMetadata, $config);
     }
