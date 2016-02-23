@@ -284,6 +284,49 @@ class ArrayUtil
     }
 
     /**
+     * Return array of ranges (inclusive)
+     * [[min1, max1], [min2, max2], ...]
+     *
+     * @param int[] $ints List of integers
+     */
+    public static function intRanges(array $ints)
+    {
+        $ints = array_unique($ints);
+        sort($ints);
+
+        $result = [];
+        while(false !== ($subResult = static::shiftRange($ints))) {
+            $result[] = $subResult;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $sortedUniqueInts
+     *
+     * @return array|false Array 2 elements [min, max] or false when the array is empty
+     */
+    public static function shiftRange(array &$sortedUniqueInts)
+    {
+        if (!$sortedUniqueInts) {
+            return false;
+        }
+
+        $min = $max = reset($sortedUniqueInts);
+
+        $c = 1;
+        while (next($sortedUniqueInts) !== false && current($sortedUniqueInts) - $c === $min) {
+            $max = current($sortedUniqueInts);
+            array_shift($sortedUniqueInts);
+            $c++;
+        }
+        array_shift($sortedUniqueInts);
+
+        return [$min, $max];
+    }
+
+    /**
      * Return the values from a single column in the input array
      *
      * http://php.net/manual/en/function.array-column.php
