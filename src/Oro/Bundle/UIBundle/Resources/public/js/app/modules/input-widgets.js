@@ -8,12 +8,12 @@ define(function(require) {
     InputWidgetManager.registerWidget({
         tagName: 'SELECT',
         selector: 'select:not(.no-uniform)',
-        widget: UniformSelectInputWidget
+        Widget: UniformSelectInputWidget
     });
 
     InputWidgetManager.registerWidget({
         tagName: 'INPUT',
         selector: 'input:file',
-        widget: UniformFileInputWidget
+        Widget: UniformFileInputWidget
     });
 });

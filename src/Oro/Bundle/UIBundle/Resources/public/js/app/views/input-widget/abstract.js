@@ -37,7 +37,7 @@ define(function(require) {
         resolveOptions: function(options) {
             _.extend(this, options || {});
 
-            this.$el.prop('inputWidget', this);
+            this.$el.data('inputWidget', this);
             this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
         },
 
@@ -46,7 +46,7 @@ define(function(require) {
                 return;
             }
 
-            this.$el.prop('inputWidget', null);
+            this.$el.data('inputWidget', null);
 
             if (this.destroyOptions) {
                 this.widgetFunction(this.destroyOptions);

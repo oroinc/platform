@@ -12,7 +12,7 @@ define(function(require) {
             _.defaults(widget, {
                 tagName: '',
                 selector: '',
-                widget: null
+                Widget: null
             });
 
             if (!this.widgetsByTag[widget.tagName]) {
@@ -33,7 +33,7 @@ define(function(require) {
                 var widgets = self.widgetsByTag[$input.prop('tagName')] || [];
                 _.each(widgets, function(widget) {
                     if (!self.hasWidget($input) && self.isApplicable($input, widget)) {
-                        self.createWidget($input, widget.widget);
+                        self.createWidget($input, widget.Widget);
                     }
                 });
             });
@@ -43,10 +43,12 @@ define(function(require) {
             return !widget.selector || $input.is(widget.selector);
         },
 
-        createWidget: function($input, Widget) {
-            return new Widget({
-                $el: $input
-            });
+        createWidget: function($input, Widget, options) {
+            if (!options) {
+                options = {};
+            }
+            options.$el = $input;
+            return new Widget(options);
         },
 
         hasWidget: function($input) {
@@ -54,7 +56,7 @@ define(function(require) {
         },
 
         getWidget: function($input) {
-            var widget = $input.prop('inputWidget');
+            var widget = $input.data('inputWidget');
             return widget ? widget : null;
         }
     };
