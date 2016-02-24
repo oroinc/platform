@@ -68,6 +68,7 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'applications' => [],
                     'entities' => [],
                     'routes' => [],
+                    'groups' => [],
                     'datagrids' => [],
                     'order' => 0,
                     'enabled' => true,
@@ -95,9 +96,11 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'action' => [
                         'replace' => 'test_replace',
                         'label' => 'Test Label 2',
+                        'substitute_action' => 'test_action',
                         'applications' => ['app1', 'app2', 'app3'],
                         'entities' => ['Entity1', 'Entity2'],
                         'routes' => ['route_1', 'route_2'],
+                        'groups' => ['group_1', 'group_2'],
                         'datagrids' => ['datagrid_1', 'datagrid_2'],
                         'order' => 15,
                         'enabled' => false,
@@ -162,9 +165,11 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'replace' => ['test_replace'],
                     'label' => 'Test Label 2',
+                    'substitute_action' => 'test_action',
                     'applications' => ['app1', 'app2', 'app3'],
                     'entities' => ['Entity1', 'Entity2'],
                     'routes' => ['route_1', 'route_2'],
+                    'groups' => ['group_1', 'group_2'],
                     'datagrids' => ['datagrid_1', 'datagrid_2'],
                     'order' => 15,
                     'enabled' => false,
@@ -266,6 +271,15 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'The child node "label" at path "action" must be configured'
             ],
+            'incorrect action[substitute_action]' => [
+                'input' => [
+                    'action' => [
+                        'label' => 'Test Label',
+                        'substitute_action' => ['array', 'value']
+                    ]
+                ],
+                'message' => 'Invalid type for path "action.substitute_action". Expected scalar, but got array'
+            ],
             'incorrect action[application]' => [
                 'input' => [
                     'action' => [
@@ -295,6 +309,18 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "action.routes". Expected array, but got string'
+            ],
+            'incorrect action[groups]' => [
+                'input' => [
+                    'action' => [
+                        'label' => 'Test Label',
+                        'applications' => [],
+                        'entities' => [],
+                        'routes' => [],
+                        'groups' => 'not array route'
+                    ]
+                ],
+                'message' => 'Invalid type for path "action.groups". Expected array, but got string'
             ],
             'incorrect action[order]' => [
                 'input' => [

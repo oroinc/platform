@@ -48,6 +48,10 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
                 'value' => []
             ],
             [
+                'method' => 'getGroups',
+                'value' => []
+            ],
+            [
                 'method' => 'getApplications',
                 'value' => []
             ],
@@ -97,9 +101,11 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
             [
                 ['name', 'test'],
                 ['label', 'test'],
+                ['substituteAction', 'test_action_name_to_substitute'],
                 ['enabled', false],
                 ['entities', ['entity1', 'entity2']],
                 ['routes', ['route1', 'route2']],
+                ['groups', ['group1', 'group2']],
                 ['applications', ['application1', 'application2']],
                 ['order', 77],
                 ['frontendOptions', ['config1', 'config2']],
