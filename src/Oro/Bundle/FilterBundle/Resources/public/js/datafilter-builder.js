@@ -90,7 +90,7 @@ define([
 
         loadFilters: function(gridName) {
             var filterNames = _.map(this.filterLoaders, _.property('name'));
-            if (!filterNames) {
+            if (!filterNames.length) {
                 return;
             }
 
