@@ -35,6 +35,7 @@ define([
         },
 
         changeHandler: function(event) {
+            mediator.trigger('serializeFolderCollection');
             var data = this.$el.serializeArray();
             var url = this.$el.attr('action');
             var method = this.$el.attr('method');
