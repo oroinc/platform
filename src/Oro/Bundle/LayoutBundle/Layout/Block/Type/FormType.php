@@ -109,9 +109,10 @@ class FormType extends AbstractFormType
             $formAccessor->setFormData($view->vars['form_data']);
         }
         $formView = $formAccessor->getView();
-        if (isset($view->vars['class_prefix'])) {
-            $this->setClassPrefixToFormView($formView, $view->vars['class_prefix']);
+        if (!isset($view->vars['class_prefix'])) {
+            $view->vars['class_prefix'] = $block->getId();
         }
+        $this->setClassPrefixToFormView($formView, $view->vars['class_prefix']);
         $view->vars['form'] = $formView;
 
         $view->vars['split_to_fields'] = $options['split_to_fields'];
