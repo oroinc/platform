@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -29,9 +28,6 @@ class ContextHelper
 
     /** @var  PropertyAccessor */
     protected $propertyAccessor;
-
-    /** @var Request */
-    protected $currentRequest;
 
     /**
      * @param DoctrineHelper $doctrineHelper
