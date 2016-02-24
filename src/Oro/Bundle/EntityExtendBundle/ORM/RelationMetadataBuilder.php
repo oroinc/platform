@@ -186,6 +186,20 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
                 $targetEntity
             )
         );
+
+        if (isset($relation['target_id_column']) && $relation['target_id_column'] !== 'id') {
+            $targetIdColumn = $relation['target_id_column'];
+            $builder->addInverseJoinColumn(
+                $this->nameGenerator->generateManyToManyJoinTableColumnName(
+                    $relation['target_entity'],
+                    '_' . $targetIdColumn
+                ),
+                $targetIdColumn,
+                false,
+                false,
+                'CASCADE'
+            );
+        }
         foreach ($cascade as $cascadeType) {
             $builder->{'cascade' . ucfirst($cascadeType)}();
         }
@@ -230,7 +244,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         );
 
         $builder->addJoinColumn(
-            $this->nameGenerator->generateRelationDefaultColumnName($fieldId->getFieldName()),
+            $this->nameGenerator->generateRelationDefaultColumnName($fieldId->getFieldName(), '_' . $targetIdColumn),
             $targetIdColumn,
             true,
             false,

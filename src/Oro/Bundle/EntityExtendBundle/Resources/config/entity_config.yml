@@ -120,6 +120,10 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                id_columns:
+                    options:
+                        auditable:          false
+
         field:
             grid_action:
                 -
