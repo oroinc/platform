@@ -46,11 +46,6 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityClass')
-            ->willReturnCallback(function ($class) {
-                return $class;
-            });
 
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()

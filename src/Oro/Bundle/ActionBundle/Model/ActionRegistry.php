@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActionRegistry
 {
@@ -16,22 +17,31 @@ class ActionRegistry
     /** @var ApplicationsHelper */
     protected $applicationsHelper;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var array|Action[] */
     protected $actions;
+
+    /** @var array */
+    protected $shortEntityNames = [];
 
     /**
      * @param ActionConfigurationProvider $configurationProvider
      * @param ActionAssembler $assembler
      * @param ApplicationsHelper $applicationsHelper
+     * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ActionConfigurationProvider $configurationProvider,
         ActionAssembler $assembler,
-        ApplicationsHelper $applicationsHelper
+        ApplicationsHelper $applicationsHelper,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
         $this->applicationsHelper = $applicationsHelper;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -123,12 +133,45 @@ class ActionRegistry
 
         $forAllEntities = $definition->isForAllEntities();
 
-        if ((!$forAllEntities && in_array($className, $definition->getEntities(), true)) ||
-            ($forAllEntities && !in_array($className, $definition->getExcludeEntities(), true))
+        if ((!$forAllEntities && in_array($className, $this->filterEntities($definition->getEntities()), true)) ||
+            ($forAllEntities && !in_array($className, $this->filterEntities($definition->getExcludeEntities()), true))
         ) {
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * @param array $entities
+     * @return array
+     */
+    protected function filterEntities(array $entities)
+    {
+        return array_filter(array_map([$this, 'getEntityClassName'], $entities), 'is_string');
+    }
+
+    /**
+     * @param string $entityName
+     * @return string|bool
+     */
+    protected function getEntityClassName($entityName)
+    {
+        if (!array_key_exists($entityName, $this->shortEntityNames)) {
+            $this->shortEntityNames[$entityName] = null;
+
+            try {
+                $entityClass = $this->doctrineHelper->getEntityClass($entityName);
+
+                if (class_exists($entityClass, true)) {
+                    $reflection = new \ReflectionClass($entityClass);
+
+                    $this->shortEntityNames[$entityName] = $reflection->getName();
+                }
+            } catch (\Exception $e) {
+            }
+        }
+
+        return $this->shortEntityNames[$entityName];
     }
 }

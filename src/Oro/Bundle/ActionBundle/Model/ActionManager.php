@@ -100,11 +100,8 @@ class ActionManager
         $context = $this->contextHelper->getContext($context);
         $actionData = $this->contextHelper->getActionData($context);
 
-        $entityClass = $this->getEntityClassName($context[ContextHelper::ENTITY_CLASS_PARAM]);
-        $entityId = $context[ContextHelper::ENTITY_ID_PARAM];
-
         $actions = $this->actionRegistry->find(
-            $entityId ? $entityClass : null,
+            $context[ContextHelper::ENTITY_ID_PARAM] ? $context[ContextHelper::ENTITY_CLASS_PARAM] : null,
             $context[ContextHelper::ROUTE_PARAM],
             $context[ContextHelper::DATAGRID_PARAM],
             $context[ContextHelper::GROUP_PARAM]
@@ -160,26 +157,5 @@ class ActionManager
         }
 
         return $template;
-    }
-
-    /**
-     * @param string $entityName
-     * @return string|bool
-     */
-    protected function getEntityClassName($entityName)
-    {
-        try {
-            $entityClass = $this->doctrineHelper->getEntityClass($entityName);
-
-            if (!class_exists($entityClass, true)) {
-                return null;
-            }
-
-            $reflection = new \ReflectionClass($entityClass);
-
-            return $reflection->getName();
-        } catch (\Exception $e) {
-            return null;
-        }
     }
 }

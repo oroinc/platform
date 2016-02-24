@@ -30,6 +30,7 @@ services:
             - @oro_action.configuration.provider
             - @oro_action.assembler
             - @oro_action.helper.applications
+            - @oro_entity.doctrine_helper
 
     oro_action.manager:
         class: %oro_action.manager.class%

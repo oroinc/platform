@@ -9,7 +9,9 @@ use Oro\Bundle\ActionBundle\Model\ActionAssembler;
 use Oro\Bundle\ActionBundle\Model\ActionRegistry;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory as FunctionFactory;
+
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionRegistryTest extends \PHPUnit_Framework_TestCase
@@ -22,6 +24,9 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
 
     /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $applicationsHelper;
+
+    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory $functionFactory */
     protected $functionFactory;
@@ -87,7 +92,21 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->registry = new ActionRegistry($this->configurationProvider, $this->assembler, $this->applicationsHelper);
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnCallback(function ($class) {
+                return $class;
+            });
+
+        $this->registry = new ActionRegistry(
+            $this->configurationProvider,
+            $this->assembler,
+            $this->applicationsHelper,
+            $this->doctrineHelper
+        );
     }
 
     /**
