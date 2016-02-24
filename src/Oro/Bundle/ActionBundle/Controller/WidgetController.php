@@ -51,6 +51,8 @@ class WidgetController extends Controller
         $errors = new ArrayCollection();
 
         $params = [
+            '_wid' => $request->get('_wid'),
+            'fromUrl' => $request->get('fromUrl'),
             'action' => $this->getActionManager()->getAction($actionName, $data),
             'actionData' => $data,
         ];
@@ -60,6 +62,8 @@ class WidgetController extends Controller
             $form = $this->get('oro_action.form_manager')->getActionForm($actionName, $data);
             $form->handleRequest($request);
 
+            $params['form'] = $form->createView();
+
             $data['form'] = $form;
 
             if ($form->isValid()) {
@@ -68,19 +72,29 @@ class WidgetController extends Controller
                 $params['response'] = $this->getResponse($data);
             }
 
-            $params['form'] = $form->createView();
-            $params['context'] = $data->getValues();
-            $params['fromUrl'] = $request->get('fromUrl');
-
         } catch (\Exception $e) {
             if (!$errors->count()) {
                 $errors->add(['message' => $e->getMessage()]);
             }
         }
 
+        $params['context'] = $data->getValues();
         $params['errors'] = $errors;
 
-        return $this->render($this->getActionManager()->getFrontendTemplate($actionName), $params);
+        if ($form->isSubmitted() && $this->hasRedirect($params)) {
+            return $this->redirect($params['response']['redirectUrl']);
+        } else {
+            return $this->render($this->getActionManager()->getFrontendTemplate($actionName), $params);
+        }
+    }
+
+    /**
+     * @param array $params
+     * @return bool
+     */
+    protected function hasRedirect(array $params)
+    {
+        return empty($params['_wid']) && !empty($params['response']['redirectUrl']);
     }
 
     /**

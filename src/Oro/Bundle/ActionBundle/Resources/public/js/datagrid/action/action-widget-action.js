@@ -16,6 +16,7 @@ define(function(require) {
             datagrid: null,
             confirmation: null,
             showDialog: null,
+            hasDialog: null,
             executionRoute: null,
             dialogRoute: null,
             dialogOptions: {
@@ -44,6 +45,7 @@ define(function(require) {
 
             var options = {
                 showDialog: this.options.showDialog,
+                hasDialog: this.options.hasDialog,
                 dialogUrl: routing.generate(this.options.dialogRoute, routeParams),
                 dialogOptions: this.options.dialogOptions,
                 url: routing.generate(this.options.executionRoute, routeParams),

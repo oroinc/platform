@@ -6,6 +6,7 @@
 {% if entity %}
     {% set className = oro_class_name(context.data) %}
     {% set entityLabel = oro_entity_config_value(className, 'label')|trans %}
+    {% set indexUrl = path(oro_entity_route(className, 'name')) %}
 
     {% oro_title_set({
         titleTemplate : "%entity% - %actionName% - %label% - %pluralLabel%",
@@ -17,6 +18,7 @@
         }
     }) %}
 {% else %}
+    {% set indexUrl = '' %}
     {% oro_title_set({titleTemplate : action.definition.label|trans}) %}
 {% endif %}
 
@@ -24,7 +26,7 @@
     {% if entity %}
         {% set breadcrumbs = {
             'entity':      entity,
-            'indexPath':   fromUrl,
+            'indexPath':   indexUrl,
             'indexLabel':  entityLabel,
             'entityTitle': entity|default('N/A'|trans)
         } %}
@@ -36,28 +38,41 @@
 {% endblock pageHeader %}
 
 {% block navButtons %}
-    {{ UI.cancelButton(fromUrl) }}
+    {{ UI.cancelButton(fromUrl|default(indexUrl)) }}
 
     {{ UI.dropdownSaveButton({'html': UI.saveAndStayButton('Submit')}) }}
 {% endblock navButtons %}
 
 {% block content_data %}
-    {% set id = 'action-page-' ~ action.name %}
+    {% if id is not defined %}
+        {% set id = 'action-page-' ~ action.name %}
+    {% endif %}
 
-    {% set dataBlocks = [{
-        'title': action.definition.label|trans,
-        'class': 'active',
-        'subblocks': [{
-            'data': [
-                form_widget(form)
-            ]
-        }]
-    }] %}
+    {% if data is not defined %}
+        {% set dataBlocks = [{
+            'title': action.definition.label|trans,
+            'class': 'active',
+            'subblocks': [{
+                'data': [
+                    form_widget(form)
+                ]
+            }]
+        }] %}
 
-    {% set data = {
-        'formErrors': form_errors(form),
-        'dataBlocks': dataBlocks
-    }%}
+        {% set data = {
+            'formErrors': formErrors|default(''),
+            'dataBlocks': dataBlocks
+        }%}
+    {% endif %}
+
+    {% if errors|length and formErrors is not defined %}
+        {% set formErrors %}
+            {% for error in errors %}
+                <li>{{ error.message | trans(error.parameters|default([]))}}</li>
+            {% endfor %}
+        {% endset %}
+        {% set data = data|merge({'formErrors' : formErrors ~ data.formErrors|default('')}) %}
+    {% endif %}
 
     {{ parent() }}
 {% endblock content_data %}
