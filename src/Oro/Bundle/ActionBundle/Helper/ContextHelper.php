@@ -146,32 +146,13 @@ class ContextHelper
         $array = [];
         foreach ($properties as $property) {
             $array[$property] = $this->getPropertyAccessor()->getValue($context, sprintf('[%s]', $property));
-        }
-        $this->multisort($array);
-
-        return md5(json_encode($array, JSON_NUMERIC_CHECK));
-    }
-
-    /**
-     * @param array $data
-     */
-    protected function multisort(array &$data)
-    {
-        $sortByKeys = array_filter($data, function ($key) {
-            return is_string($key);
-        });
-
-        if ($sortByKeys) {
-            ksort($data);
-        } else {
-            sort($data);
-        }
-
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $this->multisort($data[$key]);
+            if (is_array($array[$property])) {
+                ksort($array[$property]);
             }
         }
+        ksort($array);
+
+        return md5(json_encode($array, JSON_NUMERIC_CHECK));
     }
 
     /**
