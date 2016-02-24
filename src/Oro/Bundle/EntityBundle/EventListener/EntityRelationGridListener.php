@@ -78,7 +78,7 @@ class EntityRelationGridListener
                 $operator,
                 $targetFieldName,
                 $targetIdField,
-                $targetFieldName
+                $targetIdField
             );
         } else {
             $whenExpr = sprintf('o.%s IN (:data_in) AND o.%s NOT IN (:data_not_in)', $targetIdField, $targetIdField);
