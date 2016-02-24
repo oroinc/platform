@@ -106,7 +106,7 @@ define(function(require) {
             }
 
             options.viewsCollection = collection;
-            return _.omit(options, ['choices', 'views']);
+            return _.omit(options, ['views']);
         }
     };
 

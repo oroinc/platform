@@ -9,14 +9,14 @@ use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 /**
  * Excludes relations that are pointed to not accessible resources.
- * For example if entity1 has a reference to to entity2, but entity2 does not have API resource,
+ * For example if entity1 has a reference to to entity2, but entity2 does not have Data API resource,
  * the relation will be excluded.
  */
 class ExcludeNotAccessibleRelations implements ProcessorInterface
@@ -53,10 +53,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
-        if (!isset($definition[ConfigUtil::FIELDS])
-            || !is_array($definition[ConfigUtil::FIELDS])
-            || !ConfigUtil::isExcludeAll($definition)
-        ) {
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
             // expected normalized configs
             return;
         }
@@ -67,51 +64,33 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
             return;
         }
 
-        if ($this->updateRelations($definition, $entityClass)) {
-            $context->setResult($definition);
-        }
+        $this->updateRelations($definition, $entityClass);
     }
 
     /**
-     * @param array  $definition
-     * @param string $entityClass
-     *
-     * @return bool
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
      */
-    protected function updateRelations(array &$definition, $entityClass)
+    protected function updateRelations(EntityDefinitionConfig $definition, $entityClass)
     {
-        $hasChanges = false;
-
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        foreach ($definition[ConfigUtil::FIELDS] as $fieldName => &$fieldConfig) {
-            if (!is_array($fieldConfig) || empty($fieldConfig[ConfigUtil::DEFINITION][ConfigUtil::FIELDS])) {
+        $fields   = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->isExcluded()) {
                 continue;
             }
 
-            $fieldDefinition = $fieldConfig[ConfigUtil::DEFINITION];
-            if (ConfigUtil::isExclude($fieldDefinition)) {
-                continue;
-            }
-
-            $propertyPath = ConfigUtil::getPropertyPath($fieldDefinition, $fieldName);
+            $propertyPath = $field->getPropertyPath() ?: $fieldName;
             if (!$metadata->hasAssociation($propertyPath)) {
                 continue;
             }
 
             $mapping        = $metadata->getAssociationMapping($propertyPath);
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
-            if ($this->isResourceForRelatedEntityAccessible($targetMetadata)) {
-                continue;
+            if (!$this->isResourceForRelatedEntityAccessible($targetMetadata)) {
+                $field->setExcluded();
             }
-
-            $fieldDefinition[ConfigUtil::EXCLUDE] = true;
-
-            $fieldConfig[ConfigUtil::DEFINITION] = $fieldDefinition;
-
-            $hasChanges = true;
         }
-
-        return $hasChanges;
     }
 
     /**
@@ -125,7 +104,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
             return true;
         }
         if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
-            // check that at least one inhetited entity has API resource
+            // check that at least one inherited entity has Data API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
                 if ($this->isResourceAccessible($inheritedEntityClass)) {
                     return true;

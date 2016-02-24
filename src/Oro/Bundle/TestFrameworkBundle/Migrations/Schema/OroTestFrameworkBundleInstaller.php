@@ -65,12 +65,15 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestSearchProductTable($schema);
         $this->createTestActivityTable($schema);
         $this->createTestCustomEntityTables($schema);
+        $this->createTestDepartmentTable($schema);
+        $this->createTestPersonTable($schema);
 
         /** Foreign keys generation **/
         $this->addTestWorkflowAwareEntityForeignKeys($schema);
         $this->addTestSearchItemForeignKeys($schema);
         $this->addTestSearchItemValueForeignKeys($schema);
         $this->addTestActivityForeignKeys($schema);
+        $this->addTestPersonForeignKeys($schema);
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
     }
@@ -101,6 +104,36 @@ class OroTestFrameworkBundleInstaller implements
         $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addUniqueIndex(['workflow_item_id'], 'uniq_f824a8531023c4ee');
         $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create test_department table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestDepartmentTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_department');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create test_person table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestPersonTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_person');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('department_id', 'integer', ['notnull' => false]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('type', 'string', ['length' => 255]);
+        $table->addColumn('position', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['department_id'], 'IDX_A305D658AE80F5DF', []);
     }
 
     /**
@@ -379,6 +412,22 @@ class OroTestFrameworkBundleInstaller implements
             ['workflow_step_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+    }
+
+    /**
+     * Add test_person foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addTestPersonForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('test_person');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('test_department'),
+            ['department_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
         );
     }
 
