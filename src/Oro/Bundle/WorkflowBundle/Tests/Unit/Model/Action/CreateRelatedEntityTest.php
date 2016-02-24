@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Oro\Component\ConfigExpression\Action\CreateRelatedEntity;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity;
 
 class CreateRelatedEntityTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +37,7 @@ class CreateRelatedEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
      * @expectedExceptionMessage Object data must be an array.
      */
     public function testInitializeException()
@@ -106,7 +106,7 @@ class CreateRelatedEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\ActionException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\ActionException
      * @expectedExceptionMessage Can't create related entity \stdClass.
      */
     public function testExecuteSaveException()

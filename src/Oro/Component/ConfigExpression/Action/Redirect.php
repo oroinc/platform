@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Action;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class Redirect extends AbstractAction

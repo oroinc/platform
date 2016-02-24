@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 

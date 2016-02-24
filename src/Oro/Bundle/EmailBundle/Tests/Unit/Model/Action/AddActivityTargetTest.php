@@ -155,7 +155,7 @@ class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
      */
     public function testInitializeWithMissingRequiredOption()
     {

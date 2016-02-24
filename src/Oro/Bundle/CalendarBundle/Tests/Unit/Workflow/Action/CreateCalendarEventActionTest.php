@@ -96,7 +96,7 @@ class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
 
         if ($exceptionMessage) {
             $this->setExpectedException(
-                '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
                 $exceptionMessage
             );
         }

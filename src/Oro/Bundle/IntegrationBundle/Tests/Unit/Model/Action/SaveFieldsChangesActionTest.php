@@ -36,7 +36,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
     {
         if ($message) {
             $this->setExpectedException(
-                'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
                 $message
             );
         }

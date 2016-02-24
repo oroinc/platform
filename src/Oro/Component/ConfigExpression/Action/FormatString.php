@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 
 class FormatString extends AbstractAction
 {
@@ -67,7 +67,7 @@ class FormatString extends AbstractAction
     /**
      * @param mixed $context
      * @return array
-     * @throws \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
+     * @throws \Oro\Component\ConfigExpression\Exception\InvalidParameterException
      */
     protected function getArguments($context)
     {

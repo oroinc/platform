@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 
 class CreateObject extends AbstractAction
 {

@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Action;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 
 interface ActionInterface
 {

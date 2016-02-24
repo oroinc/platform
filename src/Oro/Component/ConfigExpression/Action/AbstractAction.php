@@ -4,8 +4,8 @@ namespace Oro\Component\ConfigExpression\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvent;
-use Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents;
+use Oro\Component\ConfigExpression\Event\ExecuteActionEvent;
+use Oro\Component\ConfigExpression\Event\ExecuteActionEvents;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
@@ -56,7 +56,7 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
     public function execute($context)
     {
         if ($this->isAllowed($context)) {
-            // dispatch oro_workflow.action.handle_before event
+            // dispatch oro_component.action.handle_before event
             $this->eventDispatcher->dispatch(
                 ExecuteActionEvents::HANDLE_BEFORE,
                 new ExecuteActionEvent($context, $this)
@@ -64,7 +64,7 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
 
             $this->executeAction($context);
 
-            // dispatch oro_workflow.action.handle_after event
+            // dispatch oro_component.action.handle_after event
             $this->eventDispatcher->dispatch(
                 ExecuteActionEvents::HANDLE_AFTER,
                 new ExecuteActionEvent($context, $this)

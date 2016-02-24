@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Action;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class TranslateAction extends AbstractAction

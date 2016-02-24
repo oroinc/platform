@@ -42,7 +42,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
@@ -78,7 +78,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
      * @expectedExceptionMessage Action "populate_channel_owner" expects an entity in parameter "attribute", string is given.
      */
     // @codingStandardsIgnoreEnd
@@ -100,7 +100,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
      * @expectedExceptionMessage Action "populate_channel_owner" expects Oro\Bundle\IntegrationBundle\Entity\Channel in parameter "integration", stdClass is given.
      */
     // @codingStandardsIgnoreEnd

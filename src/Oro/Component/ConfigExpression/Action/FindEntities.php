@@ -10,7 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 class FindEntities extends AbstractAction

@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
-use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\Action\ActionInterface as FunctionInterface;
 use Oro\Component\ConfigExpression\Action\Configurable as ConfigurableAction;

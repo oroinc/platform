@@ -5,15 +5,16 @@ namespace Oro\Bundle\CalendarBundle\Workflow\Action;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\Action\AbstractAction;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 
 /**
  * - @create_calendar_event:

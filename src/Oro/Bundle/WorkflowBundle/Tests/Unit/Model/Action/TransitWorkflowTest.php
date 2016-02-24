@@ -91,7 +91,7 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\ActionException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\ActionException
      * @expectedExceptionMessage Cannot transit workflow, instance of "stdClass" doesn't have workflow item.
      */
     public function testExecuteFailsWhenThereIsNoWorkflowItem()
@@ -209,14 +209,14 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
         return [
             'no entity' => [
                 'options' => [],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Option "entity" is required.',
             ],
             'invalid route parameters' => [
                 'options' => [
                     'entity' => new PropertyPath('test'),
                 ],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Option "transition" is required.',
             ],
         ];

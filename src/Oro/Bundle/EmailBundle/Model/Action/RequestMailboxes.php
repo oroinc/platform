@@ -6,7 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\Action\AbstractAction;
 use Oro\Component\ConfigExpression\Action\ActionInterface;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;

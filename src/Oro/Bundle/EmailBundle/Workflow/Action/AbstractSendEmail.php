@@ -8,7 +8,7 @@ use Psr\Log\LoggerAwareTrait;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\Action\AbstractAction;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 

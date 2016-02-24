@@ -2,23 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event;
 
-class ExecuteActionEvents
-{
-    /**
-     * This event occurs before execute action
-     *
-     * The event listener method receives Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvent instance.
-     *
-     * @var string
-     */
-    const HANDLE_BEFORE = 'oro_workflow.action.handle_before';
+use Oro\Component\ConfigExpression\Event\ExecuteActionEvents as BaseExecuteActionEvents;
 
-    /**
-     * This event occurs after execute action
-     *
-     * The event listener method receives Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvent instance.
-     *
-     * @var string
-     */
-    const HANDLE_AFTER = 'oro_workflow.action.handle_after';
+/**
+ * @deprecated since 1.10. Use {@see Oro\Component\ConfigExpression\Event\ExecuteActionEvent} instead
+ */
+class ExecuteActionEvents extends BaseExecuteActionEvents
+{
 }

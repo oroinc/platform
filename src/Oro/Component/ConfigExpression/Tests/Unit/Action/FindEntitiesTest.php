@@ -7,9 +7,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\FindEntities;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Action\FindEntities;
 
 class FindEntitiesTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,7 +57,7 @@ class FindEntitiesTest extends \PHPUnit_Framework_TestCase
     public function testInitializeException(array $options, $expectedMessage)
     {
         $this->setExpectedException(
-            '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+            '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
             $expectedMessage
         );
 
