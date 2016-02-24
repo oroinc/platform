@@ -66,6 +66,14 @@ class ChoiceTreeBusinessUnitProvider
     }
 
     /**
+     * @return bool
+     */
+    public function shouldBeLazy()
+    {
+        return count($this->getBusinessUnitIds()) >= 100;
+    }
+
+    /**
      * @return BusinessUnitRepository
      */
     protected function getBusinessUnitRepo()
