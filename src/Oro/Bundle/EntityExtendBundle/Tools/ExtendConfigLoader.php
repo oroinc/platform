@@ -119,4 +119,20 @@ class ExtendConfigLoader extends ConfigLoader
 
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function loadEntityConfigs(ClassMetadata $metadata, $force)
+    {
+        parent::loadEntityConfigs($metadata, $force);
+
+        $className = $metadata->getName();
+        if ($this->hasEntityConfigs($metadata)) {
+            if ($this->configManager->getProvider('extend')->hasConfig($className)) {
+                $this->configManager->getProvider('extend')->getConfig($className)
+                    ->set('id_columns', $metadata->getIdentifierColumnNames());
+            }
+        }
+    }
 }
