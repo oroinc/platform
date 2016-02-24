@@ -10,39 +10,6 @@ define([
 ], function($, _, __, routing, tools, mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
-    var filterLoaders = [];
-
-    function createFilterLoader(filterName) {
-        return function(success) {
-            filterLoaders.push({
-                name: filterName,
-                success: success
-            });
-        };
-    }
-
-    function loadFilters(gridName) {
-        var filterNames = _.map(filterLoaders, _.property('name'));
-        if (!filterNames) {
-            return;
-        }
-
-        var url = routing.generate('oro_datagrid_filter_metadata', {
-            gridName: gridName,
-            filterNames: _.map(filterLoaders, _.property('name'))
-        });
-
-        $.get(url)
-            .done(function(data) {
-                _.each(filterLoaders, function (loader) {
-                    loader.success.call(this, data[loader.name]);
-                });
-            })
-            .fail(function() {
-                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
-            });
-    }
-
     var methods = {
         /**
          * Reads data from container, collects required modules and runs filters builder
@@ -108,17 +75,49 @@ define([
                         options.collection = collection;
                     }
                     if (options.lazy) {
-                        options.loader = createFilterLoader(options.name);
+                        options.loader = methods.createFilterLoader.call(this, options.name);
                     }
                     var Filter = modules[options.type].extend(options);
                     filters[options.name] = new Filter();
                 }
-            });
-            loadFilters(this.metadata.options.gridName);
+            }, this);
+            methods.loadFilters.call(this, this.metadata.options.gridName);
 
             return {
                 filters: filters
             };
+        },
+
+        loadFilters: function(gridName) {
+            var filterNames = _.map(this.filterLoaders, _.property('name'));
+            if (!filterNames) {
+                return;
+            }
+
+            var url = routing.generate('oro_datagrid_filter_metadata', {
+                gridName: gridName,
+                filterNames: _.map(this.filterLoaders, _.property('name'))
+            });
+
+            var self = this;
+            $.get(url)
+                .done(function(data) {
+                    _.each(self.filterLoaders, function (loader) {
+                        loader.success.call(this, data[loader.name]);
+                    });
+                })
+                .fail(function() {
+                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+                });
+        },
+
+        createFilterLoader: function(filterName) {
+            return _.bind(function(success) {
+                this.filterLoaders.push({
+                    name: filterName,
+                    success: success
+                });
+            }, this);
         }
     };
 
@@ -137,6 +136,7 @@ define([
         init: function(deferred, options) {
             var self;
             self = {
+                filterLoaders: [],
                 deferred: deferred,
                 $el: options.$el,
                 gridName: options.gridName,
