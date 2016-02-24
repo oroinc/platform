@@ -6,6 +6,9 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     AbstractInputWidget = BaseView.extend({
+        /** @property {jQuery} */
+        $container: null,
+
         /** @property {Boolean} */
         keepElement: true,
 
@@ -24,6 +27,12 @@ define(function(require) {
         /** @property {mixed} */
         refreshOptions: null,
 
+        /** @property {string} */
+        containerClass: 'input-widget',
+
+        /** @property {string} */
+        containerClassSuffix: '',
+
         initialize: function(options) {
             this.resolveOptions(options);
 
@@ -32,6 +41,9 @@ define(function(require) {
             } else {
                 this.widgetFunction();
             }
+
+            this.setContainer();
+            this.getContainer().addClass(this.containerClass);
         },
 
         resolveOptions: function(options) {
@@ -39,6 +51,10 @@ define(function(require) {
 
             this.$el.data('inputWidget', this);
             this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
+
+            if (this.containerClassSuffix) {
+                this.containerClass += '-' + this.containerClassSuffix;
+            }
         },
 
         dispose: function() {
@@ -55,7 +71,17 @@ define(function(require) {
             return AbstractInputWidget.__super__.dispose.apply(this, arguments);
         },
 
-        getContainer: function() {},
+        setContainer: function() {},
+
+        getContainer: function() {
+            return this.$container;
+        },
+
+        setWidth: function(width) {
+            if (this.getContainer()) {
+                this.getContainer().width(width);
+            }
+        },
 
         refresh: function() {
             if (this.refreshOptions) {

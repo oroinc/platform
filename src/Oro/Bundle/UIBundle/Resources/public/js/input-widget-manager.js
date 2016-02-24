@@ -6,6 +6,8 @@ define(function(require) {
     var _ = require('underscore');
 
     InputWidgetManager = {
+        noWidgetSelector: '.no-input-widget',
+
         widgetsByTag: {},
 
         registerWidget: function(widget) {
@@ -40,7 +42,12 @@ define(function(require) {
         },
 
         isApplicable: function($input, widget) {
-            return !widget.selector || $input.is(widget.selector);
+            if (this.noWidgetSelector && $input.is(this.noWidgetSelector)) {
+                return false;
+            } else if (widget.selector && !$input.is(widget.selector)) {
+                return false;
+            }
+            return true;
         },
 
         createWidget: function($input, Widget, options) {

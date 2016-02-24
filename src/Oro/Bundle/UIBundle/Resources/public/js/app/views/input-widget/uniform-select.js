@@ -9,10 +9,13 @@ define(function(require) {
 
         refreshOptions: 'update',
 
+        containerClassSuffix: 'select',
+
         initialize: function() {
             UniformSelectInputWidget.__super__.initialize.apply(this, arguments);
             if (this.$el.is('.error:not([multiple])')) {
-                this.$el.removeClass('error').closest('.selector').addClass('error');
+                this.$el.removeClass('error');
+                this.$container.addClass('error');
             }
         },
 
@@ -24,9 +27,13 @@ define(function(require) {
             UniformSelectInputWidget.__super__.dispose.apply(this, arguments);
         },
 
-        getContainer: function() {
-            var $parent = this.$el.parent('.selector');
-            return $parent.length > 0 ? $parent : null;
+        setContainer: function() {
+            this.$container = this.$el.parent('.selector');
+        },
+
+        setWidth: function(width) {
+            UniformSelectInputWidget.__super__.setWidth.apply(this, arguments);
+            this.$container.find('span').width(width);
         }
     });
 

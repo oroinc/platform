@@ -10,7 +10,6 @@ define(function(require) {
 
     require('bootstrap');
     require('jquery-ui');
-    require('jquery.uniform');
     require('oroui/js/responsive-jquery-widget');
 
     var document = window.document;
@@ -80,7 +79,7 @@ define(function(require) {
 
         /**
          * Initializes
-         *  - form widgets (uniform)
+         *  - form widgets
          *  - tooltips
          *  - popovers
          *  - scrollspy

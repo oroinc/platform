@@ -15,10 +15,13 @@ define(function(require) {
 
         refreshOptions: 'update',
 
+        containerClassSuffix: 'file',
+
         initialize: function(options) {
             UniformFileInputWidget.__super__.initialize.apply(this, arguments);
             if (this.$el.is('.error')) {
-                this.$el.removeClass('error').closest('.uploader').addClass('error');
+                this.$el.removeClass('error');
+                this.$container.addClass('error');
             }
         },
 
@@ -30,9 +33,8 @@ define(function(require) {
             UniformFileInputWidget.__super__.dispose.apply(this, arguments);
         },
 
-        getContainer: function() {
-            var $parent = this.$el.parent('.uploader');
-            return $parent.length > 0 ? $parent : null;
+        setContainer: function() {
+            this.$container = this.$el.parent('.uploader');
         }
     });
 
