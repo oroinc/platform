@@ -165,11 +165,8 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
-        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
-
-        $association3Metadata                  = $this->getClassMetadataMock('Test\Association3Target');
-        $association3Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+        $association3Metadata = $this->getClassMetadataMock('Test\Association3Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -272,8 +269,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->with('association1')
             ->willReturn(['targetEntity' => 'Test\Association1Target']);
 
-        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
-        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -335,8 +331,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->with('association1')
             ->willReturn(['targetEntity' => 'Test\Association1Target']);
 
-        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
-        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -402,8 +397,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->with('association1')
             ->willReturn(['targetEntity' => 'Test\Association1Target']);
 
-        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
-        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -471,8 +465,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->with('association1')
             ->willReturn(['targetEntity' => 'Test\Association1Target']);
 
-        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
-        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')

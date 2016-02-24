@@ -59,8 +59,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
 
     public function testProcessForConfigurableEntityWithoutConfig()
     {
-        $classMetadata                  = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
@@ -139,8 +138,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             ]
         ];
 
-        $classMetadata                  = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['field1']);
@@ -188,8 +186,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
                 ]
             );
 
-        $association1ClassMetadata                  = $this->getClassMetadataMock('Test\Association1Target');
-        $association1ClassMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
         $association1ClassMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);

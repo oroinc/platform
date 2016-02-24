@@ -58,6 +58,7 @@ class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
         }
+        $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
 
         return $classMetadata;
     }

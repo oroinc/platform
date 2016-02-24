@@ -146,8 +146,7 @@ class SetTypeForTableInheritanceRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
-        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
 
         $association2Metadata                  = $this->getClassMetadataMock('Test\Association2Target');
         $association2Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
