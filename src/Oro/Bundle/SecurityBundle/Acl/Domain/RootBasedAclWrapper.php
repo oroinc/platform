@@ -73,6 +73,10 @@ class RootBasedAclWrapper implements AclInterface
         /** @var EntryInterface[] $rootAces */
         $rootAces = $this->rootAcl->getObjectFieldAces($field);
 
+        if (empty($rootAces)) {
+            $rootAces = $this->getClassAces();
+        }
+
         foreach ($rootAces as $rootAce) {
             $exists = false;
             $rootSid = $rootAce->getSecurityIdentity();

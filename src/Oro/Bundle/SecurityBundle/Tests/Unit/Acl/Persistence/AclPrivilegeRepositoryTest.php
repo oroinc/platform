@@ -3,18 +3,18 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
-use Symfony\Component\Security\Acl\Model\EntryInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -89,7 +89,12 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $this->repository = new AclPrivilegeRepository($this->manager, $this->translator);
+        /** @var \PHPUnit_Framework_MockObject_MockObject|\Doctrine\Bundle\DoctrineBundle\Registry $registry */
+        $registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->repository = new AclPrivilegeRepository($this->manager, $this->translator, $registry);
     }
 
     public function testGetPermissionNames()

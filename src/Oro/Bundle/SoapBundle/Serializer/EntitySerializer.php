@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\Serializer;
 
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -12,6 +15,7 @@ use Oro\Bundle\EntityBundle\ORM\QueryHintResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 /**
  * @todo: This is draft implementation of the entity serializer.
@@ -149,6 +153,15 @@ class EntitySerializer
     /** @var DataTransformerInterface */
     protected $dataTransformer;
 
+    /** @var AuthorizationCheckerInterface Optional authentication checker */
+    protected $authChecker;
+
+    /** @var bool */
+    protected $isFieldACLEnabled = false;
+
+    /** @var bool */
+    protected $showRestrictedFields = false;
+
     /**
      * @param ManagerRegistry          $doctrine
      * @param ConfigManager            $configManager
@@ -168,6 +181,17 @@ class EntitySerializer
         $this->dataAccessor      = $dataAccessor;
         $this->dataTransformer   = $dataTransformer;
         $this->queryHintResolver = $queryHintResolver;
+    }
+
+    /**
+     * Inject authentication check to check field ACL
+     * if not injected - all fields are allowed
+     *
+     * @param AuthorizationCheckerInterface $authChecker
+     */
+    public function setAuthenticationChecker(AuthorizationCheckerInterface $authChecker)
+    {
+        $this->authChecker = $authChecker;
     }
 
     /**
@@ -198,26 +222,43 @@ class EntitySerializer
             return [];
         }
 
+        try {
+            $securityConfig  = $this->configManager->getProvider('security')->getConfig($entityClass);
+
+            $this->isFieldACLEnabled = $securityConfig->get('field_acl_enabled');
+            $this->showRestrictedFields = $securityConfig->get('show_restricted_fields');
+        } catch (RuntimeException $e) {
+            $this->isFieldACLEnabled = false;
+            $this->showRestrictedFields = true;
+        }
+
         $result = [];
         if ($useIdAsKey) {
             $idFieldName = $this->getEntityIdFieldName($entityClass);
             foreach ($entities as $entity) {
+                // if AuthenticationChecker injected, check if entity allowed to be viewed
+                if ($this->authChecker && !$this->authChecker->isGranted('VIEW', $entity)) {
+                    continue;
+                }
+
                 $id          = $this->dataAccessor->getValue($entity, $idFieldName);
                 $result[$id] = $this->serializeItem($entity, $entityClass, $config);
             }
         } else {
             foreach ($entities as $entity) {
+                // if AuthenticationChecker injected, check if entity allowed to be viewed
+                if ($this->authChecker && !$this->authChecker->isGranted('VIEW', $entity)) {
+                    continue;
+                }
+
                 $result[] = $this->serializeItem($entity, $entityClass, $config);
             }
         }
 
-        $relatedData = $this->loadRelatedData(
-            $entityClass,
-            $this->getEntityIds($entities, $entityClass),
-            $config
-        );
+        $entityIds = $this->getEntityIds($entities, $entityClass);
+        $relatedData = $this->loadRelatedData($entityClass, $entityIds, $config);
         if (!empty($relatedData)) {
-            $this->applyRelatedData($result, $entityClass, $relatedData, $config);
+            $this->applyRelatedData($result, $relatedData, $config, $entityIds);
         }
 
         if (isset($config['post_serialize'])) {
@@ -278,36 +319,78 @@ class EntitySerializer
         $result         = [];
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $resultFields   = $this->getFieldsToSerialize($entityClass, $config);
+
         foreach ($resultFields as $field) {
-            $value = null;
-            if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
-                $targetConfig = $this->getFieldConfig($config, $field);
-                if ($entityMetadata->isAssociation($field)) {
-                    if ($value !== null) {
-                        if (!empty($targetConfig['fields'])) {
-                            if (is_string($targetConfig['fields'])) {
-                                $value = $this->dataAccessor->getValue($value, $targetConfig['fields']);
-                                $value = $this->dataTransformer->transform(
-                                    $entityClass,
-                                    $field,
-                                    $value,
-                                    $targetConfig
-                                );
-                            } else {
-                                $value = $this->serializeItem(
-                                    $value,
-                                    $entityMetadata->getAssociationTargetClass($field),
-                                    $targetConfig
-                                );
-                            }
-                        } else {
-                            $value = $this->dataTransformer->transform(
-                                $entityClass,
-                                $field,
-                                $value,
-                                $targetConfig
-                            );
-                        }
+            $isFieldAllowed = $this->isFieldACLEnabled ? $this->isAllowedField($entity, $entityClass, $field) : true;
+            if (!$this->showRestrictedFields && !$isFieldAllowed) {
+                continue;
+            }
+
+            $targetFieldConfig = $this->getFieldConfig($config, $field);
+
+            $value = $isFieldAllowed ?
+                $this->serializeItemField($entity, $field, $entityClass, $entityMetadata, $targetFieldConfig) :
+                null;
+
+            $resultFieldName = $this->getResultFieldName($field, $targetFieldConfig);
+            $result[$resultFieldName] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * @param array|object $entity
+     * @param string       $entityClass
+     * @param string       $field
+     *
+     * @return bool
+     * @throws \Doctrine\ORM\ORMException
+     */
+    protected function isAllowedField($entity, $entityClass, $field)
+    {
+        if (!$this->authChecker) {
+            return true;
+        }
+        $entityToCheck = $entity;
+        if (is_array($entityToCheck) && !empty($entityToCheck['entityId'])) {
+            $entityToCheck = $this->doctrineHelper->getEntityManager($entityClass)->getReference(
+                $entityClass,
+                $entity['entityId']
+            );
+        }
+        return $this->authChecker->isGranted('VIEW', new FieldVote($entityToCheck, $field));
+    }
+
+    /**
+     * @param object         $entity
+     * @param string         $field
+     * @param string         $entityClass
+     * @param EntityMetadata $entityMetadata
+     * @param array          $targetConfig
+     *
+     * @return array|mixed|null
+     */
+    protected function serializeItemField($entity, $field, $entityClass, EntityMetadata $entityMetadata, $targetConfig)
+    {
+        $isAssociation = $entityMetadata->isAssociation($field);
+        $value         = null;
+        if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
+            if ($isAssociation && $value !== null) {
+                if (!empty($targetConfig['fields'])) {
+                    if (is_string($targetConfig['fields'])) {
+                        $value = $this->dataAccessor->getValue($value, $targetConfig['fields']);
+                        $value = $this->dataTransformer->transform(
+                            $entityClass,
+                            $field,
+                            $value,
+                            $targetConfig
+                        );
+                    } else {
+                        $value = $this->serializeItem(
+                            $value,
+                            $entityMetadata->getAssociationTargetClass($field),
+                            $targetConfig
+                        );
                     }
                 } else {
                     $value = $this->dataTransformer->transform(
@@ -317,14 +400,19 @@ class EntitySerializer
                         $targetConfig
                     );
                 }
-                $result[$this->getResultFieldName($field, $targetConfig)] = $value;
-            } elseif ($this->isMetadataField($field)) {
-                $result[$this->getResultFieldName($field, $this->getFieldConfig($config, $field))] =
-                    $this->getMetadataFieldValue($entity, $field, $entityMetadata);
+            } elseif (!$isAssociation) {
+                $value = $this->dataTransformer->transform(
+                    $entityClass,
+                    $field,
+                    $value,
+                    $targetConfig
+                );
             }
+        } elseif ($this->isMetadataField($field)) {
+            $value = $this->getMetadataFieldValue($entity, $field, $entityMetadata);
         }
 
-        return $result;
+        return $value;
     }
 
     /**
@@ -522,22 +610,15 @@ class EntitySerializer
 
     /**
      * @param array  $result
-     * @param string $entityClass
      * @param array  $relatedData
      * @param array  $config
-     *
-     * @throws \RuntimeException
+     * @param array  $entityIds
      */
-    protected function applyRelatedData(array &$result, $entityClass, $relatedData, $config)
+    protected function applyRelatedData(array &$result, $relatedData, $config, $entityIds)
     {
-        $entityIdFieldName = $this->getEntityIdFieldName($entityClass);
         foreach ($result as &$resultItem) {
-            if (!isset($resultItem[$entityIdFieldName]) && !array_key_exists($entityIdFieldName, $resultItem)) {
-                throw new \RuntimeException(
-                    sprintf('The result item does not contain the entity identifier. Entity: %s.', $entityClass)
-                );
-            }
-            $entityId = $resultItem[$entityIdFieldName];
+            $entityId = array_shift($entityIds);
+
             foreach ($relatedData as $field => $relatedItems) {
                 $targetConfig = $this->getFieldConfig($config, $field);
                 $resultName   = $this->getResultFieldName($field, $targetConfig);
@@ -546,6 +627,7 @@ class EntitySerializer
                 if (empty($relatedItems[$entityId])) {
                     continue;
                 }
+
                 foreach ($relatedItems[$entityId] as $relatedItem) {
                     if (!empty($targetConfig['fields']) && is_string($targetConfig['fields'])) {
                         $resultItem[$resultName][] = $relatedItem[$targetConfig['fields']];

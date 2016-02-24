@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
@@ -10,16 +12,14 @@ use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -39,10 +39,10 @@ class AclPrivilegeRepository
     protected $translator;
 
     /**
-     * @param AclManager $manager
+     * @param AclManager          $manager
      * @param TranslatorInterface $translator
      */
-    final public function __construct(AclManager $manager, TranslatorInterface $translator)
+    public function __construct(AclManager $manager, TranslatorInterface $translator)
     {
         $this->manager = $manager;
         $this->translator = $translator;
@@ -84,6 +84,7 @@ class AclPrivilegeRepository
      * Gets all privileges associated with the given security identity.
      *
      * @param SID $sid
+     *
      * @return ArrayCollection|AclPrivilege[]
      */
     public function getPrivileges(SID $sid)
@@ -208,7 +209,8 @@ class AclPrivilegeRepository
         // set permissions for other objects
         foreach ($privileges as $privilege) {
             $identity = $privilege->getIdentity()->getId();
-            $extensionKey = substr($identity, 0, strpos($identity, ':'));
+            $extensionKey = $this->getExtensionKeyByIdentity($identity);
+
             /** @var AclExtensionInterface $extension */
             $extension = $context[$extensionKey]['extension'];
             $oid = $extension->getObjectIdentity($identity);
@@ -236,6 +238,23 @@ class AclPrivilegeRepository
         }
 
         $this->manager->flush();
+    }
+
+    /**
+     * @param string $identity
+     *
+     * @return string
+     */
+    protected function getExtensionKeyByIdentity($identity)
+    {
+        $extensionKey = substr($identity, 0, strpos($identity, ':'));
+
+        if (strpos($extensionKey, '+')) {
+            // field extension
+            $extensionKey = explode('+', $extensionKey)[0];
+        }
+
+        return $extensionKey;
     }
 
     /**
@@ -502,12 +521,13 @@ class AclPrivilegeRepository
     /**
      * Adds permissions to the given $privilege.
      *
-     * @param SID $sid
-     * @param AclPrivilege $privilege
-     * @param OID $oid
-     * @param \SplObjectStorage $acls
+     * @param SID                   $sid
+     * @param AclPrivilege          $privilege
+     * @param OID                   $oid
+     * @param \SplObjectStorage     $acls
      * @param AclExtensionInterface $extension
-     * @param AclInterface $rootAcl
+     * @param AclInterface          $rootAcl
+     * @param null|string           $field
      */
     protected function addPermissions(
         SID $sid,
@@ -515,14 +535,16 @@ class AclPrivilegeRepository
         OID $oid,
         \SplObjectStorage $acls,
         AclExtensionInterface $extension,
-        AclInterface $rootAcl = null
+        AclInterface $rootAcl = null,
+        $field = null
     ) {
-        $allowedPermissions = $extension->getAllowedPermissions($oid);
+        $allowedPermissions = $extension->getAllowedPermissions($oid, $field);
         $acl = $this->findAclByOid($acls, $oid);
         if ($rootAcl !== null) {
-            $this->addAclPermissions($sid, null, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
+            $this->addAclPermissions($sid, $field, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
         }
 
+        // add default permission for not found in db privileges
         foreach ($allowedPermissions as $permission) {
             if (!$privilege->hasPermission($permission)) {
                 $privilege->addPermission(new AclPermission($permission, AccessLevel::NONE_LEVEL));
@@ -580,14 +602,50 @@ class AclPrivilegeRepository
         }
         // if so far not all requested privileges are found get them from the root ACL
         if ($privilege->getPermissionCount() < count($permissions)) {
+            // get root aces
+            $rootAces = $this->getFirstNotEmptyAce(
+                $sid,
+                $rootAcl,
+                [
+                    [AclManager::OBJECT_ACE, $field],
+                    [AclManager::CLASS_ACE, $field],
+                    [AclManager::OBJECT_ACE, null],
+                    [AclManager::CLASS_ACE, null],
+                ]
+            );
+
             $this->addAcesPermissions(
                 $privilege,
                 $permissions,
-                $this->getAces($sid, $rootAcl, AclManager::OBJECT_ACE, $field),
+                $rootAces,
                 $extension,
                 true
             );
         }
+    }
+
+    /**
+     * @param SID          $sid
+     * @param AclInterface $rootAcl
+     * @param array        $accessParamList [[AclManager::*_ACE, 'fieldName1'], ...]
+     *
+     * @return null|EntryInterface[]
+     */
+    protected function getFirstNotEmptyAce($sid, $rootAcl, array $accessParamList)
+    {
+        $resultAces = [];
+
+        foreach ($accessParamList as $accessParams) {
+            list ($level, $field) = $accessParams;
+            $rootAces = $this->getAces($sid, $rootAcl, $level, $field);
+
+            if (!empty($rootAces)) {
+                $resultAces = $rootAces;
+                break;
+            }
+        }
+
+        return $resultAces;
     }
 
     /**

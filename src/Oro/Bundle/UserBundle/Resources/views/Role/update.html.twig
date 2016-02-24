@@ -21,21 +21,13 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.cancelButton(path('oro_user_role_index')) }}
-    {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success role-submit', 'label': 'Save and Close'|trans}) %}
+    {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success', 'label': 'Save and Close'|trans}) %}
     {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
-        {# button attribute 'action' is avoided because of there is unacceptable submit binding on .action-button in init-layout.js #}
-        {% set html = html ~ UI.buttonType({
-            'type': 'button',
-            'class': 'btn-success main-group role-submit',
-            'label': 'Save'|trans,
-            'data': {
-                'action': 'save_and_stay'
-            }
-        }) %}
+        {% set html = html ~ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save'|trans, 'action': 'save_and_stay'}) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
     {% set options = {
-        elSelector: '.btn-success.role-submit',
+        elSelector: '.btn-success',
         formName: form.vars.name,
         formSelector: '#' ~ form.vars.id,
         labelSelector: '#' ~ form.label.vars.id,
@@ -89,16 +81,18 @@
     {% endfor %}
     {% if additionalData is not empty %}
         {% set dataBlocks = dataBlocks|merge([{
-        'title': 'Additional'|trans,
-        'subblocks': [{
-        'title': '',
-        'useSpan': false,
-        'data' : additionalData
-        }]
-        }] ) %}
+                'title': 'Additional'|trans,
+                'subblocks': [{
+                    'title': '',
+                    'useSpan': false,
+                    'data' : additionalData
+                }]
+            }]
+        ) %}
     {% endif %}
 
     {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
+        {% if privilegeBlock != 'field' %} {# do not show field controls here #}
         {% set dataBlocks = dataBlocks|merge([{
             'title': privilegeConfig.label|trans,
             'subblocks': [
@@ -111,6 +105,7 @@
                 }
             ]
         }]) %}
+        {% endif %}
     {% endfor %}
 
     {% set dataBlocks = dataBlocks|merge([{

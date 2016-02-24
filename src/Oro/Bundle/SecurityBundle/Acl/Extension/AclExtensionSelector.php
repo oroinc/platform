@@ -4,6 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 
@@ -79,14 +81,18 @@ class AclExtensionSelector
                     $type = $val->getId();
                 }
                 $id = $val->getType();
+            } elseif ($val instanceof FieldVote) {
+                // field extension shouldn't depend on actual entity identifier
+                $type = get_class($val->getDomainObject());
+                $id = 'field';
             } else {
                 $type = get_class($val);
                 $id = $this->objectIdAccessor->getId($val);
             }
         }
 
-        if ($type !== null && $id !== null) {
-            $cacheKey = $id . '!' . $type;
+        if ($type !== null) {
+            $cacheKey = ($id ?: 'null') . '!' . $type;
             if (isset($this->localCache[$cacheKey])) {
                 return $this->localCache[$cacheKey];
             }

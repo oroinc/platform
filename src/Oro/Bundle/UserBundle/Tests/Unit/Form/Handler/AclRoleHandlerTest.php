@@ -16,8 +16,11 @@ class AclRoleHandlerTest extends \PHPUnit_Framework_TestCase
         $factory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->disableOriginalConstructor()
             ->getMock();
+        $aclCache = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\AclCacheInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->handler = new AclRoleHandler($factory, []);
+        $this->handler = new AclRoleHandler($factory, $aclCache, []);
     }
 
     public function testAddExtensionFilter()

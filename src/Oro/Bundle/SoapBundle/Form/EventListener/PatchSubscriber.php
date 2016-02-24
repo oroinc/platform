@@ -20,14 +20,17 @@ class PatchSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::PRE_BIND => 'preBind');
+        return [FormEvents::PRE_SUBMIT => 'preSubmit'];
     }
 
-    public function preBind(FormEvent $event)
+    /**
+     * @param FormEvent $event
+     */
+    public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
-        $data = array_replace($this->unbind($form), $data ?: array());
+        $data = array_replace($this->unbind($form), $data ?: []);
 
         $event->setData($data);
     }
@@ -36,12 +39,13 @@ class PatchSubscriber implements EventSubscriberInterface
      * Returns the form's data like $form->submit() expects it
      *
      * @param FormInterface $form
+     *
      * @return array
      */
     protected function unbind(FormInterface $form)
     {
         if ($form->count() > 0) {
-            $ary = array();
+            $ary = [];
 
             foreach ($form->all() as $name => $child) {
                 $value = $this->unbind($child);

@@ -34,7 +34,13 @@
 {% endblock %}
 
 {% block oro_acl_label_widget %}
-    <strong>{{ value|trans }}</strong>
+    <strong>
+        {% if form.vars.roleId|default(false) %}
+        <a href="{{ url('oro_field_acl_update', {id: form.vars.roleId, className: form.vars.className}) }}">{{ value|trans }}</a>
+        {% else %}
+        {{ value|trans }}
+        {% endif %}
+    </strong>
     {% set type = type|default('hidden') %}
     {{ block('form_widget_simple') }}
 {% endblock %}

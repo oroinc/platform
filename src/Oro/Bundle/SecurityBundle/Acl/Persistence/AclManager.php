@@ -87,14 +87,16 @@ class AclManager extends AbstractAclManager
     /**
      * Get access levels list for object.
      *
-     * @param $object
+     * @param object|string $object
+     * @param string|null   $permissionName
+     *
      * @return array
      */
-    public function getAccessLevels($object)
+    public function getAccessLevels($object, $permissionName = null)
     {
         $extension = $this->getExtensionSelector()->select($object);
 
-        return $extension->getAccessLevelNames($object);
+        return $extension->getAccessLevelNames($object, $permissionName);
     }
 
     /**
@@ -493,23 +495,25 @@ class AclManager extends AbstractAclManager
     /**
      * Gets all object-based or class-based ACEs associated with given ACL and the given security identity
      *
-     * @param SID $sid
-     * @param OID $oid
-     * @return EntryInterface[]
+     * @param SID         $sid
+     * @param OID         $oid
+     * @param null|string $fieldName
+     *
+     * @return \Symfony\Component\Security\Acl\Model\EntryInterface[]
      */
-    public function getAces(SID $sid, OID $oid)
+    public function getAces(SID $sid, OID $oid, $fieldName = null)
     {
         $this->validateAclEnabled();
 
         if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            return $this->doGetAces($sid, $oid, self::OBJECT_ACE, null);
+            return $this->doGetAces($sid, $oid, self::OBJECT_ACE, $fieldName);
         }
         $extension = $this->extensionSelector->select($oid);
         if ($oid->getIdentifier() === $extension->getExtensionKey()) {
-            return $this->doGetAces($sid, $oid, self::CLASS_ACE, null);
+            return $this->doGetAces($sid, $oid, self::CLASS_ACE, $fieldName);
         }
 
-        return $this->doGetAces($sid, $oid, self::OBJECT_ACE, null);
+        return $this->doGetAces($sid, $oid, self::OBJECT_ACE, $fieldName);
     }
 
     /**

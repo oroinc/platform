@@ -1,3 +1,4 @@
 css:
     'orosecurity':
         - 'bundles/orosecurity/css/selector.less'
+        - 'bundles/orosecurity/css/field-acl.css'

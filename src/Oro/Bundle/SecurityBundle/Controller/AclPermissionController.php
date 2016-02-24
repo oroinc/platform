@@ -20,18 +20,19 @@ class AclPermissionController extends Controller
 {
     /**
      * @Route(
-     *  "/acl-access-levels/{oid}",
+     *  "/acl-access-levels/{oid}/{permission}",
      *  name="oro_security_access_levels",
-     *  requirements={"oid"="\w+:[\w\(\)]+"},
+     *  requirements={"oid"="[\w\+]+:[\w\(\)]+", "permission"="[\w/]+"},
      *  defaults={"_format"="json"}
      * )
      * @Template
      *
      * @param string $oid
+     * @param string $permission
      *
      * @return array
      */
-    public function aclAccessLevelsAction($oid)
+    public function aclAccessLevelsAction($oid, $permission)
     {
         if (strpos($oid, 'entity:') === 0) {
             $entity = substr($oid, 7);
@@ -40,9 +41,15 @@ class AclPermissionController extends Controller
             }
         }
 
+        if (strpos($oid, 'field+') === 0) {
+            $entity = substr($oid, strpos($oid, ':') + 1);
+            $oid = substr($oid, 0, strpos($oid, ':') + 1) .
+                $this->get('oro_entity.routing_helper')->resolveEntityClass($entity);
+        }
+
         $levels = $this
             ->get('oro_security.acl.manager')
-            ->getAccessLevels($oid);
+            ->getAccessLevels($oid, $permission);
 
         return ['levels' => $levels];
     }

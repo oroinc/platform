@@ -3,6 +3,7 @@ placeholders:
         items:
             organization_selector:
                 order: 200
+
     organization_name:
         items:
             organization_name:
@@ -12,5 +13,6 @@ items:
     organization_selector:
         template: OroSecurityBundle:Organization:selector.html.twig
         applicable: @oro_user.placeholder.filter->isUserApplicable()
+
     organization_name:
         template: OroSecurityBundle:Organization:current_name.html.twig

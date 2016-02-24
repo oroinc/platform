@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
-use Doctrine\ORM\QueryBuilder;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Proxy\Proxy;
@@ -19,12 +18,14 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -172,10 +173,19 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {
             $entity->__load();
         }
+        $securityFacade = $this->get('oro_security.security_facade');
+
         $result = [];
         if ($entity) {
             if (is_array($entity)) {
+                $voteObject = $this->get('oro_entity.doctrine_helper')->createEntityInstance($entity['entity']);
+
                 foreach ($entity as $field => $value) {
+                    $isForbidden = !$securityFacade->isGranted('VIEW', new FieldVote($voteObject, $field));
+                    if ($isForbidden) {
+                        continue;
+                    }
+
                     $this->transformEntityField($field, $value);
                     $result[$field] = $value;
                 }
@@ -196,6 +206,11 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                     $accessors = ['get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field)];
                     foreach ($accessors as $accessor) {
                         if (method_exists($entity, $accessor)) {
+                            $isForbidden = !$securityFacade->isGranted('VIEW', new FieldVote($entity, $field));
+                            if ($isForbidden) {
+                                continue;
+                            }
+
                             $value = $entity->$accessor();
 
                             $this->transformEntityField($field, $value);
@@ -383,6 +398,9 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         } else {
             $headers = isset($contextValues['headers']) ? $contextValues['headers'] : [];
             unset($contextValues['headers']);
+
+//            $data = $this->get('oro_security.field_filter')
+//                ->filterRestrictedFields($data, $this->getManager()->getClass());
 
             $response = new JsonResponse($data, $status, $headers);
         }
