@@ -43,6 +43,8 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var ActionRegistry */
     protected $registry;
 
+    private $contextHelper;
+
     protected function setUp()
     {
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')

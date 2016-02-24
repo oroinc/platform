@@ -95,11 +95,9 @@ class ContextHelper
      */
     protected function getRequestParameter($name, $default = null)
     {
-        if (!$this->currentRequest) {
-            $this->currentRequest = $this->requestStack->getCurrentRequest();
-        }
+        $request = $this->requestStack->getCurrentRequest();
 
-        return $this->currentRequest ? $this->currentRequest->get($name, $default) : $default;
+        return $request ? $request->get($name, $default) : $default;
     }
 
     /**
