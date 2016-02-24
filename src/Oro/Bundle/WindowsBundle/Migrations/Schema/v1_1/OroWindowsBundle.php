@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WindowsBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 
@@ -30,7 +30,7 @@ class OroWindowsBundle implements Migration, DatabasePlatformAwareInterface
         $table = $schema->getTable('oro_windows_state');
         $column = $table->getColumn('data');
 
-        if ($this->platform instanceof PostgreSqlPlatform) {
+        if ($this->platform instanceof PostgreSQL92Platform) {
             $queries->addPreQuery(
                 'ALTER TABLE oro_windows_state ALTER COLUMN data TYPE JSON USING data::JSON'
             );
