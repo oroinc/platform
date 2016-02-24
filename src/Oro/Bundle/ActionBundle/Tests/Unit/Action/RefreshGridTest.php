@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ActionBundle\Action\RefreshGrid;
 use Oro\Bundle\ActionBundle\Model\ActionData;
@@ -53,13 +54,13 @@ class RefreshGridTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteMethod()
     {
-        $gridname = 'test_grid';
+        $gridnames = ['test_grid', new PropertyPath('param')];
 
         $context = new ActionData(['param' => 'value']);
 
-        $this->action->initialize([$gridname]);
+        $this->action->initialize($gridnames);
         $this->action->execute($context);
 
-        $this->assertEquals(['param' => 'value', 'refreshGrid' => [$gridname]], $context->getValues());
+        $this->assertEquals(['param' => 'value', 'refreshGrid' => ['test_grid', 'value']], $context->getValues());
     }
 }
