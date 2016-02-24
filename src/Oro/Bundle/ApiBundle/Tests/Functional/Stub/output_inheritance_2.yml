@@ -1,18 +1,18 @@
 data:
   0:
-    type: "auditfields"
+    type: "testdepartments"
     id: auto
     attributes:
-      oldText: "old_value"
-      newText: "new_value"
+      name: "TestDepartment"
     relationships:
-      audit:
+      staff:
         data:
-          type: "audits"
-          id: auto
+          -
+            type: "testemployees"
+            id: auto
 included:
   0:
-    type: "audits"
+    type: "testemployees"
     id: auto
     attributes:
-      objectClass: "Oro\Bundle\UserBundle\Entity\User"
+      name: "TestEmployee"

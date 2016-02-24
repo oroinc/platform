@@ -75,6 +75,7 @@ define(function(require) {
         events: {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
+            'mousedown': 'onMousedown',
             'click [data-action]': 'rethrowAction',
             'keydown input[name=value]': 'onGenericKeydown',
             'keydown': 'rethrowEvent',
@@ -227,9 +228,20 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onFocusout: function(e) {
-            if (!this.$el.has(e.relatedTarget).length) {
+            if (!this._isSelected) {
                 this.blur();
+            } else {
+                delete this._isSelected;
             }
+        },
+
+        /**
+         * Handles mousedown event
+         *
+         * @param {jQuery.Event} e
+         */
+        onMousedown: function(e) {
+            this._isSelected = true;
         },
 
         /**

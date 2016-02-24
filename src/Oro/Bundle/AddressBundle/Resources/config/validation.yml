@@ -17,7 +17,8 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
                   max: 255
 
         country:
-            - NotBlank: ~
+            - NotBlank:
+                groups: [AbstractAddress]
 
         regionText:
             - Length:

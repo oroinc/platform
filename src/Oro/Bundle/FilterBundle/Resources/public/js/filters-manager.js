@@ -13,27 +13,6 @@ define(function(require) {
     var filterWrapper = require('./datafilter-wrapper');
 
     /**
-     * Defines parent element for dropdown-menu by toggle element
-     * (this method is taken from Bootstrap-Dropdown)
-     *
-     * @param {jQuery} $toggle
-     * @returns {*|jQuery|HTMLElement}
-     */
-    function getDropdownMenuParent($toggle) {
-        var $parent;
-        var selector = $toggle.attr('data-target');
-        if (!selector) {
-            selector = $toggle.attr('href');
-            selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
-        }
-        $parent = selector && $(selector);
-        if (!$parent || !$parent.length) {
-            $parent = $toggle.parent();
-        }
-        return $parent;
-    }
-
-    /**
      * View that represents all grid filters
      *
      * @export  orofilter/js/filters-manager
@@ -433,10 +412,7 @@ define(function(require) {
             e.preventDefault();
             e.stopPropagation();
             if (!$dropdown.hasClass('oro-open')) {
-                // closes other dropdown-menus
-                $(DROPDOWN_TOGGLE_SELECTOR).each(function() {
-                    getDropdownMenuParent($(this)).removeClass('open');
-                });
+                $(DROPDOWN_TOGGLE_SELECTOR).trigger('tohide.bs.dropdown');
             }
             $dropdown.toggleClass('oro-open');
         },

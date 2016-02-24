@@ -5,24 +5,17 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class CompleteFilters implements ProcessorInterface
+/**
+ * Makes sure that the filters configuration contains all supported filters
+ * and all filters are fully configured.
+ */
+class CompleteFilters extends CompleteSection
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -30,101 +23,66 @@ class CompleteFilters implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        $filters = $context->getFilters();
-        if (empty($filters)) {
-            // nothing to normalize
-            return;
-        }
-
-        $fields = ConfigUtil::getArrayValue($filters, ConfigUtil::FIELDS);
-
-        if (ConfigUtil::isExcludeAll($filters)) {
-            $fields = ConfigUtil::removeExclusions($fields);
-        } else {
-            $entityClass = $context->getClassName();
-            if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-                $fields = ConfigUtil::removeExclusions(
-                    $this->completeFilters($fields, $entityClass, $context->getResult())
-                );
-            }
-        }
-
-        $context->setFilters(
-            [
-                ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_ALL,
-                ConfigUtil::FIELDS           => $fields
-            ]
-        );
+        $this->complete($context->getFilters(), $context->getClassName(), $context->getResult());
     }
 
     /**
-     * @param array      $filters
-     * @param string     $entityClass
-     * @param array|null $config
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    protected function completeFilters(array $filters, $entityClass, $config)
-    {
+    protected function completeFields(
+        EntityConfigInterface $section,
+        $entityClass,
+        EntityDefinitionConfig $definition
+    ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $filters = $this->getFieldFilters($filters, $metadata);
-        $filters = $this->getAssociationFilters($filters, $metadata);
+        /** @var FiltersConfig $section */
+        $this->completeFieldFilters($section, $metadata, $definition);
+        $this->completeAssociationFilters($section, $metadata, $definition);
+    }
 
-        if (!empty($config)) {
-            foreach ($filters as $fieldName => &$fieldConfig) {
-                if (ConfigUtil::isExcludedField($config, $fieldName)) {
-                    $fieldConfig[ConfigUtil::EXCLUDE] = true;
+    /**
+     * @param FiltersConfig          $filters
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function completeFieldFilters(
+        FiltersConfig $filters,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
+    ) {
+        $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
+        foreach ($indexedFields as $fieldName => $dataType) {
+            if ($definition->hasField($fieldName)) {
+                $filter = $filters->getOrAddField($fieldName);
+                if (!$filter->hasDataType()) {
+                    $filter->setDataType($dataType);
                 }
             }
         }
-
-        return $filters;
     }
 
     /**
-     * @param array         $filters
-     * @param ClassMetadata $metadata
-     *
-     * @return array
+     * @param FiltersConfig          $filters
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
      */
-    protected function getFieldFilters(array $filters, ClassMetadata $metadata)
-    {
-        $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
-        foreach ($indexedFields as $fieldName => $type) {
-            if (array_key_exists($fieldName, $filters)) {
-                // already defined
-                continue;
-            }
-            $filters[$fieldName] = [
-                ConfigUtil::DATA_TYPE => $type
-            ];
-        }
-
-        return $filters;
-    }
-
-    /**
-     * @param array         $filters
-     * @param ClassMetadata $metadata
-     *
-     * @return array
-     */
-    protected function getAssociationFilters(array $filters, ClassMetadata $metadata)
-    {
+    protected function completeAssociationFilters(
+        FiltersConfig $filters,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
+    ) {
         $relations = $this->doctrineHelper->getIndexedAssociations($metadata);
         foreach ($relations as $fieldName => $dataType) {
-            if (array_key_exists($fieldName, $filters)) {
-                // already defined
-                continue;
+            if ($definition->hasField($fieldName)) {
+                $filter = $filters->getOrAddField($fieldName);
+                if (!$filter->hasDataType()) {
+                    $filter->setDataType($dataType);
+                }
+                if (!$filter->hasArrayAllowed()) {
+                    $filter->setArrayAllowed();
+                }
             }
-            $filters[$fieldName] = [
-                ConfigUtil::DATA_TYPE   => $dataType,
-                ConfigUtil::ALLOW_ARRAY => true
-            ];
-
         }
-
-        return $filters;
     }
 }
