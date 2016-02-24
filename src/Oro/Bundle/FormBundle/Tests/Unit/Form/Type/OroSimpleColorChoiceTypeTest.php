@@ -108,7 +108,7 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
 
         $this->assertArrayHasKey('attr', $view->vars);
         $this->assertArrayHasKey('class', $view->vars['attr']);
-        $this->assertEquals('no-uniform', $view->vars['attr']['class']);
+        $this->assertEquals('no-input-widget', $view->vars['attr']['class']);
     }
 
     public function testGetParent()
