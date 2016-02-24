@@ -40,7 +40,15 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
                 'value' => true
             ],
             [
+                'method' => 'isForAllEntities',
+                'value' => false
+            ],
+            [
                 'method' => 'getEntities',
+                'value' => []
+            ],
+            [
+                'method' => 'getExcludeEntities',
                 'value' => []
             ],
             [
@@ -103,7 +111,9 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
                 ['label', 'test'],
                 ['substituteAction', 'test_action_name_to_substitute'],
                 ['enabled', false],
+                ['forAllEntities', true],
                 ['entities', ['entity1', 'entity2']],
+                ['excludeEntities', ['entity3', 'entity4']],
                 ['routes', ['route1', 'route2']],
                 ['groups', ['group1', 'group2']],
                 ['applications', ['application1', 'application2']],
@@ -115,73 +125,5 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
                 ['attributes', ['config1', 'config2']],
             ]
         );
-    }
-
-    /**
-     * @dataProvider hasContextFiltersProvider
-     *
-     * @param array $entities
-     * @param array $routes
-     * @param array $datagrids
-     * @param bool $expected
-     */
-    public function testHasContextFilters(array $entities, array $routes, array $datagrids, $expected)
-    {
-        $this->definition->setEntities($entities);
-        $this->definition->setRoutes($routes);
-        $this->definition->setDatagrids($datagrids);
-
-        $this->assertEquals($expected, $this->definition->hasContextFilters());
-    }
-
-    /**
-     * @return array
-     */
-    public function hasContextFiltersProvider()
-    {
-        return [
-            [
-                'entities' => [],
-                'routes' => [],
-                'datagrids' => [],
-                'expected' => false
-            ],
-            [
-                'entities' => ['TestEntity'],
-                'routes' => [],
-                'datagrids' => [],
-                'expected' => true
-            ],
-            [
-                'entities' => [],
-                'routes' => ['test_route'],
-                'datagrids' => [],
-                'expected' => true
-            ],
-            [
-                'entities' => [],
-                'routes' => [],
-                'datagrids' => ['test_datagrid'],
-                'expected' => true
-            ],
-            [
-                'entities' => ['TestEntity'],
-                'routes' => ['test_route'],
-                'datagrids' => [],
-                'expected' => true
-            ],
-            [
-                'entities' => [],
-                'routes' => ['test_route'],
-                'datagrids' => ['test_datagrid'],
-                'expected' => true
-            ],
-            [
-                'entities' => ['TestEntity'],
-                'routes' => [],
-                'datagrids' => ['test_datagrid'],
-                'expected' => true
-            ]
-        ];
     }
 }

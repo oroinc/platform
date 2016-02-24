@@ -98,6 +98,8 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition3 = clone $definition2;
         $definition3
             ->setName('maximum_name_and_acl')
+            ->setForAllEntities(true)
+            ->setExcludeEntities(['My\Entity2'])
             ->setConditions('preconditions', [
                 '@and' => [
                     ['@acl_granted' => 'test_acl'],
@@ -171,6 +173,8 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                         'routes' => ['my_route'],
                         'groups' => ['my_group'],
                         'enabled' => false,
+                        'forAllEntities' => true,
+                        'excludeEntities' => ['My\Entity2'],
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
                         'conditions' => ['config_cond'],

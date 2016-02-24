@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -16,7 +17,6 @@ class ContextHelper
     const ENTITY_CLASS_PARAM = 'entityClass';
     const DATAGRID_PARAM = 'datagrid';
     const GROUP_PARAM = 'group';
-    const WITHOUT_FILTERS_PARAM = 'without_filters';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -29,6 +29,9 @@ class ContextHelper
 
     /** @var  PropertyAccessor */
     protected $propertyAccessor;
+
+    /** @var Request */
+    protected $currentRequest;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -52,8 +55,7 @@ class ContextHelper
                 self::ENTITY_ID_PARAM => $this->getRequestParameter(self::ENTITY_ID_PARAM),
                 self::ENTITY_CLASS_PARAM => $this->getRequestParameter(self::ENTITY_CLASS_PARAM),
                 self::DATAGRID_PARAM => $this->getRequestParameter(self::DATAGRID_PARAM),
-                self::GROUP_PARAM => $this->getRequestParameter(self::GROUP_PARAM),
-                self::WITHOUT_FILTERS_PARAM => (bool) $this->getRequestParameter(self::WITHOUT_FILTERS_PARAM, false)
+                self::GROUP_PARAM => $this->getRequestParameter(self::GROUP_PARAM)
             ];
         }
 
@@ -93,9 +95,11 @@ class ContextHelper
      */
     protected function getRequestParameter($name, $default = null)
     {
-        $request = $this->requestStack->getCurrentRequest();
+        if (!$this->currentRequest) {
+            $this->currentRequest = $this->requestStack->getCurrentRequest();
+        }
 
-        return $request ? $request->get($name, $default) : $default;
+        return $this->currentRequest ? $this->currentRequest->get($name, $default) : $default;
     }
 
     /**
@@ -110,8 +114,7 @@ class ContextHelper
                 self::ENTITY_ID_PARAM => null,
                 self::ENTITY_CLASS_PARAM => null,
                 self::DATAGRID_PARAM => null,
-                self::GROUP_PARAM => null,
-                self::WITHOUT_FILTERS_PARAM => false
+                self::GROUP_PARAM => null
             ],
             $context
         );

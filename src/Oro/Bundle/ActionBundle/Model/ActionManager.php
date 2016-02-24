@@ -107,8 +107,7 @@ class ActionManager
             $entityId ? $entityClass : null,
             $context[ContextHelper::ROUTE_PARAM],
             $context[ContextHelper::DATAGRID_PARAM],
-            $context[ContextHelper::GROUP_PARAM],
-            $context[ContextHelper::WITHOUT_FILTERS_PARAM]
+            $context[ContextHelper::GROUP_PARAM]
         );
 
         if ($onlyAvailable) {

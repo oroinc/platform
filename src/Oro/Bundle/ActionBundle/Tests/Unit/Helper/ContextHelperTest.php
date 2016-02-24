@@ -46,7 +46,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContext($request, array $expected)
     {
-        $this->requestStack->expects($this->exactly(4))
+        $this->requestStack->expects($this->exactly(!$request ? 5 : 1))
             ->method('getCurrentRequest')
             ->willReturn($request);
 
@@ -66,6 +66,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => null,
                     'entityClass' => null,
                     'datagrid' => null,
+                    'group' => null
                 ]
             ],
             [
@@ -75,6 +76,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => null,
                     'entityClass' => null,
                     'datagrid' => null,
+                    'group' => null
                 ]
             ],
             [
@@ -84,6 +86,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'entityId' => '42',
                         'entityClass' => 'stdClass',
                         'datagrid' => 'test_datagrid',
+                        'group' => 'test_group'
                     ]
                 ),
                 'expected' => [
@@ -91,6 +94,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => '42',
                     'entityClass' => 'stdClass',
                     'datagrid' => 'test_datagrid',
+                    'group' => 'test_group'
                 ]
             ]
         ];
@@ -109,7 +113,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
         $entity->id = 42;
 
-        $this->requestStack->expects($this->exactly($requestStackCalls * 2))
+        $this->requestStack->expects($this->exactly($requestStackCalls))
             ->method('getCurrentRequest')
             ->willReturn($request);
 
@@ -149,12 +153,12 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'without request' => [
                 'request' => null,
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 10,
                 'expected' => new ActionData(['data' => null])
             ],
             'empty request' => [
                 'request' => new Request(),
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 1,
                 'expected' => new ActionData(['data' => null])
             ],
             'route1 without entity id' => [
@@ -164,7 +168,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'entityClass' => 'stdClass'
                     ]
                 ),
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 1,
                 'expected' => new ActionData(['data' => new \stdClass()])
             ],
             'entity' => [

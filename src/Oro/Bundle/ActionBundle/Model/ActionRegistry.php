@@ -39,12 +39,9 @@ class ActionRegistry
      * @param string|null $route
      * @param string|null $datagrid
      * @param string|null $group
-     * @param bool $withoutContextFilters
      * @return Action[]
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function find($entityClass, $route, $datagrid, $group, $withoutContextFilters = false)
+    public function find($entityClass, $route, $datagrid, $group = null)
     {
         $this->loadActions();
 
@@ -54,10 +51,9 @@ class ActionRegistry
         foreach ($allActions as $action) {
             $definition = $action->getDefinition();
 
-            if (($withoutContextFilters && !$definition->hasContextFilters()) ||
-                ($entityClass && in_array($entityClass, $definition->getEntities(), true)) ||
+            if ($this->isEntityClassMatched($entityClass, $definition) ||
                 ($route && in_array($route, $definition->getRoutes(), true)) ||
-                ($datagrid && in_array($route, $definition->getDatagrids(), true))
+                ($datagrid && in_array($datagrid, $definition->getDatagrids(), true))
             ) {
                 $actions[$action->getName()] = $action;
             }
@@ -107,15 +103,32 @@ class ActionRegistry
      */
     protected function filterByGroup($group = null)
     {
-        /** @var $allActions Action[] */
-        if ($group) {
-            $actions = array_filter($this->actions, function (Action $action) use ($group) {
-                return in_array($group, $action->getDefinition()->getGroups(), true);
-            });
-        } else {
-            $actions = $this->actions;
+        return array_filter($this->actions, function (Action $action) use ($group) {
+            return $group
+                ? in_array($group, $action->getDefinition()->getGroups(), true)
+                : !$action->getDefinition()->getGroups();
+        });
+    }
+
+    /**
+     * @param string $className
+     * @param ActionDefinition $definition
+     * @return bool
+     */
+    protected function isEntityClassMatched($className, ActionDefinition $definition)
+    {
+        if (!$className) {
+            return false;
         }
 
-        return $actions;
+        $forAllEntities = $definition->isForAllEntities();
+
+        if ((!$forAllEntities && in_array($className, $definition->getEntities(), true)) ||
+            ($forAllEntities && !in_array($className, $definition->getExcludeEntities(), true))
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
