@@ -46,7 +46,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContext($request, array $expected)
     {
-        $this->requestStack->expects($this->exactly(4))
+        $this->requestStack->expects($this->exactly(5))
             ->method('getCurrentRequest')
             ->willReturn($request);
 
@@ -153,12 +153,12 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'without request' => [
                 'request' => null,
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 5,
                 'expected' => new ActionData(['data' => null])
             ],
             'empty request' => [
                 'request' => new Request(),
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 5,
                 'expected' => new ActionData(['data' => null])
             ],
             'route1 without entity id' => [
@@ -168,7 +168,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'entityClass' => 'stdClass'
                     ]
                 ),
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 5,
                 'expected' => new ActionData(['data' => new \stdClass()])
             ],
             'entity' => [
