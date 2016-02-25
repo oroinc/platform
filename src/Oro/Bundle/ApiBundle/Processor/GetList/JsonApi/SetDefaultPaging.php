@@ -23,6 +23,11 @@ class SetDefaultPaging extends BaseSetDefaultPaging
     {
         /** @var GetListContext $context */
 
+        if ($context->hasQuery()) {
+            // a query is already built
+            return;
+        }
+
         if (!in_array(RequestType::REST, $context->getRequestType(), true)) {
             parent::process($context);
         } else {

@@ -7,6 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
+/**
+ * Loads data by sql query from context.
+ */
 class LoadDataBySqlQuery implements ProcessorInterface
 {
     /**
