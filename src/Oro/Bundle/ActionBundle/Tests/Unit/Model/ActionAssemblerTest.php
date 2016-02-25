@@ -8,9 +8,10 @@ use Oro\Bundle\ActionBundle\Model\ActionAssembler;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory as FunctionFactory;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
+use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
@@ -220,7 +221,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFunctionFactory()
     {
-        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory')
+        return $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
     }

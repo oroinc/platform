@@ -10,8 +10,8 @@ use Oro\Bundle\ActionBundle\Model\ActionRegistry;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory as FunctionFactory;
 
+use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionRegistryTest extends \PHPUnit_Framework_TestCase
@@ -28,7 +28,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory $functionFactory */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
     protected $functionFactory;
 
     /** @var ConditionFactory|\PHPUnit_Framework_MockObject_MockObject */
@@ -56,7 +56,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->functionFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory')
+        $this->functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 

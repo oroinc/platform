@@ -13,7 +13,7 @@ use Oro\Bundle\ActionBundle\Model\ActionRegistry;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory as FunctionFactory;
+use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
@@ -44,6 +44,27 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configurationProvider = $this
+            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -570,7 +591,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->setFrontendOptions($frontendOptions);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
-        $functionFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory')
+        $functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 

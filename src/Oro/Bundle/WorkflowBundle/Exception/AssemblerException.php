@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Exception;
 
-class AssemblerException extends WorkflowException
+use Oro\Component\ConfigExpression\Exception\AssemblerException as BaseAssemblerException;
+
+/**
+ * @deprecated since 1.10. Use {@see Oro\Component\ConfigExpression\Exception\AssemblerException} instead
+ */
+class AssemblerException extends BaseAssemblerException
 {
 }

@@ -198,12 +198,12 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * @param bool $isAllowed
+     * @param bool $isAvailable
      * @param array $definitionParams
      *
      * @return Action|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createAction($name = 'test_action', $isAllowed = true, array $definitionParams = [])
+    protected function createAction($name = 'test_action', $isAvailable = true, array $definitionParams = [])
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|ActionDefinition $definition */
         $definition = $this->getMock('Oro\Bundle\ActionBundle\Model\ActionDefinition');
@@ -225,9 +225,9 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->willReturn($name);
         $action->expects($this->any())
-            ->method('isAllowed')
+            ->method('isAvailable')
             ->withAnyParameters()
-            ->willReturn($isAllowed);
+            ->willReturn($isAvailable);
 
         return $action;
     }

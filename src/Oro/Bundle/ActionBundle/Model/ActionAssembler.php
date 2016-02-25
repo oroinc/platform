@@ -6,7 +6,8 @@ use Doctrine\ORM\ORMException;
 
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory as FunctionFactory;
+
+use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionAssembler extends AbstractAssembler

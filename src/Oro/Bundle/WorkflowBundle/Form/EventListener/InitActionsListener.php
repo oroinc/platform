@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
+use Oro\Component\ConfigExpression\Action\ActionInterface;
 
 class InitActionsListener implements EventSubscriberInterface
 {

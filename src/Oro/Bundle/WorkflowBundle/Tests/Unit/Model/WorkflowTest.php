@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
-use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -785,13 +785,13 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAttributesMapping()
     {
-        $attributeOne = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
+        $attributeOne = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
             ->getMock();
         $attributeOne->expects($this->once())
             ->method('getPropertyPath');
         $attributeOne->expects($this->never())
             ->method('getName');
-        $attributeTwo = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
+        $attributeTwo = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
             ->getMock();
         $attributeTwo->expects($this->atLeastOnce())
             ->method('getPropertyPath')
@@ -801,7 +801,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('name'));
 
         $attributes = array($attributeOne, $attributeTwo);
-        $attributeManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeManager')
+        $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
             ->disableOriginalConstructor()
             ->getMock();
         $attributeManager->expects($this->once())

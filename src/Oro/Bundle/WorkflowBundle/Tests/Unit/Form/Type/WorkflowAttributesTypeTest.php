@@ -113,7 +113,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $typeGuess = new TypeGuess($guess['form_type'], $guess['form_options'], TypeGuess::VERY_HIGH_CONFIDENCE);
             $this->attributeGuesser->expects($this->at($number))
                 ->method('guessClassAttributeForm')
-                ->with($guess['entity'], $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Model\Attribute'))
+                ->with($guess['entity'], $this->isInstanceOf('Oro\Bundle\ActionBundle\Model\Attribute'))
                 ->will($this->returnValue($typeGuess));
         }
 
@@ -183,7 +183,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                         ),
                     ),
                     'attribute_default_values' => array('first' => 'Test'),
-                    'init_actions' => $this->getMock('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+                    'init_actions' => $this->getMock('Oro\Component\ConfigExpression\Action\ActionInterface')
                 ),
                 'childrenOptions' => array(
                     'first'  => array('label' => 'First Custom', 'required' => true),

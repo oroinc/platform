@@ -79,7 +79,10 @@ class ActionExtension extends \Twig_Extension
             'fromUrl' => $request->getRequestUri()
         ];
 
-        if (array_key_exists('entity', $context) && is_object($context['entity']) &&
+        $entity = array_key_exists('entity', $context) && is_object($context['entity']) ? $context['entity'] : null;
+
+        if ($entity &&
+            $this->doctrineHelper->isManageableEntity($entity) &&
             !$this->doctrineHelper->isNewEntity($context['entity'])
         ) {
             $params['entityId'] = $this->doctrineHelper->getEntityIdentifier($context['entity']);
