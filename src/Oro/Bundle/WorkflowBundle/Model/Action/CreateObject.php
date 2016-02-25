@@ -62,7 +62,7 @@ class CreateObject extends AbstractAction
      */
     protected function createObject($context)
     {
-        $objectClassName = $this->getObjectClassName();
+        $objectClassName = $this->getObjectClassName($context);
 
         $arguments = $this->getConstructorArguments($context);
         if ($arguments) {
@@ -94,11 +94,15 @@ class CreateObject extends AbstractAction
     }
 
     /**
+     * @param mixed $context
+     *
      * @return string
      */
-    protected function getObjectClassName()
+    protected function getObjectClassName($context)
     {
-        return $this->options[self::OPTION_KEY_CLASS];
+        $class = $this->options[self::OPTION_KEY_CLASS];
+
+        return $this->contextAccessor->getValue($context, $class);
     }
 
     /**
