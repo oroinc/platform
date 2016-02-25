@@ -5,7 +5,8 @@ namespace Oro\Bundle\ApiBundle\Normalizer;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Component\EntitySerializer\DataAccessorInterface;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\EntityConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ObjectNormalizer
@@ -47,12 +48,12 @@ class ObjectNormalizer
     }
 
     /**
-     * @param mixed      $object
-     * @param array|null $config
+     * @param mixed             $object
+     * @param EntityConfig|null $config
      *
      * @return mixed
      */
-    public function normalizeObject($object, $config = null)
+    public function normalizeObject($object, EntityConfig $config = null)
     {
         if (null !== $object) {
             $object = $this->normalizeValue($object, is_array($object) ? 0 : 1, $config);
@@ -75,17 +76,17 @@ class ObjectNormalizer
         $nextLevel = $level + 1;
 
         $fields = $metadata->getFieldNames();
-        foreach ($fields as $field) {
+        foreach ($fields as $fieldName) {
             $value = null;
-            if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
-                $result[$field] = $this->normalizeValue($value, $nextLevel);
+            if ($this->dataAccessor->tryGetValue($entity, $fieldName, $value)) {
+                $result[$fieldName] = $this->normalizeValue($value, $nextLevel);
             }
         }
         $associations = $metadata->getAssociationNames();
-        foreach ($associations as $field) {
+        foreach ($associations as $fieldName) {
             $value = null;
-            if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
-                $result[$field] = $this->normalizeValue($value, $nextLevel);
+            if ($this->dataAccessor->tryGetValue($entity, $fieldName, $value)) {
+                $result[$fieldName] = $this->normalizeValue($value, $nextLevel);
             }
         }
 
@@ -115,90 +116,80 @@ class ObjectNormalizer
     }
 
     /**
-     * @param object $object
-     * @param array  $config
-     * @param int    $level
+     * @param object       $object
+     * @param EntityConfig $config
+     * @param int          $level
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function normalizeObjectByConfig($object, $config, $level)
+    protected function normalizeObjectByConfig($object, EntityConfig $config, $level)
     {
-        if (!ConfigUtil::isExcludeAll($config)) {
+        if (!$config->isExcludeAll()) {
             throw new \RuntimeException(
                 sprintf(
                     'The "%s" must be "%s".',
-                    ConfigUtil::EXCLUSION_POLICY,
-                    ConfigUtil::EXCLUSION_POLICY_ALL
+                    EntityDefinitionConfig::EXCLUSION_POLICY,
+                    EntityDefinitionConfig::EXCLUSION_POLICY_ALL
                 )
-            );
-        }
-        if (!array_key_exists(ConfigUtil::FIELDS, $config)) {
-            throw new \RuntimeException(
-                sprintf('The "%s" config does not exist.', ConfigUtil::FIELDS)
-            );
-        }
-        $fields = $config[ConfigUtil::FIELDS];
-        if (!is_array($fields)) {
-            throw new \RuntimeException(
-                sprintf('The "%s" config must be an array.', ConfigUtil::FIELDS)
             );
         }
 
         $result = [];
-        foreach ($fields as $fieldName => $fieldConfig) {
-            $value = null;
-            if (is_array($fieldConfig)) {
-                if (ConfigUtil::isExclude($fieldConfig)) {
-                    continue;
-                }
-                $propertyPath = ConfigUtil::getPropertyPath($fieldConfig, $fieldName);
-                if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {
-                    $childFields = isset($fieldConfig[ConfigUtil::FIELDS])
-                        ? $fieldConfig[ConfigUtil::FIELDS]
-                        : null;
-                    if (is_string($childFields)) {
+        $fields = $config->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->isExcluded()) {
+                continue;
+            }
+
+            $value        = null;
+            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {
+                $targetEntity = $field->getTargetEntity();
+                if (null !== $targetEntity) {
+                    $childFieldNames = array_keys($targetEntity->getFields());
+                    if ($field->isCollapsed() && count($childFieldNames) === 1) {
+                        $childFieldName = reset($childFieldNames);
                         if ($value instanceof \Traversable) {
                             $childValue = [];
                             foreach ($value as $val) {
                                 $childVal = null;
-                                $this->dataAccessor->tryGetValue($val, $childFields, $childVal);
+                                $this->dataAccessor->tryGetValue($val, $childFieldName, $childVal);
                                 $childValue[] = $childVal;
                             }
                         } else {
                             $childValue = null;
-                            if (!$this->dataAccessor->tryGetValue($value, $childFields, $childValue)) {
+                            if (!$this->dataAccessor->tryGetValue($value, $childFieldName, $childValue)) {
                                 continue;
                             }
                         }
                         $value = $childValue;
-                    } elseif (is_array($childFields)) {
-                        $value = $this->normalizeObjectByConfig($value, $fieldConfig, $level + 1);
+                    } else {
+                        $value = $this->normalizeObjectByConfig($value, $targetEntity, $level + 1);
                     }
                 }
-            } elseif (!$this->dataAccessor->tryGetValue($object, $fieldName, $value)) {
-                continue;
             }
             $result[$fieldName] = $value;
         }
 
-        if (isset($config[ConfigUtil::POST_SERIALIZE])) {
-            $result = call_user_func($config[ConfigUtil::POST_SERIALIZE], $result);
+        $postSerializeHandler = $config->getPostSerializeHandler();
+        if (null !== $postSerializeHandler) {
+            $result = call_user_func($postSerializeHandler, $result);
         }
 
         return $result;
     }
 
     /**
-     * @param mixed      $value
-     * @param int        $level
-     * @param array|null $config
+     * @param mixed             $value
+     * @param int               $level
+     * @param EntityConfig|null $config
      *
      * @return mixed
      */
-    protected function normalizeValue($value, $level, $config = null)
+    protected function normalizeValue($value, $level, EntityConfig $config = null)
     {
         if (is_array($value)) {
             $nextLevel = $level + 1;
@@ -216,7 +207,7 @@ class ObjectNormalizer
                     $result[] = $this->normalizeValue($val, $nextLevel, $config);
                 }
                 $value = $result;
-            } elseif (!empty($config)) {
+            } elseif (null !== $config) {
                 $value = $this->normalizeObjectByConfig($value, $config, $level);
             } elseif ($this->doctrineHelper->isManageableEntity($value)) {
                 if ($level <= static::MAX_NESTING_LEVEL) {

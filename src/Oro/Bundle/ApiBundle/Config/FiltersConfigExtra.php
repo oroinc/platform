@@ -24,4 +24,12 @@ class FiltersConfigExtra implements ConfigExtraInterface, ConfigExtraSectionInte
     {
         // no any modifications of the ConfigContext is required
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigType()
+    {
+        return ConfigUtil::FILTERS;
+    }
 }
