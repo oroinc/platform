@@ -4,10 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
+use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
@@ -15,15 +19,14 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     const FULL_MODE  = 'full';
     const SHORT_MODE = 'short';
 
-    /**
-     * @var SerializerInterface|NormalizerInterface|DenormalizerInterface
-     */
+    /** @var SerializerInterface|NormalizerInterface|DenormalizerInterface */
     protected $serializer;
 
-    /**
-     * @var FieldHelper
-     */
+    /** @var FieldHelper */
     protected $fieldHelper;
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
 
     /**
      * @param FieldHelper $fieldHelper
@@ -33,6 +36,14 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         $this->fieldHelper = $fieldHelper;
 
         parent::__construct([self::FULL_MODE, self::SHORT_MODE], self::FULL_MODE);
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -65,6 +76,8 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                 $this->fieldHelper->setObjectValue($result, $fieldName, $value);
             }
         }
+
+        $this->dispatchDenormalizeEvent($data, $result);
 
         return $result;
     }
@@ -149,7 +162,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $result[$fieldName] = $fieldValue;
         }
 
-        return $result;
+        return $this->dispatchNormalize($object, $result, $context);
     }
 
     /**
@@ -215,5 +228,35 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         }
 
         return false;
+    }
+
+    /**
+     * @param $data
+     * @param $result
+     */
+    protected function dispatchDenormalizeEvent($data, $result)
+    {
+        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::DENORMALIZE_ENTITY)) {
+            $this->dispatcher->dispatch(Events::DENORMALIZE_ENTITY, new DenormalizeEntityEvent($result, $data));
+        }
+    }
+
+    /**
+     * @param $object
+     * @param $result
+     * @param array $context
+     *
+     * @return array
+     */
+    protected function dispatchNormalize($object, $result, array $context)
+    {
+        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::NORMALIZE_ENTITY)) {
+            $event = new NormalizeEntityEvent($object, $result, $this->getMode($context) === static::FULL_MODE);
+            $this->dispatcher->dispatch(Events::NORMALIZE_ENTITY, $event);
+
+            return $event->getResult();
+        }
+
+        return $result;
     }
 }
