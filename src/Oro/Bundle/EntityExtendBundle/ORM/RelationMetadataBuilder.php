@@ -187,15 +187,29 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         if (!empty($relation['target_field_id'])) {
             $builder->inversedBy($relation['target_field_id']->getFieldName());
         }
-        $builder->setJoinTable(
-            $this->nameGenerator->generateManyToManyJoinTableName(
-                $fieldId->getClassName(),
-                $fieldId->getFieldName(),
-                $targetEntity
-            )
+        $entityClassName = $fieldId->getClassName();
+        $joinTableName   = $this->nameGenerator->generateManyToManyJoinTableName(
+            $entityClassName,
+            $fieldId->getFieldName(),
+            $targetEntity
         );
-
+        $selfIdColumn    = $this->getPrimaryKeyColumn($entityClassName);
         $targetIdColumn = $this->getPrimaryKeyColumn($targetEntity);
+        $builder->setJoinTable($joinTableName);
+
+        if ($selfIdColumn !== 'id') {
+            $builder->addJoinColumn(
+                $this->nameGenerator->generateManyToManyJoinTableColumnName(
+                    $entityClassName,
+                    '_' . $selfIdColumn
+                ),
+                $selfIdColumn,
+                false,
+                false,
+                'CASCADE'
+            );
+        }
+
         if ($targetIdColumn !== 'id') {
             $builder->addInverseJoinColumn(
                 $this->nameGenerator->generateManyToManyJoinTableColumnName(
