@@ -47,7 +47,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContext($request, array $expected)
     {
-        $this->requestStack->expects($this->exactly(4))
+        $this->requestStack->expects($this->exactly(5))
             ->method('getCurrentRequest')
             ->willReturn($request);
 
@@ -67,6 +67,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => null,
                     'entityClass' => null,
                     'datagrid' => null,
+                    'group' => null
                 ]
             ],
             [
@@ -76,6 +77,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => null,
                     'entityClass' => null,
                     'datagrid' => null,
+                    'group' => null
                 ]
             ],
             [
@@ -85,6 +87,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'entityId' => '42',
                         'entityClass' => 'stdClass',
                         'datagrid' => 'test_datagrid',
+                        'group' => 'test_group'
                     ]
                 ),
                 'expected' => [
@@ -92,6 +95,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => '42',
                     'entityClass' => 'stdClass',
                     'datagrid' => 'test_datagrid',
+                    'group' => 'test_group'
                 ]
             ]
         ];
@@ -150,19 +154,31 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'without request' => [
                 'request' => null,
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 5,
                 'expected' => new ActionData([
                     'data' => null,
-                    'context' => ['route' => null, 'entityId' => null, 'entityClass' => null, 'datagrid' => null],
+                    'context' => [
+                        'route' => null,
+                        'entityId' => null,
+                        'entityClass' => null,
+                        'group' => null,
+                        'datagrid' => null,
+                     ],
                     'translates' => new ActionTranslates()
                 ])
             ],
             'empty request' => [
                 'request' => new Request(),
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 5,
                 'expected' => new ActionData([
                     'data' => null,
-                    'context' => ['route' => null, 'entityId' => null, 'entityClass' => null, 'datagrid' => null],
+                    'context' => [
+                        'route' => null,
+                        'entityId' => null,
+                        'entityClass' => null,
+                        'group' => null,
+                        'datagrid' => null,
+                    ],
                     'translates' => new ActionTranslates()
                 ])
             ],
@@ -173,13 +189,14 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'entityClass' => 'stdClass'
                     ]
                 ),
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 5,
                 'expected' => new ActionData([
                     'data' => new \stdClass(),
                     'context' => [
                         'route' => 'test_route',
                         'entityId' => null,
                         'entityClass' => 'stdClass',
+                        'group' => null,
                         'datagrid' => null,
                     ],
                     'translates' => new ActionTranslates()
@@ -194,7 +211,8 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'route' => 'test_route',
                         'entityId' => '42',
                         'entityClass' => 'stdClass',
-                        'datagrid' => null
+                        'group' => null,
+                        'datagrid' => null,
                     ],
                     'translates' => new ActionTranslates()
                 ]),
@@ -213,7 +231,8 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'route' => 'test_route',
                         'entityId' => ['params' => ['id' => '42']],
                         'entityClass' => 'stdClass',
-                        'datagrid' => null
+                        'group' => null,
+                        'datagrid' => null,
                     ],
                     'translates' => new ActionTranslates()
                 ]),
@@ -257,6 +276,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         $actionData = new ActionData([
             'data' => $entity,
             'context' => array_merge($context1, [
+                'group' => null,
                 'datagrid' => null,
             ]),
             'translates' => new ActionTranslates(),

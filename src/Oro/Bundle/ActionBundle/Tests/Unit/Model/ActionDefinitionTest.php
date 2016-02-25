@@ -40,7 +40,15 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
                 'value' => true
             ],
             [
+                'method' => 'isForAllEntities',
+                'value' => false
+            ],
+            [
                 'method' => 'getEntities',
+                'value' => []
+            ],
+            [
+                'method' => 'getExcludeEntities',
                 'value' => []
             ],
             [
@@ -103,7 +111,9 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
                 ['label', 'test'],
                 ['substituteAction', 'test_action_name_to_substitute'],
                 ['enabled', false],
+                ['forAllEntities', true],
                 ['entities', ['entity1', 'entity2']],
+                ['excludeEntities', ['entity3', 'entity4']],
                 ['routes', ['route1', 'route2']],
                 ['groups', ['group1', 'group2']],
                 ['applications', ['application1', 'application2']],
