@@ -24,12 +24,9 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
             }
             if (!$context->has($key)) {
                 $result = self::ABSTAIN;
-            } else {
-                $contextValue = $context->get($key);
-                if (!$this->isMatch($value, $contextValue)) {
-                    $result = self::NOT_APPLICABLE;
-                    break;
-                }
+            } elseif (!$this->isMatch($value, $context->get($key))) {
+                $result = self::NOT_APPLICABLE;
+                break;
             }
         }
 
