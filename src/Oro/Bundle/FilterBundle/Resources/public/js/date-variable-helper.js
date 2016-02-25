@@ -112,7 +112,7 @@ define(function(require) {
             var displayValue = null;
             for (var i in this.index) {
                 if (this.index.hasOwnProperty(i)) {
-                    var regexpVariable = new RegExp('^'+value+'$', 'i');
+                    var regexpVariable = new RegExp('^' + value + '$', 'i');
                     var isShortMonth =
                         !/\s+/.test(this.index[i]) &&
                         regexpVariable.test(this.index[i].substr(0, 3)) &&
