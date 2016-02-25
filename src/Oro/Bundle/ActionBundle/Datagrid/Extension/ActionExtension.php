@@ -95,7 +95,7 @@ class ActionExtension extends AbstractExtension
 
         $actionsNew = [];
         foreach ($this->actions as $action) {
-            if ($action->isAllowed($actionData)) {
+            if ($action->isAvailable($actionData)) {
                 $actionsNew[$action->getName()] = [
                     'translates' => $actionData['translates']->toArray(),
                 ];
@@ -103,6 +103,7 @@ class ActionExtension extends AbstractExtension
                 $actionsNew[$action->getName()] = false;
             }
         }
+
         return array_merge($actionsOld, $actionsNew);
     }
 
