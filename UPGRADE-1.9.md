@@ -280,6 +280,7 @@ after:
 - Added migration `Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery` for loading to DB base permissions ('VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE')
 - Added migration `Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery` for updating ACL Entries to use custom Permissions
 - Added `acl_permission` twig extension - allows get `Permission` by `AclPermission`
+- Added third parameter to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface::getPermissions`.
 
 ####SidebarBundle
 - `Oro\Bundle\SidebarBundle\EventListener\RequestHandler` added to the class cache as performance improvement

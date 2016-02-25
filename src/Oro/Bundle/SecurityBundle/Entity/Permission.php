@@ -36,6 +36,11 @@ class Permission
     protected $label;
 
     /**
+     * If true permission will be applied for all entities in application except entities,
+     * that specified in $this->excludeEntities. In this case you do not need to specify any entity in property
+     * $this->applyToEntities.
+     * If false permission will be applied for entities that specified in $this->applyToEntities.
+     *
      * @var boolean
      *
      * @ORM\Column(name="is_apply_to_all", type="boolean")
@@ -43,6 +48,9 @@ class Permission
     protected $applyToAll = true;
 
     /**
+     * Array of entity class names. You need to specify entity classes for which you want apply current permission.
+     * This property is used only in the case when $this->applyToAll is false.
+     *
      * @var Collection|PermissionEntity[]
      *
      * @ORM\ManyToMany(targetEntity="PermissionEntity", cascade={"persist"})
@@ -59,6 +67,9 @@ class Permission
     protected $applyToEntities;
 
     /**
+     * Array of entity class names. You need to specify entity classes for which you want not apply current permission.
+     * This property is used only in the case when $this->applyToAll is true.
+     *
      * @var Collection|PermissionEntity[]
      *
      * @ORM\ManyToMany(targetEntity="PermissionEntity", cascade={"persist"})

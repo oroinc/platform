@@ -1,4 +1,4 @@
-permissions:
+oro_permissions:
     CREATE:
         exclude_entities:
             - Oro\Bundle\CronBundle\Entity\Schedule

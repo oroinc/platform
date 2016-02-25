@@ -1,4 +1,4 @@
-permissions:
+oro_permissions:
     PERMISSION1:
         label: Label for Permission 1
         group_names: frontend

@@ -579,13 +579,14 @@ class EntityAclExtension extends AbstractAclExtension
         $identity = $this->getIdentityForPermission($permission);
         if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $permission))) {
             $maskAccessLevels = [];
+            $clearedMask = $this->removeServiceBits($mask);
+
             foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
-                $_mask = $this->removeServiceBits($mask);
                 $levelMask = $this->removeServiceBits(
                     $this->getMaskBuilderConst($identity, sprintf('MASK_%s_%s', $permission, $accessLevel))
                 );
 
-                if (0 !== ($_mask & $levelMask)) {
+                if (0 !== ($clearedMask & $levelMask)) {
                     $maskAccessLevels[] = $accessLevel;
                 }
             }

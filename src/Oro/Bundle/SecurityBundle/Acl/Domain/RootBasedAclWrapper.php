@@ -212,6 +212,9 @@ class RootBasedAclWrapper implements AclInterface
     }
 
     /**
+     * Returns all object-based or object-field-based ACEs (depends on parameter $field) associated with this ACL.
+     * This ACEs grouped in arrays by security identity.
+     *
      * @param string|null $field
      * @return array
      */
@@ -220,7 +223,10 @@ class RootBasedAclWrapper implements AclInterface
         $groupedAces = [];
 
         /** @var EntryInterface[] $aces */
-        $aces = $field ? $this->rootAcl->getObjectFieldAces($field) : $this->rootAcl->getObjectAces();
+        $aces = $field
+            ? $this->rootAcl->getObjectFieldAces($field)
+            : $this->rootAcl->getObjectAces();
+
         foreach ($aces as $ace) {
             $rootSid = (string) $ace->getSecurityIdentity();
 

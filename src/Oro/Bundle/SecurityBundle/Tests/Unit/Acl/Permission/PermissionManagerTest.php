@@ -11,7 +11,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
@@ -56,10 +55,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
 
-        $this->configurationProvider = new PermissionConfigurationProvider(
-            new PermissionListConfiguration(new PermissionConfiguration()),
-            $bundles
-        );
+        $this->configurationProvider = new PermissionConfigurationProvider(new PermissionListConfiguration(), $bundles);
 
         $this->entityRepository = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository')
@@ -117,7 +113,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
         $reflection = new \ReflectionClass('Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider');
         $reflectionProperty = $reflection->getProperty('configPath');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->configurationProvider, 'permissionsCorrect.yml');
+        $reflectionProperty->setValue($this->configurationProvider, 'permissions.yml');
         $permissionNames = [];
 
         foreach ($this->manager->getPermissionsFromConfig() as $permission) {

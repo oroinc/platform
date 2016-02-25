@@ -35,7 +35,6 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('ownership.yml');
         $loader->load('services.yml');
-        $loader->load('cache.yml');
 
         $this->addClassesToCompile(['Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener']);
     }

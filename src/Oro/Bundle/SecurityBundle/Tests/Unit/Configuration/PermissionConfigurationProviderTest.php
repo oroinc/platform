@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1\TestBundle1;
@@ -25,7 +24,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         ],
         self::PERMISSION2 => [
             'label' => 'Label for Permission 2',
-            'group_names' => [PermissionConfiguration::DEFAULT_GROUP_NAME, 'frontend', 'new_group'],
+            'group_names' => [PermissionListConfiguration::DEFAULT_GROUP_NAME, 'frontend', 'new_group'],
             'apply_to_all' => false,
             'apply_to_entities' => [
                 'OroTestFrameworkBundle:TestActivity',
@@ -61,10 +60,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
 
-        $this->provider = new PermissionConfigurationProvider(
-            new PermissionListConfiguration(new PermissionConfiguration()),
-            $bundles
-        );
+        $this->provider = new PermissionConfigurationProvider(new PermissionListConfiguration(), $bundles);
     }
 
     protected function tearDown()
@@ -80,7 +76,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             self::PERMISSION3 => $this->permissions[self::PERMISSION3],
         ];
 
-        $this->loadConfig('permissionsCorrect.yml');
+        $this->loadConfig('permissions.yml');
         $permissions = $this->provider->getPermissionConfiguration();
         $this->assertEquals($expectedPermissions, $permissions);
     }
@@ -92,7 +88,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             self::PERMISSION3 => $this->permissions[self::PERMISSION3],
         ];
 
-        $this->loadConfig('permissionsCorrect.yml');
+        $this->loadConfig('permissions.yml');
         $permissions = $this->provider->getPermissionConfiguration(array_keys($expectedPermissions));
         $this->assertEquals($expectedPermissions, $permissions);
     }

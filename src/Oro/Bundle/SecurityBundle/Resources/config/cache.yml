@@ -1,5 +1,0 @@
-services:
-    oro_security.cache.provider.permission:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_security_permission' ] ]

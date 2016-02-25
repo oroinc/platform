@@ -5,8 +5,19 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 
+/**
+ * The permission mask builder for 'Entity' ACL extension.
+ */
 final class EntityMaskBuilder extends MaskBuilder
 {
+    /**
+     * Determines how many permissions stored in one mask.
+     * For service mask is used 32 bit integer value. We use five bits for each permissions in mask to store
+     * all access levels (basic, local, deep, global, system). So 15 bits used for permissions data. The remaining 16
+     * bits will be used as service bits (ss we know, 31 bits we can use for data and 1 bit is used for sign) and we
+     * have 65536 (2^16) unique combinations of masks.
+     * Current constant value was selected based on optimal numbers of unique masks and better performance.
+     */
     const MAX_PERMISSIONS_IN_MASK = 3;
 
     const SERVICE_BITS            = -32768;

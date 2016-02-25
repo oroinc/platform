@@ -10,6 +10,8 @@ use Oro\Component\Config\Merger\ConfigurationMerger;
 
 class PermissionConfigurationProvider
 {
+    const ROOT_NODE_NAME = 'oro_permissions';
+
     /** @var PermissionListConfiguration */
     protected $permissionConfiguration;
 
@@ -17,7 +19,7 @@ class PermissionConfigurationProvider
     protected $kernelBundles;
 
     /** @var string */
-    protected $configPath = 'Resources/config/permissions.yml';
+    protected $configPath = 'Resources/config/oro/permissions.yml';
 
     /**
      * @param PermissionListConfiguration $permissionConfiguration
@@ -60,7 +62,9 @@ class PermissionConfigurationProvider
         $configs = [];
 
         foreach ($resources as $resource) {
-            $configs[$resource->bundleClass] = $resource->data;
+            if (array_key_exists(self::ROOT_NODE_NAME, $resource->data)) {
+                $configs[$resource->bundleClass] = $resource->data;
+            }
         }
 
         $merger = new ConfigurationMerger($this->kernelBundles);

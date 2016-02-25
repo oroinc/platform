@@ -213,12 +213,15 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     protected function checkAclGroup(array $attributes, $group)
     {
+        if ($group === null || !$this->groupProvider || !$this->object) {
+            return self::ACCESS_ABSTAIN;
+        }
+
         $result = self::ACCESS_DENIED;
-
-        if ($group === null || !$this->groupProvider || !$this->object || $group === $this->groupProvider->getGroup()) {
-            $permissions = $this->extension->getPermissions(null, false, true);
-
+        if ($group === $this->groupProvider->getGroup()) {
             $result = self::ACCESS_ABSTAIN;
+
+            $permissions = $this->extension->getPermissions(null, false, true);
             foreach ($attributes as $attribute) {
                 if (!$this->supportsAttribute($attribute)) {
                     continue;

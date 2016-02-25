@@ -79,7 +79,6 @@ parameters:
 
     oro_security.orm.acl_conditional_factor_builder.class:     Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder
 
-    oro_security.configuration.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration
     oro_security.configuration.permission_list_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration
     oro_security.configuration.provider.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
     oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
@@ -195,6 +194,11 @@ services:
         class: %oro_security.acl.permission_map.class%
         arguments:
             - @oro_security.acl.extension_selector
+
+    oro_security.cache.provider.permission:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_security_permission' ] ]
 
     oro_security.acl.permission_manager:
         class: %oro_security.acl.permission_manager.class%
@@ -623,13 +627,8 @@ services:
     oro_security.orm.acl_conditional_factor_builder:
         class: %oro_security.orm.acl_conditional_factor_builder.class%
 
-    oro_security.configuration.permission_configuration:
-        class: %oro_security.configuration.permission_configuration.class%
-
     oro_security.configuration.permission_list_configuration:
         class: %oro_security.configuration.permission_list_configuration.class%
-        arguments:
-            - @oro_security.configuration.permission_configuration
 
     oro_security.configuration.provider.permission_configuration:
         class: %oro_security.configuration.provider.permission_configuration.class%

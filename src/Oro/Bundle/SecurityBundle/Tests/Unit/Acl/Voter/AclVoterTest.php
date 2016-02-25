@@ -10,6 +10,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 
 class AclVoterTest extends \PHPUnit_Framework_TestCase
@@ -19,6 +20,9 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|AclExtensionSelector */
     private $extensionSelector;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
+    private $groupProvider;
 
     /** @var AclVoter */
     private $voter;
@@ -31,6 +35,8 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->groupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+
         $this->voter = new AclVoter(
             $this->getMock('Symfony\Component\Security\Acl\Model\AclProviderInterface'),
             $this->getMock('Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface'),
@@ -38,6 +44,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
             $this->permissionMap
         );
         $this->voter->setAclExtensionSelector($this->extensionSelector);
+        $this->voter->setAclGroupProvider($this->groupProvider);
     }
 
     protected function tearDown()
@@ -52,8 +59,9 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
      * @param mixed $expectedObject
      * @param int $expected
      * @param array $permissions
+     * @param string $group
      */
-    public function testVote($object, $expectedObject, $expected, array $permissions = ['test'])
+    public function testVote($object, $expectedObject, $expected, array $permissions = ['test'], $group = '')
     {
         /** @var TokenInterface $token */
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
@@ -65,10 +73,15 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         $extension = $this->assertAclExtensionCalled($expectedObject, $permissions);
 
         $this->permissionMap
-            ->expects($this->atLeast(2))
+            ->expects($this->any())
             ->method('contains')
             ->with('test')
             ->willReturn(true);
+
+        $this->groupProvider
+            ->expects($this->any())
+            ->method('getGroup')
+            ->willReturn($group);
 
         if ($expected !== AclVoter::ACCESS_DENIED) {
             $this->permissionMap->expects($this->exactly(2))
@@ -132,13 +145,23 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
             [
                 'object' => new ObjectIdentity('stdClass', 'test_group@entity'),
                 'expectedObject' => new ObjectIdentity('stdClass', 'entity'),
-                'expected' => AclVoter::ACCESS_ABSTAIN
+                'expected' => AclVoter::ACCESS_ABSTAIN,
+                'permissions' => ['test'],
+                'group' => 'test_group'
             ],
             [
                 'object' => new ObjectIdentity('stdClass', 'test_group@entity'),
                 'expectedObject' => new ObjectIdentity('stdClass', 'entity'),
                 'expected' => AclVoter::ACCESS_DENIED,
-                'permissions' => ['new_test']
+                'permissions' => ['test'],
+                'group' => ''
+            ],
+            [
+                'object' => new ObjectIdentity('stdClass', 'test_group@entity'),
+                'expectedObject' => new ObjectIdentity('stdClass', 'entity'),
+                'expected' => AclVoter::ACCESS_DENIED,
+                'permissions' => ['new_test'],
+                'group' => 'test_group'
             ]
         ];
     }

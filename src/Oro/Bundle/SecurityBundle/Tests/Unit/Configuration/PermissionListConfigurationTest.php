@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 
 class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +13,7 @@ class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configuration = new PermissionListConfiguration(new PermissionConfiguration());
+        $this->configuration = new PermissionListConfiguration();
     }
 
     protected function tearDown()
@@ -42,9 +41,13 @@ class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'permission1' => [],
                     'permission2' => [
+                        'label' => 'My Label',
+                        'group_names' => ['default', 'frontend', '', ''],
+                    ],
+                    'permission3' => [
                         'label' => 'Test Label',
                         'apply_to_all' => false,
-                        'group_names' => ['frontend'],
+                        'group_names' => 'frontend',
                         'exclude_entities' => ['Entity1'],
                         'apply_to_entities' => ['Entity2'],
                         'description' => 'Test Description',
@@ -59,6 +62,13 @@ class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'apply_to_entities' => [],
                     ],
                     'permission2' => [
+                        'label' => 'My Label',
+                        'apply_to_all' => true,
+                        'group_names' => ['default', 'frontend'],
+                        'exclude_entities' => [],
+                        'apply_to_entities' => [],
+                    ],
+                    'permission3' => [
                         'label' => 'Test Label',
                         'apply_to_all' => false,
                         'group_names' => ['frontend'],
