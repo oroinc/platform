@@ -82,10 +82,11 @@ class EmailNotificationManager
             $bodyContent = '';
             try {
                 $this->emailCacheManager->ensureEmailBodyCached($email);
-                if ($email->getEmailBody()) {
+                $emailBody = $email->getEmailBody();
+                if ($emailBody) {
                     $bodyContent = $this->htmlTagHelper->shorten(
                         $this->htmlTagHelper->stripTags(
-                            $this->htmlTagHelper->purify($email->getEmailBody()->getBodyContent())
+                            $this->htmlTagHelper->purify($emailBody->getBodyContent())
                         )
                     );
                 }
