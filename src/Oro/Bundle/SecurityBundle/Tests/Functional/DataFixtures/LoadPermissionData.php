@@ -40,7 +40,7 @@ class LoadPermissionData extends AbstractFixture implements ContainerAwareInterf
         /* @var $permissionsManager PermissionManager */
         $permissionsManager = $this->container->get('oro_security.acl.permission_manager');
 
-        $config = Yaml::parse(file_get_contents(__DIR__ . '/config/permissions.yml'));
+        $config = Yaml::parse(file_get_contents(__DIR__ . '/config/oro/permissions.yml'));
         $config = $configuration->processConfiguration($config);
         $permissions = $builder->buildPermissions($config);
 
