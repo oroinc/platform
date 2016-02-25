@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -28,7 +28,7 @@ class EntityRelationGridListener
      */
     public function __construct(ConfigManager $configManager, DoctrineHelper $doctrineHelper)
     {
-        $this->configManager = $configManager;
+        $this->configManager  = $configManager;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -44,6 +44,7 @@ class EntityRelationGridListener
 
     /**
      * @param BuildBefore $event
+     *
      * @return bool
      */
     public function onBuildBefore(BuildBefore $event)
@@ -64,7 +65,7 @@ class EntityRelationGridListener
             $extendFieldConfig->get('target_title'),
             $extendFieldConfig->get('target_detailed')
         );
-        $targetIdField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityName);
+        $targetIdField    = $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityName);
         // build 'assigned' field expression
         if ($entityId) {
             $extendEntityConfig = $extendConfigProvider->getConfig($entityClassName);
@@ -73,7 +74,7 @@ class EntityRelationGridListener
             $targetFieldName    = $relation['target_field_id']->getFieldName();
             $fieldType          = $extendFieldConfig->getId()->getFieldType();
             $operator           = $fieldType === RelationType::ONE_TO_MANY ? '=' : 'MEMBER OF';
-            $whenExpr = sprintf(
+            $whenExpr           = sprintf(
                 '(:relation %s o.%s OR o.%s IN (:data_in)) AND o.%s NOT IN (:data_not_in)',
                 $operator,
                 $targetFieldName,
@@ -100,7 +101,6 @@ class EntityRelationGridListener
         // enable AdditionalFieldsExtension to add all other fields
         $config->offsetSetByPath('[options][entity_name]', $targetEntityName);
         $config->offsetSetByPath('[options][additional_fields]', $targetFieldNames);
-        $config->offsetSetByPath('[options][rowSelection][dataField]', $targetIdField);
     }
 
     /**
