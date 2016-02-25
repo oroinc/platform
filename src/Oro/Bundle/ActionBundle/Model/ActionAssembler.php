@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+use Doctrine\ORM\ORMException;
+
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
@@ -20,22 +23,31 @@ class ActionAssembler extends AbstractAssembler
     /** @var FormOptionsAssembler */
     private $formOptionsAssembler;
 
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var array */
+    private $shortEntityNames = [];
+
     /**
      * @param FunctionFactory $functionFactory
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
+     * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         FunctionFactory $functionFactory,
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
-        FormOptionsAssembler $formOptionsAssembler
+        FormOptionsAssembler $formOptionsAssembler,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->functionFactory = $functionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -73,9 +85,9 @@ class ActionAssembler extends AbstractAssembler
             ->setName($actionName)
             ->setLabel($this->getOption($options, 'label'))
             ->setSubstituteAction($this->getOption($options, 'substitute_action', null))
-            ->setForAllEntities($this->getOption($options, 'forAllEntities', false))
-            ->setEntities($this->getOption($options, 'entities', []))
-            ->setExcludeEntities($this->getOption($options, 'excludeEntities', []))
+            ->setForAllEntities($this->getOption($options, 'for_all_entities', false))
+            ->setEntities($this->filterEntities($this->getOption($options, 'entities', [])))
+            ->setExcludeEntities($this->filterEntities($this->getOption($options, 'exclude_entities', [])))
             ->setDatagrids($this->getOption($options, 'datagrids', []))
             ->setRoutes($this->getOption($options, 'routes', []))
             ->setGroups($this->getOption($options, 'groups', []))
@@ -120,5 +132,36 @@ class ActionAssembler extends AbstractAssembler
         }
 
         $actionDefinition->setConditions(ActionDefinition::PRECONDITIONS, $newDefinition);
+    }
+
+    /**
+     * @param array $entities
+     * @return array
+     */
+    protected function filterEntities(array $entities)
+    {
+        return array_filter(array_map([$this, 'getEntityClassName'], $entities), 'is_string');
+    }
+
+    /**
+     * @param string $entityName
+     * @return string|bool
+     */
+    protected function getEntityClassName($entityName)
+    {
+        if (!array_key_exists($entityName, $this->shortEntityNames)) {
+            $this->shortEntityNames[$entityName] = null;
+
+            try {
+                $entityClass = $this->doctrineHelper->getEntityClass($entityName);
+
+                if (class_exists($entityClass, true)) {
+                    $this->shortEntityNames[$entityName] = ltrim($entityClass, '\\');
+                }
+            } catch (ORMException $e) {
+            }
+        }
+
+        return $this->shortEntityNames[$entityName];
     }
 }

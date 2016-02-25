@@ -72,13 +72,6 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->assembler = new ActionAssembler(
-            $this->functionFactory,
-            $this->conditionFactory,
-            $this->attributeAssembler,
-            $this->formOptionsAssembler
-        );
-
         $this->applicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -103,11 +96,18 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 return $class;
             });
 
+        $this->assembler = new ActionAssembler(
+            $this->functionFactory,
+            $this->conditionFactory,
+            $this->attributeAssembler,
+            $this->formOptionsAssembler,
+            $this->doctrineHelper
+        );
+
         $this->registry = new ActionRegistry(
             $this->configurationProvider,
             $this->assembler,
-            $this->applicationsHelper,
-            $this->doctrineHelper
+            $this->applicationsHelper
         );
     }
 
@@ -157,7 +157,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['action6', 'action10', 'action12']
+                'expected' => ['action6', 'action10', 'action12', 'action13']
             ],
             'route1' => [
                 'entityClass' => null,
@@ -199,7 +199,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => 'route1',
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['action4', 'action6', 'action10', 'action12']
+                'expected' => ['action4', 'action6', 'action10', 'action12', 'action13']
             ],
             'route1 & datagrid1' => [
                 'entityClass' => null,
@@ -213,7 +213,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => null,
-                'expected' => ['action4', 'action6', 'action8', 'action10', 'action12']
+                'expected' => ['action4', 'action6', 'action8', 'action10', 'action12', 'action13']
             ],
             'route1 group1 & entity1 group1 & datagrid1 group1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
@@ -221,7 +221,14 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'datagrid' => 'datagrid1',
                 'group' => 'group1',
                 'expected' => ['action5', 'action7', 'action9', 'action11']
-            ]
+            ],
+            'entity2' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
+                'route' => null,
+                'datagrid' => null,
+                'group' => null,
+                'expected' => ['action10', 'action13', 'action14']
+            ],
         ];
     }
 
@@ -345,6 +352,15 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'label' => 'Label12',
                 'applications' => ['backend'],
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+            ],
+            'action13' => [
+                'label' => 'Label13',
+                'for_all_entities' => true
+            ],
+            'action14' => [
+                'label' => 'Label14',
+                'for_all_entities' => true,
+                'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
             ]
         ];
     }

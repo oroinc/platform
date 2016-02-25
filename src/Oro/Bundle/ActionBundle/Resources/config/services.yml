@@ -30,7 +30,6 @@ services:
             - @oro_action.configuration.provider
             - @oro_action.assembler
             - @oro_action.helper.applications
-            - @oro_entity.doctrine_helper
 
     oro_action.manager:
         class: %oro_action.manager.class%
@@ -46,6 +45,7 @@ services:
             - @oro_action.expression.factory
             - @oro_action.attribute_assembler
             - @oro_action.form_options_assembler
+            - @oro_entity.doctrine_helper
 
     oro_action.attribute_assembler:
         class: %oro_action.attribute_assembler.class%

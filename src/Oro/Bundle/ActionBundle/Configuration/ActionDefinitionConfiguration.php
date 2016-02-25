@@ -74,7 +74,7 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
-                ->arrayNode('excludeEntities')
+                ->arrayNode('exclude_entities')
                     ->prototype('scalar')
                     ->end()
                 ->end()
