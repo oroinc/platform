@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider\Filter;
 
-use Doctrine\Tests\Common\Persistence\ObjectManagerDecoratorTest;
 use Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider;
 
 class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
@@ -27,16 +26,21 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $dqlNameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->choiceTreeUserProvider = new ChoiceTreeUserProvider(
             $this->registry,
-            $this->aclHelper
+            $this->aclHelper,
+            $dqlNameFormatter
         );
     }
 
     public function testGetList()
     {
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->setMethods(['getArrayResult'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -44,16 +48,23 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $manager->expects($this->once())->method('getRepository')->willReturn($repository);
-        $this->registry->expects($this->once())->method('getManager')->willReturn($manager);
-
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->setMethods(['getResult'])
+        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repository);
 
-        $qb->expects($this->any())->method('getResult')->willReturn($this->getUsers());
-        $this->aclHelper->expects($this->any())->method('apply')->willReturn($qb);
+        $this->registry->expects($this->once())
+            ->method('getManager')
+            ->willReturn($manager);
+
+        $qb->expects($this->any())
+            ->method('getArrayResult')
+            ->willReturn($this->getExpectedData());
+        $this->aclHelper->expects($this->any())
+            ->method('apply')
+            ->willReturn($qb);
 
         $result = $this->choiceTreeUserProvider->getList();
         $this->assertEquals($this->getExpectedData(), $result);
@@ -69,35 +80,27 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $manager->expects($this->once())->method('getRepository')->willReturn($repository);
-        $this->registry->expects($this->once())->method('getManager')->willReturn($manager);
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repository);
+        $this->registry->expects($this->once())
+            ->method('getManager')
+            ->willReturn($manager);
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->setMethods(['getResult'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $qb->expects($this->any())->method('getResult')->willReturn([]);
-        $this->aclHelper->expects($this->any())->method('apply')->willReturn($qb);
+        $qb->expects($this->any())
+            ->method('getResult')
+            ->willReturn([]);
+        $this->aclHelper->expects($this->any())
+            ->method('apply')
+            ->willReturn($qb);
 
         $result = $this->choiceTreeUserProvider->getList();
         $this->assertEquals([], $result);
-    }
-
-    public function getUsers()
-    {
-        $data = $this->getExpectedData();
-        $response = [];
-        foreach ($data as $item) {
-            $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
-
-            $user->expects($this->any())->method('getId')->willReturn($item['id']);
-            $user->expects($this->any())->method('getFullName')->willReturn($item['name']);
-
-            $response[] = $user;
-        }
-
-        return $response;
     }
 
     protected function getExpectedData()
