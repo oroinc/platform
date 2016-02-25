@@ -9,7 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class RequestEntity extends AbstractAction
 {

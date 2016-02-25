@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Action\FindEntities;
 
 class FindEntitiesTest extends \PHPUnit_Framework_TestCase

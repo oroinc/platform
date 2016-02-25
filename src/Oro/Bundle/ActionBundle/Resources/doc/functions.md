@@ -75,7 +75,7 @@ Find Entities
 Run Action
 ----------
 
-**Class:** Oro\Component\ConfigExpression\Action\RunAction
+**Class:** Oro\Bundle\ActionBundle\Action\RunAction
 
 **Alias:** run_action
 

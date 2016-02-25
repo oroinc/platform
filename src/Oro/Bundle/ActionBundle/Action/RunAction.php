@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Action;
+namespace Oro\Bundle\ActionBundle\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\ActionBundle\Exception\InvalidParameterException;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Component\ConfigExpression\Action\AbstractAction;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class RunAction extends AbstractAction
 {

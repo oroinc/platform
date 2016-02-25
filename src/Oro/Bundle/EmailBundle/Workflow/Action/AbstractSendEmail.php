@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\Action\AbstractAction;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareInterface
 {

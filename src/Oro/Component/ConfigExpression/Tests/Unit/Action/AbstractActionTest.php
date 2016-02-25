@@ -2,7 +2,7 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Action\AbstractAction;
 use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\ArrayCondition;
 

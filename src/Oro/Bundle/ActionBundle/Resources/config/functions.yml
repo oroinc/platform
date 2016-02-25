@@ -1,5 +1,5 @@
 parameters:
-    oro_action.context_accessor.class: Oro\Bundle\ActionBundle\Model\ContextAccessor
+    oro_action.context_accessor.class: Oro\Component\ConfigExpression\Model\ContextAccessor
     oro_action.function_factory.class: Oro\Component\ConfigExpression\Action\ActionFactory
     oro_action.function_assembler.class: Oro\Component\ConfigExpression\Action\ActionAssembler
 
@@ -12,7 +12,6 @@ parameters:
     oro_action.function.create_object.class: Oro\Component\ConfigExpression\Action\CreateObject
     oro_action.function.create_date.class: Oro\Component\ConfigExpression\Action\CreateDate
     oro_action.function.create_entity.class: Oro\Component\ConfigExpression\Action\CreateEntity
-    oro_action.function.create_related_entity.class: Oro\Component\ConfigExpression\Action\CreateRelatedEntity
     oro_action.function.request_entity.class: Oro\Component\ConfigExpression\Action\RequestEntity
     oro_action.function.redirect.class: Oro\Component\ConfigExpression\Action\Redirect
     oro_action.function.format_string.class: Oro\Component\ConfigExpression\Action\FormatString
@@ -26,7 +25,7 @@ parameters:
     oro_action.function.copy_tagging.class: Oro\Component\ConfigExpression\Action\CopyTagging
     oro_action.function.call_service_method.class: Oro\Component\ConfigExpression\Action\CallServiceMethod
     oro_action.function.refresh_grid.class: Oro\Component\ConfigExpression\Action\RefreshGrid
-    oro_action.function.run_action.class: Oro\Component\ConfigExpression\Action\RunAction
+    oro_action.function.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction
     oro_action.function.find_entities.class: Oro\Component\ConfigExpression\Action\FindEntities
 
 services:

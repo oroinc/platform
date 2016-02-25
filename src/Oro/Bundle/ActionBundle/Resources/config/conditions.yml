@@ -136,6 +136,6 @@ services:
             - { name: oro_action.condition, alias: acl|acl_granted }
 
     oro_action.expression.collection_element_value_exists:
-        class: Oro\Component\ConfigExpression\Condition\CollectionElementValueExists
+        class: Oro\Bundle\ActionBundle\Condition\CollectionElementValueExists
         tags:
             - { name: oro_action.condition, alias: collection_element_value_exists }

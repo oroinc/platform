@@ -6,7 +6,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Bundle\IntegrationBundle\Model\Action\SaveFieldsChangesAction;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
 class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase

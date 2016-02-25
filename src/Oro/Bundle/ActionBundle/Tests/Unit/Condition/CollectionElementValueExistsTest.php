@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Condition;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Condition\CollectionElementValueExists;
+use Oro\Bundle\ActionBundle\Condition\CollectionElementValueExists;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 class CollectionElementValueExistsTest extends \PHPUnit_Framework_TestCase

@@ -254,7 +254,7 @@ Remove Entity
 Create Related Entity
 ---------------------
 
-**Class:** Oro\Component\ConfigExpression\Action\CreateRelatedEntity
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
 
 **Alias:** create_related_entity
 

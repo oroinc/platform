@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Component\ConfigExpression\Action\ActionFactory;
 use Oro\Component\ConfigExpression\Action\Configurable as ConfigurableAction;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Model\AbstractAssembler;
 
 /**
  * Assembles form options that can be passed to transition and step

@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Action\Traverse;
 use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\StubStorage;
 

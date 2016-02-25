@@ -6,7 +6,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
 {

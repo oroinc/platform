@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 /**
  * Show flash message

@@ -2,7 +2,7 @@
 
 namespace Oro\Component\ConfigExpression\Action;
 
-use Oro\Bundle\ActionBundle\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 
 class RefreshGrid extends AbstractAction
 {

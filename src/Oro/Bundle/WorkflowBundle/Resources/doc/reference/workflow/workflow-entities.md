@@ -468,7 +468,7 @@ and list of additional functions applicable to attributes.
 Context Accessor
 ----------------
 **Class:**
-Oro\Bundle\ActionBundle\Model\ContextAccessor
+Oro\Component\ConfigExpression\Model\ContextAccessor
 
 **Description:**
 Context is used in action and conditions and thereby it's usually an instance of Workflow Item.

@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Action;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\ActionException;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 

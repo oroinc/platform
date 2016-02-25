@@ -4,9 +4,9 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Action\RefreshGrid;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\StubStorage;
 
 class RefreshGridTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,7 +42,7 @@ class RefreshGridTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
      * @expectedExceptionMessage Gridname parameter must be specified
      */
     public function testInitializeException()
@@ -54,7 +54,7 @@ class RefreshGridTest extends \PHPUnit_Framework_TestCase
     {
         $gridname = 'test_grid';
 
-        $context = new ActionData(['param' => 'value']);
+        $context = new StubStorage(['param' => 'value']);
 
         $this->action->initialize([$gridname]);
         $this->action->execute($context);

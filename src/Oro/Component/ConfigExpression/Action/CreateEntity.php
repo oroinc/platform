@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Action;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\Exception\ActionException;
 

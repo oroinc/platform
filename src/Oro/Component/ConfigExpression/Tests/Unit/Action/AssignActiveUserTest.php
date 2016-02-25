@@ -4,10 +4,10 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\AssignActiveUser;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\ConfigExpression\Action\AssignActiveUser;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
 {

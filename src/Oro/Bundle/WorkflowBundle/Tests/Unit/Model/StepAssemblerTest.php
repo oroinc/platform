@@ -21,7 +21,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\AssemblerException
      * @dataProvider invalidOptionsDataProvider
      * @param array $configuration
      */

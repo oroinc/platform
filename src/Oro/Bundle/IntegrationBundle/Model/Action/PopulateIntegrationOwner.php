@@ -6,7 +6,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper;
 use Oro\Component\ConfigExpression\Action\AbstractAction;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 /**
  * Set owner for entity based on integration settings.

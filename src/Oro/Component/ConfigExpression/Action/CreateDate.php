@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Action;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class CreateDate extends AbstractDateAction
 {

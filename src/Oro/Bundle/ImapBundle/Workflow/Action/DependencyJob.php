@@ -9,7 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\Action\AbstractAction;
 use Oro\Component\ConfigExpression\Action\ActionInterface;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class DependencyJob extends AbstractAction
 {

@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\Action;
 use Oro\Component\ConfigExpression\Action\AbstractAction;
 use Oro\Component\ConfigExpression\Exception\ActionException;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**

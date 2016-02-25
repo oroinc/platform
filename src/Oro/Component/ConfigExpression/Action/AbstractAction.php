@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Component\ConfigExpression\Event\ExecuteActionEvent;
 use Oro\Component\ConfigExpression\Event\ExecuteActionEvents;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 abstract class AbstractAction implements ActionInterface, EventDispatcherAwareActionInterface

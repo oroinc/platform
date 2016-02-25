@@ -9,7 +9,7 @@ parameters:
     oro_workflow.action.create_date.class: Oro\Component\ConfigExpression\Action\CreateDate
     oro_workflow.action.create_datetime.class: Oro\Component\ConfigExpression\Action\CreateDateTime
     oro_workflow.action.create_entity.class: Oro\Component\ConfigExpression\Action\CreateEntity
-    oro_workflow.action.create_related_entity.class: Oro\Component\ConfigExpression\Action\CreateRelatedEntity
+    oro_workflow.action.create_related_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
     oro_workflow.action.request_entity.class: Oro\Component\ConfigExpression\Action\RequestEntity
     oro_workflow.action.call_method.class: Oro\Component\ConfigExpression\Action\CallMethod
     oro_workflow.action.start_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow
@@ -25,7 +25,7 @@ parameters:
     oro_workflow.workflow.action.copy_tagging.class:  Oro\Component\ConfigExpression\Action\CopyTagging
     oro_workflow.workflow.action.transit_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow
     oro_workflow.workflow.action.call_service_method.class: Oro\Component\ConfigExpression\Action\CallServiceMethod
-    oro_workflow.workflow.action.run_action.class: Oro\Component\ConfigExpression\Action\RunAction
+    oro_workflow.workflow.action.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction
     oro_workflow.workflow.action.find_entities.class: Oro\Component\ConfigExpression\Action\FindEntities
 
 services:

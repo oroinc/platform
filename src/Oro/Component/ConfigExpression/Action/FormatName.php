@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Action;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class FormatName extends AbstractAction
 {

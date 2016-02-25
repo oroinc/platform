@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
+namespace Oro\Component\ConfigExpression\Tests\Unit\Model;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Bundle\ActionBundle\Model\ContextAccessor;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class ContextAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -181,7 +181,7 @@ class ContextAccessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new NoSuchPropertyException('No such property')));
 
         $propertyAccessorReflection = new \ReflectionProperty(
-            'Oro\Bundle\ActionBundle\Model\ContextAccessor',
+            'Oro\Component\ConfigExpression\Model\ContextAccessor',
             'propertyAccessor'
         );
         $propertyAccessorReflection->setAccessible(true);

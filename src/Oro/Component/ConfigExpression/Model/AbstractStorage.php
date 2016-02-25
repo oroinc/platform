@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Storage;
+namespace Oro\Component\ConfigExpression\Model;
 
 abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Countable
 {
