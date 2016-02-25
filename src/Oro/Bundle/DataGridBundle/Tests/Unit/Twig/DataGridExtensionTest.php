@@ -10,6 +10,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerInterface */
@@ -72,6 +75,27 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals([$this->twigExtension, $expectedFunction[1]], $twigFunction->getCallable());
 
             next($expectedFunctions);
+        }
+    }
+
+    public function testGetTests()
+    {
+        $expectedTests = [
+            ['oro_datagrid_instance', 'isDatagridInstance'],
+        ];
+
+        /** @var \Twig_SimpleTest[] $actualTests */
+        $actualTests = $this->twigExtension->getTests();
+        $this->assertSameSize($expectedTests, $actualTests);
+
+        foreach ($actualTests as $twigTest) {
+            $expectedTest = current($expectedTests);
+
+            $this->assertInstanceOf('\Twig_SimpleTest', $twigTest);
+            $this->assertEquals($expectedTest[0], $twigTest->getName());
+            $this->assertEquals([$this->twigExtension, $expectedTest[1]], $twigTest->getCallable());
+
+            next($expectedTests);
         }
     }
 
@@ -294,5 +318,33 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($expectedFullName));
 
         $this->assertEquals($expectedFullName, $this->twigExtension->buildGridFullName($gridName, $gridScope));
+    }
+
+    /**
+     * @dataProvider isDatagridInstanceDataProvider
+     * @param mixed $var
+     * @param bool $expected
+     */
+    public function testIsDatagridInstance($var, $expected)
+    {
+        $this->assertEquals($expected, $this->twigExtension->isDatagridInstance($var));
+    }
+
+    /**
+     * @return array
+     */
+    public function isDatagridInstanceDataProvider()
+    {
+        return [
+            [
+                'var' => $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Datagrid')
+                    ->disableOriginalConstructor()->getMock(),
+                'expected' => true,
+            ],
+            [
+                'var' => 1,
+                'expected' => false,
+            ],
+        ];
     }
 }

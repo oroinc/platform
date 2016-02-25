@@ -7,7 +7,10 @@
         renderParams: parameters for grid UI
 #}
 {% macro renderGrid(name, params = {}, renderParams = {}) %}
-    {% set datagrid = oro_datagrid_build(name, params) %}
+    {% set datagrid = name %}
+    {% if datagrid is not oro_datagrid_instance %}
+        {% set datagrid = oro_datagrid_build(name, params) %}
+    {% endif %}
     {% if datagrid %}
         {% if app.request.get('_widgetContainer') == 'dialog' %}
             {% set renderParams = {'enableViews': false}|merge(renderParams) %}

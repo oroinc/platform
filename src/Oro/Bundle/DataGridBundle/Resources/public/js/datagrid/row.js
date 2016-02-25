@@ -33,8 +33,10 @@ define([
         template: null,
 
         themeOptions: {
+            view: '',
             optionPrefix: 'row',
-            className: 'grid-row'
+            className: 'grid-row',
+            actionSelector: ''
         },
 
         /**
@@ -125,11 +127,19 @@ define([
         onMouseUp: function(e) {
             this.clickPermit = false;
             // remember selection and target
-            var exclude = 'a, .dropdown, .skip-row-click';
             var $target = this.$(e.target);
-            // if the target is an action element, skip toggling the email
-            if ($target.is(exclude) || $target.parents(exclude).length) {
-                return;
+            var exclude;
+            if (this.themeOptions.actionSelector) {
+                exclude = this.themeOptions.actionSelector;
+                if (!$target.is(exclude) && !$target.parents(exclude).length) {
+                    return;
+                }
+            } else {
+                exclude = 'a, .dropdown, .skip-row-click';
+                // if the target is an action element, skip toggling the email
+                if ($target.is(exclude) || $target.parents(exclude).length) {
+                    return;
+                }
             }
 
             if (this.mouseDownSelection !== this.getSelectedText()) {
