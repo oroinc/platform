@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -101,7 +102,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-
+        $this->setExtendProviderMock();
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -181,7 +182,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-
+        $this->setExtendProviderMock();
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -263,7 +264,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-
+        $this->setExtendProviderMock();
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -353,7 +354,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-
+        $this->setExtendProviderMock();
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -593,7 +594,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-
+        $this->setExtendProviderMock();
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -778,7 +779,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-
+        $this->setExtendProviderMock();
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -886,7 +887,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-
+        $this->setExtendProviderMock();
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -993,7 +994,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-
+        $this->setExtendProviderMock();
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -1175,5 +1176,23 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $config->setValues($values);
 
         return $config;
+    }
+
+    protected function setExtendProviderMock()
+    {
+        $extendProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $extendProvider
+            ->expects($this->any())
+            ->method('hasConfig')
+            ->willReturn(false);
+
+        $this->configManager
+            ->expects($this->any())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendProvider);
     }
 }
