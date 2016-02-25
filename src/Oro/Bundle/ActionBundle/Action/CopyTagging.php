@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Action;
+namespace Oro\Bundle\ActionBundle\Action;
 
 use LogicException;
 
@@ -9,6 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Component\ConfigExpression\Action\AbstractAction;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\Model\ContextAccessor;
 

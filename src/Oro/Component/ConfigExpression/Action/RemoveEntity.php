@@ -6,8 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 /**

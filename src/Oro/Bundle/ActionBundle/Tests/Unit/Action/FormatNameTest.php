@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
-use Oro\Component\ConfigExpression\Action\FormatName;
+use Oro\Bundle\ActionBundle\Action\FormatName;
 
 class FormatNameTest extends \PHPUnit_Framework_TestCase
 {

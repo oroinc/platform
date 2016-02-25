@@ -335,7 +335,7 @@ OR
 Format Name
 -----------
 
-**Class:** Oro\Component\ConfigExpression\Action\FormatName
+**Class:** Oro\Bundle\ActionBundle\Action\FormatName
 
 **Alias:** format_name
 
@@ -416,7 +416,7 @@ OR
 Create Date
 -----------
 
-**Class:** Oro\Component\ConfigExpression\Action\CreateDate
+**Class:** Oro\Bundle\ActionBundle\Action\CreateDate
 
 **Alias:** create_date
 
@@ -444,7 +444,7 @@ OR
 Create Date Time
 ----------------
 
-**Class:** Oro\Component\ConfigExpression\Action\CreateDate
+**Class:** Oro\Component\ConfigExpression\Action\CreateDateTime
 
 **Alias:** create_datetime
 

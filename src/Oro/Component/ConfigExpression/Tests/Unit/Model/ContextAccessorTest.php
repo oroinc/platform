@@ -5,8 +5,8 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Model;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class ContextAccessorTest extends \PHPUnit_Framework_TestCase
 {

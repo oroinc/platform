@@ -7,9 +7,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Action\FindEntities;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class FindEntitiesTest extends \PHPUnit_Framework_TestCase
 {
@@ -116,7 +116,7 @@ class FindEntitiesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\NotManageableEntityException
      * @expectedExceptionMessage Entity class "\stdClass" is not manageable.
      */
     public function testExecuteNotManageableEntity()

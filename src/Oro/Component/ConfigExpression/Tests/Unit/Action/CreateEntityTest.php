@@ -4,9 +4,9 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Action\CreateEntity;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CreateEntityTest extends \PHPUnit_Framework_TestCase
 {
@@ -94,23 +94,25 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
      */
     public function executeDataProvider()
     {
+        $stubStorageClass = 'Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub';
+
         return array(
             'without data' => array(
                 'options' => array(
-                    CreateEntity::OPTION_KEY_CLASS     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    CreateEntity::OPTION_KEY_CLASS     => $stubStorageClass,
                     CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
                 )
             ),
             'with data' => array(
                 'options' => array(
-                    CreateEntity::OPTION_KEY_CLASS     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    CreateEntity::OPTION_KEY_CLASS     => $stubStorageClass,
                     CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
                     CreateEntity::OPTION_KEY_DATA      => array('key1' => 'value1', 'key2' => 'value2'),
                 )
             ),
             'without flush' => array(
                 'options' => array(
-                    CreateEntity::OPTION_KEY_CLASS     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    CreateEntity::OPTION_KEY_CLASS     => $stubStorageClass,
                     CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
                     CreateEntity::OPTION_KEY_DATA      => array('key1' => 'value1', 'key2' => 'value2'),
                     CreateEntity::OPTION_KEY_FLUSH     => false
@@ -120,7 +122,7 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\NotManageableEntityException
      * @expectedExceptionMessage Entity class "stdClass" is not manageable.
      */
     public function testExecuteEntityNotManageable()

@@ -2,9 +2,9 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Component\ConfigExpression\Action\Redirect;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class RedirectTest extends \PHPUnit_Framework_TestCase
 {
@@ -121,9 +121,6 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute(array $options, $expectedUrl)
     {
-        if (!empty($options['route'])) {
-        }
-
         $context = new ItemStub();
 
         $this->action->initialize($options);

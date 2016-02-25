@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
+use Oro\Bundle\ActionBundle\Action\CreateDate;
 use Oro\Component\ConfigExpression\Model\ContextAccessor;
-use Oro\Component\ConfigExpression\Action\CreateDate;
+use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CreateDateTest extends \PHPUnit_Framework_TestCase
 {

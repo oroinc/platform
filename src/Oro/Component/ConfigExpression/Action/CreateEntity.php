@@ -5,9 +5,9 @@ namespace Oro\Component\ConfigExpression\Action;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
-use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\Exception\ActionException;
+use Oro\Component\ConfigExpression\Exception\NotManageableEntityException;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class CreateEntity extends CreateObject
 {

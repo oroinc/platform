@@ -80,7 +80,7 @@ class RemoveEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\NotManageableEntityException
      * @expectedExceptionMessage Entity class "stdClass" is not manageable.
      */
     public function testExecuteNotManageableException()

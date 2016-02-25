@@ -10,13 +10,13 @@ parameters:
     oro_action.function.assign_value.class: Oro\Component\ConfigExpression\Action\AssignValue
     oro_action.function.unset_value.class: Oro\Component\ConfigExpression\Action\UnsetValue
     oro_action.function.create_object.class: Oro\Component\ConfigExpression\Action\CreateObject
-    oro_action.function.create_date.class: Oro\Component\ConfigExpression\Action\CreateDate
+    oro_action.function.create_date.class: Oro\Bundle\ActionBundle\Action\CreateDate
     oro_action.function.create_entity.class: Oro\Component\ConfigExpression\Action\CreateEntity
     oro_action.function.request_entity.class: Oro\Component\ConfigExpression\Action\RequestEntity
     oro_action.function.redirect.class: Oro\Component\ConfigExpression\Action\Redirect
     oro_action.function.format_string.class: Oro\Component\ConfigExpression\Action\FormatString
     oro_action.function.assign_active_user.class: Oro\Component\ConfigExpression\Action\AssignActiveUser
-    oro_action.function.format_name.class: Oro\Component\ConfigExpression\Action\FormatName
+    oro_action.function.format_name.class: Oro\Bundle\ActionBundle\Action\FormatName
     oro_action.function.traverse.class: Oro\Component\ConfigExpression\Action\Traverse
     oro_action.function.translate.class: Oro\Component\ConfigExpression\Action\TranslateAction
     oro_action.function.flash_message.class: Oro\Component\ConfigExpression\Action\FlashMessage

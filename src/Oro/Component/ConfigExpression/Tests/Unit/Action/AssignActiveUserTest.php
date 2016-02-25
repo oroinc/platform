@@ -3,11 +3,11 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Security\Core\User\User;
 
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\ConfigExpression\Action\AssignActiveUser;
 use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
 {
@@ -121,7 +121,7 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute(array $inputOptions)
     {
-        $user = new User();
+        $user = new User('testUser', 'qwerty');
 
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
             ->disableOriginalConstructor()

@@ -4,9 +4,9 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Action\CreateObject;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CreateObjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -126,13 +126,13 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
         return [
             'without data' => [
                 'options' => [
-                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    'class'     => 'Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
                 ]
             ],
             'with data' => [
                 'options' => [
-                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    'class'     => 'Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
                     'data'      => ['key1' => new PropertyPath('test_attribute'), 'key2' => 'value2'],
                 ],
@@ -148,7 +148,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
             ],
             'with complex arguments' => [
                 'options' => [
-                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    'class'     => 'Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
                     'arguments' => [['test', new PropertyPath('test_attribute')]],
                 ],
