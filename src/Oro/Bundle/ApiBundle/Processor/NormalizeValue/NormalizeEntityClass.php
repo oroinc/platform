@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
  */
 class NormalizeEntityClass extends AbstractProcessor
 {
-    const REQUIREMENT = '[a-zA-Z][\w-]+';
+    const REQUIREMENT = '[a-zA-Z]\w+';
 
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
