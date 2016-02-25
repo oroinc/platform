@@ -22,7 +22,7 @@ parameters:
     oro_workflow.action.flash_message.class: Oro\Component\ConfigExpression\Action\FlashMessage
     oro_workflow.workflow.action.remove_entity.class:  Oro\Component\ConfigExpression\Action\RemoveEntity
     oro_workflow.workflow.action.assign_constant_value.class:  Oro\Component\ConfigExpression\Action\AssignConstantValue
-    oro_workflow.workflow.action.copy_tagging.class:  Oro\Component\ConfigExpression\Action\CopyTagging
+    oro_workflow.workflow.action.copy_tagging.class:  Oro\Bundle\ActionBundle\Action\CopyTagging
     oro_workflow.workflow.action.transit_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow
     oro_workflow.workflow.action.call_service_method.class: Oro\Component\ConfigExpression\Action\CallServiceMethod
     oro_workflow.workflow.action.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction

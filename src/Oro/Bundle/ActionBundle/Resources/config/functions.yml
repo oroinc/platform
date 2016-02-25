@@ -22,7 +22,7 @@ parameters:
     oro_action.function.flash_message.class: Oro\Component\ConfigExpression\Action\FlashMessage
     oro_action.function.remove_entity.class: Oro\Component\ConfigExpression\Action\RemoveEntity
     oro_action.function.assign_constant_value.class: Oro\Component\ConfigExpression\Action\AssignConstantValue
-    oro_action.function.copy_tagging.class: Oro\Component\ConfigExpression\Action\CopyTagging
+    oro_action.function.copy_tagging.class: Oro\Bundle\ActionBundle\Action\CopyTagging
     oro_action.function.call_service_method.class: Oro\Component\ConfigExpression\Action\CallServiceMethod
     oro_action.function.refresh_grid.class: Oro\Component\ConfigExpression\Action\RefreshGrid
     oro_action.function.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction
