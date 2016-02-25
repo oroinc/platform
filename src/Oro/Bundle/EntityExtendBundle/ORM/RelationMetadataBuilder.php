@@ -77,7 +77,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         array $relation
     ) {
         $targetEntity   = $relation['target_entity'];
-        $targetIdColumn = isset($relation['target_id_column']) ? $relation['target_id_column'] : 'id';
+        $targetIdColumn = $this->getPrimaryKeyColumn($targetEntity);
         $cascade        = !empty($relation['cascade']) ? $relation['cascade'] : [];
         $cascade[]      = 'detach';
 
@@ -128,8 +128,12 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             && RelationType::ONE_TO_MANY === ExtendHelper::getRelationType($relationKey)
             && $this->isDefaultRelationRequired($fieldId)
         ) {
-            $targetIdColumn = isset($relation['target_id_column']) ? $relation['target_id_column'] : 'id';
-            $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity, $targetIdColumn);
+            $this->buildDefaultRelation(
+                $metadataBuilder,
+                $fieldId,
+                $targetEntity,
+                $this->getPrimaryKeyColumn($targetEntity)
+            );
         }
     }
 
@@ -148,8 +152,12 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         if ($relation['owner']) {
             $this->buildManyToManyOwningSideRelation($metadataBuilder, $fieldId, $relation);
             if ($this->isDefaultRelationRequired($fieldId)) {
-                $targetIdColumn = isset($relation['target_id_column']) ? $relation['target_id_column'] : 'id';
-                $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity, $targetIdColumn);
+                $this->buildDefaultRelation(
+                    $metadataBuilder,
+                    $fieldId,
+                    $targetEntity,
+                    $this->getPrimaryKeyColumn($targetEntity)
+                );
             }
         } elseif (!empty($relation['target_field_id'])) {
             $this->buildManyToManyTargetSideRelation(
@@ -187,8 +195,8 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             )
         );
 
-        if (isset($relation['target_id_column']) && $relation['target_id_column'] !== 'id') {
-            $targetIdColumn = $relation['target_id_column'];
+        $targetIdColumn = $this->getPrimaryKeyColumn($targetEntity);
+        if ($targetIdColumn !== 'id') {
             $builder->addInverseJoinColumn(
                 $this->nameGenerator->generateManyToManyJoinTableColumnName(
                     $relation['target_entity'],
@@ -295,5 +303,21 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             $fieldId->getClassName(),
             $fieldId->getFieldName()
         );
+    }
+
+    /**
+     * @param string $entityName
+     *
+     * @return string
+     */
+    protected function getPrimaryKeyColumn($entityName)
+    {
+        $pkColumns = ['id'];
+        if ($this->configManager->getProvider('extend')->hasConfig($entityName)) {
+            $config = $this->configManager->getProvider('extend')->getConfig($entityName);
+            $pkColumns = $config->get('pk_columns', false, $pkColumns);
+        }
+
+        return reset($pkColumns);
     }
 }
