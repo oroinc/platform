@@ -230,7 +230,7 @@ class ExtendFieldValueRenderListener
         $targetMetadata = $this->registry
             ->getManager()
             ->getClassMetadata($targetClassName);
-        $id             = $this->propertyAccessor->getValue($targetEntity, $targetMetadata->getSingleIdentifierFieldName());
+        $id = $this->propertyAccessor->getValue($targetEntity, $targetMetadata->getSingleIdentifierFieldName());
 
         $routeOptions = $this->getEntityRouteOptions($targetClassName, $id);
         if ($routeOptions['route'] && $this->securityFacade->isGranted('VIEW', $targetEntity)) {
