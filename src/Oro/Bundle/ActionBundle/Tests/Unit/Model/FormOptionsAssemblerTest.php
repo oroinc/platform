@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\Attribute;
 
 class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 {

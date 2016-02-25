@@ -3,10 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
-use Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition;
-use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\ConfigExpression\Action\ActionAssembler;
+use Oro\Component\ConfigExpression\Action\ActionInterface;
+use Oro\Component\ConfigExpression\Condition\AbstractConfigurableCondition;
+use Oro\Component\ConfigExpression\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class Process
@@ -32,7 +32,7 @@ class Process
     protected $action;
 
     /**
-     * @var AbstractCondition
+     * @var AbstractConfigurableCondition
      */
     protected $preCondition;
 
@@ -64,7 +64,7 @@ class Process
     }
 
     /**
-     * @return bool|AbstractCondition
+     * @return bool|AbstractConfigurableCondition
      */
     protected function getPreCondition()
     {

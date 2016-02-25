@@ -1,10 +1,12 @@
 parameters:
+    oro_action.context_accessor.class: Oro\Component\ConfigExpression\Model\ContextAccessor
     oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
+    oro_action.registry.class: Oro\Bundle\ActionBundle\Model\ActionRegistry
     oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
     oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
     oro_action.attribute_assembler.class: Oro\Bundle\ActionBundle\Model\AttributeAssembler
-    oro_action.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
+    oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_action.form_options_assembler.class: Oro\Bundle\ActionBundle\Model\FormOptionsAssembler
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
     oro_action.datagrid.action_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension
@@ -12,6 +14,9 @@ parameters:
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
 
 services:
+    oro_action.context_accessor:
+        class: %oro_action.context_accessor.class%
+
     oro_action.helper.context:
             class: %oro_action.helper.context.class%
             arguments:
@@ -23,14 +28,19 @@ services:
             arguments:
                 - @security.token_storage
 
-    oro_action.manager:
-        class: %oro_action.manager.class%
+    oro_action.registry:
+        class: %oro_action.registry.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_action.helper.context
             - @oro_action.configuration.provider
             - @oro_action.assembler
             - @oro_action.helper.applications
+
+    oro_action.manager:
+        class: %oro_action.manager.class%
+        arguments:
+            - @oro_action.registry
+            - @oro_entity.doctrine_helper
+            - @oro_action.helper.context
 
     oro_action.assembler:
         class: %oro_action.assembler.class%
@@ -39,6 +49,7 @@ services:
             - @oro_action.expression.factory
             - @oro_action.attribute_assembler
             - @oro_action.form_options_assembler
+            - @oro_entity.doctrine_helper
 
     oro_action.attribute_assembler:
         class: %oro_action.attribute_assembler.class%

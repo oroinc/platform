@@ -45,7 +45,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer'
         );
         $this->serializer = $this->getMock('Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer');
-        $this->attributeManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeManager')
+        $this->attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
             ->disableOriginalConstructor()
             ->getMock();
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
@@ -59,7 +59,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit_Framework_TestCase
             array('getName'),
             array($entityConnector, $aclManager, null, $this->attributeManager, null)
         );
-        $this->attribute = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Attribute');
+        $this->attribute = $this->getMock('Oro\Bundle\ActionBundle\Model\Attribute');
         $this->normalizer = new WorkflowDataNormalizer();
     }
 

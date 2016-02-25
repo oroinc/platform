@@ -10,6 +10,7 @@ Table of Contents
  - [Configuration Replacing](#configuration-replacing)
  - [Defining an Action](#defining-an-action)
    - [Example](#example)
+ - [Substitution of Action](#substitution-of-action)
  - [Button Options Configuration](#button-options-configuration)
    - [Example](#example-1)
  - [Frontend Options Configuration](#frontend-options-configuration)
@@ -110,6 +111,9 @@ Single action configuration has next properties:
 * **label**
     *string*
     This value will be shown in the UI.
+* **substitute_action**
+    *string*
+    Name of action that can be replaced (e.g. [substituted](#substitution-of-action)) by current one.
 * **enabled**
     *boolean*
     Flag that define whether this action is enabled. Disabled action will not used in application.
@@ -119,6 +123,9 @@ Single action configuration has next properties:
 * **routes**
     *array*
     Action button will be shown on pages which route is in list.
+* **groups**
+    *array*
+    Define an array of group names to use with current action. Behave like tagging of actions. Easiest way to pick needed group of actions for custom approaches.
 * **datagrids**
     *array*
     Action icon will be shown as an datagrid-action in listed datagrids.
@@ -154,6 +161,7 @@ actions:                                             # root elements
     demo_action:                                     # name of action
         extends: demo_action_base                    # base action name
         label: aсme.demo.actions.myentity_action     # this value will be shown in UI for action button
+        substitute_action: some_action               # configuration of 'some_action' will be replaced by configuration of this action
         enabled: false                               # action is disabled, means not used in application
         entities:                                    # on view/edit pages of this entities action button will be shown
             - Acme\Bundle\DemoBundle\Entity\MyEntity # entity class name
@@ -182,6 +190,14 @@ actions:                                             # root elements
         functions:                                   # configuration for Functions
                                                      # ...
 ```
+
+
+Substitution of Action
+======================
+
+When parameter `substitute_action` is defined and it corresponds to action name that should be displayed by default
+substitution happens. In other words, action that define substitution will be positioned in UI instead of action that
+defined in parameter.
 
 Button Options Configuration
 ==============================
@@ -232,6 +248,7 @@ actions:
                 component_name: '[name$="[component]"]'
                 component_additional: '[name$="[additional]"]'
 ```
+
 
 Frontend Options Configuration
 ==============================

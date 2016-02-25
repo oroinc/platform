@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler;
+use Oro\Component\ConfigExpression\Action\ActionAssembler;
 
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 

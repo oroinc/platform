@@ -94,7 +94,7 @@ class ActionExtension extends AbstractExtension
 
         $actionsNew = [];
         foreach ($this->actions as $action) {
-            $actionsNew[$action->getName()] = $action->isAllowed($actionData);
+            $actionsNew[$action->getName()] = $action->isAvailable($actionData);
         }
 
         return array_merge($actionsOld, $actionsNew);

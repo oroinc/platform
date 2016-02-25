@@ -8,8 +8,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
-use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeManager;
 
 class AclManagerTest extends \PHPUnit_Framework_TestCase
 {

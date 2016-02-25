@@ -14,7 +14,7 @@ To add custom condition simply add a service to DIC with the tag "oro_action.con
 
 ```
 parameters:
-    oro_action.condition.blank.class: Oro\Bundle\WorkflowBundle\ConfigExpression\Blank
+    oro_action.condition.blank.class: Oro\Bundle\ActionBundle\ConfigExpression\Blank
 services:
     oro_action.condition.blank:
         class: %oro_action.condition.blank.class%

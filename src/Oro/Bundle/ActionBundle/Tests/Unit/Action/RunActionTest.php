@@ -8,7 +8,7 @@ use Oro\Bundle\ActionBundle\Action\RunAction;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\Model\ContextAccessor;
 
 class RunActionTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,7 +57,7 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertInstanceOf(
-            'Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface',
+            'Oro\Component\ConfigExpression\Action\ActionInterface',
             $this->function->initialize($options)
         );
 
@@ -86,14 +86,14 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'inputData' => [],
-                'expectedException' => 'Oro\Bundle\ActionBundle\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Action name parameter is required'
             ],
             [
                 'inputData' => [
                     'action' => self::ACTION_NAME
                 ],
-                'expectedException' => 'Oro\Bundle\ActionBundle\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Entity class parameter is required',
             ],
             [
@@ -101,7 +101,7 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
                     'action' => self::ACTION_NAME,
                     'entity_class' => 'entityClass'
                 ],
-                'expectedException' => 'Oro\Bundle\ActionBundle\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Entity id parameter is required',
             ]
         ];
