@@ -126,7 +126,7 @@ class ActionRegistry
         $inEntities = in_array($className, $definition->getEntities(), true);
         $inExcludedEntities = in_array($className, $definition->getExcludeEntities(), true);
 
-        if (($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities && !$inExcludedEntities)) {
+        if (($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities)) {
             return true;
         }
 
