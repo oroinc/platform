@@ -13,6 +13,7 @@
                 class="{{ params.buttonOptions.class|default('back icons-holder-text action-button') }} {{ params.buttonOptions.aCss|default('') }}"
                 title="{{ linkTitle }}"
                 data-from-url="{{ fromUrl }}"
+                data-page-url="{{ params.actionUrl }}"
                 data-dialog-show="{{ params.frontendOptions.show_dialog|default(false) }}"
                 data-dialog-url="{{ params.actionUrl }}"
                 data-dialog-options="{{ dialogOptions|json_encode }}"
