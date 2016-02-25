@@ -373,9 +373,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $targetTableName  = $this->getTableName($targetTable);
         $targetTable      = $this->getTable($targetTable, $schema);
+        $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $targetColumnName = $this->nameGenerator->generateOneToManyRelationColumnName(
             $selfClassName,
-            $associationName
+            $associationName,
+            '_' . $selfPrimaryKeyColumnName
         );
 
         $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
@@ -530,7 +532,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         if (!isset($options['extend']['without_default']) || !$options['extend']['without_default']) {
             $this->addDefaultRelation($selfTable, $associationName, $targetTable);
         }
-
+        $selfIdColumn = $this->getPrimaryKeyColumnName($selfTable);
+        $targetIdColumn = $this->getPrimaryKeyColumnName($targetTable);
         $selfClassName             = $this->getEntityClassByTableName($selfTableName);
         $targetClassName           = $this->getEntityClassByTableName($targetTableName);
         $joinTableName             = $this->nameGenerator->generateManyToManyJoinTableName(
@@ -539,8 +542,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
             $targetClassName
         );
         $joinTable                 = $schema->createTable($joinTableName);
-        $selfJoinTableColumnName   = $this->nameGenerator->generateManyToManyJoinTableColumnName($selfClassName);
-        $targetJoinTableColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName($targetClassName);
+        $selfJoinTableColumnName   = $this->nameGenerator->generateManyToManyJoinTableColumnName(
+            $selfClassName,
+            '_' . $selfIdColumn
+        );
+        $targetJoinTableColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName(
+            $targetClassName,
+            '_' . $targetIdColumn
+        );
         $this->addRelation(
             $joinTable,
             $selfJoinTableColumnName,
@@ -953,8 +962,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     protected function addDefaultRelation(Table $table, $associationName, Table $targetTable)
     {
-        $defaultRelationColumnName  = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
+        $defaultRelationColumnName  = $this->nameGenerator->generateRelationDefaultColumnName(
+            $associationName,
+            '_' . $targetPrimaryKeyColumnName
+        );
         $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
         $this->addRelationColumn($table, $defaultRelationColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
         $table->addIndex([$defaultRelationColumnName]);

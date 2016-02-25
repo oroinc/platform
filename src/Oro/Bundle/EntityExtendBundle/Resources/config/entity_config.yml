@@ -117,7 +117,7 @@ oro_entity_config:
                     options:
                         auditable:          false
 
-                id_columns:
+                pk_columns:
                     options:
                         auditable:          false
 

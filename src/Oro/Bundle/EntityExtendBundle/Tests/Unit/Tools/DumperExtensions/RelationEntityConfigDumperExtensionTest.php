@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -17,11 +15,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     /** @var RelationEntityConfigDumperExtension */
     protected $extension;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
-
-    /** @var AssociationBuilder|\PHPUnit_Framework_MockObject_MockObject */
-    protected $associationBuilder;
 
     /** @var array */
     protected $configs = [];
@@ -32,14 +27,9 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->associationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->extension = new RelationEntityConfigDumperExtension(
             $this->configManager,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']),
-            $this->associationBuilder
+            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
         );
 
         // will be filled by addEntityConfig and addConfigNewField
@@ -507,12 +497,11 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     {
         $selfRelations   = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
-                'field_id'         => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
-                'owner'            => true,
-                'target_entity'    => 'Test\TargetEntity',
-                'target_field_id'  => $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany'),
-                'cascade'          => ['persist', 'remove'],
-                'target_id_column' => 'id'
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany'),
+                'cascade'         => ['persist', 'remove']
             ]
         ];
         $targetRelations = [
@@ -558,7 +547,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'Test\TargetEntity',
             'rev_rel_mto'
         );
-        $this->prepareAssociationBuilder('Test\TargetEntity');
+
         $this->extension->preUpdate();
 
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
@@ -569,11 +558,10 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     {
         $selfRelations   = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
-                'field_id'         => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
-                'owner'            => true,
-                'target_entity'    => 'Test\TargetEntity',
-                'target_field_id'  => false,
-                'target_id_column' => 'id'
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => false
             ]
         ];
         $targetRelations = [
@@ -609,7 +597,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\TargetEntity'
         );
-        $this->prepareAssociationBuilder('Test\TargetEntity');
+
         $this->extension->preUpdate();
 
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
@@ -620,12 +608,11 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     {
         $selfRelations   = [
             'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
-                'field_id'         => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
-                'owner'            => true,
-                'target_entity'    => 'Test\TargetEntity',
-                'target_field_id'  => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany'),
-                'cascade'          => ['persist', 'remove'],
-                'target_id_column' => 'id'
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany'),
+                'cascade'         => ['persist', 'remove']
             ]
         ];
         $targetRelations = [
@@ -671,7 +658,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'Test\TargetEntity',
             'sourceentity_rel_mtm'
         );
-        $this->prepareAssociationBuilder('Test\TargetEntity');
+
         $this->extension->preUpdate();
 
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
@@ -682,11 +669,10 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     {
         $selfRelations   = [
             'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
-                'field_id'         => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
-                'owner'            => true,
-                'target_entity'    => 'Test\TargetEntity',
-                'target_field_id'  => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany'),
-                'target_id_column' => 'id'
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany')
             ]
         ];
         $targetRelations = [
@@ -722,7 +708,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\TargetEntity'
         );
-        $this->prepareAssociationBuilder('Test\TargetEntity');
+
         $this->extension->preUpdate();
 
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
@@ -733,12 +719,11 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     {
         $selfRelations   = [
             'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
-                'field_id'         => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
-                'owner'            => false,
-                'target_entity'    => 'Test\TargetEntity',
-                'target_field_id'  => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne'),
-                'cascade'          => ['persist', 'remove'],
-                'target_id_column' => 'id'
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne'),
+                'cascade'         => ['persist', 'remove']
             ]
         ];
         $targetRelations = [
@@ -785,7 +770,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'sourceentity_rel_otm'
         );
 
-        $this->prepareAssociationBuilder('Test\TargetEntity');
         $this->extension->preUpdate();
 
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
@@ -796,11 +780,10 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     {
         $selfRelations   = [
             'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
-                'field_id'         => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
-                'owner'            => false,
-                'target_entity'    => 'Test\TargetEntity',
-                'target_field_id'  => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne'),
-                'target_id_column' => 'id'
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne')
             ]
         ];
         $targetRelations = [
@@ -837,7 +820,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'Test\TargetEntity'
         );
 
-        $this->prepareAssociationBuilder('Test\TargetEntity');
         $this->extension->preUpdate();
 
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
@@ -917,17 +899,5 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     protected function getFieldId($className, $fieldName, $fieldType)
     {
         return new FieldConfigId('extend', $className, $fieldName, $fieldType);
-    }
-
-    /**
-     * @param string $targetEntityClass
-     */
-    protected function prepareAssociationBuilder($targetEntityClass)
-    {
-        $this->associationBuilder
-            ->expects($this->once())
-            ->method('getPrimaryKeyColumnName')
-            ->with($targetEntityClass)
-            ->willReturn('id');
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -20,22 +19,14 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /** @var AssociationBuilder */
-    protected $associationBuilder;
-
     /**
      * @param ConfigManager   $configManager
      * @param FieldTypeHelper $fieldTypeHelper
-     * @param AssociationBuilder $associationBuilder
      */
-    public function __construct(
-        ConfigManager $configManager,
-        FieldTypeHelper $fieldTypeHelper,
-        AssociationBuilder $associationBuilder
-    ) {
-        $this->configManager      = $configManager;
-        $this->fieldTypeHelper    = $fieldTypeHelper;
-        $this->associationBuilder = $associationBuilder;
+    public function __construct(ConfigManager $configManager, FieldTypeHelper $fieldTypeHelper)
+    {
+        $this->configManager   = $configManager;
+        $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
     /**
@@ -120,10 +111,9 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
         $targetFieldId     = false;
         $targetEntityClass = $fieldConfig->get('target_entity');
-        $entityClass       = $selfFieldId->getClassName();
         if (in_array($selfFieldId->getFieldType(), RelationType::$toManyRelations, true)) {
             $relationFieldName = ExtendHelper::buildToManyRelationTargetFieldName(
-                $entityClass,
+                $selfFieldId->getClassName(),
                 $selfFieldId->getFieldName()
             );
             if ($selfFieldId->getFieldType() === RelationType::ONE_TO_MANY) {
@@ -140,13 +130,12 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
         $relationKey = $fieldConfig->get('relation_key');
 
-        $selfConfig   = $this->getEntityConfig($entityClass);
+        $selfConfig   = $this->getEntityConfig($selfFieldId->getClassName());
         $selfRelation = [
-            'field_id'         => $selfFieldId,
-            'owner'            => $selfIsOwnerSide,
-            'target_entity'    => $targetEntityClass,
-            'target_field_id'  => $targetFieldId,
-            'target_id_column' => $this->associationBuilder->getPrimaryKeyColumnName($targetEntityClass)
+            'field_id'        => $selfFieldId,
+            'owner'           => $selfIsOwnerSide,
+            'target_entity'   => $targetEntityClass,
+            'target_field_id' => $targetFieldId
         ];
         if ($fieldConfig->has('cascade')) {
             $selfRelation['cascade'] = $fieldConfig->get('cascade');
@@ -158,11 +147,10 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
         $targetConfig                  = $this->getEntityConfig($targetEntityClass);
         $targetRelation                = [
-            'field_id'         => $targetFieldId,
-            'owner'            => !$selfIsOwnerSide,
-            'target_entity'    => $entityClass,
-            'target_field_id'  => $selfFieldId,
-            'target_id_column' => $this->associationBuilder->getPrimaryKeyColumnName($entityClass)
+            'field_id'        => $targetFieldId,
+            'owner'           => !$selfIsOwnerSide,
+            'target_entity'   => $selfFieldId->getClassName(),
+            'target_field_id' => $selfFieldId,
         ];
         $targetRelations               = $targetConfig->get('relation', false, []);
         $targetRelations[$relationKey] = $targetRelation;
