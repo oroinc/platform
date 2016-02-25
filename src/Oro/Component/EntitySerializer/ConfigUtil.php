@@ -5,40 +5,48 @@ namespace Oro\Component\EntitySerializer;
 class ConfigUtil
 {
     /**
-     * A field which can be used to get the discriminator value an entity.
-     * For example:
+     * The field name or property path of the field which can be used to get the discriminator value of the entity.
+     * Example of usage:
      *  'fields' => [
      *      'type' => ['property_path' => '__discriminator__']
+     *  ]
+     * or
+     *  'fields' => [
+     *      '__discriminator__' => null
      *  ]
      */
     const DISCRIMINATOR = '__discriminator__';
 
     /**
-     * A field which can be used to get FQCN of an entity.
-     * For example:
+     * The field name or property path of the field which can be used to get FQCN of the entity.
+     * Example of usage:
      *  'fields' => [
      *      'entity' => ['property_path' => '__class__']
+     *  ]
+     * or
+     *  'fields' => [
+     *      '__class__' => null
      *  ]
      */
     const CLASS_NAME = '__class__';
 
-    const EXCLUSION_POLICY      = 'exclusion_policy';
-    const EXCLUSION_POLICY_ALL  = 'all';
-    const EXCLUSION_POLICY_NONE = 'none';
+    const FIELDS = 'fields';
 
-    const DISABLE_PARTIAL_LOAD = 'disable_partial_load';
-    const HINTS                = 'hints';
-    const FIELDS               = 'fields';
-    const ORDER_BY             = 'order_by';
-    const MAX_RESULTS          = 'max_results';
-    const DATA_TRANSFORMER     = 'data_transformer';
-    const POST_SERIALIZE       = 'post_serialize';
+    const EXCLUSION_POLICY      = EntityConfig::EXCLUSION_POLICY;
+    const EXCLUSION_POLICY_ALL  = EntityConfig::EXCLUSION_POLICY_ALL;
+    const EXCLUSION_POLICY_NONE = EntityConfig::EXCLUSION_POLICY_NONE;
+    const DISABLE_PARTIAL_LOAD  = EntityConfig::DISABLE_PARTIAL_LOAD;
+    const HINTS                 = EntityConfig::HINTS;
+    const ORDER_BY              = EntityConfig::ORDER_BY;
+    const MAX_RESULTS           = EntityConfig::MAX_RESULTS;
+    const POST_SERIALIZE        = EntityConfig::POST_SERIALIZE;
 
     const PATH_DELIMITER = '.';
 
-    const PROPERTY_PATH = 'property_path';
-    const EXCLUDE       = 'exclude';
-
+    const PROPERTY_PATH    = FieldConfig::PROPERTY_PATH;
+    const EXCLUDE          = FieldConfig::EXCLUDE;
+    const COLLAPSE         = FieldConfig::COLLAPSE;
+    const DATA_TRANSFORMER = FieldConfig::DATA_TRANSFORMER;
 
     /**
      * @param array  $config A config

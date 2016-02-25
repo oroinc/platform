@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigProcessor;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigProvider
 {
@@ -28,10 +29,10 @@ class ConfigProvider
      *
      * @param string                 $className   The FQCN of an entity
      * @param string                 $version     The version of a config
-     * @param string[]               $requestType The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string[]               $requestType The request type, for example "rest", "soap", etc.
      * @param ConfigExtraInterface[] $extras      Additional configuration data.
      *
-     * @return array|null
+     * @return Config
      */
     public function getConfig($className, $version, array $requestType = [], array $extras = [])
     {
@@ -57,18 +58,31 @@ class ConfigProvider
 
         $this->processor->process($context);
 
-        $config = [];
-        if ($context->hasResult()) {
-            $config[ConfigUtil::DEFINITION] = $context->getResult();
-        }
-        if ($context->hasFilters()) {
-            $config[ConfigUtil::FILTERS] = $context->getFilters();
-        }
-        if ($context->hasSorters()) {
-            $config[ConfigUtil::SORTERS] = $context->getSorters();
-        }
+        $config = $this->buildResult($context);
 
         $this->cache[$cacheKey] = $config;
+
+        return $config;
+    }
+
+    /**
+     * @param ConfigContext $context
+     *
+     * @return Config
+     */
+    protected function buildResult(ConfigContext $context)
+    {
+        $config = new Config();
+        if ($context->hasResult()) {
+            $config->setDefinition($context->getResult());
+        }
+        $extras = $context->getExtras();
+        foreach ($extras as $extra) {
+            $sectionName = $extra->getName();
+            if ($extra instanceof ConfigExtraSectionInterface && $context->has($sectionName)) {
+                $config->set($sectionName, $context->get($sectionName));
+            }
+        }
 
         return $config;
     }

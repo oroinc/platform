@@ -23,17 +23,17 @@ class DebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:api:debug')
-            ->setDescription('Shows details about registered API actions and processors.')
+            ->setDescription('Shows details about registered Data API actions and processors.')
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'Shows a list of processors for a specified action in the order they are executed'
+                'Shows a list of processors for a specified action'
             )
             ->addOption(
                 'request-type',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'API request type'
+                'The request type'
             );
     }
 
@@ -88,7 +88,7 @@ class DebugCommand extends ContainerAwareCommand
      */
     protected function dumpProcessors(OutputInterface $output, $action, array $requestType)
     {
-        $output->writeln('The processors are displayed in order they are executed.');
+        $output->writeln('The processors are displayed in the order they are executed.');
 
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
