@@ -49,7 +49,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
         if (!empty($config)) {
             if (!empty($config[ConfigUtil::DEFINITION])) {
                 $context->setResult(
-                    $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config)
+                    $this->loadConfigObject(ConfigUtil::DEFINITION, $config[ConfigUtil::DEFINITION])
                 );
             }
             $extras = $context->getExtras();
@@ -61,7 +61,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
                 ) {
                     $context->set(
                         $sectionName,
-                        $this->configLoaderFactory->getLoader($extra->getConfigType())->load($config[$sectionName])
+                        $this->loadConfigObject($extra->getConfigType(), $config[$sectionName])
                     );
                 }
             }
@@ -93,6 +93,17 @@ abstract class LoadFromConfigBag implements ProcessorInterface
         return null !== $config
             ? $config
             : [];
+    }
+
+    /**
+     * @param string $configType
+     * @param array  $config
+     *
+     * @return object
+     */
+    protected function loadConfigObject($configType, $config)
+    {
+        return $this->configLoaderFactory->getLoader($configType)->load($config);
     }
 
     /**
