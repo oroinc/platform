@@ -26,14 +26,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, priority: 0 }
 
-    oro_api.get_config.complete_definition.expand_related_entities:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities
-        arguments:
-            - @oro_api.doctrine_helper
-            - @oro_api.config_provider
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: expand_related_entities, priority: -5 }
-
     oro_api.get_config.load_virtual_fields:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadVirtualFields
         arguments:
@@ -118,6 +110,15 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, priority: -3 }
             - { name: oro.api.processor, action: get_relation_config, priority: -3 }
+
+    oro_api.get_config.complete_definition.expand_related_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_api.config_provider
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: expand_related_entities, priority: -5 }
+            - { name: oro.api.processor, action: get_relation_config, extra: expand_related_entities, priority: -5 }
 
     oro_api.get_config.complete_definition.fields:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfFields

@@ -101,7 +101,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
                     'include' => 'staff',
                     'fields'  => [
                         'testdepartments' => 'id,name,staff',
-                        'staff'           => 'id,name'
+                        'testemployees'   => 'id,name'
                     ],
                     'sort'    => '-id'
                 ],

@@ -48,4 +48,20 @@ class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
     {
         $context->setMaxRelatedEntities($this->maxRelatedEntities);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInheritable()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheKeyPart()
+    {
+        return self::NAME . ':' . (string)$this->maxRelatedEntities;
+    }
 }

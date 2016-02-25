@@ -30,7 +30,7 @@ class RelationConfigProvider
      * @param string                 $className   The FQCN of an entity
      * @param string                 $version     The version of a config
      * @param string[]               $requestType The request type, for example "rest", "soap", etc.
-     * @param ConfigExtraInterface[] $extras      Additional configuration data.
+     * @param ConfigExtraInterface[] $extras      Requests for additional configuration data
      *
      * @return Config
      */
@@ -40,7 +40,7 @@ class RelationConfigProvider
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $cacheKey = implode('', $requestType) . $version . $className;
+        $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras);
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];
         }
@@ -65,6 +65,26 @@ class RelationConfigProvider
         return $config;
     }
 
+    /**
+     * @param string                 $className
+     * @param string                 $version
+     * @param string[]               $requestType
+     * @param ConfigExtraInterface[] $extras
+     *
+     * @return string
+     */
+    protected function buildCacheKey($className, $version, array $requestType, array $extras)
+    {
+        $cacheKey = implode('', $requestType) . '|' . $version . '|' . $className;
+        foreach ($extras as $extra) {
+            $part = $extra->getCacheKeyPart();
+            if (!empty($part)) {
+                $cacheKey .= '|' . $part;
+            }
+        }
+
+        return $cacheKey;
+    }
 
     /**
      * @param RelationConfigContext $context
