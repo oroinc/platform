@@ -1,10 +1,10 @@
 parameters:
-    oro_action.configuration_pass.replace_property_path.class: Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath
+    oro_action.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Configuration\ConfigurationPass\ReplacePropertyPath
     oro_action.expression.extension.class: Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension
     oro_action.expression.context_accessor.class: Oro\Component\ConfigExpression\ContextAccessor
     oro_action.expression.factory.class: Oro\Component\ConfigExpression\ExpressionFactory
     oro_action.expression.assembler.class: Oro\Component\ConfigExpression\ExpressionAssembler
-    oro_action.condition.configurable.class: Oro\Bundle\WorkflowBundle\Model\Condition\Configurable
+    oro_action.condition.configurable.class: Oro\Component\ConfigExpression\Condition\Configurable
 
 services:
     oro_action.configuration_pass.replace_property_path:

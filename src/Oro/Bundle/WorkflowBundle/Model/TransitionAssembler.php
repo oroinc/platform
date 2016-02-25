@@ -5,14 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
-
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory;
-use Oro\Bundle\WorkflowBundle\Model\Action\Configurable as ConfigurableAction;
-use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\ConfigExpression\Action\ActionFactory;
+use Oro\Component\ConfigExpression\Action\Configurable as ConfigurableAction;
+use Oro\Component\ConfigExpression\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\ConfigExpression\Exception\AssemblerException;
+use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use Oro\Component\ConfigExpression\Model\AbstractAssembler;
 
 class TransitionAssembler extends AbstractAssembler
 {

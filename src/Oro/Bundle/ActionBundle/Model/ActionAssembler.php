@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory as FunctionFactory;
+use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionAssembler extends AbstractAssembler

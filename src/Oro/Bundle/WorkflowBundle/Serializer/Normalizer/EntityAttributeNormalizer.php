@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
