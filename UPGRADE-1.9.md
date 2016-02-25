@@ -303,6 +303,7 @@ after:
 - Services with tag `oro_ui.content_provider` was marked as private
 - Services with tag `oro_formatter` was marked as private
 - Class `Oro\Bundle\UIBundle\Tools\ArrayUtils` marked as deprecated. Use `Oro\Component\PhpUtils\ArrayUtil` instead.
+- Added [InputWidgetManager](./src/Oro/Bundle/UIBundle/Resources/doc/reference/input-widgets.md).
 
 ####UserBundle
 - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
