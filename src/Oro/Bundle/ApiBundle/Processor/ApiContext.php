@@ -6,14 +6,14 @@ use Oro\Component\ChainProcessor\Context as BaseContext;
 
 abstract class ApiContext extends BaseContext
 {
-    /** a list of types the current request belongs, for example "rest", "soap", "odata", etc. */
+    /** a list of types the current request belongs, for example "rest", "soap", etc. */
     const REQUEST_TYPE = 'requestType';
 
     /** API version */
     const VERSION = 'version';
 
     /**
-     * Gets a list of types the current request belongs, for example "rest", "soap", "odata", etc.
+     * Gets a list of types the current request belongs, for example "rest", "soap", etc.
      * A request can belong to several types, e.g. "rest" and "json_api".
      *
      * @return string[]
@@ -28,7 +28,7 @@ abstract class ApiContext extends BaseContext
     }
 
     /**
-     * Sets the type of the current request, for example "rest", "soap", "odata", etc.
+     * Sets the type of the current request, for example "rest", "soap", etc.
      * A request can belong to several types, e.g. "rest" and "json_api".
      * This method adds the given type(s) to a list of already set types.
      *
