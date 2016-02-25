@@ -360,6 +360,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
             'action14' => [
                 'label' => 'Label14',
                 'for_all_entities' => true,
+                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                 'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
             ]
         ];
