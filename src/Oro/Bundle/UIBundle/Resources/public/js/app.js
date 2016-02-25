@@ -2,7 +2,8 @@ define([
     'underscore',
     './app/application',
     './app/routes',
-    'module'
+    'module',
+    './extend/polyfill'
 ].concat(requirejs.s.contexts._.config.appmodules), function(_, Application, routes, module) {
     'use strict';
 
