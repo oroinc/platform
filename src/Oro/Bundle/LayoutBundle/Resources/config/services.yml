@@ -159,9 +159,3 @@ services:
             - @assets.packages
         tags:
             - { name: oro_layout.expression, alias: asset }
-
-    oro_layout.form_provider:
-        class: Oro\Bundle\LayoutBundle\Layout\DataProvider\FormProvider
-        abstract: true
-        arguments:
-            - @form.factory
