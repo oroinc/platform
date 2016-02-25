@@ -51,11 +51,7 @@ define([
                 throw new TypeError('"collection" is required');
             }
 
-            if (!options.enabled) {
-                return;
-            }
-
-            this.enabled = true;
+            this.enabled = options.enable !== false;
 
             this.columns = options.columns;
             this.collection = options.collection;
@@ -73,12 +69,9 @@ define([
          */
         _selectCurrentSortableColumn: function(column, direction) {
             if (direction !== null) {
-                var self = this;
                 this.currentColumn = column;
                 this.currentDirection = direction;
-                $('select option').filter(function() {
-                    return $(this).val() === self._getColumnValue(column, direction);
-                }).prop('selected', true);
+                this.$('select').val(this._getColumnValue(column, direction));
             }
         },
 

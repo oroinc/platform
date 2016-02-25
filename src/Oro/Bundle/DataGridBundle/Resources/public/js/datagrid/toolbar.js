@@ -66,7 +66,6 @@ define([
                 this.subviews.sortingDropdown = new this.sortingDropdown({
                     collection: this.collection,
                     columns: options.columns,
-                    enabled: options.addSorting
                 });
             }
 
