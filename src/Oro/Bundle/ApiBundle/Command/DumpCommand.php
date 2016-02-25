@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -67,7 +69,7 @@ class DumpCommand extends ContainerAwareCommand
             $table->addRow(
                 [
                     $resource->getEntityClass(),
-                    $this->convertResourceAttributesToString($this->getResourceAttributes($resource))
+                    $this->convertResourceAttributesToString($this->getResourceAttributes($resource, $requestType))
                 ]
             );
             $i++;
@@ -78,18 +80,23 @@ class DumpCommand extends ContainerAwareCommand
 
     /**
      * @param ApiResource $resource
+     * @param string[]    $requestType
      *
      * @return array
      */
-    protected function getResourceAttributes(ApiResource $resource)
+    protected function getResourceAttributes(ApiResource $resource, array $requestType)
     {
         $result = [];
 
         $entityClass = $resource->getEntityClass();
 
-        /** @var EntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = $this->getContainer()->get('oro_entity.entity_alias_resolver');
-        $result['Alias']     = $entityAliasResolver->getPluralAlias($entityClass);
+        /** @var ValueNormalizer $valueNormalizer */
+        $valueNormalizer      = $this->getContainer()->get('oro_api.value_normalizer');
+        $result['Entity Type'] = $valueNormalizer->normalizeValue(
+            $entityClass,
+            DataType::ENTITY_TYPE,
+            $requestType
+        );
 
         /** @var EntityClassNameProviderInterface $entityClassNameProvider */
         $entityClassNameProvider = $this->getContainer()->get('oro_entity.entity_class_name_provider');

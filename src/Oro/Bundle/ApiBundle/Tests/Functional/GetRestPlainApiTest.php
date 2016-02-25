@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class GetRestPlainApiTest extends ApiTestCase
@@ -31,7 +32,11 @@ class GetRestPlainApiTest extends ApiTestCase
      */
     public function testGetListRestRequests($entityClass)
     {
-        $entityAlias = $this->entityClassTransformer->transform($entityClass);
+        $entityAlias = $this->valueNormalizer->normalizeValue(
+            $entityClass,
+            DataType::ENTITY_TYPE,
+            [RequestType::REST]
+        );
 
         /**
          * @TODO: Fix AbandonedCartBundle/Acl/Voter/AbandonedCartVoter (CRM-4733)

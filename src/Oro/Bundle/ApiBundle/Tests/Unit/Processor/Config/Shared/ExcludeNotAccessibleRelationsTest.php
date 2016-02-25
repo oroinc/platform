@@ -10,7 +10,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeNotAccessibleRelations;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
 {
@@ -21,7 +23,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
     protected $router;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityAliasResolver;
+    protected $valueNormalizer;
 
     /** @var ExcludeNotAccessibleRelations */
     protected $processor;
@@ -30,11 +32,11 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper      = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
+        $this->doctrineHelper  = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->router              = $this->getMock('Symfony\Component\Routing\RouterInterface');
-        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+        $this->router          = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -46,7 +48,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         $this->processor = new ExcludeNotAccessibleRelations(
             $this->doctrineHelper,
             $this->router,
-            $this->entityAliasResolver
+            $this->valueNormalizer
         );
     }
 
@@ -182,20 +184,24 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityAliasResolver->expects($this->exactly(2))
-            ->method('hasAlias')
+        $this->valueNormalizer->expects($this->exactly(2))
+            ->method('normalizeValue')
             ->willReturnMap(
                 [
-                    ['Test\Association1Target', true],
-                    ['Test\Association3Target', true],
-                ]
-            );
-        $this->entityAliasResolver->expects($this->exactly(2))
-            ->method('getPluralAlias')
-            ->willReturnMap(
-                [
-                    ['Test\Association1Target', 'associations1'],
-                    ['Test\Association3Target', 'associations3'],
+                    [
+                        'Test\Association1Target',
+                        DataType::ENTITY_TYPE,
+                        $this->context->getRequestType(),
+                        false,
+                        'associations1'
+                    ],
+                    [
+                        'Test\Association3Target',
+                        DataType::ENTITY_TYPE,
+                        $this->context->getRequestType(),
+                        false,
+                        'associations3'
+                    ],
                 ]
             );
 
@@ -284,12 +290,15 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityAliasResolver->expects($this->once())
-            ->method('hasAlias')
-            ->with('Test\Association1Target')
-            ->willReturn(false);
-        $this->entityAliasResolver->expects($this->never())
-            ->method('getPluralAlias');
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
+            ->willThrowException(new EntityAliasNotFoundException());
 
         $this->router->expects($this->never())
             ->method('generate');
@@ -346,13 +355,14 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityAliasResolver->expects($this->once())
-            ->method('hasAlias')
-            ->with('Test\Association1Target')
-            ->willReturn(true);
-        $this->entityAliasResolver->expects($this->once())
-            ->method('getPluralAlias')
-            ->with('Test\Association1Target')
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
             ->willReturn('associations1');
 
         $this->router->expects($this->once())
@@ -412,13 +422,14 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityAliasResolver->expects($this->once())
-            ->method('hasAlias')
-            ->with('Test\Association1Target')
-            ->willReturn(true);
-        $this->entityAliasResolver->expects($this->once())
-            ->method('getPluralAlias')
-            ->with('Test\Association1Target')
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
             ->willReturn('associations1');
 
         $this->router->expects($this->once())
@@ -480,13 +491,14 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityAliasResolver->expects($this->once())
-            ->method('hasAlias')
-            ->with('Test\Association1Target')
-            ->willReturn(true);
-        $this->entityAliasResolver->expects($this->once())
-            ->method('getPluralAlias')
-            ->with('Test\Association1Target')
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
             ->willReturn('associations1');
 
         $this->router->expects($this->once())
@@ -550,17 +562,23 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityAliasResolver->expects($this->exactly(2))
-            ->method('hasAlias')
-            ->willReturnMap(
-                [
-                    ['Test\Association1Target', false],
-                    ['Test\Association1Target1', true],
-                ]
-            );
-        $this->entityAliasResolver->expects($this->once())
-            ->method('getPluralAlias')
-            ->with('Test\Association1Target1')
+        $this->valueNormalizer->expects($this->at(0))
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
+            ->willThrowException(new EntityAliasNotFoundException());
+        $this->valueNormalizer->expects($this->at(1))
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target1',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
             ->willReturn('associations1_1');
 
         $this->router->expects($this->once())
@@ -622,17 +640,23 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityAliasResolver->expects($this->exactly(2))
-            ->method('hasAlias')
-            ->willReturnMap(
-                [
-                    ['Test\Association1Target', false],
-                    ['Test\Association1Target1', true],
-                ]
-            );
-        $this->entityAliasResolver->expects($this->once())
-            ->method('getPluralAlias')
-            ->with('Test\Association1Target1')
+        $this->valueNormalizer->expects($this->at(0))
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
+            ->willThrowException(new EntityAliasNotFoundException());
+        $this->valueNormalizer->expects($this->at(1))
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target1',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
             ->willReturn('associations1_1');
 
         $this->router->expects($this->once())

@@ -9,7 +9,6 @@ use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue as Processor;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
@@ -25,6 +24,19 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $processorFactory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $processorBag     = new ProcessorBag($processorFactory);
+
+        $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityAliasResolver->expects($this->any())
+            ->method('getClassByAlias')
+            ->willReturnMap([['test_entity', 'Test\Entity']]);
+        $entityAliasResolver->expects($this->any())
+            ->method('getClassByPluralAlias')
+            ->willReturnMap([['test_entities', 'Test\Entity']]);
+        $entityAliasResolver->expects($this->any())
+            ->method('getPluralAlias')
+            ->willReturnMap([['Test\Entity', 'test_entities']]);
 
         $this->valueNormalizer = new ValueNormalizer(
             new NormalizeValueProcessor($processorBag, 'normalize_value')
@@ -46,6 +58,22 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 $this->addProcessor($processorBag, 'unsigned_integer', DataType::UNSIGNED_INTEGER),
                 new Processor\NormalizeUnsignedInteger()
+            ],
+            [
+                $this->addProcessor($processorBag, 'entityClass', DataType::ENTITY_CLASS),
+                new Processor\NormalizeEntityClass($entityAliasResolver)
+            ],
+            [
+                $this->addProcessor($processorBag, 'entityType', DataType::ENTITY_TYPE),
+                new Processor\NormalizeEntityType($entityAliasResolver)
+            ],
+            [
+                $this->addProcessor($processorBag, 'entityAlias', DataType::ENTITY_ALIAS),
+                new Processor\NormalizeEntityAlias($entityAliasResolver)
+            ],
+            [
+                $this->addProcessor($processorBag, 'entityPluralAlias', DataType::ENTITY_PLURAL_ALIAS),
+                new Processor\NormalizeEntityPluralAlias($entityAliasResolver)
             ],
             [
                 $this->addProcessor($processorBag, 'rest.boolean', DataType::BOOLEAN, [RequestType::REST]),
@@ -332,6 +360,14 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST],
                 true
             ],
+            ['Test\Entity', 'test_entity', DataType::ENTITY_ALIAS, [RequestType::REST], false],
+            ['Test\Entity', 'Test\Entity', DataType::ENTITY_ALIAS, [RequestType::REST], false],
+            ['Test\Entity', 'test_entities', DataType::ENTITY_PLURAL_ALIAS, [RequestType::REST], false],
+            ['Test\Entity', 'Test\Entity', DataType::ENTITY_PLURAL_ALIAS, [RequestType::REST], false],
+            ['test_entities', 'Test\Entity', DataType::ENTITY_TYPE, [RequestType::REST], false],
+            ['test_entities', 'test_entities', DataType::ENTITY_TYPE, [RequestType::REST], false],
+            ['Test\Entity', 'test_entities', DataType::ENTITY_CLASS, [RequestType::REST], false],
+            ['Test\Entity', 'Test\Entity', DataType::ENTITY_CLASS, [RequestType::REST], false],
         ];
     }
 

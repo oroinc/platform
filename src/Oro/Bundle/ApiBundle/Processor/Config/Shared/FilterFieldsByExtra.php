@@ -9,8 +9,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
@@ -22,19 +23,19 @@ class FilterFieldsByExtra implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityClassTransformerInterface */
-    protected $entityClassTransformer;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
 
     /**
-     * @param DoctrineHelper                  $doctrineHelper
-     * @param EntityClassTransformerInterface $entityClassTransformer
+     * @param DoctrineHelper  $doctrineHelper
+     * @param ValueNormalizer $valueNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityClassTransformerInterface $entityClassTransformer
+        ValueNormalizer $valueNormalizer
     ) {
-        $this->doctrineHelper         = $doctrineHelper;
-        $this->entityClassTransformer = $entityClassTransformer;
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -56,19 +57,29 @@ class FilterFieldsByExtra implements ProcessorInterface
             return;
         }
 
-        $this->filterFields($definition, $entityClass, $context->get(FilterFieldsConfigExtra::NAME));
+        $this->filterFields(
+            $definition,
+            $entityClass,
+            $context->get(FilterFieldsConfigExtra::NAME),
+            $context->getRequestType()
+        );
     }
 
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      * @param array                  $fieldFilters
+     * @param string[]               $requestType
      */
-    protected function filterFields(EntityDefinitionConfig $definition, $entityClass, array $fieldFilters)
-    {
+    protected function filterFields(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        array $fieldFilters,
+        array $requestType
+    ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $allowedFields = $this->getAllowedFields($metadata, $fieldFilters);
+        $allowedFields = $this->getAllowedFields($metadata, $fieldFilters, $requestType);
         if (null !== $allowedFields) {
             $idFieldNames = $metadata->getIdentifierFieldNames();
             $fields       = $definition->getFields();
@@ -91,7 +102,8 @@ class FilterFieldsByExtra implements ProcessorInterface
                     $this->filterFields(
                         $field->getTargetEntity(),
                         $metadata->getAssociationTargetClass($propertyPath),
-                        $fieldFilters
+                        $fieldFilters,
+                        $requestType
                     );
                 }
             }
@@ -101,21 +113,22 @@ class FilterFieldsByExtra implements ProcessorInterface
     /**
      * @param ClassMetadata $metadata
      * @param array         $fieldFilters
+     * @param string[]      $requestType
      *
      * @return string[]|null
      */
-    protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters)
+    protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters, array $requestType)
     {
         $allowedFields = null;
         if ($metadata->inheritanceType === ClassMetadata::INHERITANCE_TYPE_NONE) {
-            $entityType = $this->entityClassTransformer->transform($metadata->name, false);
+            $entityType = $this->convertToEntityType($metadata->name, $requestType);
             if (null !== $entityType && !empty($fieldFilters[$entityType])) {
                 $allowedFields = $fieldFilters[$entityType];
             }
         } else {
             $entityClasses = array_unique(array_merge([$metadata->name], $metadata->subClasses));
             foreach ($entityClasses as $entityClass) {
-                $entityType = $this->entityClassTransformer->transform($entityClass, false);
+                $entityType = $this->convertToEntityType($entityClass, $requestType);
                 if (null !== $entityType && !empty($fieldFilters[$entityType])) {
                     if (null === $allowedFields) {
                         $allowedFields = $fieldFilters[$entityType];
@@ -127,5 +140,21 @@ class FilterFieldsByExtra implements ProcessorInterface
         }
 
         return $allowedFields;
+    }
+
+    /**
+     * @param string   $entityClass
+     * @param string[] $requestType
+     *
+     * @return string|null
+     */
+    protected function convertToEntityType($entityClass, array $requestType)
+    {
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $requestType,
+            false
+        );
     }
 }
