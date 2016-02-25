@@ -18,7 +18,7 @@ class MetadataContext extends ApiContext
     /** the configuration of an entity */
     const CONFIG = 'config';
 
-    /** additional metadata information that should be retrieved */
+    /** a list of requests for additional metadata information that should be retrieved */
     const EXTRA = 'extra';
 
     /** @var MetadataExtraInterface[] */

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -14,8 +15,6 @@ class SetFieldsFilter implements ProcessorInterface
 {
     const FILTER_KEY          = 'fields';
     const FILTER_KEY_TEMPLATE = 'fields[%s]';
-    const FILTER_KEY_DESCRIPTION
-        = 'Return only specific fields in the response on a per-type basis by including a fields[TYPE] parameter.';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -54,28 +53,34 @@ class SetFieldsFilter implements ProcessorInterface
             return;
         }
 
-        $fieldFilter = new FieldsFilter(
-            DataType::STRING,
-            self::FILTER_KEY_DESCRIPTION
-        );
-        $fieldFilter->setArrayAllowed(true);
-
-        $filters->add(
-            sprintf(self::FILTER_KEY_TEMPLATE, $this->entityClassTransformer->transform($entityClass)),
-            $fieldFilter
-        );
+        $this->addFilter($filters, $entityClass);
 
         $associations = $context->getMetadata()->getAssociations();
-        if (!$associations) {
-            // no associations - no sense to add associations fields filters
-            return;
+        foreach ($associations as $association) {
+            $targetClasses = $association->getAcceptableTargetClassNames();
+            foreach ($targetClasses as $targetClass) {
+                $this->addFilter($filters, $targetClass);
+            }
         }
+    }
 
-        $associationKeys = array_keys($associations);
-        foreach ($associationKeys as $association) {
+    /**
+     * @param FilterCollection $filters
+     * @param string           $entityClass
+     */
+    protected function addFilter(FilterCollection $filters, $entityClass)
+    {
+        $entityType = $this->entityClassTransformer->transform($entityClass, false);
+        if ($entityType) {
+            $filter = new FieldsFilter(
+                DataType::STRING,
+                sprintf('A list of fields for the \'%s\' entity to be returned.', $entityType)
+            );
+            $filter->setArrayAllowed(true);
+
             $filters->add(
-                sprintf(self::FILTER_KEY_TEMPLATE, $association),
-                $fieldFilter
+                sprintf(self::FILTER_KEY_TEMPLATE, $entityType),
+                $filter
             );
         }
     }

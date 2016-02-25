@@ -100,7 +100,7 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                     'include' => 'owner,organization',
                     'fields'  => [
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled,owner',
-                        'owner' => 'name,phone,website,email,fax,organization,owner,users'
+                        'businessunits' => 'name,phone,website,email,fax,organization,owner,users'
                     ],
                 ],
                 'expects' => $this->loadExpectation('output_2.yml')
@@ -110,9 +110,9 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                     'include' => 'organization',
                     'fields'  => [
                         'users' => 'username,firstName,lastName,email,organization,owner,roles',
-                        'owner' => 'name,phone,website,email,fax',
-                        'organization' => 'enabled',
-                        'roles' => 'name'
+                        'businessunits' => 'name,phone,website,email,fax',
+                        'organizations' => 'enabled',
+                        'userroles' => 'name'
                     ],
                 ],
                 'expects' => $this->loadExpectation('output_3.yml')
@@ -124,7 +124,18 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                     ],
                 ],
                 'expects' => $this->loadExpectation('output_4.yml')
-            ]
+            ],
+            'Include of third level entity' => [
+                'params'  => [
+                    'include' => 'owner,owner.organization',
+                    'fields'  => [
+                        'users' => 'username,email,owner',
+                        'businessunits' => 'name,organization',
+                        'organizations' => 'name'
+                    ],
+                ],
+                'expects' => $this->loadExpectation('output_5.yml')
+            ],
         ];
     }
 }
