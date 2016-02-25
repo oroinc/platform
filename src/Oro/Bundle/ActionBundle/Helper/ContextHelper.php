@@ -15,6 +15,7 @@ class ContextHelper
     const ENTITY_ID_PARAM = 'entityId';
     const ENTITY_CLASS_PARAM = 'entityClass';
     const DATAGRID_PARAM = 'datagrid';
+    const GROUP_PARAM = 'group';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -50,6 +51,7 @@ class ContextHelper
                 self::ENTITY_ID_PARAM => $this->getRequestParameter(self::ENTITY_ID_PARAM),
                 self::ENTITY_CLASS_PARAM => $this->getRequestParameter(self::ENTITY_CLASS_PARAM),
                 self::DATAGRID_PARAM => $this->getRequestParameter(self::DATAGRID_PARAM),
+                self::GROUP_PARAM => $this->getRequestParameter(self::GROUP_PARAM)
             ];
         }
 
@@ -106,6 +108,7 @@ class ContextHelper
                 self::ENTITY_ID_PARAM => null,
                 self::ENTITY_CLASS_PARAM => null,
                 self::DATAGRID_PARAM => null,
+                self::GROUP_PARAM => null
             ],
             $context
         );

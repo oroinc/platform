@@ -26,8 +26,14 @@ class ActionDefinition
     /** @var string */
     private $substituteAction = null;
 
+    /** @var bool */
+    private $forAllEntities = false;
+
     /** @var array */
     private $entities = [];
+
+    /** @var array */
+    private $excludeEntities = [];
 
     /** @var array */
     private $datagrids = [];
@@ -161,6 +167,25 @@ class ActionDefinition
     }
 
     /**
+     * @return bool
+     */
+    public function isForAllEntities()
+    {
+        return $this->forAllEntities;
+    }
+
+    /**
+     * @param bool $forAllEntities
+     * @return $this
+     */
+    public function setForAllEntities($forAllEntities)
+    {
+        $this->forAllEntities = $forAllEntities;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getEntities()
@@ -175,6 +200,25 @@ class ActionDefinition
     public function setEntities(array $entities)
     {
         $this->entities = $entities;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExcludeEntities()
+    {
+        return $this->excludeEntities;
+    }
+
+    /**
+     * @param array $excludeEntities
+     * @return $this
+     */
+    public function setExcludeEntities(array $excludeEntities)
+    {
+        $this->excludeEntities = $excludeEntities;
 
         return $this;
     }
