@@ -8,15 +8,13 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
-use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
+use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
 
 class EntityListener
 {
@@ -32,12 +30,6 @@ class EntityListener
     /** @var Email[] */
     protected $emailsToRemove = [];
 
-    /** @var array */
-    protected $entitiesOwnedByEmail = [];
-
-    /** @var EmailOwnersProvider */
-    protected $emailOwnersProvider;
-
     /** @var Email[] */
     protected $createdEmails = [];
 
@@ -47,22 +39,25 @@ class EntityListener
     /** @var Email[] */
     protected $updatedEmails = [];
 
+    /** @var EmailActivityUpdates */
+    protected $emailActivityUpdates;
+
     /**
      * @param EmailOwnerManager $emailOwnerManager
      * @param ServiceLink $emailActivityManagerLink
      * @param ServiceLink $emailThreadManagerLink
-     * @param EmailOwnersProvider $emailOwnersProvider
+     * @param EmailActivityUpdates $emailActivityUpdates
      */
     public function __construct(
-        EmailOwnerManager   $emailOwnerManager,
-        ServiceLink         $emailActivityManagerLink,
-        ServiceLink         $emailThreadManagerLink,
-        EmailOwnersProvider $emailOwnersProvider
+        EmailOwnerManager    $emailOwnerManager,
+        ServiceLink          $emailActivityManagerLink,
+        ServiceLink          $emailThreadManagerLink,
+        EmailActivityUpdates $emailActivityUpdates
     ) {
         $this->emailOwnerManager        = $emailOwnerManager;
         $this->emailActivityManagerLink = $emailActivityManagerLink;
         $this->emailThreadManagerLink   = $emailThreadManagerLink;
-        $this->emailOwnersProvider      = $emailOwnersProvider;
+        $this->emailActivityUpdates     = $emailActivityUpdates;
     }
 
     /**
@@ -94,7 +89,7 @@ class EntityListener
             )
         );
 
-        $this->addNewEntityOwnedByEmail($uow->getScheduledEntityInsertions());
+        $this->emailActivityUpdates->processCreatedEntities($uow->getScheduledEntityInsertions());
     }
 
     /**
@@ -133,47 +128,17 @@ class EntityListener
     }
 
     /**
-     * @param array $entities
-     */
-    protected function addNewEntityOwnedByEmail($entities)
-    {
-        if ($entities) {
-            foreach ($entities as $entity) {
-                if ($this->emailOwnersProvider->supportOwnerProvider($entity)) {
-                    $this->entitiesOwnedByEmail[] = $entity;
-                }
-            }
-        }
-    }
-
-    /**
      * @param PostFlushEventArgs $event
      */
     protected function addAssociationWithEmailActivity(PostFlushEventArgs $event)
     {
-        if (!$this->entitiesOwnedByEmail) {
+        $jobs = $this->emailActivityUpdates->createJobs();
+        if (!$jobs) {
             return;
         }
 
         $em = $event->getEntityManager();
-        $jobs = array_map(
-            function ($entity) use ($em) {
-                $class = ClassUtils::getClass($entity);
-                $metadata = $em->getClassMetadata($class);
-
-                return new Job(
-                    'oro:email:update-email-owner-associations',
-                    [
-                        'class' => ClassUtils::getClass($entity),
-                        'id' => $metadata->getIdentifierValues($entity)[$metadata->getSingleIdentifierFieldName()],
-                    ]
-                );
-            },
-            $this->entitiesOwnedByEmail
-        );
-
         array_map([$em, 'persist'], $jobs);
-        $this->entitiesOwnedByEmail = [];
         $em->flush();
     }
 

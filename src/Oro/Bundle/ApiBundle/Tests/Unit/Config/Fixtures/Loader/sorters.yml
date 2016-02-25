@@ -1,0 +1,57 @@
+empty:
+    config: []
+    expected: []
+
+null_fields:
+    config:
+        fields: ~
+    expected: []
+
+empty_fields:
+    config:
+        fields: []
+    expected: []
+
+default_exclusion_policy:
+    config:
+        exclusion_policy: none
+    expected: []
+
+full:
+    config:
+        exclusion_policy: all
+        fields:
+            field1:
+                exclude: true
+                property_path: path1
+                extra1: true
+            field2:
+                exclude: true
+            field3:
+                exclude: false
+            field4:
+                property_path: path1
+            field5:
+                property_path: ~
+            field6:
+                property_path: ""
+            field7:
+                extra1: ~
+        extra1: true
+        extra2: ~
+    expected:
+        exclusion_policy: all
+        fields:
+            field1:
+                exclude: true
+                property_path: path1
+                extra1: true
+            field2:
+                exclude: true
+            field3: ~
+            field4:
+                property_path: path1
+            field5: ~
+            field6: ~
+            field7: ~
+        extra1: true
