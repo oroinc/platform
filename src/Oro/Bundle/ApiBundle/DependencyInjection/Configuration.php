@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode->children()
             ->arrayNode('actions')
-                ->info('A definition of API actions')
+                ->info('A definition of Data API actions')
                 ->example(
                     [
                         'get' => [

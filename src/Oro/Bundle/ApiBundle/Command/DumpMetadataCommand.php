@@ -13,7 +13,6 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpMetadataCommand extends ContainerAwareCommand
@@ -25,7 +24,7 @@ class DumpMetadataCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:api:metadata:dump')
-            ->setDescription('Dumps metadata of API entity.')
+            ->setDescription('Dumps entity metadata used in Data API.')
             ->addArgument(
                 'entity',
                 InputArgument::REQUIRED,
@@ -42,7 +41,7 @@ class DumpMetadataCommand extends ContainerAwareCommand
                 'request-type',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'API request type'
+                'The request type'
             );
     }
 
@@ -88,7 +87,7 @@ class DumpMetadataCommand extends ContainerAwareCommand
             $version,
             $requestType,
             [],
-            null !== $config && isset($config[ConfigUtil::DEFINITION]) ? $config[ConfigUtil::DEFINITION] : null
+            $config->getDefinition()
         );
 
         return [

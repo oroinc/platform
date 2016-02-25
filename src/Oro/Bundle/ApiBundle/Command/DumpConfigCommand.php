@@ -10,12 +10,14 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpConfigCommand extends ContainerAwareCommand
@@ -27,7 +29,7 @@ class DumpConfigCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:api:config:dump')
-            ->setDescription('Dumps API configuration.')
+            ->setDescription('Dumps entity configuration used in Data API.')
             ->addArgument(
                 'entity',
                 InputArgument::REQUIRED,
@@ -44,7 +46,7 @@ class DumpConfigCommand extends ContainerAwareCommand
                 'request-type',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'API request type'
+                'The request type'
             )
             ->addOption(
                 'section',
@@ -126,7 +128,7 @@ class DumpConfigCommand extends ContainerAwareCommand
         return [
             'oro_api' => [
                 'entities' => [
-                    $entityClass => $config
+                    $entityClass => $this->convertConfigToArray($config)
                 ]
             ]
         ];
@@ -150,9 +152,36 @@ class DumpConfigCommand extends ContainerAwareCommand
         return [
             'oro_api' => [
                 'relations' => [
-                    $entityClass => $config
+                    $entityClass => $this->convertConfigToArray($config)
                 ]
             ]
         ];
+    }
+
+    /**
+     * @param Config $config
+     *
+     * @return array
+     */
+    protected function convertConfigToArray(Config $config)
+    {
+        $result = [];
+
+        $data = $config->toArray();
+
+        // add known sections in predefined order
+        foreach ([ConfigUtil::DEFINITION, ConfigUtil::FILTERS, ConfigUtil::SORTERS] as $sectionName) {
+            if (array_key_exists($sectionName, $data)) {
+                $result[$sectionName] = $data[$sectionName];
+            }
+        }
+        // add other sections
+        foreach ($data as $sectionName => $config) {
+            if (!array_key_exists($sectionName, $result)) {
+                $result[$sectionName] = $config;
+            }
+        }
+
+        return $result;
     }
 }
