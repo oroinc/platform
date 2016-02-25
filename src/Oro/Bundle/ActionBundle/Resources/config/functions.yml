@@ -111,14 +111,6 @@ services:
         tags:
             - { name: oro_action.function, alias: create_entity }
 
-    oro_action.function.create_related_entity:
-        class: %oro_action.function.create_related_entity.class%
-        arguments:
-            - @oro_action.context_accessor
-            - @doctrine
-        tags:
-            - { name: oro_action.function, alias: create_related_entity }
-
     oro_action.function.request_entity:
         class: %oro_action.function.request_entity.class%
         arguments:
