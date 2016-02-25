@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;

@@ -90,7 +90,7 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function loadEntityConfigs(ClassMetadata $metadata, $force)
+    protected function loadEntityConfigs(ClassMetadataInfo $metadata, $force)
     {
         parent::loadEntityConfigs($metadata, $force);
 
