@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
-//use Symfony\Component\HttpFoundation\Request;
-//use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\ActionBundle\Helper\EntityConfigHelper;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

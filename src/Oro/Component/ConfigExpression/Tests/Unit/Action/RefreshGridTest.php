@@ -53,11 +53,9 @@ class RefreshGridTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteMethod()
     {
-        $gridnames = ['test_grid', new PropertyPath('param')];
-
         $context = new StubStorage(['param' => 'value']);
 
-        $this->action->initialize($gridnames);
+        $this->action->initialize(['test_grid', new PropertyPath('param')]);
         $this->action->execute($context);
 
         $this->assertEquals(['param' => 'value', 'refreshGrid' => ['test_grid', 'value']], $context->getValues());
