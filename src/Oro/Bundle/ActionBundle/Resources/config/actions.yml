@@ -1,6 +1,8 @@
 actions:
-    META_ACTION:
-        label: META
+    CRUD_ACTION:
+        label: CRUD_ACTION
+        groups:
+            - navButtons
         prefunctions:
             - @call_service_method:
                 service: oro_action.helper.entity_config
@@ -16,12 +18,16 @@ actions:
                 id: $.entityLabel
                 attribute: $.translates[entityLabel]
         button_options:
-            template: OroActionBundle:Action:meta-button.html.twig
+            template: OroActionBundle:Action:crud-button.html.twig
 
     EDIT:
-        extends: META_ACTION
+        extends: CRUD_ACTION
         acl_resource: [EDIT, $.data]
         order: 10
+        for_all_entities: true
+        groups:
+            - view_navButtons
+            - datagridRowAction
         preconditions:
             @and:
                 - @not_blank: $.routes[update]
@@ -45,9 +51,14 @@ actions:
             icon: icon-edit
 
     DELETE:
-        extends: META_ACTION
+        extends: CRUD_ACTION
         acl_resource: [DELETE, $.data]
         order: 20
+        for_all_entities: true
+        groups:
+            - view_navButtons
+            - update_navButtons
+            - datagridRowAction
         preconditions:
             @and:
                 - @not_blank: $.routes[name]
