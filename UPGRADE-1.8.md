@@ -117,7 +117,7 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 | oro_note.manager | Oro\Bundle\NoteBundle\Entity\Manager\NoteManager |
 | oro_reminder.model.email_notification | Oro\Bundle\ReminderBundle\Model\Email\EmailNotification |
 | oro_user.autocomplete.user.search_acl_handler.abstract | Oro\Bundle\UserBundle\Autocomplete\UserAclHandler |
-| oro_workflow.action.format_name | Oro\Bundle\WorkflowBundle\Model\Action\FormatName |
+| oro_workflow.action.format_name | Oro\Bundle\ActionBundle\Action\FormatName |
 | orocrm_account.form.type.account | OroCRM\Bundle\AccountBundle\Form\Type\AccountType |
 | orocrm_account.form.type.account.api | OroCRM\Bundle\AccountBundle\Form\Type\AccountApiType |
 | orocrm_case.view_factory | OroCRM\Bundle\CaseBundle\Model\ViewFactory |
