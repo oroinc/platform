@@ -1,6 +1,6 @@
 **input widget** - is any widget used for form elements, such as: datepicker, uniform, select2, etc...
 
-***InputWidget** is used to provide a common API for all input widgets.
+**\*InputWidget** is used to provide a common API for all input widgets.
 By using this API you provide ability to change input widget to any other or remove it, without changes is code, that interacts with widget.
 
 **InputWidgetManager** is used to register input widgets and create widget for applicable inputs.
