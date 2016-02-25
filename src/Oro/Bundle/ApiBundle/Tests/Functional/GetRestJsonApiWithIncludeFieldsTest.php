@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
@@ -43,7 +44,11 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
      */
     public function testGetEntityWithIncludeParameter($params, $expects)
     {
-        $entityAlias = $this->entityClassTransformer->transform(self::ENTITY_CLASS);
+        $entityAlias = $this->valueNormalizer->normalizeValue(
+            self::ENTITY_CLASS,
+            DataType::ENTITY_TYPE,
+            [RequestType::REST, RequestType::JSON_API]
+        );
 
         // test get list request
         $this->client->request(

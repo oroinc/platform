@@ -177,17 +177,11 @@ services:
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
 
-    oro_api.json_api.entity_class_transformer:
-        class: Oro\Bundle\ApiBundle\Request\JsonApi\EntityClassTransformer
-        public: false
-        arguments:
-            - @oro_entity.entity_alias_resolver
-
     oro_api.json_api.document_builder_factory:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory
         public: false
         arguments:
-            - @oro_api.json_api.entity_class_transformer
+            - @oro_api.value_normalizer
             - @oro_api.rest.entity_id_transformer
 
     oro_api.rest.routing_options_resolver:
@@ -196,7 +190,6 @@ services:
         arguments:
             - %installed%
             - @oro_api.resources_loader
-            - @oro_entity.entity_alias_resolver
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
             - %oro_api.rest.formats%

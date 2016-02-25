@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Routing;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
@@ -13,7 +14,6 @@ use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
@@ -29,9 +29,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
     /** @var ResourcesLoader */
     protected $resourcesLoader;
-
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -49,18 +46,16 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     private $supportedEntities;
 
     /**
-     * @param bool|string|null    $isApplicationInstalled
-     * @param ResourcesLoader     $resourcesLoader
-     * @param EntityAliasResolver $entityAliasResolver
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ValueNormalizer     $valueNormalizer
-     * @param string              $formats
-     * @param string              $defaultFormat
+     * @param bool|string|null $isApplicationInstalled
+     * @param ResourcesLoader  $resourcesLoader
+     * @param DoctrineHelper   $doctrineHelper
+     * @param ValueNormalizer  $valueNormalizer
+     * @param string           $formats
+     * @param string           $defaultFormat
      */
     public function __construct(
         $isApplicationInstalled,
         ResourcesLoader $resourcesLoader,
-        EntityAliasResolver $entityAliasResolver,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer,
         $formats,
@@ -68,7 +63,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     ) {
         $this->isApplicationInstalled = !empty($isApplicationInstalled);
         $this->resourcesLoader        = $resourcesLoader;
-        $this->entityAliasResolver    = $entityAliasResolver;
         $this->doctrineHelper         = $doctrineHelper;
         $this->valueNormalizer        = $valueNormalizer;
         $this->formats                = $formats;
@@ -111,7 +105,11 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             $this->supportedEntities = [];
             foreach ($resources as $resource) {
                 $className   = $resource->getEntityClass();
-                $pluralAlias = $this->entityAliasResolver->getPluralAlias($className);
+                $pluralAlias = $this->valueNormalizer->normalizeValue(
+                    $className,
+                    DataType::ENTITY_TYPE,
+                    [RequestType::REST, RequestType::JSON_API]
+                );
                 if (!empty($pluralAlias)) {
                     $this->supportedEntities[] = [
                         $className,

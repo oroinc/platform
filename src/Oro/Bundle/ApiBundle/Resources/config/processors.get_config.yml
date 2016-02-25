@@ -45,7 +45,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra
         arguments:
             - @oro_api.doctrine_helper
-            - @oro_api.json_api.entity_class_transformer
+            - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: get_config, extra: filter_fields, priority: -100 }
 
@@ -149,7 +149,7 @@ services:
         arguments:
             - @oro_api.doctrine_helper
             - @router
-            - @oro_entity.entity_alias_resolver
+            - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: get_config, requestType: rest, priority: -60 }
             - { name: oro.api.processor, action: get_relation_config, requestType: rest, priority: -60 }

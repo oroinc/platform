@@ -5,7 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 {
@@ -13,7 +15,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityClassTransformer;
+    protected $valueNormalizer;
 
     /** @var FilterFieldsByExtra */
     protected $processor;
@@ -22,14 +24,16 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper         = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
+        $this->doctrineHelper  = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityClassTransformer = $this->getMock('Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface');
+        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->processor = new FilterFieldsByExtra(
             $this->doctrineHelper,
-            $this->entityClassTransformer
+            $this->valueNormalizer
         );
     }
 
@@ -179,13 +183,31 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityClassTransformer->expects($this->exactly(3))
-            ->method('transform')
+        $this->valueNormalizer->expects($this->exactly(3))
+            ->method('normalizeValue')
             ->willReturnMap(
                 [
-                    [self::TEST_CLASS_NAME, false, 'test_class'],
-                    ['Test\Association1Target', false, 'association_1'],
-                    ['Test\Association2Target', false, 'association_2'],
+                    [
+                        self::TEST_CLASS_NAME,
+                        DataType::ENTITY_TYPE,
+                        $this->context->getRequestType(),
+                        false,
+                        'test_class'
+                    ],
+                    [
+                        'Test\Association1Target',
+                        DataType::ENTITY_TYPE,
+                        $this->context->getRequestType(),
+                        false,
+                        'association_1'
+                    ],
+                    [
+                        'Test\Association2Target',
+                        DataType::ENTITY_TYPE,
+                        $this->context->getRequestType(),
+                        false,
+                        'association_2'
+                    ],
                 ]
             );
 
@@ -229,6 +251,9 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessWhenTargetEntityUsesTableInheritance()
     {
         $config = [
@@ -289,16 +314,42 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityClassTransformer->expects($this->exactly(4))
-            ->method('transform')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, false, 'test_class'],
-                    ['Test\Association1Target', false, null],
-                    ['Test\Association1Target1', false, 'association_1_1'],
-                    ['Test\Association1Target2', false, 'association_1_2'],
-                ]
-            );
+        $this->valueNormalizer->expects($this->at(0))
+            ->method('normalizeValue')
+            ->with(
+                self::TEST_CLASS_NAME,
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
+            ->willReturn('test_class');
+        $this->valueNormalizer->expects($this->at(1))
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
+            ->willThrowException(new EntityAliasNotFoundException());
+        $this->valueNormalizer->expects($this->at(2))
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target1',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
+            ->willReturn('association_1_1');
+        $this->valueNormalizer->expects($this->at(3))
+            ->method('normalizeValue')
+            ->with(
+                'Test\Association1Target2',
+                DataType::ENTITY_TYPE,
+                $this->context->getRequestType(),
+                false
+            )
+            ->willReturn('association_1_2');
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);

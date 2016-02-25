@@ -11,8 +11,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * Excludes relations that are pointed to not accessible resources.
@@ -27,22 +28,22 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     /** @var RouterInterface */
     protected $router;
 
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
 
     /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param RouterInterface     $router
-     * @param EntityAliasResolver $entityAliasResolver
+     * @param DoctrineHelper  $doctrineHelper
+     * @param RouterInterface $router
+     * @param ValueNormalizer $valueNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         RouterInterface $router,
-        EntityAliasResolver $entityAliasResolver
+        ValueNormalizer $valueNormalizer
     ) {
-        $this->doctrineHelper      = $doctrineHelper;
-        $this->router              = $router;
-        $this->entityAliasResolver = $entityAliasResolver;
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->router          = $router;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -64,14 +65,15 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
             return;
         }
 
-        $this->updateRelations($definition, $entityClass);
+        $this->updateRelations($definition, $entityClass, $context->getRequestType());
     }
 
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
+     * @param string[]               $requestType
      */
-    protected function updateRelations(EntityDefinitionConfig $definition, $entityClass)
+    protected function updateRelations(EntityDefinitionConfig $definition, $entityClass, array $requestType)
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $fields   = $definition->getFields();
@@ -87,7 +89,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
             $mapping        = $metadata->getAssociationMapping($propertyPath);
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
-            if (!$this->isResourceForRelatedEntityAccessible($targetMetadata)) {
+            if (!$this->isResourceForRelatedEntityAccessible($targetMetadata, $requestType)) {
                 $field->setExcluded();
             }
         }
@@ -95,18 +97,19 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
     /**
      * @param ClassMetadata $targetMetadata
+     * @param string[]      $requestType
      *
      * @return bool
      */
-    protected function isResourceForRelatedEntityAccessible(ClassMetadata $targetMetadata)
+    protected function isResourceForRelatedEntityAccessible(ClassMetadata $targetMetadata, array $requestType)
     {
-        if ($this->isResourceAccessible($targetMetadata->name)) {
+        if ($this->isResourceAccessible($targetMetadata->name, $requestType)) {
             return true;
         }
         if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
             // check that at least one inherited entity has Data API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
-                if ($this->isResourceAccessible($inheritedEntityClass)) {
+                if ($this->isResourceAccessible($inheritedEntityClass, $requestType)) {
                     return true;
                 }
             }
@@ -116,15 +119,16 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
+     * @param string   $entityClass
+     * @param string[] $requestType
      *
      * @return bool
      */
-    protected function isResourceAccessible($entityClass)
+    protected function isResourceAccessible($entityClass, array $requestType)
     {
         $result = false;
 
-        $uri = $this->getEntityResourceUri($entityClass);
+        $uri = $this->getEntityResourceUri($entityClass, $requestType);
         if ($uri) {
             $matchingContext = $this->router->getContext();
 
@@ -146,18 +150,20 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
+     * @param string   $entityClass
+     * @param string[] $requestType
      *
      * @return string|null
      */
-    protected function getEntityResourceUri($entityClass)
+    protected function getEntityResourceUri($entityClass, array $requestType)
     {
-        $uri = null;
-        if ($this->entityAliasResolver->hasAlias($entityClass)) {
+        $uri        = null;
+        $entityType = $this->convertToEntityType($entityClass, $requestType);
+        if ($entityType) {
             try {
                 $uri = $this->router->generate(
                     'oro_rest_api_cget',
-                    ['entity' => $this->entityAliasResolver->getPluralAlias($entityClass)]
+                    ['entity' => $entityType]
                 );
             } catch (RoutingException $e) {
                 // ignore any exceptions
@@ -172,6 +178,22 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         }
 
         return $uri;
+    }
+
+    /**
+     * @param string   $entityClass
+     * @param string[] $requestType
+     *
+     * @return string|null
+     */
+    protected function convertToEntityType($entityClass, array $requestType)
+    {
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $requestType,
+            false
+        );
     }
 
     /**

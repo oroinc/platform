@@ -122,7 +122,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetFieldsFilter
         arguments:
             - @oro_api.doctrine_helper
-            - @oro_api.json_api.entity_class_transformer
+            - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -110 }
 
