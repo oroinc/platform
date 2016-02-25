@@ -7,12 +7,11 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\ActionBundle\Exception\AssemblerException;
 use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
-use Oro\Bundle\WorkflowBundle\Model\AttributeGuesser;
 
 class AttributeAssembler extends AbstractAssembler
 {
+    const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
+
     /**
      * @var AttributeGuesser
      */
@@ -34,7 +33,7 @@ class AttributeAssembler extends AbstractAssembler
      */
     public function assemble(ActionData $data, array $configuration)
     {
-        $entityAttributeName = WorkflowConfiguration::DEFAULT_ENTITY_ATTRIBUTE;
+        $entityAttributeName = static::DEFAULT_ENTITY_ATTRIBUTE;
         if (!array_key_exists($entityAttributeName, $configuration)) {
             $configuration[$entityAttributeName] = [
                 'label' => $entityAttributeName,

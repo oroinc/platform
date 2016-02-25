@@ -5,8 +5,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
-use Oro\Bundle\WorkflowBundle\Model\AttributeGuesser;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
 class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntity')
             ->willReturn(new \stdClass());
 
-        $this->attributeGuesser = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeGuesser')
+        $this->attributeGuesser = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeGuesser')
             ->disableOriginalConstructor()
             ->getMock();
         $this->attributeGuesser->expects($this->any())
