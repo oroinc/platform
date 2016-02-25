@@ -11,7 +11,10 @@ define(function(require) {
 
         containerClassSuffix: 'select',
 
-        initialize: function() {
+        /**
+         * @inheritDoc
+         */
+        initialize: function(options) {
             UniformSelectInputWidget.__super__.initialize.apply(this, arguments);
             if (this.$el.is('.error:not([multiple])')) {
                 this.$el.removeClass('error');
@@ -19,6 +22,9 @@ define(function(require) {
             }
         },
 
+        /**
+         * @inheritDoc
+         */
         dispose: function() {
             if (this.disposed) {
                 return;
@@ -27,10 +33,16 @@ define(function(require) {
             UniformSelectInputWidget.__super__.dispose.apply(this, arguments);
         },
 
-        setContainer: function() {
+        /**
+         * @inheritDoc
+         */
+        findContainer: function() {
             this.$container = this.$el.parent('.selector');
         },
 
+        /**
+         * @inheritDoc
+         */
         setWidth: function(width) {
             UniformSelectInputWidget.__super__.setWidth.apply(this, arguments);
             this.$container.find('span').width(width);

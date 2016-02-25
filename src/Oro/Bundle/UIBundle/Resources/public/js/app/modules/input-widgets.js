@@ -5,13 +5,13 @@ define(function(require) {
     var UniformSelectInputWidget = require('oroui/js/app/views/input-widget/uniform-select');
     var UniformFileInputWidget = require('oroui/js/app/views/input-widget/uniform-file');
 
-    InputWidgetManager.registerWidget({
+    InputWidgetManager.addWidget('uniform-select', {
         tagName: 'SELECT',
         selector: 'select:not(.no-uniform)',
         Widget: UniformSelectInputWidget
     });
 
-    InputWidgetManager.registerWidget({
+    InputWidgetManager.addWidget('uniform-file', {
         tagName: 'INPUT',
         selector: 'input:file',
         Widget: UniformFileInputWidget

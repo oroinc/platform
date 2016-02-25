@@ -5,12 +5,14 @@ define(function(require) {
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
+    /**
+     * AbstractInputWidget is the base class for all input widgets.
+     * InputWidget is used to provide a common API for all input widgets.
+     * By using this API you provide ability to change input widget to any other or remove it.
+     */
     AbstractInputWidget = BaseView.extend({
         /** @property {jQuery} */
         $container: null,
-
-        /** @property {Boolean} */
-        keepElement: true,
 
         /** @property {String} */
         widgetFunctionName: '',
@@ -33,6 +35,12 @@ define(function(require) {
         /** @property {string} */
         containerClassSuffix: '',
 
+        /** @property {Boolean} */
+        keepElement: true,
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.resolveOptions(options);
 
@@ -42,10 +50,13 @@ define(function(require) {
                 this.widgetFunction();
             }
 
-            this.setContainer();
+            this.findContainer();
             this.getContainer().addClass(this.containerClass);
         },
 
+        /**
+         * @param {Object} options
+         */
         resolveOptions: function(options) {
             _.extend(this, options || {});
 
@@ -57,6 +68,11 @@ define(function(require) {
             }
         },
 
+        /**
+         * Destroy widget
+         *
+         * @inheritDoc
+         */
         dispose: function() {
             if (this.disposed) {
                 return;
@@ -71,18 +87,34 @@ define(function(require) {
             return AbstractInputWidget.__super__.dispose.apply(this, arguments);
         },
 
-        setContainer: function() {},
+        /**
+         * Find widget root element
+         */
+        findContainer: function() {},
 
+        /**
+         * Get widget root element
+         *
+         * @returns {jQuery}
+         */
         getContainer: function() {
             return this.$container;
         },
 
+        /**
+         * Resize widget
+         *
+         * @param {mixed} width
+         */
         setWidth: function(width) {
             if (this.getContainer()) {
                 this.getContainer().width(width);
             }
         },
 
+        /**
+         * Refresh widget, by example after input value change
+         */
         refresh: function() {
             if (this.refreshOptions) {
                 this.widgetFunction(this.refreshOptions);

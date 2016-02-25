@@ -17,6 +17,9 @@ define(function(require) {
 
         containerClassSuffix: 'file',
 
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             UniformFileInputWidget.__super__.initialize.apply(this, arguments);
             if (this.$el.is('.error')) {
@@ -25,6 +28,9 @@ define(function(require) {
             }
         },
 
+        /**
+         * @inheritDoc
+         */
         dispose: function() {
             if (this.disposed) {
                 return;
@@ -33,7 +39,10 @@ define(function(require) {
             UniformFileInputWidget.__super__.dispose.apply(this, arguments);
         },
 
-        setContainer: function() {
+        /**
+         * @inheritDoc
+         */
+        findContainer: function() {
             this.$container = this.$el.parent('.uploader');
         }
     });
