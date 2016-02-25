@@ -1,6 +1,6 @@
 {% block _datagrid_toolbar_actions_container_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " pull-left grid-toolbar-mass-actions"
+        class: attr.class|default('') ~ " grid-toolbar-mass-actions pull-left"
     }) %}
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
 {% endblock %}
@@ -54,4 +54,11 @@
     <script type="text/html" id="template-datagrid-toolbar">
         <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
     </script>
+{% endblock %}
+
+{% block _datagrid_toolbar_sorting_widget %}
+    {% set attr = attr|merge({
+    class: attr.class|default('') ~ " sorting pull-left form-horizontal"
+    }) %}
+    <div{{ block('block_attributes') }}></div>
 {% endblock %}

@@ -113,3 +113,17 @@ oro:
                     You don't have permissions to delete any of the selected records.
         grid_views:
             shared_by.label: Shared by {{ name }}
+        sorters:
+            not_selected: 'No sorting'
+            undefined:
+                ascending: High to Low
+                descending: Low to High
+            string:
+                ascending: A to Z
+                descending: Z to A
+            number:
+                ascending: High to Low
+                descending: Low to High
+            currency:
+                ascending: High to Low
+                descending: Low to High
