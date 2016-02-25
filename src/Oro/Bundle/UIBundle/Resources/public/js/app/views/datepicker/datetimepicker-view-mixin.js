@@ -138,6 +138,15 @@ define(function(require) {
         },
 
         /**
+         * Returns timepicker popup
+         *
+         * @returns {JQuery}
+         */
+        getTimePickerWidget: function() {
+            return this.$frontTimeField.data('timepicker-list');
+        },
+
+        /**
          * Destroys picker widget
          */
         destroyTimePickerWidget: function() {

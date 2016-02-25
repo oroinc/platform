@@ -32,7 +32,7 @@ class ValueNormalizer
      *
      * @param mixed    $value          A value to be converted.
      * @param string   $dataType       The data-type.
-     * @param string[] $requestType    The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string[] $requestType    The request type, for example "rest", "soap", etc.
      * @param bool     $isArrayAllowed Whether a value can be an array.
      *
      * @return mixed
@@ -48,7 +48,7 @@ class ValueNormalizer
      * Gets a regular expression that can be used to validate a value of the given data-type.
      *
      * @param string   $dataType       The data-type.
-     * @param string[] $requestType    The type of API request, for example "rest", "soap", "odata", etc.
+     * @param string[] $requestType    The request type, for example "rest", "soap", etc.
      * @param bool     $isArrayAllowed Whether a value can be an array.
      *
      * @return string

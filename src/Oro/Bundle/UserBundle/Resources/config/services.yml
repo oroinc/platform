@@ -310,6 +310,7 @@ services:
         arguments:
             - @doctrine
             - @oro_security.acl_helper
+            - @oro_locale.dql.formatter.name
 
     # Validator
     oro_user.validator.user_custom_grid_field_validator:

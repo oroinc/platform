@@ -11,7 +11,12 @@ use Psr\Log\LoggerInterface;
  */
 class LoggerStrategy implements LoggerInterface
 {
+    const FORMAT = '[%.2F MiB/%.2F MiB] %s';
+
     use LoggerAwareTrait;
+
+    /** @var bool */
+    protected $debug;
 
     /**
      * Constructor allows us to pass logger when strategy is instantiating or whenever you want
@@ -20,78 +25,104 @@ class LoggerStrategy implements LoggerInterface
      */
     public function __construct(LoggerInterface $logger = null)
     {
-        $this->setLogger($logger ? : new NullLogger());
+        $this->setLogger($logger ?: new NullLogger());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function emergency($message, array $context = array())
+    public function emergency($message, array $context = [])
     {
-        return $this->logger->emergency($message, $context);
+        return $this->logger->emergency($this->buildMessage($message), $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function alert($message, array $context = array())
+    public function alert($message, array $context = [])
     {
-        return $this->logger->alert($message, $context);
+        return $this->logger->alert($this->buildMessage($message), $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function critical($message, array $context = array())
+    public function critical($message, array $context = [])
     {
-        return $this->logger->critical($message, $context);
+        return $this->logger->critical($this->buildMessage($message), $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function error($message, array $context = array())
+    public function error($message, array $context = [])
     {
-        return $this->logger->error($message, $context);
+        return $this->logger->error($this->buildMessage($message), $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function warning($message, array $context = array())
+    public function warning($message, array $context = [])
     {
-        return $this->logger->warning($message, $context);
+        return $this->logger->warning($this->buildMessage($message), $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function notice($message, array $context = array())
+    public function notice($message, array $context = [])
     {
-        return $this->logger->notice($message, $context);
+        return $this->logger->notice($this->buildMessage($message), $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function info($message, array $context = array())
+    public function info($message, array $context = [])
     {
-        return $this->logger->info($message, $context);
+        return $this->logger->info($this->buildMessage($message), $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function debug($message, array $context = array())
+    public function debug($message, array $context = [])
     {
-        return $this->logger->debug($message, $context);
+        return $this->logger->debug($this->buildMessage($message), $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
-        return $this->logger->log($level, $message, $context);
+        return $this->logger->log($level, $this->buildMessage($message), $context);
+    }
+
+    /**
+     * @param boolean $debug
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+    }
+
+    /**
+     * @param string $message
+     * @return string
+     */
+    protected function buildMessage($message)
+    {
+        if ($this->debug) {
+            return sprintf(
+                self::FORMAT,
+                memory_get_usage(true) / 1024 / 1024,
+                memory_get_peak_usage(true) / 1024 / 1024,
+                $message
+            );
+        }
+
+        return $message;
     }
 }

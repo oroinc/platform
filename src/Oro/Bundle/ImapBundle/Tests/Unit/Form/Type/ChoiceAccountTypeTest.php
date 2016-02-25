@@ -244,12 +244,15 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         $userEmailOrigin = new UserEmailOrigin();
         $userEmailOrigin->setUser($data['user']);
         $userEmailOrigin->setAccessTokenExpiresAt($data['accessTokenExpiresAt']);
-        $userEmailOrigin->setGoogleAuthCode($data['googleAuthCode']);
+
         if (isset($data['password'])) {
             $userEmailOrigin->setPassword($data['password']);
         }
         if (isset($data['accessToken'])) {
             $userEmailOrigin->setAccessToken($data['accessToken']);
+        }
+        if (isset($data['refreshToken'])) {
+            $userEmailOrigin->setRefreshToken($data['refreshToken']);
         }
         $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $userEmailOrigin->setOrganization($organization);

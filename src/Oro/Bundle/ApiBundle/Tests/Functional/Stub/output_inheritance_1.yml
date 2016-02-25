@@ -1,12 +1,12 @@
 data:
   0:
-    type: "auditfields"
+    type: "testdepartments"
     id: auto
     attributes:
-      oldText: "old_value"
-      newText: "new_value"
+      name: "TestDepartment"
     relationships:
-      audit:
+      staff:
         data:
-          type: "audits"
-          id: auto
+          -
+            type: "testemployees"
+            id: auto

@@ -51,7 +51,7 @@ class ContextListener
                     $exception->setOrganizationName($token->getOrganizationContext()->getName());
                     $exception->setToken($token);
                     $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
-                    $this->$this->getTokenStorage()->setToken(null);
+                    $this->getTokenStorage()->setToken(null);
                     throw $exception;
                 }
             } catch (NoResultException $e) {

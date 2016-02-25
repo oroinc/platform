@@ -164,7 +164,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
         $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function(e) {
             if (e.keyCode === 27) {
-                $(e.currentTarget).parent().removeClass('open');
+                $(e.currentTarget).parent().trigger('tohide.bs.dropdown');
             }
         });
 
@@ -188,15 +188,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             } else {
                 clickingTarget = $target.closest('.dropdown, .oro-drop');
             }
-            $(openDropdownsSelector).not(clickingTarget).removeClass('open');
+            $(openDropdownsSelector).not(clickingTarget).trigger('tohide.bs.dropdown');
         });
 
         $('#main-menu').mouseover(function() {
-            $(openDropdownsSelector).removeClass('open');
+            $(openDropdownsSelector).trigger('tohide.bs.dropdown');
         });
 
         mediator.on('page:beforeChange', function() {
-            $('.dot-menu.dropdown.open, .nav .dropdown.open').removeClass('open');
+            $('.dot-menu.dropdown.open, .nav .dropdown.open').trigger('tohide.bs.dropdown');
             $('.dropdown:hover > .dropdown-menu').hide().addClass('manually-hidden');
         });
         mediator.on('page:afterChange', function() {
@@ -429,6 +429,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(document).on('click', '.add-list-item', function(e) {
         e.preventDefault();
+        if ($(this).attr('disabled')) {
+            return;
+        }
         var containerSelector = $(this).data('container') || '.collection-fields-list';
         var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
         var rowCountAdd = $(containerSelector).data('row-count-add') || 1;
@@ -447,6 +450,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(document).on('click', '.addAfterRow', function(e) {
         e.preventDefault();
+        if ($(this).attr('disabled')) {
+            return;
+        }
         var $item = $(this).closest('.row-oro').parent();
         var $listContainer = $item.parent();
         var collectionInfo = getOroCollectionInfo($listContainer);
@@ -462,6 +468,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(document).on('click', '.removeRow', function(e) {
         e.preventDefault();
+        if ($(this).attr('disabled')) {
+            return;
+        }
         $(this).closest('*[data-content]')
             .trigger('content:remove')
             .remove();

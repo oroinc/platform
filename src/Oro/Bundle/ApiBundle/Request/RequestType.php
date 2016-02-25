@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Supported API request types.
+ * Supported types of Data API requests.
  */
 final class RequestType
 {
