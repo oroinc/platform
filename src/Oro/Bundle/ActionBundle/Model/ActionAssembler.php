@@ -28,7 +28,7 @@ class ActionAssembler extends AbstractAssembler
     private $doctrineHelper;
 
     /** @var array */
-    private $shortEntityNames = [];
+    private $entityNames = [];
 
     /**
      * @param FunctionFactory $functionFactory
@@ -150,19 +150,19 @@ class ActionAssembler extends AbstractAssembler
      */
     protected function getEntityClassName($entityName)
     {
-        if (!array_key_exists($entityName, $this->shortEntityNames)) {
-            $this->shortEntityNames[$entityName] = null;
+        if (!array_key_exists($entityName, $this->entityNames)) {
+            $this->entityNames[$entityName] = null;
 
             try {
                 $entityClass = $this->doctrineHelper->getEntityClass($entityName);
 
                 if (class_exists($entityClass, true)) {
-                    $this->shortEntityNames[$entityName] = ltrim($entityClass, '\\');
+                    $this->entityNames[$entityName] = ltrim($entityClass, '\\');
                 }
             } catch (ORMException $e) {
             }
         }
 
-        return $this->shortEntityNames[$entityName];
+        return $this->entityNames[$entityName];
     }
 }
