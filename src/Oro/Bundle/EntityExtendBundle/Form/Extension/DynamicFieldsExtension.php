@@ -257,7 +257,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
             $extraData = [];
             foreach ($extendConfig->get('target_grid') as $fieldName) {
                 $label = $this->configManager->getProvider('entity')
-                    ->getConfig($extendConfig->get('target_entity'), $fieldName)
+                    ->getConfig($className, $fieldName)
                     ->get('label');
 
                 $extraData[] = [
