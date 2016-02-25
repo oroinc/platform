@@ -47,6 +47,9 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
             ->disableOriginalConstructor()
             ->getMock();
+        $repository->expects($this->any())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
 
         $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
@@ -72,6 +75,11 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmptyList()
     {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->setMethods(['getArrayResult'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -79,6 +87,9 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
             ->disableOriginalConstructor()
             ->getMock();
+        $repository->expects($this->any())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
 
         $manager->expects($this->once())
             ->method('getRepository')
@@ -87,13 +98,8 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getManager')
             ->willReturn($manager);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->setMethods(['getResult'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $qb->expects($this->any())
-            ->method('getResult')
+            ->method('getArrayResult')
             ->willReturn([]);
         $this->aclHelper->expects($this->any())
             ->method('apply')
