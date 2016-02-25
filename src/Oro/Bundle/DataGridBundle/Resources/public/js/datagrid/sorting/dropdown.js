@@ -51,8 +51,6 @@ define([
                 throw new TypeError('"collection" is required');
             }
 
-            this.enabled = options.enable !== false;
-
             this.columns = options.columns;
             this.collection = options.collection;
 
