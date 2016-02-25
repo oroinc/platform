@@ -19,7 +19,7 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
      * @param string[] $expandedEntities The list of related entities.
      *                                   Each item can be an association name or a path to a nested association.
      *                                   Example: ["comments", "comments.author"]
-     *                                   Where "comments" is an association under the "articles" entity,
+     *                                   Where "comments" is an association under a primary entity,
      *                                   "author" is an association under the "comments" entity.
      */
     public function __construct(array $expandedEntities)
