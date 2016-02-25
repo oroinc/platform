@@ -70,7 +70,7 @@ class FilterFieldsByExtra implements ProcessorInterface
 
         $allowedFields = $this->getAllowedFields($metadata, $fieldFilters);
         if (null !== $allowedFields) {
-            $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+            $idFieldNames = $metadata->getIdentifierFieldNames();
             $fields       = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 if (!$field->isExcluded()

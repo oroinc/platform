@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
