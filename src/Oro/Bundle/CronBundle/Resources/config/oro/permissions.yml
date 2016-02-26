@@ -1,0 +1,20 @@
+oro_permissions:
+    CREATE:
+        exclude_entities:
+            - Oro\Bundle\CronBundle\Entity\Schedule
+
+    EDIT:
+        exclude_entities:
+            - Oro\Bundle\CronBundle\Entity\Schedule
+
+    DELETE:
+        exclude_entities:
+            - Oro\Bundle\CronBundle\Entity\Schedule
+
+    ASSIGN:
+        exclude_entities:
+            - Oro\Bundle\CronBundle\Entity\Schedule
+
+    SHARE:
+        exclude_entities:
+            - Oro\Bundle\CronBundle\Entity\Schedule
