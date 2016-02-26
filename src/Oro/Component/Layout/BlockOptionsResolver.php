@@ -35,8 +35,66 @@ class BlockOptionsResolver
     public function resolveOptions($blockType, array $options = [])
     {
         $resolver = $this->getOptionResolver($blockType);
+        $options = $this->resolveValueBags($options);
 
         return $resolver->resolve($options);
+    }
+
+    /**
+     * @param array $options
+     * @return array
+     */
+    protected function resolveValueBags(array $options)
+    {
+        foreach ($options as $key => $value) {
+            if (is_array($value)) {
+                $options[$key] = $this->resolveValueBags($value);
+            } elseif ($value instanceof OptionValueBag) {
+                $options[$key] = $value->buildValue($this->getOptionsBuilder($value, $options));
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param OptionValueBag $valueBag
+     * @param array $options
+     * @return OptionValueBuilderInterface
+     */
+    protected function getOptionsBuilder(OptionValueBag $valueBag, array $options)
+    {
+        $isArray = false;
+
+        // guess builder type based on arguments
+        $actions = $valueBag->all();
+        if ($actions) {
+            /** @var Action $action */
+            $action = reset($actions);
+            $arguments = $action->getArguments();
+            if ($arguments) {
+                $argument = reset($arguments);
+                if (is_array($argument)) {
+                    $isArray = true;
+                }
+            }
+        }
+
+        if ($isArray) {
+            return new ArrayOptionValueBuilder();
+        }
+
+        $delimiter = ' ';
+        if (isset($options['delimiter'])) {
+            $delimiter = $options['delimiter'];
+        }
+
+        $allowTokenize = true;
+        if (isset($options['allowTokenize'])) {
+            $allowTokenize = $options['allowTokenize'];
+        }
+
+        return new StringOptionValueBuilder($delimiter, $allowTokenize);
     }
 
     /**
