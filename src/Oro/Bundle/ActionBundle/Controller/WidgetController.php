@@ -70,6 +70,10 @@ class WidgetController extends Controller
                 $data = $this->getActionManager()->execute($actionName, $data, $errors);
 
                 $params['response'] = $this->getResponse($data);
+
+                if ($this->hasRedirect($params)) {
+                    return $this->redirect($params['response']['redirectUrl']);
+                }
             }
 
         } catch (\Exception $e) {
@@ -81,11 +85,7 @@ class WidgetController extends Controller
         $params['context'] = $data->getValues();
         $params['errors'] = $errors;
 
-        if ($form->isSubmitted() && $this->hasRedirect($params)) {
-            return $this->redirect($params['response']['redirectUrl']);
-        } else {
-            return $this->render($this->getActionManager()->getFrontendTemplate($actionName), $params);
-        }
+        return $this->render($this->getActionManager()->getFrontendTemplate($actionName), $params);
     }
 
     /**
