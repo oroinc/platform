@@ -38,7 +38,7 @@ class ActionRegistry
      * @param string|null $entityClass
      * @param string|null $route
      * @param string|null $datagrid
-     * @param string|null $group
+     * @param string|array|null $group
      * @return Action[]
      */
     public function find($entityClass, $route, $datagrid, $group = null)
@@ -53,7 +53,7 @@ class ActionRegistry
 
             if ($this->isEntityClassMatched($entityClass, $definition) ||
                 ($route && in_array($route, $definition->getRoutes(), true)) ||
-                ($datagrid && in_array($datagrid, $definition->getDatagrids(), true))
+                $this->isDatagridMatched($datagrid, $definition)
             ) {
                 $actions[$action->getName()] = $action;
             }
@@ -98,15 +98,16 @@ class ActionRegistry
     }
 
     /**
-     * @param string|null $group
+     * @param string|array|null $group
      * @return array|Action[]
      */
     protected function filterByGroup($group = null)
     {
+        $this->normalizeGroup($group);
+
         return array_filter($this->actions, function (Action $action) use ($group) {
-            return $group
-                ? in_array($group, $action->getDefinition()->getGroups(), true)
-                : !$action->getDefinition()->getGroups();
+            $groups = $action->getDefinition()->getGroups() ?: [''];
+            return !empty(array_intersect($group, $groups));
         });
     }
 
@@ -131,5 +132,35 @@ class ActionRegistry
         }
 
         return false;
+    }
+
+    /**
+     * @param string $datagrid
+     * @param ActionDefinition $definition
+     * @return bool
+     */
+    protected function isDatagridMatched($datagrid, ActionDefinition $definition)
+    {
+        if (!$datagrid) {
+            return false;
+        }
+
+        $forAllDatagrids = $definition->isForAllDatagrids();
+
+        return $forAllDatagrids || $datagrid && in_array($datagrid, $definition->getDatagrids(), true);
+    }
+
+    /**
+     * @param mixed $groups
+     */
+    protected function normalizeGroup(&$group)
+    {
+        if (!is_array($group)) {
+            $group = [(string)$group];
+        } else {
+            foreach ($group as $key => $value) {
+                $group[$key] = (string)$value;
+            }
+        }
     }
 }

@@ -186,6 +186,7 @@ class ActionExtension extends AbstractExtension
         return [
             'entityClass' => $entityClass ? : $config->offsetGetByPath('[entity_name]'),
             'datagrid' => $config->offsetGetByPath('[name]'),
+            'group' => ['', 'datagridRowAction'],
         ];
     }
 }

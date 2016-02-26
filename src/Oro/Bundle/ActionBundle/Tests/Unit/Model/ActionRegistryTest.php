@@ -157,7 +157,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['action6', 'action10', 'action12', 'action13']
+                'expected' => ['action6', 'action10', 'action12', 'action13', 'action15']
             ],
             'route1' => [
                 'entityClass' => null,
@@ -178,7 +178,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' => null,
                 'group' => 'group1',
-                'expected' => ['action7', 'action11']
+                'expected' => ['action7', 'action11', 'action15']
             ],
             'route1 group1' => [
                 'entityClass' => null,
@@ -199,7 +199,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => 'route1',
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['action4', 'action6', 'action10', 'action12', 'action13']
+                'expected' => ['action4', 'action6', 'action10', 'action12', 'action13', 'action15']
             ],
             'route1 & datagrid1' => [
                 'entityClass' => null,
@@ -213,14 +213,14 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => null,
-                'expected' => ['action4', 'action6', 'action8', 'action10', 'action12', 'action13']
+                'expected' => ['action4', 'action6', 'action8', 'action10', 'action12', 'action13', 'action15']
             ],
             'route1 group1 & entity1 group1 & datagrid1 group1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => 'group1',
-                'expected' => ['action5', 'action7', 'action9', 'action11']
+                'expected' => ['action5', 'action7', 'action9', 'action11', 'action15']
             ],
             'entity2' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
@@ -362,7 +362,12 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'for_all_entities' => true,
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                 'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
-            ]
+            ],
+            'action15' => [
+                'label' => 'Label15',
+                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                'groups' => ['', 'group1']
+            ],
         ];
     }
 }

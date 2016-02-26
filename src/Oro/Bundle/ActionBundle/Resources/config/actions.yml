@@ -7,7 +7,7 @@ actions:
             - @call_service_method:
                 service: oro_action.helper.entity_config
                 method: getRoutes
-                method_parameters: [$.data, ['name', 'view', 'update', 'delete']]
+                method_parameters: [$.data, ['name', 'update', 'delete']]
                 attribute: $.routes
             - @call_service_method:
                 service: oro_action.helper.entity_config
@@ -25,21 +25,13 @@ actions:
         acl_resource: [EDIT, $.data]
         order: 10
         for_all_entities: true
+        for_all_datagrids: true
         groups:
             - view_navButtons
             - datagridRowAction
         preconditions:
             @and:
                 - @not_blank: $.routes[update]
-                - @or:
-                    # datagrid
-                    - @not_blank: $.context[datagrid]
-                    # view page
-                    - @and:
-                        - @not_blank: $.routes[view]
-                        - @equal:
-                            - $.context[route]
-                            - $.routes[view]
         functions:
             - @redirect:
                 route: $.routes[update]
@@ -55,6 +47,7 @@ actions:
         acl_resource: [DELETE, $.data]
         order: 20
         for_all_entities: true
+        for_all_datagrids: true
         groups:
             - view_navButtons
             - update_navButtons
@@ -63,21 +56,6 @@ actions:
             @and:
                 - @not_blank: $.routes[name]
                 - @not_blank: $.routes[delete]
-                - @or:
-                    # datagrid
-                    - @not_blank: $.context[datagrid]
-                    # view page
-                    - @and:
-                        - @not_blank: $.routes[view]
-                        - @equal:
-                            - $.context[route]
-                            - $.routes[view]
-                    # update page
-                    - @and:
-                        - @not_blank: $.routes[update]
-                        - @equal:
-                            - $.context[route]
-                            - $.routes[update]
         functions:
             - @call_service_method:
                 service: service_container
