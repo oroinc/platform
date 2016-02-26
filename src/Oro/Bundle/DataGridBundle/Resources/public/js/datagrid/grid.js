@@ -93,7 +93,8 @@ define(function(require) {
                 addResetAction: true,
                 addRefreshAction: true,
                 addColumnManager: true,
-                columnManager: {}
+                columnManager: {},
+                addSorting: false
             },
             rowClickAction:         undefined,
             multipleSorting:        true,
@@ -441,7 +442,8 @@ define(function(require) {
             var toolbarOptions = {
                 collection:   this.collection,
                 actions:      this._getToolbarActions(),
-                extraActions: this._getToolbarExtraActions()
+                extraActions: this._getToolbarExtraActions(),
+                columns:      this.columns
             };
             _.defaults(toolbarOptions, options);
 
