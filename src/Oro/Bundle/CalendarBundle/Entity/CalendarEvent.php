@@ -37,7 +37,6 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE;EDIT;DELETE",
  *              "group_name"=""
  *          },
  *          "grouping"={
