@@ -18,6 +18,25 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     /** @var AttributeAssembler */
     protected $assembler;
 
+    protected function setUp()
+    {
+        $this->actionData = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionData')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->actionData->expects($this->any())
+            ->method('getEntity')
+            ->willReturn(new \stdClass());
+
+        $this->attributeGuesser = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeGuesser')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->attributeGuesser->expects($this->any())
+            ->method('fixPropertyPath')
+            ->willReturnArgument(0);
+
+        $this->assembler = new AttributeAssembler($this->attributeGuesser);
+    }
+
     /**
      * @dataProvider invalidOptionsDataProvider
      *
@@ -350,24 +369,5 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
         $attribute->setEntityAcl($entityAcl);
 
         return $attribute;
-    }
-
-    protected function setUp()
-    {
-        $this->actionData = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionData')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->actionData->expects($this->any())
-            ->method('getEntity')
-            ->willReturn(new \stdClass());
-
-        $this->attributeGuesser = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeGuesser')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->attributeGuesser->expects($this->any())
-            ->method('fixPropertyPath')
-            ->willReturnArgument(0);
-
-        $this->assembler = new AttributeAssembler($this->attributeGuesser);
     }
 }

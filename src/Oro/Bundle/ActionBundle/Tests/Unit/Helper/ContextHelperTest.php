@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContextHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +20,24 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
     /** @var ContextHelper */
     protected $helper;
 
+    protected function setUp()
+    {
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->helper = new ContextHelper($this->doctrineHelper, $this->requestStack);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->helper, $this->doctrineHelper, $this->requestStack);
+    }
+
     /**
      * @dataProvider getContextDataProvider
      *
@@ -27,7 +46,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContext($request, array $expected)
     {
-        $this->requestStack->expects($this->exactly(1))
+        $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
@@ -209,23 +228,5 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
 
         // use local cache
         $this->assertEquals($actionData, $this->helper->getActionData($context2));
-    }
-
-    protected function setUp()
-    {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->helper = new ContextHelper($this->doctrineHelper, $this->requestStack);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->helper, $this->doctrineHelper, $this->requestStack);
     }
 }

@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ContextHelper
 {
@@ -40,6 +41,26 @@ class ContextHelper
 
     /**
      * @param array|null $context
+     * @return array
+     */
+    public function getContext(array $context = null)
+    {
+        if (null === $context) {
+            $currentRequest = $this->requestStack->getCurrentRequest();
+            $context = $currentRequest ? [
+                self::ROUTE_PARAM => $currentRequest->get(self::ROUTE_PARAM),
+                self::ENTITY_ID_PARAM => $currentRequest->get(self::ENTITY_ID_PARAM),
+                self::ENTITY_CLASS_PARAM => $currentRequest->get(self::ENTITY_CLASS_PARAM),
+                self::DATAGRID_PARAM => $currentRequest->get(self::DATAGRID_PARAM),
+                self::GROUP_PARAM => $currentRequest->get(self::GROUP_PARAM)
+            ] : [];
+        }
+
+        return $this->normalizeContext($context);
+    }
+
+    /**
+     * @param array|null $context
      * @return ActionData
      */
     public function getActionData(array $context = null)
@@ -65,26 +86,6 @@ class ContextHelper
     }
 
     /**
-     * @param array|null $context
-     * @return array
-     */
-    public function getContext(array $context = null)
-    {
-        if (null === $context) {
-            $currentRequest = $this->requestStack->getCurrentRequest();
-            $context = $currentRequest ? [
-                self::ROUTE_PARAM => $currentRequest->get(self::ROUTE_PARAM),
-                self::ENTITY_ID_PARAM => $currentRequest->get(self::ENTITY_ID_PARAM),
-                self::ENTITY_CLASS_PARAM => $currentRequest->get(self::ENTITY_CLASS_PARAM),
-                self::DATAGRID_PARAM => $currentRequest->get(self::DATAGRID_PARAM),
-                self::GROUP_PARAM => $currentRequest->get(self::GROUP_PARAM)
-            ] : [];
-        }
-
-        return $this->normalizeContext($context);
-    }
-
-    /**
      * @param array $context
      * @return array
      */
@@ -100,6 +101,26 @@ class ContextHelper
             ],
             $context
         );
+    }
+
+    /**
+     * @param string $entityClass
+     * @param mixed $entityId
+     * @return Object
+     */
+    protected function getEntityReference($entityClass, $entityId)
+    {
+        $entity = null;
+
+        if ($this->doctrineHelper->isManageableEntity($entityClass)) {
+            if ($entityId) {
+                $entity = $this->doctrineHelper->getEntityReference($entityClass, $entityId);
+            } else {
+                $entity = $this->doctrineHelper->createEntityInstance($entityClass);
+            }
+        }
+
+        return $entity;
     }
 
     /**
@@ -128,25 +149,5 @@ class ContextHelper
         }
 
         return $this->propertyAccessor;
-    }
-
-    /**
-     * @param string $entityClass
-     * @param mixed $entityId
-     * @return Object
-     */
-    protected function getEntityReference($entityClass, $entityId)
-    {
-        $entity = null;
-
-        if ($this->doctrineHelper->isManageableEntity($entityClass)) {
-            if ($entityId) {
-                $entity = $this->doctrineHelper->getEntityReference($entityClass, $entityId);
-            } else {
-                $entity = $this->doctrineHelper->createEntityInstance($entityClass);
-            }
-        }
-
-        return $entity;
     }
 }

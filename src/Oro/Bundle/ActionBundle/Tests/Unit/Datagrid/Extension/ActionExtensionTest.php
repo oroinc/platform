@@ -26,6 +26,53 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ActionManager */
     protected $manager;
 
+    protected function setUp()
+    {
+        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
+        $contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $contextHelper->expects($this->any())
+            ->method('getActionData')
+            ->willReturn(new ActionData(['data' => ['param']]));
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper $applicationHelper */
+        $applicationHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $provider = $this->getMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
+        $provider->expects($this->any())
+            ->method('getActions')
+            ->willReturn(['test_config' => ['label' => 'test_label']]);
+
+        $this->massActionProviderRegistry = $this
+            ->getMockBuilder('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->massActionProviderRegistry->expects($this->any())
+            ->method('getProvider')
+            ->with(self::PROVIDER_ALIAS)
+            ->willReturn($provider);
+
+        $this->extension = new ActionExtension(
+            $this->manager,
+            $contextHelper,
+            $applicationHelper,
+            $this->massActionProviderRegistry
+        );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->extension, $this->manager, $this->massActionProviderRegistry);
+    }
+
     /**
      * @param DatagridConfiguration $config
      * @param Action[] $actions
@@ -122,6 +169,34 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return array
+     */
+    public function getActionsPermissionsProvider()
+    {
+        $actionAllowed1 = $this->createAction('action1', true);
+        $actionAllowed2 = $this->createAction('action2', true);
+        $actionNotAllowed = $this->createAction('action3', false);
+
+        return [
+            'no actions' => [
+                'record' => new ResultRecord(['id' => 1]),
+                'actions' => [],
+                'expectedActions' => [],
+            ],
+            '2 allowed actions' => [
+                'record' => new ResultRecord(['id' => 2]),
+                'actions' => [$actionAllowed1, $actionAllowed2],
+                'expectedActions' => ['action1' => true, 'action2' => true],
+            ],
+            '1 allowed action' => [
+                'record' => new ResultRecord(['id' => 3]),
+                'actions' => [$actionAllowed1, $actionNotAllowed],
+                'expectedActions' => ['action1' => true, 'action3' => false],
+            ],
+        ];
+    }
+
+    /**
      * @param string $name
      * @param bool $isAvailable
      * @param array $definitionParams
@@ -155,80 +230,5 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($isAvailable);
 
         return $action;
-    }
-
-    /**
-     * @return array
-     */
-    public function getActionsPermissionsProvider()
-    {
-        $actionAllowed1 = $this->createAction('action1', true);
-        $actionAllowed2 = $this->createAction('action2', true);
-        $actionNotAllowed = $this->createAction('action3', false);
-
-        return [
-            'no actions' => [
-                'record' => new ResultRecord(['id' => 1]),
-                'actions' => [],
-                'expectedActions' => [],
-            ],
-            '2 allowed actions' => [
-                'record' => new ResultRecord(['id' => 2]),
-                'actions' => [$actionAllowed1, $actionAllowed2],
-                'expectedActions' => ['action1' => true, 'action2' => true],
-            ],
-            '1 allowed action' => [
-                'record' => new ResultRecord(['id' => 3]),
-                'actions' => [$actionAllowed1, $actionNotAllowed],
-                'expectedActions' => ['action1' => true, 'action3' => false],
-            ],
-        ];
-    }
-
-    protected function setUp()
-    {
-        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
-        $contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $contextHelper->expects($this->any())
-            ->method('getActionData')
-            ->willReturn(new ActionData(['data' => ['param']]));
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper $applicationHelper */
-        $applicationHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $provider = $this->getMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
-        $provider->expects($this->any())
-            ->method('getActions')
-            ->willReturn(['test_config' => ['label' => 'test_label']]);
-
-        $this->massActionProviderRegistry = $this
-            ->getMockBuilder('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->massActionProviderRegistry->expects($this->any())
-            ->method('getProvider')
-            ->with(self::PROVIDER_ALIAS)
-            ->willReturn($provider);
-
-        $this->extension = new ActionExtension(
-            $this->manager,
-            $contextHelper,
-            $applicationHelper,
-            $this->massActionProviderRegistry
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->extension, $this->manager, $this->massActionProviderRegistry);
     }
 }

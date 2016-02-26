@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
-use Oro\Bundle\ActionBundle\Model\Attribute;
-use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -34,6 +38,38 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $formConfigProvider;
+
+    protected function setUp()
+    {
+        $this->formRegistry = $this->getMockBuilder('Symfony\Component\Form\FormRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->managerRegistry
+            = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry');
+
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->formConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->guesser = new AttributeGuesser(
+            $this->formRegistry,
+            $this->managerRegistry,
+            $this->entityConfigProvider,
+            $this->formConfigProvider
+        );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->managerRegistry);
+        unset($this->entityConfigProvider);
+        unset($this->guesser);
+    }
 
     /**
      * @expectedException \Oro\Bundle\ActionBundle\Exception\AttributeException
@@ -82,30 +118,6 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->setEntityMetadata(array($rootClass => $metadata));
 
         $this->assertNull($this->guesser->guessMetadataAndField($rootClass, $propertyPath));
-    }
-
-    /**
-     * @param array $metadataArray
-     */
-    protected function setEntityMetadata(array $metadataArray)
-    {
-        $valueMap = array();
-        foreach ($metadataArray as $entity => $metadata) {
-            $valueMap[] = array($entity, $metadata);
-        }
-
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())
-            ->method('getClassMetadata')
-            ->with($this->isType('string'))
-            ->will($this->returnValueMap($valueMap));
-
-        $this->managerRegistry->expects($this->any())
-            ->method('getManagerForClass')
-            ->with($this->isType('string'))
-            ->will($this->returnValue($entityManager));
     }
 
     public function testGuessMetadataAndFieldAssociationField()
@@ -201,64 +213,6 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
             'object',
             array('class' => 'DateTime')
         );
-    }
-
-    /**
-     * @param string $class
-     * @param string $field
-     * @param bool $multiple
-     * @param bool $hasConfig
-     * @param string|null $label
-     * @param string|null $fieldType
-     */
-    protected function setEntityConfigProvider(
-        $class,
-        $field,
-        $multiple = false,
-        $hasConfig = true,
-        $label = null,
-        $fieldType = null
-    ) {
-        $labelOption = $multiple ? 'plural_label' : 'label';
-
-        $entityConfig = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $entityConfig->expects($this->any())->method('has')->with($labelOption)
-            ->will($this->returnValue(!empty($label)));
-        $entityConfig->expects($this->any())->method('get')->with($labelOption)
-            ->will($this->returnValue($label));
-
-        $this->entityConfigProvider->expects($this->any())->method('hasConfig')->with($class, $field)
-            ->will($this->returnValue($hasConfig));
-        $this->entityConfigProvider->expects($this->any())->method('getConfig')->with($class, $field)
-            ->will($this->returnValue($entityConfig));
-
-        if ($fieldType) {
-            $configId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $entityConfig->expects($this->any())->method('getId')
-                ->will($this->returnValue($configId));
-            $configId->expects($this->any())->method('getFieldType')
-                ->will($this->returnValue($fieldType));
-        }
-    }
-
-    /**
-     * @param array $actualOptions
-     * @param string|null $label
-     * @param string $type
-     * @param array $options
-     */
-    protected function assertAttributeOptions($actualOptions, $label, $type, array $options = array())
-    {
-        $this->assertNotNull($actualOptions);
-        $this->assertInternalType('array', $actualOptions);
-        $this->assertArrayHasKey('label', $actualOptions);
-        $this->assertArrayHasKey('type', $actualOptions);
-        $this->assertArrayHasKey('options', $actualOptions);
-        $this->assertEquals($label, $actualOptions['label']);
-        $this->assertEquals($type, $actualOptions['type']);
-        $this->assertEquals($options, $actualOptions['options']);
     }
 
     public function testGuessAttributeParametersSingleAssociation()
@@ -420,22 +374,6 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $type
-     * @param string $propertyPath
-     * @param array $options
-     * @return Attribute
-     */
-    protected function createAttribute($type, $propertyPath = null, array $options = array())
-    {
-        $attribute = new Attribute();
-        $attribute->setType($type)
-            ->setPropertyPath($propertyPath)
-            ->setOptions($options);
-
-        return $attribute;
-    }
-
-    /**
      * @param string $expected
      * @param Attribute $attribute
      * @dataProvider guessClassAttributeFormDataProvider
@@ -479,35 +417,101 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function setUp()
+    /**
+     * @param string $type
+     * @param string $propertyPath
+     * @param array $options
+     * @return Attribute
+     */
+    protected function createAttribute($type, $propertyPath = null, array $options = array())
     {
-        $this->formRegistry = $this->getMockBuilder('Symfony\Component\Form\FormRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attribute = new Attribute();
+        $attribute->setType($type)
+            ->setPropertyPath($propertyPath)
+            ->setOptions($options);
 
-        $this->managerRegistry
-            = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry');
-
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->guesser = new AttributeGuesser(
-            $this->formRegistry,
-            $this->managerRegistry,
-            $this->entityConfigProvider,
-            $this->formConfigProvider
-        );
+        return $attribute;
     }
 
-    protected function tearDown()
+    /**
+     * @param array $actualOptions
+     * @param string|null $label
+     * @param string $type
+     * @param array $options
+     */
+    protected function assertAttributeOptions($actualOptions, $label, $type, array $options = array())
     {
-        unset($this->managerRegistry);
-        unset($this->entityConfigProvider);
-        unset($this->guesser);
+        $this->assertNotNull($actualOptions);
+        $this->assertInternalType('array', $actualOptions);
+        $this->assertArrayHasKey('label', $actualOptions);
+        $this->assertArrayHasKey('type', $actualOptions);
+        $this->assertArrayHasKey('options', $actualOptions);
+        $this->assertEquals($label, $actualOptions['label']);
+        $this->assertEquals($type, $actualOptions['type']);
+        $this->assertEquals($options, $actualOptions['options']);
+    }
+
+    /**
+     * @param array $metadataArray
+     */
+    protected function setEntityMetadata(array $metadataArray)
+    {
+        $valueMap = array();
+        foreach ($metadataArray as $entity => $metadata) {
+            $valueMap[] = array($entity, $metadata);
+        }
+
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->with($this->isType('string'))
+            ->will($this->returnValueMap($valueMap));
+
+        $this->managerRegistry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($this->isType('string'))
+            ->will($this->returnValue($entityManager));
+    }
+
+    /**
+     * @param string $class
+     * @param string $field
+     * @param bool $multiple
+     * @param bool $hasConfig
+     * @param string|null $label
+     * @param string|null $fieldType
+     */
+    protected function setEntityConfigProvider(
+        $class,
+        $field,
+        $multiple = false,
+        $hasConfig = true,
+        $label = null,
+        $fieldType = null
+    ) {
+        $labelOption = $multiple ? 'plural_label' : 'label';
+
+        $entityConfig = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $entityConfig->expects($this->any())->method('has')->with($labelOption)
+            ->will($this->returnValue(!empty($label)));
+        $entityConfig->expects($this->any())->method('get')->with($labelOption)
+            ->will($this->returnValue($label));
+
+        $this->entityConfigProvider->expects($this->any())->method('hasConfig')->with($class, $field)
+            ->will($this->returnValue($hasConfig));
+        $this->entityConfigProvider->expects($this->any())->method('getConfig')->with($class, $field)
+            ->will($this->returnValue($entityConfig));
+
+        if ($fieldType) {
+            $configId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $entityConfig->expects($this->any())->method('getId')
+                ->will($this->returnValue($configId));
+            $configId->expects($this->any())->method('getFieldType')
+                ->will($this->returnValue($fieldType));
+        }
     }
 }

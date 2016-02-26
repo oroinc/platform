@@ -3,12 +3,14 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
+
 use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\Action\ActionInterface as FunctionInterface;
 use Oro\Component\ConfigExpression\Condition\Configurable as ConfigurableCondition;
@@ -39,6 +41,39 @@ class ActionTest extends \PHPUnit_Framework_TestCase
 
     /** @var ActionData */
     protected $data;
+
+    protected function setUp()
+    {
+        $this->definition = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionDefinition')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->action = new Action(
+            $this->functionFactory,
+            $this->conditionFactory,
+            $this->attributeAssembler,
+            $this->formOptionsAssembler,
+            $this->definition
+        );
+
+        $this->data = new ActionData();
+    }
 
     public function testGetName()
     {
@@ -84,27 +119,6 @@ class ActionTest extends \PHPUnit_Framework_TestCase
             });
 
         $this->action->init($this->data);
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
-     * @param ActionData $data
-     * @return FunctionInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createFunction(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
-        ActionData $data
-    ) {
-        /* @var $function FunctionInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $function = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $function->expects($expects)
-            ->method('execute')
-            ->with($data);
-
-        return $function;
     }
 
     /**
@@ -187,7 +201,6 @@ class ActionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedData['available'], $this->action->isAvailable($inputData['data']));
     }
-
 
     /**
      * @return array
@@ -347,6 +360,7 @@ class ActionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider contextBoundAndSubstitutionProvider
+     *
      * @param array $groups
      * @param array $datagrigs
      * @param array $entities
@@ -444,30 +458,6 @@ class ActionTest extends \PHPUnit_Framework_TestCase
                 false
             ],
         ];
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
-     * @param ActionData $data
-     * @param bool $returnValue
-     * @return ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createCondition(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
-        ActionData $data,
-        $returnValue
-    ) {
-        /* @var $condition ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject */
-        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\Configurable')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $condition->expects($expects)
-            ->method('evaluate')
-            ->with($data)
-            ->willReturn($returnValue);
-
-        return $condition;
     }
 
     /**
@@ -721,6 +711,51 @@ class ActionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
+     * @param ActionData $data
+     * @return FunctionInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createFunction(
+        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
+        ActionData $data
+    ) {
+        /* @var $function FunctionInterface|\PHPUnit_Framework_MockObject_MockObject */
+        $function = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $function->expects($expects)
+            ->method('execute')
+            ->with($data);
+
+        return $function;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
+     * @param ActionData $data
+     * @param bool $returnValue
+     * @return ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createCondition(
+        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
+        ActionData $data,
+        $returnValue
+    ) {
+        /* @var $condition ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject */
+        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\Configurable')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $condition->expects($expects)
+            ->method('evaluate')
+            ->with($data)
+            ->willReturn($returnValue);
+
+        return $condition;
+    }
+
     public function testGetAttributeManager()
     {
         $attributes = ['attribute' => ['label' => 'attr_label']];
@@ -743,38 +778,5 @@ class ActionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\AttributeManager', $attributeManager);
         $this->assertEquals(new ArrayCollection(['test_attr' => $attribute]), $attributeManager->getAttributes());
-    }
-
-    protected function setUp()
-    {
-        $this->definition = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->action = new Action(
-            $this->functionFactory,
-            $this->conditionFactory,
-            $this->attributeAssembler,
-            $this->formOptionsAssembler,
-            $this->definition
-        );
-
-        $this->data = new ActionData();
     }
 }

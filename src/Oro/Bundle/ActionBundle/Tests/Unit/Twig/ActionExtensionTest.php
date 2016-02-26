@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Twig;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Twig\ActionExtension;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,6 +29,37 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var ActionExtension */
     protected $extension;
+
+    protected function setUp()
+    {
+        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->appsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->extension = new ActionExtension(
+            $this->actionManager,
+            $this->appsHelper,
+            $this->doctrineHelper,
+            $this->requestStack
+        );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->extension, $this->actionManager, $this->appsHelper, $this->doctrineHelper, $this->requestStack);
+    }
 
     public function testGetName()
     {
@@ -139,18 +171,6 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @param int $id
-     * @return \stdClass
-     */
-    protected function getEntity($id = null)
-    {
-        $entity = new \stdClass();
-        $entity->id = $id;
-
-        return $entity;
-    }
-
     public function testGetWidgetRoute()
     {
         $this->appsHelper->expects($this->once())
@@ -189,34 +209,15 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    protected function setUp()
+    /**
+     * @param int $id
+     * @return \stdClass
+     */
+    protected function getEntity($id = null)
     {
-        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entity = new \stdClass();
+        $entity->id = $id;
 
-        $this->appsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->extension = new ActionExtension(
-            $this->actionManager,
-            $this->appsHelper,
-            $this->doctrineHelper,
-            $this->requestStack
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->extension, $this->actionManager, $this->appsHelper, $this->doctrineHelper, $this->requestStack);
+        return $entity;
     }
 }

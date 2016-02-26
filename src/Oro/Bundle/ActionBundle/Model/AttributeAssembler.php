@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Bundle\ActionBundle\Exception\AssemblerException;
 use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
 
@@ -171,24 +172,6 @@ class AttributeAssembler extends AbstractAssembler
 
     /**
      * @param Attribute $attribute
-     * @throws AssemblerException If attribute is invalid
-     */
-    protected function assertAttributeHasClassOption(Attribute $attribute)
-    {
-        $this->assertAttributeHasOptions($attribute, 'class');
-        if (!class_exists($attribute->getOption('class'))) {
-            throw new AssemblerException(
-                sprintf(
-                    'Class "%s" referenced by "class" option in attribute "%s" not found',
-                    $attribute->getOption('class'),
-                    $attribute->getName()
-                )
-            );
-        }
-    }
-
-    /**
-     * @param Attribute $attribute
      * @param string|array $optionNames
      * @throws MissedRequiredOptionException If attribute is invalid
      */
@@ -220,6 +203,24 @@ class AttributeAssembler extends AbstractAssembler
                     sprintf('Option "%s" cannot be used in attribute "%s"', $optionName, $attribute->getName())
                 );
             }
+        }
+    }
+
+    /**
+     * @param Attribute $attribute
+     * @throws AssemblerException If attribute is invalid
+     */
+    protected function assertAttributeHasClassOption(Attribute $attribute)
+    {
+        $this->assertAttributeHasOptions($attribute, 'class');
+        if (!class_exists($attribute->getOption('class'))) {
+            throw new AssemblerException(
+                sprintf(
+                    'Class "%s" referenced by "class" option in attribute "%s" not found',
+                    $attribute->getOption('class'),
+                    $attribute->getName()
+                )
+            );
         }
     }
 }

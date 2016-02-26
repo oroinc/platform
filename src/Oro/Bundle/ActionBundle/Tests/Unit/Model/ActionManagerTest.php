@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
@@ -13,6 +14,7 @@ use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
+
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**
@@ -33,6 +35,30 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     protected $manager;
 
     /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        $this->actionRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->manager = new ActionManager($this->actionRegistry, $this->doctrineHelper, $this->contextHelper);
+    }
+
+    /**
      * @dataProvider hasActionsDataProvider
      *
      * @param array $actions
@@ -44,33 +70,6 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContextHelperCalled();
         $this->assertEquals($expected, $this->manager->hasActions());
-    }
-
-    /**
-     * @param array $context
-     * @param int $getContextCalls
-     * @param int $getActionDataCalls
-     */
-    protected function assertContextHelperCalled(array $context = [], $getContextCalls = 1, $getActionDataCalls = 1)
-    {
-        $this->contextHelper->expects($this->exactly($getContextCalls))
-            ->method('getContext')
-            ->willReturn(
-                array_merge(
-                    [
-                        'route' => null,
-                        'entityId' => null,
-                        'entityClass' => null,
-                        'datagrid' => null,
-                        'group' => null
-                    ],
-                    $context
-                )
-            );
-
-        $this->contextHelper->expects($this->exactly($getActionDataCalls))
-            ->method('getActionData')
-            ->willReturn(new ActionData());
     }
 
     /**
@@ -95,130 +94,6 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $name
-     * @return array
-     */
-    protected function getActions($name = null)
-    {
-        $actions = [
-            'action1' => $this->getAction('action1', 50, ['show_dialog' => false]),
-            'action2' => $this->getAction('action2', 40, ['show_dialog' => true], [], ['route1']),
-            'action3' => $this->getAction(
-                'action3',
-                30,
-                ['show_dialog' => true],
-                ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1']
-            ),
-            'action4' => $this->getAction(
-                'action4',
-                20,
-                ['template' => 'test.html.twig', 'show_dialog' => true],
-                [
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'
-                ],
-                ['route1', 'route2']
-            ),
-            'action5' => $this->getAction(
-                'action5',
-                10,
-                ['show_dialog' => true],
-                [
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'
-                ],
-                ['route2', 'route3'],
-                [],
-                [],
-                false
-            ),
-            'action6' => $this->getAction(
-                'action6',
-                50,
-                ['show_dialog' => true],
-                ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
-                ['route2', 'route3']
-            ),
-            'action7' => $this->getAction(
-                'action7',
-                50,
-                ['show_dialog' => true],
-                [
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'
-                ],
-                ['route1', 'route2', 'route3']
-            )
-        ];
-
-        return $name ? $actions[$name] : $actions;
-    }
-
-    /**
-     * @param string $name
-     * @param int $order
-     * @param array $frontendOptions
-     * @param array $entities
-     * @param array $routes
-     * @param array $datagrids
-     * @param array $group
-     * @param bool $enabled
-     * @return Action
-     */
-    protected function getAction(
-        $name,
-        $order = 10,
-        array $frontendOptions = [],
-        array $entities = [],
-        array $routes = [],
-        array $datagrids = [],
-        array $group = [],
-        $enabled = true
-    ) {
-        $definition = new ActionDefinition();
-        $definition
-            ->setName($name)
-            ->setLabel('Label ' . $name)
-            ->setEnabled($enabled)
-            ->setOrder($order)
-            ->setRoutes($routes)
-            ->setEntities($entities)
-            ->setDatagrids($datagrids)
-            ->setGroups($group)
-            ->setFrontendOptions($frontendOptions);
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
-        $functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
-        $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler */
-        $attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
-        $formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return new Action(
-            $functionFactory,
-            $conditionFactory,
-            $attributeAssembler,
-            $formOptionsAssembler,
-            $definition
-        );
-    }
-
-    /**
      * @dataProvider getActionsProvider
      *
      * @param string $class
@@ -239,34 +114,6 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($actions);
 
         $this->assertGetActions($expected, $context);
-    }
-
-    /**
-     * @param array $expectedActions
-     * @param array $inputContext
-     */
-    protected function assertGetActions(array $expectedActions, array $inputContext)
-    {
-        $this->contextHelper->expects($this->any())
-            ->method('getContext')
-            ->willReturnCallback(function ($context) {
-                return array_merge(
-                    [
-                        'route' => null,
-                        'entityId' => null,
-                        'entityClass' => null,
-                        'datagrid' => null,
-                        'group' => null
-                    ],
-                    $context
-                );
-            });
-
-        $this->contextHelper->expects($this->any())
-            ->method('getActionData')
-            ->willReturn(new ActionData());
-
-        $this->assertEquals($expectedActions, array_keys($this->manager->getActions($inputContext)));
     }
 
     /**
@@ -374,21 +221,6 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool $isAvailable
-     * @return Action|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createActionMock($isAvailable = true)
-    {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Action $action */
-        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $action->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
-
-        return $action;
-    }
-
-    /**
      * @dataProvider executeByContextDataProvider
      *
      * @param array $context
@@ -425,31 +257,6 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->executeByContext('test_action', $context, $errors);
 
         $this->assertEmpty($errors->toArray());
-    }
-
-    /**
-     * @param string $className
-     * @param bool $throwException
-     */
-    protected function assertEntityManagerCalled($className, $throwException = false)
-    {
-        $entityManager = $this->getMock('Doctrine\ORM\EntityManagerInterface');
-        $entityManager->expects($this->once())->method('beginTransaction');
-
-        if ($throwException) {
-            $entityManager->expects($this->once())
-                ->method('flush')
-                ->willThrowException(new \Exception('Flush exception'));
-            $entityManager->expects($this->once())->method('rollback');
-        } else {
-            $entityManager->expects($this->once())->method('flush');
-            $entityManager->expects($this->once())->method('commit');
-        }
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
-            ->with($this->isInstanceOf($className))
-            ->willReturn($entityManager);
     }
 
     /**
@@ -592,26 +399,221 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $className
+     * @param bool $throwException
      */
-    protected function setUp()
+    protected function assertEntityManagerCalled($className, $throwException = false)
     {
-        $this->actionRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionRegistry')
+        $entityManager = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $entityManager->expects($this->once())->method('beginTransaction');
+
+        if ($throwException) {
+            $entityManager->expects($this->once())
+                ->method('flush')
+                ->willThrowException(new \Exception('Flush exception'));
+            $entityManager->expects($this->once())->method('rollback');
+        } else {
+            $entityManager->expects($this->once())->method('flush');
+            $entityManager->expects($this->once())->method('commit');
+        }
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManager')
+            ->with($this->isInstanceOf($className))
+            ->willReturn($entityManager);
+    }
+
+    /**
+     * @param array $expectedActions
+     * @param array $inputContext
+     */
+    protected function assertGetActions(array $expectedActions, array $inputContext)
+    {
+        $this->contextHelper->expects($this->any())
+            ->method('getContext')
+            ->willReturnCallback(function ($context) {
+                return array_merge(
+                    [
+                        'route' => null,
+                        'entityId' => null,
+                        'entityClass' => null,
+                        'datagrid' => null,
+                        'group' => null
+                    ],
+                    $context
+                );
+            });
+
+        $this->contextHelper->expects($this->any())
+            ->method('getActionData')
+            ->willReturn(new ActionData());
+
+        $this->assertEquals($expectedActions, array_keys($this->manager->getActions($inputContext)));
+    }
+
+    /**
+     * @param array $context
+     * @param int $getContextCalls
+     * @param int $getActionDataCalls
+     */
+    protected function assertContextHelperCalled(array $context = [], $getContextCalls = 1, $getActionDataCalls = 1)
+    {
+        $this->contextHelper->expects($this->exactly($getContextCalls))
+            ->method('getContext')
+            ->willReturn(
+                array_merge(
+                    [
+                        'route' => null,
+                        'entityId' => null,
+                        'entityClass' => null,
+                        'datagrid' => null,
+                        'group' => null
+                    ],
+                    $context
+                )
+            );
+
+        $this->contextHelper->expects($this->exactly($getActionDataCalls))
+            ->method('getActionData')
+            ->willReturn(new ActionData());
+    }
+
+    /**
+     * @param string $name
+     * @return array
+     */
+    protected function getActions($name = null)
+    {
+        $actions = [
+            'action1' => $this->getAction('action1', 50, ['show_dialog' => false]),
+            'action2' => $this->getAction('action2', 40, ['show_dialog' => true], [], ['route1']),
+            'action3' => $this->getAction(
+                'action3',
+                30,
+                ['show_dialog' => true],
+                ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1']
+            ),
+            'action4' => $this->getAction(
+                'action4',
+                20,
+                ['template' => 'test.html.twig', 'show_dialog' => true],
+                [
+                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'
+                ],
+                ['route1', 'route2']
+            ),
+            'action5' => $this->getAction(
+                'action5',
+                10,
+                ['show_dialog' => true],
+                [
+                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
+                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'
+                ],
+                ['route2', 'route3'],
+                [],
+                [],
+                false
+            ),
+            'action6' => $this->getAction(
+                'action6',
+                50,
+                ['show_dialog' => true],
+                ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                ['route2', 'route3']
+            ),
+            'action7' => $this->getAction(
+                'action7',
+                50,
+                ['show_dialog' => true],
+                [
+                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
+                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'
+                ],
+                ['route1', 'route2', 'route3']
+            )
+        ];
+
+        return $name ? $actions[$name] : $actions;
+    }
+
+    /**
+     * @param string $name
+     * @param int $order
+     * @param array $frontendOptions
+     * @param array $entities
+     * @param array $routes
+     * @param array $datagrids
+     * @param array $group
+     * @param bool $enabled
+     * @return Action
+     */
+    protected function getAction(
+        $name,
+        $order = 10,
+        array $frontendOptions = [],
+        array $entities = [],
+        array $routes = [],
+        array $datagrids = [],
+        array $group = [],
+        $enabled = true
+    ) {
+        $definition = new ActionDefinition();
+        $definition
+            ->setName($name)
+            ->setLabel('Label ' . $name)
+            ->setEnabled($enabled)
+            ->setOrder($order)
+            ->setRoutes($routes)
+            ->setEntities($entities)
+            ->setDatagrids($datagrids)
+            ->setGroups($group)
+            ->setFrontendOptions($frontendOptions);
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
+        $functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
+        $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler */
+        $attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
+        $formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new ActionManager($this->actionRegistry, $this->doctrineHelper, $this->contextHelper);
+        return new Action(
+            $functionFactory,
+            $conditionFactory,
+            $attributeAssembler,
+            $formOptionsAssembler,
+            $definition
+        );
+    }
+
+    /**
+     * @param bool $isAvailable
+     * @return Action|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createActionMock($isAvailable = true)
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Action $action */
+        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $action->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
+
+        return $action;
     }
 }

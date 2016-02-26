@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration\ConfigurationPass;
 
-use Oro\Bundle\ActionBundle\Configuration\ConfigurationPass\ReplacePropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPath;
+
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationPass\ReplacePropertyPath;
 
 class ReplacePropertyPathTest extends \PHPUnit_Framework_TestCase
 {

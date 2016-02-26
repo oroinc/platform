@@ -8,7 +8,9 @@ use Oro\Bundle\ActionBundle\Model\ActionAssembler;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
@@ -19,6 +21,31 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
 
     /** @var ActionAssembler */
     protected $assembler;
+
+    protected function setUp()
+    {
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnCallback(function ($class) {
+                return $class;
+            });
+
+        $this->assembler = new ActionAssembler(
+            $this->getFunctionFactory(),
+            $this->getConditionFactory(),
+            $this->getAttributeAssembler(),
+            $this->getFormOptionsAssembler(),
+            $this->doctrineHelper
+        );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->assembler, $this->functionFactory, $this->conditionFactory, $this->attributeAssembler);
+    }
 
     /**
      * @param array $configuration
@@ -189,26 +216,6 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    protected function setUp()
-    {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityClass')
-            ->willReturnCallback(function ($class) {
-                return $class;
-            });
-
-        $this->assembler = new ActionAssembler(
-            $this->getFunctionFactory(),
-            $this->getConditionFactory(),
-            $this->getAttributeAssembler(),
-            $this->getFormOptionsAssembler(),
-            $this->doctrineHelper
-        );
-    }
-
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|FunctionFactory
      */
@@ -247,10 +254,5 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->assembler, $this->functionFactory, $this->conditionFactory, $this->attributeAssembler);
     }
 }

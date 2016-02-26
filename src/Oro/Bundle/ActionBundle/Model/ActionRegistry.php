@@ -74,6 +74,17 @@ class ActionRegistry
     }
 
     /**
+     * @param string $name
+     * @return null|Action
+     */
+    public function findByName($name)
+    {
+        $this->loadActions();
+
+        return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
+    }
+
+    /**
      * @throws ActionReferenceException
      */
     protected function loadActions()
@@ -157,17 +168,6 @@ class ActionRegistry
         }
 
         return false;
-    }
-
-    /**
-     * @param string $name
-     * @return null|Action
-     */
-    public function findByName($name)
-    {
-        $this->loadActions();
-
-        return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
     }
 
     /**
