@@ -106,8 +106,8 @@ class ActionRegistry
         $this->normalizeGroup($group);
 
         return array_filter($this->actions, function (Action $action) use ($group) {
-            $groups = $action->getDefinition()->getGroups() ?: [''];
-            return !empty(array_intersect($group, $groups));
+            $matchedGroups = array_intersect($group, $action->getDefinition()->getGroups() ?: ['']);
+            return !empty($matchedGroups);
         });
     }
 
