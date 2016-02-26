@@ -87,18 +87,16 @@ class QueryFactory
     }
 
     /**
-     * @param array $associationMapping
-     * @param array $entityIds
-     * @param array $config
+     * @param array        $associationMapping
+     * @param array        $entityIds
+     * @param EntityConfig $config
      *
      * @return array [['entityId' => mixed, 'relatedEntityId' => mixed], ...]
      */
-    public function getRelatedItemsIds($associationMapping, $entityIds, $config)
+    public function getRelatedItemsIds($associationMapping, $entityIds, EntityConfig $config)
     {
-        $limit = isset($config[ConfigUtil::MAX_RESULTS])
-            ? $config[ConfigUtil::MAX_RESULTS]
-            : -1;
-        if ($limit > 0 && count($entityIds) > 1) {
+        $limit = $config->getMaxResults();
+        if (null !== $limit && count($entityIds) > 1) {
             $selectStmt = null;
             $subQueries = [];
             foreach ($entityIds as $id) {
@@ -139,13 +137,13 @@ class QueryFactory
     }
 
     /**
-     * @param array $associationMapping
-     * @param array $entityIds
-     * @param array $config
+     * @param array        $associationMapping
+     * @param array        $entityIds
+     * @param EntityConfig $config
      *
      * @return Query
      */
-    protected function getRelatedItemsIdsQuery($associationMapping, $entityIds, $config)
+    protected function getRelatedItemsIdsQuery($associationMapping, $entityIds, EntityConfig $config)
     {
         $qb = $this->getToManyAssociationQueryBuilder($associationMapping, $entityIds)
             ->addSelect(
@@ -160,17 +158,14 @@ class QueryFactory
 
     /**
      * @param QueryBuilder $qb
-     * @param array        $config
+     * @param EntityConfig $config
      *
      * @return Query
      */
-    public function getQuery(QueryBuilder $qb, $config)
+    public function getQuery(QueryBuilder $qb, EntityConfig $config)
     {
         $query = $qb->getQuery();
-        $this->queryHintResolver->resolveHints(
-            $query,
-            ConfigUtil::getArrayValue($config, ConfigUtil::HINTS)
-        );
+        $this->queryHintResolver->resolveHints($query, $config->getHints());
 
         return $query;
     }

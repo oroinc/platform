@@ -305,14 +305,9 @@ class FieldHelper
     public function getIdentityValues($entity)
     {
         $entityName = ClassUtils::getClass($entity);
-
         $identityFieldNames = $this->getIdentityFieldNames($entityName);
-        $identityValues = [];
-        foreach ($identityFieldNames as $identityFieldName) {
-            $identityValues[$identityFieldName] = $this->getObjectValue($entity, $identityFieldName);
-        }
 
-        return $identityValues;
+        return $this->getFieldsValues($entity, $identityFieldNames);
     }
 
     /**
@@ -334,7 +329,7 @@ class FieldHelper
      * @param string $entityName
      * @return string[]
      */
-    protected function getIdentityFieldNames($entityName)
+    public function getIdentityFieldNames($entityName)
     {
         if (!array_key_exists($entityName, $this->identityFieldsCache)) {
             $this->identityFieldsCache[$entityName] = [];
@@ -351,6 +346,21 @@ class FieldHelper
         }
 
         return $this->identityFieldsCache[$entityName];
+    }
+
+    /**
+     * @param object $entity
+     * @param array $fieldNames
+     * @return array
+     */
+    public function getFieldsValues($entity, $fieldNames)
+    {
+        $values = [];
+        foreach ($fieldNames as $fieldName) {
+            $values[$fieldName] = $this->getObjectValue($entity, $fieldName);
+        }
+
+        return $values;
     }
 
     /**

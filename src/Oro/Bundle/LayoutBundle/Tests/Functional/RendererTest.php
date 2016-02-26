@@ -241,7 +241,7 @@ class RendererTest extends LayoutTestCase
                     'groups'           => [
                         'general'    => [
                             'title'  => 'General Info',
-                            'fields' => ['user']
+                            'fields' => ['user.firstName', 'user.lastName']
                         ],
                         'additional' => [
                             'title'   => 'Additional Info',
@@ -311,7 +311,12 @@ class RendererTest extends LayoutTestCase
         /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->getContainer()->get('form.factory');
 
-        $form = $formFactory->createNamedBuilder('form_for_layout_renderer_test')
+        $form = $formFactory->createNamedBuilder(
+            'form_for_layout_renderer_test',
+            'form',
+            null,
+            ['csrf_protection' => false]
+        )
             ->add('user', new UserNameType())
             ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false])
             ->add(
@@ -378,49 +383,7 @@ HTML;
     protected function getTwigFormLayoutResult()
     {
         $expected = <<<HTML
-<fieldset>
-    <legend>Additional Info</legend>
-    <div>
-        <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_jobTitle"
-            name="form_for_layout_renderer_test[jobTitle]"
-            data-ftid="form_for_layout_renderer_test_jobTitle"/>
-    </div>
-    <div>
-        <label>Gender</label>
-        <div id="form_for_layout_renderer_test_gender" data-ftid="form_for_layout_renderer_test_gender">
-            <input type="radio"
-                id="form_for_layout_renderer_test_gender_placeholder"
-                name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_placeholder"
-                value=""/>
-            <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
-            <input type="radio"
-                id="form_for_layout_renderer_test_gender_0"
-                name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_0"
-                value="male"/>
-            <label for="form_for_layout_renderer_test_gender_0">Male</label>
-            <input type="radio"
-                id="form_for_layout_renderer_test_gender_1"
-                name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_1"
-                value="female"/>
-            <label for="form_for_layout_renderer_test_gender_1">Female</label>
-        </div>
-    </div>
-</fieldset>
-<fieldset>
-    <legend>General Info</legend>
-    <div>
-        <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_lastName"
-            name="form_for_layout_renderer_test[user][lastName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_lastName"/>
-    </div>
+<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test">
     <div>
         <label class="required">User</label>
         <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
@@ -432,22 +395,16 @@ HTML;
                     required="required"
                     data-ftid="form_for_layout_renderer_test_user_firstName"/>
             </div>
+            <div>
+                <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_lastName"
+                    name="form_for_layout_renderer_test[user][lastName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+            </div>
         </div>
     </div>
-</fieldset>
-HTML;
-
-        return $expected;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getPhpFormLayoutResult()
-    {
-        $expected = <<<HTML
-<fieldset>
-    <legend>Additional Info</legend>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
         <input type="text"
@@ -478,17 +435,19 @@ HTML;
             <label for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
-</fieldset>
-<fieldset>
-    <legend>General Info</legend>
-    <div>
-        <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_lastName"
-            name="form_for_layout_renderer_test[user][lastName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_lastName"/>
-    </div>
+</div>
+HTML;
+
+        return $expected;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPhpFormLayoutResult()
+    {
+        $expected = <<<HTML
+<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test">
     <div>
         <label class="required">User</label>
         <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
@@ -500,9 +459,47 @@ HTML;
                     required="required"
                     data-ftid="form_for_layout_renderer_test_user_firstName"/>
             </div>
+            <div>
+                <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_lastName"
+                    name="form_for_layout_renderer_test[user][lastName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+            </div>
         </div>
     </div>
-</fieldset>
+    <div>
+        <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
+        <input type="text"
+            id="form_for_layout_renderer_test_jobTitle"
+            name="form_for_layout_renderer_test[jobTitle]"
+            data-ftid="form_for_layout_renderer_test_jobTitle"/>
+    </div>
+    <div>
+        <label>Gender</label>
+        <div id="form_for_layout_renderer_test_gender" data-ftid="form_for_layout_renderer_test_gender">
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_placeholder"
+                name="form_for_layout_renderer_test[gender]"
+                data-ftid="form_for_layout_renderer_test_gender_placeholder"
+                value=""/>
+            <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_0"
+                name="form_for_layout_renderer_test[gender]"
+                data-ftid="form_for_layout_renderer_test_gender_0"
+                value="male"/>
+            <label for="form_for_layout_renderer_test_gender_0">Male</label>
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_1"
+                name="form_for_layout_renderer_test[gender]"
+                data-ftid="form_for_layout_renderer_test_gender_1"
+                value="female"/>
+            <label for="form_for_layout_renderer_test_gender_1">Female</label>
+        </div>
+    </div>
+</div>
 HTML;
 
         return $expected;

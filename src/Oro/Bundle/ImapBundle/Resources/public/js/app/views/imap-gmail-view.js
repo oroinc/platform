@@ -14,20 +14,13 @@ define(function(require) {
         },
 
         $googleErrorMessage: null,
-
         errorMessage: '',
-
         type: '',
-
         html: '',
-
-        token: '',
-
+        accessToken: '',
+        refreshToken: '',
         expiredAt: '',
-
         email: '',
-
-        googleAuthCode: '',
 
         /**
          * @constructor
@@ -35,7 +28,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
+            this.googleErrorMessage = options.googleErrorMessage;
             this.type = options.type;
         },
 
@@ -44,10 +37,10 @@ define(function(require) {
                 this.$el.html(this.html);
             }
 
-            this.$el.find('input[name$="[userEmailOrigin][accessToken]"]').val(this.token);
+            this.$el.find('input[name$="[userEmailOrigin][accessToken]"]').val(this.accessToken);
+            this.$el.find('input[name$="[userEmailOrigin][refreshToken]"]').val(this.refreshToken);
             this.$el.find('input[name$="[userEmailOrigin][user]"]').val(this.email);
             this.$el.find('input[name$="[userEmailOrigin][accessTokenExpiresAt]"]').val(this.expiredAt);
-            this.$el.find('input[name$="[userEmailOrigin][googleAuthCode]"]').val(this.googleAuthCode);
 
             if (this.errorMessage.length > 0) {
                 this.showErrorMessage();
@@ -105,18 +98,23 @@ define(function(require) {
 
         /**
          * Return values from types of form
-         * @returns {{type: string, accessToken: *, clientId: *, user: *, imapPort: *, imapHost: *, imapEncryption: *, smtpPort: *, smtpHost: *, smtpEncryption: *, accessTokenExpiresAt: *, googleAuthCode: *}}
+         * @returns {{type: string, accessToken: *, clientId: *, user: *, imapPort: *, imapHost: *, imapEncryption: *, smtpPort: *, smtpHost: *, smtpEncryption: *, accessTokenExpiresAt: *, refreshToken: *}}
          */
         getData: function() {
-            var token = this.$el.find('input[name$="[userEmailOrigin][accessToken]"]').val();
+            var accessToken = this.$el.find('input[name$="[userEmailOrigin][accessToken]"]').val();
+            var refreshToken = this.$el.find('input[name$="[userEmailOrigin][refreshToken]"]').val();
 
-            if (!token) {
-                token = this.token;
+            if (!accessToken) {
+                accessToken = this.accessToken;
+            }
+            if (!refreshToken) {
+                refreshToken = this.refreshToken;
             }
 
             return {
                 type: this.type,
-                accessToken: token,
+                accessToken: accessToken,
+                refreshToken: refreshToken,
                 clientId: this.$el.find('input[name$="[userEmailOrigin][clientId]"]').val(),
                 user: this.$el.find('input[name$="[userEmailOrigin][user]"]').val(),
                 imapPort: this.$el.find('input[name$="[userEmailOrigin][imapPort]"]').val(),
@@ -125,17 +123,24 @@ define(function(require) {
                 smtpPort: this.$el.find('input[name$="[userEmailOrigin][smtpPort]"]').val(),
                 smtpHost: this.$el.find('input[name$="[userEmailOrigin][smtpHost]"]').val(),
                 smtpEncryption: this.$el.find('input[name$="[userEmailOrigin][smtpEncryption]"]').val(),
-                accessTokenExpiresAt: this.$el.find('input[name$="[userEmailOrigin][accessTokenExpiresAt]"]').val(),
-                googleAuthCode: this.$el.find('input[name$="[userEmailOrigin][googleAuthCode]"]').val()
+                accessTokenExpiresAt: this.$el.find('input[name$="[userEmailOrigin][accessTokenExpiresAt]"]').val()
             };
         },
 
         /**
-         * Set token
+         * Set access token
          * @param {string} value
          */
-        setToken: function(value) {
-            this.token = value;
+        setAccessToken: function(value) {
+            this.accessToken = value;
+        },
+
+        /**
+         * Set refresh token
+         * @param {string} value
+         */
+        setRefreshToken: function(value) {
+            this.refreshToken = value;
         },
 
         /**
@@ -155,26 +160,32 @@ define(function(require) {
         },
 
         /**
-         * set googleAuthCode
-         * @param {string} value
-         */
-        setGoogleAuthCode: function(value) {
-            this.googleAuthCode = value;
-        },
-
-        /**
          * Change style for block with error message to show
          */
         showErrorMessage: function() {
-            this.$googleErrorMessage.html(this.errorMessage);
-            this.$googleErrorMessage.show();
+            var $errorBlock = this.getErrorBlock();
+
+            if ($errorBlock.length > 0) {
+                $errorBlock.html(this.errorMessage);
+                $errorBlock.show();
+            }
         },
 
         /**
          * Change style for block with error message to hide
          */
         hideErrorMessage: function() {
-            this.$googleErrorMessage.hide();
+            var $errorBlock = this.getErrorBlock();
+            if ($errorBlock.length > 0) {
+                $errorBlock.hide();
+            }
+        },
+
+        /**
+         * @returns {*}
+         */
+        getErrorBlock: function() {
+            return this.$el.find(this.googleErrorMessage);
         },
 
         /**
