@@ -109,6 +109,9 @@ abstract class AbstractFilter implements FilterInterface
         return $metadata;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function resolveOptions()
     {
         $this->params[FilterUtility::FORM_OPTIONS_KEY] = array_merge(
