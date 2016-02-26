@@ -5,9 +5,9 @@ namespace Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Exception;
 
 /**
- * Checks array or collection has not elements.
+ * Checks array or collection has elements.
  */
-class HasElements extends HasNotElements
+class HasElements extends NoElements
 {
     /**
      * {@inheritdoc}

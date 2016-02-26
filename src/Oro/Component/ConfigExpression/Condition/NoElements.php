@@ -7,13 +7,11 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
 
 /**
- * Checks array or collection has elements.
+ * Checks array or collection has no any elements.
  */
-class HasNotElements extends AbstractCondition implements ContextAccessorAwareInterface
+class NoElements extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
-
-    const ALLOWED_OPTIONS_COUNT = 1;
 
     /** @var mixed */
     protected $value;
@@ -23,7 +21,7 @@ class HasNotElements extends AbstractCondition implements ContextAccessorAwareIn
      */
     public function getName()
     {
-        return 'has_not_elements';
+        return 'no_elements';
     }
 
     /**
@@ -47,11 +45,11 @@ class HasNotElements extends AbstractCondition implements ContextAccessorAwareIn
      */
     public function initialize(array $options)
     {
-        if (self::ALLOWED_OPTIONS_COUNT === count($options)) {
+        if (1 === count($options)) {
             $this->value = reset($options);
         } else {
             throw new Exception\InvalidArgumentException(
-                sprintf('Options must have ' . self::ALLOWED_OPTIONS_COUNT . ' element, but %d given.', count($options))
+                sprintf('Options must have 1 element, but %d given.', count($options))
             );
         }
 

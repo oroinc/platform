@@ -6,27 +6,27 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Condition\HasNotElements;
+use Oro\Component\ConfigExpression\Condition\NoElements;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
-class HasNotElementsTest extends \PHPUnit_Framework_TestCase
+class NoElementsTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var HasNotElements */
+    /** @var NoElements */
     protected $condition;
 
     protected function setUp()
     {
-        $this->condition = new HasNotElements();
+        $this->condition = new NoElements();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      * @param array $options
-     * @param $context
-     * @param $expectedResult
+     * @param array $context
+     * @param bool $expectedResult
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, $expectedResult)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -110,7 +110,7 @@ class HasNotElementsTest extends \PHPUnit_Framework_TestCase
                 'options'  => ['value'],
                 'message'  => null,
                 'expected' => [
-                    '@has_not_elements' => [
+                    '@no_elements' => [
                         'parameters' => [
                             'value'
                         ]
@@ -121,7 +121,7 @@ class HasNotElementsTest extends \PHPUnit_Framework_TestCase
                 'options'  => ['value'],
                 'message'  => 'Test message',
                 'expected' => [
-                    '@has_not_elements' => [
+                    '@no_elements' => [
                         'message'    => 'Test message',
                         'parameters' => [
                             'value'
@@ -154,17 +154,17 @@ class HasNotElementsTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => ['value'],
                 'message'  => null,
-                'expected' => '$factory->create(\'has_not_elements\', [\'value\'])'
+                'expected' => '$factory->create(\'no_elements\', [\'value\'])'
             ],
             [
                 'options'  => ['value'],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'has_not_elements\', [\'value\'])->setMessage(\'Test\')'
+                'expected' => '$factory->create(\'no_elements\', [\'value\'])->setMessage(\'Test\')'
             ],
             [
                 'options'  => [new PropertyPath('foo[bar].baz')],
                 'message'  => null,
-                'expected' => '$factory->create(\'has_not_elements\', ['
+                'expected' => '$factory->create(\'no_elements\', ['
                     . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath('
                     . '\'foo[bar].baz\', [\'foo\', \'bar\', \'baz\'], [false, true, false])'
                     . '])'

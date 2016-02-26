@@ -53,10 +53,10 @@ services:
         tags:
             - { name: oro_layout.expression, alias: has_elements }
 
-    oro_layout.expression.has_not_elements:
-        class: Oro\Component\ConfigExpression\Condition\HasNotElements
+    oro_layout.expression.no_elements:
+        class: Oro\Component\ConfigExpression\Condition\NoElements
         tags:
-            - { name: oro_layout.expression, alias: has_not_elements }
+            - { name: oro_layout.expression, alias: no_elements }
 
     oro_layout.expression.has_value:
         class: Oro\Component\ConfigExpression\Condition\HasValue

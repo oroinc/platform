@@ -23,10 +23,10 @@ class HasElementsTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider evaluateDataProvider
      * @param array $options
-     * @param $context
-     * @param $expectedResult
+     * @param array $context
+     * @param bool $expectedResult
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, $expectedResult)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));

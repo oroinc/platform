@@ -72,10 +72,10 @@ services:
         tags:
             - { name: oro_workflow.expression, alias: has_elements }
 
-    oro_workflow.expression.has_not_elements:
-        class: Oro\Component\ConfigExpression\Condition\HasNotElements
+    oro_workflow.expression.no_elements:
+        class: Oro\Component\ConfigExpression\Condition\NoElements
         tags:
-            - { name: oro_workflow.expression, alias: has_not_elements }
+            - { name: oro_workflow.expression, alias: no_elements }
 
     oro_workflow.expression.has_value:
         class: Oro\Component\ConfigExpression\Condition\HasValue
