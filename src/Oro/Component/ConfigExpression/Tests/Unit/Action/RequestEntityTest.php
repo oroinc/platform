@@ -4,8 +4,8 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\RequestEntity;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\RequestEntity;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class RequestEntityTest extends \PHPUnit_Framework_TestCase
@@ -65,7 +65,7 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
     public function testInitializeException(array $options, $expectedMessage)
     {
         $this->setExpectedException(
-            '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+            '\Oro\Component\Action\Exception\InvalidParameterException',
             $expectedMessage
         );
 
@@ -122,7 +122,7 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NotManageableEntityException
+     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
      * @expectedExceptionMessage Entity class "\stdClass" is not manageable.
      */
     public function testExecuteNotManageableEntity()

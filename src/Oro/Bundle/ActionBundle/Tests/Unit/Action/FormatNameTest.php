@@ -23,7 +23,7 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
@@ -37,7 +37,7 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Object parameter is required
      */
     public function testInitializeExceptionNoObject()
@@ -46,7 +46,7 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Attribute name parameter is required
      */
     public function testInitializeExceptionNoAttribute()

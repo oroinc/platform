@@ -33,7 +33,7 @@ To add custom action add a service to DIC with tag "oro_workflow.action", for ex
 
 ```
 parameters:
-    oro_workflow.action.close_workflow.class: Oro\Component\ConfigExpression\Action\CloseWorkflow
+    oro_workflow.action.close_workflow.class: Oro\Component\Action\Action\CloseWorkflow
 services:
     oro_workflow.action.close_workflow:
         class: %oro_workflow.action.close_workflow.class%
@@ -42,7 +42,7 @@ services:
 ```
 
 Symbol "|" in alias can be used to have several aliases. Note that service class must implement
-Oro\Component\ConfigExpression\Action\ActionInterface.
+Oro\Component\Action\Action\ActionInterface.
 
 Configuration Syntax
 --------------------
@@ -77,7 +77,7 @@ See syntax examples:
 Assign Value
 ------------
 
-**Class:** Oro\Component\ConfigExpression\Action\AssignValue
+**Class:** Oro\Component\Action\Action\AssignValue
 
 **Alias:** assign_value
 
@@ -108,7 +108,7 @@ OR
 Assign Active User
 ------------------
 
-**Class** Oro\Component\ConfigExpression\Action\AssignActiveUser
+**Class** Oro\Component\Action\Action\AssignActiveUser
 
 **Alias** assign_active_user or get_active_user
 
@@ -131,7 +131,7 @@ OR
 Unset Value
 ------------
 
-**Class:** Oro\Component\ConfigExpression\Action\UnsetValue
+**Class:** Oro\Component\Action\Action\UnsetValue
 
 **Alias:** unset_value
 
@@ -160,7 +160,7 @@ OR
 Create Object
 -------------
 
-**Class:** Oro\Component\ConfigExpression\Action\CreateObject
+**Class:** Oro\Component\Action\Action\CreateObject
 
 **Alias:** create_object
 
@@ -192,7 +192,7 @@ OR
 Create Entity
 -------------
 
-**Class:** Oro\Component\ConfigExpression\Action\CreateEntity
+**Class:** Oro\Component\Action\Action\CreateEntity
 
 **Alias:** create_entity
 
@@ -236,7 +236,7 @@ OR
 Remove Entity
 -------------
 
-**Class:** Oro\Component\ConfigExpression\Action\RemoveEntity
+**Class:** Oro\Component\Action\Action\RemoveEntity
 
 **Alias:** remove_entity
 
@@ -289,7 +289,7 @@ OR
 Find Entity
 -----------
 
-**Class:** Oro\Component\ConfigExpression\Action\RequestEntity
+**Class:** Oro\Component\Action\Action\RequestEntity
 
 **Alias:** find_entity|request_entity
 
@@ -355,7 +355,7 @@ Format Name
 Format String
 -------------
 
-**Class:** Oro\Component\ConfigExpression\Action\FormatString
+**Class:** Oro\Component\Action\Action\FormatString
 
 **Alias:** format_string
 
@@ -379,7 +379,7 @@ Format String
 Call Method
 -----------
 
-**Class:** Oro\Component\ConfigExpression\Action\CallMethod
+**Class:** Oro\Component\Action\Action\CallMethod
 
 **Alias:** call_method
 
@@ -444,7 +444,7 @@ OR
 Create Date Time
 ----------------
 
-**Class:** Oro\Component\ConfigExpression\Action\CreateDateTime
+**Class:** Oro\Component\Action\Action\CreateDateTime
 
 **Alias:** create_datetime
 
@@ -552,7 +552,7 @@ OR
 Redirect
 --------
 
-**Class:** Oro\Component\ConfigExpression\Action\Redirect
+**Class:** Oro\Component\Action\Action\Redirect
 
 **Alias:** redirect
 
@@ -585,7 +585,7 @@ OR
 Tree Executor
 -------------
 
-**Class:** Oro\Component\ConfigExpression\Action\TreeExecutor
+**Class:** Oro\Component\Action\Action\TreeExecutor
 
 **Alias:** tree
 
@@ -617,7 +617,7 @@ OR
 Foreach
 -------
 
-**Class:** Oro\Component\ConfigExpression\Action\Traverse
+**Class:** Oro\Component\Action\Action\Traverse
 
 **Alias:** traverse|foreach
 
@@ -645,7 +645,7 @@ OR
 Configurable
 ------------
 
-**Class:** Oro\Component\ConfigExpression\Action\Configurable
+**Class:** Oro\Component\Action\Action\Configurable
 
 **Alias:** configurable
 
@@ -680,7 +680,7 @@ $configurableAction->execute($context); // build list of actions and execute the
 Flash Message
 -------------
 
-**Class:** Oro\Component\ConfigExpression\Action\FlashMessage
+**Class:** Oro\Component\Action\Action\FlashMessage
 
 **Alias:** flash_message
 

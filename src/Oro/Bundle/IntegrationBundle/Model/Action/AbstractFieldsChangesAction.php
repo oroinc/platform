@@ -3,8 +3,8 @@
 namespace Oro\Bundle\IntegrationBundle\Model\Action;
 
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
-use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Component\ConfigExpression\Action\AbstractAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Action\AbstractAction;
 
 abstract class AbstractFieldsChangesAction extends AbstractAction
 {

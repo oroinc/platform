@@ -5,10 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
-use Oro\Component\ConfigExpression\Action\ActionFactory;
-use Oro\Component\ConfigExpression\Action\Configurable as ConfigurableAction;
-use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Component\ConfigExpression\Model\AbstractAssembler;
+use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\Configurable as ConfigurableAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Model\AbstractAssembler;
 
 /**
  * Assembles form options that can be passed to transition and step

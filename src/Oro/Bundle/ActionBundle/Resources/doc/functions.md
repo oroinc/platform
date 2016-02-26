@@ -10,7 +10,7 @@ Table of Contents
 Call Service Method
 -------------------
 
-**Class:** Oro\Component\ConfigExpression\Action\CallServiceMethod
+**Class:** Oro\Component\Action\Action\CallServiceMethod
 
 **Alias:** call_service_method
 
@@ -45,7 +45,7 @@ OR
 Find Entities
 -------------
 
-**Class:** Oro\Component\ConfigExpression\Action\FindEntities
+**Class:** Oro\Component\Action\Action\FindEntities
 
 **Alias:** find_entities
 

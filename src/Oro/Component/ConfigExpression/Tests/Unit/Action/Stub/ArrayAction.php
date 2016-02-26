@@ -4,9 +4,9 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Component\ConfigExpression\Action\ActionInterface;
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
-use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
+use Oro\Component\Action\Exception\InvalidParameterException;
 
 class ArrayAction extends ArrayCollection implements ActionInterface
 {

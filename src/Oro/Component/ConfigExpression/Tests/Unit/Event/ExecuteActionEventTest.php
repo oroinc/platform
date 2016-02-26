@@ -2,7 +2,7 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
-use Oro\Component\ConfigExpression\Event\ExecuteActionEvent;
+use Oro\Component\Action\Event\ExecuteActionEvent;
 
 class ExecuteActionEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class ExecuteActionEventTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
+        $this->action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->getMock();
 
         $this->context = new \stdClass();

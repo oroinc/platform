@@ -5,8 +5,8 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\User\User;
 
-use Oro\Component\ConfigExpression\Action\AssignActiveUser;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\AssignActiveUser;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
@@ -87,7 +87,7 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
         return array(
             'no options' => array(
                 'options' => array(),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Only one attribute parameter must be defined',
             ),
             'too many options' => array(
@@ -95,21 +95,21 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
                     'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
                     'additional' => 'value'
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Only one attribute parameter must be defined',
             ),
             'no attribute' => array(
                 'options' => array(
                     'additional' => 'value'
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Attribute must be defined',
             ),
             'not a property path' => array(
                 'options' => array(
                     'attribute' => self::ATTRIBUTE_NAME,
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Attribute must be valid property definition',
             ),
         );

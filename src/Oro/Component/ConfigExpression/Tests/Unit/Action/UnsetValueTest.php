@@ -2,9 +2,9 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
-use Oro\Component\ConfigExpression\Action\ActionInterface;
-use Oro\Component\ConfigExpression\Action\AssignValue;
-use Oro\Component\ConfigExpression\Action\UnsetValue;
+use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Action\AssignValue;
+use Oro\Component\Action\Action\UnsetValue;
 
 class UnsetValueTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class UnsetValueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->assignValue = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\AssignValue')
+        $this->assignValue = $this->getMockBuilder('Oro\Component\Action\Action\AssignValue')
             ->disableOriginalConstructor()
             ->getMock();
 

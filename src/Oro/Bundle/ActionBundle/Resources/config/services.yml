@@ -1,5 +1,5 @@
 parameters:
-    oro_action.context_accessor.class: Oro\Component\ConfigExpression\Model\ContextAccessor
+    oro_action.context_accessor.class: Oro\Component\Action\Model\ContextAccessor
     oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
     oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager

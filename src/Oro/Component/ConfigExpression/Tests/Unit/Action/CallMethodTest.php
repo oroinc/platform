@@ -4,8 +4,8 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\CallMethod;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\CallMethod;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CallMethodTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +25,7 @@ class CallMethodTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Method name parameter is required
      */
     public function testInitializeNoMethod()
@@ -34,7 +34,7 @@ class CallMethodTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Object must be valid property definition
      */
     public function testInitializeInvalidObject()
@@ -56,7 +56,7 @@ class CallMethodTest extends \PHPUnit_Framework_TestCase
             'attribute' => 'test'
         );
         $this->assertInstanceOf(
-            'Oro\Component\ConfigExpression\Action\ActionInterface',
+            'Oro\Component\Action\Action\ActionInterface',
             $this->action->initialize($options)
         );
         $this->assertAttributeEquals($options, 'options', $this->action);

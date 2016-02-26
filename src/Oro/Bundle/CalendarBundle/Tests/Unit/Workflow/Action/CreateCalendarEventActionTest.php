@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Workflow\Action;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\CalendarBundle\Workflow\Action\CreateCalendarEventAction;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Model\ContextAccessor;
 
 class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
 {
@@ -96,7 +96,7 @@ class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
 
         if ($exceptionMessage) {
             $this->setExpectedException(
-                '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                '\Oro\Component\Action\Exception\InvalidParameterException',
                 $exceptionMessage
             );
         }

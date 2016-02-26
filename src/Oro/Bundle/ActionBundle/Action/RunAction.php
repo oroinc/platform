@@ -7,9 +7,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Component\ConfigExpression\Action\AbstractAction;
-use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Model\ContextAccessor;
 
 class RunAction extends AbstractAction
 {

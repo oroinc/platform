@@ -4,9 +4,9 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
-use Oro\Component\ConfigExpression\Action\ActionInterface;
-use Oro\Component\ConfigExpression\Action\RemoveEntity;
+use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Action\RemoveEntity;
 
 class RemoveEntityTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,7 +40,7 @@ class RemoveEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
@@ -68,7 +68,7 @@ class RemoveEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Action "remove_entity" expects reference to entity as parameter, string is given.
      */
     public function testExecuteNotObjectException()
@@ -80,7 +80,7 @@ class RemoveEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NotManageableEntityException
+     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
      * @expectedExceptionMessage Entity class "stdClass" is not manageable.
      */
     public function testExecuteNotManageableException()

@@ -6,8 +6,8 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
-use Oro\Component\ConfigExpression\Condition\Configurable as ConfigurableCondition;
-use Oro\Component\ConfigExpression\Action\Configurable as ConfigurableAction;
+use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,7 +64,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->actionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
+        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
         $this->assembler = new TransitionAssembler(
@@ -75,7 +75,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\AssemblerException
+     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider missedTransitionDefinitionDataProvider
      * @param array $configuration
      */
@@ -103,7 +103,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\AssemblerException
+     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider incorrectTransitionDefinitionDataProvider
      * @param array $definitions
      */
@@ -133,7 +133,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\AssemblerException
+     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider incorrectStepsDataProvider
      * @param array $steps
      */
@@ -412,7 +412,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function createAction()
     {
-        return $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
+        return $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->getMockForAbstractClass();
     }
 }

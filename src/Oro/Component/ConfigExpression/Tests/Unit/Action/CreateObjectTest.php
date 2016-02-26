@@ -4,8 +4,8 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\CreateObject;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\CreateObject;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CreateObjectTest extends \PHPUnit_Framework_TestCase
@@ -37,7 +37,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Class name parameter is required
      */
     public function testInitializeExceptionNoClassName()
@@ -46,7 +46,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Attribute name parameter is required
      */
     public function testInitializeExceptionNoAttribute()
@@ -55,7 +55,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Attribute must be valid property definition.
      */
     public function testInitializeExceptionInvalidAttribute()
@@ -64,7 +64,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Object data must be an array.
      */
     public function testInitializeExceptionInvalidData()
@@ -75,7 +75,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Object constructor arguments must be an array.
      */
     public function testInitializeExceptionInvalidArguments()

@@ -2,8 +2,8 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
-use Oro\Component\ConfigExpression\Action\Redirect;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\Redirect;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class RedirectTest extends \PHPUnit_Framework_TestCase
@@ -100,7 +100,7 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
         return array(
             'no name' => array(
                 'options' => array(),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Either url or route parameter must be specified',
             ),
             'invalid route parameters' => array(
@@ -108,7 +108,7 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
                     'route' => 'test_route_name',
                     'route_parameters' => 'stringData',
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Route parameters must be an array',
             ),
         );

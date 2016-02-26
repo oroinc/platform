@@ -183,7 +183,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                         ),
                     ),
                     'attribute_default_values' => array('first' => 'Test'),
-                    'init_actions' => $this->getMock('Oro\Component\ConfigExpression\Action\ActionInterface')
+                    'init_actions' => $this->getMock('Oro\Component\Action\Action\ActionInterface')
                 ),
                 'childrenOptions' => array(
                     'first'  => array('label' => 'First Custom', 'required' => true),

@@ -4,8 +4,8 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\CreateEntity;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\CreateEntity;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CreateEntityTest extends \PHPUnit_Framework_TestCase
@@ -122,7 +122,7 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NotManageableEntityException
+     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
      * @expectedExceptionMessage Entity class "stdClass" is not manageable.
      */
     public function testExecuteEntityNotManageable()
@@ -137,7 +137,7 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\ActionException
+     * @expectedException \Oro\Component\Action\Exception\ActionException
      * @expectedExceptionMessage Can't create entity stdClass. Test exception.
      */
     public function testExecuteCantCreateEntity()

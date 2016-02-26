@@ -2,8 +2,8 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
-use Oro\Component\ConfigExpression\Action\AssignValue;
-use Oro\Component\ConfigExpression\Action\ActionInterface;
+use Oro\Component\Action\Action\AssignValue;
+use Oro\Component\Action\Action\ActionInterface;
 
 class AssignValueTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->action = new AssignValue($this->contextAccessor);
@@ -30,7 +30,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Attribute and value parameters are required.
      * @dataProvider invalidOptionsNumberDataProvider
      * @param array $options
@@ -52,7 +52,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Attribute must be valid property definition.
      * @dataProvider invalidOptionsAttributeDataProvider
      * @param array $options
@@ -71,7 +71,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Attribute must be defined.
      */
     public function testInitializeExceptionNoAttribute()
@@ -80,7 +80,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Value must be defined.
      */
     public function testInitializeExceptionNoValue()
@@ -95,7 +95,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
     public function testInitialize($options)
     {
         $this->assertInstanceOf(
-            'Oro\Component\ConfigExpression\Action\ActionInterface',
+            'Oro\Component\Action\Action\ActionInterface',
             $this->action->initialize($options)
         );
 

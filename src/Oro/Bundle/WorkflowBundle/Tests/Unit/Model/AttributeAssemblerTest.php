@@ -53,22 +53,22 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
         return array(
             'no_options' => array(
                 array('name' => array('property_path' => null)),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Option "label" is required'
             ),
             'no_type' => array(
                 array('name' => array('label' => 'test', 'property_path' => null)),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Option "type" is required'
             ),
             'no_label' => array(
                 array('name' => array('type' => 'test', 'property_path' => null)),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Option "label" is required'
             ),
             'invalid_type' => array(
                 array('name' => array('label' => 'Label', 'type' => 'text', 'property_path' => null)),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Invalid attribute type "text", allowed types are "bool", "boolean", "int", "integer", ' .
                     '"float", "string", "array", "object", "entity"'
             ),
@@ -79,17 +79,17 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                         'property_path' => null
                     )
                 ),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Option "class" cannot be used in attribute "name"'
             ),
             'missing_object_class' => array(
                 array('name' => array('label' => 'Label', 'type' => 'object', 'property_path' => null)),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Option "class" is required in attribute "name"'
             ),
             'missing_entity_class' => array(
                 array('name' => array('label' => 'Label', 'type' => 'entity', 'property_path' => null)),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Option "class" is required in attribute "name"'
             ),
             'invalid_class' => array(
@@ -99,7 +99,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                         'property_path' => null
                     )
                 ),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Class "InvalidClass" referenced by "class" option in attribute "name" not found'
             ),
             'not_allowed_entity_acl' => array(
@@ -109,7 +109,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                         'entity_acl' => array('update' => false),
                     )
                 ),
-                'Oro\Component\ConfigExpression\Exception\AssemblerException',
+                'Oro\Component\Action\Exception\AssemblerException',
                 'Attribute "Label" with type "object" can\'t have entity ACL'
             ),
         );

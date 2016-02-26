@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 
@@ -131,14 +131,14 @@ class StartWorkflowTest extends \PHPUnit_Framework_TestCase
         return array(
             'no name' => array(
                 'options' => array(),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Workflow name parameter is required',
             ),
             'no attribute' => array(
                 'options' => array(
                     'name' => 'acmeWorkflow'
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Attribute name parameter is required',
             ),
             'invalid attribute' => array(
@@ -146,7 +146,7 @@ class StartWorkflowTest extends \PHPUnit_Framework_TestCase
                     'name' => 'acmeWorkflow',
                     'attribute' => 'notPropertyPath'
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Attribute must be valid property definition',
             ),
             'invalid entity' => array(
@@ -155,7 +155,7 @@ class StartWorkflowTest extends \PHPUnit_Framework_TestCase
                     'attribute' => new PropertyPath('workflowItem'),
                     'entity' => 'notPropertyPath'
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Entity must be valid property definition',
             ),
         );
@@ -202,7 +202,7 @@ class StartWorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Entity value must be an object
      */
     public function testExecuteEntityNotAnObject()

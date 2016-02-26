@@ -4,8 +4,8 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
-use Oro\Component\ConfigExpression\Action\Traverse;
+use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\Action\Action\Traverse;
 use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\StubStorage;
 
 class TraverseTest extends \PHPUnit_Framework_TestCase
@@ -22,7 +22,7 @@ class TraverseTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configurableAction = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\Configurable')
+        $this->configurableAction = $this->getMockBuilder('Oro\Component\Action\Action\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -74,7 +74,7 @@ class TraverseTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $options, $message)
     {
-        $this->setExpectedException('Oro\Component\ConfigExpression\Exception\InvalidParameterException', $message);
+        $this->setExpectedException('Oro\Component\Action\Exception\InvalidParameterException', $message);
         $this->configurableAction->expects($this->never())->method('initialize');
         $this->action->initialize($options);
     }

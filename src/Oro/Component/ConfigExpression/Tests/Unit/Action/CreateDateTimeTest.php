@@ -4,8 +4,8 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\CreateDateTime;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\CreateDateTime;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
@@ -37,7 +37,7 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Option "attribute" name parameter is required
      */
     public function testInitializeExceptionNoAttribute()
@@ -46,7 +46,7 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Option "attribute" must be valid property definition.
      */
     public function testInitializeExceptionInvalidAttribute()
@@ -55,7 +55,7 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Option "time" must be a string, boolean given.
      */
     public function testInitializeExceptionInvalidTime()
@@ -64,7 +64,7 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Option "timezone" must be a string or instance of DateTimeZone, boolean given.
      */
     public function testInitializeExceptionInvalidTimezone()

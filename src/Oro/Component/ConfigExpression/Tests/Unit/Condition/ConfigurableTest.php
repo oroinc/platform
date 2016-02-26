@@ -2,7 +2,7 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
-use Oro\Component\ConfigExpression\Condition\Configurable;
+use Oro\Component\Action\Condition\Configurable;
 
 class ConfigurableTest extends \PHPUnit_Framework_TestCase
 {

@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\FormatString;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\FormatString;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class FormatStringTest extends \PHPUnit_Framework_TestCase
@@ -121,21 +121,21 @@ class FormatStringTest extends \PHPUnit_Framework_TestCase
         return array(
             'no attribute' => array(
                 'options' => array(),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Attribute name parameter is required',
             ),
             'incorrect attribute' => array(
                 'options' => array(
                     'attribute' => 'string'
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Attribute must be valid property definition',
             ),
             'no string' => array(
                 'options' => array(
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'String parameter must be specified',
             ),
             'incorrect arguments' => array(
@@ -144,7 +144,7 @@ class FormatStringTest extends \PHPUnit_Framework_TestCase
                     'string' => $this->testString,
                     'arguments' => 'not array',
                 ),
-                'exceptionName' => '\Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Argument parameter must be either array or PropertyPath',
             ),
         );
@@ -172,7 +172,7 @@ class FormatStringTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Argument parameter must be traversable
      */
     public function testNotTraversableArguments()

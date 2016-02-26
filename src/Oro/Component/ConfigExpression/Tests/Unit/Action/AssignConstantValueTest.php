@@ -4,9 +4,9 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
-use Oro\Component\ConfigExpression\Action\ActionInterface;
-use Oro\Component\ConfigExpression\Action\AssignConstantValue;
+use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Action\AssignConstantValue;
 
 class AssignConstantValueTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +34,7 @@ class AssignConstantValueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
@@ -84,7 +84,7 @@ class AssignConstantValueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Cannot evaluate value of "someValue", constant is not exist.
      */
     public function testExecuteIncorrectUnknownConstant()
@@ -101,7 +101,7 @@ class AssignConstantValueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Cannot evaluate value of "UnknownClass1000::someValue", class is not exist.
      */
     public function testExecuteIncorrectNoClass()
@@ -118,7 +118,7 @@ class AssignConstantValueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Action "assign_constant_value" expects a string in parameter "value", array is given.
      */
     public function testExecuteException()

@@ -6,8 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Action\CallServiceMethod;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Action\CallServiceMethod;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\TestService;
 
@@ -50,7 +50,7 @@ class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertInstanceOf(
-            'Oro\Component\ConfigExpression\Action\ActionInterface',
+            'Oro\Component\Action\Action\ActionInterface',
             $this->action->initialize($options)
         );
 
@@ -87,14 +87,14 @@ class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'inputData' => [],
-                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Service name parameter is required'
             ],
             [
                 'inputData' => [
                     'service' => 'test_service'
                 ],
-                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Undefined service with name "test_service"',
                 'hasService' => false
             ],
@@ -102,7 +102,7 @@ class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
                 'inputData' => [
                     'service' => 'test_service'
                 ],
-                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Method name parameter is required'
             ],
             [
@@ -110,7 +110,7 @@ class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
                     'service' => 'test_service',
                     'method' => 'test_method'
                 ],
-                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Could not found public method "test_method" in service "test_service"'
             ]
         ];

@@ -1,7 +1,7 @@
 parameters:
     oro_workflow.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Configuration\ConfigurationPass\ReplacePropertyPath
 
-    oro_workflow.action_assembler.class: Oro\Component\ConfigExpression\Action\ActionAssembler
+    oro_workflow.action_assembler.class: Oro\Component\Action\Action\ActionAssembler
     oro_workflow.attribute_assembler.class: Oro\Bundle\WorkflowBundle\Model\AttributeAssembler
     oro_workflow.step_assembler.class: Oro\Bundle\WorkflowBundle\Model\StepAssembler
     oro_workflow.transition_assembler.class: Oro\Bundle\WorkflowBundle\Model\TransitionAssembler

@@ -4,10 +4,10 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\ArrayAction;
 use Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\ArrayCondition;
-use Oro\Component\ConfigExpression\Action\ActionAssembler;
-use Oro\Component\ConfigExpression\Action\ActionInterface;
-use Oro\Component\ConfigExpression\Action\TreeExecutor;
-use Oro\Component\ConfigExpression\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionAssembler;
+use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Action\TreeExecutor;
+use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
@@ -22,7 +22,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $test = $this;
 
-        $actionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
+        $actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->setMethods(array('create'))
             ->getMock();
@@ -83,7 +83,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         $assembler->addConfigurationPass($configurationPass);
         /** @var TreeExecutor $actualTree */
         $actualTree = $assembler->assemble($source);
-        $this->assertInstanceOf('Oro\Component\ConfigExpression\Action\TreeExecutor', $actualTree);
+        $this->assertInstanceOf('Oro\Component\Action\Action\TreeExecutor', $actualTree);
         $this->assertEquals($expected, $this->getActions($actualTree));
     }
 
@@ -280,7 +280,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getTreeExecutorActionReflection()
     {
-        $reflection = new \ReflectionProperty('Oro\Component\ConfigExpression\Action\TreeExecutor', 'actions');
+        $reflection = new \ReflectionProperty('Oro\Component\Action\Action\TreeExecutor', 'actions');
         $reflection->setAccessible(true);
 
         return $reflection;
@@ -293,7 +293,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $test = $this;
 
-        $treeExecutor = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\TreeExecutor')
+        $treeExecutor = $this->getMockBuilder('Oro\Component\Action\Action\TreeExecutor')
             ->setMethods(array('addAction'))
             ->getMock();
         $treeExecutor->expects($this->any())
@@ -320,7 +320,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         $condition = null;
         if ($postAction instanceof TreeExecutor) {
             $reflection = new \ReflectionProperty(
-                'Oro\Component\ConfigExpression\Action\TreeExecutor',
+                'Oro\Component\Action\Action\TreeExecutor',
                 'condition'
             );
             $reflection->setAccessible(true);

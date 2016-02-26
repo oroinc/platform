@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Event\ProcessEvents;
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
-use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
+use Oro\Component\Action\Exception\InvalidParameterException;
 
 class ProcessHandler
 {

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Component\ConfigExpression\Action\ActionInterface as BaseActionInterface;
+use Oro\Component\Action\Action\ActionInterface as BaseActionInterface;
 
 /**
- * @deprecated since 1.10. Use {@see Oro\Component\ConfigExpression\Action\ActionInterface} instead
+ * @deprecated since 1.10. Use {@see Oro\Component\Action\Action\ActionInterface} instead
  */
 interface ActionInterface extends BaseActionInterface
 {

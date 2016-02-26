@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Model\Condition;
 
-use Oro\Component\ConfigExpression\Condition\AbstractConfigurableCondition;
+use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
@@ -17,7 +17,7 @@ use Oro\Component\ConfigExpression\Exception;
  * Class IsInstanceOf
  * @package Oro\Bundle\EmailBundle\Model\Condition
  */
-class IsInstanceOf extends AbstractConfigurableCondition implements ContextAccessorAwareInterface
+class IsInstanceOf extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
 
