@@ -22,8 +22,9 @@ class ConfigUpdateCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:config:update')
-            ->setDescription('Application config update.')
-            ->addOption('application-url', null, InputOption::VALUE_REQUIRED, 'Application URL');
+            ->setDescription('Global application config update.')
+            ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Config name')
+            ->addOption('value', null, InputOption::VALUE_REQUIRED, 'Config value');
     }
 
     /**
@@ -32,10 +33,33 @@ class ConfigUpdateCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $options = $input->getOptions();
-        if (!empty($options['application-url'])) {
-            $this->getConfigManager()->set('oro_ui.application_url', $options['application-url']);
+        $this->checkRequiredOptions($options);
+
+        if (!empty($options['name'])) {
+            $this->getConfigManager()->set($options['name'], $options['value']);
         }
         $this->getConfigManager()->flush();
+    }
+
+    /**
+     * @param array $options
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    protected function checkRequiredOptions($options)
+    {
+        $requiredOptions = [
+            'name',
+            'value'
+        ];
+
+        foreach ($requiredOptions as $requiredOption) {
+            if (empty($options[$requiredOption])) {
+                throw new \InvalidArgumentException('--' . $requiredOption . ' option required');
+            }
+        }
+
+        return $this;
     }
 
     /**
