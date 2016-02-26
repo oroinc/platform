@@ -7,7 +7,10 @@ use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
+use Oro\Bundle\EntityExtendBundle\Exception\InvalidRelationEntityException;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -77,7 +80,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         array $relation
     ) {
         $targetEntity   = $relation['target_entity'];
-        $targetIdColumn = $this->getPrimaryKeyColumn($targetEntity);
+        $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
         $cascade        = !empty($relation['cascade']) ? $relation['cascade'] : [];
         $cascade[]      = 'detach';
 
@@ -128,12 +131,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             && RelationType::ONE_TO_MANY === ExtendHelper::getRelationType($relationKey)
             && $this->isDefaultRelationRequired($fieldId)
         ) {
-            $this->buildDefaultRelation(
-                $metadataBuilder,
-                $fieldId,
-                $targetEntity,
-                $this->getPrimaryKeyColumn($targetEntity)
-            );
+            $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
         }
     }
 
@@ -152,12 +150,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         if ($relation['owner']) {
             $this->buildManyToManyOwningSideRelation($metadataBuilder, $fieldId, $relation);
             if ($this->isDefaultRelationRequired($fieldId)) {
-                $this->buildDefaultRelation(
-                    $metadataBuilder,
-                    $fieldId,
-                    $targetEntity,
-                    $this->getPrimaryKeyColumn($targetEntity)
-                );
+                $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
             }
         } elseif (!empty($relation['target_field_id'])) {
             $this->buildManyToManyTargetSideRelation(
@@ -193,8 +186,8 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             $fieldId->getFieldName(),
             $targetEntity
         );
-        $selfIdColumn    = $this->getPrimaryKeyColumn($entityClassName);
-        $targetIdColumn = $this->getPrimaryKeyColumn($targetEntity);
+        $selfIdColumn = $this->getSinglePrimaryKeyColumn($entityClassName);
+        $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
         $builder->setJoinTable($joinTableName);
 
         if ($selfIdColumn !== 'id') {
@@ -251,22 +244,23 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      * @param ClassMetadataBuilder $metadataBuilder
      * @param FieldConfigId        $fieldId
      * @param string               $targetEntity
-     * @param string               $targetIdColumn
      *
      */
     protected function buildDefaultRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
-        $targetEntity,
-        $targetIdColumn
+        $targetEntity
     ) {
-        $builder = $metadataBuilder->createManyToOne(
+        $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
+        $builder        = $metadataBuilder->createManyToOne(
             ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName(),
             $targetEntity
         );
-
         $builder->addJoinColumn(
-            $this->nameGenerator->generateRelationDefaultColumnName($fieldId->getFieldName(), '_' . $targetIdColumn),
+            $this->nameGenerator->generateRelationDefaultColumnName(
+                $fieldId->getFieldName(),
+                '_' . $targetIdColumn
+            ),
             $targetIdColumn,
             true,
             false,
@@ -324,12 +318,18 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      *
      * @return string
      */
-    protected function getPrimaryKeyColumn($entityName)
+    protected function getSinglePrimaryKeyColumn($entityName)
     {
         $pkColumns = ['id'];
-        if ($this->configManager->getProvider('extend')->hasConfig($entityName)) {
-            $config = $this->configManager->getProvider('extend')->getConfig($entityName);
-            $pkColumns = $config->get('pk_columns', false, $pkColumns);
+        if ($this->configManager->hasConfig($entityName)) {
+            $entityConfig = $this->configManager->getEntityConfig('extend', $entityName);
+            $pkColumns = $entityConfig->get('pk_columns', false, $pkColumns);
+            if (count($pkColumns) > 1) {
+                // TODO This restriction should be removed in scope of https://magecore.atlassian.net/browse/BAP-9815
+                throw new InvalidRelationEntityException(
+                    sprintf('Entity class %s has not single primary key.', $entityName)
+                );
+            }
         }
 
         return reset($pkColumns);
