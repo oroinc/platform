@@ -147,15 +147,16 @@ class ActionManager
     /**
      * @param string $actionName
      * @param ActionData $actionData
+     * @param bool $checkAvailable
      * @return Action
      * @throws ActionNotFoundException
      */
-    public function getAction($actionName, ActionData $actionData)
+    public function getAction($actionName, ActionData $actionData, $checkAvailable = true)
     {
         $this->loadActions();
 
         $action = array_key_exists($actionName, $this->actions) ? $this->actions[$actionName] : null;
-        if (!$action instanceof Action || !$action->isAvailable($actionData)) {
+        if (!$action instanceof Action || ($checkAvailable && !$action->isAvailable($actionData))) {
             throw new ActionNotFoundException($actionName);
         }
 
@@ -170,7 +171,7 @@ class ActionManager
     public function getFrontendTemplate($actionName, array $context = null)
     {
         $template = self::DEFAULT_FORM_TEMPLATE;
-        $action = $this->getAction($actionName, $this->contextHelper->getActionData($context));
+        $action = $this->getAction($actionName, $this->contextHelper->getActionData($context), false);
 
         if ($action) {
             $frontendOptions = $action->getDefinition()->getFrontendOptions();
