@@ -35,9 +35,7 @@ class ConfigUpdateCommand extends ContainerAwareCommand
         $options = $input->getOptions();
         $this->checkRequiredOptions($options);
 
-        if (!empty($options['name'])) {
-            $this->getConfigManager()->set($options['name'], $options['value']);
-        }
+        $this->getConfigManager()->set($options['name'], $options['value']);
         $this->getConfigManager()->flush();
     }
 
