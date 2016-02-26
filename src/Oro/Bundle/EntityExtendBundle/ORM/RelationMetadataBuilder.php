@@ -7,7 +7,10 @@ use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
+use Oro\Bundle\EntityExtendBundle\Exception\InvalidRelationEntityException;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -77,7 +80,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         array $relation
     ) {
         $targetEntity   = $relation['target_entity'];
-        $targetIdColumn = $this->getPrimaryKeyColumn($targetEntity);
+        $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
         $cascade        = !empty($relation['cascade']) ? $relation['cascade'] : [];
         $cascade[]      = 'detach';
 
@@ -128,12 +131,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             && RelationType::ONE_TO_MANY === ExtendHelper::getRelationType($relationKey)
             && $this->isDefaultRelationRequired($fieldId)
         ) {
-            $this->buildDefaultRelation(
-                $metadataBuilder,
-                $fieldId,
-                $targetEntity,
-                $this->getPrimaryKeyColumn($targetEntity)
-            );
+            $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
         }
     }
 
@@ -152,12 +150,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         if ($relation['owner']) {
             $this->buildManyToManyOwningSideRelation($metadataBuilder, $fieldId, $relation);
             if ($this->isDefaultRelationRequired($fieldId)) {
-                $this->buildDefaultRelation(
-                    $metadataBuilder,
-                    $fieldId,
-                    $targetEntity,
-                    $this->getPrimaryKeyColumn($targetEntity)
-                );
+                $this->buildDefaultRelation($metadataBuilder, $fieldId, $targetEntity);
             }
         } elseif (!empty($relation['target_field_id'])) {
             $this->buildManyToManyTargetSideRelation(
@@ -187,15 +180,29 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         if (!empty($relation['target_field_id'])) {
             $builder->inversedBy($relation['target_field_id']->getFieldName());
         }
-        $builder->setJoinTable(
-            $this->nameGenerator->generateManyToManyJoinTableName(
-                $fieldId->getClassName(),
-                $fieldId->getFieldName(),
-                $targetEntity
-            )
+        $entityClassName = $fieldId->getClassName();
+        $joinTableName   = $this->nameGenerator->generateManyToManyJoinTableName(
+            $entityClassName,
+            $fieldId->getFieldName(),
+            $targetEntity
         );
+        $selfIdColumn = $this->getSinglePrimaryKeyColumn($entityClassName);
+        $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
+        $builder->setJoinTable($joinTableName);
 
-        $targetIdColumn = $this->getPrimaryKeyColumn($targetEntity);
+        if ($selfIdColumn !== 'id') {
+            $builder->addJoinColumn(
+                $this->nameGenerator->generateManyToManyJoinTableColumnName(
+                    $entityClassName,
+                    '_' . $selfIdColumn
+                ),
+                $selfIdColumn,
+                false,
+                false,
+                'CASCADE'
+            );
+        }
+
         if ($targetIdColumn !== 'id') {
             $builder->addInverseJoinColumn(
                 $this->nameGenerator->generateManyToManyJoinTableColumnName(
@@ -237,22 +244,23 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      * @param ClassMetadataBuilder $metadataBuilder
      * @param FieldConfigId        $fieldId
      * @param string               $targetEntity
-     * @param string               $targetIdColumn
      *
      */
     protected function buildDefaultRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
-        $targetEntity,
-        $targetIdColumn
+        $targetEntity
     ) {
-        $builder = $metadataBuilder->createOneToOne(
+        $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
+        $builder        = $metadataBuilder->createManyToOne(
             ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName(),
             $targetEntity
         );
-
         $builder->addJoinColumn(
-            $this->nameGenerator->generateRelationDefaultColumnName($fieldId->getFieldName(), '_' . $targetIdColumn),
+            $this->nameGenerator->generateRelationDefaultColumnName(
+                $fieldId->getFieldName(),
+                '_' . $targetIdColumn
+            ),
             $targetIdColumn,
             true,
             false,
@@ -310,12 +318,18 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      *
      * @return string
      */
-    protected function getPrimaryKeyColumn($entityName)
+    protected function getSinglePrimaryKeyColumn($entityName)
     {
         $pkColumns = ['id'];
-        if ($this->configManager->getProvider('extend')->hasConfig($entityName)) {
-            $config = $this->configManager->getProvider('extend')->getConfig($entityName);
-            $pkColumns = $config->get('pk_columns', false, $pkColumns);
+        if ($this->configManager->hasConfig($entityName)) {
+            $entityConfig = $this->configManager->getEntityConfig('extend', $entityName);
+            $pkColumns = $entityConfig->get('pk_columns', false, $pkColumns);
+            if (count($pkColumns) > 1) {
+                // TODO This restriction should be removed in scope of https://magecore.atlassian.net/browse/BAP-9815
+                throw new InvalidRelationEntityException(
+                    sprintf('Entity class %s has not single primary key.', $entityName)
+                );
+            }
         }
 
         return reset($pkColumns);

@@ -95,13 +95,10 @@ class ExtendConfigLoader extends ConfigLoader
         parent::loadEntityConfigs($metadata, $force);
 
         $className = $metadata->getName();
-        if ($this->hasEntityConfigs($metadata)) {
-            if ($this->configManager->getProvider('extend')->hasConfig($className)) {
-                $configInterface = $this->configManager->getProvider('extend')->getConfig($className);
-                $configInterface
-                    ->set('pk_columns', $metadata->getIdentifierColumnNames());
-                $this->configManager->persist($configInterface);
-            }
+        if ($this->hasEntityConfigs($metadata) && $this->configManager->hasConfig($className)) {
+            $entityConfig = $this->configManager->getEntityConfig('extend', $className);
+            $entityConfig->set('pk_columns', $metadata->getIdentifierColumnNames());
+            $this->configManager->persist($entityConfig);
         }
     }
 }
