@@ -4,8 +4,9 @@ define([
     'chaplin',
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/models/page-model'
-], function($, _, Chaplin, __, BaseController, PageModel) {
+    'oroui/js/app/models/page-model',
+    'module'
+], function($, _, Chaplin, __, BaseController, PageModel, module) {
     'use strict';
 
     var PageController;
@@ -16,8 +17,15 @@ define([
     var utils = Chaplin.utils;
     var mediator = Chaplin.mediator;
 
+    var config = module.config();
+    config = _.extend({
+        fullRedirect: false
+    }, config);
+
     PageController = BaseController.extend({});
     _.extend(PageController.prototype, {
+        fullRedirect: config.fullRedirect,
+
         /**
          * Creates page model
          * @override
@@ -265,6 +273,9 @@ define([
                 // IE removes starting slash
                 pathDesc.url = (pathname[0] === '/' ? '' : '/') + pathname + (query && ('?' + query));
             }
+            options = _.defaults(options, {
+                fullRedirect: this.fullRedirect
+            });
             if (options.fullRedirect) {
                 query = utils.queryParams.parse(query);
                 query._rand = Math.random();
