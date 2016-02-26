@@ -35,6 +35,9 @@ class ActionExtension extends AbstractExtension
     /** @var array|Action[] */
     protected $actions = [];
 
+    /** @var array  */
+    protected $actionGroups;
+
     /**
      * @param ActionManager $actionManager
      * @param ContextHelper $contextHelper
@@ -51,6 +54,14 @@ class ActionExtension extends AbstractExtension
         $this->contextHelper = $contextHelper;
         $this->applicationsHelper = $applicationHelper;
         $this->providerRegistry = $providerRegistry;
+    }
+
+    /**
+     * @param array $actionGroups
+     */
+    public function setActionGroups(array $actionGroups)
+    {
+        $this->actionGroups = $actionGroups;
     }
 
     /**
@@ -186,7 +197,7 @@ class ActionExtension extends AbstractExtension
         return [
             'entityClass' => $entityClass ? : $config->offsetGetByPath('[entity_name]'),
             'datagrid' => $config->offsetGetByPath('[name]'),
-            'group' => ['', 'datagridRowAction'],
+            'group' => $this->actionGroups,
         ];
     }
 }

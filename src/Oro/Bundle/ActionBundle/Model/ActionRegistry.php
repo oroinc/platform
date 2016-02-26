@@ -7,6 +7,8 @@ use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 
 class ActionRegistry
 {
+    const DEFAULT_GROUP = '';
+
     /** @var ActionConfigurationProvider */
     protected $configurationProvider;
 
@@ -106,7 +108,7 @@ class ActionRegistry
         $this->normalizeGroup($group);
 
         return array_filter($this->actions, function (Action $action) use ($group) {
-            $matchedGroups = array_intersect($group, $action->getDefinition()->getGroups() ?: ['']);
+            $matchedGroups = array_intersect($group, $action->getDefinition()->getGroups() ?: [static::DEFAULT_GROUP]);
             return !empty($matchedGroups);
         });
     }
@@ -151,12 +153,12 @@ class ActionRegistry
     }
 
     /**
-     * @param mixed $groups
+     * @param string|array|null $group
      */
     protected function normalizeGroup(&$group)
     {
         if (!is_array($group)) {
-            $group = [(string)$group];
+            $group = empty($group) ? [static::DEFAULT_GROUP] : [(string)$group];
         } else {
             foreach ($group as $key => $value) {
                 $group[$key] = (string)$value;

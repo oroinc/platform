@@ -20,22 +20,22 @@ services:
         class: %oro_action.context_accessor.class%
 
     oro_action.helper.context:
-            class: %oro_action.helper.context.class%
-            arguments:
-                - @oro_entity.doctrine_helper
-                - @request_stack
+        class: %oro_action.helper.context.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @request_stack
 
     oro_action.helper.applications:
-            class: %oro_action.helper.applications.class%
-            arguments:
-                - @security.token_storage
+        class: %oro_action.helper.applications.class%
+        arguments:
+            - @security.token_storage
 
     oro_action.helper.entity_config:
-            class: %oro_action.helper.entity_config.class%
-            arguments:
-                - @oro_entity_config.provider.entity
-                - @oro_entity.doctrine_helper
-                - @oro_security.acl.group_provider.chain
+        class: %oro_action.helper.entity_config.class%
+        arguments:
+            - @oro_entity_config.provider.entity
+            - @oro_entity.doctrine_helper
+            - @oro_security.acl.group_provider.chain
 
     oro_action.registry:
         class: %oro_action.registry.class%
@@ -127,6 +127,8 @@ services:
             - @oro_action.helper.context
             - @oro_action.helper.applications
             - @oro_action.datagrid.mass_action_provider.registry
+        calls:
+            - [setActionGroups, [['', 'datagridRowAction']]]
         tags:
             - { name: oro_datagrid.extension }
         lazy: true

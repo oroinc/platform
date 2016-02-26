@@ -113,14 +113,26 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
      * @param ResultRecord $record
      * @param $actions
      * @param array $expectedActions
+     * @param array $context
+     * @param array $groups
      *
      * @dataProvider getActionsPermissionsProvider
      */
-    public function testGetActionsPermissions(ResultRecord $record, $actions, array $expectedActions)
-    {
+    public function testGetActionsPermissions(
+        ResultRecord $record,
+        $actions,
+        array $expectedActions,
+        array $context,
+        array $groups = null
+    ) {
         $this->manager->expects($this->any())
             ->method('getActions')
+            ->with($context, false)
             ->willReturn($actions);
+
+        if (null !== $groups) {
+            $this->extension->setActionGroups($groups);
+        }
 
         $this->extension->isApplicable(DatagridConfiguration::create(['name' => 'datagrid_name']));
 
@@ -187,16 +199,29 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 1]),
                 'actions' => [],
                 'expectedActions' => [],
+                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
+                'groups' => null,
+            ],
+            'no actions and group1' => [
+                'record' => new ResultRecord(['id' => 1]),
+                'actions' => [],
+                'expectedActions' => [],
+                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => ['group1']],
+                'groups' => ['group1'],
             ],
             '2 allowed actions' => [
                 'record' => new ResultRecord(['id' => 2]),
                 'actions' => [$actionAllowed1, $actionAllowed2],
                 'expectedActions' => ['action1' => ['translates' => []], 'action2' => ['translates' => []]],
+                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
+                'groups' => null,
             ],
             '1 allowed action' => [
                 'record' => new ResultRecord(['id' => 3]),
                 'actions' => [$actionAllowed1, $actionNotAllowed],
                 'expectedActions' => ['action1' => ['translates' => []], 'action3' => false],
+                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
+                'groups' => null,
             ],
         ];
     }
