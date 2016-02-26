@@ -237,7 +237,7 @@ class SystemAwareResolver implements ContainerAwareInterface
             // Perform method call
             if ($method) {
                 if ($lazy) {
-                    return function() use ($val, $matchedString, $service, $method, $arguments) {
+                    return function () use ($val, $matchedString, $service, $method, $arguments) {
                         return $this->replaceValueInString(
                             $val,
                             $matchedString,
