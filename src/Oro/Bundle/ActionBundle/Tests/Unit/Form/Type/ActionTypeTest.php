@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
 use Oro\Bundle\ActionBundle\Model\Action;
@@ -13,6 +11,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Component\ConfigExpression\Model\ContextAccessor;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ActionTypeTest extends FormIntegrationTestCase
 {
@@ -24,28 +23,6 @@ class ActionTypeTest extends FormIntegrationTestCase
 
     /** @var ActionType */
     protected $formType;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requiredAttributesListener = new RequiredAttributesListener();
-
-        $this->formType = new ActionType(
-            $this->actionManager,
-            $this->requiredAttributesListener,
-            new ContextAccessor()
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->formType, $this->actionManager, $this->requiredAttributesListener);
-    }
 
     /**
      * @dataProvider submitDataProvider
@@ -202,6 +179,66 @@ class ActionTypeTest extends FormIntegrationTestCase
     }
 
     /**
+     * @param array $data
+     * @param bool $modified
+     * @return ActionData
+     */
+    protected function createActionData(array $data = [], $modified = false)
+    {
+        $actionData = new ActionData($data);
+
+        if ($modified) {
+            $actionData->modifiedData = null;
+            unset($actionData->modifiedData);
+        }
+
+        return $actionData;
+    }
+
+    /**
+     * @param bool $noAttributes
+     * @return Action|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createAction($noAttributes = false)
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeManager $attributeManager */
+        $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $attributeManager->expects($this->any())
+            ->method('getAttribute')
+            ->willReturnCallback(
+                function ($attributeName) use ($noAttributes) {
+                    if ($noAttributes) {
+                        return null;
+                    }
+
+                    $attribute = new Attribute();
+                    $attribute
+                        ->setName($attributeName)
+                        ->setLabel(ucfirst($attributeName) . ' Label')
+                        ->setType('text');
+
+                    return $attribute;
+                }
+            );
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Action $action */
+        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $action->expects($this->any())
+            ->method('getAttributeManager')
+            ->with($this->isInstanceOf('Oro\Bundle\ActionBundle\Model\ActionData'))
+            ->willReturn($attributeManager);
+        $action->expects($this->any())
+            ->method('getName')
+            ->willReturn('test_action');
+
+        return $action;
+    }
+
+    /**
      * @dataProvider exceptionDataProvider
      *
      * @param array $options
@@ -262,63 +299,25 @@ class ActionTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @param array $data
-     * @param bool $modified
-     * @return ActionData
-     */
-    protected function createActionData(array $data = [], $modified = false)
+    protected function setUp()
     {
-        $actionData = new ActionData($data);
+        parent::setUp();
 
-        if ($modified) {
-            $actionData->modifiedData = null;
-            unset($actionData->modifiedData);
-        }
+        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        return $actionData;
+        $this->requiredAttributesListener = new RequiredAttributesListener();
+
+        $this->formType = new ActionType(
+            $this->actionManager,
+            $this->requiredAttributesListener,
+            new ContextAccessor()
+        );
     }
 
-    /**
-     * @param bool $noAttributes
-     * @return Action|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createAction($noAttributes = false)
+    protected function tearDown()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeManager $attributeManager */
-        $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $attributeManager->expects($this->any())
-            ->method('getAttribute')
-            ->willReturnCallback(
-                function ($attributeName) use ($noAttributes) {
-                    if ($noAttributes) {
-                        return null;
-                    }
-
-                    $attribute = new Attribute();
-                    $attribute
-                        ->setName($attributeName)
-                        ->setLabel(ucfirst($attributeName) . ' Label')
-                        ->setType('text');
-
-                    return $attribute;
-                }
-            );
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Action $action */
-        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $action->expects($this->any())
-            ->method('getAttributeManager')
-            ->with($this->isInstanceOf('Oro\Bundle\ActionBundle\Model\ActionData'))
-            ->willReturn($attributeManager);
-        $action->expects($this->any())
-            ->method('getName')
-            ->willReturn('test_action');
-
-        return $action;
+        unset($this->formType, $this->actionManager, $this->requiredAttributesListener);
     }
 }

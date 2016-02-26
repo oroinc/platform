@@ -35,6 +35,16 @@ class Attribute
     protected $options = array();
 
     /**
+     * Get attribute type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Set attribute type
      *
      * @param string $type
@@ -44,16 +54,6 @@ class Attribute
     {
         $this->type = $type;
         return $this;
-    }
-
-    /**
-     * Get attribute type
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -81,6 +81,16 @@ class Attribute
     }
 
     /**
+     * Get attribute label.
+     *
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
      * Set attribute label.
      *
      * @param string $label
@@ -93,13 +103,13 @@ class Attribute
     }
 
     /**
-     * Get attribute label.
+     * Get attribute name.
      *
      * @return string
      */
-    public function getLabel()
+    public function getName()
     {
-        return $this->label;
+        return $this->name;
     }
 
     /**
@@ -115,13 +125,13 @@ class Attribute
     }
 
     /**
-     * Get attribute name.
+     * Get options.
      *
-     * @return string
+     * @return array
      */
-    public function getName()
+    public function getOptions()
     {
-        return $this->name;
+        return $this->options;
     }
 
     /**
@@ -134,16 +144,6 @@ class Attribute
     {
         $this->options = $options;
         return $this;
-    }
-
-    /**
-     * Get options.
-     *
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
     }
 
     /**

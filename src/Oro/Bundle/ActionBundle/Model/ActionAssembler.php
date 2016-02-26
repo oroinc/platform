@@ -3,10 +3,8 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\ORM\ORMException;
-
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
@@ -116,6 +114,15 @@ class ActionAssembler extends AbstractAssembler
     }
 
     /**
+     * @param array $entities
+     * @return array
+     */
+    protected function filterEntities(array $entities)
+    {
+        return array_filter(array_map([$this, 'getEntityClassName'], $entities), 'is_string');
+    }
+
+    /**
      * @param ActionDefinition $actionDefinition
      * @param mixed $aclResource
      */
@@ -133,15 +140,6 @@ class ActionAssembler extends AbstractAssembler
         }
 
         $actionDefinition->setConditions(ActionDefinition::PRECONDITIONS, $newDefinition);
-    }
-
-    /**
-     * @param array $entities
-     * @return array
-     */
-    protected function filterEntities(array $entities)
-    {
-        return array_filter(array_map([$this, 'getEntityClassName'], $entities), 'is_string');
     }
 
     /**

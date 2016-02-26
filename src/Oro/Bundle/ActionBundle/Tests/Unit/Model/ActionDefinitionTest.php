@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
-
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
@@ -12,11 +11,6 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
 
     /** @var ActionDefinition */
     protected $definition;
-
-    protected function setUp()
-    {
-        $this->definition = new ActionDefinition();
-    }
 
     /**
      * @dataProvider defaultsDataProvider
@@ -125,5 +119,10 @@ class ActionDefinitionTest extends \PHPUnit_Framework_TestCase
                 ['attributes', ['config1', 'config2']],
             ]
         );
+    }
+
+    protected function setUp()
+    {
+        $this->definition = new ActionDefinition();
     }
 }

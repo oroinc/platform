@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
 use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\Action\ActionInterface as FunctionInterface;
@@ -71,14 +70,6 @@ class Action
     }
 
     /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->getDefinition()->getName();
-    }
-
-    /**
      * @return ActionDefinition
      */
     public function getDefinition()
@@ -96,6 +87,26 @@ class Action
 
     /**
      * @param ActionData $data
+     * @param string $name
+     */
+    protected function executeFunctions(ActionData $data, $name)
+    {
+        if (!array_key_exists($name, $this->functions)) {
+            $this->functions[$name] = false;
+
+            $config = $this->definition->getFunctions($name);
+            if ($config) {
+                $this->functions[$name] = $this->functionFactory->create(ConfigurableAction::ALIAS, $config);
+            }
+        }
+
+        if ($this->functions[$name] instanceof FunctionInterface) {
+            $this->functions[$name]->execute($data);
+        }
+    }
+
+    /**
+     * @param ActionData $data
      * @param Collection $errors
      * @throws ForbiddenActionException
      */
@@ -106,22 +117,6 @@ class Action
         }
 
         $this->executeFunctions($data, ActionDefinition::FUNCTIONS);
-    }
-
-    /**
-     * Check that action is available to show
-     *
-     * @param ActionData $data
-     * @param Collection $errors
-     * @return bool
-     */
-    public function isAvailable(ActionData $data, Collection $errors = null)
-    {
-        if ($this->hasForm()) {
-            return $this->isPreConditionAllowed($data, $errors);
-        } else {
-            return $this->isAllowed($data, $errors);
-        }
     }
 
     /**
@@ -151,66 +146,6 @@ class Action
 
     /**
      * @param ActionData $data
-     * @return AttributeManager
-     */
-    public function getAttributeManager(ActionData $data)
-    {
-        $hash = spl_object_hash($data);
-
-        if (!array_key_exists($hash, $this->attributeManagers)) {
-            $this->attributeManagers[$hash] = false;
-
-            $config = $this->definition->getAttributes();
-            if ($config) {
-                $this->attributeManagers[$hash] = new AttributeManager(
-                    $this->attributeAssembler->assemble($data, $config)
-                );
-            }
-        }
-
-        return $this->attributeManagers[$hash];
-    }
-
-    /**
-     * @param ActionData $data
-     * @return array
-     */
-    public function getFormOptions(ActionData $data)
-    {
-        if ($this->formOptions === null) {
-            $this->formOptions = [];
-            $formOptionsConfig = $this->definition->getFormOptions();
-            if ($formOptionsConfig) {
-                $this->formOptions = $this->formOptionsAssembler
-                    ->assemble($formOptionsConfig, $this->getAttributeManager($data)->getAttributes());
-            }
-        }
-
-        return $this->formOptions;
-    }
-
-    /**
-     * @param ActionData $data
-     * @param string $name
-     */
-    protected function executeFunctions(ActionData $data, $name)
-    {
-        if (!array_key_exists($name, $this->functions)) {
-            $this->functions[$name] = false;
-
-            $config = $this->definition->getFunctions($name);
-            if ($config) {
-                $this->functions[$name] = $this->functionFactory->create(ConfigurableAction::ALIAS, $config);
-            }
-        }
-
-        if ($this->functions[$name] instanceof FunctionInterface) {
-            $this->functions[$name]->execute($data);
-        }
-    }
-
-    /**
-     * @param ActionData $data
      * @param string $name
      * @param Collection $errors
      * @return boolean
@@ -234,6 +169,30 @@ class Action
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getDefinition()->getName();
+    }
+
+    /**
+     * Check that action is available to show
+     *
+     * @param ActionData $data
+     * @param Collection $errors
+     * @return bool
+     */
+    public function isAvailable(ActionData $data, Collection $errors = null)
+    {
+        if ($this->hasForm()) {
+            return $this->isPreConditionAllowed($data, $errors);
+        } else {
+            return $this->isAllowed($data, $errors);
+        }
+    }
+
+    /**
      * @return bool
      */
     public function hasForm()
@@ -241,5 +200,60 @@ class Action
         $formOptionsConfig = $this->definition->getFormOptions();
 
         return !empty($formOptionsConfig['attribute_fields']);
+    }
+
+    /**
+     * @param ActionData $data
+     * @return array
+     */
+    public function getFormOptions(ActionData $data)
+    {
+        if ($this->formOptions === null) {
+            $this->formOptions = [];
+            $formOptionsConfig = $this->definition->getFormOptions();
+            if ($formOptionsConfig) {
+                $this->formOptions = $this->formOptionsAssembler
+                    ->assemble($formOptionsConfig, $this->getAttributeManager($data)->getAttributes());
+            }
+        }
+
+        return $this->formOptions;
+    }
+
+
+    public function hasUnboundSubstitution()
+    {
+        return (
+            $this->definition->getSubstituteAction() &&
+            false === (
+                $this->definition->getGroups() ||
+                $this->definition->getDatagrids() ||
+                $this->definition->getEntities() ||
+                $this->definition->getExcludeEntities() ||
+                $this->definition->isForAllEntities()
+            )
+        );
+    }
+
+    /**
+     * @param ActionData $data
+     * @return AttributeManager
+     */
+    public function getAttributeManager(ActionData $data)
+    {
+        $hash = spl_object_hash($data);
+
+        if (!array_key_exists($hash, $this->attributeManagers)) {
+            $this->attributeManagers[$hash] = false;
+
+            $config = $this->definition->getAttributes();
+            if ($config) {
+                $this->attributeManagers[$hash] = new AttributeManager(
+                    $this->attributeAssembler->assemble($data, $config)
+                );
+            }
+        }
+
+        return $this->attributeManagers[$hash];
     }
 }

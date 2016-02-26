@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 
 class AttributeManager
@@ -28,6 +27,14 @@ class AttributeManager
     }
 
     /**
+     * @return string
+     */
+    public function getEntityAttributeName()
+    {
+        return $this->entityAttributeName;
+    }
+
+    /**
      * @param string $entityAttributeName
      * @return AttributeManager
      */
@@ -36,14 +43,6 @@ class AttributeManager
         $this->entityAttributeName = $entityAttributeName;
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntityAttributeName()
-    {
-        return $this->entityAttributeName;
     }
 
     /**
@@ -97,6 +96,16 @@ class AttributeManager
     }
 
     /**
+     * Get list of all attributes with type entity
+     *
+     * @return Collection|Attribute[]
+     */
+    public function getEntityAttributes()
+    {
+        return $this->getAttributesByType('entity');
+    }
+
+    /**
      * @param string $type
      * @return Collection|Attribute[]
      */
@@ -108,15 +117,5 @@ class AttributeManager
                 return $attribute->getType() == $type;
             }
         );
-    }
-
-    /**
-     * Get list of all attributes with type entity
-     *
-     * @return Collection|Attribute[]
-     */
-    public function getEntityAttributes()
-    {
-        return $this->getAttributesByType('entity');
     }
 }

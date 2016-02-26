@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\ActionBundle\Action\RunAction;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RunActionTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,31 +21,6 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ActionManager */
     protected $manager;
-
-    protected function setUp()
-    {
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
-        $contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $contextHelper->expects($this->any())
-            ->method('getActionData')
-            ->willReturn(new ActionData(['data' => ['param']]));
-
-        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->function = new RunAction(new ContextAccessor(), $this->manager, $contextHelper);
-        $this->function->setDispatcher($this->eventDispatcher);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->function, $this->eventDispatcher, $this->manager);
-    }
 
     public function testInitialize()
     {
@@ -128,6 +102,16 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $data
+     */
+    protected function assertManagerCalled(array $data)
+    {
+        $this->manager->expects($this->once())
+            ->method('execute')
+            ->willReturn(new ActionData($data));
+    }
+
+    /**
      * @return array
      */
     public function executeActionDataProvider()
@@ -161,13 +145,28 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @param array $data
-     */
-    protected function assertManagerCalled(array $data)
+    protected function setUp()
     {
-        $this->manager->expects($this->once())
-            ->method('execute')
-            ->willReturn(new ActionData($data));
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
+        $contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $contextHelper->expects($this->any())
+            ->method('getActionData')
+            ->willReturn(new ActionData(['data' => ['param']]));
+
+        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->function = new RunAction(new ContextAccessor(), $this->manager, $contextHelper);
+        $this->function->setDispatcher($this->eventDispatcher);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->function, $this->eventDispatcher, $this->manager);
     }
 }

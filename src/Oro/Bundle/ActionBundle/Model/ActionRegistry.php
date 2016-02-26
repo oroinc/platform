@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Exception\ActionReferenceException;
+use Oro\Bundle\ActionBundle\Helper\ActionSubstitutionHelper;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 
 class ActionRegistry
@@ -18,6 +20,12 @@ class ActionRegistry
 
     /** @var array|Action[] */
     protected $actions;
+
+    /**
+     * Substitutions map
+     * @var array
+     */
+    protected $substitutions;
 
     /**
      * @param ActionConfigurationProvider $configurationProvider
@@ -53,26 +61,21 @@ class ActionRegistry
 
             if ($this->isEntityClassMatched($entityClass, $definition) ||
                 ($route && in_array($route, $definition->getRoutes(), true)) ||
-                ($datagrid && in_array($datagrid, $definition->getDatagrids(), true))
+                ($datagrid && in_array($datagrid, $definition->getDatagrids(), true)) ||
+                $action->hasUnboundSubstitution()
             ) {
                 $actions[$action->getName()] = $action;
             }
         }
 
+        $this->applySubstitutions($actions);
+
         return $actions;
     }
 
     /**
-     * @param string $name
-     * @return null|Action
+     * @throws ActionReferenceException
      */
-    public function findByName($name)
-    {
-        $this->loadActions();
-
-        return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
-    }
-
     protected function loadActions()
     {
         if ($this->actions !== null) {
@@ -80,6 +83,8 @@ class ActionRegistry
         }
 
         $this->actions = [];
+
+        $substitutions = [];
 
         $configuration = $this->configurationProvider->getActionConfiguration();
         $actions = $this->assembler->assemble($configuration);
@@ -93,8 +98,29 @@ class ActionRegistry
                 continue;
             }
 
-            $this->actions[$action->getName()] = $action;
+            $actionName = $action->getName();
+
+            $this->actions[$actionName] = $action;
+
+            $substitutionTarget = $action->getDefinition()->getSubstituteAction();
+            if ($substitutionTarget) {
+                $substitutions[$substitutionTarget] = $actionName;
+            }
         }
+
+        $this->substitutions = [];
+
+        foreach ($substitutions as $target => $replacementName) {
+            if (array_key_exists($target, $this->actions)) {
+                $this->substitutions[$target] = $replacementName;
+            } else {
+                unset($this->actions[$replacementName]); //if nothing to replace no need to keep the action
+            }
+        }
+
+        //circular references protection - throws an exception if found (this check can be moved to compiler pass)
+        ActionSubstitutionHelper::detectCircularSubstitutions($this->substitutions);
+
     }
 
     /**
@@ -131,5 +157,26 @@ class ActionRegistry
         }
 
         return false;
+    }
+
+    /**
+     * @param string $name
+     * @return null|Action
+     */
+    public function findByName($name)
+    {
+        $this->loadActions();
+
+        return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
+    }
+
+    /**
+     * @param array $actions
+     */
+    protected function applySubstitutions(array &$actions)
+    {
+        if ($this->substitutions) {
+            ActionSubstitutionHelper::applySubstitutions($this->substitutions, $actions);
+        }
     }
 }

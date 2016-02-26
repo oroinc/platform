@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
-
-use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,16 +18,6 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
      * @var FormOptionsAssembler
      */
     protected $assembler;
-
-    protected function setUp()
-    {
-        $this->configurationPass = $this->getMock(
-            'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
-        );
-
-        $this->assembler = new FormOptionsAssembler();
-        $this->assembler->addConfigurationPass($this->configurationPass);
-    }
 
     public function testAssemble()
     {
@@ -77,6 +65,18 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
                 $attributes
             )
         );
+    }
+
+    /**
+     * @param string $name
+     * @return Attribute
+     */
+    protected function createAttribute($name)
+    {
+        $attribute = new Attribute();
+        $attribute->setName($name);
+
+        return $attribute;
     }
 
     /**
@@ -144,15 +144,13 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @return Attribute
-     */
-    protected function createAttribute($name)
+    protected function setUp()
     {
-        $attribute = new Attribute();
-        $attribute->setName($name);
+        $this->configurationPass = $this->getMock(
+            'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
+        );
 
-        return $attribute;
+        $this->assembler = new FormOptionsAssembler();
+        $this->assembler->addConfigurationPass($this->configurationPass);
     }
 }

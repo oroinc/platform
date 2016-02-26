@@ -91,6 +91,14 @@ class ActionDefinition
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * @param string $name
      * @return $this
      */
@@ -104,9 +112,9 @@ class ActionDefinition
     /**
      * @return string
      */
-    public function getName()
+    public function getLabel()
     {
-        return $this->name;
+        return $this->label;
     }
 
     /**
@@ -121,11 +129,11 @@ class ActionDefinition
     }
 
     /**
-     * @return string
+     * @return boolean
      */
-    public function getLabel()
+    public function isEnabled()
     {
-        return $this->label;
+        return $this->enabled;
     }
 
     /**
@@ -140,11 +148,11 @@ class ActionDefinition
     }
 
     /**
-     * @return boolean
+     * @return integer
      */
-    public function isEnabled()
+    public function getOrder()
     {
-        return $this->enabled;
+        return $this->order;
     }
 
     /**
@@ -156,14 +164,6 @@ class ActionDefinition
         $this->order = $order;
 
         return $this;
-    }
-
-    /**
-     * @return integer
-     */
-    public function getOrder()
-    {
-        return $this->order;
     }
 
     /**

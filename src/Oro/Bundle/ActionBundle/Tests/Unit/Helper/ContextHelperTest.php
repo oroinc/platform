@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContextHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,24 +19,6 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
     /** @var ContextHelper */
     protected $helper;
 
-    protected function setUp()
-    {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->helper = new ContextHelper($this->doctrineHelper, $this->requestStack);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->helper, $this->doctrineHelper, $this->requestStack);
-    }
-
     /**
      * @dataProvider getContextDataProvider
      *
@@ -46,7 +27,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContext($request, array $expected)
     {
-        $this->requestStack->expects($this->exactly(5))
+        $this->requestStack->expects($this->exactly(1))
             ->method('getCurrentRequest')
             ->willReturn($request);
 
@@ -113,7 +94,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
         $entity->id = 42;
 
-        $this->requestStack->expects($this->exactly($requestStackCalls * 2))
+        $this->requestStack->expects($this->exactly($requestStackCalls))
             ->method('getCurrentRequest')
             ->willReturn($request);
 
@@ -153,12 +134,12 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'without request' => [
                 'request' => null,
-                'requestStackCalls' => 5,
+                'requestStackCalls' => 2,
                 'expected' => new ActionData(['data' => null])
             ],
             'empty request' => [
                 'request' => new Request(),
-                'requestStackCalls' => 5,
+                'requestStackCalls' => 2,
                 'expected' => new ActionData(['data' => null])
             ],
             'route1 without entity id' => [
@@ -168,7 +149,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'entityClass' => 'stdClass'
                     ]
                 ),
-                'requestStackCalls' => 5,
+                'requestStackCalls' => 2,
                 'expected' => new ActionData(['data' => new \stdClass()])
             ],
             'entity' => [
@@ -228,5 +209,23 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
 
         // use local cache
         $this->assertEquals($actionData, $this->helper->getActionData($context2));
+    }
+
+    protected function setUp()
+    {
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->helper = new ContextHelper($this->doctrineHelper, $this->requestStack);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->helper, $this->doctrineHelper, $this->requestStack);
     }
 }

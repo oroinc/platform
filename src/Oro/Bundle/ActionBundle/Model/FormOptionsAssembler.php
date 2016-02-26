@@ -3,13 +3,9 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
-use Oro\Bundle\ActionBundle\Model\Attribute;
-
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 class FormOptionsAssembler
 {
@@ -78,11 +74,16 @@ class FormOptionsAssembler
     }
 
     /**
-     * @param ConfigurationPassInterface $configurationPass
+     * @param string $attributeName
+     * @throws UnknownAttributeException
      */
-    public function addConfigurationPass(ConfigurationPassInterface $configurationPass)
+    protected function assertAttributeExists($attributeName)
     {
-        $this->configurationPasses[] = $configurationPass;
+        if (!isset($this->attributes[$attributeName])) {
+            throw new UnknownAttributeException(
+                sprintf('Unknown attribute "%s".', $attributeName)
+            );
+        }
     }
 
     /**
@@ -99,15 +100,10 @@ class FormOptionsAssembler
     }
 
     /**
-     * @param string $attributeName
-     * @throws UnknownAttributeException
+     * @param ConfigurationPassInterface $configurationPass
      */
-    protected function assertAttributeExists($attributeName)
+    public function addConfigurationPass(ConfigurationPassInterface $configurationPass)
     {
-        if (!isset($this->attributes[$attributeName])) {
-            throw new UnknownAttributeException(
-                sprintf('Unknown attribute "%s".', $attributeName)
-            );
-        }
+        $this->configurationPasses[] = $configurationPass;
     }
 }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 
 class AttributeManagerTest extends \PHPUnit_Framework_TestCase
