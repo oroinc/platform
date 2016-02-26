@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config;
 
+use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
@@ -58,7 +60,7 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->context->hasFilters());
         $this->assertNull($this->context->getFilters());
 
-        $filters = ConfigUtil::getInitialConfig();
+        $filters = new FiltersConfig();
 
         $this->context->setFilters($filters);
         $this->assertTrue($this->context->hasFilters());
@@ -74,7 +76,7 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->context->hasSorters());
         $this->assertNull($this->context->getSorters());
 
-        $sorters = ConfigUtil::getInitialConfig();
+        $sorters = new SortersConfig();
 
         $this->context->setSorters($sorters);
         $this->assertTrue($this->context->hasSorters());

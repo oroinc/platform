@@ -3,9 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Object;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
@@ -46,7 +49,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject($object, $config);
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
 
         $this->assertEquals(
             [
@@ -68,13 +74,15 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             'fields'           => [
                 'id'    => null,
                 'name1' => [
-                    'exclusion_policy' => 'all',
-                    'property_path'    => 'name'
+                    'property_path' => 'name'
                 ]
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject($object, $config);
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
 
         $this->assertEquals(
             [
@@ -104,7 +112,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             }
         ];
 
-        $result = $this->objectNormalizer->normalizeObject($object, $config);
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
 
         $this->assertEquals(
             [
@@ -148,7 +159,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->objectNormalizer->normalizeObject(
             $this->createProductObject(),
-            $config
+            $this->createConfigObject($config)
         );
 
         $this->assertEquals(
@@ -194,7 +205,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject($product, $config);
+        $result = $this->objectNormalizer->normalizeObject(
+            $product,
+            $this->createConfigObject($config)
+        );
 
         $this->assertEquals(
             [
@@ -240,7 +254,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $result = $this->objectNormalizer->normalizeObject($product, $config);
+        $result = $this->objectNormalizer->normalizeObject(
+            $product,
+            $this->createConfigObject($config)
+        );
 
         $this->assertEquals(
             [
@@ -288,5 +305,17 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $owner->addProduct($product);
 
         return $product;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return EntityDefinitionConfig
+     */
+    protected function createConfigObject(array $config)
+    {
+        $loaderFactory = new ConfigLoaderFactory();
+
+        return $loaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
 }
