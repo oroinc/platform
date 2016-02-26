@@ -293,7 +293,10 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
         if (!$columnName) {
             $columnName =
-                $this->nameGenerator->generateRelationColumnName($fieldId->getFieldName(), '_' . $targetIdColumn);
+                $this->nameGenerator->generateRelationColumnName(
+                    $fieldId->getFieldName(),
+                    '_' . $targetIdColumn
+                );
         }
 
         return $columnName;
