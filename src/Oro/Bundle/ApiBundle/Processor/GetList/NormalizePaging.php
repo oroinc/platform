@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Resets page limit and first result number in case if paging disabled.
+ */
 class NormalizePaging implements ProcessorInterface
 {
     const UNLIMITED_RESULT = -1;
