@@ -13,7 +13,7 @@ included:
     type: organizations
     id: "1"
     attributes:
-      name: "OroCRM"
+      enabled: true
   1:
     type: businessunits
     id: "1"

@@ -136,7 +136,7 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                     'fields'  => [
                         'users' => 'username,email,owner',
                         'businessunits' => 'name,organization',
-                        'organizations' => 'name'
+                        'organizations' => 'enabled'
                     ],
                 ],
                 'expects' => $this->loadExpectation('output_5.yml')
