@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Loads data by query from context.
+ * Loads data using ORM QueryBuilder object.
  */
 class LoadDataByOrmQuery implements ProcessorInterface
 {

@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Builds Query builder by given class name.
+ * Builds ORM QueryBuilder object that will be used to get a list of entities by the Criteria object.
  */
 class BuildQuery implements ProcessorInterface
 {

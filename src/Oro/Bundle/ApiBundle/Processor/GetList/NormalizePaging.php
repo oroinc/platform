@@ -6,7 +6,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Resets page limit and first result number in case if paging disabled.
+ * Removes paging properties (FirstResult and MaxResults) from the Criteria object
+ * in case if MaxResults equals -1, that means "unlimited".
  */
 class NormalizePaging implements ProcessorInterface
 {

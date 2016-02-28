@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 
 /**
- * Registers filters according to filters configuration.
+ * Registers filters according to the "filters" configuration section.
  */
 class RegisterFilters implements ProcessorInterface
 {

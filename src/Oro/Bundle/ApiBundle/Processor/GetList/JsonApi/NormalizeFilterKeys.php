@@ -12,8 +12,8 @@ use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Enclose filters keys with filter[%s].
- * Replace filter key for identifier field to filter[id].
+ * Encloses filters keys by the "filter[%s]" pattern.
+ * Replaces the filter key for the identifier field with "filter[id]".
  */
 class NormalizeFilterKeys implements ProcessorInterface
 {

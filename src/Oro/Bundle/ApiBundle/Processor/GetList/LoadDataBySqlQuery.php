@@ -8,7 +8,7 @@ use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 /**
- * Loads data by sql query from context.
+ * Loads data using SqlQueryBuilder object.
  */
 class LoadDataBySqlQuery implements ProcessorInterface
 {
