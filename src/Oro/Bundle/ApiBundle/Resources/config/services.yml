@@ -1,4 +1,6 @@
 parameters:
+    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
+    oro_api.config.max_nesting_level: 3
     # a list of supported formats of REST API requests delimited by |
     oro_api.rest.formats: json
     # default format of REST API requests
@@ -83,6 +85,23 @@ services:
         arguments:
             - @oro_api.collect_resources.processor
 
+    oro_api.config_extension_registry:
+        class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
+        arguments:
+            - %oro_api.config.max_nesting_level%
+
+    oro_api.config_extension.filters:
+        class: Oro\Bundle\ApiBundle\Config\FiltersConfigExtension
+        public: false
+        tags:
+            - { name: oro_api.config_extension }
+
+    oro_api.config_extension.sorters:
+        class: Oro\Bundle\ApiBundle\Config\SortersConfigExtension
+        public: false
+        tags:
+            - { name: oro_api.config_extension }
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
@@ -92,6 +111,8 @@ services:
     oro_api.config_loader_factory:
         class: Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory
         public: false
+        arguments:
+            - @oro_api.config_extension_registry
 
     oro_api.config_provider:
         class: Oro\Bundle\ApiBundle\Provider\ConfigProvider

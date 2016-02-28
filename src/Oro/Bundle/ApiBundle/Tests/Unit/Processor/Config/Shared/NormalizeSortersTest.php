@@ -95,19 +95,13 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                 'definition'      => [
                     'fields' => [
                         'field1' => [
-                            'definition' => [
-                                'property_path' => 'realField1'
-                            ]
+                            'property_path' => 'realField1'
                         ],
                         'field2' => [
-                            'definition' => [
-                                'property_path' => 'realField2',
-                                'fields'        => [
-                                    'field21' => [
-                                        'definition' => [
-                                            'property_path' => 'realField21'
-                                        ]
-                                    ]
+                            'property_path' => 'realField2',
+                            'fields'        => [
+                                'field21' => [
+                                    'property_path' => 'realField21'
                                 ]
                             ],
                             'sorters'    => [
@@ -117,25 +111,21 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                             ]
                         ],
                         'field3' => [
-                            'definition' => [
-                                'property_path' => 'realField3',
-                                'fields'        => [
-                                    'field31' => [
-                                        'property_path' => 'realField31',
+                            'property_path' => 'realField3',
+                            'fields'        => [
+                                'field31' => [
+                                    'property_path' => 'realField31',
+                                ],
+                                'field32' => [
+                                    'property_path' => 'realField32',
+                                    'fields'        => [
+                                        'field321' => [
+                                            'property_path' => 'realField321',
+                                        ]
                                     ],
-                                    'field32' => [
-                                        'definition' => [
-                                            'property_path' => 'realField32',
-                                            'fields'        => [
-                                                'field321' => [
-                                                    'property_path' => 'realField321',
-                                                ]
-                                            ]
-                                        ],
-                                        'sorters'    => [
-                                            'fields' => [
-                                                'field321' => null
-                                            ]
+                                    'sorters'    => [
+                                        'fields' => [
+                                            'field321' => null
                                         ]
                                     ]
                                 ]
@@ -177,12 +167,10 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                             'property_path' => 'realField1'
                         ],
                         'field2' => [
-                            'definition' => [
-                                'property_path' => 'realField2',
-                                'fields'        => [
-                                    'field21' => [
-                                        'property_path' => 'realField21',
-                                    ]
+                            'property_path' => 'realField2',
+                            'fields'        => [
+                                'field21' => [
+                                    'property_path' => 'realField21',
                                 ]
                             ],
                             'sorters'    => [
@@ -296,22 +284,20 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                 'definition'      => [
                     'fields' => [
                         'toOne1'  => [
-                            'definition' => [
-                                'fields' => [
-                                    'toOne1_toOne11'  => [
-                                        'sorters' => [
-                                            'fields' => [
-                                                'toOne1_toOne11_field111' => null
-                                            ]
+                            'fields' => [
+                                'toOne1_toOne11'  => [
+                                    'sorters' => [
+                                        'fields' => [
+                                            'toOne1_toOne11_field111' => null
                                         ]
-                                    ],
-                                    'toOne1_toMany11' => [
-                                        'sorters' => [
-                                            'fields' => [
-                                                'toOne1_toMany11_field111' => null
-                                            ]
+                                    ]
+                                ],
+                                'toOne1_toMany11' => [
+                                    'sorters' => [
+                                        'fields' => [
+                                            'toOne1_toMany11_field111' => null
                                         ]
-                                    ],
+                                    ]
                                 ],
                             ],
                             'sorters'    => [
