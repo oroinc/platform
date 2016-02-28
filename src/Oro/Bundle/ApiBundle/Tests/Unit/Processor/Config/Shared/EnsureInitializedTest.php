@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\EnsureInitialized;
-use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigLoader;
+use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
@@ -17,7 +17,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->configLoaderFactory->setLoader('test_section', new TestConfigLoader());
+        $this->configExtensionRegistry->addExtension(new TestConfigExtension());
 
         $this->processor = new EnsureInitialized($this->configLoaderFactory);
     }

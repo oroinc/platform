@@ -20,6 +20,7 @@ services:
     oro_api.get_config.load_from_config_bag:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag
         arguments:
+            - @oro_api.config_extension_registry
             - @oro_api.config_loader_factory
             - @oro_entity.entity_hierarchy_provider.all
             - @oro_api.config_bag
@@ -86,6 +87,7 @@ services:
     oro_api.get_relation_config.load_from_config_bag:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromConfigBag
         arguments:
+            - @oro_api.config_extension_registry
             - @oro_api.config_loader_factory
             - @oro_entity.entity_hierarchy_provider.all
             - @oro_api.config_bag

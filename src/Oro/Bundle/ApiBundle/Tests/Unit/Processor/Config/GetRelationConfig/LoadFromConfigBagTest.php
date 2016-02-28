@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetRelationConfig;
 
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
+use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class LoadFromConfigBagTest extends ConfigProcessorTestCase
@@ -47,7 +47,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         $config = [];
 
         $this->configBag->expects($this->never())
-            ->method('getConfig');
+            ->method('getRelationConfig');
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -61,7 +61,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWhenNoConfigIsReturnedFromConfigBag()
     {
         $this->configBag->expects($this->exactly(2))
-            ->method('getConfig')
+            ->method('getRelationConfig')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, $this->context->getVersion(), null],
@@ -82,7 +82,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithInheritanceWhenNoParentConfigIsReturnedFromConfigBag()
     {
         $this->configBag->expects($this->exactly(2))
-            ->method('getConfig')
+            ->method('getRelationConfig')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, $this->context->getVersion(), ['inherit' => true]],
@@ -103,7 +103,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWhenConfigWithoutInheritanceIsReturnedFromConfigBag()
     {
         $this->configBag->expects($this->once())
-            ->method('getConfig')
+            ->method('getRelationConfig')
             ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
             ->willReturn(['inherit' => false]);
 
@@ -118,19 +118,18 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithoutInheritance()
     {
         $config = [
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
-            'fields'       => [
+            'collapse' => true,
+            'fields'   => [
                 'field1' => null,
                 'field2' => null,
                 'field3' => null,
             ],
-            'filters'      => [
+            'filters'  => [
                 'fields' => [
                     'field1' => null
                 ]
             ],
-            'sorters'      => [
+            'sorters'  => [
                 'fields' => [
                     'field1' => null
                 ]
@@ -138,7 +137,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         ];
 
         $this->configBag->expects($this->once())
-            ->method('getConfig')
+            ->method('getRelationConfig')
             ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
             ->willReturn($config);
 
@@ -152,9 +151,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'label'        => 'Test Entity',
-                'plural_label' => 'Test Entities',
-                'fields'       => [
+                'collapse' => true,
+                'fields'   => [
                     'field1' => null,
                     'field2' => null,
                     'field3' => null,
@@ -179,20 +177,19 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithInheritance()
     {
         $config = [
-            'label'        => 'Other Entity',
-            'plural_label' => 'Other Entities',
-            'fields'       => [
+            'collapse' => false,
+            'fields'   => [
                 'field1' => null,
                 'field2' => null,
                 'field3' => null,
                 'field4' => null,
             ],
-            'filters'      => [
+            'filters'  => [
                 'fields' => [
                     'field1' => null
                 ]
             ],
-            'sorters'      => [
+            'sorters'  => [
                 'fields' => [
                     'field1' => null
                 ]
@@ -221,23 +218,22 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         ];
 
         $parentConfig3 = [
-            'inherit'      => false,
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
-            'order_by'     => [
+            'collapse' => true,
+            'inherit'  => false,
+            'order_by' => [
                 'field3' => 'ASC'
             ],
-            'fields'       => [
+            'fields'   => [
                 'field3' => [
                     'exclude' => true
                 ],
             ],
-            'filters'      => [
+            'filters'  => [
                 'fields' => [
                     'field3' => null,
                 ]
             ],
-            'sorters'      => [
+            'sorters'  => [
                 'fields' => [
                     'field3' => null,
                 ]
@@ -245,7 +241,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         ];
 
         $this->configBag->expects($this->exactly(4))
-            ->method('getConfig')
+            ->method('getRelationConfig')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
@@ -265,12 +261,10 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'label'        => 'Other Entity',
-                'plural_label' => 'Other Entities',
-                'order_by'     => [
+                'order_by' => [
                     'field2' => 'ASC'
                 ],
-                'fields'       => [
+                'fields'   => [
                     'field1' => null,
                     'field2' => [
                         'exclude' => true
@@ -320,7 +314,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         ];
 
         $this->configBag->expects($this->exactly(2))
-            ->method('getConfig')
+            ->method('getRelationConfig')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, $this->context->getVersion(), null],

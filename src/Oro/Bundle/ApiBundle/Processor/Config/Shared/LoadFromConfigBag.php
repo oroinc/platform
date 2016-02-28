@@ -4,8 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
@@ -15,6 +16,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
  */
 abstract class LoadFromConfigBag implements ProcessorInterface
 {
+    /** @var ConfigExtensionRegistry */
+    protected $configExtensionRegistry;
+
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
 
@@ -22,13 +26,16 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     protected $entityHierarchyProvider;
 
     /**
+     * @param ConfigExtensionRegistry          $configExtensionRegistry
      * @param ConfigLoaderFactory              $configLoaderFactory
      * @param EntityHierarchyProviderInterface $entityHierarchyProvider
      */
     public function __construct(
+        ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
         EntityHierarchyProviderInterface $entityHierarchyProvider
     ) {
+        $this->configExtensionRegistry = $configExtensionRegistry;
         $this->configLoaderFactory     = $configLoaderFactory;
         $this->entityHierarchyProvider = $entityHierarchyProvider;
     }
@@ -47,11 +54,6 @@ abstract class LoadFromConfigBag implements ProcessorInterface
 
         $config = $this->loadConfig($context->getClassName(), $context->getVersion());
         if (!empty($config)) {
-            if (!empty($config[ConfigUtil::DEFINITION])) {
-                $context->setResult(
-                    $this->loadConfigObject(ConfigUtil::DEFINITION, $config[ConfigUtil::DEFINITION])
-                );
-            }
             $extras = $context->getExtras();
             foreach ($extras as $extra) {
                 $sectionName = $extra->getName();
@@ -65,6 +67,15 @@ abstract class LoadFromConfigBag implements ProcessorInterface
                     );
                 }
             }
+
+            $sectionNames = $this->getAllConfigSectionNames();
+            foreach ($sectionNames as $sectionName) {
+                unset($config[$sectionName]);
+            }
+
+            $context->setResult(
+                $this->loadConfigObject(ConfigUtil::DEFINITION, $config)
+            );
         }
     }
 
@@ -77,22 +88,33 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     protected function loadConfig($entityClass, $version)
     {
         $config = $this->getConfig($entityClass, $version);
-        if (empty($config) || $this->isInherit($config)) {
+        if (null === $config) {
+            $config = [];
+        }
+        $isInherit = $this->isInherit($config);
+        if (array_key_exists(ConfigUtil::INHERIT, $config)) {
+            unset($config[ConfigUtil::INHERIT]);
+        }
+        if ($isInherit) {
             $parentClasses = $this->entityHierarchyProvider->getHierarchyForClassName($entityClass);
             foreach ($parentClasses as $parentClass) {
                 $parentConfig = $this->getConfig($parentClass, $version);
                 if (!empty($parentConfig)) {
-                    $config = $this->mergeConfigs($parentConfig, $config);
-                    if (!$this->isInherit($parentConfig)) {
+                    $isInherit = $this->isInherit($parentConfig);
+                    if (array_key_exists(ConfigUtil::INHERIT, $parentConfig)) {
+                        unset($parentConfig[ConfigUtil::INHERIT]);
+                    }
+                    $config = empty($config)
+                        ? $parentConfig
+                        : $this->mergeConfigs($config, $parentConfig);
+                    if (!$isInherit) {
                         break;
                     }
                 }
             }
         }
 
-        return null !== $config
-            ? $config
-            : [];
+        return $config;
     }
 
     /**
@@ -119,16 +141,22 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     }
 
     /**
-     * @param array      $parentConfig
-     * @param array|null $config
-     *
-     * @return array
+     * @return string[]
      */
-    protected function mergeConfigs($parentConfig, $config)
+    protected function getAllConfigSectionNames()
     {
-        return null === $config
-            ? $parentConfig
-            : array_merge_recursive($parentConfig, $config);
+        $sectionNameMap = [];
+        $extensions     = $this->configExtensionRegistry->getExtensions();
+        foreach ($extensions as $extension) {
+            $sections = $extension->getEntityConfigurationSections();
+            foreach ($sections as $name => $configuration) {
+                if (!isset($sectionNameMap[$name])) {
+                    $sectionNameMap[$name] = true;
+                }
+            }
+        }
+
+        return array_keys($sectionNameMap);
     }
 
     /**
@@ -138,4 +166,12 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      * @return array|null
      */
     abstract protected function getConfig($entityClass, $version);
+
+    /**
+     * @param array $config
+     * @param array $parentConfig
+     *
+     * @return array
+     */
+    abstract protected function mergeConfigs(array $config, array $parentConfig);
 }
