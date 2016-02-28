@@ -77,9 +77,12 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
             ]
         ];
 
-        $extra1 = $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface');
-        $extra2 = new TestConfigSection('test_section');
-        $this->context->setExtras([$extra1, $extra2]);
+        $this->context->setExtras(
+            [
+                $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
+                new TestConfigSection('test_section')
+            ]
+        );
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects($this->once())
@@ -109,14 +112,14 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                         'Test\Association1Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getExtras(),
+                        $this->context->getInheritableExtras(),
                         $this->createRelationConfigObject()
                     ],
                     [
                         'Test\Association2Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getExtras(),
+                        $this->context->getInheritableExtras(),
                         $this->createRelationConfigObject(
                             [
                                 'exclusion_policy' => 'all',
@@ -131,7 +134,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                         'Test\Association3Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getExtras(),
+                        $this->context->getInheritableExtras(),
                         $this->createRelationConfigObject(
                             [
                                 'exclusion_policy' => 'all',

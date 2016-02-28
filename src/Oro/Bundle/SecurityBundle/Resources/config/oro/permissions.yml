@@ -1,0 +1,7 @@
+oro_permissions:
+    VIEW: []
+    CREATE: []
+    EDIT: []
+    DELETE: []
+    ASSIGN: []
+    SHARE: []

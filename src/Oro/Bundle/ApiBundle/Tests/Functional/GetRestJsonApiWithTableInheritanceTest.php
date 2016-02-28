@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 
@@ -61,7 +62,11 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
 
         }
 
-        $entityAlias = $this->entityClassTransformer->transform(self::ENTITY_CLASS);
+        $entityAlias = $this->valueNormalizer->normalizeValue(
+            self::ENTITY_CLASS,
+            DataType::ENTITY_TYPE,
+            [RequestType::REST, RequestType::JSON_API]
+        );
 
         // test get list request
         $this->client->request(
@@ -101,7 +106,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
                     'include' => 'staff',
                     'fields'  => [
                         'testdepartments' => 'id,name,staff',
-                        'staff'           => 'id,name'
+                        'testemployees'   => 'id,name'
                     ],
                     'sort'    => '-id'
                 ],

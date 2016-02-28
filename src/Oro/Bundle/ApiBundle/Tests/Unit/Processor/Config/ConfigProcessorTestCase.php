@@ -4,7 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -18,6 +21,9 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
     /** @var ConfigContext */
     protected $context;
 
+    /** @var ConfigExtensionRegistry */
+    protected $configExtensionRegistry;
+
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
 
@@ -28,7 +34,11 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->setRequestType(self::TEST_REQUEST_TYPE);
 
-        $this->configLoaderFactory = new ConfigLoaderFactory();
+        $this->configExtensionRegistry = new ConfigExtensionRegistry();
+        $this->configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $this->configExtensionRegistry->addExtension(new SortersConfigExtension());
+
+        $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);
     }
 
     /**
@@ -70,6 +80,7 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
         }
+        $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
 
         return $classMetadata;
     }

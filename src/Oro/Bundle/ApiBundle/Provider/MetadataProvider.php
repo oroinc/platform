@@ -27,7 +27,7 @@ class MetadataProvider
      * @param string                      $className   The FQCN of an entity
      * @param string                      $version     The version of a config
      * @param string[]                    $requestType The request type, for example "rest", "soap", etc.
-     * @param MetadataExtraInterface[]    $extras      Additional metadata information
+     * @param MetadataExtraInterface[]    $extras      Requests for additional metadata information
      * @param EntityDefinitionConfig|null $config      The configuration of an entity
      *
      * @return EntityMetadata|null

@@ -22,7 +22,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE;EDIT",
  *              "group_name"=""
  *          },
  *          "ownership"={

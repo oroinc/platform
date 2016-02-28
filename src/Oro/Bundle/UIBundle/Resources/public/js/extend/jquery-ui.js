@@ -8,6 +8,9 @@ define(['jquery', 'jquery-ui'], function($) {
             _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker
         };
 
+        var dropdownClassName = 'ui-datepicker-dialog-is-below';
+        var dropupClassName = 'ui-datepicker-dialog-is-above';
+
         /**
          * Combines space-separated line of events with widget's namespace
          *  for handling datepicker's position change
@@ -70,8 +73,6 @@ define(['jquery', 'jquery-ui'], function($) {
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker;
         var _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
-        var dropdownClassName = 'ui-datepicker-dialog-is-below';
-        var dropupClassName = 'ui-datepicker-dialog-is-above';
 
         /**
          * Bind update position method after datepicker is opened
