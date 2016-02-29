@@ -24,7 +24,7 @@ class AdditionalMetadataCacheWarmer implements CacheWarmerInterface
      */
     public function isOptional()
     {
-       return true; 
+        return true;
     }
 
     /**
