@@ -6,10 +6,14 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -19,7 +23,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
     /** @var ExtendDbIdentifierNameGenerator */
@@ -318,7 +322,13 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
 
         $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
 
-        $this->configManager->expects($this->once())
+        $this->configManager
+            ->expects($this->at(0))
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->willReturn(false);
+
+        $this->configManager->expects($this->at(1))
             ->method('hasConfig')
             ->with($entityClass, $fieldName)
             ->willReturn(true);
