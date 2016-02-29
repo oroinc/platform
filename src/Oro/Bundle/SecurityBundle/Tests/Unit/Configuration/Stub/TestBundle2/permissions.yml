@@ -1,0 +1,16 @@
+oro_permissions:
+    PERMISSION1:
+        label: Label for Permission 1
+        group_names: frontend
+
+    PERMISSION2:
+        label: Label for Permission 2
+        description: Permission 2 description
+        apply_to_entities: ['OroTestFrameworkBundle:TestActivityTarget']
+        exclude_entities: ['OroTestFrameworkBundle:WorkflowAwareEntity']
+        group_names: ['new_group']
+        apply_to_all: false
+
+    PERMISSION3:
+        label: Label for Permission 3
+        apply_to_entities: ['NotManageableEntity']

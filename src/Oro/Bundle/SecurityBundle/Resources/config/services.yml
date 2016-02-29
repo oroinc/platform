@@ -14,6 +14,7 @@ parameters:
     oro_security.acl.dbal.provider.class:                      Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider
     oro_security.acl.permission_granting_strategy.class:       Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy
     oro_security.acl.permission_map.class:                     Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap
+    oro_security.acl.permission_manager.class:                 Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
     oro_security.acl.object_identity_factory.class:            Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
     oro_security.acl.object_identity_retrieval_strategy.class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityRetrievalStrategy
     oro_security.acl.object_id_accessor.class:                 Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor
@@ -48,6 +49,7 @@ parameters:
 
     oro_security.twig.security_extension.class:                Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
     oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
+    oro_security.twig.acl.permission_extension.class:          Oro\Bundle\SecurityBundle\Twig\Acl\PermissionExtension
 
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
@@ -76,6 +78,10 @@ parameters:
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
 
     oro_security.orm.acl_conditional_factor_builder.class:     Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder
+
+    oro_security.configuration.permission_list_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration
+    oro_security.configuration.provider.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
+    oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
 
 services:
     oro_security.security_facade:
@@ -152,6 +158,8 @@ services:
             - @oro_security.entity_security_metadata_provider
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.owner.ownership_decision_maker.chain
+            - @oro_security.acl.permission_manager
+            - @oro_security.acl.group_provider.chain
         calls:
             - [setEntityOwnerAccessor, [@oro_security.owner.entity_owner_accessor]]
         tags:
@@ -186,6 +194,19 @@ services:
         class: %oro_security.acl.permission_map.class%
         arguments:
             - @oro_security.acl.extension_selector
+
+    oro_security.cache.provider.permission:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_security_permission' ] ]
+
+    oro_security.acl.permission_manager:
+        class: %oro_security.acl.permission_manager.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_security.configuration.provider.permission_configuration
+            - @oro_security.configuration.builder.permission_configuration
+            - @oro_security.cache.provider.permission
 
     oro_security.acl.object_identity_factory:
         class: %oro_security.acl.object_identity_factory.class%
@@ -380,6 +401,13 @@ services:
         class: %oro_security.twig.security_organization_extension%
         arguments:
             - @security.context
+        tags:
+            - { name: twig.extension }
+
+    oro_security.twig.acl.permission_extension:
+        class: %oro_security.twig.acl.permission_extension.class%
+        arguments:
+            - @oro_security.acl.permission_manager
         tags:
             - { name: twig.extension }
 
@@ -598,3 +626,18 @@ services:
 
     oro_security.orm.acl_conditional_factor_builder:
         class: %oro_security.orm.acl_conditional_factor_builder.class%
+
+    oro_security.configuration.permission_list_configuration:
+        class: %oro_security.configuration.permission_list_configuration.class%
+
+    oro_security.configuration.provider.permission_configuration:
+        class: %oro_security.configuration.provider.permission_configuration.class%
+        arguments:
+            - @oro_security.configuration.permission_list_configuration
+            - %kernel.bundles%
+
+    oro_security.configuration.builder.permission_configuration:
+        class: %oro_security.configuration.builder.permission_configuration.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @validator
