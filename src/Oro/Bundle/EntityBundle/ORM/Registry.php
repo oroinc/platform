@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Manager;
+namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Bundle\DoctrineBundle\Registry as DoctrineRegistry;
 
