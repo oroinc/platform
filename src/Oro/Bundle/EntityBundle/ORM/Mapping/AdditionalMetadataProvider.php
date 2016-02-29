@@ -2,24 +2,24 @@
 
 namespace Oro\Bundle\EntityBundle\ORM\Mapping;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 class AdditionalMetadataProvider
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var Cache */
     protected $cacheDriver;
 
     /**
-     * @param Registry $registry
+     * @param ManagerRegistry $registry
      * @param Cache $cacheDriver
      */
-    public function __construct(Registry $registry, Cache $cacheDriver)
+    public function __construct(ManagerRegistry $registry, Cache $cacheDriver)
     {
         $this->registry = $registry;
         $this->cacheDriver = $cacheDriver;
