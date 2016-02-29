@@ -55,7 +55,6 @@ define([
             var original = this.get('original');
             var included = this.get('included');
             var excluded = this.get('excluded');
-            id = parseInt(id);
 
             var isActive = model.get(this.columnName);
             var originallyActive;
