@@ -3,9 +3,8 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener;
-use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 
-class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
+class UpdateSchemaDoctrineListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -94,9 +93,9 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->input
             ->expects($this->once())
-            ->method('getOption')
+            ->method('hasOption')
             ->with('force')
-            ->will($this->returnValue(null));
+            ->will($this->returnValue(false));
 
         $this->eventMock
             ->expects($this->exactly(2))
@@ -114,7 +113,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->input
             ->expects($this->once())
-            ->method('getOption')
+            ->method('hasOption')
             ->with('force')
             ->will($this->returnValue(true));
 

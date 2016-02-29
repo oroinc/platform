@@ -5,14 +5,14 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\EventListener;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class UpdateSchemaListenerTest extends WebTestCase
+class UpdateSchemaDoctrineListenerTest extends WebTestCase
 {
     protected function setUp()
     {
@@ -41,15 +41,16 @@ class UpdateSchemaListenerTest extends WebTestCase
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
-        $command = $application->get($commandName);
-        $bufferedOutput = new BufferedOutput();
+        $application->doRun(new ArrayInput(['help']), new BufferedOutput());
 
+        $command = $application->find($commandName);
+        $bufferedOutput = new BufferedOutput();
         $this->getContainer()->get('event_dispatcher')->dispatch(
             ConsoleEvents::TERMINATE,
-            new ConsoleCommandEvent($command, new ArrayInput($params), $bufferedOutput)
+            new ConsoleTerminateEvent($command, new ArrayInput($params), $bufferedOutput, 0)
         );
 
-        $this->assertContains($expectedContent, $bufferedOutput);
+        $this->assertEquals($expectedContent, $bufferedOutput->fetch());
     }
 
     /**
@@ -57,9 +58,6 @@ class UpdateSchemaListenerTest extends WebTestCase
      */
     public function commandDataProvider()
     {
-        // when we use PostgreSQL, during doctrine:schema:update, doctrine does not delete search index.
-        $postgreSQLContent = 'Nothing to update - your database is already in sync with the current entity metadata.';
-
         return [
             'otherCommand mysql' => [
                 'platform' => DatabaseDriverInterface::DRIVER_MYSQL,
@@ -71,7 +69,7 @@ class UpdateSchemaListenerTest extends WebTestCase
                 'platform' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
                 'commandName' => 'doctrine:mapping:info',
                 'params' => [],
-                'expectedContent' => 'OK',
+                'expectedContent' => '',
             ],
             'commandWithoutOption mysql' => [
                 'platform' => DatabaseDriverInterface::DRIVER_MYSQL,
@@ -83,19 +81,19 @@ class UpdateSchemaListenerTest extends WebTestCase
                 'platform' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
                 'commandName' => 'doctrine:schema:update',
                 'params' => [],
-                'expectedContent' => $postgreSQLContent,
+                'expectedContent' => '',
             ],
             'commandWithAnotherOption mysql' => [
                 'platform' => DatabaseDriverInterface::DRIVER_MYSQL,
                 'commandName' => 'doctrine:schema:update',
                 'params' => ['--dump-sql' => true],
-                'expectedContent' => 'ALTER TABLE 1',
+                'expectedContent' => '',
             ],
             'commandWithAnotherOption psql' => [
                 'platform' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
                 'commandName' => 'doctrine:schema:update',
                 'params' => ['--dump-sql' => true],
-                'expectedContent' => $postgreSQLContent,
+                'expectedContent' => '',
             ],
             'commandWithForceOption mysql' => [
                 'platform' => DatabaseDriverInterface::DRIVER_MYSQL,
@@ -107,7 +105,7 @@ class UpdateSchemaListenerTest extends WebTestCase
                 'platform' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
                 'commandName' => 'doctrine:schema:update',
                 'params' => ['--force' => true],
-                'expectedContent' => $postgreSQLContent,
+                'expectedContent' => '',
             ],
         ];
     }
