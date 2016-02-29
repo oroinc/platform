@@ -216,10 +216,12 @@ class ArrayUtil
     }
 
     /**
-     * Return first element on which callback returns truthy value, null otherwise
+     * Return first element on which callback returns true value, null otherwise
      *
      * @param callable $callback
      * @param array    $array
+     *
+     * @return mixed|null
      */
     public static function find(callable $callback, array $array)
     {
@@ -288,6 +290,8 @@ class ArrayUtil
      * [[min1, max1], [min2, max2], ...]
      *
      * @param int[] $ints List of integers
+     *
+     * @return array
      */
     public static function intRanges(array $ints)
     {
@@ -295,7 +299,7 @@ class ArrayUtil
         sort($ints);
 
         $result = [];
-        while(false !== ($subResult = static::shiftRange($ints))) {
+        while (false !== ($subResult = static::shiftRange($ints))) {
             $result[] = $subResult;
         }
 

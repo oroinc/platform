@@ -185,7 +185,7 @@ class AclRoleHandler
     protected function createRoleFormInstance(AbstractRole $role, array $privilegeConfig)
     {
         return $this->formFactory->create(
-            new ACLRoleType($privilegeConfig),
+            new AclRoleType($privilegeConfig),
             $role
         );
     }

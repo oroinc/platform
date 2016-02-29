@@ -102,7 +102,7 @@ define([
             var self = this;
             $.get(url)
                 .done(function(data) {
-                    _.each(self.filterLoaders, function (loader) {
+                    _.each(self.filterLoaders, function(loader) {
                         loader.success.call(this, data[loader.name]);
                     });
                 })
