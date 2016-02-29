@@ -29,7 +29,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW",
  *              "group_name"=""
  *          },
  *          "note"={
