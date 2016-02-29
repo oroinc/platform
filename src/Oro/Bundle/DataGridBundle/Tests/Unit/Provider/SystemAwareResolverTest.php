@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
+use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass;
 
 class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,6 +21,11 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container->expects($this->any())
+            ->method('get')
+            ->will($this->returnValueMap([
+                ['oro_datagrid.some_class', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new SomeClass(),]
+            ]));
         $this->resolver  = new SystemAwareResolver($this->container);
     }
 
@@ -113,25 +121,6 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
             $arguments = [$gridName, 'choices', $gridDefinition['filters']['entityName']];
         }
 
-        $service = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass')
-            ->getMock();
-        $service->expects($this->once())
-            ->method('getAnswerToLifeAndEverything')
-            ->will(
-                $this->returnCallback(
-                    function () use ($arguments, $expected) {
-                        $this->assertEquals($arguments, func_get_args());
-
-                        return $expected;
-                    }
-                )
-            );
-
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('oro_datagrid.some_class')
-            ->will($this->returnValue($service));
-
         $gridDefinition = $this->resolver->resolve($gridName, $gridDefinition);
 
         $this->assertEquals($expected, $gridDefinition['filters']['entityName']['choices']);
@@ -165,6 +154,23 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testResolveLazyServiceMethodCall()
+    {
+        $gridDefinition = [
+            'filters' => [
+                'entityName' => [
+                    'choices_builder' => '@?oro_datagrid.some_class->getAnswerToLifeAndEverything'
+                ]
+            ]
+        ];
+
+        $resolvedDefinition = $this->resolver->resolve('grid', $gridDefinition);
+        $builder = $resolvedDefinition['filters']['entityName']['choices_builder'];
+
+        $this->assertTrue(is_callable($builder));
+        $this->assertEquals(42, call_user_func($builder));
+    }
+
     public function testResolveService()
     {
         $gridName = 'test';
@@ -176,16 +182,9 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $service = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass')
-            ->getMock();
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('oro_datagrid.some_class')
-            ->will($this->returnValue($service));
-
         $gridDefinition = $this->resolver->resolve($gridName, $gridDefinition);
 
-        $this->assertEquals($service, $gridDefinition['filters']['entityName']['choices_builder']);
+        $this->assertEquals(new SomeClass(), $gridDefinition['filters']['entityName']['choices_builder']);
     }
 
     /**

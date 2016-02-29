@@ -110,8 +110,12 @@ class OrmFilterExtension extends AbstractExtension
         $filters       = $this->getFiltersToApply($config);
         $values        = $this->getValuesToApply($config);
         $initialValues = $this->getValuesToApply($config, false);
+        $lazy          = $data->offsetGetOr(MetadataObject::LAZY_KEY, true);
 
         foreach ($filters as $filter) {
+            if (!$lazy) {
+                $filter->resolveOptions();
+            }
             $value        = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
             $initialValue = isset($initialValues[$filter->getName()]) ? $initialValues[$filter->getName()] : false;
 
