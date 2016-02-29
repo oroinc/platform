@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 
-use Oro\Component\Testing\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class ActionTestCase extends WebTestCase
 {

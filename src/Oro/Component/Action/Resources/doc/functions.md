@@ -554,27 +554,3 @@ Find Entities
         age: 10
         cnt: 0
 ```
-
-Run Action
-----------
-
-**Class:** Oro\Bundle\ActionBundle\Action\RunAction
-
-**Alias:** run_action
-
-**Description:** Run action.
-
-**Parameters:**
- - attribute - attribute where action result value should be set (optional)
- - action - action name
- - entity_class - class of Entity for ActionData
- - entity_id - id of Entity for ActionData
-
-**Configuration Example**
-```
-- @run_action:
-    attribute: $.result
-    action: acme_demo_action
-    entity_class: Acme\Bundle\DemoBundle\Entity\User
-    entity_id: $.user.id
-```
