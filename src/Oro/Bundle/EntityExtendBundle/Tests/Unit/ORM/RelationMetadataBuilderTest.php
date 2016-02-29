@@ -7,11 +7,13 @@ use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -102,7 +104,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setExtendProviderMock();
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -182,7 +184,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setExtendProviderMock();
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -264,7 +266,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setExtendProviderMock();
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -320,7 +322,13 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
 
         $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
 
-        $this->configManager->expects($this->once())
+        $this->configManager
+            ->expects($this->at(0))
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->willReturn(false);
+
+        $this->configManager->expects($this->at(1))
             ->method('hasConfig')
             ->with($entityClass, $fieldName)
             ->willReturn(true);
@@ -354,7 +362,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setExtendProviderMock();
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -594,7 +602,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setExtendProviderMock();
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -779,7 +787,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setExtendProviderMock();
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -887,7 +895,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setExtendProviderMock();
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -994,7 +1002,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
-        $this->setExtendProviderMock();
+
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
@@ -1176,23 +1184,5 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $config->setValues($values);
 
         return $config;
-    }
-
-    protected function setExtendProviderMock()
-    {
-        $extendProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extendProvider
-            ->expects($this->any())
-            ->method('hasConfig')
-            ->willReturn(false);
-
-        $this->configManager
-            ->expects($this->any())
-            ->method('getProvider')
-            ->with('extend')
-            ->willReturn($extendProvider);
     }
 }
