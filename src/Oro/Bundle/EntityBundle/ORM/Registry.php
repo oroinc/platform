@@ -2,49 +2,42 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Bundle\DoctrineBundle\Registry as DoctrineRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry as BaseRegistry;
 
-use Doctrine\ORM\EntityManager;
-
-class Registry extends DoctrineRegistry
+class Registry extends BaseRegistry
 {
-    /** @var EntityManager[] */
-    private $cachedManagers = [];
-
-    /** @var array */
+    /** @var string[] [entity class => manager hash, ...] */
     private $managersMap = [];
+
+    /** @var array [manager hash => manager|null, ...] */
+    private $cachedManagers = [];
 
     /**
      * {@inheritdoc}
      */
     public function resetManager($name = null)
     {
+        $this->managersMap    = [];
         $this->cachedManagers = [];
-        $this->managersMap = [];
 
-        return parent::resetManager($name);
+        parent::resetManager($name);
     }
 
     /**
-     * @param string $entityClass The real class name of an entity
-     *
-     * @return EntityManager|null
+     * {@inheritdoc}
      */
-    public function getManagerForClass($entityClass)
+    public function getManagerForClass($class)
     {
-        if (!array_key_exists($entityClass, $this->managersMap)) {
-            $manager = parent::getManagerForClass($entityClass);
-            if (null !== $manager) {
-                $hash = spl_object_hash($manager);
-                $this->cachedManagers[$hash] = $manager;
-                $this->managersMap[$entityClass] = $hash;
-            } else {
-                $this->managersMap[$entityClass] = null;
-            }
-
-            return $manager;
+        if (array_key_exists($class, $this->managersMap)) {
+            return $this->cachedManagers[$this->managersMap[$class]];
         }
 
-        return $this->managersMap[$entityClass] ? $this->cachedManagers[$this->managersMap[$entityClass]] : null;
+        $manager = parent::getManagerForClass($class);
+        $hash    = null !== $manager ? spl_object_hash($manager) : '';
+
+        $this->managersMap[$class]   = $hash;
+        $this->cachedManagers[$hash] = $manager;
+
+        return $manager;
     }
 }
