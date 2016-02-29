@@ -6,7 +6,7 @@ actions:
         button_options:
             template: OroActionBundle:Action:crud-button.html.twig
 
-    EDIT:
+    UPDATE:
         extends: CRUD_ACTION
         acl_resource: [EDIT, $.data]
         order: 10

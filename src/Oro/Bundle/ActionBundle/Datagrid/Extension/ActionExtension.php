@@ -68,8 +68,9 @@ class ActionExtension extends AbstractExtension
 
         $this->processActionsConfig($config);
         $this->processMassActionsConfig($config);
+
         $this->actionConfiguration = $config->offsetGetOr(DatagridActionExtension::ACTION_CONFIGURATION_KEY, []);
-        $config->offsetSet(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [$this, 'getActionsPermissions']);
+        $config->offsetSet(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [$this, 'getRowConfiguration']);
 
         return true;
     }
@@ -79,15 +80,8 @@ class ActionExtension extends AbstractExtension
      *
      * @return array
      */
-    public function getActionsPermissions(ResultRecordInterface $record)
+    public function getRowConfiguration(ResultRecordInterface $record)
     {
-        $actionsOld = [];
-        // process own permissions of the datagrid
-        if ($this->actionConfiguration && is_callable($this->actionConfiguration)) {
-            $actionsOld = call_user_func($this->actionConfiguration, $record);
-            $actionsOld = is_array($actionsOld) ? $actionsOld : [];
-        };
-
         $actionData = $this->contextHelper->getActionData([
             'entityId' => $record->getValue('id'),
             'entityClass' => $this->datagridContext['entityClass'],
@@ -99,7 +93,28 @@ class ActionExtension extends AbstractExtension
             $actionsNew[$action->getName()] = $this->getRowActionsConfig($action, $actionData);
         }
 
-        return array_merge($actionsOld, $actionsNew);
+        return array_merge($this->getParentRowConfiguration($record), $actionsNew);
+    }
+
+    /**
+     * @param ResultRecordInterface $record
+     * @return array
+     */
+    protected function getParentRowConfiguration(ResultRecordInterface $record)
+    {
+        if (empty($this->actionConfiguration)) {
+            return [];
+        }
+
+        $rowActions = [];
+
+        if (is_callable($this->actionConfiguration)) {
+            $rowActions = call_user_func($this->actionConfiguration, $record);
+        } elseif (is_array($this->actionConfiguration)) {
+            $rowActions = $this->actionConfiguration;
+        }
+
+        return is_array($rowActions) ? $rowActions : [];
     }
 
     /**
