@@ -4,8 +4,10 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Exception\ActionReferenceException;
+use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 use Oro\Bundle\ActionBundle\Helper\ActionSubstitutionHelper;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Helper\SubstitutionVenue;
 
 class ActionRegistry
 {
@@ -22,10 +24,9 @@ class ActionRegistry
     protected $actions;
 
     /**
-     * Substitutions map
-     * @var array
+     * @var SubstitutionVenue
      */
-    protected $substitutions;
+    protected $substitution;
 
     /**
      * @param ActionConfigurationProvider $configurationProvider
@@ -40,13 +41,14 @@ class ActionRegistry
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
         $this->applicationsHelper = $applicationsHelper;
+        $this->substitution = new SubstitutionVenue();
     }
 
     /**
-     * @param string|null $entityClass
-     * @param string|null $route
-     * @param string|null $datagrid
-     * @param string|null $group
+     * @param string|null $entityClass match by entity
+     * @param string|null $route match by route
+     * @param string|null $datagrid match by grid
+     * @param string|null $group filter by group
      * @return Action[]
      */
     public function find($entityClass, $route, $datagrid, $group = null)
@@ -60,15 +62,15 @@ class ActionRegistry
             $definition = $action->getDefinition();
 
             if ($this->isEntityClassMatched($entityClass, $definition) ||
+                $action->hasUnboundSubstitution() ||
                 ($route && in_array($route, $definition->getRoutes(), true)) ||
-                ($datagrid && in_array($datagrid, $definition->getDatagrids(), true)) ||
-                $action->hasUnboundSubstitution()
+                ($datagrid && in_array($datagrid, $definition->getDatagrids(), true))
             ) {
                 $actions[$action->getName()] = $action;
             }
         }
 
-        $this->applySubstitutions($actions);
+        $this->substitution->apply($actions);
 
         return $actions;
     }
@@ -85,7 +87,7 @@ class ActionRegistry
     }
 
     /**
-     * @throws ActionReferenceException
+     * @throws CircularReferenceException
      */
     protected function loadActions()
     {
@@ -95,7 +97,7 @@ class ActionRegistry
 
         $this->actions = [];
 
-        $substitutions = [];
+        $replacements = [];
 
         $configuration = $this->configurationProvider->getActionConfiguration();
         $actions = $this->assembler->assemble($configuration);
@@ -115,22 +117,20 @@ class ActionRegistry
 
             $substitutionTarget = $action->getDefinition()->getSubstituteAction();
             if ($substitutionTarget) {
-                $substitutions[$substitutionTarget] = $actionName;
+                $replacements[$substitutionTarget] = $actionName;
             }
         }
 
-        $this->substitutions = [];
-
-        foreach ($substitutions as $target => $replacementName) {
+        $substitutionMap = [];
+        foreach ($replacements as $target => $replacementName) {
             if (array_key_exists($target, $this->actions)) {
-                $this->substitutions[$target] = $replacementName;
+                $substitutionMap[$target] = $replacementName;
             } else {
                 unset($this->actions[$replacementName]); //if nothing to replace no need to keep the action
             }
         }
 
-        //circular references protection - throws an exception if found (this check can be moved to compiler pass)
-        ActionSubstitutionHelper::detectCircularSubstitutions($this->substitutions);
+        $this->substitution->setMap($substitutionMap);
 
     }
 
@@ -163,20 +163,6 @@ class ActionRegistry
         $inEntities = in_array($className, $definition->getEntities(), true);
         $inExcludedEntities = in_array($className, $definition->getExcludeEntities(), true);
 
-        if (($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param array $actions
-     */
-    protected function applySubstitutions(array &$actions)
-    {
-        if ($this->substitutions) {
-            ActionSubstitutionHelper::applySubstitutions($this->substitutions, $actions);
-        }
+        return ($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities);
     }
 }
