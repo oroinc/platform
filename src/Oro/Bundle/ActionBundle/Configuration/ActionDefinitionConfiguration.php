@@ -221,7 +221,7 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
                 ->variableNode('confirmation')
                     ->beforeNormalization()
                         ->ifString()
-                        ->then(function($value) {
+                        ->then(function ($value) {
                             return !empty($value) ? ['message' => $value] : [];
                         })
                     ->end()

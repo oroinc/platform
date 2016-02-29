@@ -1,8 +1,7 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Helper;
+namespace Oro\Bundle\EntityConfigBundle\Helper;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
@@ -15,33 +14,24 @@ class EntityConfigHelper
     /** @var AclGroupProviderInterface */
     protected $groupProvider;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /**
-     * @param ConfigProvider $entityConfigProvider
-     * @param DoctrineHelper $doctrineHelper
+     * @param ConfigProvider $configProvider
      * @param AclGroupProviderInterface $groupProvider
      */
-    public function __construct(
-        ConfigProvider $entityConfigProvider,
-        DoctrineHelper $doctrineHelper,
-        AclGroupProviderInterface $groupProvider
-    ) {
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(ConfigProvider $configProvider, AclGroupProviderInterface $groupProvider) {
+        $this->configProvider = $configProvider;
         $this->groupProvider = $groupProvider;
     }
 
     /**
-     * @param mixed $class
+     * @param string|object $class
      * @param array $routes
      * @param string $groupName
      * @return array
      */
     public function getRoutes($class, array $routes, $groupName = '')
     {
-        $metadata = $this->getEntityConfigManager()->getEntityMetadata($this->doctrineHelper->getEntityClass($class));
+        $metadata = $this->getConfigManager()->getEntityMetadata($this->configProvider->getClassName($class));
 
         $result = [];
 
@@ -55,13 +45,13 @@ class EntityConfigHelper
     }
 
     /**
-     * @param mixed $class
+     * @param string|object $class
      * @param string $name
      * @return mixed
      */
     public function getConfigValue($class, $name)
     {
-        $config = $this->entityConfigProvider->getConfig($this->doctrineHelper->getEntityClass($class));
+        $config = $this->configProvider->getConfig($class);
 
         return $config->get($name);
     }
@@ -85,8 +75,8 @@ class EntityConfigHelper
     /**
      * @return ConfigManager
      */
-    protected function getEntityConfigManager()
+    protected function getConfigManager()
     {
-        return $this->entityConfigProvider->getConfigManager();
+        return $this->configProvider->getConfigManager();
     }
 }

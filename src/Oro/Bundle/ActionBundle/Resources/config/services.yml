@@ -1,8 +1,8 @@
 parameters:
     oro_action.context_accessor.class: Oro\Component\ConfigExpression\Model\ContextAccessor
+    oro_action.handler.delete.class: Oro\Bundle\ActionBundle\Handler\DeleteHandler
     oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
-    oro_action.helper.entity_config.class: Oro\Bundle\ActionBundle\Helper\EntityConfigHelper
     oro_action.registry.class: Oro\Bundle\ActionBundle\Model\ActionRegistry
     oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
     oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
@@ -19,23 +19,23 @@ services:
     oro_action.context_accessor:
         class: %oro_action.context_accessor.class%
 
+    oro_action.handler.delete:
+        class: %oro_action.handler.delete.class%
+        arguments:
+            - @oro_soap.handler.delete
+            - @oro_action.api_manager
+            - @oro_entity.doctrine_helper
+
     oro_action.helper.context:
-            class: %oro_action.helper.context.class%
-            arguments:
-                - @oro_entity.doctrine_helper
-                - @request_stack
+        class: %oro_action.helper.context.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @request_stack
 
     oro_action.helper.applications:
-            class: %oro_action.helper.applications.class%
-            arguments:
-                - @security.token_storage
-
-    oro_action.helper.entity_config:
-            class: %oro_action.helper.entity_config.class%
-            arguments:
-                - @oro_entity_config.provider.entity
-                - @oro_entity.doctrine_helper
-                - @oro_security.acl.group_provider.chain
+        class: %oro_action.helper.applications.class%
+        arguments:
+            - @security.token_storage
 
     oro_action.registry:
         class: %oro_action.registry.class%

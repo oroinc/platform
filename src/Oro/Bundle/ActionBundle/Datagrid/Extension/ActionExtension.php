@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Datagrid\Extension;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -95,16 +96,26 @@ class ActionExtension extends AbstractExtension
 
         $actionsNew = [];
         foreach ($this->actions as $action) {
-            if ($action->isAvailable($actionData)) {
-                $actionsNew[$action->getName()] = [
-                    'translates' => $actionData['translates']->toArray(),
-                ];
-            } else {
-                $actionsNew[$action->getName()] = false;
-            }
+            $actionsNew[$action->getName()] = $this->getRowActionsConfig($action, $actionData);
         }
 
         return array_merge($actionsOld, $actionsNew);
+    }
+
+    /**
+     * @param Action $action
+     * @param ActionData $actionData
+     * @return bool|array
+     */
+    protected function getRowActionsConfig(Action $action, ActionData $actionData)
+    {
+        if (!$action->isAvailable($actionData)) {
+            return false;
+        }
+
+        return [
+            'translates' => $actionData->getScalarValues(),
+        ];
     }
 
     /**

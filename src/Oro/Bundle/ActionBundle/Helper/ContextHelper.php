@@ -7,7 +7,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionTranslates;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ContextHelper
@@ -79,11 +78,7 @@ class ContextHelper
                 );
             }
 
-            $this->actionDatas[$hash] = new ActionData([
-                'data' => $entity,
-                'context' => $context,
-                'translates' => new ActionTranslates(),
-            ]);
+            $this->actionDatas[$hash] = new ActionData(['data' => $entity]);
         }
 
         return $this->actionDatas[$hash];
