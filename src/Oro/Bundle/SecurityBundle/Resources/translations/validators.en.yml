@@ -1,0 +1,4 @@
+oro.security.permission.constraints:
+    name_contains_illegal_characters: >
+        'The property "name" contains illegal characters. The valid value should start with a letter and only contain letters, '
+        'numbers, underscores ("_"), hyphens ("-") and colons (":").'

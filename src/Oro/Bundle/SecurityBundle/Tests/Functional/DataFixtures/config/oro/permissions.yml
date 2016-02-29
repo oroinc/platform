@@ -1,0 +1,41 @@
+oro_permissions:
+    TEST_PERMISSION1:
+        label: Label1
+        description: Description1
+        group_names: group1
+        apply_to_all: true
+        apply_to_entities:
+            - TestEntity1
+            - TestEntity2
+        exclude_entities:
+            - TestEntity10
+            - TestEntity11
+
+    TEST_PERMISSION2:
+        label: Label2
+        description: Description2
+        group_names: [group1, group2]
+        apply_to_all: false
+        apply_to_entities:
+            - TestEntity2
+            - TestEntity3
+        exclude_entities:
+            - TestEntity11
+            - TestEntity12
+
+    TEST_PERMISSION3:
+        label: Label3
+        description: Description3
+        apply_to_all: false
+        group_names: [group2]
+        apply_to_entities:
+            - TestEntity3
+            - TestEntity4
+        exclude_entities:
+            - TestEntity12
+            - TestEntity13
+
+    TEST_PERMISSION4:
+        label: Label4
+        description: Description4
+        apply_to_all: true
