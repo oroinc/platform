@@ -4,10 +4,12 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class EmailRepository extends EntityRepository
 {
@@ -159,26 +161,64 @@ class EmailRepository extends EntityRepository
      */
     public function getEmailsByOwnerEntity($entity, $ownerColumnName)
     {
-        $emailFoundInRecipients = $this
-            ->createQueryBuilder('e')
-            ->join('e.recipients', 'r')
-            ->join('r.emailAddress', 'ea')
-            ->andWhere("ea.$ownerColumnName = :contactId")
-            ->andWhere('ea.hasOwner = :hasOwner')
-            ->setParameter('contactId', $entity->getId())
-            ->setParameter('hasOwner', true)
-            ->getQuery()->getResult();
+        return call_user_func_array(
+            'array_merge',
+            array_map(
+                function (QueryBuilder $qb) {
+                    return $qb->getQuery()->getResult();
+                },
+                $this->createEmailsByOwnerEntityQbs($entity, $ownerColumnName)
+            )
+        );
+    }
 
-        $emailFoundInFrom = $this
-            ->createQueryBuilder('e')
-            ->join('e.fromEmailAddress', 'ea')
-            ->andWhere("ea.$ownerColumnName = :contactId")
-            ->andWhere('ea.hasOwner = :hasOwner')
-            ->setParameter('contactId', $entity->getId())
-            ->setParameter('hasOwner', true)
-            ->getQuery()->getResult();
+    /**
+     * Has email entities by owner entity
+     *
+     * @param object $entity
+     * @param string $ownerColumnName
+     *
+     * @return bool
+     */
+    public function hasEmailsByOwnerEntity($entity, $ownerColumnName)
+    {
+        return ArrayUtil::some(
+            function (QueryBuilder $qb) {
+                return (bool) $qb
+                    ->select('e.id')
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getArrayResult();
+            },
+            $this->createEmailsByOwnerEntityQbs($entity, $ownerColumnName)
+        );
+    }
 
-        return array_merge($emailFoundInRecipients, $emailFoundInFrom);
+    /**
+     * @param object $entity
+     * @param string $ownerColumnName
+     *
+     * @return QueryBuilder[]
+     */
+    protected function createEmailsByOwnerEntityQbs($entity, $ownerColumnName)
+    {
+        return [
+            $this
+                ->createQueryBuilder('e')
+                ->join('e.recipients', 'r')
+                ->join('r.emailAddress', 'ea')
+                ->andWhere(sprintf('ea.%s = :contactId', $ownerColumnName))
+                ->andWhere('ea.hasOwner = :hasOwner')
+                ->setParameter('contactId', $entity->getId())
+                ->setParameter('hasOwner', true),
+            $this
+                ->createQueryBuilder('e')
+                ->join('e.fromEmailAddress', 'ea')
+                ->andWhere(sprintf('ea.%s = :contactId', $ownerColumnName))
+                ->andWhere('ea.hasOwner = :hasOwner')
+                ->setParameter('contactId', $entity->getId())
+                ->setParameter('hasOwner', true),
+        ];
     }
 
     /**

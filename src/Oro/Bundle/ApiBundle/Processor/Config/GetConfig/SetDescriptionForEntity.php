@@ -6,10 +6,12 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+/**
+ * Adds "label", "plural_label" and "description" attributes for the entity.
+ */
 class SetDescriptionForEntity implements ProcessorInterface
 {
     /** @var EntityClassNameProviderInterface */
@@ -37,31 +39,24 @@ class SetDescriptionForEntity implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        $definition = $context->getResult();
-        if (empty($definition)) {
-            // an entity configuration does not exist
-            return;
-        }
-
+        $definition  = $context->getResult();
         $entityClass = $context->getClassName();
-        if (!isset($definition[ConfigUtil::LABEL])) {
+        if (!$definition->hasLabel()) {
             $entityName = $this->entityClassNameProvider->getEntityClassName($entityClass);
             if ($entityName) {
-                $definition[ConfigUtil::LABEL] = $entityName;
+                $definition->setLabel($entityName);
             }
         }
-        if (!isset($definition[ConfigUtil::PLURAL_LABEL])) {
+        if (!$definition->hasPluralLabel()) {
             $entityPluralName = $this->entityClassNameProvider->getEntityClassPluralName($entityClass);
             if ($entityPluralName) {
-                $definition[ConfigUtil::PLURAL_LABEL] = $entityPluralName;
+                $definition->setPluralLabel($entityPluralName);
             }
         }
-        if (!isset($definition[ConfigUtil::DESCRIPTION]) && $this->entityConfigProvider->hasConfig($entityClass)) {
-            $definition[ConfigUtil::DESCRIPTION] = new Label(
-                $this->entityConfigProvider->getConfig($entityClass)->get('description')
+        if (!$definition->hasDescription() && $this->entityConfigProvider->hasConfig($entityClass)) {
+            $definition->setDescription(
+                new Label($this->entityConfigProvider->getConfig($entityClass)->get('description'))
             );
         }
-
-        $context->setResult($definition);
     }
 }

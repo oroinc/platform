@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 
 /**
  * @dbIsolation
@@ -13,7 +13,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
     /**
      * FQCN of the entity being used for testing.
      */
-    const ENTITY_CLASS = 'Oro\Bundle\DataAuditBundle\Entity\AuditField';
+    const ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment';
 
     /**
      * {@inheritdoc}
@@ -30,7 +30,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
 
         parent::setUp();
 
-        $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadAuditData']);
+        $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadTableInheritanceData']);
     }
 
     /**
@@ -49,14 +49,15 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
      */
     public function testGetEntityWithTableInheritance($params, $expects)
     {
-        /** @var Audit $auditLogEntry */
-        $auditLogEntry = $this->getReference('audit_log_entry');
+        /** @var TestDepartment $department */
+        $department = $this->getReference('test_department');
 
-        $expects['data'][0]['id'] = (string)$auditLogEntry->getField('username')->getId();
+        $expects['data'][0]['id'] = (string)$department->getId();
 
-        $expects['data'][0]['relationships']['audit']['data']['id'] = (string)$auditLogEntry->getId();
+        $expects['data'][0]['relationships']['staff']['data'][0]['id'] =
+            (string)$department->getStaff()->first()->getId();
         if (isset($expects['included'][0]['id'])) {
-            $expects['included'][0]['id'] = (string)$auditLogEntry->getId();
+            $expects['included'][0]['id'] = (string)(string)$department->getStaff()->first()->getId();
 
         }
 
@@ -89,7 +90,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
             'Related entity with table inheritance'            => [
                 'params'  => [
                     'fields' => [
-                        'auditfields' => 'oldText,newText,audit'
+                        'testdepartments' => 'id,name,staff'
                     ],
                     'sort'   => '-id'
                 ],
@@ -97,10 +98,10 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
             ],
             'Related entity with table inheritance (expanded)' => [
                 'params'  => [
-                    'include' => 'audit',
+                    'include' => 'staff',
                     'fields'  => [
-                        'auditfields' => 'oldText,newText,audit',
-                        'audit'       => 'objectClass'
+                        'testdepartments' => 'id,name,staff',
+                        'staff'           => 'id,name'
                     ],
                     'sort'    => '-id'
                 ],
