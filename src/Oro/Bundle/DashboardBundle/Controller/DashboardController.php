@@ -26,6 +26,7 @@ use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
 /**
  * @Route("/dashboard")
@@ -318,6 +319,7 @@ class DashboardController extends Controller
      *      name="oro_dashboard_grid",
      *      requirements={"gridName"="[\w\:-]+"}
      * )
+     * @Template("OroDashboardBundle:Dashboard:grid.html.twig")
      *
      * @param string  $widget
      * @param string  $gridName
@@ -329,7 +331,6 @@ class DashboardController extends Controller
     {
         $params       = $request->get('params', []);
         $renderParams = $request->get('renderParams', []);
-        $template     = $request->get('template', 'OroDashboardBundle:Dashboard:grid.html.twig');
 
         $viewId = $this->getWidgetConfigs()->getWidgetOptions()->get('gridView');
         if ($viewId && null !== $view = $this->findView($viewId)) {
@@ -345,7 +346,18 @@ class DashboardController extends Controller
             );
         }
 
-        $parameters = array_merge(
+        $options = $this->getWidgetConfigs()->getWidgetOptions();
+        $gridConfig = $this->getDatagridConfigurationProvider()->getConfiguration($gridName);
+        if (isset($gridConfig['filters'], $gridConfig['filters']['columns'])) {
+            if (!isset($params['_filter'])) {
+                $params['_filter'] = [];
+            }
+
+            $filters = array_intersect_key($options->all(), $gridConfig['filters']['columns']);
+            $params['_filter'] = array_merge($params['_filter'], $filters);
+        }
+
+        return array_merge(
             [
                 'gridName'     => $gridName,
                 'params'       => $params,
@@ -353,8 +365,14 @@ class DashboardController extends Controller
             ],
             $this->getWidgetConfigs()->getWidgetAttributesForTwig($widget)
         );
+    }
 
-        return $this->render($template, $parameters);
+    /**
+     * @return ConfigurationProviderInterface
+     */
+    protected function getDatagridConfigurationProvider()
+    {
+        return $this->get('oro_datagrid.configuration.provider.chain');
     }
 
     /**
