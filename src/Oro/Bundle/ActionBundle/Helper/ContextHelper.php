@@ -66,7 +66,7 @@ class ContextHelper
     /**
      * @param array $context
      * @return array
-     * @throws \HttpRequestMethodException
+     * @throws \RuntimeException
      */
     public function getActionParameters(array $context)
     {
@@ -79,7 +79,10 @@ class ContextHelper
             'fromUrl' => $request->getRequestUri()
         ];
 
-        if (array_key_exists('entity', $context) && is_object($context['entity']) &&
+        $entity = array_key_exists('entity', $context) && is_object($context['entity']) ? $context['entity'] : null;
+
+        if ($entity &&
+            $this->doctrineHelper->isManageableEntity($entity) &&
             !$this->doctrineHelper->isNewEntity($context['entity'])
         ) {
             $params[self::ENTITY_ID_PARAM] = $this->doctrineHelper->getEntityIdentifier($context['entity']);
