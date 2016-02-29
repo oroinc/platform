@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
@@ -11,6 +12,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ContextHelperTest extends \PHPUnit_Framework_TestCase
 {
+    const ROUTE = 'test_route';
+    const REQUEST_URI = '/test/request/uri';
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
@@ -30,7 +34,9 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new ContextHelper($this->doctrineHelper, $this->requestStack);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+        $this->helper = new ContextHelper($this->doctrineHelper, $propertyAccessor, $this->requestStack);
     }
 
     protected function tearDown()
@@ -46,7 +52,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContext($request, array $expected)
     {
-        $this->requestStack->expects($this->exactly(4))
+        $this->requestStack->expects($this->any())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
@@ -93,6 +99,97 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'datagrid' => 'test_datagrid',
                 ]
             ]
+        ];
+    }
+
+    /**
+     * @dataProvider getActionParametersDataProvider
+     *
+     * @param array $context
+     * @param array $expected
+     */
+    public function testGetActionParameters(array $context, array $expected)
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Request $request */
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->expects($this->once())
+            ->method('get')
+            ->with('_route')
+            ->willReturn(self::ROUTE);
+        $request->expects($this->once())
+            ->method('getRequestUri')
+            ->willReturn(self::REQUEST_URI);
+
+        $this->requestStack->expects($this->once())
+            ->method('getMasterRequest')
+            ->willReturn($request);
+
+        if (array_key_exists('entity', $context)) {
+            $this->doctrineHelper->expects($this->once())
+                ->method('isNewEntity')
+                ->with($context['entity'])
+                ->willReturn(is_null($context['entity']->id));
+
+            $this->doctrineHelper->expects($context['entity']->id ? $this->once() : $this->never())
+                ->method('getEntityIdentifier')
+                ->with($context['entity'])
+                ->willReturn(['id' => $context['entity']->id]);
+        }
+
+        $this->assertEquals($expected, $this->helper->getActionParameters($context));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Master Request is not defined
+     */
+    public function testGetActionParametersException()
+    {
+        $this->helper->getActionParameters([]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getActionParametersDataProvider()
+    {
+        return [
+            'empty context' => [
+                'context' => [],
+                'expected' => ['route' => self::ROUTE, 'fromUrl' => self::REQUEST_URI],
+            ],
+            'entity_class' => [
+                'context' => ['entity_class' => '\stdClass'],
+                'expected' => ['route' => self::ROUTE, 'entityClass' => '\stdClass', 'fromUrl' => self::REQUEST_URI],
+            ],
+            'new entity' => [
+                'context' => ['entity' => $this->getEntity()],
+                'expected' => ['route' => self::ROUTE, 'fromUrl' => self::REQUEST_URI],
+            ],
+            'existing entity' => [
+                'context' => ['entity' => $this->getEntity(42)],
+                'expected' => [
+                    'route' => self::ROUTE,
+                    'entityClass' => 'stdClass',
+                    'entityId' => ['id' => 42],
+                    'fromUrl' => self::REQUEST_URI
+                ],
+            ],
+            'existing entity & entity_class' => [
+                'context' => ['entity' => $this->getEntity(43), 'entity_class' => 'testClass'],
+                'expected' => [
+                    'route' => self::ROUTE,
+                    'entityClass' => 'stdClass',
+                    'entityId' => ['id' => 43],
+                    'fromUrl' => self::REQUEST_URI
+                ],
+            ],
+            'new entity & entity_class' => [
+                'context' => ['entity' => $this->getEntity(), 'entity_class' => 'testClass'],
+                'expected' => ['route' => self::ROUTE, 'entityClass' => 'testClass', 'fromUrl' => self::REQUEST_URI],
+            ],
         ];
     }
 
@@ -149,12 +246,12 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'without request' => [
                 'request' => null,
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 5,
                 'expected' => new ActionData(['data' => null])
             ],
             'empty request' => [
                 'request' => new Request(),
-                'requestStackCalls' => 4,
+                'requestStackCalls' => 5,
                 'expected' => new ActionData(['data' => null])
             ],
             'route1 without entity id' => [
@@ -224,5 +321,17 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
 
         // use local cache
         $this->assertEquals($actionData, $this->helper->getActionData($context2));
+    }
+
+    /**
+     * @param int $id
+     * @return \stdClass
+     */
+    protected function getEntity($id = null)
+    {
+        $entity = new \stdClass();
+        $entity->id = $id;
+
+        return $entity;
     }
 }
