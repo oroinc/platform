@@ -3,7 +3,6 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\ConfigExpression\Action\RefreshGrid;
 use Oro\Component\ConfigExpression\Model\ContextAccessor;

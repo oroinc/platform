@@ -18,7 +18,8 @@ class EntityConfigHelper
      * @param ConfigProvider $configProvider
      * @param AclGroupProviderInterface $groupProvider
      */
-    public function __construct(ConfigProvider $configProvider, AclGroupProviderInterface $groupProvider) {
+    public function __construct(ConfigProvider $configProvider, AclGroupProviderInterface $groupProvider)
+    {
         $this->configProvider = $configProvider;
         $this->groupProvider = $groupProvider;
     }
