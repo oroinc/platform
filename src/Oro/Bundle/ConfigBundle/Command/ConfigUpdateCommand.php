@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ConfigBundle\Command;
 
-use Oro\Bundle\ConfigBundle\Config\AbstractScopeManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,10 +17,9 @@ class ConfigUpdateCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:config:update')
-            ->setDescription('Update config parameter. By default - in global scope')
+            ->setDescription('Update config parameter in global scope')
             ->addArgument('name', InputArgument::REQUIRED, 'Config parameter name')
-            ->addArgument('value', InputArgument::REQUIRED, 'Config parameter value')
-            ->addOption('scope', null, InputOption::VALUE_REQUIRED, 'Config scope name.', 'global');
+            ->addArgument('value', InputArgument::REQUIRED, 'Config parameter value');
     }
 
     /**
@@ -29,18 +27,8 @@ class ConfigUpdateCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configManager = $this->getConfigManager($input->getOption('scope'));
+        $configManager = $this->getContainer()->get('oro_config.scope.global');
         $configManager->set($input->getArgument('name'), $input->getArgument('value'));
         $configManager->flush();
-    }
-
-    /**
-     * @param $scopeName
-     *
-     * @return AbstractScopeManager
-     */
-    protected function getConfigManager($scopeName)
-    {
-        return $this->getContainer()->get('oro_config.scope.' . $scopeName);
     }
 }

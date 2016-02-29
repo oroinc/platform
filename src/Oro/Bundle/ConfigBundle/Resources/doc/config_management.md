@@ -69,12 +69,9 @@ Array with `settings` - key should be set using `Containerbuilder#prependExtensi
 
 ### Change config value via console command ###
   
-You can change value of config parameter via console command `oro:config:update`.
+You can change value of config parameter in global scope via console command `oro:config:update`.
 
 This command have teo argumets:
 
  - Config parameter name - the key of config parameter you want to change. For example, 'oro_anybundle.anysetting';
  - Config parameter value - the value you want to set to the parameter.
- 
-Additionally, this command have an option `scope`. With this option you can set the scope, in what you want to change 
-the parameter.
