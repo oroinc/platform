@@ -6,34 +6,18 @@ use Oro\Bundle\ApiBundle\Config\SorterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\ValidateSorting;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 
-class ValidateSortingTest extends \PHPUnit_Framework_TestCase
+class ValidateSortingTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
-
-    /** @var GetListContext */
-    protected $context;
-
     /** @var ValidateSorting */
     protected $processor;
 
     protected function setUp()
     {
-        $this->configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
-        $this->context = new GetListContext($this->configProvider, $this->metadataProvider);
         $this->processor = new ValidateSorting();
     }
 
@@ -42,8 +26,10 @@ class ValidateSortingTest extends \PHPUnit_Framework_TestCase
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->context->setQuery($qb);
         $this->processor->process($this->context);
+
         $this->assertSame($qb, $this->context->getQuery());
     }
 
@@ -54,18 +40,18 @@ class ValidateSortingTest extends \PHPUnit_Framework_TestCase
     public function testProcessOnExcludedField()
     {
         $sortersConfig = new SortersConfig();
-        $sorterConfig = new SorterFieldConfig();
+        $sorterConfig  = new SorterFieldConfig();
         $sorterConfig->setExcluded(true);
         $sortersConfig->addField('id', $sorterConfig);
-        $this->context->setConfigOfSorters($sortersConfig);
 
         $sorterFilter = new SortFilter('integer');
-        $filters = new FilterCollection();
+        $filters      = new FilterCollection();
         $filters->add('sort', $sorterFilter);
-        $this->context->set('filters', $filters);
 
         $this->prepareConfigs();
 
+        $this->context->setConfigOfSorters($sortersConfig);
+        $this->context->set('filters', $filters);
         $this->processor->process($this->context);
     }
 
@@ -76,10 +62,10 @@ class ValidateSortingTest extends \PHPUnit_Framework_TestCase
     public function testProcessOnEmptySortersConfig()
     {
         $sortersConfig = new SortersConfig();
-        $this->context->setConfigOfSorters($sortersConfig);
 
         $this->prepareConfigs();
 
+        $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
     }
 
@@ -90,26 +76,26 @@ class ValidateSortingTest extends \PHPUnit_Framework_TestCase
     public function testProcessOnNonConfiguredSorterField()
     {
         $sortersConfig = new SortersConfig();
-        $sorterConfig = new SorterFieldConfig();
+        $sorterConfig  = new SorterFieldConfig();
         $sorterConfig->setExcluded(true);
         $sortersConfig->addField('name', $sorterConfig);
-        $this->context->setConfigOfSorters($sortersConfig);
 
         $this->prepareConfigs();
 
+        $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
     }
 
     public function testProcess()
     {
         $sortersConfig = new SortersConfig();
-        $sorterConfig = new SorterFieldConfig();
+        $sorterConfig  = new SorterFieldConfig();
         $sorterConfig->setExcluded(false);
         $sortersConfig->addField('id', $sorterConfig);
-        $this->context->setConfigOfSorters($sortersConfig);
 
         $this->prepareConfigs();
 
+        $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
     }
 
@@ -117,9 +103,8 @@ class ValidateSortingTest extends \PHPUnit_Framework_TestCase
     protected function prepareConfigs()
     {
         $sorterFilter = new SortFilter('integer');
-        $filters = new FilterCollection();
+        $filters      = new FilterCollection();
         $filters->add('sort', $sorterFilter);
-        $this->context->set('filters', $filters);
 
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
             ->disableOriginalConstructor()
@@ -130,6 +115,8 @@ class ValidateSortingTest extends \PHPUnit_Framework_TestCase
         $filterValues = new RestFilterValueAccessor($request);
         // emulate sort normalizer
         $filterValues->get('sort')->setValue(['id' => 'DESC']);
+
+        $this->context->set('filters', $filters);
         $this->context->setFilterValues($filterValues);
     }
 }

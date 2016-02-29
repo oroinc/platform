@@ -2,18 +2,25 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class GetListContextTest extends \PHPUnit_Framework_TestCase
+class GetListProcessorTestCase extends \PHPUnit_Framework_TestCase
 {
+    const TEST_VERSION      = '1.1';
+    const TEST_REQUEST_TYPE = RequestType::REST;
+
+    /** @var GetListContext */
+    protected $context;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadataProvider;
-
-    /** @var GetListContext */
-    protected $context;
 
     protected function setUp()
     {
@@ -25,16 +32,14 @@ class GetListContextTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->context = new GetListContext($this->configProvider, $this->metadataProvider);
-    }
-
-    public function testTotalCountCallback()
-    {
-        $this->assertNull($this->context->getTotalCountCallback());
-
-        $totalCountCallback = [$this, 'calculateTotalCount'];
-
-        $this->context->setTotalCountCallback($totalCountCallback);
-        $this->assertEquals($totalCountCallback, $this->context->getTotalCountCallback());
-        $this->assertEquals($totalCountCallback, $this->context->get(GetListContext::TOTAL_COUNT_CALLBACK));
+        $this->context->setVersion(self::TEST_VERSION);
+        $this->context->setRequestType(self::TEST_REQUEST_TYPE);
+        $this->context->setConfigExtras(
+            [
+                new VirtualFieldsConfigExtra(),
+                new FiltersConfigExtra(),
+                new SortersConfigExtra()
+            ]
+        );
     }
 }

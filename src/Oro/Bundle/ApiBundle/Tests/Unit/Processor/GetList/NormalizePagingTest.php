@@ -3,32 +3,23 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
-use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\NormalizePaging;
 
-class NormalizePagingTest extends \PHPUnit_Framework_TestCase
+class NormalizePagingTest extends GetListProcessorTestCase
 {
-    /** @var GetContext */
-    protected $context;
-
     /** @var NormalizePaging */
     protected $processor;
 
     protected function setUp()
     {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
-        $this->context = new GetContext($configProvider, $metadataProvider);
         $classResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
-        $criteria = new Criteria($classResolver);
-        $this->context->setCriteria($criteria);
+
+        $this->context->setCriteria(new Criteria($classResolver));
+
         $this->processor = new NormalizePaging();
     }
 
@@ -45,7 +36,9 @@ class NormalizePagingTest extends \PHPUnit_Framework_TestCase
         $criteria = $this->context->getCriteria();
         $criteria->setFirstResult(12);
         $criteria->setMaxResults(-1);
+
         $this->processor->process($this->context);
+
         $this->assertNull($criteria->getMaxResults());
         $this->assertNull($criteria->getFirstResult());
     }
@@ -55,7 +48,9 @@ class NormalizePagingTest extends \PHPUnit_Framework_TestCase
         $criteria = $this->context->getCriteria();
         $criteria->setFirstResult(2);
         $criteria->setMaxResults(10);
+
         $this->processor->process($this->context);
+
         $this->assertEquals(10, $criteria->getMaxResults());
         $this->assertEquals(2, $criteria->getFirstResult());
     }

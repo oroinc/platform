@@ -2,43 +2,27 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 
-use Oro\Bundle\ApiBundle\Processor\GetList\BuildQuery;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\CorrectSortValue;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
-use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
-class CorrectSortValueTest extends OrmRelatedTestCase
+class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var CorrectSortValue */
     protected $processor;
-
-    /** @var GetListContext */
-    protected $context;
 
     protected function setUp()
     {
         parent::setUp();
 
         $this->processor = new CorrectSortValue($this->doctrineHelper);
-
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->context          = new GetListContext($this->configProvider, $this->metadataProvider);
     }
 
     public function testProcessOnExistingQuery()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->context->setQuery($qb);
+        $qb = $this->getQueryBuilderMock();
 
+        $this->context->setQuery($qb);
         $this->processor->process($this->context);
 
         $this->assertSame($qb, $this->context->getQuery());
@@ -46,20 +30,12 @@ class CorrectSortValueTest extends OrmRelatedTestCase
 
     public function testProcessForNotManageableEntity()
     {
-        $className      = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User';
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with($className)
-            ->willReturn(false);
-        $doctrineHelper->expects($this->never())
-            ->method('getEntityMetadataForClass');
+        $className = 'Test\Class';
 
-        $processor = new BuildQuery($doctrineHelper);
+        $this->notManageableClassNames = [$className];
+
         $this->context->setClassName($className);
-        $processor->process($this->context);
+        $this->processor->process($this->context);
 
         $this->assertNull($this->context->getQuery());
     }
@@ -78,7 +54,6 @@ class CorrectSortValueTest extends OrmRelatedTestCase
 
         $this->context->setFilterValues(new RestFilterValueAccessor($request));
         $this->context->setClassName($className);
-
         $this->processor->process($this->context);
 
         $filterValues = $this->context->getFilterValues();

@@ -17,6 +17,9 @@ class OrmRelatedTestCase extends OrmTestCase
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var string[] */
+    protected $notManageableClassNames = [];
+
     protected function setUp()
     {
         $reader         = new AnnotationReader();
@@ -38,7 +41,13 @@ class OrmRelatedTestCase extends OrmTestCase
             ->getMock();
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->willReturn($this->em);
+            ->willReturnCallback(
+                function ($class) {
+                    return !in_array($class, $this->notManageableClassNames, true)
+                        ? $this->em
+                        : null;
+                }
+            );
         $doctrine->expects($this->any())
             ->method('getAliasNamespace')
             ->will(
@@ -50,5 +59,15 @@ class OrmRelatedTestCase extends OrmTestCase
             );
 
         $this->doctrineHelper = new DoctrineHelper($doctrine);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getQueryBuilderMock()
+    {
+        return $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

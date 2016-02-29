@@ -2,27 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\ValidateResult;
 
-class ValidateResultTest extends \PHPUnit_Framework_TestCase
+class ValidateResultTest extends GetListProcessorTestCase
 {
-    /** @var GetListContext */
-    protected $context;
-
     /** @var ValidateResult */
     protected $processor;
 
     protected function setUp()
     {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
-        $this->context = new GetListContext($configProvider, $metadataProvider);
         $this->processor = new ValidateResult();
     }
 
@@ -42,7 +32,6 @@ class ValidateResultTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessOnEmptyQuery()
     {
-        $this->assertNull($this->context->getQuery());
         $this->processor->process($this->context);
     }
 
