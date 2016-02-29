@@ -3,42 +3,111 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\BuildJsonApiDocument;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\JsonApi\BuildJsonApiDocumentTest as ParentTest;
-use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class BuildJsonApiDocumentTest extends ParentTest
+class BuildJsonApiDocumentTest extends GetListProcessorTestCase
 {
-    /**
-     * @return ProcessorInterface
-     */
-    protected function getProcessor()
-    {
-        return new BuildJsonApiDocument($this->documentBuilderFactory);
-    }
+    /** @var BuildJsonApiDocument */
+    protected $processor;
 
-    /**
-     * @return Context
-     */
-    protected function getContext()
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $documentBuilder;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $documentBuilderFactory;
+
+    protected function setUp()
     {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+        parent::setUp();
+
+        $this->documentBuilder        = $this
+            ->getMockBuilder('Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
+        $this->documentBuilderFactory = $this
+            ->getMockBuilder('Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new GetListContext($configProvider, $metadataProvider);
+        $this->processor = new BuildJsonApiDocument($this->documentBuilderFactory);
     }
 
-    /**
-     * @return string
-     */
-    protected function getSetterDataFunctionName()
+    public function testProcessContextWithoutErrorsOnEmptyResult()
     {
-        return 'setDataCollection';
+        $this->documentBuilder->expects($this->once())
+            ->method('setDataCollection')
+            ->with(null);
+        $this->documentBuilder->expects($this->once())
+            ->method('getDocument');
+        $this->documentBuilderFactory->expects($this->once())
+            ->method('createDocumentBuilder')
+            ->willReturn($this->documentBuilder);
+
+        $this->context->setResult(null);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessContextWithoutErrorsOnNonEmptyResult()
+    {
+        $result   = [new \stdClass()];
+        $metadata = new EntityMetadata();
+
+        $this->documentBuilder->expects($this->once())
+            ->method('setDataCollection')
+            ->with($result, $metadata);
+        $this->documentBuilder->expects($this->once())
+            ->method('getDocument');
+        $this->documentBuilderFactory->expects($this->once())
+            ->method('createDocumentBuilder')
+            ->willReturn($this->documentBuilder);
+
+        $this->context->setResult($result);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWithErrors()
+    {
+        $error = new Error();
+
+        $this->documentBuilder->expects($this->never())
+            ->method('setDataCollection');
+        $this->documentBuilder->expects($this->once())
+            ->method('getDocument');
+        $this->documentBuilder->expects($this->once())
+            ->method('setErrorCollection')
+            ->with([$error]);
+        $this->documentBuilderFactory->expects($this->once())
+            ->method('createDocumentBuilder')
+            ->willReturn($this->documentBuilder);
+
+        $this->context->addError($error);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessWithException()
+    {
+        $exception = new \LogicException();
+
+        $this->documentBuilder->expects($this->once())
+            ->method('setDataCollection')
+            ->willThrowException($exception);
+        $this->documentBuilder->expects($this->once())
+            ->method('getDocument');
+        $this->documentBuilder->expects($this->once())
+            ->method('setErrorObject');
+        $this->documentBuilderFactory->expects($this->exactly(2))
+            ->method('createDocumentBuilder')
+            ->willReturn($this->documentBuilder);
+
+        $this->context->setResult(null);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(500, $this->context->getResponseStatusCode());
     }
 }

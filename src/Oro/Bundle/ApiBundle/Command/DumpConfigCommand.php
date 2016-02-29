@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -56,6 +57,12 @@ class DumpConfigCommand extends ContainerAwareCommand
                 'entities'
             )
             ->addOption(
+                'without-virtual-fields',
+                null,
+                InputOption::VALUE_NONE,
+                'Whether virtual fields should not be added'
+            )
+            ->addOption(
                 'with-descriptions',
                 null,
                 InputOption::VALUE_NONE,
@@ -78,6 +85,9 @@ class DumpConfigCommand extends ContainerAwareCommand
         $version = Version::LATEST;
 
         $extras = [new FiltersConfigExtra(), new SortersConfigExtra()];
+        if (!$input->getOption('without-virtual-fields')) {
+            $extras[] = new VirtualFieldsConfigExtra();
+        }
         if ($input->getOption('with-descriptions')) {
             $extras[] = new DescriptionsConfigExtra();
         }

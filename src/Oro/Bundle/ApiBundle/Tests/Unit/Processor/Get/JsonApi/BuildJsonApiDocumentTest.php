@@ -4,30 +4,26 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\JsonApi;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\Get\JsonApi\BuildJsonApiDocument;
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
-class BuildJsonApiDocumentTest extends \PHPUnit_Framework_TestCase
+class BuildJsonApiDocumentTest extends GetProcessorTestCase
 {
-    /** @var ProcessorInterface */
-    protected $processor;
-
-    /** @var Context */
-    protected $context;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $documentBuilder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $documentBuilderFactory;
 
-    protected $setDataFunctionName;
+    /** @var BuildJsonApiDocument */
+    protected $processor;
 
     protected function setUp()
     {
-        $this->documentBuilder = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder')
+        parent::setUp();
+
+        $this->documentBuilder        = $this
+            ->getMockBuilder('Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $this->documentBuilderFactory = $this
@@ -35,16 +31,13 @@ class BuildJsonApiDocumentTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = $this->getProcessor();
-        $this->context = $this->getContext();
-        $this->setDataFunctionName = $this->getSetterDataFunctionName();
+        $this->processor = new BuildJsonApiDocument($this->documentBuilderFactory);
     }
 
     public function testProcessContextWithoutErrorsOnEmptyResult()
     {
-        $this->context->setResult(null);
         $this->documentBuilder->expects($this->once())
-            ->method($this->setDataFunctionName)
+            ->method('setDataObject')
             ->with(null);
         $this->documentBuilder->expects($this->once())
             ->method('getDocument');
@@ -52,17 +45,17 @@ class BuildJsonApiDocumentTest extends \PHPUnit_Framework_TestCase
             ->method('createDocumentBuilder')
             ->willReturn($this->documentBuilder);
 
+        $this->context->setResult(null);
         $this->processor->process($this->context);
     }
 
     public function testProcessContextWithoutErrorsOnNonEmptyResult()
     {
-        $result = [new \stdClass()];
-        $this->context->setResult($result);
+        $result   = [new \stdClass()];
         $metadata = new EntityMetadata();
-        $this->context->setMetadata($metadata);
+
         $this->documentBuilder->expects($this->once())
-            ->method($this->setDataFunctionName)
+            ->method('setDataObject')
             ->with($result, $metadata);
         $this->documentBuilder->expects($this->once())
             ->method('getDocument');
@@ -70,15 +63,17 @@ class BuildJsonApiDocumentTest extends \PHPUnit_Framework_TestCase
             ->method('createDocumentBuilder')
             ->willReturn($this->documentBuilder);
 
+        $this->context->setResult($result);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
     }
 
     public function testProcessWithErrors()
     {
         $error = new Error();
-        $this->context->addError($error);
+
         $this->documentBuilder->expects($this->never())
-            ->method($this->setDataFunctionName);
+            ->method('setDataObject');
         $this->documentBuilder->expects($this->once())
             ->method('getDocument');
         $this->documentBuilder->expects($this->once())
@@ -88,17 +83,18 @@ class BuildJsonApiDocumentTest extends \PHPUnit_Framework_TestCase
             ->method('createDocumentBuilder')
             ->willReturn($this->documentBuilder);
 
-        $this->assertTrue($this->context->hasErrors());
+        $this->context->addError($error);
         $this->processor->process($this->context);
+
         $this->assertFalse($this->context->hasErrors());
     }
 
     public function testProcessWithException()
     {
         $exception = new \LogicException();
-        $this->context->setResult(null);
+
         $this->documentBuilder->expects($this->once())
-            ->method($this->setDataFunctionName)
+            ->method('setDataObject')
             ->willThrowException($exception);
         $this->documentBuilder->expects($this->once())
             ->method('getDocument');
@@ -108,38 +104,9 @@ class BuildJsonApiDocumentTest extends \PHPUnit_Framework_TestCase
             ->method('createDocumentBuilder')
             ->willReturn($this->documentBuilder);
 
+        $this->context->setResult(null);
         $this->processor->process($this->context);
+
         $this->assertEquals(500, $this->context->getResponseStatusCode());
-    }
-
-    /**
-     * @return ProcessorInterface
-     */
-    protected function getProcessor()
-    {
-        return new BuildJsonApiDocument($this->documentBuilderFactory);
-    }
-
-    /**
-     * @return Context
-     */
-    protected function getContext()
-    {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return new GetContext($configProvider, $metadataProvider);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getSetterDataFunctionName()
-    {
-        return 'setDataObject';
     }
 }

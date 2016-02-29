@@ -6,14 +6,10 @@ use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
-use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\RegisterFilters;
 
-class RegisterFiltersTest extends \PHPUnit_Framework_TestCase
+class RegisterFiltersTest extends GetListProcessorTestCase
 {
-    /** @var GetContext */
-    protected $context;
-
     /** @var RegisterFilters */
     protected $processor;
 
@@ -22,25 +18,21 @@ class RegisterFiltersTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->context = new GetContext($configProvider, $metadataProvider);
+        parent::setUp();
 
         $this->filterFactory = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+
         $this->processor = new RegisterFilters($this->filterFactory);
     }
 
     public function testProcessOnEmptyFiltersConfig()
     {
         $filtersConfig = new FiltersConfig();
-        $this->context->setConfigOfFilters($filtersConfig);
+
         $this->filterFactory->expects($this->never())
             ->method('createFilter');
+
+        $this->context->setConfigOfFilters($filtersConfig);
         $this->processor->process($this->context);
     }
 
@@ -52,9 +44,11 @@ class RegisterFiltersTest extends \PHPUnit_Framework_TestCase
     {
         $filtersConfig = new FiltersConfig();
         $filtersConfig->setExcludeNone();
-        $this->context->setConfigOfFilters($filtersConfig);
+
         $this->filterFactory->expects($this->never())
             ->method('createFilter');
+
+        $this->context->setConfigOfFilters($filtersConfig);
         $this->processor->process($this->context);
     }
 
@@ -74,7 +68,6 @@ class RegisterFiltersTest extends \PHPUnit_Framework_TestCase
         $nameConfig->setArrayAllowed(true);
         $nameConfig->setDescription('name field');
         $filtersConfig->addField('name', $nameConfig);
-        $this->context->setConfigOfFilters($filtersConfig);
 
         $this->filterFactory->expects($this->exactly(2))
             ->method('createFilter')
@@ -84,7 +77,10 @@ class RegisterFiltersTest extends \PHPUnit_Framework_TestCase
                     ['string', new FieldsFilter('string')],
                 ]
             );
+
+        $this->context->setConfigOfFilters($filtersConfig);
         $this->processor->process($this->context);
+
         $filters = $this->context->getFilters();
         $this->assertEquals(2, $filters->count());
         $idFilter = $filters->get('id');

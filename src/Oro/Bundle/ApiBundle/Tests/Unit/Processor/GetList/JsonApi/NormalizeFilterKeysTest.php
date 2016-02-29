@@ -5,17 +5,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Processor\GetList\BuildQuery;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\NormalizeFilterKeys;
-use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
-class NormalizeFilterKeysTest extends OrmRelatedTestCase
+class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var NormalizeFilterKeys */
     protected $processor;
-
-    /** @var GetListContext */
-    protected $context;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
@@ -27,23 +23,13 @@ class NormalizeFilterKeysTest extends OrmRelatedTestCase
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->processor = new NormalizeFilterKeys($this->doctrineHelper, $this->translator);
-
-        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->context          = new GetListContext($configProvider, $metadataProvider);
     }
 
     public function testProcessOnExistingQuery()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->context->setQuery($qb);
+        $qb = $this->getQueryBuilderMock();
 
+        $this->context->setQuery($qb);
         $this->processor->process($this->context);
 
         $this->assertSame($qb, $this->context->getQuery());
@@ -51,20 +37,12 @@ class NormalizeFilterKeysTest extends OrmRelatedTestCase
 
     public function testProcessForNotManageableEntity()
     {
-        $className      = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User';
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with($className)
-            ->willReturn(false);
-        $doctrineHelper->expects($this->never())
-            ->method('getEntityMetadataForClass');
+        $className = 'Test\Class';
 
-        $processor = new BuildQuery($doctrineHelper);
+        $this->notManageableClassNames = [$className];
+
         $this->context->setClassName($className);
-        $processor->process($this->context);
+        $this->processor->process($this->context);
 
         $this->assertNull($this->context->getQuery());
     }
@@ -90,7 +68,6 @@ class NormalizeFilterKeysTest extends OrmRelatedTestCase
 
         $this->context->set('filters', $filtersDefinition);
         $this->context->setClassName($className);
-
         $this->processor->process($this->context);
 
         $filtersDefinition = $this->context->getFilters();

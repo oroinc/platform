@@ -7,24 +7,18 @@ use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultPaging;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class SetDefaultPagingTest extends \PHPUnit_Framework_TestCase
+class SetDefaultPagingTest extends GetListProcessorTestCase
 {
     /** @var SetDefaultPaging */
     protected $processor;
 
-    /** @var GetListContext */
-    protected $context;
-
     protected function setUp()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->context = new GetListContext($configProvider, $metadataProvider);
+        parent::setUp();
+
         $this->processor = new SetDefaultPaging();
     }
 
@@ -33,15 +27,19 @@ class SetDefaultPagingTest extends \PHPUnit_Framework_TestCase
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->context->setQuery($qb);
         $this->processor->process($this->context);
+
         $this->assertSame($qb, $this->context->getQuery());
     }
 
     public function testProcessForJSONAPIRequest()
     {
-        $this->context->setRequestType(['json_api']);
+        $this->context->remove(GetListContext::REQUEST_TYPE);
+        $this->context->setRequestType([RequestType::JSON_API]);
         $this->processor->process($this->context);
+
         $filters = $this->context->getFilters();
         $this->assertEquals(2, $filters->count());
         $this->assertEquals(10, $filters->get('page[size]')->getDefaultValue());
@@ -56,7 +54,6 @@ class SetDefaultPagingTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessForMixedRequest()
     {
-        $this->context->setRequestType(['rest', 'json_api']);
         $pageSizeFilter = new PageSizeFilter('integer');
         $pageNumberFilter = new PageNumberFilter('integer');
         $filters = new FilterCollection();
@@ -64,6 +61,8 @@ class SetDefaultPagingTest extends \PHPUnit_Framework_TestCase
         $filters->add('page', $pageNumberFilter);
         $this->context->set('filters', $filters);
 
+        $this->context->remove(GetListContext::REQUEST_TYPE);
+        $this->context->setRequestType([RequestType::REST, RequestType::JSON_API]);
         $this->processor->process($this->context);
 
         $this->assertEquals(2, $filters->count());

@@ -2,27 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
 
-use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\Get\ValidateResult;
 
-class ValidateResultTest extends \PHPUnit_Framework_TestCase
+class ValidateResultTest extends GetProcessorTestCase
 {
-    /** @var GetContext */
-    protected $context;
-
     /** @var ValidateResult */
     protected $processor;
 
     protected function setUp()
     {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
-        $this->context = new GetContext($configProvider, $metadataProvider);
         $this->processor = new ValidateResult();
     }
 
