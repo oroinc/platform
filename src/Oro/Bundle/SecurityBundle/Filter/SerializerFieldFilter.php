@@ -47,7 +47,7 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
             $entity = $this->getEntityReference($entityClass, $entity['entityId']);
         }
 
-        $isFieldAllowed = $this->isFieldAclEnabled($entity) ?
+        $isFieldAllowed = $this->isFieldAclEnabled($entityClass) ?
             $this->authChecker->isGranted('VIEW', new FieldVote($entity, $field)) :
             true;
         $shouldShowRestricted = $this->shouldShowRestricted($entityClass);

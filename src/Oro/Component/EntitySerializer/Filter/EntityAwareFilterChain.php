@@ -31,11 +31,13 @@ class EntityAwareFilterChain implements EntityAwareFilterInterface
         // if no filters - nothing will be filtered
         $finalResult = static::FILTER_NOTHING;
 
-        foreach ($this->filters as $filter) {
-            $result = $filter->checkField($entity, $entityClass, $field);
+        foreach ($this->filters as $filters) {
+            foreach ($filters as $filter) {
+                $result = $filter->checkField($entity, $entityClass, $field);
 
-            if ($result < static::FILTER_NOTHING) {
-                $finalResult = $result;
+                if ($result < static::FILTER_NOTHING) {
+                    $finalResult = $result;
+                }
             }
         }
 
@@ -50,11 +52,13 @@ class EntityAwareFilterChain implements EntityAwareFilterInterface
         // if no filters - nothing will be filtered
         $finalResult = static::FILTER_NOTHING;
 
-        foreach ($this->filters as $filter) {
-            $result = $filter->checkEntity($entity);
+        foreach ($this->filters as $filters) {
+            foreach ($filters as $filter) {
+                $result = $filter->checkEntity($entity);
 
-            if ($result < static::FILTER_NOTHING) {
-                $finalResult = $result;
+                if ($result < static::FILTER_NOTHING) {
+                    $finalResult = $result;
+                }
             }
         }
 
