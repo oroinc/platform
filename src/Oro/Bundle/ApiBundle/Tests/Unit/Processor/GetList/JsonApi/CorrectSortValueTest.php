@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 
-use Oro\Bundle\ApiBundle\Processor\GetList\BuildQuery;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\CorrectSortValue;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;

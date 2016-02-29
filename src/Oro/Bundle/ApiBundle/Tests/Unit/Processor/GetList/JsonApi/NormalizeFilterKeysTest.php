@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
-use Oro\Bundle\ApiBundle\Processor\GetList\BuildQuery;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\NormalizeFilterKeys;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
