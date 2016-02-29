@@ -68,16 +68,6 @@ class DataGridExtension extends \Twig_Extension
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getTests()
-    {
-        return [
-            new \Twig_SimpleTest('oro_datagrid_instance', [$this, 'isDatagridInstance']),
-        ];
-    }
-
-    /**
      * @param string $name
      * @param array $params
      * @return DatagridInterface
@@ -168,15 +158,6 @@ class DataGridExtension extends \Twig_Extension
     public function buildGridInputName($name)
     {
         return $this->nameStrategy->getGridUniqueName($name);
-    }
-
-    /**
-     * @param mixed $var
-     * @return bool
-     */
-    public function isDatagridInstance($var)
-    {
-        return $var instanceof DatagridInterface;
     }
 
     /**

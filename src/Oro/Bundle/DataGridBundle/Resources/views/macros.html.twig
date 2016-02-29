@@ -7,10 +7,7 @@
         renderParams: parameters for grid UI
 #}
 {% macro renderGrid(name, params = {}, renderParams = {}) %}
-    {% set datagrid = name %}
-    {% if datagrid is not oro_datagrid_instance %}
-        {% set datagrid = oro_datagrid_build(name, params) %}
-    {% endif %}
+    {% set datagrid = oro_datagrid_build(name, params) %}
     {% if datagrid %}
         {% if app.request.get('_widgetContainer') == 'dialog' %}
             {% set renderParams = {'enableViews': false}|merge(renderParams) %}
@@ -42,7 +39,7 @@
             enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
             showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
             inputName: oro_datagrid_build_inputname(datagrid.name),
-            themeOptions: metaData.themeOptions|default({})|merge(renderParams.themeOptions|default({}))
+            themeOptions: renderParams.themeOptions|default({})
         } %}
 
         <div id="{{ gridId }}"
