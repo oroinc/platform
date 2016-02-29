@@ -127,7 +127,13 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($request);
 
         if (array_key_exists('entity', $context)) {
-            $this->doctrineHelper->expects($this->once())
+            $this->doctrineHelper->expects($this->any())
+                ->method('isManageableEntity')
+                ->withAnyParameters()
+                ->willReturnCallback(function ($entity) {
+                    return $entity instanceof \stdClass;
+                });
+            $this->doctrineHelper->expects($this->any())
                 ->method('isNewEntity')
                 ->with($context['entity'])
                 ->willReturn(is_null($context['entity']->id));
