@@ -222,18 +222,3 @@ services:
             - @doctrine
         tags:
             - { name: oro_action.function, alias: find_entities }
-
-    oro_action.function.send_email_template:
-        class: %oro_email.workflow.action.send_email_template.class%
-        arguments:
-            - @oro_action.context_accessor
-            - @oro_email.mailer.processor
-            - @oro_email.email.address.helper
-            - @oro_entity.entity_name_resolver
-            - @oro_email.email_renderer
-            - @doctrine.orm.entity_manager
-            - @validator
-        calls:
-            - [setLogger, [@logger]]
-        tags:
-            - { name: oro_action.function, alias: send_email_template }
