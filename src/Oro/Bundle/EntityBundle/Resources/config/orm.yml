@@ -15,10 +15,6 @@ services:
         arguments:
             - @doctrine
 
-    oro_entity.doctrine_helper.link:
-        tags:
-            - { name: oro_service_link,  service: oro_entity.doctrine_helper }
-
     oro_entity.entity_identifier_accessor:
         class: %oro_entity.entity_identifier_accessor.class%
         arguments:
