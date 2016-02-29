@@ -122,7 +122,8 @@ class ActionExtension extends AbstractExtension
                     'entityClass' => $this->datagridContext['entityClass'],
                     'datagrid' => $this->datagridContext['datagrid'],
                     'confirmation' =>  !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '',
-                    'showDialog' => $action->hasForm(),
+                    'hasDialog' => $action->hasForm(),
+                    'showDialog' => !empty($frontendOptions['show_dialog']),
                     'executionRoute' => $this->applicationsHelper->getExecutionRoute(),
                     'dialogRoute' => $this->applicationsHelper->getDialogRoute(),
                     'dialogOptions' => [

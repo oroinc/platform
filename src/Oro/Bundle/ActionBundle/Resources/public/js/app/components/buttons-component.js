@@ -45,7 +45,8 @@ define(function(require) {
         _getActionManager: function($element) {
             if (!$element.data('action-manager')) {
                 var options = {
-                    showDialog: Boolean($element.data('dialog-url')),
+                    showDialog: Boolean($element.data('dialog-show')),
+                    hasDialog: Boolean($element.data('dialog-url')),
                     dialogUrl: $element.data('dialog-url'),
                     dialogOptions: $element.data('dialog-options'),
                     redirectUrl: $element.data('page-url'),

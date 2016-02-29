@@ -75,15 +75,20 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doExecute: function(e) {
-            if (this.options.showDialog) {
-                var widget = new DialogWidget(this._getDialogOptions(this.options));
+            if (this.options.hasDialog) {
+                var options = this._getDialogOptions(this.options);
+                if (this.options.showDialog) {
+                    var widget = new DialogWidget(options);
 
-                Backbone.listenTo(widget, 'formSave', _.bind(function(response) {
-                    widget.remove();
-                    this.doResponse(response, e);
-                }, this));
+                    Backbone.listenTo(widget, 'formSave', _.bind(function(response) {
+                        widget.remove();
+                        this.doResponse(response, e);
+                    }, this));
 
-                widget.render();
+                    widget.render();
+                } else {
+                    this.doRedirect(options.url);
+                }
             } else if (this.options.redirectUrl) {
                 this.doRedirect(this.options.redirectUrl);
             } else {
