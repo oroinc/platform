@@ -12,6 +12,16 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 abstract class AbstractAction implements ActionInterface, EventDispatcherAwareActionInterface
 {
     /**
+     * @deprecated since 1.10. Use {@see Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE} instead
+     */
+    const HANDLE_BEFORE = 'oro_workflow.action.handle_before';
+
+    /**
+     * @deprecated since 1.10. Use {@see Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER} instead
+     */
+    const HANDLE_AFTER = 'oro_workflow.action.handle_after';
+
+    /**
      * @var ContextAccessor
      */
     protected $contextAccessor;
@@ -56,17 +66,27 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
     public function execute($context)
     {
         if ($this->isAllowed($context)) {
-            // dispatch oro_component.action.handle_before event
+            // dispatch oro_action.action.handle_before event
             $this->eventDispatcher->dispatch(
                 ExecuteActionEvents::HANDLE_BEFORE,
                 new ExecuteActionEvent($context, $this)
             );
 
+            $this->eventDispatcher->dispatch(
+                self::HANDLE_BEFORE,
+                new ExecuteActionEvent($context, $this)
+            );
+
             $this->executeAction($context);
 
-            // dispatch oro_component.action.handle_after event
+            // dispatch oro_action.action.handle_after event
             $this->eventDispatcher->dispatch(
                 ExecuteActionEvents::HANDLE_AFTER,
+                new ExecuteActionEvent($context, $this)
+            );
+
+            $this->eventDispatcher->dispatch(
+                self::HANDLE_AFTER,
                 new ExecuteActionEvent($context, $this)
             );
         }
