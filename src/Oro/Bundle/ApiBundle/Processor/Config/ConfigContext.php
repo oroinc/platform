@@ -3,10 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config;
 
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
+/**
+ * @method EntityDefinitionConfig|null getResult()
+ */
 class ConfigContext extends ApiContext
 {
     /** FQCN of an entity */
@@ -125,7 +131,7 @@ class ConfigContext extends ApiContext
     /**
      * Gets a definition of filters.
      *
-     * @return array|null
+     * @return FiltersConfig|null
      */
     public function getFilters()
     {
@@ -135,9 +141,9 @@ class ConfigContext extends ApiContext
     /**
      * Sets a definition of filters.
      *
-     * @param array|null $filters
+     * @param FiltersConfig|null $filters
      */
-    public function setFilters($filters)
+    public function setFilters(FiltersConfig $filters = null)
     {
         $this->set(FiltersConfigExtra::NAME, $filters);
     }
@@ -155,7 +161,7 @@ class ConfigContext extends ApiContext
     /**
      * Gets a definition of sorters.
      *
-     * @return array|null
+     * @return SortersConfig|null
      */
     public function getSorters()
     {
@@ -165,9 +171,9 @@ class ConfigContext extends ApiContext
     /**
      * Sets a definition of sorters.
      *
-     * @param array|null $sorters
+     * @param SortersConfig|null $sorters
      */
-    public function setSorters($sorters)
+    public function setSorters(SortersConfig $sorters = null)
     {
         $this->set(SortersConfigExtra::NAME, $sorters);
     }

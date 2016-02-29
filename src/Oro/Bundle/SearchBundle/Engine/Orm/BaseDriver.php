@@ -181,7 +181,7 @@ abstract class BaseDriver
             $this->setTextOrderBy($qb, $index);
         }
 
-        return $searchString;
+        return '(' . $searchString . ' ) ';
     }
 
     /**

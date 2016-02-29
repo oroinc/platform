@@ -4,8 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Model\Label;
 
+/**
+ * Localizes "description" attribute for filters.
+ */
 class NormalizeDescriptionForFilters extends NormalizeDescription
 {
     /**
@@ -16,15 +19,12 @@ class NormalizeDescriptionForFilters extends NormalizeDescription
         /** @var ConfigContext $context */
 
         $filters = $context->getFilters();
-        if (empty($filters) || empty($filters[ConfigUtil::FIELDS])) {
-            // a configuration of filters does not exist
-            return;
+        $fields  = $filters->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $description = $field->getDescription();
+            if ($description instanceof Label) {
+                $field->setDescription($this->trans($description));
+            }
         }
-
-        foreach ($filters[ConfigUtil::FIELDS] as &$filterConfig) {
-            $this->normalizeAttribute($filterConfig, ConfigUtil::DESCRIPTION);
-        }
-
-        $context->setFilters($filters);
     }
 }
