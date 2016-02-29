@@ -1,0 +1,3 @@
+oro_permissions:
+    PERMISSION.BAD.NAME:
+        label: Label for Permission with a Bad Name
