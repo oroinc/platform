@@ -35,22 +35,20 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
     public function testEvaluate()
     {
         $options = [];
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = new \stdClass();
         $errors = $this->getMockForAbstractClass('Doctrine\Common\Collections\Collection');
         $realCondition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
             ->getMockForAbstractClass();
         $realCondition->expects($this->exactly(2))
             ->method('evaluate')
-            ->with($workflowItem, $errors)
+            ->with($context, $errors)
             ->willReturn(true);
         $this->assembler->expects($this->once())
             ->method('assemble')
             ->with($options)
             ->willReturn($realCondition);
         $this->condition->initialize($options);
-        $this->assertTrue($this->condition->evaluate($workflowItem, $errors));
-        $this->assertTrue($this->condition->evaluate($workflowItem, $errors));
+        $this->assertTrue($this->condition->evaluate($context, $errors));
+        $this->assertTrue($this->condition->evaluate($context, $errors));
     }
 }
