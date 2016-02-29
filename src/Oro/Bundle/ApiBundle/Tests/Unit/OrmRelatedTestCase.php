@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -13,6 +14,9 @@ class OrmRelatedTestCase extends OrmTestCase
 {
     /** @var EntityManagerMock */
     protected $em;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    protected $doctrine;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -36,10 +40,10 @@ class OrmRelatedTestCase extends OrmTestCase
             ]
         );
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $doctrine->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturnCallback(
                 function ($class) {
@@ -48,7 +52,7 @@ class OrmRelatedTestCase extends OrmTestCase
                         : null;
                 }
             );
-        $doctrine->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getAliasNamespace')
             ->will(
                 $this->returnValueMap(
@@ -58,7 +62,7 @@ class OrmRelatedTestCase extends OrmTestCase
                 )
             );
 
-        $this->doctrineHelper = new DoctrineHelper($doctrine);
+        $this->doctrineHelper = new DoctrineHelper($this->doctrine);
     }
 
     /**

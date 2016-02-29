@@ -147,7 +147,7 @@ class Criteria extends BaseCriteria
         }
 
         if (!isset($this->joins[$path])) {
-            $newJoin = new Join($joinType, $join, $conditionType, $condition, $indexBy);
+            $newJoin = new Join($joinType, $join, null, $conditionType, $condition, $indexBy);
 
             $this->joins[$path] = $newJoin;
 
@@ -166,7 +166,7 @@ class Criteria extends BaseCriteria
                     . 'Existing join: "%s". New join: "%s".',
                     $path,
                     (string)$existingJoin,
-                    (string)(new Join($joinType, $join, $conditionType, $condition, $indexBy))
+                    (string)(new Join($joinType, $join, null, $conditionType, $condition, $indexBy))
                 )
             );
         }
