@@ -329,7 +329,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             if (count($pkColumns) > 1) {
                 // TODO This restriction should be removed in scope of https://magecore.atlassian.net/browse/BAP-9815
                 throw new InvalidRelationEntityException(
-                    sprintf('Entity class %s has not single primary key.', $entityName)
+                    sprintf('Entity class %s has composite primary key.', $entityName)
                 );
             }
         }
