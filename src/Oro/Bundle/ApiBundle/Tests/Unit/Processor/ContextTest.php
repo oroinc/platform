@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -116,11 +120,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($headers->get($key1));
         $this->assertNull($headers[$key1]);
 
-        $this->assertEquals(1, count($headers));
+        $this->assertCount(1, $headers);
         $this->assertEquals([$key1 => null], $headers->toArray());
 
         $headers->clear();
-        $this->assertEquals(0, count($headers));
+        $this->assertCount(0, $headers);
     }
 
     /**
@@ -179,11 +183,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($headers->get($key1));
         $this->assertNull($headers[$key1]);
 
-        $this->assertEquals(1, count($headers));
+        $this->assertCount(1, $headers);
         $this->assertEquals([$key1 => null], $headers->toArray());
 
         $headers->clear();
-        $this->assertEquals(0, count($headers));
+        $this->assertCount(0, $headers);
     }
 
     public function testResponseStatusCode()
@@ -215,7 +219,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             new TestConfigExtra('extra1')
         ];
 
-        $config         = ConfigUtil::getInitialConfig();
+        $config = new EntityDefinitionConfig();
+        $config->setExcludeAll();
         $section1Config = ['test'];
 
         $this->context->setVersion($version);
@@ -232,10 +237,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 $configExtras
             )
             ->willReturn(
-                [
-                    ConfigUtil::DEFINITION => $config,
-                    'section1' => $section1Config
-                ]
+                $this->getConfig(
+                    [
+                        ConfigUtil::DEFINITION => $config,
+                        'section1'             => $section1Config
+                    ]
+                )
             );
 
         // test that a config is not loaded yet
@@ -272,7 +279,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             new TestConfigSection('section2')
         ];
 
-        $config         = ConfigUtil::getInitialConfig();
+        $config = new EntityDefinitionConfig();
+        $config->setExcludeAll();
         $section1Config = ['test'];
 
         $this->context->setVersion($version);
@@ -289,10 +297,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 $configExtras
             )
             ->willReturn(
-                [
-                    ConfigUtil::DEFINITION => $config,
-                    'section1' => $section1Config
-                ]
+                $this->getConfig(
+                    [
+                        ConfigUtil::DEFINITION => $config,
+                        'section1'             => $section1Config
+                    ]
+                )
             );
 
         // test that a config is not loaded yet
@@ -330,7 +340,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigWhenItIsSetExplicitly()
     {
-        $config = ConfigUtil::getInitialConfig();
+        $config = new EntityDefinitionConfig();
+        $config->setExcludeAll();
 
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
@@ -417,17 +428,19 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadKnownSectionConfigByGetConfigOf($configSection)
     {
-        $mainConfig    = ConfigUtil::getInitialConfig();
-        $sectionConfig = ConfigUtil::getInitialConfig();
+        $mainConfig    = new EntityDefinitionConfig();
+        $sectionConfig = [];
 
-        $mainConfig[ConfigUtil::FIELDS]['field1']    = null;
-        $mainConfig[ConfigUtil::FIELDS]['field2']    = null;
+        $mainConfig->addField('field1');
+        $mainConfig->addField('field2');
         $sectionConfig[ConfigUtil::FIELDS]['field1'] = null;
 
-        $config = [
-            ConfigUtil::DEFINITION => $mainConfig,
-            $configSection => $sectionConfig
-        ];
+        $config = $this->getConfig(
+            [
+                ConfigUtil::DEFINITION => $mainConfig,
+                $configSection         => $sectionConfig
+            ]
+        );
 
         $this->context->setClassName('Test\Class');
         // set "known" sections
@@ -463,10 +476,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider configSectionProvider
      */
-    public function testConfigWhenIsSetExplicitlyForKnownSection($configSection)
+    public function testConfigWhenIsSetExplicitlyForKnownSection($configSection, $sectionConfig)
     {
-        $sectionConfig = ConfigUtil::getInitialConfig();
-
         $this->context->setClassName('Test\Class');
         // set "known" sections
         $this->context->setConfigExtras([new FiltersConfigExtra(), new SortersConfigExtra()]);
@@ -494,8 +505,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function configSectionProvider()
     {
         return [
-            [FiltersConfigExtra::NAME],
-            [SortersConfigExtra::NAME]
+            [FiltersConfigExtra::NAME, new FiltersConfig()],
+            [SortersConfigExtra::NAME, new SortersConfig()]
         ];
     }
 
@@ -590,7 +601,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             new TestConfigSection('section2')
         ];
 
-        $config         = ConfigUtil::getInitialConfig();
+        $config         = new EntityDefinitionConfig();
         $metadata       = new EntityMetadata();
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
@@ -608,7 +619,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 [$requestType],
                 $configExtras
             )
-            ->willReturn([ConfigUtil::DEFINITION => $config]);
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
         $this->metadataProvider->expects($this->once())
             ->method('getMetadata')
             ->with(
@@ -759,5 +770,20 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->resetErrors();
         $this->assertFalse($this->context->hasErrors());
         $this->assertSame([], $this->context->getErrors());
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return Config
+     */
+    protected function getConfig(array $data = [])
+    {
+        $result = new Config();
+        foreach ($data as $sectionName => $config) {
+            $result->set($sectionName, $config);
+        }
+
+        return $result;
     }
 }
