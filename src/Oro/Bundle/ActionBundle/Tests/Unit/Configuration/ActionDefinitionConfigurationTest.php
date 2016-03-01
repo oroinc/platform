@@ -71,6 +71,7 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'exclude_entities' => [],
                     'routes' => [],
                     'groups' => [],
+                    'for_all_datagrids' => false,
                     'datagrids' => [],
                     'order' => 0,
                     'enabled' => true,
@@ -105,6 +106,7 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                         'exclude_entities' => ['Entity3'],
                         'routes' => ['route_1', 'route_2'],
                         'groups' => ['group_1', 'group_2'],
+                        'for_all_datagrids' => true,
                         'datagrids' => ['datagrid_1', 'datagrid_2'],
                         'order' => 15,
                         'enabled' => false,
@@ -176,6 +178,7 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'exclude_entities' => ['Entity3'],
                     'routes' => ['route_1', 'route_2'],
                     'groups' => ['group_1', 'group_2'],
+                    'for_all_datagrids' => true,
                     'datagrids' => ['datagrid_1', 'datagrid_2'],
                     'order' => 15,
                     'enabled' => false,
@@ -204,7 +207,9 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                         'template' => 'template',
                         'title' => 'dialog title',
                         'options' => ['width' => 400],
-                        'confirmation' => 'Confirmation message',
+                        'confirmation' => [
+                            'message' => 'Confirmation message',
+                        ],
                         'show_dialog' => false
                     ],
                     'button_options' => [
