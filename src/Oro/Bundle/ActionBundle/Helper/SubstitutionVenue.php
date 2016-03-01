@@ -6,24 +6,18 @@ use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 
 class SubstitutionVenue
 {
-
     const SUBSTITUTION_PATH_MAX_DEPTH = 10;
 
-    /**
-     * @var array
-     */
+    /* @var array */
     private $map;
-    /**
-     * @var bool
-     */
+
+    /* @var bool */
     private $ignoreCircularReferences;
-    /**
-     * @var bool
-     */
+
+    /* @var bool */
     private $clearUnboundedSubstitutions;
-    /**
-     * @var int
-     */
+
+    /* @var int */
     private $maxDepth;
 
     /**
@@ -50,6 +44,7 @@ class SubstitutionVenue
     public function substitute(array $things)
     {
         $this->apply($things);
+
         return $things;
     }
 
@@ -131,7 +126,6 @@ class SubstitutionVenue
      * @param int $depth
      * @return string the key of last found point
      * @throws CircularReferenceException
-     * @internal int $depth
      */
     private function lookUpReplacements(array &$map, $key, $maxDepth, $depth = 1)
     {
@@ -170,6 +164,7 @@ class SubstitutionVenue
             self::assertNoCircularReferences($map);
         }
         $this->map = $map;
+
         return $this;
     }
 

@@ -370,10 +370,10 @@ class ActionTest extends \PHPUnit_Framework_TestCase
      * @param bool $expected
      */
     public function testIsUnboundSubstitution(
-        $groups,
-        $datagrigs,
-        $entities,
-        $excludeEntities,
+        array $groups,
+        array $datagrigs,
+        array $entities,
+        array $excludeEntities,
         $isForAllEntities,
         $substitution,
         $expected

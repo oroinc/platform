@@ -21,9 +21,7 @@ class ActionRegistry
     /** @var array|Action[] */
     protected $actions;
 
-    /**
-     * @var SubstitutionVenue
-     */
+    /* @var SubstitutionVenue */
     protected $substitution;
 
     /**
