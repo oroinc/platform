@@ -105,24 +105,6 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ResultRecord $record
-     * @param $actions
-     * @param array $expectedActions
-     *
-     * @dataProvider getActionsPermissionsProvider
-     */
-    public function testGetActionsPermissions(ResultRecord $record, $actions, array $expectedActions)
-    {
-        $this->manager->expects($this->any())
-            ->method('getActions')
-            ->willReturn($actions);
-
-        $this->extension->isApplicable(DatagridConfiguration::create(['name' => 'datagrid_name']));
-
-        $this->assertEquals($expectedActions, $this->extension->getActionsPermissions($record));
-    }
-
-    /**
      * @return array
      */
     public function isApplicableProvider()
@@ -143,6 +125,36 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $action2ResultConfig = [
+            'type' => 'action-widget',
+            'label' => null,
+            'rowAction' => false,
+            'link' => '#',
+            'icon' => 'edit',
+            'options' => [
+                'actionName' => 'test_action',
+                'entityClass' => null,
+                'datagrid' => null,
+                'confirmation' => '',
+                'showDialog' => null,
+                'executionRoute' => null,
+                'dialogRoute' => null,
+                'dialogOptions' => [
+                    'title' => null,
+                    'dialogOptions' => []
+                ]
+            ]
+        ];
+
+        $action3 = $this->createAction(
+            'action3',
+            true,
+            [
+                'getName' => 'action3',
+                'getLabel' => 'Action 3 label'
+            ]
+        );
+
         return [
             'applicable with provider' => [
                 'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
@@ -160,6 +172,14 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                     'mass_actions' => ['test_action' => ['label' => 'test_mass_action_label']]
                 ]
             ],
+            'should not replace existing default action' => [
+                'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
+                'actions' => [$action3, $action2],
+                'expected' => true,
+                'expectedConfiguration' => [
+                    'actions' => ['action3' => ['label' => 'default action3'], 'test_action' => $action2ResultConfig]
+                ]
+            ],
             'not applicable' => [
                 'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
                 'actions' => [],
@@ -167,6 +187,25 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @param ResultRecord $record
+     * @param $actions
+     * @param array $expectedActions
+     *
+     * @dataProvider getActionsPermissionsProvider
+     */
+    public function testGetActionsPermissions(ResultRecord $record, $actions, array $expectedActions)
+    {
+        $this->manager->expects($this->any())
+            ->method('getActions')
+            ->willReturn($actions);
+
+        $this->extension->isApplicable(DatagridConfiguration::create(['name' => 'datagrid_name']));
+
+        $this->assertEquals($expectedActions, $this->extension->getActionsPermissions($record));
+    }
+
 
     /**
      * @return array
