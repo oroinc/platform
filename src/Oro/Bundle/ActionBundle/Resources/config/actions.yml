@@ -11,6 +11,7 @@ actions:
         acl_resource: [EDIT, $.data]
         order: 10
         for_all_entities: true
+        for_all_datagrids: true
         groups:
             - view_navButtons
             - datagridRowAction
@@ -38,6 +39,7 @@ actions:
         acl_resource: [DELETE, $.data]
         order: 20
         for_all_entities: true
+        for_all_datagrids: true
         groups:
             - view_navButtons
             - update_navButtons

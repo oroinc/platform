@@ -110,6 +110,8 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
      * @param ResultRecord $record
      * @param $actions
      * @param array $expectedActions
+     * @param array $context
+     * @param array $groups
      *
      * @dataProvider getRowConfigurationProvider
      */
@@ -121,6 +123,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     ) {
         $this->manager->expects($this->any())
             ->method('getActions')
+            ->with($context, false)
             ->willReturn($actions);
 
         $this->extension->isApplicable($datagridConfig);
@@ -217,6 +220,15 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 1]),
                 'actions' => [],
                 'expectedActions' => [],
+                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
+                'groups' => null,
+            ],
+            'no actions and group1' => [
+                'record' => new ResultRecord(['id' => 1]),
+                'actions' => [],
+                'expectedActions' => [],
+                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => ['group1']],
+                'groups' => ['group1'],
             ],
             '2 allowed actions' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
