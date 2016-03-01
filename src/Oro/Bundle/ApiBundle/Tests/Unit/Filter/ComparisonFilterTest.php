@@ -82,8 +82,8 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
             'empty filter' => [
                 'fieldName',  //fieldName
                 true, //isArrayAllowed
-                null, //new FilterValue('path', null, null), //filter
-                new Criteria()  // expectation
+                null, //filter
+                new Criteria() //expectation
             ],
             'EQ filter' => [
                 'fieldName',

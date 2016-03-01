@@ -22,19 +22,17 @@ class FieldVisitorTest extends \PHPUnit_Framework_TestCase
 
     public function testWalkComparison()
     {
-        $this->assertEmpty($this->getObjectAttribute($this->fieldVisitor, 'fields'));
+        $this->assertEmpty($this->fieldVisitor->getFields());
 
         $this->fieldVisitor->walkComparison(new Comparison('fieldName', Comparison::EQ, 'value'));
 
+        $this->assertCount(1, $this->fieldVisitor->getFields());
         $this->assertSame(['fieldName'], $this->fieldVisitor->getFields());
-
-        $this->assertCount(1, $this->getObjectAttribute($this->fieldVisitor, 'fields'));
-        $this->assertArrayHasKey('fieldName', $this->getObjectAttribute($this->fieldVisitor, 'fields'));
     }
 
     public function testWalkCompositeExpression()
     {
-        $this->assertEmpty($this->getObjectAttribute($this->fieldVisitor, 'fields'));
+        $this->assertEmpty($this->fieldVisitor->getFields());
 
         $this->fieldVisitor->walkCompositeExpression(
             new CompositeExpression(
@@ -46,11 +44,9 @@ class FieldVisitorTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertSame(['fieldName1', 'fieldName2'], $this->fieldVisitor->getFields());
+        $fields = $this->fieldVisitor->getFields();
 
-        $fields = $this->getObjectAttribute($this->fieldVisitor, 'fields');
         $this->assertCount(2, $fields);
-        $this->assertArrayHasKey('fieldName1', $fields);
-        $this->assertArrayHasKey('fieldName2', $fields);
+        $this->assertSame(['fieldName1', 'fieldName2'], $fields);
     }
 }

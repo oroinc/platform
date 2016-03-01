@@ -10,6 +10,7 @@ class ChainFilterFactoryTest extends \PHPUnit_Framework_TestCase
     /** @var ChainFilterFactory */
     protected $filterFactory;
 
+    /** @var SimpleFilterFactory */
     protected $simpleFilterFactory;
 
     /**
@@ -29,28 +30,16 @@ class ChainFilterFactoryTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testAddFilterFactory()
+    public function testAddCreateFilterFactory()
     {
-        /**
-         * test Add factory
-         */
         $this->filterFactory->addFilterFactory($this->simpleFilterFactory);
 
-        $this->assertCount(1, $this->getObjectAttribute($this->filterFactory, 'factories'));
-        $this->assertInstanceOf(
-            '\Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory',
-            $this->getObjectAttribute($this->filterFactory, 'factories')[0]
-        );
-
-        /**
-         * test Create filter
-         */
         $filters = $this->getFilters();
         foreach ($filters as $filter) {
-            list($type, $className, $exists) = $filter;
+            list($type, , $exists) = $filter;
 
             if ($exists) {
-                $this->assertInstanceOf($className, $this->filterFactory->createFilter($type));
+                $this->assertNotNull($this->filterFactory->createFilter($type));
             } else {
                 $this->assertNull($this->filterFactory->createFilter($type));
             }

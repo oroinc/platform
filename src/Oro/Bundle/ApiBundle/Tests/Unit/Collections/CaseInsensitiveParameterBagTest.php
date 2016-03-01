@@ -40,11 +40,11 @@ class CaseInsensitiveParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, $this->caseInsensitiveParameterBag->get(ucfirst($key)));
         $this->assertSame($value, $this->caseInsensitiveParameterBag->get(ucwords($key)));
 
-        $this->assertCount(1, $this->readAttribute($this->caseInsensitiveParameterBag, 'items'));
+        $this->assertCount(1, $this->caseInsensitiveParameterBag->toArray());
 
         $this->caseInsensitiveParameterBag->remove($key);
 
-        $this->assertCount(0, $this->readAttribute($this->caseInsensitiveParameterBag, 'items'));
+        $this->assertCount(0, $this->caseInsensitiveParameterBag->toArray());
     }
 
     public function caseDataProvider()
