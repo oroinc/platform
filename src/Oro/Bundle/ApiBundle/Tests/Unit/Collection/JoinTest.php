@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Collections;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\Join;
 
