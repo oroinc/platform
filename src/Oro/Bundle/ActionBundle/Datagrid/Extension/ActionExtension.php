@@ -50,7 +50,7 @@ class ActionExtension extends AbstractExtension
     ) {
         $this->actionManager = $actionManager;
         $this->contextHelper = $contextHelper;
-        $this->applicationsHelper = $applicationHelper;
+        $this->applicationHelper = $applicationHelper;
         $this->providerRegistry = $providerRegistry;
     }
 
@@ -141,33 +141,46 @@ class ActionExtension extends AbstractExtension
         $actionsConfig = $config->offsetGetOr('actions', []);
 
         foreach ($this->actions as $action) {
-            $buttonOptions = $action->getDefinition()->getButtonOptions();
-            $frontendOptions = $action->getDefinition()->getFrontendOptions();
-
-            $actionsConfig[$action->getName()] = [
-                'type' => 'action-widget',
-                'label' => $action->getDefinition()->getLabel(),
-                'rowAction' => false,
-                'link' => '#',
-                'icon' => !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit',
-                'options' => [
-                    'actionName' => $action->getName(),
-                    'entityClass' => $this->datagridContext['entityClass'],
-                    'datagrid' => $this->datagridContext['datagrid'],
-                    'confirmation' =>  !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '',
-                    'showDialog' => $action->hasForm(),
-                    'executionRoute' => $this->applicationsHelper->getExecutionRoute(),
-                    'dialogRoute' => $this->applicationsHelper->getDialogRoute(),
-                    'dialogOptions' => [
-                        'title' => $action->getDefinition()->getLabel(),
-                        'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
-                    ],
-                    'translates' => [],
-                ]
-            ];
+            $actionName = strtolower($action->getName());
+            if (!array_key_exists($actionName, $actionsConfig)) {
+                $actionsConfig[$actionName] = $this->getRowsActionsConfig($action);
+            }
         }
 
         $config->offsetSet('actions', $actionsConfig);
+    }
+
+    /**
+     * @param Action $action
+     * @return array
+     */
+    protected function getRowsActionsConfig(Action $action)
+    {
+        $buttonOptions = $action->getDefinition()->getButtonOptions();
+        $frontendOptions = $action->getDefinition()->getFrontendOptions();
+        $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
+        $confirmation = !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '';
+
+        return [
+            'type' => 'action-widget',
+            'label' => $action->getDefinition()->getLabel(),
+            'rowAction' => false,
+            'link' => '#',
+            'icon' => $icon,
+            'options' => [
+                'actionName' => $action->getName(),
+                'entityClass' => $this->datagridContext['entityClass'],
+                'datagrid' => $this->datagridContext['datagrid'],
+                'confirmation' => $confirmation,
+                'showDialog' => $action->hasForm(),
+                'executionRoute' => $this->applicationHelper->getExecutionRoute(),
+                'dialogRoute' => $this->applicationHelper->getDialogRoute(),
+                'dialogOptions' => [
+                    'title' => $action->getDefinition()->getLabel(),
+                    'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
+                ]
+            ]
+        ];
     }
 
     /**
@@ -210,7 +223,7 @@ class ActionExtension extends AbstractExtension
         $entityClass = $config->offsetGetByPath('[extended_entity_name]');
 
         return [
-            'entityClass' => $entityClass ? : $config->offsetGetByPath('[entity_name]'),
+            'entityClass' => $entityClass ?: $config->offsetGetByPath('[entity_name]'),
             'datagrid' => $config->offsetGetByPath('[name]'),
         ];
     }

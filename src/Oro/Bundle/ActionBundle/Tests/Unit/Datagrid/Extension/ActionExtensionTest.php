@@ -149,9 +149,18 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $action3 = $this->createAction(
+            'action3',
+            true,
+            [
+                'getName' => 'action3',
+                'getLabel' => 'Action 3 label'
+            ]
+        );
+
         return [
             'applicable with provider' => [
-                'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => [$action1],
                 'expected' => true,
                 'expectedConfiguration' => [
@@ -159,15 +168,34 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'applicable with single mass action' => [
-                'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => [$action2],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_action' => ['label' => 'test_mass_action_label']]
                 ]
             ],
+            'applicable with single action' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'actions' => [$action3],
+                'expected' => true,
+                'expectedConfiguration' => [
+                    'actions' => ['action3' => $this->getRowActionConfig('action3', 'datagrid1', 'Action 3 label')],
+                ]
+            ],
+            'should not replace existing default action' => [
+                'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
+                'actions' => [$action3, $action2],
+                'expected' => true,
+                'expectedConfiguration' => [
+                    'actions' => [
+                        'action3' => ['label' => 'default action3'],
+                        'test_action' => $this->getRowActionConfig('test_action'),
+                    ]
+                ]
+            ],
             'not applicable' => [
-                'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => [],
                 'expected' => false
             ]
@@ -244,6 +272,36 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                     'update' => true,
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @param string $action
+     * @param string $datagrid
+     * @param string $label
+     * @return array
+     */
+    protected function getRowActionConfig($action, $datagrid = null, $label = null)
+    {
+        return [
+            'type' => 'action-widget',
+            'label' => $label,
+            'rowAction' => false,
+            'link' => '#',
+            'icon' => 'edit',
+            'options' => [
+                'actionName' => $action,
+                'entityClass' => null,
+                'datagrid' => $datagrid,
+                'confirmation' => '',
+                'showDialog' => null,
+                'executionRoute' => null,
+                'dialogRoute' => null,
+                'dialogOptions' => [
+                    'title' => $label,
+                    'dialogOptions' => []
+                ]
+            ]
         ];
     }
 
