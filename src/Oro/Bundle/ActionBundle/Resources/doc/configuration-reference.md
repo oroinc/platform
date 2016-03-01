@@ -120,6 +120,12 @@ Single action configuration has next properties:
 * **entities**
     *array*
     Array of entity class names. Action button will be shown on view/edit pages of this entities.
+* **for_all_entities**
+    *boolean*
+    Boolean flag that determines that current action matched against all entities if any present.
+* **exclude_entities**
+    *array*
+    List of entities that should be excluded from matching against current action
 * **routes**
     *array*
     Action button will be shown on pages which route is in list.
@@ -129,6 +135,9 @@ Single action configuration has next properties:
 * **datagrids**
     *array*
     Action icon will be shown as an datagrid-action in listed datagrids.
+* **for_all_datagrids**
+    *boolean*
+    Flag that determines that current action should match for all datagrids if any present.
 * **order**
     *integer*
     Parameter that specifies the display order of actions buttons.
@@ -191,13 +200,27 @@ actions:                                             # root elements
                                                      # ...
 ```
 
+Matching and Filter Mechanism
+=============================
+
+There are config fields responsible for matching and filtering actions that corresponds to actual context call (e.g. request or place in template, etc.)
+Filters are presents in single property `groups` for now. Match properties are: among wildcards - `for_all_entities`, `for_all_datagrids` and simple comparisons: `entities`, `routes`, `datagrids`, 
+also `exclude_entities` - as reverse helper useful with wildcard `for_all_entities` defined to `true`.
+
+To be clear, filters discards all non matched actions and applied first before matchers. 
+Then, matchers, in turn, collect all actions where any of comparison met though `OR` statement. E.g. 
+ if `datagrid` `OR` `route` will be met in context as present in action config then that action will be added to list.
 
 Substitution of Action
 ======================
 
-When parameter `substitute_action` is defined and it corresponds to action name that should be displayed by default
+When parameter `substitute_action` is defined and it corresponds to other action name that should be displayed (e.g. matched by context)
 substitution happens. In other words, action that define substitution will be positioned in UI instead of action that
 defined in parameter.
+For substitutor-action (e.g. action that have `substitute_action` parameter) same matching and filter mechanisms are applied as for normal action with one difference:
+if no matching or filtering criteria are specified than that action will be matched automatically.
+But after all - actions that did not make any replacement will be cleared from output.
+
 
 Button Options Configuration
 ==============================
