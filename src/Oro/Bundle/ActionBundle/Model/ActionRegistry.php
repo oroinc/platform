@@ -3,9 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
-use Oro\Bundle\ActionBundle\Exception\ActionReferenceException;
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
-use Oro\Bundle\ActionBundle\Helper\ActionSubstitutionHelper;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\SubstitutionVenue;
 
