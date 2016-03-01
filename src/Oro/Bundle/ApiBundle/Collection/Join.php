@@ -50,6 +50,7 @@ class Join extends BaseJoin
 
     /**
      * Determines whether the given join object represents the same join statement as the current one.
+     * Please note that the join type is not a part of the comparison.
      *
      * @param Join $join
      *
